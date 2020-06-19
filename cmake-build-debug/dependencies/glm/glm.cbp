@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="glm"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\dependencies\;CMake Files\dependencies\glm\;CMake Files\dependencies\glm\glm\;CMake Files\dependencies\glfw\;CMake Files\dependencies\glfw\CMake\;CMake Files\dependencies\glfw\src\;CMake Files\dependencies\glad\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/glm"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/glm/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/glm/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/glm/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/glm/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glm/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\glm\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glm/glm/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\glm\glm\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\glfw\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/CMake/cmake_uninstall.cmake.in">
+			<Option virtualFolder="CMake Files\dependencies\glfw\CMake\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/CMake/glfw3.pc.in">
+			<Option virtualFolder="CMake Files\dependencies\glfw\CMake\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/CMake/glfw3Config.cmake.in">
+			<Option virtualFolder="CMake Files\dependencies\glfw\CMake\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/src/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\glfw\src\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/src/glfw_config.h.in">
+			<Option virtualFolder="CMake Files\dependencies\glfw\src\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glad/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\glad\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

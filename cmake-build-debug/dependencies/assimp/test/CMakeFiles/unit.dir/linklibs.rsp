@@ -1,0 +1,1 @@
+  -LC:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp  -L/lib  ../lib/libassimpd.a ../lib/libzlibstaticd.a ../lib/libIrrXMLd.a -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 

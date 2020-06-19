@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="zlib"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\dependencies\;CMake Files\dependencies\glm\;CMake Files\dependencies\glm\glm\;CMake Files\dependencies\glfw\;CMake Files\dependencies\glfw\CMake\;CMake Files\dependencies\glfw\src\;CMake Files\dependencies\glad\;CMake Files\dependencies\assimp\;CMake Files\dependencies\assimp\include\;CMake Files\dependencies\assimp\include\assimp\;CMake Files\dependencies\assimp\cmake-modules\;CMake Files\dependencies\assimp\contrib\;CMake Files\dependencies\assimp\contrib\zlib\;CMake Files\dependencies\assimp\contrib\irrXML\;CMake Files\dependencies\assimp\code\;CMake Files\dependencies\assimp\tools\;CMake Files\dependencies\assimp\tools\assimp_cmd\;CMake Files\dependencies\assimp\test\;CMake Files\dependencies\assimp\test\headercheck\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="zlibstatic">
+				<Option output="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/lib/libzlibstaticd.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DWIN32_LEAN_AND_MEAN"/>
+					<Add option="-D_LARGEFILE64_SOURCE=1"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/."/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glm"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glad/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++/i686-w64-mingw32"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++/backward"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include-fixed"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/../../../../i686-w64-mingw32/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib/Makefile&quot;  VERBOSE=1 zlibstatic"/>
+					<CompileFile command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="zlibstatic/fast">
+				<Option output="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/lib/libzlibstaticd.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DWIN32_LEAN_AND_MEAN"/>
+					<Add option="-D_LARGEFILE64_SOURCE=1"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/."/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glm"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glad/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++/i686-w64-mingw32"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++/backward"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include-fixed"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/../../../../i686-w64-mingw32/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib/Makefile&quot;  VERBOSE=1 zlibstatic/fast"/>
+					<CompileFile command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib/zconf.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/adler32.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/compress.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/crc32.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/crc32.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/deflate.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/deflate.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/gzclose.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/gzguts.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/gzlib.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/gzread.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/gzwrite.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/infback.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/inffast.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/inffast.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/inffixed.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/inflate.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/inflate.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/inftrees.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/inftrees.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/trees.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/trees.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/uncompr.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/zlib.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/zutil.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/zutil.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glm/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\glm\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glm/glm/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\glm\glm\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\glfw\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/CMake/cmake_uninstall.cmake.in">
+			<Option virtualFolder="CMake Files\dependencies\glfw\CMake\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/CMake/glfw3.pc.in">
+			<Option virtualFolder="CMake Files\dependencies\glfw\CMake\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/CMake/glfw3Config.cmake.in">
+			<Option virtualFolder="CMake Files\dependencies\glfw\CMake\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/src/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\glfw\src\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/src/glfw_config.h.in">
+			<Option virtualFolder="CMake Files\dependencies\glfw\src\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glad/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\glad\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\assimp\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/assimp-config-version.cmake.in">
+			<Option virtualFolder="CMake Files\dependencies\assimp\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/assimp-config.cmake.in">
+			<Option virtualFolder="CMake Files\dependencies\assimp\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/assimp.pc.in">
+			<Option virtualFolder="CMake Files\dependencies\assimp\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/assimpTargets-debug.cmake.in">
+			<Option virtualFolder="CMake Files\dependencies\assimp\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/assimpTargets.cmake.in">
+			<Option virtualFolder="CMake Files\dependencies\assimp\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/revision.h.in">
+			<Option virtualFolder="CMake Files\dependencies\assimp\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/config.h.in">
+			<Option virtualFolder="CMake Files\dependencies\assimp\include\assimp\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/cmake-modules/FindPkgMacros.cmake">
+			<Option virtualFolder="CMake Files\dependencies\assimp\cmake-modules\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/cmake-modules/FindRT.cmake">
+			<Option virtualFolder="CMake Files\dependencies\assimp\cmake-modules\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/cmake-modules/FindZLIB.cmake">
+			<Option virtualFolder="CMake Files\dependencies\assimp\cmake-modules\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/cmake-modules/PrecompiledHeader.cmake">
+			<Option virtualFolder="CMake Files\dependencies\assimp\cmake-modules\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\assimp\contrib\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\assimp\contrib\zlib\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/zconf.h.cmakein">
+			<Option virtualFolder="CMake Files\dependencies\assimp\contrib\zlib\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/zlib.pc.cmakein">
+			<Option virtualFolder="CMake Files\dependencies\assimp\contrib\zlib\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/irrXML/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\assimp\contrib\irrXML\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\assimp\code\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/tools/assimp_cmd/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\assimp\tools\assimp_cmd\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\assimp\test\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/headercheck/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\assimp\test\headercheck\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

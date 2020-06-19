@@ -1,0 +1,2558 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="Assimp"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\dependencies\;CMake Files\dependencies\glm\;CMake Files\dependencies\glm\glm\;CMake Files\dependencies\glfw\;CMake Files\dependencies\glfw\CMake\;CMake Files\dependencies\glfw\src\;CMake Files\dependencies\glad\;CMake Files\dependencies\assimp\;CMake Files\dependencies\assimp\include\;CMake Files\dependencies\assimp\include\assimp\;CMake Files\dependencies\assimp\cmake-modules\;CMake Files\dependencies\assimp\contrib\;CMake Files\dependencies\assimp\contrib\zlib\;CMake Files\dependencies\assimp\contrib\irrXML\;CMake Files\dependencies\assimp\code\;CMake Files\dependencies\assimp\tools\;CMake Files\dependencies\assimp\tools\assimp_cmd\;CMake Files\dependencies\assimp\test\;CMake Files\dependencies\assimp\test\headercheck\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="zlibstatic">
+				<Option output="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/lib/libzlibstaticd.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DWIN32_LEAN_AND_MEAN"/>
+					<Add option="-D_LARGEFILE64_SOURCE=1"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/."/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glm"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glad/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++/i686-w64-mingw32"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++/backward"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include-fixed"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/../../../../i686-w64-mingw32/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib/Makefile&quot;  VERBOSE=1 zlibstatic"/>
+					<CompileFile command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="zlibstatic/fast">
+				<Option output="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/lib/libzlibstaticd.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DWIN32_LEAN_AND_MEAN"/>
+					<Add option="-D_LARGEFILE64_SOURCE=1"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/."/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glm"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glad/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++/i686-w64-mingw32"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++/backward"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include-fixed"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/../../../../i686-w64-mingw32/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib/Makefile&quot;  VERBOSE=1 zlibstatic/fast"/>
+					<CompileFile command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="IrrXML">
+				<Option output="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/lib/libIrrXMLd.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/irrXML"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DWIN32_LEAN_AND_MEAN"/>
+					<Add option="-DASSIMP_BUILD_NO_C4D_IMPORTER"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/."/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glm"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glad/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++/i686-w64-mingw32"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++/backward"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include-fixed"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/../../../../i686-w64-mingw32/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/irrXML/Makefile&quot;  VERBOSE=1 IrrXML"/>
+					<CompileFile command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/irrXML/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/irrXML/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/irrXML/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="IrrXML/fast">
+				<Option output="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/lib/libIrrXMLd.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/irrXML"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DWIN32_LEAN_AND_MEAN"/>
+					<Add option="-DASSIMP_BUILD_NO_C4D_IMPORTER"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/."/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glm"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glad/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++/i686-w64-mingw32"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++/backward"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include-fixed"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/../../../../i686-w64-mingw32/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/irrXML/Makefile&quot;  VERBOSE=1 IrrXML/fast"/>
+					<CompileFile command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/irrXML/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/irrXML/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/irrXML/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="assimp">
+				<Option output="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/lib/libassimpd.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/code"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DWIN32_LEAN_AND_MEAN"/>
+					<Add option="-DASSIMP_BUILD_NO_C4D_IMPORTER"/>
+					<Add option="-DMINIZ_USE_UNALIGNED_LOADS_AND_STORES=0"/>
+					<Add option="-DASSIMP_BUILD_DLL_EXPORT"/>
+					<Add option="-DOPENDDLPARSER_BUILD"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/."/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glm"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glad/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/../contrib/rapidjson/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/../contrib"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/../contrib/unzip"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/irrXML"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/../contrib/openddlparser/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/../include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/code/../include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/.."/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++/i686-w64-mingw32"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++/backward"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include-fixed"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/../../../../i686-w64-mingw32/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/code/Makefile&quot;  VERBOSE=1 assimp"/>
+					<CompileFile command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/code/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/code/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/code/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="assimp/fast">
+				<Option output="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/lib/libassimpd.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/code"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DWIN32_LEAN_AND_MEAN"/>
+					<Add option="-DASSIMP_BUILD_NO_C4D_IMPORTER"/>
+					<Add option="-DMINIZ_USE_UNALIGNED_LOADS_AND_STORES=0"/>
+					<Add option="-DASSIMP_BUILD_DLL_EXPORT"/>
+					<Add option="-DOPENDDLPARSER_BUILD"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/."/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glm"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glad/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/../contrib/rapidjson/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/../contrib"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/../contrib/unzip"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/irrXML"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/../contrib/openddlparser/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/../include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/code/../include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/.."/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++/i686-w64-mingw32"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++/backward"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include-fixed"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/../../../../i686-w64-mingw32/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/code/Makefile&quot;  VERBOSE=1 assimp/fast"/>
+					<CompileFile command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/code/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/code/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/code/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="assimp_cmd">
+				<Option output="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/bin/assimpd.exe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DWIN32_LEAN_AND_MEAN"/>
+					<Add option="-DASSIMP_BUILD_NO_C4D_IMPORTER"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/."/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glm"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glad/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/tools/assimp_cmd"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/../include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/code/../include"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++/i686-w64-mingw32"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++/backward"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include-fixed"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/../../../../i686-w64-mingw32/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/tools/assimp_cmd/Makefile&quot;  VERBOSE=1 assimp_cmd"/>
+					<CompileFile command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/tools/assimp_cmd/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/tools/assimp_cmd/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/tools/assimp_cmd/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="assimp_cmd/fast">
+				<Option output="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/bin/assimpd.exe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DWIN32_LEAN_AND_MEAN"/>
+					<Add option="-DASSIMP_BUILD_NO_C4D_IMPORTER"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/."/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glm"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glad/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/tools/assimp_cmd"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/../include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/code/../include"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++/i686-w64-mingw32"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++/backward"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include-fixed"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/../../../../i686-w64-mingw32/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/tools/assimp_cmd/Makefile&quot;  VERBOSE=1 assimp_cmd/fast"/>
+					<CompileFile command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/tools/assimp_cmd/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/tools/assimp_cmd/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/tools/assimp_cmd/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="unit">
+				<Option output="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/bin/unit.exe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DWIN32_LEAN_AND_MEAN"/>
+					<Add option="-DASSIMP_BUILD_NO_C4D_IMPORTER"/>
+					<Add option="-DASSIMP_TEST_MODELS_DIR=&quot;C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/models&quot;"/>
+					<Add option="-DASSIMP_TEST_MODELS_NONBSD_DIR=&quot;C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/models-nonbsd&quot;"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/."/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glm"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glad/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/gtest/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/gtest"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/../include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/code/../include"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++/i686-w64-mingw32"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++/backward"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include-fixed"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/../../../../i686-w64-mingw32/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/test/Makefile&quot;  VERBOSE=1 unit"/>
+					<CompileFile command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="unit/fast">
+				<Option output="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/bin/unit.exe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DWIN32_LEAN_AND_MEAN"/>
+					<Add option="-DASSIMP_BUILD_NO_C4D_IMPORTER"/>
+					<Add option="-DASSIMP_TEST_MODELS_DIR=&quot;C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/models&quot;"/>
+					<Add option="-DASSIMP_TEST_MODELS_NONBSD_DIR=&quot;C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/models-nonbsd&quot;"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/."/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glm"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glad/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/gtest/include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/gtest"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/../include"/>
+					<Add directory="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/code/../include"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++/i686-w64-mingw32"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include/c++/backward"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/include-fixed"/>
+					<Add directory="C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/../lib/gcc/i686-w64-mingw32/8.1.0/../../../../i686-w64-mingw32/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/test/Makefile&quot;  VERBOSE=1 unit/fast"/>
+					<CompileFile command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~2/MINGW-~1/I686-8~1.0-P/mingw32/bin/mingw32-make.exe -f &quot;C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/contrib/zlib/zconf.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/cmake-build-debug/dependencies/assimp/include/assimp/config.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/3DS/3DSConverter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/3DS/3DSExporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/3DS/3DSExporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/3DS/3DSHelper.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/3DS/3DSLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/3DS/3DSLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/3MF/3MFXmlTags.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/3MF/D3MFExporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/3MF/D3MFExporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/3MF/D3MFImporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/3MF/D3MFImporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/3MF/D3MFOpcPackage.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/3MF/D3MFOpcPackage.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/AC/ACLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/AC/ACLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/AMF/AMFImporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/AMF/AMFImporter.hpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/AMF/AMFImporter_Geometry.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/AMF/AMFImporter_Macro.hpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/AMF/AMFImporter_Material.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/AMF/AMFImporter_Node.hpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/AMF/AMFImporter_Postprocess.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/ASE/ASELoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/ASE/ASELoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/ASE/ASEParser.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/ASE/ASEParser.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Assbin/AssbinExporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Assbin/AssbinExporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Assbin/AssbinFileWriter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Assbin/AssbinFileWriter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Assbin/AssbinLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Assbin/AssbinLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Assjson/cencode.c">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Assjson/cencode.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Assjson/json_exporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Assjson/mesh_splitter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Assjson/mesh_splitter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Assxml/AssxmlExporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Assxml/AssxmlExporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Assxml/AssxmlFileWriter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Assxml/AssxmlFileWriter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/B3D/B3DImporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/B3D/B3DImporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/BVH/BVHLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/BVH/BVHLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Blender/BlenderBMesh.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Blender/BlenderBMesh.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Blender/BlenderCustomData.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Blender/BlenderCustomData.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Blender/BlenderDNA.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Blender/BlenderDNA.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Blender/BlenderDNA.inl">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Blender/BlenderIntermediate.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Blender/BlenderLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Blender/BlenderLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Blender/BlenderModifier.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Blender/BlenderModifier.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Blender/BlenderScene.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Blender/BlenderScene.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Blender/BlenderSceneGen.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Blender/BlenderTessellator.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Blender/BlenderTessellator.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/COB/COBLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/COB/COBLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/COB/COBScene.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/CSM/CSMLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/CSM/CSMLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Collada/ColladaExporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Collada/ColladaExporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Collada/ColladaHelper.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Collada/ColladaHelper.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Collada/ColladaLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Collada/ColladaLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Collada/ColladaParser.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Collada/ColladaParser.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/DXF/DXFHelper.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/DXF/DXFLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/DXF/DXFLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXAnimation.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXBinaryTokenizer.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXCommon.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXCompileConfig.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXConverter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXConverter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXDeformer.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXDocument.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXDocument.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXDocumentUtil.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXDocumentUtil.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXExportNode.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXExportNode.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXExportProperty.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXExportProperty.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXExporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXExporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXImportSettings.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXImporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXImporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXMaterial.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXMeshGeometry.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXMeshGeometry.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXModel.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXNodeAttribute.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXParser.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXParser.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXProperties.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXProperties.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXTokenizer.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXTokenizer.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXUtil.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/FBX/FBXUtil.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/HMP/HMPFileData.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/HMP/HMPLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/HMP/HMPLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/HMP/HalfLifeFileData.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/IFC/IFCBoolean.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/IFC/IFCCurve.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/IFC/IFCGeometry.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/IFC/IFCLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/IFC/IFCLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/IFC/IFCMaterial.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/IFC/IFCOpenings.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/IFC/IFCProfile.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/IFC/IFCReaderGen1_2x3.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/IFC/IFCReaderGen2_2x3.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/IFC/IFCReaderGen_2x3.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/IFC/IFCUtil.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/IFC/IFCUtil.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Irr/IRRLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Irr/IRRLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Irr/IRRMeshLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Irr/IRRMeshLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Irr/IRRShared.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Irr/IRRShared.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/LWO/LWOAnimation.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/LWO/LWOAnimation.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/LWO/LWOBLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/LWO/LWOFileData.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/LWO/LWOLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/LWO/LWOLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/LWO/LWOMaterial.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/LWS/LWSLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/LWS/LWSLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/M3D/M3DExporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/M3D/M3DExporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/M3D/M3DImporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/M3D/M3DImporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/M3D/M3DMaterials.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/M3D/M3DWrapper.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/M3D/M3DWrapper.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/M3D/m3d.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MD2/MD2FileData.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MD2/MD2Loader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MD2/MD2Loader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MD2/MD2NormalTable.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MD3/MD3FileData.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MD3/MD3Loader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MD3/MD3Loader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MD5/MD5Loader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MD5/MD5Loader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MD5/MD5Parser.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MD5/MD5Parser.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MDC/MDCFileData.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MDC/MDCLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MDC/MDCLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MDC/MDCNormalTable.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MDL/HalfLife/HL1FileData.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MDL/HalfLife/HL1ImportDefinitions.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MDL/HalfLife/HL1ImportSettings.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MDL/HalfLife/HL1MDLLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MDL/HalfLife/HL1MDLLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MDL/HalfLife/HL1MeshTrivert.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MDL/HalfLife/HalfLifeMDLBaseHeader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MDL/HalfLife/LogFunctions.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MDL/HalfLife/UniqueNameGenerator.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MDL/HalfLife/UniqueNameGenerator.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MDL/MDLDefaultColorMap.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MDL/MDLFileData.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MDL/MDLLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MDL/MDLLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MDL/MDLMaterialLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MMD/MMDCpp14.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MMD/MMDImporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MMD/MMDImporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MMD/MMDPmdParser.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MMD/MMDPmxParser.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MMD/MMDPmxParser.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MMD/MMDVmdParser.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MS3D/MS3DLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/MS3D/MS3DLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/NDO/NDOLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/NDO/NDOLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/NFF/NFFLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/NFF/NFFLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/OFF/OFFLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/OFF/OFFLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Obj/ObjExporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Obj/ObjExporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Obj/ObjFileData.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Obj/ObjFileImporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Obj/ObjFileImporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Obj/ObjFileMtlImporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Obj/ObjFileMtlImporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Obj/ObjFileParser.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Obj/ObjFileParser.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Obj/ObjTools.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Ogre/OgreBinarySerializer.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Ogre/OgreBinarySerializer.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Ogre/OgreImporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Ogre/OgreImporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Ogre/OgreMaterial.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Ogre/OgreParsingUtils.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Ogre/OgreStructs.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Ogre/OgreStructs.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Ogre/OgreXmlSerializer.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Ogre/OgreXmlSerializer.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/OpenGEX/OpenGEXExporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/OpenGEX/OpenGEXExporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/OpenGEX/OpenGEXImporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/OpenGEX/OpenGEXImporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/OpenGEX/OpenGEXStructs.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Ply/PlyExporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Ply/PlyExporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Ply/PlyLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Ply/PlyLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Ply/PlyParser.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Ply/PlyParser.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Q3BSP/Q3BSPFileData.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Q3BSP/Q3BSPFileImporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Q3BSP/Q3BSPFileImporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Q3BSP/Q3BSPFileParser.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Q3BSP/Q3BSPFileParser.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Q3D/Q3DLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Q3D/Q3DLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Raw/RawLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Raw/RawLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/SIB/SIBImporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/SIB/SIBImporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/SMD/SMDLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/SMD/SMDLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/STEPParser/STEPFileEncoding.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/STEPParser/STEPFileEncoding.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/STEPParser/STEPFileReader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/STEPParser/STEPFileReader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/STL/STLExporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/STL/STLExporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/STL/STLLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/STL/STLLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Step/StepExporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Step/StepExporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Terragen/TerragenLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Terragen/TerragenLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Unreal/UnrealLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/Unreal/UnrealLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X/XFileExporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X/XFileExporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X/XFileHelper.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X/XFileImporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X/XFileImporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X/XFileParser.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X/XFileParser.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X3D/FIReader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X3D/FIReader.hpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X3D/X3DExporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X3D/X3DExporter.hpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X3D/X3DImporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X3D/X3DImporter.hpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X3D/X3DImporter_Geometry2D.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X3D/X3DImporter_Geometry3D.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X3D/X3DImporter_Group.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X3D/X3DImporter_Light.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X3D/X3DImporter_Macro.hpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X3D/X3DImporter_Metadata.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X3D/X3DImporter_Networking.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X3D/X3DImporter_Node.hpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X3D/X3DImporter_Postprocess.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X3D/X3DImporter_Rendering.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X3D/X3DImporter_Shape.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X3D/X3DImporter_Texturing.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/X3D/X3DVocabulary.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/XGL/XGLLoader.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/XGL/XGLLoader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/glTF/glTFAsset.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/glTF/glTFAsset.inl">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/glTF/glTFAssetWriter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/glTF/glTFAssetWriter.inl">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/glTF/glTFCommon.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/glTF/glTFCommon.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/glTF/glTFExporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/glTF/glTFExporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/glTF/glTFImporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/glTF/glTFImporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/glTF2/glTF2Asset.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/glTF2/glTF2Asset.inl">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/glTF2/glTF2AssetWriter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/glTF2/glTF2AssetWriter.inl">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/glTF2/glTF2Exporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/glTF2/glTF2Exporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/glTF2/glTF2Importer.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/AssetLib/glTF2/glTF2Importer.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/CApi/AssimpCExport.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/CApi/CInterfaceIOWrapper.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/CApi/CInterfaceIOWrapper.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/Assimp.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/BaseImporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/BaseProcess.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/BaseProcess.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/Bitmap.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/CreateAnimMesh.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/DefaultIOStream.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/DefaultIOSystem.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/DefaultLogger.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/DefaultProgressHandler.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/Exporter.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/FileLogStream.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/IFF.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/Importer.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/Importer.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/ImporterRegistry.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/PolyTools.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/PostStepRegistry.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/RemoveComments.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/SGSpatialSort.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/SceneCombiner.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/ScenePreprocessor.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/ScenePreprocessor.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/ScenePrivate.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/SkeletonMeshBuilder.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/SpatialSort.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/StandardShapes.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/StdOStreamLogStream.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/Subdivision.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/TargetAnimation.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/TargetAnimation.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/Version.cpp">
+			<Option target="assimp"/>
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/VertexTriangleAdjacency.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/VertexTriangleAdjacency.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/Win32DebugLogStream.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/ZipArchiveIOSystem.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/material.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/scene.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/simd.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Common/simd.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Material/MaterialSystem.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/Material/MaterialSystem.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/ArmaturePopulate.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/ArmaturePopulate.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/CalcTangentsProcess.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/CalcTangentsProcess.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/ComputeUVMappingProcess.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/ComputeUVMappingProcess.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/ConvertToLHProcess.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/ConvertToLHProcess.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/DeboneProcess.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/DeboneProcess.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/DropFaceNormalsProcess.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/DropFaceNormalsProcess.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/EmbedTexturesProcess.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/EmbedTexturesProcess.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/FindDegenerates.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/FindDegenerates.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/FindInstancesProcess.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/FindInstancesProcess.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/FindInvalidDataProcess.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/FindInvalidDataProcess.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/FixNormalsStep.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/FixNormalsStep.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/GenBoundingBoxesProcess.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/GenBoundingBoxesProcess.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/GenFaceNormalsProcess.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/GenFaceNormalsProcess.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/GenVertexNormalsProcess.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/GenVertexNormalsProcess.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/ImproveCacheLocality.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/ImproveCacheLocality.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/JoinVerticesProcess.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/JoinVerticesProcess.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/LimitBoneWeightsProcess.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/LimitBoneWeightsProcess.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/MakeVerboseFormat.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/MakeVerboseFormat.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/OptimizeGraph.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/OptimizeGraph.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/OptimizeMeshes.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/OptimizeMeshes.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/PretransformVertices.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/PretransformVertices.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/ProcessHelper.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/ProcessHelper.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/RemoveRedundantMaterials.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/RemoveRedundantMaterials.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/RemoveVCProcess.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/RemoveVCProcess.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/ScaleProcess.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/ScaleProcess.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/SortByPTypeProcess.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/SortByPTypeProcess.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/SplitByBoneCountProcess.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/SplitByBoneCountProcess.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/SplitLargeMeshes.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/SplitLargeMeshes.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/TextureTransform.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/TextureTransform.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/TriangulateProcess.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/TriangulateProcess.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/ValidateDataStructure.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/PostProcessing/ValidateDataStructure.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/clipper/clipper.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/clipper/clipper.hpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/gtest/src/gtest-all.cc">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/irrXML/CXMLReaderImpl.h">
+			<Option target="IrrXML"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/irrXML/heapsort.h">
+			<Option target="IrrXML"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/irrXML/irrArray.h">
+			<Option target="IrrXML"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/irrXML/irrString.h">
+			<Option target="IrrXML"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/irrXML/irrTypes.h">
+			<Option target="IrrXML"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/irrXML/irrXML.cpp">
+			<Option target="IrrXML"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/irrXML/irrXML.h">
+			<Option target="IrrXML"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/openddlparser/code/DDLNode.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/openddlparser/code/OpenDDLCommon.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/openddlparser/code/OpenDDLExport.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/openddlparser/code/OpenDDLParser.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/openddlparser/code/OpenDDLStream.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/openddlparser/code/Value.cpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/openddlparser/include/openddlparser/DDLNode.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/openddlparser/include/openddlparser/OpenDDLCommon.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/openddlparser/include/openddlparser/OpenDDLExport.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/openddlparser/include/openddlparser/OpenDDLParser.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/openddlparser/include/openddlparser/OpenDDLParserUtils.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/openddlparser/include/openddlparser/OpenDDLStream.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/openddlparser/include/openddlparser/Value.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/poly2tri/poly2tri/common/shapes.cc">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/poly2tri/poly2tri/common/shapes.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/poly2tri/poly2tri/common/utils.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/poly2tri/poly2tri/sweep/advancing_front.cc">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/poly2tri/poly2tri/sweep/advancing_front.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/poly2tri/poly2tri/sweep/cdt.cc">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/poly2tri/poly2tri/sweep/cdt.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/poly2tri/poly2tri/sweep/sweep.cc">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/poly2tri/poly2tri/sweep/sweep.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/poly2tri/poly2tri/sweep/sweep_context.cc">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/poly2tri/poly2tri/sweep/sweep_context.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/unzip/crypt.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/unzip/ioapi.c">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/unzip/ioapi.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/unzip/unzip.c">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/unzip/unzip.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zip/src/miniz.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zip/src/zip.c">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zip/src/zip.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/adler32.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/compress.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/crc32.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/crc32.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/deflate.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/deflate.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/gzclose.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/gzguts.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/gzlib.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/gzread.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/gzwrite.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/infback.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/inffast.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/inffast.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/inffixed.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/inflate.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/inflate.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/inftrees.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/inftrees.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/trees.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/trees.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/uncompr.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/zlib.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/zutil.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/zutil.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/BaseImporter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/Bitmap.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/BlobIOSystem.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/ByteSwapper.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/ColladaMetaData.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/Compiler/poppack1.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/Compiler/pstdint.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/Compiler/pushpack1.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/CreateAnimMesh.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/DefaultIOStream.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/DefaultIOSystem.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/DefaultLogger.hpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/Defines.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/Exceptional.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/Exporter.hpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/GenericProperty.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/Hash.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/IOStream.hpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/IOStreamBuffer.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/IOSystem.hpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/Importer.hpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/LineSplitter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/LogAux.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/LogStream.hpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/Logger.hpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/MathFunctions.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/MemoryIOWrapper.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/NullLogger.hpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/ParsingUtils.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/Profiler.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/ProgressHandler.hpp">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/RemoveComments.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/SGSpatialSort.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/SceneCombiner.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/SkeletonMeshBuilder.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/SmallVector.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/SmoothingGroups.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/SmoothingGroups.inl">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/SpatialSort.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/StandardShapes.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/StreamReader.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/StreamWriter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/StringComparison.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/StringUtils.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/Subdivision.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/TinyFormatter.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/Vertex.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/XMLTools.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/ZipArchiveIOSystem.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/aabb.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/ai_assert.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/anim.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/camera.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/cexport.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/cfileio.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/cimport.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/color4.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/color4.inl">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/commonMetaData.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/defs.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/fast_atof.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/importerdesc.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/irrXMLWrapper.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/light.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/material.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/material.inl">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/matrix3x3.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/matrix3x3.inl">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/matrix4x4.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/matrix4x4.inl">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/mesh.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/metadata.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/pbrmaterial.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/postprocess.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/qnan.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/quaternion.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/quaternion.inl">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/scene.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/texture.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/types.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/vector2.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/vector2.inl">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/vector3.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/vector3.inl">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/version.h">
+			<Option target="assimp"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/AbstractImportExportBase.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/AbstractImportExportBase.h">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/AssimpAPITest.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/AssimpAPITest_aiMatrix3x3.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/AssimpAPITest_aiMatrix4x4.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/AssimpAPITest_aiQuaternion.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/AssimpAPITest_aiVector2D.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/AssimpAPITest_aiVector3D.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/CCompilerTest.c">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/Common/uiScene.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/Common/utLineSplitter.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/Common/utSpatialSort.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/ImportExport/Assxml/utAssxmlImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/ImportExport/MDL/MDLHL1TestFiles.h">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/ImportExport/MDL/utMDLImporter_HL1_ImportSettings.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/ImportExport/MDL/utMDLImporter_HL1_Materials.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/ImportExport/MDL/utMDLImporter_HL1_Nodes.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/ImportExport/RAW/utRAWImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/ImportExport/Terragen/utTerragenImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/ImportExport/utAssjsonImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/ImportExport/utCOBImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/ImportExport/utExporter.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/ImportExport/utMD2Importer.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/ImportExport/utMD3Importer.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/ImportExport/utMD5Importer.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/ImportExport/utMDLImporter.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/ImportExport/utNFFImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/ImportExport/utOFFImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/ImportExport/utOgreImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/ImportExport/utQ3BSPFileImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/ImportExport/utXGLImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/Main.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/MathTest.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/MathTest.h">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/RandomNumberGeneration.h">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/SceneDiffer.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/SceneDiffer.h">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/TestIOSystem.h">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/TestModelFactory.h">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/UTLogStream.h">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/ut3DImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/ut3DSImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utACImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utAMFImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utASEImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utAnim.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utArmaturePopulate.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utAssbinImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utB3DImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utBVHImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utBatchLoader.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utBlendImportAreaLight.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utBlendImportMaterials.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utBlenderImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utBlenderIntermediate.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utBlenderWork.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utCSMImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utColladaExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utColladaImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utD3MFImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utDXFImporterExporter.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utDefaultIOStream.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utFBXImporterExporter.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utFastAtof.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utFindDegenerates.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utFindInvalidData.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utFixInfacingNormals.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utGenBoundingBoxesProcess.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utGenNormals.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utHMPImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utIFCImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utIOStreamBuffer.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utIOSystem.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utImporter.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utImproveCacheLocality.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utIssues.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utJoinVertices.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utLWOImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utLWSImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utLimitBoneWeights.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utM3DImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utMDCImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utMaterialSystem.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utMatrix3x3.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utMatrix4x4.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utMetadata.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utObjImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utObjTools.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utOpenGEXImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utPLYImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utPMXImporter.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utPretransformVertices.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utProfiler.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utQ3DImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utRemoveComments.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utRemoveComponent.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utRemoveRedundantMaterials.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utRemoveVCProcess.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utSIBImporter.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utSMDImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utSTLImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utScaleProcess.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utSceneCombiner.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utScenePreprocessor.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utSharedPPData.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utSimd.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utSortByPType.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utSplitLargeMeshes.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utStringUtils.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utTargetAnimation.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utTextureTransform.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utTriangulate.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utTypes.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utVector3.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utVersion.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utVertexTriangleAdjacency.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utX3DImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utXImporterExporter.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utglTF2ImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/unit/utglTFImportExport.cpp">
+			<Option target="unit"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/tools/assimp_cmd/CompareDump.cpp">
+			<Option target="assimp_cmd"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/tools/assimp_cmd/Export.cpp">
+			<Option target="assimp_cmd"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/tools/assimp_cmd/ImageExtractor.cpp">
+			<Option target="assimp_cmd"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/tools/assimp_cmd/Info.cpp">
+			<Option target="assimp_cmd"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/tools/assimp_cmd/Main.cpp">
+			<Option target="assimp_cmd"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/tools/assimp_cmd/Main.h">
+			<Option target="assimp_cmd"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/tools/assimp_cmd/WriteDump.cpp">
+			<Option target="assimp_cmd"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/tools/assimp_cmd/assimp_cmd.rc">
+			<Option target="assimp_cmd"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/tools/assimp_cmd/resource.h">
+			<Option target="assimp_cmd"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glm/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\glm\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glm/glm/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\glm\glm\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\glfw\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/CMake/cmake_uninstall.cmake.in">
+			<Option virtualFolder="CMake Files\dependencies\glfw\CMake\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/CMake/glfw3.pc.in">
+			<Option virtualFolder="CMake Files\dependencies\glfw\CMake\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/CMake/glfw3Config.cmake.in">
+			<Option virtualFolder="CMake Files\dependencies\glfw\CMake\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/src/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\glfw\src\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glfw/src/glfw_config.h.in">
+			<Option virtualFolder="CMake Files\dependencies\glfw\src\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/glad/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\glad\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\assimp\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/assimp-config-version.cmake.in">
+			<Option virtualFolder="CMake Files\dependencies\assimp\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/assimp-config.cmake.in">
+			<Option virtualFolder="CMake Files\dependencies\assimp\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/assimp.pc.in">
+			<Option virtualFolder="CMake Files\dependencies\assimp\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/assimpTargets-debug.cmake.in">
+			<Option virtualFolder="CMake Files\dependencies\assimp\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/assimpTargets.cmake.in">
+			<Option virtualFolder="CMake Files\dependencies\assimp\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/revision.h.in">
+			<Option virtualFolder="CMake Files\dependencies\assimp\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/include/assimp/config.h.in">
+			<Option virtualFolder="CMake Files\dependencies\assimp\include\assimp\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/cmake-modules/FindPkgMacros.cmake">
+			<Option virtualFolder="CMake Files\dependencies\assimp\cmake-modules\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/cmake-modules/FindRT.cmake">
+			<Option virtualFolder="CMake Files\dependencies\assimp\cmake-modules\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/cmake-modules/FindZLIB.cmake">
+			<Option virtualFolder="CMake Files\dependencies\assimp\cmake-modules\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/cmake-modules/PrecompiledHeader.cmake">
+			<Option virtualFolder="CMake Files\dependencies\assimp\cmake-modules\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\assimp\contrib\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\assimp\contrib\zlib\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/zconf.h.cmakein">
+			<Option virtualFolder="CMake Files\dependencies\assimp\contrib\zlib\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/zlib/zlib.pc.cmakein">
+			<Option virtualFolder="CMake Files\dependencies\assimp\contrib\zlib\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/contrib/irrXML/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\assimp\contrib\irrXML\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/code/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\assimp\code\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/tools/assimp_cmd/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\assimp\tools\assimp_cmd\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\assimp\test\"/>
+		</Unit>
+		<Unit filename="C:/Users/User/Documents/GitHub/PrototypeEngine/dependencies/assimp/test/headercheck/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\dependencies\assimp\test\headercheck\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

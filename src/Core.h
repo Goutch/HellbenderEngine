@@ -1,0 +1,22 @@
+#pragma once
+
+#include <Configs.h>
+#include <core/PrototypeEngine.h>
+#include <core/ressource/Ressource.h>
+#include <core/ressource/Mesh.h>
+#include <core/ressource/Framebuffer.h>
+#include <core/ressource/ShaderProgram.h>
+#include <core/ressource/Texture.h>
+#include <core/utility/Log.h>
+#include <core/utility/Geometry.h>
+#include <core/entity/Entity.h>
+#include <core/entity/Scene.h>
+#include <core/entity/Transform.h>
+#include <core/entity/component/Component.h>
+#include <core/entity/component/MeshRenderer.h>
+#include <core/entity/component/Camera.h>
+#include <core/entity/component/CameraController.h>
+#include <core/graphics/Graphics.h>
+#include <core/graphics/Layer.h>
+#include <core/input/Input.h>
+#include <core/math/Plane.h>
