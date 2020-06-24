@@ -8,4 +8,4 @@ enum {
     OPENGL_RENDERER=0,
     VULKAN_RENDERER,
 };
-#define RENDERER OpenGL
+#define RENDERER OPENGL_RENDERER
