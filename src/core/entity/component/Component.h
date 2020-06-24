@@ -7,8 +7,10 @@ using namespace glm;
 class Entity;
 
 class Component {
+    bool subscribed_draw=false;
+    bool subscribed_update=false;
 protected:
-    Entity *entity= nullptr;
+    Entity *entity = nullptr;
 public:
     Component() {};
 
@@ -19,9 +21,13 @@ public:
 
     virtual void onAttach() {};
 
-    virtual void onDraw() {}
+    virtual void onDetach();
 
-    virtual void onUpdate(float delta) {}
+    virtual void onUpdate(float delta){};
+    virtual void subscribeUpdate() final;
+    virtual void unsubscribeUpdate() final;
 
-    virtual void onDetach() {}
+    virtual void onDraw(){};
+    virtual void subscribeDraw() final;
+    virtual void unsubscribeDraw() final;
 };

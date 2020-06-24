@@ -3,11 +3,16 @@
 //
 
 #include "Entity.h"
+#include <core/utility/Log.h>
 
-unsigned long Entity::current_id = 0;
+unsigned int Entity::current_id = 0;
 
 Entity::Entity() {
     setName("Entity_" + std::to_string(current_id++));
+}
+
+Entity::Entity(Entity *parent) {
+    setParent(parent);
 }
 
 Entity::Entity(std::string name) {
@@ -49,17 +54,9 @@ void Entity::onDestroy() {
     if (parent != nullptr)parent->removeChild(this);
 }
 
-void Entity::draw() {
-    for (Component *c:components) {
-        c->onDraw();
-    }
-}
 
-void Entity::update(float delta) {
-    for (Component *c:components) {
-        c->onUpdate(delta);
-    }
-}
+
+
 
 
 

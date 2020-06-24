@@ -1,12 +1,9 @@
 #pragma once
 
-#include <Configs.h>
+
+#include <CompilationConfigs.h>
 #include <core/PrototypeEngine.h>
-#include <core/ressource/Ressource.h>
-#include <core/ressource/Mesh.h>
-#include <core/ressource/Framebuffer.h>
-#include <core/ressource/ShaderProgram.h>
-#include <core/ressource/Texture.h>
+#include <core/resource/Resource.h>
 #include <core/utility/Log.h>
 #include <core/utility/Geometry.h>
 #include <core/entity/Entity.h>
@@ -20,3 +17,6 @@
 #include <core/graphics/Layer.h>
 #include <core/input/Input.h>
 #include <core/math/Plane.h>
+#include <core/utility/Event.h>
+#include <glm/glm.hpp>
+using namespace glm;

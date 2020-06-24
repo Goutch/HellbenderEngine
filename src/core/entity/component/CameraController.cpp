@@ -7,11 +7,11 @@
 #include "core/entity/Entity.h"
 #include "GLFW/glfw3.h"
 #include "Camera.h"
-#include "Configs.h"
+#include "CompilationConfigs.h"
+#include <core/PrototypeEngine.h>
+#include <core/entity/Scene.h>
 
 void CameraController::onUpdate(float delta) {
-    Component::onUpdate(delta);
-
     double x, y;
     Input::getMousePosition(x, y);
     Input::setCursorPosition(static_cast<float>(WIDTH) / 2.0f, static_cast<float>(HEIGHT) / 2.0f);
@@ -61,6 +61,7 @@ void CameraController::onAttach() {
     Component::onAttach();
     camera = entity->getComponent<Camera>();
     Input::setCursorVisible(false);
+    subscribeUpdate();
 }
 
 void CameraController::onDetach() {

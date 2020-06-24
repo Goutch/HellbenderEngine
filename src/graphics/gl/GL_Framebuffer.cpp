@@ -5,8 +5,13 @@
 #include "GL_Framebuffer.h"
 #include "glad/glad.h"
 #include "core/utility/Log.h"
-GL_Framebuffer::GL_Framebuffer(int width, int height) {
 
+GL_Framebuffer::GL_Framebuffer() {
+    glGenFramebuffers(1, &fbo);
+    glGenRenderbuffers(1, &rbo);
+    glGenTextures(1,&texture);
+}
+GL_Framebuffer::GL_Framebuffer(int width, int height) {
     glGenFramebuffers(1, &fbo);
     glGenRenderbuffers(1, &rbo);
     glGenTextures(1,&texture);
@@ -56,9 +61,9 @@ void GL_Framebuffer::unbindTexture() const {
 }
 
 void GL_Framebuffer::bindTexture() const {
-
     glBindTexture(GL_TEXTURE_2D, texture);
 }
+
 
 
 

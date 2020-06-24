@@ -7,6 +7,7 @@
 #include <core/entity/Entity.h>
 const Camera* Camera::main= nullptr;
 void Camera::onAttach() {
+    Component::onAttach();
     if(Camera::main== nullptr)
     {
         Camera::main=this;

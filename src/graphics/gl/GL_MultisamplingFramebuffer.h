@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include <core/ressource/Framebuffer.h>
+#include <core/resource/Framebuffer.h>
 
 class GL_MultisamplingFramebuffer: public Framebuffer {
     unsigned int ms_fbo;
@@ -11,6 +11,7 @@ class GL_MultisamplingFramebuffer: public Framebuffer {
     unsigned int ms_texture;
     unsigned int texture;
 public:
+    GL_MultisamplingFramebuffer();
     GL_MultisamplingFramebuffer(int width,int height);
     ~GL_MultisamplingFramebuffer() override;
 

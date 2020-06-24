@@ -6,10 +6,10 @@ class Transform;
 
 class Mesh;
 
-#include <core/graphics/Renderer.h>
+#include <core/graphics/IRenderer.h>
 #include "list"
 
-class GL_Renderer : public Renderer {
+class GL_Renderer : public IRenderer {
     struct RenderObject {
         const Transform *transform;
         const Mesh *mesh;

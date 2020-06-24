@@ -2,12 +2,18 @@
 
 
 #include <vector>
-#include <core/ressource/Framebuffer.h>
-#include "Renderer.h"
+#include "glm/glm.hpp"
+using namespace glm;
+class IRenderer;
+class GLFWwindow;
+class Layer;
+class ShaderProgram;
+class Mesh;
+class Transform;
 
 
 class Graphics {
-    static Renderer* renderer;
+    static IRenderer* renderer;
     static GLFWwindow *window;
     static Layer* default_layer;
 public:

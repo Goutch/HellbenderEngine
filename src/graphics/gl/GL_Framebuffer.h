@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include <core/ressource/Framebuffer.h>
+#include <core/resource/Framebuffer.h>
 #include "GL_Texture.h"
 
 class GL_Framebuffer: public Framebuffer {
@@ -12,6 +12,7 @@ class GL_Framebuffer: public Framebuffer {
 
     unsigned int texture;
 public:
+    GL_Framebuffer();
     GL_Framebuffer(int width,int height);
     ~GL_Framebuffer();
 

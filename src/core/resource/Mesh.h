@@ -1,12 +1,10 @@
 
 #pragma once
 #include <vector>
-#include "Ressource.h"
-#include "unordered_map"
 #include "glm/glm.hpp"
 using namespace glm;
 
-class Mesh : public Ressource{
+class Mesh{
 protected:
     unsigned int vertex_count=0;
     unsigned int index_count=0;
@@ -21,5 +19,7 @@ public:
     unsigned int getVertexCount() const {return vertex_count;}
     unsigned int getIndexCount() const {return index_count;}
     bool hasIndexBuffer() const {return has_index_buffer;}
+    virtual void bind() const=0;
+    virtual void unbind() const=0;
 };
 

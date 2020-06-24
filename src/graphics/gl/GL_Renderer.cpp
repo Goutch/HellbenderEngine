@@ -4,14 +4,14 @@
 
 #include "GL_Renderer.h"
 #include "glad/glad.h"
-#include <core/ressource/ShaderProgram.h>
-#include <core/ressource/Mesh.h>
+#include <core/resource/ShaderProgram.h>
+#include <core/resource/Mesh.h>
 #include <core/entity/Transform.h>
 #include "GLFW/glfw3.h"
 #include "core/utility/Log.h"
-#include "Configs.h"
-#include "core/ressource/Framebuffer.h"
-#include "core/ressource/Texture.h"
+#include "CompilationConfigs.h"
+#include "core/resource/Framebuffer.h"
+#include "core/resource/Texture.h"
 #include "core/graphics/Graphics.h"
 #include "core/graphics/Layer.h"
 #if DEBUG_MODE

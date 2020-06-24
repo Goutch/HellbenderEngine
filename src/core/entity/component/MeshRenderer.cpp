@@ -5,10 +5,10 @@
 #include <core/graphics/Graphics.h>
 #include "core/entity/Entity.h"
 #include "MeshRenderer.h"
-
 void MeshRenderer::onAttach() {
     Component::onAttach();
     shader=Graphics::DEFAULT_MESH_SHADER;
+    subscribeDraw();
 }
 
 void MeshRenderer::onDraw() {

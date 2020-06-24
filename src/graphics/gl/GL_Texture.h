@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/ressource/Texture.h>
+#include <core/resource/Texture.h>
 
 class GL_Texture : public Texture {
 public:

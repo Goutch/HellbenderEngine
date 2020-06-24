@@ -2,18 +2,16 @@
 
 
 #include "glm/glm.hpp"
-class Layer;
-
 using namespace glm;
-
+class Layer;
 class ShaderProgram;
 class Transform;
 class Mesh;
 class GLFWwindow;
 class Framebuffer;
-class Renderer {
+class IRenderer {
 public:
-    virtual ~Renderer(){};
+    virtual ~IRenderer(){};
     virtual void init()=0;
     virtual GLFWwindow* createWindow()=0;
     virtual void render(const mat4& projection_matrix,const mat4& view_matrix)=0;

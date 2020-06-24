@@ -1,12 +1,7 @@
-//
-// Created by User on 07-Jun.-2020.
-//
 #include "PrototypeEngine.h"
 #include <core/graphics/Graphics.h>
 #include <core/entity/Scene.h>
 #include <core/entity/component/Camera.h>
-#include <core/ressource/Mesh.h>
-#include <core/ressource/ShaderProgram.h>
 #include <core/input/Input.h>
 #include "GLFW/glfw3.h"
 #include "core/utility/Timer.h"
@@ -23,7 +18,6 @@ Scene* PrototypeEngine::setScene(std::string path) {
         current_scene->terminate();
         delete current_scene;
     }
-
     current_scene = new Scene();
     current_scene->init();
     return current_scene;
@@ -35,14 +29,18 @@ void PrototypeEngine::run() {
         current_scene=new Scene();
     }
     time=new Timer();
+    Timer delta=Timer();
+    float delta_t;
     while (!glfwWindowShouldClose(window)&&current_scene!= nullptr)
     {
         glfwSwapBuffers(window);
         glfwPollEvents();
         if (glfwGetKey(window, GLFW_KEY_ESCAPE))quit();
-        current_scene->update(1.0f/60.0f);
+        current_scene->update(delta_t);
         current_scene->draw();
         Graphics::render(Camera::main->getProjectionMatrix(), Camera::main->getViewMatrix());
+        delta.reset();
+        delta_t=delta.ms();
     }
     delete time;
     delete current_scene;

@@ -4,7 +4,7 @@
 #include "glm/glm.hpp"
 #include <unordered_map>
 #include <vector>
-#include <core/ressource/ShaderProgram.h>
+#include <core/resource/ShaderProgram.h>
 
 using namespace glm;
 
@@ -19,8 +19,8 @@ private:
     unsigned int program_id;
 
 public:
-
-    GL_ShaderProgram(const std::string &vertexShader, const std::string &fragmentShader, bool source = false);
+    GL_ShaderProgram();
+    GL_ShaderProgram(const std::string &vertexShader, const std::string &fragmentShader);
 
     GL_ShaderProgram(const std::string &vertexShader,
                      const std::string &geometryShader,
@@ -30,6 +30,8 @@ public:
     ~GL_ShaderProgram();
 
     void bind() const override;
+
+    void setShaders(std::string vertex_path, std::string fragment_path) override;
 
     void unbind() const override;
 

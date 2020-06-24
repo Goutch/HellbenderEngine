@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/ressource/Mesh.h>
+#include <core/resource/Mesh.h>
 #include "unordered_map"
 
 class GL_Mesh : public Mesh {

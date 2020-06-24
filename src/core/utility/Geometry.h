@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/ressource/Mesh.h>
+#include <core/resource/Mesh.h>
 struct UsedBuffers
 {
     bool vertex_position=true;

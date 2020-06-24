@@ -1,18 +1,15 @@
 //
 // Created by User on 14-Jun.-2020.
 //
-
-#include <graphics/gl/GL_Framebuffer.h>
-#include <graphics/gl/GL_MultisamplingFramebuffer.h>
-#include <core/PrototypeEngine.h>
 #include "Layer.h"
-#include "glm/gtc/matrix_transform.hpp"
 
+#include <core/PrototypeEngine.h>
+#include <core/resource/Resource.h>
+#include "glm/gtc/matrix_transform.hpp"
 Layer::Layer(unsigned int width, unsigned int height, const ShaderProgram &shader_program) {
-    this->width = width;
-    this->heigth = height;
     this->shader_program = &shader_program;
-    framebuffer = new GL_MultisamplingFramebuffer(width, height);
+    framebuffer = Resource::get<Framebuffer>();
+    setSize(width,height);
     projection_matrix = glm::ortho(-0.5, 0.5, -0.5, 0.5, -1.0, 1.0);
 }
 
@@ -45,6 +42,7 @@ unsigned int Layer::getHeight() {
 void Layer::setSize(unsigned int width, unsigned int height) {
     this->width = width;
     this->heigth = height;
+
     framebuffer->setResolution(width, height);
 }
 

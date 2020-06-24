@@ -4,14 +4,15 @@
 #include <string>
 #include <list>
 #include <core/entity/component/Component.h>
-#include <core/utility/Log.h>
+
 
 class Entity : public Transform {
-    static unsigned long current_id;
-    unsigned long id;
+    static unsigned int current_id;
+    unsigned int id;
     std::string name;
     std::list<Component *> components;
 public:
+    Entity(Entity* parent);
     Entity(std::string name);
 
     Entity(std::string name, Entity *parent);
@@ -25,10 +26,6 @@ public:
     Entity();
 
     virtual void init() {};
-
-    virtual void draw();
-
-    virtual void update(float delta);
 
     virtual void onDestroy();
 
