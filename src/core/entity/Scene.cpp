@@ -40,13 +40,13 @@ void Scene::terminate() {
 
 Entity *Scene::instantiate(std::string name, Entity *parent) {
     Entity *e = new Entity(name, parent);
-    entities.emplace(e);
+    entities.insert(e);
     e->init();
     return e;
 }
 Entity *Scene::instantiate(Entity *parent) {
     Entity* e =new Entity(parent);
-    entities.emplace(e);
+    entities.insert(e);
     e->init();
     return e;
 }

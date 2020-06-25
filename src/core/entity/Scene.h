@@ -2,17 +2,15 @@
 
 
 #include <string>
-#include <core/utility/Event.h>
-#include "list"
 #include "Entity.h"
-
+#include "unordered_set"
 /*
  * Storage container for entities
  */
 class Scene {
-    std::set<Entity *> entities;
-    std::set<Component*> update_listeners;
-    std::set<Component*> draw_listeners;
+    std::unordered_set<Entity *> entities;
+    std::unordered_set<Component*> update_listeners;
+    std::unordered_set<Component*> draw_listeners;
 public:
 
     Scene(std::string path);

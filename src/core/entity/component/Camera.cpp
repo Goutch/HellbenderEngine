@@ -5,6 +5,7 @@
 #include "Camera.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include <core/entity/Entity.h>
+#include "CompilationConfigs.h"
 const Camera* Camera::main= nullptr;
 void Camera::onAttach() {
     Component::onAttach();
@@ -12,6 +13,8 @@ void Camera::onAttach() {
     {
         Camera::main=this;
     }
+    //todo: set to current framebuffer size
+    setAspectRatio(WIDTH,HEIGHT);
     generateProjectionMatrix();
 }
 
