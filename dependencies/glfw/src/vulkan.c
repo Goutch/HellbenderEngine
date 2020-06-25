@@ -189,7 +189,7 @@ const char* _glfwGetVulkanResultString(VkResult result)
         case VK_ERROR_MEMORY_MAP_FAILED:
             return "Mapping of a memory object has failed";
         case VK_ERROR_LAYER_NOT_PRESENT:
-            return "A requested default_layer is not present or could not be loaded";
+            return "A requested layer is not present or could not be loaded";
         case VK_ERROR_EXTENSION_NOT_PRESENT:
             return "A requested extension is not supported";
         case VK_ERROR_FEATURE_NOT_PRESENT:
@@ -211,7 +211,7 @@ const char* _glfwGetVulkanResultString(VkResult result)
         case VK_ERROR_NATIVE_WINDOW_IN_USE_KHR:
             return "The requested window is already connected to a VkSurfaceKHR, or to some other non-Vulkan API";
         case VK_ERROR_VALIDATION_FAILED_EXT:
-            return "A validation default_layer found an error";
+            return "A validation layer found an error";
         default:
             return "ERROR: UNKNOWN VULKAN ERROR";
     }
