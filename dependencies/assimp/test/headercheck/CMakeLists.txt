@@ -30,7 +30,7 @@ FOREACH( HEADER ${headers} )
   # add library
   add_library( ${TEST_NAME} EXCLUDE_FROM_ALL ${TEST_FILE} )
   list(APPEND headerchecklibs ${TEST_NAME})
-ENDFOREACH()
+ENDFOREACH( HEADER )
 
 add_custom_target(headercheck DEPENDS ${headerchecklibs})
 

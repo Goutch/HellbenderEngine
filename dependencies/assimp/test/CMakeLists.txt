@@ -1,7 +1,7 @@
 # Open Asset Import Library (assimp)
 # ----------------------------------------------------------------------
 #
-# Copyright (c) 2006-2020, assimp team
+# Copyright (c) 2006-2019, assimp team
 
 
 # All rights reserved.
@@ -61,14 +61,6 @@ SET( COMMON
   unit/utIssues.cpp
   unit/utAnim.cpp
   unit/AssimpAPITest.cpp
-  unit/AssimpAPITest_aiMatrix3x3.cpp
-  unit/AssimpAPITest_aiMatrix4x4.cpp
-  unit/AssimpAPITest_aiQuaternion.cpp
-  unit/AssimpAPITest_aiVector2D.cpp
-  unit/AssimpAPITest_aiVector3D.cpp
-  unit/MathTest.cpp
-  unit/MathTest.h
-  unit/RandomNumberGeneration.h
   unit/utBatchLoader.cpp
   unit/utDefaultIOStream.cpp
   unit/utFastAtof.cpp
@@ -84,13 +76,10 @@ SET( COMMON
   unit/utProfiler.cpp
   unit/utSharedPPData.cpp
   unit/utStringUtils.cpp
-  unit/Common/uiScene.cpp
   unit/Common/utLineSplitter.cpp
-  unit/Common/utSpatialSort.cpp
 )
 
 SET( IMPORTERS
-  unit/ImportExport/Assxml/utAssxmlImportExport.cpp
   unit/utLWSImportExport.cpp
   unit/utLWOImportExport.cpp
   unit/utSMDImportExport.cpp
@@ -124,11 +113,11 @@ SET( IMPORTERS
   unit/utBlendImportMaterials.cpp
   unit/utBlenderWork.cpp
   unit/utBVHImportExport.cpp
-  unit/utColladaExport.cpp
+  unit/utColladaExportCamera.cpp
+  unit/utColladaExportLight.cpp
   unit/utColladaImportExport.cpp
   unit/utCSMImportExport.cpp
   unit/utB3DImportExport.cpp
-  unit/utM3DImportExport.cpp
   unit/utMDCImportExport.cpp
   unit/utAssbinImportExport.cpp
   unit/ImportExport/utAssjsonImportExport.cpp
@@ -138,17 +127,6 @@ SET( IMPORTERS
   unit/ImportExport/utOFFImportExport.cpp
   unit/ImportExport/utNFFImportExport.cpp
   unit/ImportExport/utXGLImportExport.cpp
-  unit/ImportExport/utMD2Importer.cpp
-  unit/ImportExport/utMD3Importer.cpp
-  unit/ImportExport/utMD5Importer.cpp
-  unit/ImportExport/utMDLImporter.cpp
-  unit/ImportExport/MDL/MDLHL1TestFiles.h
-  unit/ImportExport/MDL/utMDLImporter_HL1_ImportSettings.cpp
-  unit/ImportExport/MDL/utMDLImporter_HL1_Materials.cpp
-  unit/ImportExport/MDL/utMDLImporter_HL1_Nodes.cpp
-  #unit/ImportExport/IRR/utIrrImportExport.cpp
-  unit/ImportExport/RAW/utRAWImportExport.cpp
-  unit/ImportExport/Terragen/utTerragenImportExport.cpp
 )
 
 SET( MATERIAL
@@ -170,7 +148,6 @@ SET( POST_PROCESSES
   unit/utRemoveRedundantMaterials.cpp
   unit/utRemoveVCProcess.cpp
   unit/utScaleProcess.cpp
-  unit/utArmaturePopulate.cpp
   unit/utJoinVertices.cpp
   unit/utRemoveComments.cpp
   unit/utRemoveComponent.cpp
@@ -214,13 +191,20 @@ SET_PROPERTY( TARGET assimp PROPERTY DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX} )
 
 IF( WIN32 )
     SET( platform_libs )
-ELSE()
+ELSE( WIN32 )
     SET( platform_libs pthread )
-ENDIF()
+ENDIF( WIN32 )
+
+IF( WIN32 )
+  ADD_CUSTOM_COMMAND(TARGET unit
+    PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:assimp> $<TARGET_FILE_DIR:unit>
+    MAIN_DEPENDENCY assimp)
+ENDIF( WIN32 )
 
 IF(MSVC)
 		add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-ENDIF()
+ENDIF(MSVC)
 
 target_link_libraries( unit assimp ${platform_libs} )
 

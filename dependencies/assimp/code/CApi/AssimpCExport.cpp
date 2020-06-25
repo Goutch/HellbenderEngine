@@ -3,7 +3,7 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2020, assimp team
+Copyright (c) 2006-2019, assimp team
 
 
 
@@ -73,11 +73,11 @@ ASSIMP_API const aiExportFormatDesc* aiGetExportFormatDescription( size_t index)
 
     aiExportFormatDesc *desc = new aiExportFormatDesc;
     desc->description = new char[ strlen( orig->description ) + 1 ]();
-    ::memcpy( (char*) desc->description, orig->description, strlen( orig->description ) );
+    ::strncpy( (char*) desc->description, orig->description, strlen( orig->description ) );
     desc->fileExtension = new char[ strlen( orig->fileExtension ) + 1 ]();
-    ::memcpy( ( char* ) desc->fileExtension, orig->fileExtension, strlen( orig->fileExtension ) );
+    ::strncpy( ( char* ) desc->fileExtension, orig->fileExtension, strlen( orig->fileExtension ) );
     desc->id = new char[ strlen( orig->id ) + 1 ]();
-    ::memcpy( ( char* ) desc->id, orig->id, strlen( orig->id ) );
+    ::strncpy( ( char* ) desc->id, orig->id, strlen( orig->id ) );
 
     return desc;
 }

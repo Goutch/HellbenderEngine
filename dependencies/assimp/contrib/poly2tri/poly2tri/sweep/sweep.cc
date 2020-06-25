@@ -36,11 +36,6 @@
 
 namespace p2t {
 
-#ifdef _WIN32
-#    pragma warning(push)
-#    pragma warning( disable : 4702 )
-#endif // _WIN32
-
 // Triangulate simple polygon with holes
 void Sweep::Triangulate(SweepContext& tcx)
 {
@@ -57,8 +52,8 @@ void Sweep::SweepPoints(SweepContext& tcx)
   for (size_t i = 1; i < tcx.point_count(); i++) {
     Point& point = *tcx.GetPoint(i);
     Node* node = &PointEvent(tcx, point);
-    for (unsigned int ii = 0; ii < point.edge_list.size(); ii++) {
-      EdgeEvent(tcx, point.edge_list[ii], node);
+    for (unsigned int i = 0; i < point.edge_list.size(); i++) {
+      EdgeEvent(tcx, point.edge_list[i], node);
     }
   }
 }
@@ -800,8 +795,5 @@ Sweep::~Sweep() {
 
 }
 
-#ifdef _WIN32
-#    pragma warning( pop )
-#endif // _WIN32
-
 }
+

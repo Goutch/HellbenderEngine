@@ -3,7 +3,7 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2020, assimp team
+Copyright (c) 2006-2019, assimp team
 
 
 
@@ -107,7 +107,7 @@ LogStream* LogStream::createDefaultStream(aiDefaultLogStream    streams,
         return nullptr;
 #endif
 
-    // Platform-independent default streams
+        // Platform-independent default streams
     case aiDefaultLogStream_STDERR:
         return new StdOStreamLogStream(std::cerr);
     case aiDefaultLogStream_STDOUT:
@@ -121,7 +121,7 @@ LogStream* LogStream::createDefaultStream(aiDefaultLogStream    streams,
     };
 
     // For compilers without dead code path detection
-    return nullptr;
+    return NULL;
 }
 
 // ----------------------------------------------------------------------------------
@@ -175,18 +175,6 @@ void Logger::debug(const char* message) {
         return;
     }
     return OnDebug(message);
-}
-
-// ----------------------------------------------------------------------------------
-void Logger::verboseDebug(const char *message) {
-
-	// SECURITY FIX: otherwise it's easy to produce overruns since
-	// sometimes importers will include data from the input file
-	// (i.e. node names) in their messages.
-	if (strlen(message) > MAX_LOG_MESSAGE_LENGTH) {
-		return;
-	}
-	return OnVerboseDebug(message);
 }
 
 // ----------------------------------------------------------------------------------
@@ -263,7 +251,7 @@ void DefaultLogger::kill() {
 // ----------------------------------------------------------------------------------
 //  Debug message
 void DefaultLogger::OnDebug( const char* message ) {
-    if ( m_Severity < Logger::DEBUG ) {
+    if ( m_Severity == Logger::NORMAL ) {
         return;
     }
 
@@ -272,19 +260,6 @@ void DefaultLogger::OnDebug( const char* message ) {
 	ai_snprintf(msg, Size, "Debug, T%u: %s", GetThreadID(), message);
 
     WriteToStreams( msg, Logger::Debugging );
-}
-
-//  Verbose debug message
-void DefaultLogger::OnVerboseDebug(const char *message) {
-	if (m_Severity < Logger::VERBOSE) {
-		return;
-	}
-
-	static const size_t Size = MAX_LOG_MESSAGE_LENGTH + 16;
-	char msg[Size];
-	ai_snprintf(msg, Size, "Debug, T%u: %s", GetThreadID(), message);
-
-	WriteToStreams(msg, Logger::Debugging);
 }
 
 // ----------------------------------------------------------------------------------
@@ -345,7 +320,7 @@ bool DefaultLogger::attachStream( LogStream *pStream, unsigned int severity ) {
 
 // ----------------------------------------------------------------------------------
 //  Detach a stream
-bool DefaultLogger::detachStream( LogStream *pStream, unsigned int severity ) {
+bool DefaultLogger::detatchStream( LogStream *pStream, unsigned int severity ) {
     if ( nullptr == pStream ) {
         return false;
     }

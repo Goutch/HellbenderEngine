@@ -3,7 +3,9 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2020, assimp team
+Copyright (c) 2006-2019, assimp team
+
+
 
 All rights reserved.
 
@@ -40,55 +42,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "UnitTestPCH.h"
-#include <assimp/postprocess.h>
+#include "AbstractImportExportBase.h"
 #include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
 
 using namespace Assimp;
 
-TEST(utXGLImporter, importBCN_Epileptic) {
-    Assimp::Importer importer;
-    const aiScene *scene = importer.ReadFile(ASSIMP_TEST_MODELS_DIR "/XGL/BCN_Epileptic.zgl", aiProcess_ValidateDataStructure);
-    ASSERT_NE(nullptr, scene);
-}
+class utXGLImportExport : public AbstractImportExportBase {
+public:
+    virtual bool importerTest() {
+        Assimp::Importer importer;
+        const aiScene *scene = importer.ReadFile(ASSIMP_TEST_MODELS_DIR "/XGL/sample_official.xgl", 0);
+        return true;
+        return nullptr != scene;
+    }
+};
 
-TEST(utXGLImporter, importCubesWithAlpha) {
-    Assimp::Importer importer;
-    const aiScene *scene = importer.ReadFile(ASSIMP_TEST_MODELS_DIR "/XGL/cubes_with_alpha.zgl", aiProcess_ValidateDataStructure);
-    ASSERT_NE(nullptr, scene);
-}
-
-TEST(utXGLImporter, importSample_official) {
-    Assimp::Importer importer;
-    const aiScene *scene = importer.ReadFile(ASSIMP_TEST_MODELS_DIR "/XGL/sample_official.xgl", aiProcess_ValidateDataStructure);
-    ASSERT_NE(nullptr, scene);
-}
-
-TEST(utXGLImporter, importSample_official_asxml) {
-    Assimp::Importer importer;
-    const aiScene *scene = importer.ReadFile(ASSIMP_TEST_MODELS_DIR "/XGL/sample_official_asxml.xml", aiProcess_ValidateDataStructure);
-    ASSERT_NE(nullptr, scene);
-}
-
-TEST(utXGLImporter, importSphereWithMatGloss) {
-    Assimp::Importer importer;
-    const aiScene *scene = importer.ReadFile(ASSIMP_TEST_MODELS_DIR "/XGL/sphere_with_mat_gloss_10pc.zgl", aiProcess_ValidateDataStructure);
-    ASSERT_NE(nullptr, scene);
-}
-
-TEST(utXGLImporter, importSpiderASCII) {
-    Assimp::Importer importer;
-    const aiScene *scene = importer.ReadFile(ASSIMP_TEST_MODELS_DIR "/XGL/Spider_ascii.zgl", aiProcess_ValidateDataStructure);
-    ASSERT_NE(nullptr, scene);
-}
-
-TEST(utXGLImporter, importWuson) {
-    Assimp::Importer importer;
-    const aiScene *scene = importer.ReadFile(ASSIMP_TEST_MODELS_DIR "/XGL/Wuson.zgl", aiProcess_ValidateDataStructure);
-    ASSERT_NE(nullptr, scene);
-}
-
-TEST(utXGLImporter, importWusonDXF) {
-    Assimp::Importer importer;
-    const aiScene *scene = importer.ReadFile(ASSIMP_TEST_MODELS_DIR "/XGL/wuson_dxf.zgl", aiProcess_ValidateDataStructure);
-    ASSERT_NE(nullptr, scene);
+TEST_F(utXGLImportExport, importXGLFromFileTest) {
+    EXPECT_TRUE(importerTest());
 }

@@ -3,7 +3,7 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2020, assimp team
+Copyright (c) 2006-2019, assimp team
 
 
 
@@ -330,23 +330,19 @@ void SortByPTypeProcess::Execute( aiScene* pScene) {
             ai_assert(outFaces == out->mFaces + out->mNumFaces);
 
             // now generate output bones
-			for (unsigned int q = 0; q < mesh->mNumBones; ++q) {
-				if (!tempBones[q].empty()) {
-					++out->mNumBones;
-				}
-			}
+            for (unsigned int q = 0; q < mesh->mNumBones;++q)
+                if (!tempBones[q].empty())++out->mNumBones;
 
-            if (out->mNumBones) {
+            if (out->mNumBones)
+            {
                 out->mBones = new aiBone*[out->mNumBones];
-                for (unsigned int q = 0, boneIdx = 0; q < mesh->mNumBones;++q)
+                for (unsigned int q = 0, real = 0; q < mesh->mNumBones;++q)
                 {
                     TempBoneInfo& in = tempBones[q];
-					if (in.empty()) {
-						continue;
-					}
+                    if (in.empty())continue;
 
                     aiBone* srcBone = mesh->mBones[q];
-					aiBone *bone = out->mBones[boneIdx] = new aiBone();
+                    aiBone* bone = out->mBones[real] = new aiBone();
 
                     bone->mName = srcBone->mName;
                     bone->mOffsetMatrix = srcBone->mOffsetMatrix;
@@ -356,7 +352,7 @@ void SortByPTypeProcess::Execute( aiScene* pScene) {
 
                     ::memcpy(bone->mWeights,&in[0],bone->mNumWeights*sizeof(aiVertexWeight));
 
-                    ++boneIdx;
+                    ++real;
                 }
             }
         }
@@ -368,7 +364,7 @@ void SortByPTypeProcess::Execute( aiScene* pScene) {
         delete mesh;
 
         // avoid invalid pointer
-        pScene->mMeshes[i] = nullptr;
+        pScene->mMeshes[i] = NULL;
     }
 
     if (outMeshes.empty())

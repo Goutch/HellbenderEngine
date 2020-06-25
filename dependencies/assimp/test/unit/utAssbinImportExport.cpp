@@ -3,7 +3,7 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2020, assimp team
+Copyright (c) 2006-2019, assimp team
 
 All rights reserved.
 
@@ -38,11 +38,12 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ---------------------------------------------------------------------------
 */
-#include "AbstractImportExportBase.h"
 #include "UnitTestPCH.h"
-#include <assimp/postprocess.h>
-#include <assimp/Exporter.hpp>
+#include "SceneDiffer.h"
+#include "AbstractImportExportBase.h"
 #include <assimp/Importer.hpp>
+#include <assimp/Exporter.hpp>
+#include <assimp/postprocess.h>
 
 using namespace Assimp;
 
@@ -52,18 +53,24 @@ class utAssbinImportExport : public AbstractImportExportBase {
 public:
     bool importerTest() override {
         Importer importer;
-        const aiScene *scene = importer.ReadFile(ASSIMP_TEST_MODELS_DIR "/OBJ/spider.obj", aiProcess_ValidateDataStructure);
+        const aiScene *scene = importer.ReadFile( ASSIMP_TEST_MODELS_DIR "/OBJ/spider.obj", aiProcess_ValidateDataStructure );
 
         Exporter exporter;
-        EXPECT_EQ(aiReturn_SUCCESS, exporter.Export(scene, "assbin", ASSIMP_TEST_MODELS_DIR "/OBJ/spider_out.assbin"));
-        const aiScene *newScene = importer.ReadFile(ASSIMP_TEST_MODELS_DIR "/OBJ/spider_out.assbin", aiProcess_ValidateDataStructure);
+        EXPECT_EQ( aiReturn_SUCCESS, exporter.Export( scene, "assbin", ASSIMP_TEST_MODELS_DIR "/OBJ/spider_out.assbin" ) );
+        const aiScene *newScene = importer.ReadFile( ASSIMP_TEST_MODELS_DIR "/OBJ/spider_out.assbin", aiProcess_ValidateDataStructure );
 
         return newScene != nullptr;
     }
 };
 
-TEST_F(utAssbinImportExport, import3ExportAssbinDFromFileTest) {
-    EXPECT_TRUE(importerTest());
+TEST_F( utAssbinImportExport, exportAssbin3DFromFileTest ) {
+    Importer importer;
+    const aiScene *scene = importer.ReadFile( ASSIMP_TEST_MODELS_DIR "/OBJ/spider.obj", aiProcess_ValidateDataStructure );
+    EXPECT_NE( nullptr, scene );
+}
+
+TEST_F( utAssbinImportExport, import3ExportAssbinDFromFileTest ) {
+    EXPECT_TRUE( importerTest() );
 }
 
 #endif // #ifndef ASSIMP_BUILD_NO_EXPORT

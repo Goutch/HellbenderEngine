@@ -2,7 +2,7 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2020, assimp team
+Copyright (c) 2006-2019, assimp team
 
 
 All rights reserved.
@@ -217,7 +217,6 @@ void ScenePreprocessor::ProcessAnimation (aiAnimation* anim)
 
                 // No rotation keys? Generate a dummy track
                 if (!channel->mNumRotationKeys) {
-                    ai_assert(!channel->mRotationKeys);
                     channel->mNumRotationKeys = 1;
                     channel->mRotationKeys = new aiQuatKey[1];
                     aiQuatKey& q = channel->mRotationKeys[0];
@@ -225,14 +224,11 @@ void ScenePreprocessor::ProcessAnimation (aiAnimation* anim)
                     q.mTime  = 0.;
                     q.mValue = rotation;
 
-                    ASSIMP_LOG_VERBOSE_DEBUG("ScenePreprocessor: Dummy rotation track has been generated");
-                } else {
-                    ai_assert(channel->mRotationKeys);
+                    ASSIMP_LOG_DEBUG("ScenePreprocessor: Dummy rotation track has been generated");
                 }
 
                 // No scaling keys? Generate a dummy track
                 if (!channel->mNumScalingKeys)  {
-                    ai_assert(!channel->mScalingKeys);
                     channel->mNumScalingKeys = 1;
                     channel->mScalingKeys = new aiVectorKey[1];
                     aiVectorKey& q = channel->mScalingKeys[0];
@@ -240,14 +236,11 @@ void ScenePreprocessor::ProcessAnimation (aiAnimation* anim)
                     q.mTime  = 0.;
                     q.mValue = scaling;
 
-                    ASSIMP_LOG_VERBOSE_DEBUG("ScenePreprocessor: Dummy scaling track has been generated");
-                } else {
-                    ai_assert(channel->mScalingKeys);
+                    ASSIMP_LOG_DEBUG("ScenePreprocessor: Dummy scaling track has been generated");
                 }
 
                 // No position keys? Generate a dummy track
                 if (!channel->mNumPositionKeys) {
-                    ai_assert(!channel->mPositionKeys);
                     channel->mNumPositionKeys = 1;
                     channel->mPositionKeys = new aiVectorKey[1];
                     aiVectorKey& q = channel->mPositionKeys[0];
@@ -255,16 +248,14 @@ void ScenePreprocessor::ProcessAnimation (aiAnimation* anim)
                     q.mTime  = 0.;
                     q.mValue = position;
 
-                    ASSIMP_LOG_VERBOSE_DEBUG("ScenePreprocessor: Dummy position track has been generated");
-                } else {
-                    ai_assert(channel->mPositionKeys);
+                    ASSIMP_LOG_DEBUG("ScenePreprocessor: Dummy position track has been generated");
                 }
             }
         }
     }
 
     if (anim->mDuration == -1.)     {
-        ASSIMP_LOG_VERBOSE_DEBUG("ScenePreprocessor: Setting animation duration");
+        ASSIMP_LOG_DEBUG("ScenePreprocessor: Setting animation duration");
         anim->mDuration = last - std::min( first, 0. );
     }
 }

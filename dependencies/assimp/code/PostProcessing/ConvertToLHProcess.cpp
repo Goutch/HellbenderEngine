@@ -3,7 +3,7 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2020, assimp team
+Copyright (c) 2006-2019, assimp team
 
 
 
@@ -299,7 +299,7 @@ void FlipUVsProcess::ProcessMaterial (aiMaterial* _mat)
     for (unsigned int a = 0; a < mat->mNumProperties;++a)   {
         aiMaterialProperty* prop = mat->mProperties[a];
         if( !prop ) {
-            ASSIMP_LOG_VERBOSE_DEBUG( "Property is null" );
+            ASSIMP_LOG_DEBUG( "Property is null" );
             continue;
         }
 

@@ -15,19 +15,24 @@ add_subdirectory("dependencies/glad")
 include_directories("dependencies/stb")
 add_subdirectory("dependencies/stb")
 
+include_directories("dependencies/assimp/include")
+add_subdirectory("dependencies/assimp")
+
 include_directories("src")
 
 set(CORE_FILES
 		src/core/Core.h
-
 		src/core/PrototypeEngine.cpp
 		src/core/PrototypeEngine.h
+
 		src/CompilationConfigs.h
 
 		src/core/resource/ShaderProgram.h
 		src/core/resource/Texture.h
 		src/core/resource/Framebuffer.h
 		src/core/resource/Resource.cpp
+		src/core/resource/Texture.cpp
+		src/core/resource/Model.cpp
 
         src/core/graphics/IRenderer.h
 		src/core/graphics/Graphics.cpp
@@ -55,7 +60,7 @@ set(CORE_FILES
 		src/core/utility/Geometry.h
 		src/core/utility/Timer.cpp
 		src/core/utility/Event.h
-		src/core/resource/Texture.cpp)
+		src/core/resource/Model.cpp)
 
 set(GL_FILES
 		src/graphics/gl/GL_Core.h
@@ -68,11 +73,11 @@ set(GL_FILES
 		src/graphics/gl/GL_Debug.cpp
 		src/graphics/gl/GL_Debug.h
 		src/graphics/gl/GL_MultisamplingFramebuffer.cpp
-		src/graphics/gl/GL_MultisamplingFramebuffer.h )
+		src/graphics/gl/GL_MultisamplingFramebuffer.h src/core/resource/Model.h)
 
 add_library (${PROJECT_NAME}
 		${CORE_FILES}
 		${GL_FILES}
 		)
 
-target_link_libraries(${PROJECT_NAME} glm glfw glad stb)
+target_link_libraries(${PROJECT_NAME} glm glfw glad stb assimp)

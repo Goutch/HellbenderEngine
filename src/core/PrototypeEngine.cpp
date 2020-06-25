@@ -30,7 +30,7 @@ void PrototypeEngine::run() {
     }
     time=new Timer();
     Timer delta=Timer();
-    float delta_t;
+    float delta_t=0.0f;
     while (!glfwWindowShouldClose(window)&&current_scene!= nullptr)
     {
         glfwSwapBuffers(window);

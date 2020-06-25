@@ -3,7 +3,9 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2020, assimp team
+Copyright (c) 2006-2019, assimp team
+
+
 
 All rights reserved.
 
@@ -48,23 +50,27 @@ class utMatrix3x3Test : public ::testing::Test {
     // empty
 };
 
-TEST_F(utMatrix3x3Test, FromToMatrixTest) {
+TEST_F( utMatrix3x3Test, FromToMatrixTest ) {
     aiVector3D res;
     aiMatrix3x3 trafo;
 
     const double PRECISION = 0.000001;
 
     // axes test
-    aiVector3D axes[] = { aiVector3D(1, 0, 0), aiVector3D(0, 1, 0), aiVector3D(0, 0, 1) };
+    aiVector3D axes[] =
+        { aiVector3D(1, 0, 0)
+        , aiVector3D(0, 1, 0)
+        , aiVector3D(0, 0, 1)
+        };
 
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
-            aiMatrix3x3::FromToMatrix(axes[i], axes[j], trafo);
+            aiMatrix3x3::FromToMatrix( axes[i], axes[j], trafo );
             res = trafo * axes[i];
 
-            ASSERT_NEAR(axes[j].x, res.x, PRECISION);
-            ASSERT_NEAR(axes[j].y, res.y, PRECISION);
-            ASSERT_NEAR(axes[j].z, res.z, PRECISION);
+            ASSERT_NEAR( axes[j].x, res.x, PRECISION );
+            ASSERT_NEAR( axes[j].y, res.y, PRECISION );
+            ASSERT_NEAR( axes[j].z, res.z, PRECISION );
         }
     }
 
@@ -73,27 +79,23 @@ TEST_F(utMatrix3x3Test, FromToMatrixTest) {
 
     aiVector3D from, to;
 
-    auto random_ratio = []() -> float {
-        return static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-    };
-
     for (int i = 0; i < NUM_SAMPLES; ++i) {
-        from = aiVector3D(
-                1.f * random_ratio(),
-                1.f * random_ratio(),
-                1.f * random_ratio())
-                       .Normalize();
-        to = aiVector3D(
-                1.f * random_ratio(),
-                1.f * random_ratio(),
-                1.f * random_ratio())
-                     .Normalize();
+        from = aiVector3D
+            ( 1.f * rand() / RAND_MAX
+            , 1.f * rand() / RAND_MAX
+            , 1.f * rand() / RAND_MAX
+            ).Normalize();
+        to = aiVector3D
+            ( 1.f * rand() / RAND_MAX
+            , 1.f * rand() / RAND_MAX
+            , 1.f * rand() / RAND_MAX
+            ).Normalize();
 
-        aiMatrix3x3::FromToMatrix(from, to, trafo);
+        aiMatrix3x3::FromToMatrix( from, to, trafo );
         res = trafo * from;
 
-        ASSERT_NEAR(to.x, res.x, PRECISION);
-        ASSERT_NEAR(to.y, res.y, PRECISION);
-        ASSERT_NEAR(to.z, res.z, PRECISION);
+        ASSERT_NEAR( to.x, res.x, PRECISION );
+        ASSERT_NEAR( to.y, res.y, PRECISION );
+        ASSERT_NEAR( to.z, res.z, PRECISION );
     }
 }

@@ -3,7 +3,7 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2020, assimp team
+Copyright (c) 2006-2019, assimp team
 
 All rights reserved.
 
@@ -47,8 +47,10 @@ using namespace Assimp;
 
 class FindDegeneratesProcessTest : public ::testing::Test {
 public:
-    FindDegeneratesProcessTest() :
-            Test(), mMesh(nullptr), mProcess(nullptr) {
+    FindDegeneratesProcessTest()
+    : Test()
+    , mMesh( nullptr )
+    , mProcess( nullptr ) {
         // empty
     }
 
@@ -57,8 +59,8 @@ protected:
     virtual void TearDown();
 
 protected:
-    aiMesh *mMesh;
-    FindDegeneratesProcess *mProcess;
+    aiMesh* mMesh;
+    FindDegeneratesProcess* mProcess;
 };
 
 void FindDegeneratesProcessTest::SetUp() {
@@ -68,24 +70,24 @@ void FindDegeneratesProcessTest::SetUp() {
     mMesh->mNumFaces = 1000;
     mMesh->mFaces = new aiFace[1000];
 
-    mMesh->mNumVertices = 5000 * 2;
-    mMesh->mVertices = new aiVector3D[5000 * 2];
+    mMesh->mNumVertices = 5000*2;
+    mMesh->mVertices = new aiVector3D[5000*2];
 
     for (unsigned int i = 0; i < 5000; ++i) {
-        mMesh->mVertices[i] = mMesh->mVertices[i + 5000] = aiVector3D((float)i);
+        mMesh->mVertices[i] = mMesh->mVertices[i+5000] = aiVector3D((float)i);
     }
 
     mMesh->mPrimitiveTypes = aiPrimitiveType_LINE | aiPrimitiveType_POINT |
-                             aiPrimitiveType_POLYGON | aiPrimitiveType_TRIANGLE;
+    aiPrimitiveType_POLYGON | aiPrimitiveType_TRIANGLE;
 
     unsigned int numOut = 0, numFaces = 0;
     for (unsigned int i = 0; i < 1000; ++i) {
-        aiFace &f = mMesh->mFaces[i];
-        f.mNumIndices = (i % 5) + 1; // between 1 and 5
-        f.mIndices = new unsigned int[f.mNumIndices];
-        bool had = false;
-        for (unsigned int n = 0; n < f.mNumIndices; ++n) {
-            // FIXME
+        aiFace& f = mMesh->mFaces[i];
+    f.mNumIndices = (i % 5)+1; // between 1 and 5
+    f.mIndices = new unsigned int[f.mNumIndices];
+    bool had = false;
+    for (unsigned int n = 0; n < f.mNumIndices;++n) {
+        // FIXME
 #if 0
         // some duplicate indices
         if ( n && n == (i / 200)+1) {
@@ -94,11 +96,12 @@ void FindDegeneratesProcessTest::SetUp() {
         }
         // and some duplicate vertices
 #endif
-            if (n && i % 2 && 0 == n % 2) {
-                f.mIndices[n] = f.mIndices[n - 1] + 5000;
-                had = true;
-            } else {
-                f.mIndices[n] = numOut++;
+        if (n && i % 2 && 0 == n % 2) {
+            f.mIndices[n] = f.mIndices[n-1]+5000;
+            had = true;
+        }
+        else {
+            f.mIndices[n] = numOut++;
             }
         }
         if (!had)
@@ -119,7 +122,7 @@ TEST_F(FindDegeneratesProcessTest, testDegeneratesDetection) {
 
     unsigned int out = 0;
     for (unsigned int i = 0; i < 1000; ++i) {
-        aiFace &f = mMesh->mFaces[i];
+        aiFace& f = mMesh->mFaces[i];
         out += f.mNumIndices;
     }
 
@@ -127,9 +130,9 @@ TEST_F(FindDegeneratesProcessTest, testDegeneratesDetection) {
     EXPECT_EQ(10000U, mMesh->mNumVertices);
     EXPECT_EQ(out, mMesh->mNumUVComponents[0]);
     EXPECT_EQ(static_cast<unsigned int>(
-                      aiPrimitiveType_LINE | aiPrimitiveType_POINT |
-                      aiPrimitiveType_POLYGON | aiPrimitiveType_TRIANGLE),
-            mMesh->mPrimitiveTypes);
+                  aiPrimitiveType_LINE | aiPrimitiveType_POINT |
+                  aiPrimitiveType_POLYGON | aiPrimitiveType_TRIANGLE),
+              mMesh->mPrimitiveTypes);
 }
 
 TEST_F(FindDegeneratesProcessTest, testDegeneratesRemoval) {
@@ -145,5 +148,5 @@ TEST_F(FindDegeneratesProcessTest, testDegeneratesRemovalWithAreaCheck) {
     mProcess->EnableInstantRemoval(true);
     mProcess->ExecuteOnMesh(mMesh);
 
-    EXPECT_EQ(mMesh->mNumUVComponents[1] - 100, mMesh->mNumFaces);
+    EXPECT_EQ(mMesh->mNumUVComponents[1]-100, mMesh->mNumFaces);
 }

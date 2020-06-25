@@ -3,7 +3,7 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2020, assimp team
+Copyright (c) 2006-2019, assimp team
 
 
 
@@ -132,9 +132,11 @@ bool MakeVerboseFormatProcess::MakeVerboseFormat(aiMesh* pcMesh)
             // need to build a clean list of bones, too
             for (unsigned int i = 0;i < pcMesh->mNumBones;++i)
             {
-				for (unsigned int boneIdx = 0; boneIdx < pcMesh->mBones[i]->mNumWeights; ++boneIdx) {
-					const aiVertexWeight &w = pcMesh->mBones[i]->mWeights[boneIdx];
-                    if(pcFace->mIndices[q] == w.mVertexId) {
+                for (unsigned int a = 0;  a < pcMesh->mBones[i]->mNumWeights;a++)
+                {
+                    const aiVertexWeight& w = pcMesh->mBones[i]->mWeights[a];
+                    if(pcFace->mIndices[q] == w.mVertexId)
+                    {
                         aiVertexWeight wNew;
                         wNew.mVertexId = iIndex;
                         wNew.mWeight = w.mWeight;
@@ -155,17 +157,17 @@ bool MakeVerboseFormatProcess::MakeVerboseFormat(aiMesh* pcMesh)
                 pvBitangents[iIndex] = pcMesh->mBitangents[pcFace->mIndices[q]];
             }
 
-            unsigned int pp = 0;
-			while (pcMesh->HasTextureCoords(pp))
+            unsigned int p = 0;
+            while (pcMesh->HasTextureCoords(p))
             {
-				apvTextureCoords[pp][iIndex] = pcMesh->mTextureCoords[pp][pcFace->mIndices[q]];
-				++pp;
+                apvTextureCoords[p][iIndex] = pcMesh->mTextureCoords[p][pcFace->mIndices[q]];
+                ++p;
             }
-			pp = 0;
-			while (pcMesh->HasVertexColors(pp))
+            p = 0;
+            while (pcMesh->HasVertexColors(p))
             {
-				apvColorSets[pp][iIndex] = pcMesh->mColors[pp][pcFace->mIndices[q]];
-				++pp;
+                apvColorSets[p][iIndex] = pcMesh->mColors[p][pcFace->mIndices[q]];
+                ++p;
             }
             pcFace->mIndices[q] = iIndex;
         }

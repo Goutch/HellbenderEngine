@@ -3,7 +3,7 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2020, assimp team
+Copyright (c) 2006-2019, assimp team
 
 
 
@@ -48,10 +48,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_ASSIMP_HPP_INC
 #define AI_ASSIMP_HPP_INC
 
-#ifdef __GNUC__
-#   pragma GCC system_header
-#endif
-
 #ifndef __cplusplus
 #   error This header requires C++ to be used. Use assimp.h for plain C.
 #endif // __cplusplus
@@ -59,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Public ASSIMP data structures
 #include <assimp/types.h>
 
-namespace Assimp {
+namespace Assimp    {
     // =======================================================================
     // Public interface to Assimp
     class Importer;
@@ -285,7 +281,7 @@ public:
      *  The return value remains valid until the property is modified.
      * @see GetPropertyInteger()
      */
-    std::string GetPropertyString(const char* szName,
+    const std::string GetPropertyString(const char* szName,
         const std::string& sErrorReturn = "") const;
 
     // -------------------------------------------------------------------
@@ -294,7 +290,7 @@ public:
      *  The return value remains valid until the property is modified.
      * @see GetPropertyInteger()
      */
-    aiMatrix4x4 GetPropertyMatrix(const char* szName,
+    const aiMatrix4x4 GetPropertyMatrix(const char* szName,
         const aiMatrix4x4& sErrorReturn = aiMatrix4x4()) const;
 
     // -------------------------------------------------------------------
