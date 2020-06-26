@@ -8,7 +8,7 @@
 class Camera : public Component{
 private:
 
-    mat4 projection_matrix;
+    mat4 projection_matrix=mat4(1.0f);
     float fov=80;
     std::array<Plane,6> frustum_planes;
     float aspect_ratio=1;
