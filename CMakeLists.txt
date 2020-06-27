@@ -15,10 +15,6 @@ add_subdirectory("dependencies/glad")
 include_directories("dependencies/stb")
 add_subdirectory("dependencies/stb")
 
-set(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
-include_directories("dependencies/assimp/include")
-add_subdirectory("dependencies/assimp")
-
 include_directories("src")
 
 set(CORE_FILES
@@ -80,4 +76,4 @@ add_library (${PROJECT_NAME}
 		${GL_FILES}
 		)
 
-target_link_libraries(${PROJECT_NAME} glm glfw glad stb assimp)
+target_link_libraries(${PROJECT_NAME} glm glfw glad stb)

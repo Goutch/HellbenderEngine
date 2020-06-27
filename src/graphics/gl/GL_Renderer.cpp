@@ -56,6 +56,7 @@ void GL_Renderer::renderLayer(Layer &layer) {
     shader.unbind();
 }
 void GL_Renderer::init() {
+
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
         Log::error("Failed to load glad");
     }
