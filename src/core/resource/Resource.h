@@ -6,6 +6,7 @@
 #include "Mesh.h"
 #include "CompilationConfigs.h"
 #include "core/utility/Log.h"
+#include "typeinfo"
 namespace Resource {
     template<class T> T* get(){ Log::error(std::string("Resource")+typeid(T).name()+"is not implemented for the current renderer");};
 

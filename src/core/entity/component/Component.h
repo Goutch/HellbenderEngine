@@ -12,6 +12,7 @@ class Component {
 protected:
     Entity *entity = nullptr;
 public:
+
     Component() {};
 
     void attach(Entity *entity) {
@@ -30,4 +31,6 @@ public:
     virtual void onDraw(){};
     virtual void subscribeDraw() final;
     virtual void unsubscribeDraw() final;
+
+    Entity* getEntity(){return entity;}
 };

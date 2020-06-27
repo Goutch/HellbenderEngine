@@ -15,6 +15,7 @@
 #elif
 
 #endif
+const Mesh *Graphics::DEFAULT_CUBE = nullptr;
 const Mesh *Graphics::DEFAULT_QUAD = nullptr;
 const ShaderProgram *Graphics::DEFAULT_MESH_SHADER = nullptr;
 const ShaderProgram *Graphics::DEFAULT_LAYER_SHADER = nullptr;
@@ -53,11 +54,16 @@ void Graphics::terminate() {
     delete DEFAULT_MESH_SHADER;
     delete DEFAULT_LAYER_SHADER;
     delete DEFAULT_QUAD;
+    delete DEFAULT_CUBE;
     delete default_layer;
     delete renderer;
 }
 
 void Graphics::initializeDefaultVariables() {
+    //DEFAULT_CUBE
+    Mesh *cube = Resource::get<Mesh>();
+    Geometry::createCube(*cube, 1, 1, 1);
+    DEFAULT_CUBE = cube;
     //DEFAULT_QUAD
     Mesh *quad = Resource::get<Mesh>();
     Geometry::createQuad(*quad, 1, 1);

@@ -13,6 +13,8 @@ Timer *PrototypeEngine::time = nullptr;
 void PrototypeEngine::init() {
     window = Graphics::init();
     Input::init(window);
+    current_scene=new Scene();
+    current_scene->init();
 }
 
 Scene *PrototypeEngine::setScene(std::string path) {
@@ -26,10 +28,6 @@ Scene *PrototypeEngine::setScene(std::string path) {
 }
 
 void PrototypeEngine::run() {
-    if (current_scene == nullptr) {
-        current_scene = new Scene();
-        current_scene->init();
-    }
     time = new Timer();
     Timer delta = Timer();
     float delta_t = 0.0f;
