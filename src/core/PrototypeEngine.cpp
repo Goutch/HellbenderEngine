@@ -38,8 +38,8 @@ void PrototypeEngine::run() {
         current_scene->update(delta_t);
         current_scene->draw();
         Graphics::render(Camera::main->getProjectionMatrix(), Camera::main->getViewMatrix());
-        delta.reset();
         delta_t = delta.ms();
+        delta.reset();
     }
     delete time;
     delete current_scene;

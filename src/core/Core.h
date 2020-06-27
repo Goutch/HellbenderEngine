@@ -11,6 +11,7 @@
 #include <core/entity/Transform.h>
 #include <core/entity/component/Component.h>
 #include <core/entity/component/MeshRenderer.h>
+#include <core/entity/component/InstancesRenderer.h>
 #include <core/entity/component/Camera.h>
 #include <core/entity/component/CameraController.h>
 #include <core/graphics/Graphics.h>

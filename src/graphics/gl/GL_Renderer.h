@@ -10,12 +10,14 @@ class Mesh;
 #include "list"
 
 class GL_Renderer : public IRenderer {
+private:
     struct RenderObject {
         const Transform *transform;
         const Mesh *mesh;
         const ShaderProgram *shader;
     };
     std::list<RenderObject> render_objects;
+
 private:
     GLFWwindow *window;
 public:
@@ -24,6 +26,8 @@ public:
     void init() override;
 
     void draw(const Transform &transform, const Mesh &mesh, const ShaderProgram &shader) override;
+
+    void drawInstanced(const Mesh &mesh, const ShaderProgram &shader) override;
 
     void render(const mat4 &projection_matrix, const mat4 &view_matrix) override;
 

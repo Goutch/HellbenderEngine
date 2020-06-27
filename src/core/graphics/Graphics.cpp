@@ -19,6 +19,7 @@ const Mesh *Graphics::DEFAULT_CUBE = nullptr;
 const Mesh *Graphics::DEFAULT_QUAD = nullptr;
 const ShaderProgram *Graphics::DEFAULT_MESH_SHADER = nullptr;
 const ShaderProgram *Graphics::DEFAULT_LAYER_SHADER = nullptr;
+const ShaderProgram *Graphics::DEFAULT_INSTANCED_SHADER = nullptr;
 IRenderer *Graphics::renderer = nullptr;
 GLFWwindow *Graphics::window = nullptr;
 Layer *Graphics::default_layer = nullptr;
@@ -41,6 +42,10 @@ void Graphics::draw(const Transform &transform, const Mesh &mesh, const ShaderPr
     renderer->draw(transform, mesh, shader);
 }
 
+void Graphics::drawInstanced(const Mesh &mesh, const ShaderProgram &shader) {
+    renderer->drawInstanced(mesh, shader);
+}
+
 void Graphics::render(const mat4 &projection_matrix, const mat4 &view_matrix) {
     default_layer->getFramebuffer().bind();
     renderer->clear();
@@ -53,6 +58,7 @@ void Graphics::render(const mat4 &projection_matrix, const mat4 &view_matrix) {
 void Graphics::terminate() {
     delete DEFAULT_MESH_SHADER;
     delete DEFAULT_LAYER_SHADER;
+    delete DEFAULT_INSTANCED_SHADER;
     delete DEFAULT_QUAD;
     delete DEFAULT_CUBE;
     delete default_layer;
@@ -72,7 +78,11 @@ void Graphics::initializeDefaultVariables() {
     ShaderProgram *default_mesh_shader = Resource::get<ShaderProgram>();
     default_mesh_shader->setShaders(std::string(RESOURCE_PATH) + "shaders/shader.vert",
                                     std::string(RESOURCE_PATH) + "shaders/shader.frag");
-    DEFAULT_MESH_SHADER = default_mesh_shader;
+    //DEFAULT_INSTANCED_SHADER
+    ShaderProgram *default_instanced_shader = Resource::get<ShaderProgram>();
+    default_instanced_shader->setShaders(std::string(RESOURCE_PATH) + "shaders/instancedShader.vert",
+                                         std::string(RESOURCE_PATH) + "shaders/shader.frag");
+    DEFAULT_INSTANCED_SHADER=default_instanced_shader;
     //DEFAULT_LAYER_SHADER
     ShaderProgram *default_layer_shader = Resource::get<ShaderProgram>();
     default_layer_shader->setShaders(std::string(RESOURCE_PATH) + "shaders/layer.vert",
@@ -81,6 +91,9 @@ void Graphics::initializeDefaultVariables() {
     //DEFAULT_LAYER
     default_layer = new Layer(WIDTH, HEIGHT, *DEFAULT_LAYER_SHADER);
 }
+
+
+
 
 
 

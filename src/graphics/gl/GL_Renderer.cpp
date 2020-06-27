@@ -22,18 +22,29 @@ void
 GL_Renderer::draw(const Transform &transform, const Mesh &mesh, const ShaderProgram &shader) {
     render_objects.push_back({&transform, &mesh, &shader});
 }
-
+void GL_Renderer::drawInstanced(const Mesh &mesh, const ShaderProgram &shader) {
+    render_objects.push_back({nullptr,&mesh,&shader});
+}
 void GL_Renderer::render(const mat4 &projection_matrix, const mat4 &view_matrix) {
     glEnable(GL_DEPTH_TEST);
     for (auto ro:render_objects) {
         ro.shader->bind();
         ro.shader->setUniform("projection_matrix", projection_matrix);
         ro.shader->setUniform("view_matrix", view_matrix);
-        ro.shader->setUniform("transform_matrix", ro.transform->getMatrix());
+        if(ro.transform)
+            ro.shader->setUniform("transform_matrix", ro.transform->getMatrix());
         ro.mesh->bind();
-        ro.mesh->hasIndexBuffer() ?
-        glDrawElements(GL_TRIANGLES, ro.mesh->getIndexCount(), GL_UNSIGNED_INT, 0) :
-        glDrawArrays(GL_TRIANGLES, 0, ro.mesh->getVertexCount());
+        if(ro.mesh->getInstanceCount()==1)
+        {
+            ro.mesh->hasIndexBuffer() ?
+            glDrawElements(GL_TRIANGLES, ro.mesh->getIndexCount(), GL_UNSIGNED_INT, 0) :
+            glDrawArrays(GL_TRIANGLES, 0, ro.mesh->getVertexCount());
+        } else if(ro.mesh->getInstanceCount()>1){
+            ro.mesh->hasIndexBuffer()?
+            glDrawElementsInstanced(GL_TRIANGLES,ro.mesh->getIndexCount(),GL_UNSIGNED_INT,0,ro.mesh->getInstanceCount()):
+            glDrawArraysInstanced(GL_TRIANGLES,0,ro.mesh->getVertexCount(),ro.mesh->getInstanceCount());
+        }
+
         ro.mesh->unbind();
         ro.shader->unbind();
     }
@@ -89,6 +100,8 @@ GLFWwindow *GL_Renderer::createWindow() {
 void GL_Renderer::clear() const {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
+
+
 
 
 
