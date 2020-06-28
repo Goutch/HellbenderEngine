@@ -38,12 +38,12 @@ GLFWwindow *Graphics::init() {
     return window;
 }
 
-void Graphics::draw(const Transform &transform, const Mesh &mesh, const ShaderProgram &shader) {
-    renderer->draw(transform, mesh, shader);
+void Graphics::draw(const Transform &transform, const Mesh &mesh, const Material &material) {
+    renderer->draw(transform, mesh, material);
 }
 
-void Graphics::drawInstanced(const Mesh &mesh, const ShaderProgram &shader) {
-    renderer->drawInstanced(mesh, shader);
+void Graphics::drawInstanced(const Mesh &mesh, const Material &material) {
+    renderer->drawInstanced(mesh, material);
 }
 
 void Graphics::render(const mat4 &projection_matrix, const mat4 &view_matrix) {
@@ -78,6 +78,7 @@ void Graphics::initializeDefaultVariables() {
     ShaderProgram *default_mesh_shader = Resource::get<ShaderProgram>();
     default_mesh_shader->setShaders(std::string(RESOURCE_PATH) + "shaders/shader.vert",
                                     std::string(RESOURCE_PATH) + "shaders/shader.frag");
+    DEFAULT_MESH_SHADER=default_mesh_shader;
     //DEFAULT_INSTANCED_SHADER
     ShaderProgram *default_instanced_shader = Resource::get<ShaderProgram>();
     default_instanced_shader->setShaders(std::string(RESOURCE_PATH) + "shaders/instancedShader.vert",

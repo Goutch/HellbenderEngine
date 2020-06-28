@@ -4,7 +4,7 @@ class GLFWwindow;
 class Scene;
 class Timer;
 
-class PrototypeEngine {
+class HBE {
     static GLFWwindow* window;
     static Timer* time;
 public:

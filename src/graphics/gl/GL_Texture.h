@@ -3,11 +3,8 @@
 #include <core/resource/Texture.h>
 
 class GL_Texture : public Texture {
-public:
-    void setSlot(unsigned int slot) override;
 
 private:
-    unsigned int slot = 0;
     unsigned int texture_id;
 public:
     GL_Texture();
@@ -16,9 +13,9 @@ public:
 
     void setData(unsigned char *data, int width, int height, TEXTURE_TYPE texture_type) override;
 
-    void bind() const;
+    void bind(unsigned int slot=0) const override ;
 
-    void unbind() const;
+    void unbind(unsigned int slot=0) const override ;
 
     unsigned int getId();
 };

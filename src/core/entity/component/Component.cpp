@@ -1,11 +1,11 @@
 #include "Component.h"
-#include "core/PrototypeEngine.h"
+#include "core/HBE.h"
 #include "core/entity/Scene.h"
 
 void Component::subscribeDraw() {
     if (!subscribed_draw) {
         subscribed_draw = true;
-        PrototypeEngine::current_scene->subscribeDraw(this);
+        HBE::current_scene->subscribeDraw(this);
     }
 
 }
@@ -13,21 +13,21 @@ void Component::subscribeDraw() {
 void Component::unsubscribeDraw() {
     if (subscribed_draw) {
         subscribed_draw = false;
-        PrototypeEngine::current_scene->unsubscribeDraw(this);
+        HBE::current_scene->unsubscribeDraw(this);
     }
 }
 
 void Component::subscribeUpdate() {
     if (!subscribed_update) {
         subscribed_update = true;
-        PrototypeEngine::current_scene->subscribeUpdate(this);
+        HBE::current_scene->subscribeUpdate(this);
     }
 }
 
 void Component::unsubscribeUpdate() {
     if (subscribed_update) {
         subscribed_update = false;
-        PrototypeEngine::current_scene->unsubscribeUpdate(this);
+        HBE::current_scene->unsubscribeUpdate(this);
     }
 }
 

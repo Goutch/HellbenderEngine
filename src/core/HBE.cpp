@@ -1,4 +1,4 @@
-#include "PrototypeEngine.h"
+#include "HBE.h"
 #include <core/graphics/Graphics.h>
 #include <core/entity/Scene.h>
 #include <core/entity/component/Camera.h>
@@ -6,18 +6,18 @@
 #include "GLFW/glfw3.h"
 #include "core/utility/Timer.h"
 
-Scene *PrototypeEngine::current_scene = nullptr;
-GLFWwindow *PrototypeEngine::window = nullptr;
-Timer *PrototypeEngine::time = nullptr;
+Scene *HBE::current_scene = nullptr;
+GLFWwindow *HBE::window = nullptr;
+Timer *HBE::time = nullptr;
 
-void PrototypeEngine::init() {
+void HBE::init() {
     window = Graphics::init();
     Input::init(window);
     current_scene=new Scene();
     current_scene->init();
 }
 
-Scene *PrototypeEngine::setScene(std::string path) {
+Scene *HBE::setScene(std::string path) {
     if (current_scene != nullptr) {
         current_scene->terminate();
         delete current_scene;
@@ -27,10 +27,14 @@ Scene *PrototypeEngine::setScene(std::string path) {
     return current_scene;
 }
 
-void PrototypeEngine::run() {
+void HBE::run() {
     time = new Timer();
     Timer delta = Timer();
     float delta_t = 0.0f;
+    if(Camera::main== nullptr)
+    {
+        current_scene->instantiate<Camera>();
+    }
     while (!glfwWindowShouldClose(window) && current_scene != nullptr) {
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -45,16 +49,16 @@ void PrototypeEngine::run() {
     delete current_scene;
 }
 
-void PrototypeEngine::terminate() {
+void HBE::terminate() {
     Graphics::terminate();
     glfwTerminate();
 }
 
-void PrototypeEngine::quit() {
+void HBE::quit() {
     glfwSetWindowShouldClose(window, true);
 }
 
-float PrototypeEngine::getTime() {
+float HBE::getTime() {
     return time->ms();
 }
 

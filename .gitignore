@@ -1,4 +1,4 @@
-.idea/
-cmake-build*
-.vs/
-out/
+*.idea/
+*cmake-build*
+*.vs/
+*out/

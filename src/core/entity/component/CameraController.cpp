@@ -8,7 +8,7 @@
 #include "GLFW/glfw3.h"
 #include "Camera.h"
 #include "CompilationConfigs.h"
-#include <core/PrototypeEngine.h>
+#include <core/HBE.h>
 #include <core/entity/Scene.h>
 
 void CameraController::onUpdate(float delta) {
@@ -68,6 +68,10 @@ void CameraController::onUpdate(float delta) {
 void CameraController::onAttach() {
     Component::onAttach();
     camera = entity->getComponent<Camera>();
+    if(camera== nullptr)
+    {
+        camera=entity->attach<Camera>();
+    }
     Input::setCursorVisible(false);
     subscribeUpdate();
 }

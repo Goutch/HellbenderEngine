@@ -5,22 +5,22 @@
 #include <core/graphics/Graphics.h>
 #include "core/entity/Entity.h"
 #include "MeshRenderer.h"
+#include "core/resource/Resource.h"
 void MeshRenderer::onAttach() {
     Component::onAttach();
-    shader=Graphics::DEFAULT_MESH_SHADER;
     subscribeDraw();
 }
 
-void MeshRenderer::onDraw() {
-    Graphics::draw(*entity, *mesh, *shader);
+void MeshRenderer::onDraw(){
+    Graphics::draw(*entity, *mesh, *material);
 }
 
 void MeshRenderer::setMesh(const Mesh &mesh){
     this->mesh=&mesh;
 }
 
-void MeshRenderer::setShader(const ShaderProgram &shader) {
-    this->shader=&shader;
+void MeshRenderer::setMaterial(const Material &material) {
+    this->material=&material;
 }
 
 

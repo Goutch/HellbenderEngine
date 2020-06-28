@@ -2,7 +2,7 @@
 
 
 #include <CompilationConfigs.h>
-#include <core/PrototypeEngine.h>
+#include <core/HBE.h>
 #include <core/resource/Resource.h>
 #include <core/utility/Log.h>
 #include <core/utility/Geometry.h>
@@ -19,5 +19,7 @@
 #include <core/input/Input.h>
 #include <core/math/Plane.h>
 #include <core/utility/Event.h>
+#include <core/utility/Timer.h>
+#include <core/utility/Noise.h>
 #include <glm/glm.hpp>
 using namespace glm;

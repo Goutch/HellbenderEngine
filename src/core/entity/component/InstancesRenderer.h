@@ -1,19 +1,21 @@
 #pragma once
 
-#include <core/resource/ShaderProgram.h>
+#include <core/resource/Material.h>
 #include <core/resource/Mesh.h>
 #include <core/entity/Transform.h>
 #include "Component.h"
-class InstancesRenderer: public Component {
 
-    Mesh* mesh;
-    const ShaderProgram* shader;
+class InstancesRenderer : public Component {
+
+    Mesh *mesh;
+    const Material *material;
+
     void onAttach() override;
 
     void onDraw() override;
 
 public:
-    void setShader(const ShaderProgram &shader);
+    void setMaterial(const Material &material);
 
     void setMesh(Mesh &mesh);
 };

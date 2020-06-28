@@ -3,7 +3,7 @@
 //
 #include "Layer.h"
 
-#include <core/PrototypeEngine.h>
+#include <core/HBE.h>
 #include <core/resource/Resource.h>
 #include "glm/gtc/matrix_transform.hpp"
 Layer::Layer(unsigned int width, unsigned int height, const ShaderProgram &shader_program) {
@@ -50,7 +50,7 @@ void Layer::setShaderUniforms() const {
     shader_program->setUniform("texture_0",0);
     shader_program->setUniform("projection_matrix",projection_matrix);
     shader_program->setUniform("resolution",glm::vec2(width,heigth));
-    shader_program->setUniform("time",PrototypeEngine::getTime());
+    shader_program->setUniform("time", HBE::getTime());
 }
 
 

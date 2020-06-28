@@ -32,5 +32,5 @@ public:
     virtual void subscribeDraw() final;
     virtual void unsubscribeDraw() final;
 
-    Entity* getEntity(){return entity;}
+    Entity* getEntity() const{return entity;}
 };

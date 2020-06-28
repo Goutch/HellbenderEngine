@@ -17,6 +17,10 @@ void GL_Texture::setData(unsigned char *data, int width, int height, Texture::TE
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     switch (texture_type) {
+        case TEXTURE_TYPE::R8: {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, data);
+            break;
+        }
         case TEXTURE_TYPE::RGBA8: {
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
             break;
@@ -33,19 +37,16 @@ void GL_Texture::setData(unsigned char *data, int width, int height, Texture::TE
     unbind();
 }
 
-void GL_Texture::bind() const {
+void GL_Texture::bind(unsigned int slot) const {
     glActiveTexture(GL_TEXTURE0 + slot);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void GL_Texture::unbind() const {
-    glActiveTexture(GL_TEXTURE0 +slot);
+void GL_Texture::unbind(unsigned int slot) const {
+    glActiveTexture(GL_TEXTURE0 + slot);
     glBindTexture(GL_TEXTURE_2D, texture_id);
 }
 
-void GL_Texture::setSlot(unsigned int slot) {
-    this->slot = slot;
-}
 
 unsigned int GL_Texture::getId() {
     return texture_id;

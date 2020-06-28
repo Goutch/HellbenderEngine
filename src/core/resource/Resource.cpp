@@ -14,6 +14,11 @@ template<> Texture* Resource::get<Texture>() {
 #endif
     return nullptr;
 }
+
+template<> Material* Resource::get<Material>() {
+    return new Material();
+}
+
 template<> ShaderProgram* Resource::get<ShaderProgram>() {
 #if RENDERER==OPENGL_RENDERER
     return new GL_ShaderProgram();
