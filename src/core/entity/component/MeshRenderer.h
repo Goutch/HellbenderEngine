@@ -2,17 +2,17 @@
 
 
 #include <core/entity/component/Component.h>
-class ShaderProgram;
+class Material;
 class MeshRenderer : public Component {
     const Mesh *mesh;
-    const ShaderProgram *shader;
+    const Material *material;
 
 public:
     void onAttach() override;
 
     void onDraw() override;
 
-    void setShader(const ShaderProgram &shader);
+    void setMaterial(const Material &material);
 
     void setMesh(const Mesh &mesh);
 

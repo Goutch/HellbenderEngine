@@ -33,19 +33,16 @@ void GL_Texture::setData(unsigned char *data, int width, int height, Texture::TE
     unbind();
 }
 
-void GL_Texture::bind() const {
+void GL_Texture::bind(unsigned int slot) const {
     glActiveTexture(GL_TEXTURE0 + slot);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void GL_Texture::unbind() const {
+void GL_Texture::unbind(unsigned int slot) const {
     glActiveTexture(GL_TEXTURE0 +slot);
     glBindTexture(GL_TEXTURE_2D, texture_id);
 }
 
-void GL_Texture::setSlot(unsigned int slot) {
-    this->slot = slot;
-}
 
 unsigned int GL_Texture::getId() {
     return texture_id;

@@ -6,15 +6,25 @@
 #include "Mesh.h"
 #include "CompilationConfigs.h"
 #include "core/utility/Log.h"
+#include "core/resource/Material.h"
 #include "typeinfo"
+
 namespace Resource {
-    template<class T> T* get(){ Log::error(std::string("Resource")+typeid(T).name()+"is not implemented for the current renderer");};
+    template<class T>
+    T *get() { Log::error(std::string("Resource ") + typeid(T).name() + " is not implemented for the current renderer"); };
 
-    template<> Texture* get<Texture>();
+    template<>
+    Texture *get<Texture>();
 
-    template<> ShaderProgram* get<ShaderProgram>();
+    template<>
+    Material *get<Material>();
 
-    template<> Mesh* get<Mesh>();
+    template<>
+    ShaderProgram *get<ShaderProgram>();
 
-    template<> Framebuffer* get<Framebuffer>();
+    template<>
+    Mesh *get<Mesh>();
+
+    template<>
+    Framebuffer *get<Framebuffer>();
 };

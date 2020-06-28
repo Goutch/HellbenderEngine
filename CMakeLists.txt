@@ -56,7 +56,7 @@ set(CORE_FILES
 		src/core/utility/Geometry.h
 		src/core/utility/Timer.cpp
 		src/core/utility/Event.h
-        src/core/entity/component/InstancesRenderer.cpp src/core/entity/component/InstancesRenderer.h)
+        src/core/entity/component/InstancesRenderer.cpp src/core/entity/component/InstancesRenderer.h src/core/resource/Material.cpp src/core/resource/Material.h)
 
 set(GL_FILES
 		src/graphics/gl/GL_Core.h
@@ -69,7 +69,7 @@ set(GL_FILES
 		src/graphics/gl/GL_Debug.cpp
 		src/graphics/gl/GL_Debug.h
 		src/graphics/gl/GL_MultisamplingFramebuffer.cpp
-		src/graphics/gl/GL_MultisamplingFramebuffer.h src/core/resource/GLSL_TYPE.h)
+		src/graphics/gl/GL_MultisamplingFramebuffer.h src/core/resource/GLSL_TYPE.h src/RuntimeConfigs.h)
 
 add_library (${PROJECT_NAME}
 		${CORE_FILES}

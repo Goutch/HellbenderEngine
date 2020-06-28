@@ -8,11 +8,11 @@ void InstancesRenderer::onAttach() {
 
 void InstancesRenderer::onDraw() {
     Component::onDraw();
-    Graphics::drawInstanced(*mesh,*shader);
+    Graphics::drawInstanced(*mesh,*material);
 }
 
-void InstancesRenderer::setShader(const ShaderProgram &shader) {
-    this->shader=&shader;
+void InstancesRenderer::setMaterial(const Material &material) {
+    this->material=&material;
 }
 
 void InstancesRenderer::setMesh(Mesh &mesh) {

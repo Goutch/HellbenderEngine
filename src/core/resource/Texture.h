@@ -15,10 +15,9 @@ public:
 
     virtual void setData(unsigned char *data, int width, int height, TEXTURE_TYPE texture_type) = 0;
     virtual void load(std::string path);
-    virtual void setSlot(unsigned int slot) = 0;
 
     virtual ~Texture() {};
-    virtual void bind() const=0;
-    virtual void unbind() const=0;
+    virtual void bind(unsigned int slot=0) const=0;
+    virtual void unbind(unsigned int slot=0) const=0;
 };
 
