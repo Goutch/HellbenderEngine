@@ -78,7 +78,7 @@ set(GL_FILES
 		src/graphics/gl/GL_Debug.cpp
 		src/graphics/gl/GL_Debug.h
 		src/graphics/gl/GL_MultisamplingFramebuffer.cpp
-		src/graphics/gl/GL_MultisamplingFramebuffer.h src/core/resource/GLSL_TYPE.h src/RuntimeConfigs.h)
+		src/graphics/gl/GL_MultisamplingFramebuffer.h )
 
 add_library (${PROJECT_NAME}
 		${CORE_FILES}
