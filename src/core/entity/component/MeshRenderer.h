@@ -16,7 +16,7 @@ public:
     void setMaterial(const Material &material);
 
     void setMesh(const Mesh &mesh);
-
+    const Mesh* getMesh();
 
 };
 

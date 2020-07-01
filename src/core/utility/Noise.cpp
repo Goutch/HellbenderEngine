@@ -42,6 +42,14 @@ float Noise::perlin(float x, float y) {
     return noiser->GetPerlin(x, y);
 }
 
+float Noise::celular(float x, float y, float z) {
+    return noiser->GetCellular(x,y,z);
+}
+
+float Noise::celular(float x, float y) {
+    return noiser->GetCellular(x,y);
+}
+
 
 
 

@@ -65,6 +65,7 @@ set(CORE_FILES
 		src/core/utility/Timer.cpp
 		src/core/utility/Event.h
         src/core/utility/Noise.cpp
+		src/core/utility/Job.cpp
 )
 
 set(GL_FILES
@@ -78,7 +79,7 @@ set(GL_FILES
 		src/graphics/gl/GL_Debug.cpp
 		src/graphics/gl/GL_Debug.h
 		src/graphics/gl/GL_MultisamplingFramebuffer.cpp
-		src/graphics/gl/GL_MultisamplingFramebuffer.h src/core/resource/GLSL_TYPE.h src/RuntimeConfigs.h)
+		src/graphics/gl/GL_MultisamplingFramebuffer.h )
 
 add_library (${PROJECT_NAME}
 		${CORE_FILES}

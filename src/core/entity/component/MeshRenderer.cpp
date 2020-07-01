@@ -15,10 +15,12 @@ void MeshRenderer::onDraw(){
     Graphics::draw(*entity, *mesh, *material);
 }
 
-void MeshRenderer::setMesh(const Mesh &mesh){
+void MeshRenderer::setMesh( const Mesh &mesh){
     this->mesh=&mesh;
 }
-
+const Mesh * MeshRenderer::getMesh() {
+    return mesh;
+}
 void MeshRenderer::setMaterial(const Material &material) {
     this->material=&material;
 }

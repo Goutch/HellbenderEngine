@@ -21,5 +21,6 @@
 #include <core/utility/Event.h>
 #include <core/utility/Timer.h>
 #include <core/utility/Noise.h>
+#include <core/utility/Job.h>
 #include <glm/glm.hpp>
 using namespace glm;

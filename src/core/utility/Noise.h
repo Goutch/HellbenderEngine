@@ -16,4 +16,7 @@ public:
 
     float perlin(float x,float y,float z);
     float perlin(float x,float y);
+
+    float celular(float x,float y,float z);
+    float celular(float x,float y);
 };
