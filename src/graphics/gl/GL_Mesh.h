@@ -20,6 +20,8 @@ public:
 
     void setIndices(const std::vector<unsigned int> &data) override;
 
+    void setBuffer(unsigned int position, const std::vector<unsigned int> &data) override;
+
     void setBuffer(unsigned int position, const std::vector<float> &data) override;
 
     void setBuffer(unsigned int position, const std::vector<vec2> &data) override;
@@ -28,10 +30,13 @@ public:
 
     void setBuffer(unsigned int position, const std::vector<vec4> &data) override;
 
+
     void setInstancedBuffer(unsigned int position, const std::vector<mat4> &data) override;
 
     void setBuffer(unsigned int position, const float *data, unsigned int data_count, unsigned int byte_size,
                    unsigned int count_per_vertex);
 
     unsigned int getVBO(unsigned int position);
+
+
 };

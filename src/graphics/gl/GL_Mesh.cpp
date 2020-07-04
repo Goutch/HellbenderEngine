@@ -117,6 +117,16 @@ void GL_Mesh::setBuffer(unsigned int position, const std::vector<int> &data) {
     glEnableVertexAttribArray(position);
     unbind();
 }
+void GL_Mesh::setBuffer(unsigned int position, const std::vector<unsigned int> &data) {
+    unsigned int vbo = getVBO(4);
+    vertex_count = data.size();
+    bind();
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(GL_UNSIGNED_INT), data.data(), GL_STATIC_DRAW);;
+    glVertexAttribIPointer(position, 1, GL_UNSIGNED_INT, sizeof(GL_UNSIGNED_INT), nullptr);
+    glEnableVertexAttribArray(position);
+    unbind();
+}
 
 
 
