@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Component.h"
-#include "math.h"
+#define _USE_MATH_DEFINES
+#include <math.h>
 class Camera;
 class CameraController: public Component {
     Camera* camera;

@@ -10,6 +10,8 @@ class GL_Mesh : public Mesh {
 public:
     GL_Mesh();
 
+    void setBuffer(unsigned int position, const std::vector<int> &data) override;
+
     ~GL_Mesh();
 
     void bind() const override;
@@ -28,7 +30,8 @@ public:
 
     void setInstancedBuffer(unsigned int position, const std::vector<mat4> &data) override;
 
-    void setBuffer(unsigned int position, const float *data, unsigned int data_count, unsigned int byte_size, unsigned int count_per_vertex);
+    void setBuffer(unsigned int position, const float *data, unsigned int data_count, unsigned int byte_size,
+                   unsigned int count_per_vertex);
 
     unsigned int getVBO(unsigned int position);
 };

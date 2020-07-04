@@ -6,16 +6,16 @@
 #include <fstream>
 #include <sstream>
 #include <glm/gtc/type_ptr.hpp>
-void GL_ShaderProgram::setShaders(std::string vertex_path, std::string fragment_path) {
 
+void GL_ShaderProgram::setShaders(std::string vertex_path, std::string fragment_path) {
     Log::status("Compiling vertex shader:" + vertex_path);
     std::string sourcevs;
-     sourcevs = getSource(vertex_path);
+    sourcevs = getSource(vertex_path);
     unsigned int vs = compileShader(GL_VERTEX_SHADER, sourcevs);
 
     Log::status("Compiling fragment shader:" + fragment_path);
     std::string sourcefs;
-    sourcefs = getSource(fragment_path) ;
+    sourcefs = getSource(fragment_path);
     unsigned int fs = compileShader(GL_FRAGMENT_SHADER, sourcefs);
 
     glAttachShader(program_id, vs);
@@ -26,17 +26,18 @@ void GL_ShaderProgram::setShaders(std::string vertex_path, std::string fragment_
     glDeleteShader(vs);
     glDeleteShader(fs);
 }
+
 GL_ShaderProgram::GL_ShaderProgram() {
     program_id = glCreateProgram();
 }
 
-
 GL_ShaderProgram::GL_ShaderProgram(const std::string &vertexShader, const std::string &fragmentShader) {
     program_id = glCreateProgram();
-    setShaders(vertexShader,fragmentShader);
+    setShaders(vertexShader, fragmentShader);
 }
 
-GL_ShaderProgram::GL_ShaderProgram(const std::string &vertexShader, const std::string &geometryShader, const std::string &fragmentShader,
+GL_ShaderProgram::GL_ShaderProgram(const std::string &vertexShader, const std::string &geometryShader,
+                                   const std::string &fragmentShader,
                                    bool source) {
     program_id = glCreateProgram();
 
@@ -80,8 +81,9 @@ void GL_ShaderProgram::unbind() const {
 }
 
 int GL_ShaderProgram::uniformLocation(std::string name) const {
-    if (uniforms.find(name) != uniforms.end())
-        return uniforms.at(name);
+    auto uniform_it = uniforms.find(name);
+    if (uniform_it != uniforms.end())
+        return uniform_it->second;
     int location = glGetUniformLocation(program_id, name.c_str());;
     uniforms[name] = location;
     return location;

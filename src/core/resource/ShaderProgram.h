@@ -9,8 +9,10 @@ public:
 
     virtual ~ShaderProgram() {};
 
-    virtual void bind() const=0;
-    virtual void unbind() const=0;
+    virtual void bind() const = 0;
+
+    virtual void unbind() const = 0;
+
     virtual void setShaders(std::string vertex_path, std::string fragment_path) = 0;
 
     virtual void setUniform(std::string name, int i) const = 0;

@@ -49,7 +49,7 @@ void GL_Mesh::setInstancedBuffer(unsigned int position, const std::vector<mat4> 
     instance_count = data.size();
     bind();
 
-    unsigned int vbo=getVBO(position);
+    unsigned int vbo = getVBO(position);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::mat4), &data[0], GL_STATIC_DRAW);
 
@@ -86,7 +86,7 @@ void GL_Mesh::setBuffer(unsigned int position,
                         unsigned int count_per_vertex) {
     bind();
     vertex_count = data_count;
-    unsigned int vbo=getVBO(position);
+    unsigned int vbo = getVBO(position);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, data_count * byte_size, data, GL_STATIC_DRAW);
     glVertexAttribPointer(position, count_per_vertex, GL_FLOAT, GL_FALSE, count_per_vertex * byte_size, nullptr);
@@ -105,6 +105,17 @@ unsigned int GL_Mesh::getVBO(unsigned int position) {
         vbo = vbo_it->second;
     }
     return vbo;
+}
+
+void GL_Mesh::setBuffer(unsigned int position, const std::vector<int> &data) {
+    unsigned int vbo = getVBO(4);
+    vertex_count = data.size();
+    bind();
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(GL_INT), data.data(), GL_STATIC_DRAW);;
+    glVertexAttribIPointer(position, 1, GL_INT, sizeof(GL_INT), nullptr);
+    glEnableVertexAttribArray(position);
+    unbind();
 }
 
 
