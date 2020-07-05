@@ -108,7 +108,7 @@ unsigned int GL_Mesh::getVBO(unsigned int position) {
 }
 
 void GL_Mesh::setBuffer(unsigned int position, const std::vector<int> &data) {
-    unsigned int vbo = getVBO(4);
+    unsigned int vbo = getVBO(position);
     vertex_count = data.size();
     bind();
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -118,7 +118,7 @@ void GL_Mesh::setBuffer(unsigned int position, const std::vector<int> &data) {
     unbind();
 }
 void GL_Mesh::setBuffer(unsigned int position, const std::vector<unsigned int> &data) {
-    unsigned int vbo = getVBO(4);
+    unsigned int vbo = getVBO(position);
     vertex_count = data.size();
     bind();
     glBindBuffer(GL_ARRAY_BUFFER, vbo);

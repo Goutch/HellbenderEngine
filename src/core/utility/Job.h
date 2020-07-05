@@ -1,8 +1,8 @@
 #pragma once
 
 #include <thread>
+
 #include <future>
-#include "functional"
 
 class Job {
 
