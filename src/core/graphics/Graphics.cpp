@@ -7,6 +7,7 @@
 #include <core/utility/Geometry.h>
 #include <core/graphics/Layer.h>
 #include <core/resource/Resource.h>
+#include <RuntimeConfigs.h>
 
 #if RENDERER == OPENGL_RENDERER
 
@@ -31,8 +32,10 @@ GLFWwindow *Graphics::init() {
 #elif RENDERER == VULKAN_RENDERER
 
 #endif
-
     window = renderer->createWindow();
+    if (!VSYNC)
+        glfwSwapInterval(0);
+
     renderer->init();
     initializeDefaultVariables();
     return window;
@@ -78,12 +81,12 @@ void Graphics::initializeDefaultVariables() {
     ShaderProgram *default_mesh_shader = Resource::get<ShaderProgram>();
     default_mesh_shader->setShaders(std::string(RESOURCE_PATH) + "shaders/shader.vert",
                                     std::string(RESOURCE_PATH) + "shaders/shader.frag");
-    DEFAULT_MESH_SHADER=default_mesh_shader;
+    DEFAULT_MESH_SHADER = default_mesh_shader;
     //DEFAULT_INSTANCED_SHADER
     ShaderProgram *default_instanced_shader = Resource::get<ShaderProgram>();
     default_instanced_shader->setShaders(std::string(RESOURCE_PATH) + "shaders/instancedShader.vert",
                                          std::string(RESOURCE_PATH) + "shaders/shader.frag");
-    DEFAULT_INSTANCED_SHADER=default_instanced_shader;
+    DEFAULT_INSTANCED_SHADER = default_instanced_shader;
     //DEFAULT_LAYER_SHADER
     ShaderProgram *default_layer_shader = Resource::get<ShaderProgram>();
     default_layer_shader->setShaders(std::string(RESOURCE_PATH) + "shaders/layer.vert",
@@ -92,6 +95,7 @@ void Graphics::initializeDefaultVariables() {
     //DEFAULT_LAYER
     default_layer = new Layer(WIDTH, HEIGHT, *DEFAULT_LAYER_SHADER);
 }
+
 
 
 

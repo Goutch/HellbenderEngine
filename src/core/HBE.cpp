@@ -3,17 +3,21 @@
 #include <core/entity/Scene.h>
 #include <core/entity/component/Camera.h>
 #include <core/input/Input.h>
+#include <core/utility/Log.h>
 #include "GLFW/glfw3.h"
 #include "core/utility/Timer.h"
+#include "CompilationConfigs.h"
 
 Scene *HBE::current_scene = nullptr;
 GLFWwindow *HBE::window = nullptr;
 Timer *HBE::time = nullptr;
+int HBE::fps_counter = 0;
+float HBE::fps_timer = 0;
 
 void HBE::init() {
     window = Graphics::init();
     Input::init(window);
-    current_scene=new Scene();
+    current_scene = new Scene();
     current_scene->init();
 }
 
@@ -31,8 +35,7 @@ void HBE::run() {
     time = new Timer();
     Timer delta = Timer();
     float delta_t = 0.0f;
-    if(Camera::main== nullptr)
-    {
+    if (Camera::main == nullptr) {
         current_scene->instantiate<Camera>();
     }
     while (!glfwWindowShouldClose(window) && current_scene != nullptr) {
@@ -44,6 +47,9 @@ void HBE::run() {
         Graphics::render(Camera::main->getProjectionMatrix(), Camera::main->getViewMatrix());
         delta_t = delta.ms();
         delta.reset();
+#if DEBUG_MODE
+        printFPS(delta_t);
+#endif
     }
     delete time;
     delete current_scene;
@@ -62,5 +68,15 @@ float HBE::getTime() {
     return time->ms();
 }
 
+void HBE::printFPS(float delta) {
+    fps_counter++;
+    fps_timer += delta;
+    if (fps_timer >= 1.0) {
+        Log::debug("fps:" + std::to_string(fps_counter));
+        fps_counter = 0;
+        fps_timer = 0;
+    }
+
+}
 
 

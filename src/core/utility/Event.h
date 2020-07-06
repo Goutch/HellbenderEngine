@@ -3,15 +3,15 @@
 #include "unordered_set"
 
 template <typename... Args> class Event {
-    mutable std::unordered_set<void(*)(Args...)> callbacks;
+    std::unordered_set<void(*)(Args...)> callbacks;
 
 public:
-    void operator += (void(* callback)(Args...)) const
+    void operator += (void(* callback)(Args...))
     {
         callbacks.emplace(callback);
     }
 
-    void operator -= (void(* callback)(Args...)) const
+    void operator -= (void(* callback)(Args...))
     {
         callbacks.erase(callback);
     }

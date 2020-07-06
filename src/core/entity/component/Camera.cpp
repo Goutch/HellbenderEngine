@@ -6,7 +6,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include <core/entity/Entity.h>
 #include "CompilationConfigs.h"
-const Camera* Camera::main= nullptr;
+Camera* Camera::main= nullptr;
 void Camera::onAttach() {
     Component::onAttach();
     if(Camera::main== nullptr)
@@ -19,7 +19,14 @@ void Camera::onAttach() {
 }
 
 void Camera::generateProjectionMatrix() {
-    projection_matrix = glm::perspective<float>(glm::radians(fov), aspect_ratio, 0.1f, render_distance);
+    if(render_mode==RenderMode::PERSPECTIVE)
+    {
+        projection_matrix = glm::perspective<float>(glm::radians(fov), aspect_ratio, 0.1f, render_distance);
+    }
+    if(render_mode==RenderMode::ORTHOGRAPHIC)
+    {
+        projection_matrix=glm::ortho(-0.5*aspect_ratio,0.5*aspect_ratio,-0.5,0.5,-1.0,1.0);
+    }
     calculateFrustumPlanes();
 }
 
@@ -101,6 +108,11 @@ bool Camera::isBoxInFrustum(const vec3 &position, float size_x, float size_y, fl
     if (isPointInFrustum(position + vec3(size_x, size_y, 0.0f))) { return true; }
     if (isPointInFrustum(position + vec3(0.0f, size_y, size_z))) { return true; }
     return isPointInFrustum(position + vec3(size_x, 0.0f, size_z));
+}
+
+void Camera::setRenderMode(RenderMode mode) {
+    render_mode=mode;
+    generateProjectionMatrix();
 }
 
 

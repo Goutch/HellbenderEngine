@@ -27,7 +27,6 @@ public:
     static void drawInstanced(const Mesh &mesh, const Material &material);
     static void render(const mat4& projection_matrix,const mat4& view_matrix);
     static void terminate();
-
 private:
     static void initializeDefaultVariables();
 
