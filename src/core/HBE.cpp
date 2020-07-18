@@ -45,7 +45,7 @@ void HBE::run() {
         current_scene->update(delta_t);
         current_scene->draw();
         Graphics::render(Camera::main->getProjectionMatrix(), Camera::main->getViewMatrix());
-        delta_t = delta.ms();
+        delta_t = delta.ms()/1000;
         delta.reset();
 #if DEBUG_MODE
         printFPS(delta_t);

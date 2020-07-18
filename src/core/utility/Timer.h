@@ -9,6 +9,8 @@ public:
     Timer();
     void reset();
     float ms() const;
+
+    double ns() const;
 };
 
 

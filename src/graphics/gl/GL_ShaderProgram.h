@@ -32,7 +32,7 @@ public:
     void bind() const override;
 
     void setShaders(std::string vertex_path, std::string fragment_path) override;
-
+    void setComputeShader(std::string compute_path) override ;
     void unbind() const override;
 
 

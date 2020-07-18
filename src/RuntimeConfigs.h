@@ -1,3 +1,3 @@
 #pragma once
 
-#define VSYNC true
+#define VSYNC false

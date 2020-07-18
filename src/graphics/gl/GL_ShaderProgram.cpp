@@ -39,7 +39,6 @@ GL_ShaderProgram::GL_ShaderProgram(const std::string &vertexShader, const std::s
 GL_ShaderProgram::GL_ShaderProgram(const std::string &vertexShader, const std::string &geometryShader,
                                    const std::string &fragmentShader,
                                    bool source) {
-    program_id = glCreateProgram();
 
     if (!source)Log::status("Compiling vertex getShader:" + vertexShader);
     std::string sourcevs;
@@ -66,6 +65,18 @@ GL_ShaderProgram::GL_ShaderProgram(const std::string &vertexShader, const std::s
     glDeleteShader(gs);
     glDeleteShader(fs);
 
+}
+void GL_ShaderProgram::setComputeShader(std::string compute_path) {
+    Log::status("Compiling compute shader:" + compute_path);
+    std::string source_cs;
+    source_cs = getSource(compute_path);
+    unsigned int cs = compileShader(GL_COMPUTE_SHADER, source_cs);
+
+    glAttachShader(program_id, cs);
+    glLinkProgram(program_id);
+    glValidateProgram(program_id);
+    Log::debug("program id=" + std::to_string(program_id));
+    glDeleteShader(cs);
 }
 
 GL_ShaderProgram::~GL_ShaderProgram() {
@@ -208,6 +219,7 @@ std::string GL_ShaderProgram::getSource(const std::string &path) {
     }
     return "";
 }
+
 
 
 
