@@ -12,6 +12,28 @@ void Material::bind() const {
     if(shader!= nullptr)
     {
         shader->bind();
+        for (auto p:properties) {
+            switch (p.second.type) {
+                case GLSL_TYPE::FLOAT:
+                    shader->setUniform(p.first, *static_cast<float*>(p.second.value));
+                    break;
+                case GLSL_TYPE::VEC2:
+                    shader->setUniform(p.first, *static_cast<vec2*>(p.second.value));
+                    break;
+                case GLSL_TYPE::VEC3:
+                    shader->setUniform(p.first, *static_cast<vec3*>(p.second.value));
+                    break;
+                case GLSL_TYPE::VEC4:
+                    shader->setUniform(p.first, *static_cast<vec4*>(p.second.value));
+                    break;
+                case GLSL_TYPE::MAT4:
+                    shader->setUniform(p.first, *static_cast<mat4*>(p.second.value));
+                    break;
+                case GLSL_TYPE::INT:
+                    shader->setUniform(p.first, *static_cast<int*>(p.second.value));
+                    break;
+            }
+        }
         shader->setUniform("material_color", color);
         if (texture) {
             shader->setUniform("has_texture", true);
@@ -68,4 +90,73 @@ const ShaderProgram &Material::getShader() const {
 void Material::setColor(vec4 color) {
     this->color = color;
 }
+
+void Material::setProperty(std::string name, mat4 &value) {
+    auto it=properties.find(name);
+    if(it==properties.end())
+    {
+        properties.emplace(name,MaterialProperty(value));
+    }
+    else
+    {
+        it->second=MaterialProperty(value);
+    }
+
+}
+void Material::setProperty(std::string name, vec4 &value) {
+    auto it=properties.find(name);
+    if(it==properties.end())
+    {
+        properties.emplace(name,MaterialProperty(value));
+    }
+    else
+    {
+        it->second=MaterialProperty(value);
+    }
+}
+void Material::setProperty(std::string name, vec3 &value) {
+    auto it=properties.find(name);
+    if(it==properties.end())
+    {
+        properties.emplace(name,MaterialProperty(value));
+    }
+    else
+    {
+        it->second=MaterialProperty(value);
+    }
+}
+void Material::setProperty(std::string name, vec2 &value) {
+    auto it=properties.find(name);
+    if(it==properties.end())
+    {
+        properties.emplace(name,MaterialProperty(value));
+    }
+    else
+    {
+        it->second=MaterialProperty(value);
+    }
+}
+void Material::setProperty(std::string name, float value) {
+    auto it=properties.find(name);
+    if(it==properties.end())
+    {
+        properties.emplace(name,MaterialProperty(value));
+    }
+    else
+    {
+        it->second=MaterialProperty(value);
+    }
+}
+void Material::setProperty(std::string name, int value) {
+    auto it=properties.find(name);
+    if(it==properties.end())
+    {
+        properties.emplace(name,MaterialProperty(value));
+    }
+    else
+    {
+        it->second=MaterialProperty(value);
+    }
+}
+
 

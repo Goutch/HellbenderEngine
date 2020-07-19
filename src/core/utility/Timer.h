@@ -10,7 +10,7 @@ public:
     void reset();
     float ms() const;
 
-    double ns() const;
+    float ns() const;
 };
 
 

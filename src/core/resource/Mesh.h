@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "glm/glm.hpp"
-#include "GLSL_TYPE.h"
+
 using namespace glm;
 class Mesh {
 protected:

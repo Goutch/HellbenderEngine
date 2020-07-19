@@ -42,10 +42,11 @@ void HBE::run() {
         glfwSwapBuffers(window);
         glfwPollEvents();
         if (glfwGetKey(window, GLFW_KEY_ESCAPE))quit();
+
         current_scene->update(delta_t);
         current_scene->draw();
         Graphics::render(Camera::main->getProjectionMatrix(), Camera::main->getViewMatrix());
-        delta_t = delta.ms()/1000;
+        delta_t = delta.ns()/1000000000;
         delta.reset();
 #if DEBUG_MODE
         printFPS(delta_t);

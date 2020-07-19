@@ -34,7 +34,6 @@ set(CORE_FILES
 		src/core/resource/Texture.cpp
 		src/core/resource/Material.cpp
 		src/core/resource/Material.h
-		src/core/resource/GLSL_TYPE.h
 
         src/core/graphics/IRenderer.h
 		src/core/graphics/Graphics.cpp
@@ -66,7 +65,7 @@ set(CORE_FILES
 		src/core/utility/Event.h
         src/core/utility/Noise.cpp
 		src/core/utility/Job.cpp
-)
+        src/core/resource/MaterialProperty.h)
 
 set(GL_FILES
 		src/graphics/gl/GL_Core.h
