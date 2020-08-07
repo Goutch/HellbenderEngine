@@ -2,3 +2,4 @@
 *cmake-build*
 *.vs/
 *out/
+dependencies/HellbenderUtility/
