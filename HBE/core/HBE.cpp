@@ -5,12 +5,12 @@
 #include <core/input/Input.h>
 #include <core/utility/Log.h>
 #include "GLFW/glfw3.h"
-#include "core/utility/Timer.h"
+#include "HBU/Clock.h"
 #include "CompilationConfigs.h"
 
 Scene *HBE::current_scene = nullptr;
 GLFWwindow *HBE::window = nullptr;
-Timer *HBE::time = nullptr;
+Clock *HBE::time = nullptr;
 int HBE::fps_counter = 0;
 float HBE::fps_timer = 0;
 
@@ -32,8 +32,8 @@ Scene *HBE::setScene(std::string path) {
 }
 
 void HBE::run() {
-    time = new Timer();
-    Timer delta = Timer();
+    time = new Clock();
+    Clock delta = Clock();
     float delta_t = 0.0f;
     if (Camera::main == nullptr) {
         current_scene->instantiate<Camera>();
@@ -46,7 +46,7 @@ void HBE::run() {
         current_scene->update(delta_t);
         current_scene->draw();
         Graphics::render(Camera::main->getProjectionMatrix(), Camera::main->getViewMatrix());
-        delta_t = delta.ns()/1000000000;
+        delta_t = delta.ns()/SECONDS_TO_NANOSECOND;
         delta.reset();
 #if DEBUG_MODE
         printFPS(delta_t);

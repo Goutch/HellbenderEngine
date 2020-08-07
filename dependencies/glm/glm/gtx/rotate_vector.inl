@@ -20,7 +20,7 @@ namespace glm
 		T t1 = sin((static_cast<T>(1) - a) * Alpha) / SinAlpha;
 		T t2 = sin(a * Alpha) / SinAlpha;
 
-		// interpolate src vectors
+		// interpolate HBU vectors
 		return x * t1 + y * t2;
 	}
 

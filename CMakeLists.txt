@@ -17,72 +17,73 @@ add_subdirectory("dependencies/stb")
 
 include_directories("dependencies/FastNoise")
 add_subdirectory("dependencies/FastNoise")
-include_directories("src")
+
+include_directories("dependencies/HellbenderUtility")
+add_subdirectory("dependencies/HellbenderUtility")
+
+include_directories("HBE")
 
 set(CORE_FILES
-		src/core/Core.h
-        src/core/HBE.cpp
-        src/core/HBE.h
+		HBE/core/Core.h
+        HBE/core/HBE.cpp
+        HBE/core/HBE.h
 
-		src/CompilationConfigs.h
-		src/RuntimeConfigs.h
+		HBE/CompilationConfigs.h
+		HBE/RuntimeConfigs.h
 
-		src/core/resource/ShaderProgram.h
-		src/core/resource/Texture.h
-		src/core/resource/Framebuffer.h
-		src/core/resource/Resource.cpp
-		src/core/resource/Texture.cpp
-		src/core/resource/Material.cpp
-		src/core/resource/Material.h
+		HBE/core/resource/ShaderProgram.h
+		HBE/core/resource/Texture.h
+		HBE/core/resource/Framebuffer.h
+		HBE/core/resource/Resource.cpp
+		HBE/core/resource/Texture.cpp
+		HBE/core/resource/Material.cpp
+		HBE/core/resource/Material.h
 
-        src/core/graphics/IRenderer.h
-		src/core/graphics/Graphics.cpp
-		src/core/graphics/Graphics.h
-		src/core/graphics/Layer.cpp
-		src/core/graphics/Layer.h
+        HBE/core/graphics/IRenderer.h
+		HBE/core/graphics/Graphics.cpp
+		HBE/core/graphics/Graphics.h
+		HBE/core/graphics/Layer.cpp
+		HBE/core/graphics/Layer.h
 
-		src/core/input/Input.h
-		src/core/input/Input.cpp
+		HBE/core/input/Input.h
+		HBE/core/input/Input.cpp
 
-		src/core/entity/Scene.cpp
-		src/core/entity/Scene.h
-		src/core/entity/Entity.cpp
-		src/core/entity/Transform.cpp
-		src/core/entity/component/Camera.cpp
-		src/core/entity/component/Component.h
-		src/core/entity/component/CameraController.cpp
-		src/core/entity/component/MeshRenderer.cpp
-		src/core/entity/component/MeshRenderer.h
-		src/core/entity/component/CameraController.h
-		src/core/entity/component/Component.cpp
-		src/core/entity/component/InstancesRenderer.cpp
-		src/core/entity/component/InstancesRenderer.h
+		HBE/core/entity/Scene.cpp
+		HBE/core/entity/Scene.h
+		HBE/core/entity/Entity.cpp
+		HBE/core/entity/Transform.cpp
+		HBE/core/entity/component/Camera.cpp
+		HBE/core/entity/component/Component.h
+		HBE/core/entity/component/CameraController.cpp
+		HBE/core/entity/component/MeshRenderer.cpp
+		HBE/core/entity/component/MeshRenderer.h
+		HBE/core/entity/component/CameraController.h
+		HBE/core/entity/component/Component.cpp
+		HBE/core/entity/component/InstancesRenderer.cpp
+		HBE/core/entity/component/InstancesRenderer.h
 
-		src/core/utility/Log.cpp
-		src/core/utility/Geometry.cpp
-		src/core/utility/Geometry.h
-		src/core/utility/Timer.cpp
-		src/core/utility/Event.h
-        src/core/utility/Noise.cpp
-		src/core/utility/Job.cpp
-        src/core/resource/MaterialProperty.h)
+		HBE/core/utility/Log.cpp
+		HBE/core/utility/Geometry.cpp
+		HBE/core/utility/Geometry.h
+		HBE/core/utility/Noise.cpp
+		HBE/core/resource/MaterialProperty.h)
 
 set(GL_FILES
-		src/graphics/gl/GL_Core.h
-		src/graphics/gl/GL_Renderer.cpp
- 		src/graphics/gl/GL_Texture.cpp
-		src/graphics/gl/GL_ShaderProgram.cpp
-		src/graphics/gl/GL_Mesh.cpp
-		src/graphics/gl/GL_Framebuffer.cpp
-		src/graphics/gl/GL_Framebuffer.h
-		src/graphics/gl/GL_Debug.cpp
-		src/graphics/gl/GL_Debug.h
-		src/graphics/gl/GL_MultisamplingFramebuffer.cpp
-		src/graphics/gl/GL_MultisamplingFramebuffer.h )
+		HBE/graphics/gl/GL_Core.h
+		HBE/graphics/gl/GL_Renderer.cpp
+ 		HBE/graphics/gl/GL_Texture.cpp
+		HBE/graphics/gl/GL_ShaderProgram.cpp
+		HBE/graphics/gl/GL_Mesh.cpp
+		HBE/graphics/gl/GL_Framebuffer.cpp
+		HBE/graphics/gl/GL_Framebuffer.h
+		HBE/graphics/gl/GL_Debug.cpp
+		HBE/graphics/gl/GL_Debug.h
+		HBE/graphics/gl/GL_MultisamplingFramebuffer.cpp
+		HBE/graphics/gl/GL_MultisamplingFramebuffer.h)
 
 add_library (${PROJECT_NAME}
 		${CORE_FILES}
 		${GL_FILES}
 		)
 
-target_link_libraries(${PROJECT_NAME} glm glfw glad stb FastNoise)
+target_link_libraries(${PROJECT_NAME} HellbenderUtility glm glfw glad stb FastNoise)

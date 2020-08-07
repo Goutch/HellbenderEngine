@@ -18,9 +18,10 @@
 #include <core/graphics/Layer.h>
 #include <core/input/Input.h>
 #include <core/math/Plane.h>
-#include <core/utility/Event.h>
-#include <core/utility/Timer.h>
+#include <HBU/Event.h>
+#include <HBU/Clock.h>
+#include <HBU/Job.h>
 #include <core/utility/Noise.h>
-#include <core/utility/Job.h>
+
 #include <glm/glm.hpp>
 using namespace glm;

@@ -4,6 +4,7 @@
 #include "string"
 
 class ShaderProgram {
+
 public:
 
     ShaderProgram() {};

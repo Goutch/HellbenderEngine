@@ -4,14 +4,16 @@ class GLFWwindow;
 
 class Scene;
 
-class Timer;
+class Clock;
 
 class HBE {
     static GLFWwindow *window;
-    static Timer *time;
+    static Clock *time;
     static int fps_counter;
     static float fps_timer;
 public:
+    static Scene *current_scene;
+
     static void init();
 
     static void run();
@@ -23,9 +25,7 @@ public:
     static void terminate();
 
     static float getTime();
-
-    static Scene *current_scene;
-
+private:
     static void printFPS(float);
 };
 
