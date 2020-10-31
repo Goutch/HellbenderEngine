@@ -6,7 +6,7 @@
 using namespace glm;
 class IRenderer;
 class GLFWwindow;
-class Layer;
+class RenderTarget;
 class ShaderProgram;
 class Mesh;
 class Transform;
@@ -15,9 +15,9 @@ class Material;
 class Graphics {
     static IRenderer* renderer;
     static GLFWwindow *window;
-    static Layer* default_layer;
+    static RenderTarget* render_target;
 public:
-    static const ShaderProgram* DEFAULT_LAYER_SHADER;
+    static const ShaderProgram* DEFAULT_SCREEN_SHADER;
     static const ShaderProgram* DEFAULT_MESH_SHADER;
     static const ShaderProgram* DEFAULT_INSTANCED_SHADER;
     static const Mesh* DEFAULT_QUAD;
@@ -26,11 +26,10 @@ public:
     static void draw(const Transform &transform, const Mesh &mesh, const Material &material);
     static void drawInstanced(const Mesh &mesh, const Material &material);
     static void render(const mat4& projection_matrix,const mat4& view_matrix);
+    static const RenderTarget* getRenderTarget();
     static void terminate();
+    static void onWindowSizeChange(GLFWwindow* window,int width,int height);
 private:
     static void initializeDefaultVariables();
-
-
-    void OnVSyncChange(bool v_sync);
 };
 

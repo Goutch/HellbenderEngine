@@ -15,9 +15,6 @@ add_subdirectory("dependencies/glad")
 include_directories("dependencies/stb")
 add_subdirectory("dependencies/stb")
 
-include_directories("dependencies/HellbenderUtility")
-add_subdirectory("dependencies/HellbenderUtility")
-
 include_directories("HBE")
 
 set(CORE_FILES
@@ -41,8 +38,8 @@ set(CORE_FILES
         HBE/core/graphics/IRenderer.h
 		HBE/core/graphics/Graphics.cpp
 		HBE/core/graphics/Graphics.h
-		HBE/core/graphics/Layer.cpp
-		HBE/core/graphics/Layer.h
+		HBE/core/graphics/RenderTarget.cpp
+		HBE/core/graphics/RenderTarget.h
 
 		HBE/core/input/Input.h
 		HBE/core/input/Input.cpp
@@ -64,6 +61,8 @@ set(CORE_FILES
 		HBE/core/utility/Log.cpp
 		HBE/core/utility/Geometry.cpp
 		HBE/core/utility/Geometry.h
+		HBE/core/utility/Job.cpp
+		HBE/core/utility/Clock.cpp
 		)
 
 set(GL_FILES
@@ -84,4 +83,4 @@ add_library (${PROJECT_NAME}
 		${GL_FILES}
 		)
 
-target_link_libraries(${PROJECT_NAME} HBU glm glfw glad stb)
+target_link_libraries(${PROJECT_NAME} glm glfw glad stb)

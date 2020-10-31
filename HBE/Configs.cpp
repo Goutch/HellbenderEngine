@@ -7,5 +7,4 @@ bool Configs::getVerticalSync(){
 }
 void Configs::setVerticalSync(bool v_sync){
     vertical_sync = v_sync;
-    OnVerticalSyncChange.invoke(v_sync);
 }

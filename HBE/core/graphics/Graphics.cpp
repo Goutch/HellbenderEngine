@@ -5,7 +5,7 @@
 #include <core/utility/Log.h>
 #include <GLFW/glfw3.h>
 #include <core/utility/Geometry.h>
-#include <core/graphics/Layer.h>
+#include <core/graphics/RenderTarget.h>
 #include <core/resource/Resource.h>
 #include <Configs.h>
 
@@ -20,11 +20,11 @@
 const Mesh *Graphics::DEFAULT_CUBE = nullptr;
 const Mesh *Graphics::DEFAULT_QUAD = nullptr;
 const ShaderProgram *Graphics::DEFAULT_MESH_SHADER = nullptr;
-const ShaderProgram *Graphics::DEFAULT_LAYER_SHADER = nullptr;
+const ShaderProgram *Graphics::DEFAULT_SCREEN_SHADER = nullptr;
 const ShaderProgram *Graphics::DEFAULT_INSTANCED_SHADER = nullptr;
 IRenderer *Graphics::renderer = nullptr;
 GLFWwindow *Graphics::window = nullptr;
-Layer *Graphics::default_layer = nullptr;
+RenderTarget *Graphics::render_target = nullptr;
 
 
 GLFWwindow *Graphics::init() {
@@ -34,16 +34,19 @@ GLFWwindow *Graphics::init() {
 
 #endif
     window = renderer->createWindow();
+
     if (!Configs::getVerticalSync())
         glfwSwapInterval(0);
     renderer->init();
+    glfwSetWindowSizeCallback(window,Graphics::onWindowSizeChange);
     initializeDefaultVariables();
+
     return window;
 }
 
-void Graphics::OnVSyncChange(bool v_sync)
+void Graphics::onWindowSizeChange(GLFWwindow* window, int width, int height)
 {
-
+    render_target->setSize(width,height);
 }
 
 void Graphics::draw(const Transform &transform, const Mesh &mesh, const Material &material) {
@@ -55,22 +58,22 @@ void Graphics::drawInstanced(const Mesh &mesh, const Material &material) {
 }
 
 void Graphics::render(const mat4 &projection_matrix, const mat4 &view_matrix) {
-    default_layer->getFramebuffer().bind();
+    render_target->getFramebuffer().bind();
     renderer->clear();
     renderer->render(projection_matrix, view_matrix);
-    default_layer->getFramebuffer().unbind();
+    render_target->getFramebuffer().unbind();
     renderer->clear();
-    renderer->renderLayer(*default_layer);
+    renderer->renderLayer(*render_target);
 }
 
 void Graphics::terminate() {
 
     delete DEFAULT_MESH_SHADER;
-    delete DEFAULT_LAYER_SHADER;
+    delete DEFAULT_SCREEN_SHADER;
     delete DEFAULT_INSTANCED_SHADER;
     delete DEFAULT_QUAD;
     delete DEFAULT_CUBE;
-    delete default_layer;
+    delete render_target;
     delete renderer;
 }
 
@@ -93,14 +96,20 @@ void Graphics::initializeDefaultVariables() {
     default_instanced_shader->setShaders(std::string(RESOURCE_PATH) + "shaders/instancedShader.vert",
                                          std::string(RESOURCE_PATH) + "shaders/shader.frag");
     DEFAULT_INSTANCED_SHADER = default_instanced_shader;
-    //DEFAULT_LAYER_SHADER
-    ShaderProgram *default_layer_shader = Resource::get<ShaderProgram>();
-    default_layer_shader->setShaders(std::string(RESOURCE_PATH) + "shaders/layer.vert",
-                                     std::string(RESOURCE_PATH) + "shaders/layer.frag");
-    DEFAULT_LAYER_SHADER = default_layer_shader;
-    //DEFAULT_LAYER
-    default_layer = new Layer(WIDTH, HEIGHT, *DEFAULT_LAYER_SHADER);
+    //DEFAULT_SCREEN_SHADER
+    ShaderProgram *default_screen_shader = Resource::get<ShaderProgram>();
+    default_screen_shader->setShaders(std::string(RESOURCE_PATH) + "shaders/screen.vert",
+                                     std::string(RESOURCE_PATH) + "shaders/screen.frag");
+    DEFAULT_SCREEN_SHADER = default_screen_shader;
+    //DEFAULT_RENDER_TARGET
+    render_target = new RenderTarget(WIDTH, HEIGHT, *DEFAULT_SCREEN_SHADER);
 }
+
+const RenderTarget *Graphics::getRenderTarget() {
+    return render_target;
+}
+
+
 
 
 

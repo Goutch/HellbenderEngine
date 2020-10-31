@@ -1,17 +1,20 @@
 #pragma once
 
 class Framebuffer;
+
 class ShaderProgram;
 
 #include "glm/glm.hpp"
+#include "core/utility/Event.h"
 using namespace glm;
-class Layer {
+
+class RenderTarget {
     unsigned int width;
     unsigned int heigth;
     mat4 projection_matrix;
     Framebuffer *framebuffer;
 public:
-    Layer(unsigned int width, unsigned int height, const ShaderProgram &shader_program);
+    RenderTarget(unsigned int width, unsigned int height, const ShaderProgram &shader_program);
 
     const ShaderProgram *shader_program;
 
@@ -21,9 +24,9 @@ public:
 
     const mat4 &getProjectionMatrix();
 
-    unsigned int getWidth();
+    unsigned int getWidth() const;
 
-    unsigned int getHeight();
+    unsigned int getHeight() const;
 
     void setSize(unsigned int width, unsigned int height);
 

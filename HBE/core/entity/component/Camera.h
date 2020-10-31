@@ -26,7 +26,6 @@ private:
 public:
     static Camera *main;
     void onAttach() override;
-
     void setAspectRatio(float width, float height);
     void setAspectRatio(float aspect_ratio);
     float getAspectRatio();

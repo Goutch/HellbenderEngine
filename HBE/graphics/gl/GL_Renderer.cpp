@@ -12,7 +12,7 @@
 #include "core/utility/Log.h"
 #include "CompilationConfigs.h"
 #include "core/resource/Framebuffer.h"
-#include "core/graphics/Layer.h"
+#include "core/graphics/RenderTarget.h"
 
 #if DEBUG_MODE
 
@@ -54,7 +54,7 @@ void GL_Renderer::render(const mat4 &projection_matrix, const mat4 &view_matrix)
     render_objects.clear();
 }
 
-void GL_Renderer::renderLayer(Layer &layer) {
+void GL_Renderer::renderLayer(RenderTarget &layer) {
     glDisable(GL_DEPTH_TEST);
     glViewport(0, 0, layer.getWidth(), layer.getHeight());
     const ShaderProgram &shader = layer.getShaderProgram();

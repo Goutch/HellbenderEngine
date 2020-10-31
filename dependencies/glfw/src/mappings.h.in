@@ -37,7 +37,7 @@
 // All gamepad mappings not labeled GLFW are copied from the
 // SDL_GameControllerDB project under the following license:
 //
-// Simple DirectMedia Layer
+// Simple DirectMedia RenderTarget
 // Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 //
 // This software is provided 'as-is', without any express or implied warranty.

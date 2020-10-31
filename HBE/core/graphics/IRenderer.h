@@ -5,7 +5,7 @@
 
 using namespace glm;
 
-class Layer;
+class RenderTarget;
 
 class Transform;
 
@@ -27,7 +27,7 @@ public:
 
     virtual void render(const mat4 &projection_matrix, const mat4 &view_matrix = mat4(1.0f)) = 0;
 
-    virtual void renderLayer(Layer &layer) = 0;
+    virtual void renderLayer(RenderTarget &layer) = 0;
 
     virtual void draw(const Transform &transform, const Mesh &mesh, const Material &material) = 0;
 

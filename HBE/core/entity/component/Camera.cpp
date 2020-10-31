@@ -6,6 +6,8 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include <core/entity/Entity.h>
 #include "CompilationConfigs.h"
+#include <core/graphics/Graphics.h>
+#include <core/graphics/RenderTarget.h>
 Camera* Camera::main= nullptr;
 void Camera::onAttach() {
     Component::onAttach();
@@ -13,8 +15,7 @@ void Camera::onAttach() {
     {
         Camera::main=this;
     }
-    //todo: set to current framebuffer size
-    setAspectRatio(WIDTH,HEIGHT);
+    setAspectRatio(Graphics::getRenderTarget()->getWidth(),Graphics::getRenderTarget()->getHeight());
     generateProjectionMatrix();
 }
 
@@ -114,6 +115,8 @@ void Camera::setRenderMode(RenderMode mode) {
     render_mode=mode;
     generateProjectionMatrix();
 }
+
+
 
 
 
