@@ -14,6 +14,7 @@ class RenderTarget {
     mat4 projection_matrix;
     Framebuffer *framebuffer;
 public:
+    Event<int,int> onSizeChange;
     RenderTarget(unsigned int width, unsigned int height, const ShaderProgram &shader_program);
 
     const ShaderProgram *shader_program;

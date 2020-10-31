@@ -47,6 +47,8 @@ void RenderTarget::setSize(unsigned int width, unsigned int height) {
     this->heigth = height;
 
     framebuffer->setResolution(width, height);
+
+    onSizeChange.invoke(width,height);
 }
 
 void RenderTarget::setShaderUniforms() const {

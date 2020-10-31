@@ -105,7 +105,7 @@ void Graphics::initializeDefaultVariables() {
     render_target = new RenderTarget(WIDTH, HEIGHT, *DEFAULT_SCREEN_SHADER);
 }
 
-const RenderTarget *Graphics::getRenderTarget() {
+RenderTarget *Graphics::getRenderTarget() {
     return render_target;
 }
 

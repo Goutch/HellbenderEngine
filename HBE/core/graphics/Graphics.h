@@ -26,7 +26,7 @@ public:
     static void draw(const Transform &transform, const Mesh &mesh, const Material &material);
     static void drawInstanced(const Mesh &mesh, const Material &material);
     static void render(const mat4& projection_matrix,const mat4& view_matrix);
-    static const RenderTarget* getRenderTarget();
+    static RenderTarget* getRenderTarget();
     static void terminate();
     static void onWindowSizeChange(GLFWwindow* window,int width,int height);
 private:

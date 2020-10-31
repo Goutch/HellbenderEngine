@@ -45,4 +45,5 @@ public:
 
     void setRenderMode(RenderMode mode);
 
+    void onRenderTargetSizeChange(int width, int height);
 };
