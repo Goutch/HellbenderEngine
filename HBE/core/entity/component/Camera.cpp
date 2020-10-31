@@ -5,7 +5,6 @@
 #include "Camera.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include <core/entity/Entity.h>
-#include "CompilationConfigs.h"
 #include <core/graphics/Graphics.h>
 #include <core/graphics/RenderTarget.h>
 Camera* Camera::main= nullptr;
@@ -18,8 +17,12 @@ void Camera::onAttach() {
     setAspectRatio(Graphics::getRenderTarget()->getWidth(),Graphics::getRenderTarget()->getHeight());
 
     Graphics::getRenderTarget()->onSizeChange.subscribe<Camera>(this,&Camera::onRenderTargetSizeChange);
-    Graphics::getRenderTarget()->onSizeChange.unsubsribe<Camera>(this);
+
     generateProjectionMatrix();
+}
+
+void Camera::onDetach() {
+    Graphics::getRenderTarget()->onSizeChange.unsubsribe(this);
 }
 
 void Camera::onRenderTargetSizeChange(int width,int height)

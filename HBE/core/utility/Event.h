@@ -19,8 +19,7 @@ public:
     {
         instances_callbacks.emplace((void*)instance,std::bind(fun, instance,std::placeholders::_1,std::placeholders::_2));
     }
-    template<typename T>
-    void unsubsribe(T* instance)
+    void unsubsribe(void* instance)
     {
         instances_callbacks.erase((void*)instance);
     }
