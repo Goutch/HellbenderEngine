@@ -23,7 +23,7 @@ public:
     void setNormalMap(const Texture* texture);
     const ShaderProgram& getShader() const;
     void setColor(vec4 color);
-    void setProperty(std::string name,mat4& value);
+    void setProperty(std::string name, mat4& value);
     void setProperty(std::string name, int value);
     void setProperty(std::string name, float value);
     void setProperty(std::string name, vec2 &value);

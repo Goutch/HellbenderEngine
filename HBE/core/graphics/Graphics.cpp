@@ -7,7 +7,7 @@
 #include <core/utility/Geometry.h>
 #include <core/graphics/Layer.h>
 #include <core/resource/Resource.h>
-#include <RuntimeConfigs.h>
+#include <Configs.h>
 
 #if RENDERER == OPENGL_RENDERER
 
@@ -16,6 +16,7 @@
 #elif
 
 #endif
+
 const Mesh *Graphics::DEFAULT_CUBE = nullptr;
 const Mesh *Graphics::DEFAULT_QUAD = nullptr;
 const ShaderProgram *Graphics::DEFAULT_MESH_SHADER = nullptr;
@@ -33,12 +34,16 @@ GLFWwindow *Graphics::init() {
 
 #endif
     window = renderer->createWindow();
-    if (!VSYNC)
+    if (!Configs::getVerticalSync())
         glfwSwapInterval(0);
-
     renderer->init();
     initializeDefaultVariables();
     return window;
+}
+
+void Graphics::OnVSyncChange(bool v_sync)
+{
+
 }
 
 void Graphics::draw(const Transform &transform, const Mesh &mesh, const Material &material) {
@@ -59,6 +64,7 @@ void Graphics::render(const mat4 &projection_matrix, const mat4 &view_matrix) {
 }
 
 void Graphics::terminate() {
+
     delete DEFAULT_MESH_SHADER;
     delete DEFAULT_LAYER_SHADER;
     delete DEFAULT_INSTANCED_SHADER;

@@ -15,21 +15,19 @@ add_subdirectory("dependencies/glad")
 include_directories("dependencies/stb")
 add_subdirectory("dependencies/stb")
 
-include_directories("dependencies/FastNoise")
-add_subdirectory("dependencies/FastNoise")
-
 include_directories("dependencies/HellbenderUtility")
 add_subdirectory("dependencies/HellbenderUtility")
 
 include_directories("HBE")
 
 set(CORE_FILES
+		HBE/Configs.cpp
 		HBE/core/Core.h
         HBE/core/HBE.cpp
         HBE/core/HBE.h
 
 		HBE/CompilationConfigs.h
-		HBE/RuntimeConfigs.h
+        HBE/Configs.h
 
 		HBE/core/resource/ShaderProgram.h
 		HBE/core/resource/Texture.h
@@ -38,6 +36,7 @@ set(CORE_FILES
 		HBE/core/resource/Texture.cpp
 		HBE/core/resource/Material.cpp
 		HBE/core/resource/Material.h
+		HBE/core/resource/MaterialProperty.h
 
         HBE/core/graphics/IRenderer.h
 		HBE/core/graphics/Graphics.cpp
@@ -65,8 +64,7 @@ set(CORE_FILES
 		HBE/core/utility/Log.cpp
 		HBE/core/utility/Geometry.cpp
 		HBE/core/utility/Geometry.h
-		HBE/core/utility/Noise.cpp
-		HBE/core/resource/MaterialProperty.h)
+		)
 
 set(GL_FILES
 		HBE/graphics/gl/GL_Core.h
@@ -79,11 +77,11 @@ set(GL_FILES
 		HBE/graphics/gl/GL_Debug.cpp
 		HBE/graphics/gl/GL_Debug.h
 		HBE/graphics/gl/GL_MultisamplingFramebuffer.cpp
-		HBE/graphics/gl/GL_MultisamplingFramebuffer.h)
+		HBE/graphics/gl/GL_MultisamplingFramebuffer.h )
 
 add_library (${PROJECT_NAME}
 		${CORE_FILES}
 		${GL_FILES}
 		)
 
-target_link_libraries(${PROJECT_NAME} HellbenderUtility glm glfw glad stb FastNoise)
+target_link_libraries(${PROJECT_NAME} HBU glm glfw glad stb)

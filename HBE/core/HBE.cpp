@@ -5,7 +5,7 @@
 #include <core/input/Input.h>
 #include <core/utility/Log.h>
 #include "GLFW/glfw3.h"
-#include "HBU/Clock.h"
+#include "core/utility/Clock.h"
 #include "CompilationConfigs.h"
 
 Scene *HBE::current_scene = nullptr;

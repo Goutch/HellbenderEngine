@@ -6,8 +6,6 @@ uniform sampler2D texture_0;
 uniform vec4 material_color;
 void main()
 {
-
-    vec3 c;
     if(has_texture)
     {
         FragColor=texture(texture_0,uv)*material_color;
@@ -16,5 +14,4 @@ void main()
     {
         FragColor =material_color;
     }
-
 }

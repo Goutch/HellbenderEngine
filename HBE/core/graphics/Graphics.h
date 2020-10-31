@@ -31,5 +31,6 @@ private:
     static void initializeDefaultVariables();
 
 
+    void OnVSyncChange(bool v_sync);
 };
 

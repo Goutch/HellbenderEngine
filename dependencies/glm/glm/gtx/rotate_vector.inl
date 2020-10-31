@@ -20,7 +20,7 @@ namespace glm
 		T t1 = sin((static_cast<T>(1) - a) * Alpha) / SinAlpha;
 		T t2 = sin(a * Alpha) / SinAlpha;
 
-		// interpolate HBU vectors
+		// interpolate HellbenderUtility vectors
 		return x * t1 + y * t2;
 	}
 
