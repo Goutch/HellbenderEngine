@@ -1,7 +1,6 @@
 
 #pragma once
 #include <chrono>
-#include <unordered_map>
 
 #define SECONDS_TO_NANOSECOND 1000000000
 
@@ -12,6 +11,8 @@ class Clock {
 public:
     Clock();
     void reset();
+    void start();
+    void stop();
     float ms() const;
 
     float ns() const;

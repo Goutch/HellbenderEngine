@@ -4,6 +4,15 @@
 Clock::Clock() {
     start=std::chrono::high_resolution_clock::now();
 }
+
+void Clock::stop() {
+    //todo
+}
+
+void Clock::start() {
+    //todo
+}
+
 void Clock::reset() {
 
     start= std::chrono::high_resolution_clock::now();
