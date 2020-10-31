@@ -3,9 +3,7 @@
 //
 #include "RenderTarget.h"
 
-#include <core/HBE.h>
-#include <core/resource/Resource.h>
-#include "glm/gtc/matrix_transform.hpp"
+#include <HBE.h>
 
 RenderTarget::RenderTarget(unsigned int width, unsigned int height, const ShaderProgram &shader_program) {
     this->shader_program = &shader_program;

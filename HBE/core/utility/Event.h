@@ -10,7 +10,7 @@ public:
     {
         static_callbacks.insert(static_callback);
     }
-    void unsubsribe(void(* static_callback)(Args...))
+    void unsubscribe(void(* static_callback)(Args...))
     {
         static_callbacks.erase(static_callback);
     }
@@ -19,7 +19,7 @@ public:
     {
         instances_callbacks.emplace((void*)instance,std::bind(fun, instance,std::placeholders::_1,std::placeholders::_2));
     }
-    void unsubsribe(void* instance)
+    void unsubscribe(void* instance)
     {
         instances_callbacks.erase((void*)instance);
     }
@@ -28,7 +28,7 @@ public:
         for (void(* c)(Args...) :static_callbacks) {
             c(args...);
         }
-        for (const std::pair<void *, std::function<void(int, int)>> pair:instances_callbacks) {
+        for (const std::pair<void *, std::function<void(Args...)>> pair:instances_callbacks) {
             pair.second(args...);
         }
     };

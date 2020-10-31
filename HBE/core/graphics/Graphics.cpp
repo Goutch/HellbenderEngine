@@ -37,13 +37,17 @@ GLFWwindow *Graphics::init() {
 
     if (!Configs::getVerticalSync())
         glfwSwapInterval(0);
+
     renderer->init();
     glfwSetWindowSizeCallback(window,Graphics::onWindowSizeChange);
     initializeDefaultVariables();
-
+    Configs::onVerticalSyncChange.subscribe(Graphics::onVerticalSyncChange);
     return window;
 }
-
+void Graphics::onVerticalSyncChange(bool v_sync)
+{
+    glfwSwapInterval(v_sync);
+}
 void Graphics::onWindowSizeChange(GLFWwindow* window, int width, int height)
 {
     render_target->setSize(width,height);
@@ -67,7 +71,7 @@ void Graphics::render(const mat4 &projection_matrix, const mat4 &view_matrix) {
 }
 
 void Graphics::terminate() {
-
+    Configs::onVerticalSyncChange.unsubscribe(Graphics::onVerticalSyncChange);
     delete DEFAULT_MESH_SHADER;
     delete DEFAULT_SCREEN_SHADER;
     delete DEFAULT_INSTANCED_SHADER;

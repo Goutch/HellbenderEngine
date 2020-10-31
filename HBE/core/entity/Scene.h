@@ -5,9 +5,6 @@
 #include "Entity.h"
 #include "unordered_set"
 
-/*
- * Storage container for entities
- */
 class Scene {
     std::unordered_set<Entity *> entities;
     std::unordered_set<Component *> update_listeners;

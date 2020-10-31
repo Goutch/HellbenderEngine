@@ -44,6 +44,8 @@ public:
     bool isBoxInFrustum(const vec3& position,float size_x,float size_y,float size_z) const;
     bool isSphereInFrustum(const vec3 &position, float radius) const;
 
+    void setOrthographic();
+    void setPerspectove();
     void setRenderMode(RenderMode mode);
 
     void onRenderTargetSizeChange(int width, int height);

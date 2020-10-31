@@ -18,10 +18,9 @@ add_subdirectory("dependencies/stb")
 include_directories("HBE")
 
 set(CORE_FILES
+		HBE/HBE.cpp
+		HBE/HBE.h
 		HBE/Configs.cpp
-		HBE/core/Core.h
-        HBE/core/HBE.cpp
-        HBE/core/HBE.h
 
 		HBE/CompilationConfigs.h
         HBE/Configs.h

@@ -1,12 +1,5 @@
 #include "HBE.h"
-#include <core/graphics/Graphics.h>
-#include <core/entity/Scene.h>
-#include <core/entity/component/Camera.h>
-#include <core/input/Input.h>
-#include <core/utility/Log.h>
 #include "GLFW/glfw3.h"
-#include "core/utility/Clock.h"
-#include "CompilationConfigs.h"
 
 Scene *HBE::current_scene = nullptr;
 GLFWwindow *HBE::window = nullptr;

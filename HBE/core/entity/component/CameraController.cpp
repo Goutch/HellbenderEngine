@@ -1,15 +1,10 @@
 //
 // Created by User on 12-Jun.-2020.
 //
-
-#include <core/input/Input.h>
-#include "CameraController.h"
-#include "core/entity/Entity.h"
+#include <HBE.h>
 #include "GLFW/glfw3.h"
-#include "Camera.h"
 #include "CompilationConfigs.h"
-#include <core/HBE.h>
-#include <core/entity/Scene.h>
+
 
 void CameraController::onUpdate(float delta) {
     double x, y;

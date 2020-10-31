@@ -1,13 +1,11 @@
 #include "Component.h"
-#include "core/HBE.h"
-#include "core/entity/Scene.h"
+#include "HBE.h"
 
 void Component::subscribeDraw() {
     if (!subscribed_draw) {
         subscribed_draw = true;
         HBE::current_scene->subscribeDraw(this);
     }
-
 }
 
 void Component::unsubscribeDraw() {

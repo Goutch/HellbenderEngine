@@ -7,6 +7,7 @@
 #include <core/entity/Entity.h>
 #include <core/graphics/Graphics.h>
 #include <core/graphics/RenderTarget.h>
+#include "Configs.h"
 Camera* Camera::main= nullptr;
 void Camera::onAttach() {
     Component::onAttach();
@@ -22,7 +23,7 @@ void Camera::onAttach() {
 }
 
 void Camera::onDetach() {
-    Graphics::getRenderTarget()->onSizeChange.unsubsribe(this);
+    Graphics::getRenderTarget()->onSizeChange.unsubscribe(this);
 }
 
 void Camera::onRenderTargetSizeChange(int width,int height)
@@ -126,6 +127,10 @@ bool Camera::isBoxInFrustum(const vec3 &position, float size_x, float size_y, fl
 void Camera::setRenderMode(RenderMode mode) {
     render_mode=mode;
     generateProjectionMatrix();
+}
+
+void Camera::setOrthographic() {
+
 }
 
 

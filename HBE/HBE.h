@@ -1,8 +1,6 @@
+
 #pragma once
-
-
 #include <CompilationConfigs.h>
-#include <core/HBE.h>
 #include <core/resource/Resource.h>
 #include <core/utility/Log.h>
 #include <core/utility/Geometry.h>
@@ -25,3 +23,33 @@
 
 #include <glm/glm.hpp>
 using namespace glm;
+class GLFWwindow;
+
+class Scene;
+
+class Clock;
+
+class HBE {
+    static GLFWwindow *window;
+    static Clock *time;
+    static int fps_counter;
+    static float fps_timer;
+public:
+    static Scene *current_scene;
+
+    static void init();
+
+    static void run();
+
+    static Scene *setScene(std::string path);
+
+    static void quit();
+
+    static void terminate();
+
+    static float getTime();
+private:
+    static void printFPS(float);
+};
+
+

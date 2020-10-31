@@ -6,7 +6,7 @@
 
 #define SECOND_TO_MILISECOND 1000
 class Clock {
-    std::chrono::high_resolution_clock ::time_point start;
+    std::chrono::high_resolution_clock ::time_point start_time;
 
 public:
     Clock();

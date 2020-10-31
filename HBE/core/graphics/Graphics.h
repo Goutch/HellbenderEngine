@@ -31,5 +31,7 @@ public:
     static void onWindowSizeChange(GLFWwindow* window,int width,int height);
 private:
     static void initializeDefaultVariables();
+
+    static void onVerticalSyncChange(bool v_sync);
 };
 
