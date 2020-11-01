@@ -7,6 +7,3 @@ For now  it only support Opengl rendering but I plan to tinker with Vulkan suppo
 
 Only Linux(gcc) and Windows(mingw) is tested.
 
-
-TODO:
--Resources memory handling
