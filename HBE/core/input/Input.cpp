@@ -5,7 +5,7 @@
 
 GLFWwindow *Input::window = nullptr;
 float Input::wheel_offset =0.0f;
-bool Input::getInput(int code) {
+bool Input::getKeyDown(KEY code) {
     return glfwGetKey(window, code) == GLFW_PRESS;
 }
 

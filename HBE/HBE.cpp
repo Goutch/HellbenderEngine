@@ -1,6 +1,5 @@
 #include "HBE.h"
 #include "GLFW/glfw3.h"
-
 Scene *HBE::current_scene = nullptr;
 GLFWwindow *HBE::window = nullptr;
 Clock *HBE::time = nullptr;
@@ -26,7 +25,7 @@ Scene *HBE::setScene(std::string path) {
 
 void HBE::run() {
     time = new Clock();
-    Clock delta = Clock();
+    Clock update_clock = Clock();
     float delta_t = 0.0f;
     if (Camera::main == nullptr) {
         current_scene->instantiate<Camera>();
@@ -34,13 +33,13 @@ void HBE::run() {
     while (!glfwWindowShouldClose(window) && current_scene != nullptr) {
         glfwSwapBuffers(window);
         glfwPollEvents();
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE))quit();
-
+        if (Input::getKeyDown(KEY::ESCAPE))
+            quit();
         current_scene->update(delta_t);
         current_scene->draw();
         Graphics::render(Camera::main->getProjectionMatrix(), Camera::main->getViewMatrix());
-        delta_t = delta.ns()/SECONDS_TO_NANOSECOND;
-        delta.reset();
+        delta_t = update_clock.ns() / SECONDS_TO_NANOSECOND;
+        update_clock.reset();
 #if DEBUG_MODE
         printFPS(delta_t);
 #endif
@@ -51,7 +50,6 @@ void HBE::run() {
 
 void HBE::terminate() {
     Graphics::terminate();
-    glfwTerminate();
 }
 
 void HBE::quit() {

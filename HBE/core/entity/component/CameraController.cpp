@@ -2,7 +2,6 @@
 // Created by User on 12-Jun.-2020.
 //
 #include <HBE.h>
-#include "GLFW/glfw3.h"
 #include "CompilationConfigs.h"
 
 
@@ -37,22 +36,22 @@ void CameraController::onUpdate(float delta) {
 
 
     vec3 translation = vec3(0);
-    if (Input::getInput(GLFW_KEY_S)) {
+    if (Input::getKeyDown(KEY::S)) {
         translation.z += 1;
     }
-    if (Input::getInput(GLFW_KEY_W)) {
+    if (Input::getKeyDown(KEY::W)) {
         translation.z = -1;
     }
-    if (Input::getInput(GLFW_KEY_D)) {
+    if (Input::getKeyDown(KEY::D)) {
         translation.x += 1;
     }
-    if (Input::getInput(GLFW_KEY_A)) {
+    if (Input::getKeyDown(KEY::A)) {
         translation.x = -1;
     }
-    if (Input::getInput(GLFW_KEY_SPACE)) {
+    if (Input::getKeyDown(KEY::SPACE)) {
         translation.y += 1;
     }
-    if (Input::getInput(GLFW_KEY_LEFT_CONTROL)) {
+    if (Input::getKeyDown(KEY::LEFT_CONTROL)) {
         translation.y = -1;
     }
 

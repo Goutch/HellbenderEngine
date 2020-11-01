@@ -79,6 +79,7 @@ void Graphics::terminate() {
     delete DEFAULT_CUBE;
     delete render_target;
     delete renderer;
+    glfwTerminate();
 }
 
 void Graphics::initializeDefaultVariables() {
