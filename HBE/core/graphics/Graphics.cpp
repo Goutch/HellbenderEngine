@@ -84,25 +84,25 @@ void Graphics::terminate() {
 
 void Graphics::initializeDefaultVariables() {
     //DEFAULT_CUBE
-    Mesh *cube = Resource::get<Mesh>();
+    Mesh *cube = Resource::create<Mesh>();
     Geometry::createCube(*cube, 1, 1, 1);
     DEFAULT_CUBE = cube;
     //DEFAULT_QUAD
-    Mesh *quad = Resource::get<Mesh>();
+    Mesh *quad = Resource::create<Mesh>();
     Geometry::createQuad(*quad, 1, 1);
     DEFAULT_QUAD = quad;
     //DEFAULT_MESH_SHADER
-    ShaderProgram *default_mesh_shader = Resource::get<ShaderProgram>();
+    ShaderProgram *default_mesh_shader = Resource::create<ShaderProgram>();
     default_mesh_shader->setShaders(std::string(RESOURCE_PATH) + "shaders/shader.vert",
                                     std::string(RESOURCE_PATH) + "shaders/shader.frag");
     DEFAULT_MESH_SHADER = default_mesh_shader;
     //DEFAULT_INSTANCED_SHADER
-    ShaderProgram *default_instanced_shader = Resource::get<ShaderProgram>();
+    ShaderProgram *default_instanced_shader = Resource::create<ShaderProgram>();
     default_instanced_shader->setShaders(std::string(RESOURCE_PATH) + "shaders/instancedShader.vert",
                                          std::string(RESOURCE_PATH) + "shaders/shader.frag");
     DEFAULT_INSTANCED_SHADER = default_instanced_shader;
     //DEFAULT_SCREEN_SHADER
-    ShaderProgram *default_screen_shader = Resource::get<ShaderProgram>();
+    ShaderProgram *default_screen_shader = Resource::create<ShaderProgram>();
     default_screen_shader->setShaders(std::string(RESOURCE_PATH) + "shaders/screen.vert",
                                      std::string(RESOURCE_PATH) + "shaders/screen.frag");
     DEFAULT_SCREEN_SHADER = default_screen_shader;

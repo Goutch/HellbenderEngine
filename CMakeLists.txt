@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 set(CMAKE_CXX_STANDARD 17)
 
-project(HellbenderEngine)
+project(HellbenderEngine CXX)
+
 
 include_directories("dependencies/glm")
 add_subdirectory("dependencies/glm")
@@ -14,6 +15,22 @@ add_subdirectory("dependencies/glad")
 
 include_directories("dependencies/stb")
 add_subdirectory("dependencies/stb")
+
+link_directories("dependencies/assimp/")
+include_directories(${ASSIMP_INCLUDE_DIR})
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	add_library(assimp 	"dependencies/assimp/assimp-vc142-mt.a")
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	add_library(assimp 	"dependencies/assimp/assimp-vc142-mt.a")
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+	add_library(assimp 	"dependencies/assimp/assimp-vc142-mt.a")
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+	add_library(assimp 	"dependencies/assimp/assimp-vc142-mt.dll")
+endif()
+set_target_properties(assimp PROPERTIES LINKER_LANGUAGE CXX)
+include_directories("dependencies/assimp/include")
+
+
 
 include_directories("HBE")
 
@@ -32,7 +49,7 @@ set(CORE_FILES
 		HBE/core/resource/Texture.cpp
 		HBE/core/resource/Material.cpp
 		HBE/core/resource/Material.h
-		HBE/core/resource/MaterialProperty.h
+		HBE/core/resource/Model.h
 
         HBE/core/graphics/IRenderer.h
 		HBE/core/graphics/Graphics.cpp
@@ -56,12 +73,15 @@ set(CORE_FILES
 		HBE/core/entity/component/Component.cpp
 		HBE/core/entity/component/InstancesRenderer.cpp
 		HBE/core/entity/component/InstancesRenderer.h
+		HBE/core/entity/component/ModelRenderer.h
+		HBE/core/entity/component/ModelRenderer.cpp
 
 		HBE/core/utility/Log.cpp
 		HBE/core/utility/Geometry.cpp
 		HBE/core/utility/Geometry.h
 		HBE/core/utility/Job.cpp
 		HBE/core/utility/Clock.cpp
+		HBE/core/utility/ModelImporter.cpp
 		)
 
 set(GL_FILES
@@ -82,4 +102,4 @@ add_library (${PROJECT_NAME}
 		${GL_FILES}
 		)
 
-target_link_libraries(${PROJECT_NAME} glm glfw glad stb)
+target_link_libraries(${PROJECT_NAME} glm glfw glad stb dependencies/assimp/assimp)

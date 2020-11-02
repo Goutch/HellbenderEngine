@@ -7,7 +7,7 @@
 
 RenderTarget::RenderTarget(unsigned int width, unsigned int height, const ShaderProgram &shader_program) {
     this->shader_program = &shader_program;
-    framebuffer = Resource::get<Framebuffer>();
+    framebuffer = Resource::create<Framebuffer>();
     setSize(width, height);
     projection_matrix = glm::ortho(-0.5, 0.5, -0.5, 0.5, -1.0, 1.0);
 }

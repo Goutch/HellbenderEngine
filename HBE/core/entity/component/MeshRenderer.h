@@ -17,7 +17,6 @@ public:
 
     void setMesh(const Mesh &mesh);
     const Mesh* getMesh();
-
 };
 
 

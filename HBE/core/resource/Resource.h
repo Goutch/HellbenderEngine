@@ -7,24 +7,33 @@
 #include "CompilationConfigs.h"
 #include "core/utility/Log.h"
 #include "core/resource/Material.h"
+#include "core/resource/Model.h"
 #include "typeinfo"
 
 namespace Resource {
     template<class T>
-    T *get() { Log::error(std::string("Resource ") + typeid(T).name() + " is not implemented for the current renderer"); };
+    T *create() { Log::error(std::string("Resource ") + typeid(T).name() + " is not implemented for the current renderer"); };
+
+    template<class T>
+            T* load(std::string path) {Log::error(std::string("Resource ") + typeid(T).name() + " is not implemented for the current renderer"); }
+    template<>
+    Texture *create<Texture>();
 
     template<>
-    Texture *get<Texture>();
+    Texture *load<Texture>(std::string path);
 
     template<>
-    Material *get<Material>();
+    Material *create<Material>();
 
     template<>
-    ShaderProgram *get<ShaderProgram>();
+    ShaderProgram *create<ShaderProgram>();
 
     template<>
-    Mesh *get<Mesh>();
+    Mesh *create<Mesh>();
 
     template<>
-    Framebuffer *get<Framebuffer>();
+    Model *load<Model>(std::string path);
+
+    template<>
+    Framebuffer *create<Framebuffer>();
 };
