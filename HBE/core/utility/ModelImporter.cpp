@@ -19,10 +19,11 @@ std::pair<MeshData, MaterialData> processMesh(aiMesh *mesh, const aiScene *scene
 
     MeshData mesh_data;
     for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
-        mesh_data.positions.emplace_back(vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z));
-        mesh_data.normals.emplace_back(vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z));
+        mesh_data.positions.emplace_back(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
+        if(i<mesh_data.normals.size())
+            mesh_data.normals.emplace_back(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
         if (mesh->mTextureCoords[0])mesh_data.uvs.emplace_back(vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y));
-        mesh_data.indices.emplace_back();
+            mesh_data.indices.emplace_back();
     }
     for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
         aiFace face = mesh->mFaces[i];

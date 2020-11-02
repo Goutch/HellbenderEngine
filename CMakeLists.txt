@@ -2,35 +2,35 @@ cmake_minimum_required(VERSION 3.15)
 set(CMAKE_CXX_STANDARD 17)
 
 project(HellbenderEngine CXX)
+SET(CMAKE_C_LINK_EXECUTABLE ${CMAKE_CXX_LINK_EXECUTABLE})
+
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm")
+
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/include")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw")
+
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/include")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad")
+
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb")
 
 
-include_directories("dependencies/glm")
-add_subdirectory("dependencies/glm")
 
-include_directories("dependencies/glfw/include")
-add_subdirectory("dependencies/glfw")
-
-include_directories("dependencies/glad/include")
-add_subdirectory("dependencies/glad")
-
-include_directories("dependencies/stb")
-add_subdirectory("dependencies/stb")
-
-link_directories("dependencies/assimp/")
-include_directories(${ASSIMP_INCLUDE_DIR})
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	add_library(assimp 	"dependencies/assimp/assimp-vc142-mt.a")
+	set(ASSIMP_LIB_NAME libassimp.so.5.0.1)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	add_library(assimp 	"dependencies/assimp/assimp-vc142-mt.a")
+	set(ASSIMP_LIB_NAME libassimp.so.5.0.1)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
-	add_library(assimp 	"dependencies/assimp/assimp-vc142-mt.a")
+
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-	add_library(assimp 	"dependencies/assimp/assimp-vc142-mt.dll")
+
 endif()
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/include")
+add_library(assimp STATIC "dependencies/assimp/lib/${ASSIMP_LIB_NAME}")
+link_libraries(assimp ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/lib/${ASSIMP_LIB_NAME})
 set_target_properties(assimp PROPERTIES LINKER_LANGUAGE CXX)
-include_directories("dependencies/assimp/include")
-
-
 
 include_directories("HBE")
 
@@ -49,7 +49,7 @@ set(CORE_FILES
 		HBE/core/resource/Texture.cpp
 		HBE/core/resource/Material.cpp
 		HBE/core/resource/Material.h
-		HBE/core/resource/Model.h
+		HBE/core/resource/Model.cpp
 
         HBE/core/graphics/IRenderer.h
 		HBE/core/graphics/Graphics.cpp
@@ -81,8 +81,7 @@ set(CORE_FILES
 		HBE/core/utility/Geometry.h
 		HBE/core/utility/Job.cpp
 		HBE/core/utility/Clock.cpp
-		HBE/core/utility/ModelImporter.cpp
-		)
+		HBE/core/utility/ModelImporter.cpp)
 
 set(GL_FILES
 		HBE/graphics/gl/GL_Core.h
@@ -102,4 +101,5 @@ add_library (${PROJECT_NAME}
 		${GL_FILES}
 		)
 
-target_link_libraries(${PROJECT_NAME} glm glfw glad stb dependencies/assimp/assimp)
+target_link_libraries(${PROJECT_NAME} glm glfw glad stb assimp)
+

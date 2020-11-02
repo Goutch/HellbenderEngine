@@ -14,9 +14,16 @@ void ModelRenderer::onAttach() {
 }
 
 void ModelRenderer::onDraw() {
-    std::vector<std::pair<Mesh *, Material *>> meshes = model->getMeshes();
-    for (int i = 0; i < meshes.size(); ++i) {
-        Graphics::draw(*entity, *meshes[i].first, *meshes[i].second);
+    if(model)
+    {
+        auto meshes = model->getMeshes();
+        for (int i = 0; i < meshes.size(); ++i) {
+            Graphics::draw(*entity, *meshes[i].first, *meshes[i].second);
+        }
+    }
+    else
+    {
+        Log::warning("Model renderer "+getEntity()->getName()+" does not have a model");
     }
 }
 

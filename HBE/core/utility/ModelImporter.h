@@ -20,6 +20,6 @@ struct MaterialData {
 class ModelImporter {
 
 public:
-    std::vector<std::pair<MeshData,MaterialData>>* load(std::string path);
+    static std::vector<std::pair<MeshData,MaterialData>>* load(std::string path);
 };
 
