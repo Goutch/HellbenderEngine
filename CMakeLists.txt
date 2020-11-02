@@ -81,9 +81,10 @@ set(GL_FILES
 		HBE/graphics/gl/GL_Debug.cpp
 		HBE/graphics/gl/GL_Debug.h
 		HBE/graphics/gl/GL_MultisamplingFramebuffer.cpp
-		HBE/graphics/gl/GL_MultisamplingFramebuffer.h )
+		HBE/graphics/gl/GL_MultisamplingFramebuffer.h)
 
-add_library (${PROJECT_NAME}
+add_executable (${PROJECT_NAME}
+		main.cpp
 		${CORE_FILES}
 		${GL_FILES}
 		)
