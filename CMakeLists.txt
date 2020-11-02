@@ -16,21 +16,8 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb")
 
-
-
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	set(ASSIMP_LIB_NAME libassimp.so.5.0.1)
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	set(ASSIMP_LIB_NAME libassimp.so.5.0.1)
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
-
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-
-endif()
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/include")
-add_library(assimp STATIC "dependencies/assimp/lib/${ASSIMP_LIB_NAME}")
-link_libraries(assimp ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/lib/${ASSIMP_LIB_NAME})
-set_target_properties(assimp PROPERTIES LINKER_LANGUAGE CXX)
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp")
 
 include_directories("HBE")
 
