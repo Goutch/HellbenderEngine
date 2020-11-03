@@ -32,7 +32,6 @@ set(CORE_FILES
 		HBE/core/resource/ShaderProgram.h
 		HBE/core/resource/Texture.h
 		HBE/core/resource/Framebuffer.h
-		HBE/core/resource/Resource.cpp
 		HBE/core/resource/Texture.cpp
 		HBE/core/resource/Material.cpp
 		HBE/core/resource/Material.h

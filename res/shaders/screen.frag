@@ -3,7 +3,6 @@ out vec4 FragColor;
 in vec2 uvs;
 uniform vec2 resolution;
 uniform sampler2D texture_0;
-uniform float time;
 const float exposure=1.;
 const float gamma=1.;
 

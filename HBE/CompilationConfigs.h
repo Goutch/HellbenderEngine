@@ -1,5 +1,5 @@
 #pragma once
-#define RESOURCE_PATH "../dependencies/HellbenderEngine/res/"
+#define RESOURCE_PATH "../res/"
 #define APPLICATION_NAME "PROTOTYPE"
 #define WIDTH 900
 #define HEIGHT 600

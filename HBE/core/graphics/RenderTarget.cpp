@@ -2,8 +2,8 @@
 // Created by User on 14-Jun.-2020.
 //
 #include "RenderTarget.h"
-
-#include <HBE.h>
+#include <core/resource/Resource.h>
+#include "glm/gtc/matrix_transform.hpp"
 
 RenderTarget::RenderTarget(unsigned int width, unsigned int height, const ShaderProgram &shader_program) {
     this->shader_program = &shader_program;
@@ -53,7 +53,6 @@ void RenderTarget::setShaderUniforms() const {
     shader_program->setUniform("texture_0", 0);
     shader_program->setUniform("projection_matrix", projection_matrix);
     shader_program->setUniform("resolution", glm::vec2(width, heigth));
-    shader_program->setUniform("time", HBE::getTime());
 }
 
 

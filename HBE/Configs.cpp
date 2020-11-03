@@ -1,9 +1,25 @@
 #include "Configs.h"
 
+bool Configs::antialiasing=true;
+Event<bool> Configs::onAntialiasingChange;
+
 bool Configs::vertical_sync = true;
 Event<bool> Configs::onVerticalSyncChange;
+
 Configs::CAMERA_MODE Configs::default_camera_mode = Configs::CAMERA_MODE::PERSPECTIVE;
 Event<Configs::CAMERA_MODE> Configs::onDefaultCameraModeChange;
+
+
+void Configs::setAntialiasing(bool antialiasing) {
+    Configs::antialiasing=antialiasing;
+    onAntialiasingChange.invoke(antialiasing);
+}
+
+bool Configs::getAntialiasing()
+{
+    return antialiasing;
+}
+
 bool Configs::getVerticalSync() {
     return vertical_sync;
 }
@@ -21,3 +37,5 @@ void Configs::setDefaultCameraMode(CAMERA_MODE mode) {
     default_camera_mode=mode;
     onDefaultCameraModeChange.invoke(default_camera_mode);
 }
+
+
