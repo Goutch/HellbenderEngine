@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include <core/resource/Framebuffer.h>
+#include <core/graphics/Framebuffer.h>
 #include "GL_Texture.h"
 
 class GL_Framebuffer: public Framebuffer {
@@ -14,6 +14,8 @@ class GL_Framebuffer: public Framebuffer {
 public:
     GL_Framebuffer();
     GL_Framebuffer(int width,int height);
+
+
     ~GL_Framebuffer();
 
     void setResolution(int width,int height) override;

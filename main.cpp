@@ -1,37 +1,43 @@
 #include "HBE.h"
 
+//create a component to rotate the model entity
+class Rotator : public Component {
+    float turn_per_second=0.1;
+    void onAttach() override
+    {
+        subscribeUpdate();
+    }
+    void onUpdate(float delta) override {
+        entity->rotate(M_PI*2*delta*turn_per_second, vec3(0, 1, 0));
+    }
+};
+
 int main() {
     HBE::init();
 
-    Camera* camera=HBE::current_scene->instantiate<Camera>();
-    camera->setRenderMode(ORTHOGRAPHIC);
-    Entity *triangle_entity = HBE::current_scene->instantiate();
-    MeshRenderer *mesh_renderer = triangle_entity->attach<MeshRenderer>();
+    //-----------------------CAMERA--------------------------
+    //Instanciate an entity with the camera component attached
+    Camera *camera = HBE::current_scene->instantiate<Camera>();
 
-    Mesh *mesh = Resource::create<Mesh>();
+    //Set rendering mode to 3 dimensions
+    camera->setRenderMode(PERSPECTIVE);
+    camera->setFOV(70);
+    //set the camera position a in the back
+    camera->getEntity()->setPosition(vec3(0, 2, 5));
 
-    std::vector<vec3> vertex_positions = {
-            vec3(-0.25, -.25, 0.),
-            vec3(0.25, -0.25, 0.),
-            vec3(0., 0.25, 0.),
-    };
-    mesh->setBuffer(0, vertex_positions);
-    mesh_renderer->setMesh(*mesh);
+    //-----------------------MODEL ENTITY------------------
+    //Create model entity
+    ModelRenderer *model_renderer = HBE::current_scene->instantiate<ModelRenderer>();
+    model_renderer->getEntity()->attach<Rotator>();
 
-    //Create material
-    Material *material = Resource::create<Material>();
-    material->setShader(Graphics::DEFAULT_MESH_SHADER);
-    //Set the color to red
-    material->setColor(vec4(1,0,0,1));
-
-    //Set the material of the mesh renderer
-    mesh_renderer->setMaterial(*material);
+    //Create Model resource
+    auto model = Model::create()->load(std::string("../teapot.obj"));
+    model_renderer->setModel(*model);
     HBE::run();
 
     //-----------------------CLEANUP------------------
     //Delete ressources created with Resource.create<>()
-    delete mesh;
-    delete material;
+    delete model;
 
     //terminate engine
     HBE::terminate();

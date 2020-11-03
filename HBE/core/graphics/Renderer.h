@@ -17,9 +17,11 @@ class Framebuffer;
 
 class Material;
 
-class IRenderer {
+class Renderer {
 public:
-    virtual ~IRenderer() {};
+    static Renderer* create();
+
+    virtual ~Renderer() {};
 
     virtual void init() = 0;
 
@@ -27,7 +29,7 @@ public:
 
     virtual void render(const mat4 &projection_matrix, const mat4 &view_matrix = mat4(1.0f)) = 0;
 
-    virtual void renderLayer(RenderTarget &layer) = 0;
+    virtual void renderTarget(RenderTarget &target) = 0;
 
     virtual void draw(const Transform &transform, const Mesh &mesh, const Material &material) = 0;
 

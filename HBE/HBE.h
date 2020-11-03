@@ -1,7 +1,13 @@
 
 #pragma once
 #include <CompilationConfigs.h>
-#include <core/resource/Resource.h>
+#include <Configs.h>
+
+#include <core/resource/ShaderProgram.h>
+#include <core/resource/Mesh.h>
+#include <core/resource/Texture.h>
+#include <core/resource/Material.h>
+#include <core/resource/Model.h>
 
 #include <core/entity/Entity.h>
 #include <core/entity/Scene.h>
@@ -21,7 +27,7 @@
 
 #include <core/utility/Event.h>
 #include <core/utility/Clock.h>
-#include <core/utility/Job.h>
+//#include <core/utility/Job.h>
 #include <core/utility/Log.h>
 #include <core/utility/Geometry.h>
 

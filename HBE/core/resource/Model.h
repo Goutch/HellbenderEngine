@@ -2,12 +2,14 @@
 #include <core/resource/Mesh.h>
 #include <core/utility/Log.h>
 #include "core/utility/ModelImporter.h"
-class Model {
+#include "Resource.h"
+class Model :Resource<Model>{
     std::vector<std::pair<Mesh *,Material *>> meshes;
 public:
+    static Model* create();
     void setMaterial(Material *material, int mesh_index = 0);
 
-    void load(std::string path);
+    Model * load(std::string path);
 
     const std::vector<std::pair<Mesh *,Material *>>& getMeshes() const;
 

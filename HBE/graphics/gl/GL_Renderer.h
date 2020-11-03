@@ -6,10 +6,10 @@ class Transform;
 
 class Mesh;
 
-#include <core/graphics/IRenderer.h>
+#include <core/graphics/Renderer.h>
 #include "list"
 
-class GL_Renderer : public IRenderer {
+class GL_Renderer : public Renderer {
 private:
     struct RenderObject {
         const Transform *transform;
@@ -31,7 +31,7 @@ public:
 
     void render(const mat4 &projection_matrix, const mat4 &view_matrix) override;
 
-    void renderLayer(RenderTarget &layer) override;
+    void renderTarget(RenderTarget &layer) override;
 
     GLFWwindow *createWindow() override;
 };

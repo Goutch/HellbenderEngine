@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include <core/resource/Framebuffer.h>
+#include <core/graphics/Framebuffer.h>
 
 class GL_MultisamplingFramebuffer: public Framebuffer {
     unsigned int ms_fbo;
@@ -13,6 +13,7 @@ class GL_MultisamplingFramebuffer: public Framebuffer {
 public:
     GL_MultisamplingFramebuffer();
     GL_MultisamplingFramebuffer(int width,int height);
+
     ~GL_MultisamplingFramebuffer() override;
 
     void setResolution(int width,int height) override;

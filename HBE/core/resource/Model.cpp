@@ -1,5 +1,8 @@
 
+
 #include "Resource.h"
+#include "Model.h"
+
 
 const std::vector<std::pair<Mesh *, Material *>> &Model::getMeshes() const {
     return meshes;
@@ -12,11 +15,13 @@ Model::~Model() {
     }
 }
 
-void Model::load(std::string path) {
+
+Model* Model::load(std::string path) {
+
     Log::status("Loading model:" + path);
     std::vector<std::pair<MeshData, MaterialData>> *meshes_data = ModelImporter::load(path);
     for (int i = 0; i < meshes_data->size(); ++i) {
-        meshes.emplace_back(Resource::create<Mesh>(), Resource::create<Material>());
+        meshes.emplace_back(Mesh::create(), Material::create());
         meshes[i].first->setIndices((*meshes_data)[i].first.indices);
         if (!(*meshes_data)[i].first.positions.empty()) {
             meshes[i].first->setBuffer(0, (*meshes_data)[i].first.positions);
@@ -30,11 +35,24 @@ void Model::load(std::string path) {
 
 
         meshes[i].second->setShader(Graphics::DEFAULT_MESH_SHADER);
-        meshes[i].second->setColor(vec4(1, 0, 0, 1));
+
+        if(!(*meshes_data)[i].second.diffuse_texture_paths.empty())
+        {
+            auto t=Texture::create();
+            t->load((*meshes_data)[i].second.diffuse_texture_paths[0]);
+            meshes[i].second->setTexture(t);
+        }
+
+
     }
     delete meshes_data;
+    return this;
 }
 
 void Model::setMaterial(Material *material, int mesh_index) {
     meshes[mesh_index].second = material;
+}
+
+Model* Model::create() {
+    return new Model();
 }

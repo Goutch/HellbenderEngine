@@ -3,7 +3,7 @@
 //
 
 #include "Material.h"
-
+#include "core/utility/Log.h"
 Material::Material() {
     shader = Graphics::DEFAULT_MESH_SHADER;
 }
@@ -158,5 +158,11 @@ void Material::setProperty(std::string name, int value) {
         it->second=MaterialProperty(value);
     }
 }
+
+Material *Material::create() {
+    return new Material();
+}
+
+
 
 

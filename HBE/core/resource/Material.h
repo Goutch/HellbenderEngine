@@ -4,6 +4,7 @@
 #include "ShaderProgram.h"
 #include "core/graphics/Graphics.h"
 #include "unordered_map"
+#include "Resource.h"
 enum GLSL_TYPE{
     FLOAT,
     VEC2,
@@ -49,7 +50,7 @@ struct MaterialProperty
         value=new mat4(v);
     }
 };
-class Material {
+class Material:Resource<Material>{
     const ShaderProgram *shader= nullptr;
     const Texture *texture = nullptr;
     const Texture *normal_map = nullptr;
@@ -57,8 +58,10 @@ class Material {
     glm::vec4 color=glm::vec4(1,1,1,1);
     bool is_transparent = false;
     std::unordered_map<std::string,MaterialProperty> properties;
-public:
     Material();
+public:
+    static Material* create();
+
     void bind() const;
     void unbind() const;
     void setShader(const ShaderProgram* shaderProgram);

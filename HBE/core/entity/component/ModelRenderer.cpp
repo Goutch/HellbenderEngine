@@ -4,9 +4,9 @@
 
 #include "ModelRenderer.h"
 #include <core/graphics/Graphics.h>
+#include <core/utility/Log.h>
 #include "core/entity/Entity.h"
-#include "MeshRenderer.h"
-#include "core/resource/Resource.h"
+#include "core/resource/Model.h"
 
 void ModelRenderer::onAttach() {
     Component::onAttach();

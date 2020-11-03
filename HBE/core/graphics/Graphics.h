@@ -4,7 +4,7 @@
 #include <vector>
 #include "glm/glm.hpp"
 using namespace glm;
-class IRenderer;
+class Renderer;
 class GLFWwindow;
 class RenderTarget;
 class ShaderProgram;
@@ -13,7 +13,7 @@ class Transform;
 class Material;
 
 class Graphics {
-    static IRenderer* renderer;
+    static Renderer* renderer;
     static GLFWwindow *window;
     static RenderTarget* render_target;
 public:

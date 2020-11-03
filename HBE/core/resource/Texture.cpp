@@ -1,9 +1,10 @@
 #include <core/utility/Log.h>
 #include <fstream>
+#include <graphics/gl/GL_Texture.h>
 #include "Texture.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-void Texture::load(std::string path) {
+Texture* Texture::load(std::string path) {
     std::ifstream file(path.c_str());
     if (file.good()) {
         unsigned char *buffer;
@@ -17,4 +18,14 @@ void Texture::load(std::string path) {
     } else {
         Log::error("Failed to load texture:" + path);
     }
+    return this;
+}
+
+Texture *Texture::create() {
+#if RENDERER == OPENGL_RENDERER
+    return new GL_Texture();
+#elif RENDERER == VULKAN_RENDERER
+
+#endif
+    return nullptr;
 }

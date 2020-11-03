@@ -6,9 +6,9 @@
 #include <GLFW/glfw3.h>
 #include <core/utility/Geometry.h>
 #include <core/graphics/RenderTarget.h>
-#include <core/resource/Resource.h>
 #include <Configs.h>
-
+#include "Framebuffer.h"
+#include "core/resource/ShaderProgram.h"
 #if RENDERER == OPENGL_RENDERER
 
 #include "graphics/gl/GL_Renderer.h"
@@ -22,35 +22,31 @@ const Mesh *Graphics::DEFAULT_QUAD = nullptr;
 const ShaderProgram *Graphics::DEFAULT_MESH_SHADER = nullptr;
 const ShaderProgram *Graphics::DEFAULT_SCREEN_SHADER = nullptr;
 const ShaderProgram *Graphics::DEFAULT_INSTANCED_SHADER = nullptr;
-IRenderer *Graphics::renderer = nullptr;
+Renderer *Graphics::renderer = nullptr;
 GLFWwindow *Graphics::window = nullptr;
 RenderTarget *Graphics::render_target = nullptr;
 
 
 GLFWwindow *Graphics::init() {
-#if RENDERER == OPENGL_RENDERER
-    renderer = new GL_Renderer();
-#elif RENDERER == VULKAN_RENDERER
-
-#endif
+    renderer = Renderer::create();
     window = renderer->createWindow();
 
     if (!Configs::getVerticalSync())
         glfwSwapInterval(0);
 
     renderer->init();
-    glfwSetWindowSizeCallback(window,Graphics::onWindowSizeChange);
+    glfwSetWindowSizeCallback(window, Graphics::onWindowSizeChange);
     initializeDefaultVariables();
     Configs::onVerticalSyncChange.subscribe(Graphics::onVerticalSyncChange);
     return window;
 }
-void Graphics::onVerticalSyncChange(bool v_sync)
-{
+
+void Graphics::onVerticalSyncChange(bool v_sync) {
     glfwSwapInterval(v_sync);
 }
-void Graphics::onWindowSizeChange(GLFWwindow* window, int width, int height)
-{
-    render_target->setSize(width,height);
+
+void Graphics::onWindowSizeChange(GLFWwindow *window, int width, int height) {
+    render_target->setSize(width, height);
 }
 
 void Graphics::draw(const Transform &transform, const Mesh &mesh, const Material &material) {
@@ -67,7 +63,7 @@ void Graphics::render(const mat4 &projection_matrix, const mat4 &view_matrix) {
     renderer->render(projection_matrix, view_matrix);
     render_target->getFramebuffer().unbind();
     renderer->clear();
-    renderer->renderLayer(*render_target);
+    renderer->renderTarget(*render_target);
 }
 
 void Graphics::terminate() {
@@ -84,27 +80,27 @@ void Graphics::terminate() {
 
 void Graphics::initializeDefaultVariables() {
     //DEFAULT_CUBE
-    Mesh *cube = Resource::create<Mesh>();
+    Mesh *cube = Mesh::create();
     Geometry::createCube(*cube, 1, 1, 1);
     DEFAULT_CUBE = cube;
     //DEFAULT_QUAD
-    Mesh *quad = Resource::create<Mesh>();
+    Mesh *quad = Mesh::create();
     Geometry::createQuad(*quad, 1, 1);
     DEFAULT_QUAD = quad;
     //DEFAULT_MESH_SHADER
-    ShaderProgram *default_mesh_shader = Resource::create<ShaderProgram>();
+    ShaderProgram *default_mesh_shader = ShaderProgram::create();
     default_mesh_shader->setShaders(std::string(RESOURCE_PATH) + "shaders/shader.vert",
                                     std::string(RESOURCE_PATH) + "shaders/shader.frag");
     DEFAULT_MESH_SHADER = default_mesh_shader;
     //DEFAULT_INSTANCED_SHADER
-    ShaderProgram *default_instanced_shader = Resource::create<ShaderProgram>();
+    ShaderProgram *default_instanced_shader = ShaderProgram::create();
     default_instanced_shader->setShaders(std::string(RESOURCE_PATH) + "shaders/instancedShader.vert",
                                          std::string(RESOURCE_PATH) + "shaders/shader.frag");
     DEFAULT_INSTANCED_SHADER = default_instanced_shader;
     //DEFAULT_SCREEN_SHADER
-    ShaderProgram *default_screen_shader = Resource::create<ShaderProgram>();
+    ShaderProgram *default_screen_shader = ShaderProgram::create();
     default_screen_shader->setShaders(std::string(RESOURCE_PATH) + "shaders/screen.vert",
-                                     std::string(RESOURCE_PATH) + "shaders/screen.frag");
+                                      std::string(RESOURCE_PATH) + "shaders/screen.frag");
     DEFAULT_SCREEN_SHADER = default_screen_shader;
     //DEFAULT_RENDER_TARGET
     render_target = new RenderTarget(WIDTH, HEIGHT, *DEFAULT_SCREEN_SHADER);

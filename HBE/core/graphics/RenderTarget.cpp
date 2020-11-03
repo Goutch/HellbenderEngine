@@ -4,10 +4,11 @@
 #include "RenderTarget.h"
 #include <core/resource/Resource.h>
 #include "glm/gtc/matrix_transform.hpp"
-
+#include "Framebuffer.h"
+#include "core/resource/ShaderProgram.h"
 RenderTarget::RenderTarget(unsigned int width, unsigned int height, const ShaderProgram &shader_program) {
     this->shader_program = &shader_program;
-    framebuffer = Resource::create<Framebuffer>();
+    framebuffer = Framebuffer::create();
     setSize(width, height);
     projection_matrix = glm::ortho(-0.5, 0.5, -0.5, 0.5, -1.0, 1.0);
 }

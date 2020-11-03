@@ -3,16 +3,19 @@
 
 #include <vector>
 #include "glm/glm.hpp"
+#include "Resource.h"
 
 using namespace glm;
-class Mesh {
+
+class Mesh : Resource<Mesh> {
 protected:
     unsigned int vertex_count = 0;
     unsigned int index_count = 0;
     bool has_index_buffer = false;
     unsigned int instance_count = 1;
+
 public:
-    virtual ~Mesh() {};
+    static Mesh *create();
 
     virtual void setIndices(const std::vector<unsigned int> &data) = 0;
 
@@ -26,7 +29,7 @@ public:
 
     virtual void setBuffer(unsigned int position, const std::vector<vec4> &data) = 0;
 
-    virtual void setBuffer(unsigned int position, const std::vector<unsigned int> &data)=0;
+    virtual void setBuffer(unsigned int position, const std::vector<unsigned int> &data) = 0;
 
     virtual void setInstancedBuffer(unsigned int position, const std::vector<mat4> &data) = 0;
 
@@ -42,4 +45,5 @@ public:
 
     virtual void unbind() const = 0;
 };
+
 

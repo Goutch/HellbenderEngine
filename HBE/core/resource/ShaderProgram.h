@@ -1,15 +1,12 @@
 #pragma once
-
+#include "Resource.h"
 #include "glm/glm.hpp"
 #include "string"
 
-class ShaderProgram {
+class ShaderProgram:Resource<ShaderProgram> {
 
 public:
-
-    ShaderProgram() {};
-
-    virtual ~ShaderProgram() {};
+    static ShaderProgram* create();
 
     virtual void bind() const = 0;
 
@@ -57,4 +54,6 @@ public:
 
     virtual void setUniform(std::string name, const glm::mat4 &m) const = 0;
 };
+
+
 
