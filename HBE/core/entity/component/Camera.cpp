@@ -7,6 +7,7 @@
 #include <core/entity/Entity.h>
 #include <core/graphics/Graphics.h>
 #include <core/graphics/RenderTarget.h>
+#include <core/utility/Log.h>
 #include "Configs.h"
 Camera* Camera::main= nullptr;
 void Camera::onAttach() {
@@ -81,7 +82,12 @@ float Camera::getFOV() const {
 
 void Camera::setFOV(float fov) {
     this->fov = fov;
-    generateProjectionMatrix();
+    if(render_mode==ORTHOGRAPHIC)
+    {
+        Log::warning("Can't set field of view when camera is set to orthographic mode");
+    } else{
+        generateProjectionMatrix();
+    }
 }
 
 void Camera::calculateFrustumPlanes() {
