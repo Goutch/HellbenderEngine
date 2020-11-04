@@ -60,7 +60,11 @@ void HBE::quit() {
 }
 
 float HBE::getTime() {
-    return time->ms();
+    if(time)
+    {
+        return time->ms()/SECOND_TO_MILISECOND;
+    }
+    return 0;
 }
 
 void HBE::printFPS(float delta) {

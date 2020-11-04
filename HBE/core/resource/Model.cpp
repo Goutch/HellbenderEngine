@@ -18,8 +18,8 @@ Model::~Model() {
 
 
 Model *Model::load(std::string path) {
-
-    Log::status("Loading model:" + path);
+    this->path=path;
+    Log::status("Loading:" + path);
     auto meshes_data = ModelImporter::load(path);
     constructModel(meshes_data);
     return this;
@@ -34,7 +34,9 @@ Model *Model::create() {
 }
 
 void Model::loadAsync(std::string path) {
-    auto job =  JobManager::create<std::vector<std::pair<MeshData, MaterialData>>*, std::string>();
+    this->path=path;
+    Log::status("Loading async:" + path);
+    auto job = JobManager::create<std::vector<std::pair<MeshData, MaterialData>>*, std::string>();
     job->setCallback<Model>(this, &Model::constructModel);
     job->run(&ModelImporter::load, path);
 
@@ -65,7 +67,7 @@ void Model::constructModel(std::vector<std::pair<MeshData, MaterialData>> *meshe
         }
     }
     delete meshes_data;
-    Log::status("Loaded model \nVertex count = " + std::to_string(vertex_count));
+    Log::status(path+ " loaded \n\tVertex count = " + std::to_string(vertex_count));
 
 }
 

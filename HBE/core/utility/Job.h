@@ -7,9 +7,9 @@
 
 class IJob {
 public:
-    virtual bool isFinish() const = 0;
+    virtual bool isFinish() = 0;
 
-    virtual void onFinish() const = 0;
+    virtual void onFinish() = 0;
 };
 
 template<typename Return, typename... Args>

@@ -41,7 +41,7 @@ class Clock;
 
 class HBE {
     static GLFWwindow *window;
-    static Clock *time;
+    static Clock* time;
     static int fps_counter;
     static float fps_timer;
 public:

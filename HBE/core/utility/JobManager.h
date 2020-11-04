@@ -8,7 +8,7 @@ private:
 public:
     template<typename Return, typename... Args>
     static Job<Return, Args...> *create() {
-        Job* job=new Job<Return,Args...>();
+        Job<Return, Args...>* job=new Job<Return,Args...>();
         running_jobs.push_back(job);
         return job;
     }
