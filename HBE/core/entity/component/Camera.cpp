@@ -18,7 +18,7 @@ void Camera::onAttach() {
     }
     setAspectRatio(Graphics::getRenderTarget()->getWidth(),Graphics::getRenderTarget()->getHeight());
 
-    Graphics::getRenderTarget()->onSizeChange.subscribe<Camera>(this,&Camera::onRenderTargetSizeChange);
+    Graphics::getRenderTarget()->onSizeChange.subscribe(this,&Camera::onRenderTargetSizeChange);
 
     generateProjectionMatrix();
 }

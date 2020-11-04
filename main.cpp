@@ -3,11 +3,17 @@
 //create a component to rotate the model entity
 class Rotator : public Component {
     float turn_per_second=0.1;
+    Clock c;
     void onAttach() override
     {
         subscribeUpdate();
     }
     void onUpdate(float delta) override {
+        if(c.ms()>1000)
+        {
+            c.reset();
+            Configs::setVerticalSync(false);
+        }
         entity->rotate(M_PI*2*delta*turn_per_second, vec3(0, 1, 0));
     }
 };

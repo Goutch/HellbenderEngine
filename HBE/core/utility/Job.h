@@ -1,35 +1,35 @@
 #pragma once
 
 #include <thread>
-#include "Event.h"
+#include "Function.h"
 #include <future>
 #include "list"
 
 
-template<typename... Args>
+template<typename Return,typename... Args>
 class Job {
-    std::future<void> result;
-    std::function<void()> finish_callback;
+    std::future<Return> result;
+    std::function<void(Return)> finish_callback;
 
 public:
-
-
-    void run(void(*static_function)(Args...),Args... args) {
+    void run(Return(*static_function)(Args...),Args... args) {
         this->result = std::async(std::launch::async, static_function, args...);
     }
-    template<typename T>
-    void run(T *instance, void(T::* member_function)(Args...),Args... args) {
+
+    template<typename Object>
+    void run(Object *instance, Return(Object::* member_function)(Args...),Args... args) {
         this->result = std::async(member_function,instance, args...);
     }
 
-    void setCallback(void(*static_callback)())
+    void setCallback(void(*static_callback)(Return))
     {
         finish_callback = std::bind(static_callback);
     }
-    template<typename T>
-    void setCallback(T *instance, void(T::* member_function)())
+
+    template<typename Object>
+    void setCallback(Object *instance, void(Object::* member_function)(Return))
     {
-        finish_callback = std::bind(member_function, instance);
+        finish_callback = Attach(member_function,instance);
     }
 
     bool isFinish() {
@@ -37,7 +37,7 @@ public:
     }
 
     void onFinish() {
-        finish_callback();
+        finish_callback(result.get());
     }
 
 };

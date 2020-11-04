@@ -31,8 +31,7 @@ set(CORE_FILES
 
 		HBE/core/resource/ShaderProgram.h
 		HBE/core/resource/Texture.h
-		HBE/core/graphics/Framebuffer.h
-		HBE/core/graphics/Framebuffer.cpp
+		HBE/core/resource/Resource.cpp
 		HBE/core/resource/Texture.cpp
 		HBE/core/resource/Material.cpp
 		HBE/core/resource/Material.h
@@ -40,6 +39,8 @@ set(CORE_FILES
 		HBE/core/resource/ShaderProgram.cpp
 		HBE/core/resource/Mesh.cpp
 
+		HBE/core/graphics/Framebuffer.h
+		HBE/core/graphics/Framebuffer.cpp
 		HBE/core/graphics/Renderer.h
 		HBE/core/graphics/Graphics.cpp
 		HBE/core/graphics/Graphics.h
@@ -70,7 +71,7 @@ set(CORE_FILES
 		HBE/core/utility/Geometry.cpp
 		HBE/core/utility/Geometry.h
 		HBE/core/utility/Clock.cpp
-		HBE/core/utility/ModelImporter.cpp HBE/core/utility/function.h)
+		HBE/core/utility/ModelImporter.cpp)
 
 set(GL_FILES
 		HBE/graphics/gl/GL_Core.h
