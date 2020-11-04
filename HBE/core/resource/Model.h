@@ -6,6 +6,7 @@
 class Model :Resource{
     std::string path;
     std::vector<std::pair<Mesh *,Material *>> meshes;
+    void clearModels();
 public:
     static Model* create();
     void setMaterial(Material *material, int mesh_index = 0);

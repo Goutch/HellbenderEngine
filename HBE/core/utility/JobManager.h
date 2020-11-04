@@ -12,17 +12,5 @@ public:
         running_jobs.push_back(job);
         return job;
     }
-    static void updateJobsStatus(){
-        for (auto i = running_jobs.begin(); i != running_jobs.end();) {
-            if ((*i)->isFinish()) {
-                (*i)->onFinish();
-                delete (*i);
-                auto current=i;
-                --i;
-                running_jobs.erase(current);
-            } else {
-                ++i;
-            }
-        }
-    }
+    static void updateJobsStatus();
 };

@@ -10,15 +10,12 @@ const std::vector<std::pair<Mesh *, Material *>> &Model::getMeshes() const {
 }
 
 Model::~Model() {
-    for (int i = 0; i < meshes.size(); ++i) {
-        delete meshes[i].first;
-        delete meshes[i].second;
-    }
+    clearModels();
 }
 
 
 Model *Model::load(std::string path) {
-    this->path=path;
+    this->path = path;
     Log::status("Loading:" + path);
     auto meshes_data = ModelImporter::load(path);
     constructModel(meshes_data);
@@ -34,9 +31,9 @@ Model *Model::create() {
 }
 
 void Model::loadAsync(std::string path) {
-    this->path=path;
+    this->path = path;
     Log::status("Loading async:" + path);
-    auto job = JobManager::create<std::vector<std::pair<MeshData, MaterialData>>*, std::string>();
+    auto job = JobManager::create<std::vector<std::pair<MeshData, MaterialData>> *, std::string>();
     job->setCallback<Model>(this, &Model::constructModel);
     job->run(&ModelImporter::load, path);
 
@@ -44,6 +41,7 @@ void Model::loadAsync(std::string path) {
 
 void Model::constructModel(std::vector<std::pair<MeshData, MaterialData>> *meshes_data) {
     int vertex_count = 0;
+    clearModels();
     for (int i = 0; i < meshes_data->size(); ++i) {
         meshes.emplace_back(Mesh::create(), Material::create());
         meshes[i].first->setIndices((*meshes_data)[i].first.indices);
@@ -67,8 +65,15 @@ void Model::constructModel(std::vector<std::pair<MeshData, MaterialData>> *meshe
         }
     }
     delete meshes_data;
-    Log::status(path+ " loaded \n\tVertex count = " + std::to_string(vertex_count));
+    Log::status(path + " loaded \n\tVertex count = " + std::to_string(vertex_count));
 
+}
+
+void Model::clearModels() {
+    for (int i = 0; i < meshes.size(); ++i) {
+        delete meshes[i].first;
+        delete meshes[i].second;
+    }
 }
 
 
