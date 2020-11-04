@@ -30,6 +30,7 @@
 #include <core/utility/JobManager.h>
 #include <core/utility/Log.h>
 #include <core/utility/Geometry.h>
+#include <core/utility/Random.h>
 
 #include <glm/glm.hpp>
 using namespace glm;

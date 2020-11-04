@@ -17,6 +17,14 @@ class Rotator : public Component {
             c.reset();
             index++;
             model_renderer->setModel(*models[index%models.size()]);
+            if(!models[index%models.size()]->getMeshes().empty())
+            {
+                model_renderer->getModel()->getMeshes()[0].second->setColor(vec4(
+                        Random::range(0.0f,1.0f),
+                        Random::range(0.0f,1.0f),
+                        Random::range(0.0f,1.0f),
+                        1.0f));  
+            }
         }
         entity->rotate(M_PI * 2 * delta * turn_per_second, vec3(0, 1, 0));
     }

@@ -73,7 +73,7 @@ set(CORE_FILES
 		HBE/core/utility/Clock.cpp
 		HBE/core/utility/ModelImporter.cpp
 		HBE/core/utility/JobManager.cpp
-		HBE/core/utility/JobManager.h)
+		HBE/core/utility/JobManager.h HBE/core/utility/Random.cpp HBE/core/utility/Random.h)
 
 set(GL_FILES
 		HBE/graphics/gl/GL_Core.h
