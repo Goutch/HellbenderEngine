@@ -71,7 +71,9 @@ set(CORE_FILES
 		HBE/core/utility/Geometry.cpp
 		HBE/core/utility/Geometry.h
 		HBE/core/utility/Clock.cpp
-		HBE/core/utility/ModelImporter.cpp)
+		HBE/core/utility/ModelImporter.cpp
+		HBE/core/utility/JobManager.cpp
+		HBE/core/utility/JobManager.h)
 
 set(GL_FILES
 		HBE/graphics/gl/GL_Core.h

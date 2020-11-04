@@ -27,7 +27,7 @@
 
 #include <core/utility/Event.h>
 #include <core/utility/Clock.h>
-//#include <core/utility/Job.h>
+#include <core/utility/JobManager.h>
 #include <core/utility/Log.h>
 #include <core/utility/Geometry.h>
 
