@@ -50,7 +50,7 @@ struct MaterialProperty
         value=new mat4(v);
     }
 };
-class Material:Resource<Material>{
+class Material:Resource{
     const ShaderProgram *shader= nullptr;
     const Texture *texture = nullptr;
     const Texture *normal_map = nullptr;

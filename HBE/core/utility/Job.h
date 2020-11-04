@@ -5,38 +5,39 @@
 #include <future>
 #include "list"
 
-template<typename ReturnType,typename Function,typename... Args>
+
+template<typename... Args>
 class Job {
-    std::future<ReturnType> result;
-    static std::list<Job *> running_jobs;
-private:
-    Job(Function &&fun, Args &&... args) {
-        this->result = std::async(std::launch::async, fun, args...);
-    }
+    std::future<void> result;
+    std::function<void()> finish_callback;
 
 public:
-    Event<ReturnType> onFinish;
 
-    template<typename R,typename F,typename... A>
-    static Job *run(F &&fun, A &&... args) {
-        running_jobs.push_back(new Job<R,F, A...>(fun, args...));
+
+    void run(void(*static_function)(Args...),Args... args) {
+        this->result = std::async(std::launch::async, static_function, args...);
+    }
+    template<typename T>
+    void run(T *instance, void(T::* member_function)(Args...),Args... args) {
+        this->result = std::async(member_function,instance, args...);
     }
 
-    static void doCallbacks() {
-        auto it = running_jobs.begin();
-        while (it != running_jobs.end()) {
-            auto current = it++;
-            if ((*current)->isFinish())
-                running_jobs.erase(current);
-            (*current)->onFinish.invoke();
-        }
+    void setCallback(void(*static_callback)())
+    {
+        finish_callback = std::bind(static_callback);
+    }
+    template<typename T>
+    void setCallback(T *instance, void(T::* member_function)())
+    {
+        finish_callback = std::bind(member_function, instance);
     }
 
     bool isFinish() {
         return result.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready;
     }
 
-    ReturnType getReturnValue() {
-        return result.get();
+    void onFinish() {
+        finish_callback();
     }
+
 };

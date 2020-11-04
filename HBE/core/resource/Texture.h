@@ -2,7 +2,7 @@
 
 #include <string>
 #include "Resource.h"
-class Texture :Resource<Texture>{
+class Texture :Resource{
 protected:
     int width = 1;
     int height = 1;

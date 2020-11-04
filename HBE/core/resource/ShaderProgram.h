@@ -3,7 +3,7 @@
 #include "glm/glm.hpp"
 #include "string"
 
-class ShaderProgram:Resource<ShaderProgram> {
+class ShaderProgram:Resource {
 
 public:
     static ShaderProgram* create();

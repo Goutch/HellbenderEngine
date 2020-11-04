@@ -2,6 +2,8 @@
 
 #include "unordered_set"
 #include "functional"
+
+
 template <typename... Args> class Event {
     std::unordered_set<void(*)(Args...)> static_callbacks;
     std::unordered_map<void*,std::function<void(Args...)>> instances_callbacks;
@@ -14,10 +16,10 @@ public:
     {
         static_callbacks.erase(static_callback);
     }
-    template<typename T>
-    void subscribe(T* instance,void(T::* fun)(Args...) )
+    template<typename Object>
+    void subscribe(Object* instance,void(Object::* fun)(Args...) )
     {
-        instances_callbacks.emplace((void*)instance,std::bind(fun, instance,std::placeholders::_1,std::placeholders::_2));
+        instances_callbacks.emplace([instance](Args... args){return (obj.*f)(args...);})
     }
     void unsubscribe(void* instance)
     {

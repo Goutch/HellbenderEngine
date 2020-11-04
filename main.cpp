@@ -31,7 +31,8 @@ int main() {
     model_renderer->getEntity()->attach<Rotator>();
 
     //Create Model resource
-    auto model = Model::create()->load(std::string("../teapot.obj"));
+    Model* model = Model::create();
+    model->loadAsync(std::string("../teapot.obj"));
     model_renderer->setModel(*model);
     HBE::run();
 

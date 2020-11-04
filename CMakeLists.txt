@@ -45,6 +45,7 @@ set(CORE_FILES
 		HBE/core/graphics/Graphics.h
 		HBE/core/graphics/RenderTarget.cpp
 		HBE/core/graphics/RenderTarget.h
+		HBE/core/graphics/Renderer.cpp
 
 		HBE/core/input/Input.h
 		HBE/core/input/Input.cpp
@@ -69,7 +70,7 @@ set(CORE_FILES
 		HBE/core/utility/Geometry.cpp
 		HBE/core/utility/Geometry.h
 		HBE/core/utility/Clock.cpp
-		HBE/core/utility/ModelImporter.cpp HBE/core/graphics/Renderer.cpp)
+		HBE/core/utility/ModelImporter.cpp HBE/core/utility/function.h)
 
 set(GL_FILES
 		HBE/graphics/gl/GL_Core.h
@@ -82,8 +83,7 @@ set(GL_FILES
 		HBE/graphics/gl/GL_Debug.cpp
 		HBE/graphics/gl/GL_Debug.h
 		HBE/graphics/gl/GL_MultisamplingFramebuffer.cpp
-		HBE/graphics/gl/GL_MultisamplingFramebuffer.h
-		)
+		HBE/graphics/gl/GL_MultisamplingFramebuffer.h)
 
 add_executable (${PROJECT_NAME}
 		main.cpp

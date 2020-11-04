@@ -1,5 +1,7 @@
 #include "HBE.h"
 #include "GLFW/glfw3.h"
+
+#include "core/resource/Resource.h"
 Scene *HBE::current_scene = nullptr;
 GLFWwindow *HBE::window = nullptr;
 Clock *HBE::time = nullptr;
@@ -35,6 +37,7 @@ void HBE::run() {
         glfwPollEvents();
         if (Input::getKeyDown(KEY::ESCAPE))
             quit();
+        Resource::updateJobsStatus();
         current_scene->update(delta_t);
         current_scene->draw();
         Graphics::render(Camera::main->getProjectionMatrix(), Camera::main->getViewMatrix());
