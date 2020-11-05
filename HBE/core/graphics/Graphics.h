@@ -2,6 +2,7 @@
 
 
 #include <vector>
+#include <string>
 #include "glm/glm.hpp"
 using namespace glm;
 class Renderer;
@@ -28,10 +29,11 @@ public:
     static void render(const mat4& projection_matrix,const mat4& view_matrix);
     static RenderTarget* getRenderTarget();
     static void terminate();
+    static void onWindowTitleChange(std::basic_string<char, std::char_traits<char>> title);
     static void onWindowSizeChange(GLFWwindow* window,int width,int height);
+    static void onVerticalSyncChange(bool v_sync);
 private:
     static void initializeDefaultVariables();
 
-    static void onVerticalSyncChange(bool v_sync);
 };
 

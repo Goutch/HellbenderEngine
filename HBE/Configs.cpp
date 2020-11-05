@@ -1,6 +1,9 @@
 #include "Configs.h"
 
-bool Configs::antialiasing=true;
+Event<std::string> Configs::onWindowTitleChange;
+std::string Configs::window_title = "CHANGE WITH Configs::setWindowTitle";
+
+bool Configs::antialiasing = true;
 Event<bool> Configs::onAntialiasingChange;
 
 bool Configs::vertical_sync = true;
@@ -11,12 +14,11 @@ Event<Configs::CAMERA_MODE> Configs::onDefaultCameraModeChange;
 
 
 void Configs::setAntialiasing(bool antialiasing) {
-    Configs::antialiasing=antialiasing;
+    Configs::antialiasing = antialiasing;
     onAntialiasingChange.invoke(antialiasing);
 }
 
-bool Configs::getAntialiasing()
-{
+bool Configs::getAntialiasing() {
     return antialiasing;
 }
 
@@ -34,8 +36,17 @@ Configs::CAMERA_MODE Configs::getDefaultCameraMode() {
 }
 
 void Configs::setDefaultCameraMode(CAMERA_MODE mode) {
-    default_camera_mode=mode;
+    default_camera_mode = mode;
     onDefaultCameraModeChange.invoke(default_camera_mode);
+}
+
+void Configs::setWindowTitle(std::string title) {
+    window_title = title;
+    onWindowTitleChange.invoke(title);
+}
+
+std::string Configs::getWindowTitle() {
+    return window_title;
 }
 
 

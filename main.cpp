@@ -23,7 +23,7 @@ class Rotator : public Component {
                         Random::range(0.0f,1.0f),
                         Random::range(0.0f,1.0f),
                         Random::range(0.0f,1.0f),
-                        1.0f));  
+                        1.0f));
             }
         }
         entity->rotate(M_PI * 2 * delta * turn_per_second, vec3(0, 1, 0));
@@ -31,6 +31,7 @@ class Rotator : public Component {
 };
 
 int main() {
+    Configs::setWindowTitle("3D view");
     HBE::init();
 
     //-----------------------CAMERA--------------------------
@@ -39,7 +40,7 @@ int main() {
 
     //Set rendering mode to 3 dimensions
     camera->setRenderMode(PERSPECTIVE);
-    camera->setFOV(70);
+    camera->setFOV(50);
     //set the camera position a in the back
     camera->getEntity()->setPosition(vec3(0, 2, 15));
 

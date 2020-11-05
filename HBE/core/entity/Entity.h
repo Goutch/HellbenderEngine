@@ -7,12 +7,15 @@
 
 
 class Entity : public Transform {
+    friend class Scene;
     static unsigned int current_id;
     unsigned int id;
     std::string name;
     std::list<Component *> components;
-public:
+
+
     Entity(Entity* parent);
+
     Entity(std::string name);
 
     Entity(std::string name, Entity *parent);
@@ -25,6 +28,7 @@ public:
 
     Entity();
 
+public:
     virtual void init() {};
 
     virtual void onDestroy();

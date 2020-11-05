@@ -6,10 +6,17 @@ class Configs {
 public:
     enum CAMERA_MODE {PERSPECTIVE,ORTHOGRAPHIC};
 private:
+    static std::string window_title;
     static bool antialiasing;
     static bool vertical_sync;
     static CAMERA_MODE default_camera_mode;
+
 public:
+    static Event<std::string> onWindowTitleChange;
+    static void setWindowTitle(std::string title);
+    static std::string getWindowTitle();
+
+
     static Event<bool> onAntialiasingChange;
     static void setAntialiasing(bool antialiasing);
     static bool getAntialiasing();

@@ -26,7 +26,6 @@ Renderer *Graphics::renderer = nullptr;
 GLFWwindow *Graphics::window = nullptr;
 RenderTarget *Graphics::render_target = nullptr;
 
-
 GLFWwindow *Graphics::init() {
     renderer = Renderer::create();
     window = renderer->createWindow();

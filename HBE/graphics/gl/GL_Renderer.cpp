@@ -8,6 +8,7 @@
 #include <core/resource/Material.h>
 #include <core/resource/Mesh.h>
 #include <core/entity/Transform.h>
+#include <Configs.h>
 #include "GLFW/glfw3.h"
 #include "core/utility/Log.h"
 #include "CompilationConfigs.h"
@@ -89,6 +90,11 @@ void GL_Renderer::init() {
 #endif
 }
 
+void Graphics::onWindowTitleChange(std::string title)
+{
+    glfwSetWindowTitle(window,title.c_str());
+}
+
 GLFWwindow *GL_Renderer::createWindow() {
     if (!glfwInit()) {
         Log::error("Failed to load glfw");
@@ -97,7 +103,8 @@ GLFWwindow *GL_Renderer::createWindow() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(WIDTH, HEIGHT, APPLICATION_NAME, nullptr, nullptr);
+    window = glfwCreateWindow(WIDTH, HEIGHT, Configs::getWindowTitle().c_str(), nullptr, nullptr);
+    Configs::onWindowTitleChange.subscribe(&Graphics::onWindowTitleChange);
     glfwMakeContextCurrent(window);
     return window;
 }
