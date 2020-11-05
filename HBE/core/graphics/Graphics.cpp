@@ -7,8 +7,10 @@
 #include <core/utility/Geometry.h>
 #include <core/graphics/RenderTarget.h>
 #include <Configs.h>
+
 #include "Framebuffer.h"
 #include "core/resource/ShaderProgram.h"
+
 #if RENDERER == OPENGL_RENDERER
 
 #include "graphics/gl/GL_Renderer.h"
@@ -32,11 +34,12 @@ GLFWwindow *Graphics::init() {
 
     if (!Configs::getVerticalSync())
         glfwSwapInterval(0);
-
+    Configs::onVerticalSyncChange.subscribe(Graphics::onVerticalSyncChange);
     renderer->init();
+
     glfwSetWindowSizeCallback(window, Graphics::onWindowSizeChange);
     initializeDefaultVariables();
-    Configs::onVerticalSyncChange.subscribe(Graphics::onVerticalSyncChange);
+
     return window;
 }
 

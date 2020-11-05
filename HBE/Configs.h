@@ -6,6 +6,7 @@ class Configs {
 public:
     enum CAMERA_MODE {PERSPECTIVE,ORTHOGRAPHIC};
 private:
+    static std::string icon_path;
     static std::string window_title;
     static bool antialiasing;
     static bool vertical_sync;
@@ -28,4 +29,6 @@ public:
     static Event<CAMERA_MODE> onDefaultCameraModeChange;
     static void setDefaultCameraMode(CAMERA_MODE mode);
     static CAMERA_MODE getDefaultCameraMode();
+
+    static std::string getWindowIconPath();
 };

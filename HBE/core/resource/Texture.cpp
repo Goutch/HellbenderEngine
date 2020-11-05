@@ -29,3 +29,14 @@ Texture *Texture::create() {
 #endif
     return nullptr;
 }
+
+void Texture::load(std::string path, unsigned char *buffer,int& width,int& height) {
+    std::ifstream file(path.c_str());
+    if (file.good()) {
+        int nb_channels;
+        stbi_set_flip_vertically_on_load(true);
+        buffer = stbi_load(path.c_str(), &width, &height, &nb_channels, 4);
+    } else {
+        Log::error("Failed to load texture:" + path);
+    }
+}

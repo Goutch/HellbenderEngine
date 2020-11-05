@@ -3,6 +3,8 @@
 Event<std::string> Configs::onWindowTitleChange;
 std::string Configs::window_title = "CHANGE WITH Configs::setWindowTitle";
 
+std::string Configs::icon_path="../Hellbender_logo.png";
+
 bool Configs::antialiasing = true;
 Event<bool> Configs::onAntialiasingChange;
 
@@ -11,6 +13,7 @@ Event<bool> Configs::onVerticalSyncChange;
 
 Configs::CAMERA_MODE Configs::default_camera_mode = Configs::CAMERA_MODE::PERSPECTIVE;
 Event<Configs::CAMERA_MODE> Configs::onDefaultCameraModeChange;
+
 
 
 void Configs::setAntialiasing(bool antialiasing) {
@@ -47,6 +50,10 @@ void Configs::setWindowTitle(std::string title) {
 
 std::string Configs::getWindowTitle() {
     return window_title;
+}
+
+std::string Configs::getWindowIconPath() {
+    return icon_path;
 }
 
 

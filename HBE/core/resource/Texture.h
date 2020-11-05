@@ -13,7 +13,7 @@ public:
         R8,
         DEPTH32,
     };
-
+    static void load(std::string path,unsigned char *buffer,int& width,int& height);
     static Texture *create();
 
     Texture *load(std::string path);

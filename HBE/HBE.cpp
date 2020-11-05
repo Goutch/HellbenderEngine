@@ -1,6 +1,6 @@
 #include "HBE.h"
 #include "GLFW/glfw3.h"
-
+#include "scripting/ScriptManager.h"
 
 Scene *HBE::current_scene = nullptr;
 GLFWwindow *HBE::window = nullptr;
@@ -13,6 +13,7 @@ void HBE::init() {
     Input::init(window);
     current_scene = new Scene();
     current_scene->init();
+    ScriptManager::init();
 }
 
 Scene *HBE::setScene(std::string path) {
@@ -52,6 +53,7 @@ void HBE::run() {
 }
 
 void HBE::terminate() {
+    ScriptManager::terminate();
     Graphics::terminate();
 }
 

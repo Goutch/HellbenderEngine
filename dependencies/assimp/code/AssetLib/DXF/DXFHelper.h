@@ -212,7 +212,7 @@ struct Block
 
 struct FileData
 {
-    // note: the LAST block always contains the stuff from ENTITIES.
+    // note: the BOTTOM block always contains the stuff from ENTITIES.
     std::vector<Block> blocks;
 };
 

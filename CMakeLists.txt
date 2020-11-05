@@ -19,6 +19,9 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/include")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp")
 
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/lua/src")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/lua/")
+
 include_directories("HBE")
 
 set(CORE_FILES
@@ -73,7 +76,15 @@ set(CORE_FILES
 		HBE/core/utility/Clock.cpp
 		HBE/core/utility/ModelImporter.cpp
 		HBE/core/utility/JobManager.cpp
-		HBE/core/utility/JobManager.h HBE/core/utility/Random.cpp HBE/core/utility/Random.h)
+		HBE/core/utility/JobManager.h
+		HBE/core/utility/Random.cpp
+		HBE/core/utility/Random.h)
+
+set(SCRIPTING_FILES
+		HBE/scripting/ScriptManager.cpp
+		HBE/scripting/Script.cpp
+		HBE/scripting/Script.h
+		HBE/scripting/Serializer.cpp)
 
 set(GL_FILES
 		HBE/graphics/gl/GL_Core.h
@@ -86,13 +97,14 @@ set(GL_FILES
 		HBE/graphics/gl/GL_Debug.cpp
 		HBE/graphics/gl/GL_Debug.h
 		HBE/graphics/gl/GL_MultisamplingFramebuffer.cpp
-		HBE/graphics/gl/GL_MultisamplingFramebuffer.h)
+		HBE/graphics/gl/GL_MultisamplingFramebuffer.h HBE/scripting/Serializer.cpp HBE/scripting/Serializer.h)
 
 add_executable (${PROJECT_NAME}
 		main.cpp
 		${CORE_FILES}
 		${GL_FILES}
+		${SCRIPTING_FILES}
 		)
 
-target_link_libraries(${PROJECT_NAME} glm glfw glad stb assimp)
+target_link_libraries(${PROJECT_NAME} glm glfw glad stb assimp lua)
 
