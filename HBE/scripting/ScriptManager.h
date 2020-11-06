@@ -14,7 +14,7 @@ public:
     static bool checkLua(int code);
     static bool doString(std::string command);
     static bool doScript(std::string script_path);
-    static void readTable(std::string file_path);
+    static void readTable(int table_index);
 
     static void callFunction(std::string function_name);
     static void registerFunction(std::string function_name){};
@@ -58,4 +58,5 @@ public:
 
         lua_register(L, function_name.c_str(), cf);
     }*/
+    void readTable(std::string table_name, int table_index);
 };

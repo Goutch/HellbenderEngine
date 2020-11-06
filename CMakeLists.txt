@@ -82,8 +82,6 @@ set(CORE_FILES
 
 set(SCRIPTING_FILES
 		HBE/scripting/ScriptManager.cpp
-		HBE/scripting/Script.cpp
-		HBE/scripting/Script.h
 		HBE/scripting/Serializer.cpp)
 
 set(GL_FILES
