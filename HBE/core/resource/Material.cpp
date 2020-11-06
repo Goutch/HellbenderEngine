@@ -163,6 +163,11 @@ Material *Material::create() {
     return new Material();
 }
 
-
+void Material::serialize(Serializer *serializer) const {
+    serializer->start("Material");
+    if(shader)
+        shader->serialize(serializer);
+    serializer->end();
+}
 
 

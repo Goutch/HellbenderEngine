@@ -1,12 +1,13 @@
 #pragma once
 
+#include <core/resource/Resource.h>
 #include "glm/glm.hpp"
 
 using namespace glm;
 
 class Entity;
 
-class Component {
+class Component :Resource {
     bool subscribed_draw=false;
     bool subscribed_update=false;
 protected:
@@ -33,4 +34,6 @@ public:
     virtual void unsubscribeDraw() final;
 
     Entity* getEntity() const{return entity;}
+
+    void serialize(Serializer* serializer) const{};
 };

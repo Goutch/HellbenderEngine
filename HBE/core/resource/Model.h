@@ -17,5 +17,7 @@ public:
     const std::vector<std::pair<Mesh *,Material *>>& getMeshes() const;
 
     ~Model();
+
+    void serialize(Serializer* serializer) const override;
 };
 

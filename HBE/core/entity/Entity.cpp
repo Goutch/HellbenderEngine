@@ -54,6 +54,15 @@ void Entity::onDestroy() {
     if (parent != nullptr)parent->removeChild(this);
 }
 
+void Entity::serialize(Serializer *serializer) const {
+    serializer->start("Entity");
+    serializer->addField("name",name);
+    serializer->addField("position",getPosition());
+    serializer->addField("rotation",getRotation());
+    serializer->addField("scale",getScale());
+    serializer->end();
+}
+
 
 
 

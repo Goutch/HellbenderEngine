@@ -76,7 +76,11 @@ void Model::clearModels() {
     }
 }
 
-
+void Model::serialize(Serializer *serializer) const {
+    serializer->start("Model");
+    serializer->addField("path",path);
+    serializer->end();
+}
 
 
 

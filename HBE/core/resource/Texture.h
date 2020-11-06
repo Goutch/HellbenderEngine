@@ -3,6 +3,8 @@
 #include <string>
 #include "Resource.h"
 class Texture :Resource{
+private:
+    std::string path;
 protected:
     int width = 1;
     int height = 1;
@@ -27,5 +29,7 @@ public:
     virtual void bind(unsigned int slot = 0) const = 0;
 
     virtual void unbind(unsigned int slot = 0) const = 0;
+
+    void serialize(Serializer* serializer) const override;
 };
 

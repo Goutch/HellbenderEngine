@@ -3,6 +3,7 @@
 //
 #include <HBE.h>
 #include "CompilationConfigs.h"
+#include "CameraController.h"
 
 
 void CameraController::onUpdate(float delta) {
@@ -73,4 +74,8 @@ void CameraController::onAttach() {
 void CameraController::onDetach() {
     Component::onDetach();
     Input::setCursorVisible(true);
+}
+
+void CameraController::serialize(Serializer *serializer) const {
+    Component::serialize(serializer);
 }

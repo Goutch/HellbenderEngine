@@ -139,6 +139,10 @@ void Camera::setOrthographic() {
 
 }
 
+void Camera::serialize(Serializer *serializer) const {
+    Component::serialize(serializer);
+}
+
 
 
 

@@ -25,4 +25,8 @@ void MeshRenderer::setMaterial(const Material &material) {
     this->material=&material;
 }
 
+void MeshRenderer::serialize(Serializer *serializer) const {
+
+}
+
 

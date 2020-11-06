@@ -34,3 +34,7 @@ void ModelRenderer::setModel(const Model &model) {
 const Model *ModelRenderer::getModel() {
     return model;
 }
+
+void ModelRenderer::serialize(Serializer *serializer) const {
+
+}

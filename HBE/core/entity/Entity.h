@@ -4,9 +4,11 @@
 #include <string>
 #include <list>
 #include <core/entity/component/Component.h>
+#include <scripting/Serializer.h>
+#include <core/resource/Resource.h>
 
 
-class Entity : public Transform {
+class Entity : public Transform , public Resource{
     friend class Scene;
     static unsigned int current_id;
     unsigned int id;
@@ -68,4 +70,6 @@ public:
         }
         return nullptr;
     }
+
+    void serialize(Serializer* serializer) const override;
 };

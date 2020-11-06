@@ -14,4 +14,6 @@ public:
 
     void setModel(const Model &model);
     const Model* getModel();
+
+    void serialize(Serializer* serializer) const override;
 };

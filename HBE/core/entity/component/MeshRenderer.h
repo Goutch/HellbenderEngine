@@ -17,6 +17,8 @@ public:
 
     void setMesh(const Mesh &mesh);
     const Mesh* getMesh();
+
+    void serialize(Serializer* serializer) const override;
 };
 
 

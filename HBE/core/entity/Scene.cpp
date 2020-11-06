@@ -78,6 +78,17 @@ void Scene::unsubscribeUpdate(Component *component) {
     update_listeners.erase(component);
 }
 
+void Scene::serialize(Serializer *serializer) const {
+    serializer->start("Scene");
+    serializer->startArray("entities");
+    for (auto e: entities)
+    {
+        e->serialize(serializer);
+    }
+    serializer->endArray();
+    serializer->end();
+}
+
 
 
 

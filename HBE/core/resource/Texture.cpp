@@ -40,3 +40,9 @@ void Texture::load(std::string path, unsigned char *buffer,int& width,int& heigh
         Log::error("Failed to load texture:" + path);
     }
 }
+
+void Texture::serialize(Serializer *serializer) const {
+    serializer->start("Texture");
+    serializer->addField("path",path);
+    serializer->end();
+}

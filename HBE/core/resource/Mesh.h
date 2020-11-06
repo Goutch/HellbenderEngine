@@ -7,7 +7,7 @@
 
 using namespace glm;
 
-class Mesh : Resource {
+class Mesh {
 protected:
     unsigned int vertex_count = 0;
     unsigned int index_count = 0;
@@ -44,6 +44,7 @@ public:
     virtual void bind() const = 0;
 
     virtual void unbind() const = 0;
+
 };
 
 

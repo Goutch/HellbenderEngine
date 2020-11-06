@@ -19,8 +19,8 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/include")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp")
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/lua/src")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/lua/")
+include_directories("dependencies/lua/src")
+add_subdirectory("dependencies/lua/")
 
 include_directories("HBE")
 

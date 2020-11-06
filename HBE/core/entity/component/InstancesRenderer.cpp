@@ -18,3 +18,7 @@ void InstancesRenderer::setMaterial(const Material &material) {
 void InstancesRenderer::setMesh(Mesh &mesh) {
     this->mesh=&mesh;
 }
+
+void InstancesRenderer::serialize(Serializer *serializer) const {
+
+}

@@ -10,3 +10,21 @@ ShaderProgram *ShaderProgram::create() {
 #endif
     return nullptr;
 }
+
+void ShaderProgram::serialize(Serializer *serializer) const {
+    serializer->start("ShaderProgram");
+    for (auto s:shaders) {
+        switch (s.first) {
+            case SHADER_TYPE::VERTEX:
+                serializer->addField("vertex_path",s.second);
+                break;
+            case SHADER_TYPE::FRAGMENT:
+                serializer->addField("fragment_path",s.second);
+                break;
+            case SHADER_TYPE::COMPUTE:
+                serializer->addField("compute_path",s.second);
+                break;
+        }
+    }
+    serializer->end();
+}

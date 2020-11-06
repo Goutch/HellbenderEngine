@@ -33,3 +33,4 @@ void Component::onDetach() {
     if (subscribed_update)unsubscribeUpdate();
     if (subscribed_draw)unsubscribeDraw();
 }
+

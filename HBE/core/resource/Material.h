@@ -76,4 +76,6 @@ public:
     void setProperty(std::string name, vec2 &value);
     void setProperty(std::string name, vec3 &value);
     void setProperty(std::string name, vec4 &value);
+
+    void serialize(Serializer* serializer) const override;
 };

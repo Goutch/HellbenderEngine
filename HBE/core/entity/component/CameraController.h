@@ -15,5 +15,6 @@ class CameraController: public Component {
     void onUpdate(float delta) override;
     void onAttach() override;
     void onDetach() override;
+    void serialize(Serializer* serializer) const override;
 };
 

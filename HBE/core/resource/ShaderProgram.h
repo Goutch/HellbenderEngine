@@ -2,9 +2,12 @@
 #include "Resource.h"
 #include "glm/glm.hpp"
 #include "string"
-
+#include "map"
+enum class SHADER_TYPE{
+    COMPUTE,VERTEX,FRAGMENT
+};
 class ShaderProgram:Resource {
-
+    std::map<SHADER_TYPE,std::string> shaders;
 public:
     static ShaderProgram* create();
 
@@ -53,6 +56,7 @@ public:
     virtual void setUniformVec4Array(unsigned int location, const glm::vec4 *v, unsigned int count) const = 0;
 
     virtual void setUniform(std::string name, const glm::mat4 &m) const = 0;
+    void serialize(Serializer* serializer) const override;
 };
 
 

@@ -1,2 +1,4 @@
 print("[lua]hello")
-h_f("[C++]hello from lua")
+function test_fun()
+    print("it is working i guess")
+end

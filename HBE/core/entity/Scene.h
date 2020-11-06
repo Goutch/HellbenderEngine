@@ -5,7 +5,7 @@
 #include "Entity.h"
 #include "unordered_set"
 
-class Scene {
+class Scene :public Resource{
     std::unordered_set<Entity *> entities;
     std::unordered_set<Component *> update_listeners;
     std::unordered_set<Component *> draw_listeners;
@@ -54,5 +54,7 @@ public:
     void subscribeUpdate(Component *component);
 
     void unsubscribeUpdate(Component *component);
+
+    void serialize(Serializer* serializer) const override;
 };
 

@@ -49,6 +49,6 @@ public:
     void setRenderMode(RenderMode mode);
 
     void onRenderTargetSizeChange(int width, int height);
-
+    void serialize(Serializer* serializer) const override;
 
 };
