@@ -45,7 +45,13 @@ class HBE {
     static Clock* time;
     static int fps_counter;
     static float fps_timer;
+
 public:
+    static Event<> onInit;
+    static Event<float> onUpdate;
+    static Event<Scene*> onSceneChange;
+
+
     static Scene *current_scene;
 
     static void init();

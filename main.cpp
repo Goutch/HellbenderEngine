@@ -65,6 +65,11 @@ int main() {
     models.push_back(teapot_model);
 
     model_renderer->setModel(*bunny_model);
+
+    Serializer* s=new Serializer("../res/scenes/scene.lua");
+    HBE::current_scene->serialize(s);
+    delete s;
+
     HBE::run();
 
     //-----------------------CLEANUP------------------

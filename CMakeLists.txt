@@ -78,11 +78,16 @@ set(CORE_FILES
 		HBE/core/utility/JobManager.cpp
 		HBE/core/utility/JobManager.h
 		HBE/core/utility/Random.cpp
-		HBE/core/utility/Random.h)
+		HBE/core/utility/Random.h
+
+		HBE/core/serialization/Serializer.cpp
+		HBE/core/serialization/Serializer.h
+		HBE/core/serialization/Deserializer.cpp
+		HBE/core/serialization/Deserializer.h)
 
 set(SCRIPTING_FILES
 		HBE/scripting/ScriptManager.cpp
-		HBE/scripting/Serializer.cpp)
+        HBE/core/serialization/Serializer.cpp)
 
 set(GL_FILES
 		HBE/graphics/gl/GL_Core.h
@@ -95,7 +100,7 @@ set(GL_FILES
 		HBE/graphics/gl/GL_Debug.cpp
 		HBE/graphics/gl/GL_Debug.h
 		HBE/graphics/gl/GL_MultisamplingFramebuffer.cpp
-		HBE/graphics/gl/GL_MultisamplingFramebuffer.h HBE/scripting/Serializer.cpp HBE/scripting/Serializer.h)
+		HBE/graphics/gl/GL_MultisamplingFramebuffer.h)
 
 add_executable (${PROJECT_NAME}
 		main.cpp

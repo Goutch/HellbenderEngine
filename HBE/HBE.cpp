@@ -7,6 +7,9 @@ GLFWwindow *HBE::window = nullptr;
 Clock *HBE::time = nullptr;
 int HBE::fps_counter = 0;
 float HBE::fps_timer = 0;
+Event<> HBE::onInit;
+Event<float> HBE::onUpdate;
+Event<Scene*> HBE::onSceneChange;
 
 void HBE::init() {
     window = Graphics::init();
@@ -14,6 +17,7 @@ void HBE::init() {
     current_scene = new Scene();
     current_scene->init();
     ScriptManager::init();
+    onInit.invoke();
 }
 
 Scene *HBE::setScene(std::string path) {
@@ -23,6 +27,7 @@ Scene *HBE::setScene(std::string path) {
     }
     current_scene = new Scene();
     current_scene->init();
+    onSceneChange.invoke(current_scene);
     return current_scene;
 }
 
@@ -40,6 +45,7 @@ void HBE::run() {
             quit();
         JobManager::updateJobsStatus();
         current_scene->update(delta_t);
+        onUpdate.invoke(delta_t);
         current_scene->draw();
         Graphics::render(Camera::main->getProjectionMatrix(), Camera::main->getViewMatrix());
         delta_t = update_clock.ns() / SECONDS_TO_NANOSECOND;
@@ -77,7 +83,6 @@ void HBE::printFPS(float delta) {
         fps_counter = 0;
         fps_timer = 0;
     }
-
 }
 
 

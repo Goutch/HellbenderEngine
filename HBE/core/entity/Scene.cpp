@@ -79,8 +79,8 @@ void Scene::unsubscribeUpdate(Component *component) {
 }
 
 void Scene::serialize(Serializer *serializer) const {
-    serializer->start("Scene");
-    serializer->startArray("entities");
+    serializer->begin("Scene");
+    serializer->beginArray("entities");
     for (auto e: entities)
     {
         e->serialize(serializer);

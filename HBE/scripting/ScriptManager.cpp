@@ -101,18 +101,10 @@ void ScriptManager::readTable(int table_index,int depth) {
     }
     printf("%s", (indentation+"}\n").c_str());
 }
-#include "Serializer.h"
-#include "HBE.h"
+
 void ScriptManager::init() {
     L = luaL_newstate();
     luaL_openlibs(L);
-    doScript("../res/scripts/test.lua");
-    Serializer *s=new Serializer("../res/textures/testing.lua");
-    Texture* t =Texture::create();
-    t->load("../res/textures/Hellbender_logo.png");
-    t->serialize(s);
-    delete s;
-    delete t;
 }
 
 void ScriptManager::terminate() {

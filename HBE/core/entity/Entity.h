@@ -4,7 +4,7 @@
 #include <string>
 #include <list>
 #include <core/entity/component/Component.h>
-#include <scripting/Serializer.h>
+#include <core/serialization/Serializer.h>
 #include <core/resource/Resource.h>
 
 

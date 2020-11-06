@@ -12,7 +12,7 @@ ShaderProgram *ShaderProgram::create() {
 }
 
 void ShaderProgram::serialize(Serializer *serializer) const {
-    serializer->start("ShaderProgram");
+    serializer->begin("ShaderProgram");
     for (auto s:shaders) {
         switch (s.first) {
             case SHADER_TYPE::VERTEX:

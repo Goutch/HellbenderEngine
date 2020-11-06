@@ -43,7 +43,7 @@ void Texture::load(std::string path, unsigned char *buffer,int& width,int& heigh
 }
 
 void Texture::serialize(Serializer *serializer) const {
-    serializer->start("Texture");
+    serializer->begin("Texture");
     serializer->addField("path",path);
     serializer->end();
 }

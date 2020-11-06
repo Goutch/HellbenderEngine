@@ -12,6 +12,7 @@ Entity::Entity() {
 }
 
 Entity::Entity(Entity *parent) {
+    setName("Entity_" + std::to_string(current_id++));
     setParent(parent);
 }
 
@@ -55,7 +56,7 @@ void Entity::onDestroy() {
 }
 
 void Entity::serialize(Serializer *serializer) const {
-    serializer->start("Entity");
+    serializer->begin("Entity");
     serializer->addField("name",name);
     serializer->addField("position",getPosition());
     serializer->addField("rotation",getRotation());

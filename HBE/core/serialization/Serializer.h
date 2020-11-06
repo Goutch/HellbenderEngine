@@ -9,12 +9,13 @@ class Serializer {
     int depth=0;
     std::ofstream file;
     std::string indentation;
+    std::stack<bool> arrays;
 public:
     Serializer(std::string file_path);
     ~Serializer();
-    void start(std::string name);
+    void begin(std::string name);
     void end();
-    void startArray(std::string name);
+    void beginArray(std::string name);
     void endArray();
 
     void addField(std::string name,std::string value);
