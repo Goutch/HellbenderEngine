@@ -5,6 +5,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 Texture* Texture::load(std::string path) {
+    this->path=path;
     std::ifstream file(path.c_str());
     if (file.good()) {
         unsigned char *buffer;

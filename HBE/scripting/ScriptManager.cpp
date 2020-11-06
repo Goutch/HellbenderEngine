@@ -51,19 +51,30 @@ void print_stack(lua_State *L) {
     printf("END\n");
 }
 
-void ScriptManager::readTable(int table_index) {
+void ScriptManager::readTable(int table_index,int depth) {
     printf("{\n");
-
+    std::string indentation;
+    for (int i = 0; i < depth; ++i) {
+        indentation+="\t";
+    }
     if (lua_istable(L, table_index)) {
         lua_pushnil(L);
-
         int key_index = -2;
-        int value_index = -1;
-        while (lua_next(L, table_index) != 0) {
-            print_stack(L);
+        int value_index=-1;
+        while (lua_next(L, key_index) != 0) {
+
             std::string key_type = luaL_typename(L, key_index);
             std::string value_type = luaL_typename(L, value_index);
-            printf("%s = %s ", key_type.c_str(), value_type.c_str());
+            printf((indentation+"%s").c_str() ,indentation.c_str(),key_type.c_str());
+            switch (lua_type(L,key_index)) {
+                case LUA_TNUMBER://is unamed
+                    printf("%g", lua_tonumber(L, key_index));
+                    break;
+                case LUA_TSTRING://is named
+                    printf("%s", lua_tostring(L, key_index));
+                    break;
+            }
+            printf(" = %s ", value_type.c_str());
             switch (lua_type(L, value_index)) {
                 case LUA_TNUMBER:
                     printf("%g\n", lua_tonumber(L, value_index));
@@ -78,28 +89,30 @@ void ScriptManager::readTable(int table_index) {
                     printf("%s\n", "null");
                     break;
                 case LUA_TTABLE:
-                    readTable(value_index);
+                    readTable(value_index,depth+1);
                     break;
                 default:
-                    printf("%s\n", lua_topointer(L, value_index));
+                    printf("%p\n", lua_topointer(L, value_index));
                     break;
             }
-            print_stack(L);
-            lua_pop(L, -1);
-            print_stack(L);
+            lua_pop(L,1);
         }
 
     }
-    printf("}\n");
+    printf("%s", (indentation+"}\n").c_str());
 }
-
-
+#include "Serializer.h"
+#include "HBE.h"
 void ScriptManager::init() {
     L = luaL_newstate();
     luaL_openlibs(L);
     doScript("../res/scripts/test.lua");
-    lua_getglobal(L, "table_root");
-    readTable(lua_gettop(L));
+    Serializer *s=new Serializer("../res/textures/testing.lua");
+    Texture* t =Texture::create();
+    t->load("../res/textures/Hellbender_logo.png");
+    t->serialize(s);
+    delete s;
+    delete t;
 }
 
 void ScriptManager::terminate() {

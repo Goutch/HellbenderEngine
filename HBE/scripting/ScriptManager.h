@@ -14,7 +14,7 @@ public:
     static bool checkLua(int code);
     static bool doString(std::string command);
     static bool doScript(std::string script_path);
-    static void readTable(int table_index);
+    static void readTable(int table_index,int depth =0);
 
     static void callFunction(std::string function_name);
     static void registerFunction(std::string function_name){};
