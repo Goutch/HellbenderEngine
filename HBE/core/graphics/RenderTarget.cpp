@@ -57,5 +57,10 @@ void RenderTarget::setShaderUniforms() const {
 }
 
 
+unsigned int RenderTarget::getTextureID() {
+    return framebuffer->getTextureID();
+}
+
+
 
 

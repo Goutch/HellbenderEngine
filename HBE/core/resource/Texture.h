@@ -22,6 +22,8 @@ public:
 
     static void save(Texture *texture, std::string path);
 
+
+    virtual unsigned int getTextureID() const=0;
     virtual void setData(unsigned char *data, int width, int height, TEXTURE_TYPE texture_type) = 0;
 
     virtual ~Texture() {};

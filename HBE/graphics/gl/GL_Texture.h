@@ -17,5 +17,5 @@ public:
 
     void unbind(unsigned int slot=0) const override ;
 
-    unsigned int getId();
+    unsigned int getTextureID() const;
 };

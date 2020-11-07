@@ -18,6 +18,8 @@ public:
 
     ~GL_Framebuffer();
 
+    unsigned int getTextureID() override;
+
     void setResolution(int width,int height) override;
     void bindTexture() const override ;
     void unbindTexture() const override ;

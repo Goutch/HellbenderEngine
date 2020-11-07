@@ -48,7 +48,7 @@ void GL_Texture::unbind(unsigned int slot) const {
 }
 
 
-unsigned int GL_Texture::getId() {
+unsigned int GL_Texture::getTextureID() const {
     return texture_id;
 }
 

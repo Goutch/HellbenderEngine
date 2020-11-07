@@ -11,6 +11,7 @@ private:
     static bool antialiasing;
     static bool vertical_sync;
     static CAMERA_MODE default_camera_mode;
+    static bool custom_rendering;
 
 public:
     static Event<std::string> onWindowTitleChange;
@@ -31,4 +32,7 @@ public:
     static CAMERA_MODE getDefaultCameraMode();
 
     static std::string getWindowIconPath();
+
+    static void setCustomRendering(bool is_custom);
+    static bool getCustomRendering();
 };

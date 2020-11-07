@@ -14,7 +14,7 @@ Event<bool> Configs::onVerticalSyncChange;
 Configs::CAMERA_MODE Configs::default_camera_mode = Configs::CAMERA_MODE::PERSPECTIVE;
 Event<Configs::CAMERA_MODE> Configs::onDefaultCameraModeChange;
 
-
+bool Configs::custom_rendering = false;
 
 void Configs::setAntialiasing(bool antialiasing) {
     Configs::antialiasing = antialiasing;
@@ -54,6 +54,14 @@ std::string Configs::getWindowTitle() {
 
 std::string Configs::getWindowIconPath() {
     return icon_path;
+}
+
+void Configs::setCustomRendering(bool is_custom) {
+    custom_rendering = is_custom;
+}
+
+bool Configs::getCustomRendering() {
+    return custom_rendering;
 }
 
 

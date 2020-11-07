@@ -5,7 +5,6 @@
 #include <core/graphics/Graphics.h>
 #include "core/entity/Entity.h"
 #include "MeshRenderer.h"
-#include "core/resource/Resource.h"
 void MeshRenderer::onAttach() {
     Component::onAttach();
     subscribeDraw();

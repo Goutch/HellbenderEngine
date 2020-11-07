@@ -3,6 +3,7 @@
 #include <core/entity/Transform.h>
 #include <CompilationConfigs.h>
 #include <core/utility/Log.h>
+#include <core/utility/Event.h>
 #include <GLFW/glfw3.h>
 #include <core/utility/Geometry.h>
 #include <core/graphics/RenderTarget.h>
@@ -27,7 +28,7 @@ const ShaderProgram *Graphics::DEFAULT_INSTANCED_SHADER = nullptr;
 Renderer *Graphics::renderer = nullptr;
 GLFWwindow *Graphics::window = nullptr;
 RenderTarget *Graphics::render_target = nullptr;
-
+Event<int,int> Graphics::onWindowSizeChange;
 GLFWwindow *Graphics::init() {
     renderer = Renderer::create();
     window = renderer->createWindow();
@@ -37,7 +38,7 @@ GLFWwindow *Graphics::init() {
     Configs::onVerticalSyncChange.subscribe(Graphics::onVerticalSyncChange);
     renderer->init();
 
-    glfwSetWindowSizeCallback(window, Graphics::onWindowSizeChange);
+    glfwSetWindowSizeCallback(window, Graphics::onWindowSizeChangeCallback);
     initializeDefaultVariables();
 
     return window;
@@ -47,8 +48,9 @@ void Graphics::onVerticalSyncChange(bool v_sync) {
     glfwSwapInterval(v_sync);
 }
 
-void Graphics::onWindowSizeChange(GLFWwindow *window, int width, int height) {
+void Graphics::onWindowSizeChangeCallback(GLFWwindow *window, int width, int height) {
     render_target->setSize(width, height);
+    onWindowSizeChange.invoke(width,height);
 }
 
 void Graphics::draw(const Transform &transform, const Mesh &mesh, const Material &material) {
@@ -65,7 +67,10 @@ void Graphics::render(const mat4 &projection_matrix, const mat4 &view_matrix) {
     renderer->render(projection_matrix, view_matrix);
     render_target->getFramebuffer().unbind();
     renderer->clear();
-    renderer->renderTarget(*render_target);
+    if(!Configs::getCustomRendering())
+    {
+        renderer->renderTarget(*render_target);
+    }
 }
 
 void Graphics::terminate() {
@@ -114,6 +119,10 @@ RenderTarget *Graphics::getRenderTarget() {
 
 GLFWwindow *Graphics::getWindow() {
     return window;
+}
+
+void Graphics::getWindowSize(int &width, int &height) {
+    glfwGetWindowSize(window,&width,&height);
 }
 
 

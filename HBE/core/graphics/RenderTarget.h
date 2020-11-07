@@ -6,6 +6,7 @@ class ShaderProgram;
 
 #include "glm/glm.hpp"
 #include "core/utility/Event.h"
+
 using namespace glm;
 
 class RenderTarget {
@@ -14,7 +15,8 @@ class RenderTarget {
     mat4 projection_matrix;
     Framebuffer *framebuffer;
 public:
-    Event<int,int> onSizeChange;
+    Event<int, int> onSizeChange;
+
     RenderTarget(unsigned int width, unsigned int height, const ShaderProgram &shader_program);
 
     const ShaderProgram *shader_program;
@@ -36,5 +38,7 @@ public:
     void setProjectionMatrix(mat4 projection_matrix);
 
     void setShaderProgram(ShaderProgram &shader_program);
+
+    unsigned int getTextureID();
 };
 

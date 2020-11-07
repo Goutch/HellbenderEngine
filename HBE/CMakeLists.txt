@@ -3,22 +3,22 @@ set(CMAKE_CXX_STANDARD 17)
 
 project(HBE CXX)
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm")
+include_directories(PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm")
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/include")
+include_directories(PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/include")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw")
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/include")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad")
+include_directories(PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/include")
+add_subdirectory( "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad")
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb")
+include_directories(PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb")
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/include")
+include_directories(PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/include")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp")
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/lua/src")
+include_directories(PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/lua/src")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/lua/")
 
 include_directories(".")
@@ -108,5 +108,11 @@ add_library (${PROJECT_NAME}
 		${SCRIPTING_FILES}
 		)
 
-target_link_libraries(${PROJECT_NAME} glm glfw glad stb assimp lua)
+target_link_libraries(${PROJECT_NAME}
+		PUBLIC glm
+		PUBLIC glfw
+		PUBLIC glad
+		PUBLIC stb
+		PUBLIC assimp
+		PUBLIC lua)
 

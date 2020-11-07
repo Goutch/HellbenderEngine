@@ -86,3 +86,7 @@ void GL_MultisamplingFramebuffer::unbind() const {
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
+
+unsigned int GL_MultisamplingFramebuffer::getTextureID() {
+    return texture;
+}
