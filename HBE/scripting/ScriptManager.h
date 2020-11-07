@@ -5,9 +5,12 @@
 #include "string"
 #include "tuple"
 #include "vector"
+#include "core/utility/Event.h"
 class ScriptManager {
     static lua_State *L;
+
 public:
+    static Event<> OnRegisterClass;
     static void init();
 
     static void terminate();
@@ -18,6 +21,7 @@ public:
 
     static void callFunction(std::string function_name);
     static void registerFunction(std::string function_name){};
+    static void registerClass(std::string class_name){};
 
     /*template <size_t I = 0, typename... Args>
     typename std::enable_if<I == sizeof...(Args),

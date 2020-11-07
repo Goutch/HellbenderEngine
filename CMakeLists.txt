@@ -1,113 +1,17 @@
 cmake_minimum_required(VERSION 3.15)
 set(CMAKE_CXX_STANDARD 17)
 
-project(HellbenderEngine CXX)
-SET(CMAKE_C_LINK_EXECUTABLE ${CMAKE_CXX_LINK_EXECUTABLE})
+project(HellbenderEditor CXX)
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm")
+include_directories("HBE/")
+add_subdirectory("HBE/")
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/include")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw")
-
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/include")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad")
-
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb")
-
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/include")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp")
-
-include_directories("dependencies/lua/src")
-add_subdirectory("dependencies/lua/")
-
-include_directories("HBE")
-
-set(CORE_FILES
-		HBE/HBE.cpp
-		HBE/HBE.h
-		HBE/Configs.cpp
-
-		HBE/CompilationConfigs.h
-        HBE/Configs.h
-
-		HBE/core/resource/ShaderProgram.h
-		HBE/core/resource/Texture.h
-		HBE/core/resource/Resource.cpp
-		HBE/core/resource/Texture.cpp
-		HBE/core/resource/Material.cpp
-		HBE/core/resource/Material.h
-		HBE/core/resource/Model.cpp
-		HBE/core/resource/ShaderProgram.cpp
-		HBE/core/resource/Mesh.cpp
-
-		HBE/core/graphics/Framebuffer.h
-		HBE/core/graphics/Framebuffer.cpp
-		HBE/core/graphics/Renderer.h
-		HBE/core/graphics/Graphics.cpp
-		HBE/core/graphics/Graphics.h
-		HBE/core/graphics/RenderTarget.cpp
-		HBE/core/graphics/RenderTarget.h
-		HBE/core/graphics/Renderer.cpp
-
-		HBE/core/input/Input.h
-		HBE/core/input/Input.cpp
-
-		HBE/core/entity/Scene.cpp
-		HBE/core/entity/Scene.h
-		HBE/core/entity/Entity.cpp
-		HBE/core/entity/Transform.cpp
-		HBE/core/entity/component/Camera.cpp
-		HBE/core/entity/component/Component.h
-		HBE/core/entity/component/CameraController.cpp
-		HBE/core/entity/component/MeshRenderer.cpp
-		HBE/core/entity/component/MeshRenderer.h
-		HBE/core/entity/component/CameraController.h
-		HBE/core/entity/component/Component.cpp
-		HBE/core/entity/component/InstancesRenderer.cpp
-		HBE/core/entity/component/InstancesRenderer.h
-		HBE/core/entity/component/ModelRenderer.h
-		HBE/core/entity/component/ModelRenderer.cpp
-
-		HBE/core/utility/Log.cpp
-		HBE/core/utility/Geometry.cpp
-		HBE/core/utility/Geometry.h
-		HBE/core/utility/Clock.cpp
-		HBE/core/utility/ModelImporter.cpp
-		HBE/core/utility/JobManager.cpp
-		HBE/core/utility/JobManager.h
-		HBE/core/utility/Random.cpp
-		HBE/core/utility/Random.h
-
-		HBE/core/serialization/Serializer.cpp
-		HBE/core/serialization/Serializer.h
-		HBE/core/serialization/Deserializer.cpp
-		HBE/core/serialization/Deserializer.h)
-
-set(SCRIPTING_FILES
-		HBE/scripting/ScriptManager.cpp
-        HBE/core/serialization/Serializer.cpp)
-
-set(GL_FILES
-		HBE/graphics/gl/GL_Core.h
-		HBE/graphics/gl/GL_Renderer.cpp
- 		HBE/graphics/gl/GL_Texture.cpp
-		HBE/graphics/gl/GL_ShaderProgram.cpp
-		HBE/graphics/gl/GL_Mesh.cpp
-		HBE/graphics/gl/GL_Framebuffer.cpp
-		HBE/graphics/gl/GL_Framebuffer.h
-		HBE/graphics/gl/GL_Debug.cpp
-		HBE/graphics/gl/GL_Debug.h
-		HBE/graphics/gl/GL_MultisamplingFramebuffer.cpp
-		HBE/graphics/gl/GL_MultisamplingFramebuffer.h)
+include_directories(dependencies/imgui)
+set(CORE_FILES)
 
 add_executable (${PROJECT_NAME}
 		main.cpp
-		${CORE_FILES}
-		${GL_FILES}
-		${SCRIPTING_FILES}
 		)
 
-target_link_libraries(${PROJECT_NAME} glm glfw glad stb assimp lua)
+target_link_libraries(${PROJECT_NAME} HBE imgui)
 

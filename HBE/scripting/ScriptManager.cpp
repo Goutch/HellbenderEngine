@@ -105,6 +105,7 @@ void ScriptManager::readTable(int table_index,int depth) {
 void ScriptManager::init() {
     L = luaL_newstate();
     luaL_openlibs(L);
+
 }
 
 void ScriptManager::terminate() {
