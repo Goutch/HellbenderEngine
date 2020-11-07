@@ -10,36 +10,36 @@ include_directories(misc/freetype)
 include_directories(misc/single_file)
 
 add_library(imgui
-        backends/imgui_impl_allegro5.cpp
-        backends/imgui_impl_allegro5.h
-        backends/imgui_impl_dx10.cpp
-        backends/imgui_impl_dx10.h
-        backends/imgui_impl_dx11.cpp
-        backends/imgui_impl_dx11.h
-        backends/imgui_impl_dx12.cpp
-        backends/imgui_impl_dx12.h
-        backends/imgui_impl_dx9.cpp
-        backends/imgui_impl_dx9.h
-        backends/imgui_impl_glfw.cpp
-        backends/imgui_impl_glfw.h
-        backends/imgui_impl_glut.cpp
-        backends/imgui_impl_glut.h
-        backends/imgui_impl_marmalade.cpp
-        backends/imgui_impl_marmalade.h
-        backends/imgui_impl_metal.h
-        backends/imgui_impl_metal.mm
-        backends/imgui_impl_opengl2.cpp
-        backends/imgui_impl_opengl2.h
+        #backends/imgui_impl_allegro5.cpp
+        #backends/imgui_impl_allegro5.h
+        #backends/imgui_impl_dx10.cpp
+        #backends/imgui_impl_dx10.h
+        #backends/imgui_impl_dx11.cpp
+        #backends/imgui_impl_dx11.h
+        #backends/imgui_impl_dx12.cpp
+        #backends/imgui_impl_dx12.h
+        #backends/imgui_impl_dx9.cpp
+        #backends/imgui_impl_dx9.h
+        #backends/imgui_impl_glfw.cpp
+        #backends/imgui_impl_glfw.h
+        #backends/imgui_impl_glut.cpp
+        #backends/imgui_impl_glut.h
+        #backends/imgui_impl_marmalade.cpp
+        #backends/imgui_impl_marmalade.h
+        #backends/imgui_impl_metal.h
+        #backends/imgui_impl_metal.mm
+        #backends/imgui_impl_opengl2.cpp
+        #backends/imgui_impl_opengl2.h
         backends/imgui_impl_opengl3.cpp
         backends/imgui_impl_opengl3.h
-        backends/imgui_impl_osx.h
-        backends/imgui_impl_osx.mm
-        backends/imgui_impl_sdl.cpp
-        backends/imgui_impl_sdl.h
-        backends/imgui_impl_vulkan.cpp
-        backends/imgui_impl_vulkan.h
-        backends/imgui_impl_win32.cpp
-        backends/imgui_impl_win32.h
+        #backends/imgui_impl_osx.h
+        #backends/imgui_impl_osx.mm
+        #backends/imgui_impl_sdl.cpp
+        #backends/imgui_impl_sdl.h
+        #backends/imgui_impl_vulkan.cpp
+        #backends/imgui_impl_vulkan.h
+        #backends/imgui_impl_win32.cpp
+        #backends/imgui_impl_win32.h
         misc/cpp/imgui_stdlib.cpp
         misc/cpp/imgui_stdlib.h
         misc/fonts/binary_to_compressed_c.cpp

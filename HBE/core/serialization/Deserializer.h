@@ -1,9 +1,12 @@
 #pragma once
 
 #include <string>
-#include <lua.hpp>
+
 #include <vector>
 #include "core/utility/Log.h"
+
+class lua_State;
+
 class Deserializer {
 private:
     lua_State* L;

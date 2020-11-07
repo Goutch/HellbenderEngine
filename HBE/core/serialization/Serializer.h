@@ -1,7 +1,6 @@
 #pragma once
 #include <fstream>
 #include "string"
-#include "lua.hpp"
 #include "stack"
 #include "glm/glm.hpp"
 using namespace glm;

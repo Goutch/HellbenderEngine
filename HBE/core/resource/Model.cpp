@@ -3,7 +3,7 @@
 #include <core/utility/JobManager.h>
 #include "Resource.h"
 #include "Model.h"
-
+#include "core/serialization/Serializer.h"
 
 const std::vector<std::pair<Mesh *, Material *>> &Model::getMeshes() const {
     return meshes;

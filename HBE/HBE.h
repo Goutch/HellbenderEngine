@@ -32,6 +32,8 @@
 #include <core/utility/Geometry.h>
 #include <core/utility/Random.h>
 
+#include <core/serialization/Serializer.h>
+
 #include <glm/glm.hpp>
 using namespace glm;
 class GLFWwindow;
@@ -50,7 +52,7 @@ public:
     static Event<> onInit;
     static Event<float> onUpdate;
     static Event<Scene*> onSceneChange;
-
+    static Event<RenderTarget*> onRenderFinish;
 
     static Scene *current_scene;
 

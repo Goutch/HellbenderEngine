@@ -7,11 +7,11 @@ include_directories("HBE/")
 add_subdirectory("HBE/")
 
 include_directories(dependencies/imgui)
-set(CORE_FILES)
+add_subdirectory(dependencies/imgui)
 
 add_executable (${PROJECT_NAME}
 		main.cpp
-		)
+		editor/Editor.cpp editor/Editor.h)
 
 target_link_libraries(${PROJECT_NAME} HBE imgui)
 

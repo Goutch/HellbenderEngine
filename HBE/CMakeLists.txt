@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.15)
 set(CMAKE_CXX_STANDARD 17)
 
 project(HBE CXX)
-SET(CMAKE_C_LINK_EXECUTABLE ${CMAKE_CXX_LINK_EXECUTABLE})
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm")
@@ -22,7 +21,7 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/lua/src")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/lua/")
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
+include_directories(".")
 
 set(CORE_FILES
 		HBE.cpp

@@ -3,7 +3,7 @@
 //
 
 #include "Deserializer.h"
-
+#include <lua.hpp>
 Deserializer::Deserializer(std::string path) {
     L = luaL_newstate();
 

@@ -112,6 +112,10 @@ RenderTarget *Graphics::getRenderTarget() {
     return render_target;
 }
 
+GLFWwindow *Graphics::getWindow() {
+    return window;
+}
+
 
 
 

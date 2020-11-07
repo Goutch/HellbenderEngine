@@ -1,9 +1,7 @@
-//
-// Created by User on 2020-06-27.
-//
 
 #include "Material.h"
 #include "core/utility/Log.h"
+#include "core/serialization/Serializer.h"
 Material::Material() {
     shader = Graphics::DEFAULT_MESH_SHADER;
 }

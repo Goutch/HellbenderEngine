@@ -4,7 +4,7 @@
 
 #include "Entity.h"
 #include <core/utility/Log.h>
-
+#include "core/serialization/Serializer.h"
 unsigned int Entity::current_id = 0;
 
 Entity::Entity() {

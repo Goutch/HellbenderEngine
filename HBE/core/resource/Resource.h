@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/serialization/Serializer.h>
+class Serializer;
 #include "core/utility/Job.h"
 #include "core/utility/ModelImporter.h"
 #include "list"

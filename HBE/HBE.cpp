@@ -10,7 +10,7 @@ float HBE::fps_timer = 0;
 Event<> HBE::onInit;
 Event<float> HBE::onUpdate;
 Event<Scene*> HBE::onSceneChange;
-
+Event<RenderTarget*> HBE::onRenderFinish;
 void HBE::init() {
     window = Graphics::init();
     Input::init(window);
@@ -48,6 +48,7 @@ void HBE::run() {
         onUpdate.invoke(delta_t);
         current_scene->draw();
         Graphics::render(Camera::main->getProjectionMatrix(), Camera::main->getViewMatrix());
+        onRenderFinish.invoke(Graphics::getRenderTarget());
         delta_t = update_clock.ns() / SECONDS_TO_NANOSECOND;
         update_clock.reset();
 #if DEBUG_MODE

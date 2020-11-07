@@ -3,7 +3,7 @@
 //
 
 #include "Scene.h"
-
+#include "core/serialization/Serializer.h"
 Scene::Scene() {
 
 }
