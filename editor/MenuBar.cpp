@@ -9,6 +9,8 @@
 #include "SceneHierarchy.h"
 #include "SceneView.h"
 #include "Terminal.h"
+#include "Inspector.h"
+
 void MenuBar::draw(ViewOptions& viewOptions) {
     if (ImGui::BeginMenuBar()) {
         if (ImGui::BeginMenu("File")) {
@@ -30,7 +32,7 @@ void MenuBar::draw(ViewOptions& viewOptions) {
             if (ImGui::RadioButton(Terminal::name,viewOptions.terminal_active)) {
                 viewOptions.terminal_active=!viewOptions.terminal_active;
             }
-            if (ImGui::RadioButton(Terminal::name,viewOptions.inspector_active)) {
+            if (ImGui::RadioButton(Inspector::name,viewOptions.inspector_active)) {
                 viewOptions.inspector_active=!viewOptions.inspector_active;
             }
             ImGui::EndMenu();

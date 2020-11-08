@@ -52,7 +52,7 @@ public:
     static Event<> onInit;
     static Event<float> onUpdate;
     static Event<Scene*> onSceneChange;
-    static Event<RenderTarget*> onRenderFinish;
+    static Event<> onRender;
 
     static Scene *current_scene;
 

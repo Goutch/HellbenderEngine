@@ -1,16 +1,16 @@
 
 #include "Graphics.h"
+
+#include "Framebuffer.h"
 #include <core/entity/Transform.h>
 #include <CompilationConfigs.h>
 #include <core/utility/Log.h>
 #include <core/utility/Event.h>
-#include <GLFW/glfw3.h>
 #include <core/utility/Geometry.h>
 #include <core/graphics/RenderTarget.h>
-#include <Configs.h>
-
-#include "Framebuffer.h"
 #include "core/resource/ShaderProgram.h"
+#include <Configs.h>
+#include <GLFW/glfw3.h>
 
 #if RENDERER == OPENGL_RENDERER
 
@@ -28,7 +28,7 @@ const ShaderProgram *Graphics::DEFAULT_INSTANCED_SHADER = nullptr;
 Renderer *Graphics::renderer = nullptr;
 GLFWwindow *Graphics::window = nullptr;
 RenderTarget *Graphics::render_target = nullptr;
-Event<int,int> Graphics::onWindowSizeChange;
+Event<int, int> Graphics::onWindowSizeChange;
 
 GLFWwindow *Graphics::init() {
     renderer = Renderer::create();
@@ -51,11 +51,10 @@ void Graphics::onVerticalSyncChange(bool v_sync) {
 }
 
 void Graphics::onWindowSizeChangeCallback(GLFWwindow *window, int width, int height) {
-    if(!Configs::getCustomRendering())
-    {
+    if (!Configs::getCustomRendering()) {
         render_target->setSize(width, height);
     }
-    onWindowSizeChange.invoke(width,height);
+    onWindowSizeChange.invoke(width, height);
 }
 
 void Graphics::draw(const Transform &transform, const Mesh &mesh, const Material &material) {
@@ -66,16 +65,17 @@ void Graphics::drawInstanced(const Mesh &mesh, const Material &material) {
     renderer->drawInstanced(mesh, material);
 }
 
-void Graphics::render(const mat4 &projection_matrix, const mat4 &view_matrix) {
+void Graphics::render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix) {
     render_target->getFramebuffer().bind();
     renderer->clear();
-    renderer->render(projection_matrix, view_matrix);
+    renderer->render(render_target, projection_matrix, view_matrix);
     render_target->getFramebuffer().unbind();
-    if(!Configs::getCustomRendering())
-    {
-        renderer->clear();
-        renderer->renderTarget(*render_target);
-    }
+
+}
+
+void Graphics::present(const RenderTarget *render_target) {
+    renderer->clear();
+    renderer->present(render_target);
 }
 
 void Graphics::terminate() {
@@ -127,7 +127,7 @@ GLFWwindow *Graphics::getWindow() {
 }
 
 void Graphics::getWindowSize(int &width, int &height) {
-    glfwGetWindowSize(window,&width,&height);
+    glfwGetWindowSize(window, &width, &height);
 }
 
 void Graphics::clear() {
@@ -135,7 +135,11 @@ void Graphics::clear() {
 }
 
 void Graphics::onWindowTitleChange(std::string title) {
-    glfwSetWindowTitle(window,title.c_str());
+    glfwSetWindowTitle(window, title.c_str());
+}
+
+void Graphics::clearDrawCache() {
+    renderer->clearDrawCache();
 }
 
 

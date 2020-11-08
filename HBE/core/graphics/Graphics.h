@@ -44,7 +44,9 @@ public:
 
     static void drawInstanced(const Mesh &mesh, const Material &material);
 
-    static void render(const mat4 &projection_matrix, const mat4 &view_matrix);
+    static void render(const RenderTarget* render_target,const mat4 &projection_matrix, const mat4 &view_matrix);
+
+    static void present(const RenderTarget* render_target);
 
     static void clear();
 
@@ -59,6 +61,8 @@ public:
     static void onWindowSizeChangeCallback(GLFWwindow *window, int width, int height);
 
     static void onVerticalSyncChange(bool v_sync);
+
+    static void clearDrawCache();
 
 private:
     static void initializeDefaultVariables();

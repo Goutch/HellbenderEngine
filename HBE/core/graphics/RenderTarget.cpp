@@ -6,6 +6,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "Framebuffer.h"
 #include "core/resource/ShaderProgram.h"
+
 RenderTarget::RenderTarget(unsigned int width, unsigned int height, const ShaderProgram &shader_program) {
     this->shader_program = &shader_program;
     framebuffer = Framebuffer::create();
@@ -21,11 +22,11 @@ void RenderTarget::setProjectionMatrix(glm::mat4 projection_matrix) {
     this->projection_matrix = projection_matrix;
 }
 
-const Framebuffer &RenderTarget::getFramebuffer() {
+const Framebuffer &RenderTarget::getFramebuffer() const{
     return *framebuffer;
 }
 
-const ShaderProgram &RenderTarget::getShaderProgram() {
+const ShaderProgram &RenderTarget::getShaderProgram() const{
     return *shader_program;
 }
 

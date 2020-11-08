@@ -29,9 +29,11 @@ public:
 
     void drawInstanced(const Mesh &mesh, const Material &material) override;
 
-    void render(const mat4 &projection_matrix, const mat4 &view_matrix) override;
+    void render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix) override;
 
-    void renderTarget(RenderTarget &render_target) override;
+    void present(const RenderTarget *render_target) override;
+
+    void clearDrawCache() override;
 
     GLFWwindow *createWindow() override;
 };

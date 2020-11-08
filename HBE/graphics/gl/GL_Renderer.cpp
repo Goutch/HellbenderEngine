@@ -10,7 +10,6 @@
 #include <core/entity/Transform.h>
 #include <Configs.h>
 #include "GLFW/glfw3.h"
-#include "core/utility/Log.h"
 #include "CompilationConfigs.h"
 #include "core/graphics/Framebuffer.h"
 #include "core/graphics/RenderTarget.h"
@@ -30,39 +29,39 @@ void GL_Renderer::drawInstanced(const Mesh &mesh, const Material &material) {
     render_objects.push_back({nullptr, &mesh, &material});
 }
 
-void GL_Renderer::render(const mat4 &projection_matrix, const mat4 &view_matrix) {
+void GL_Renderer::render(const RenderTarget* render_target,const mat4 &projection_matrix, const mat4 &view_matrix) {
     glEnable(GL_DEPTH_TEST);
-    glViewport(0, 0, Graphics::getRenderTarget()->getWidth(), Graphics::getRenderTarget()->getHeight());
-    for (auto ro:render_objects) {
-        ro.material->bind();
-        ro.material->getShader().setUniform("projection_matrix", projection_matrix);
-        ro.material->getShader().setUniform("view_matrix", view_matrix);
-        if (ro.transform)
-            ro.material->getShader().setUniform("transform_matrix", ro.transform->getMatrix());
-        ro.mesh->bind();
-        if (ro.mesh->getInstanceCount() == 1) {
-            ro.mesh->hasIndexBuffer() ?
-            glDrawElements(GL_TRIANGLES, ro.mesh->getIndexCount(), GL_UNSIGNED_INT, 0) :
-            glDrawArrays(GL_TRIANGLES, 0, ro.mesh->getVertexCount());
-        } else if (ro.mesh->getInstanceCount() > 1) {
-            ro.mesh->hasIndexBuffer() ?
-            glDrawElementsInstanced(GL_TRIANGLES, ro.mesh->getIndexCount(), GL_UNSIGNED_INT, 0, ro.mesh->getInstanceCount()) :
-            glDrawArraysInstanced(GL_TRIANGLES, 0, ro.mesh->getVertexCount(), ro.mesh->getInstanceCount());
+    glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+    glViewport(0, 0, render_target->getWidth(), render_target->getHeight());
+    for (auto render_object:render_objects) {
+        render_object.material->bind();
+        render_object.material->getShader().setUniform("projection_matrix", projection_matrix);
+        render_object.material->getShader().setUniform("view_matrix", view_matrix);
+        if (render_object.transform)
+            render_object.material->getShader().setUniform("transform_matrix", render_object.transform->getMatrix());
+        render_object.mesh->bind();
+        if (render_object.mesh->getInstanceCount() == 1) {
+            render_object.mesh->hasIndexBuffer() ?
+            glDrawElements(GL_TRIANGLES, render_object.mesh->getIndexCount(), GL_UNSIGNED_INT, 0) :
+            glDrawArrays(GL_TRIANGLES, 0, render_object.mesh->getVertexCount());
+        } else if (render_object.mesh->getInstanceCount() > 1) {
+            render_object.mesh->hasIndexBuffer() ?
+            glDrawElementsInstanced(GL_TRIANGLES, render_object.mesh->getIndexCount(), GL_UNSIGNED_INT, 0, render_object.mesh->getInstanceCount()) :
+            glDrawArraysInstanced(GL_TRIANGLES, 0, render_object.mesh->getVertexCount(), render_object.mesh->getInstanceCount());
         }
 
-        ro.mesh->unbind();
-        ro.material->unbind();
+        render_object.mesh->unbind();
+        render_object.material->unbind();
     }
-    render_objects.clear();
 }
 
-void GL_Renderer::renderTarget(RenderTarget &render_target) {
+void GL_Renderer::present(const RenderTarget *render_target) {
     glDisable(GL_DEPTH_TEST);
-    glViewport(0, 0, render_target.getWidth(), render_target.getHeight());
-    const ShaderProgram &shader = render_target.getShaderProgram();
-    const Framebuffer &framebuffer = render_target.getFramebuffer();
+    glViewport(0, 0, render_target->getWidth(), render_target->getHeight());
+    const ShaderProgram &shader = render_target->getShaderProgram();
+    const Framebuffer &framebuffer = render_target->getFramebuffer();
     shader.bind();
-    render_target.setShaderUniforms();
+    render_target->setShaderUniforms();
     framebuffer.bindTexture();
     Graphics::DEFAULT_QUAD->bind();
     Graphics::DEFAULT_QUAD->hasIndexBuffer() ?
@@ -79,9 +78,6 @@ void GL_Renderer::init() {
         Log::error("Failed to load glad");
     }
     int w,h;
-    Graphics::getWindowSize(w,h);
-    glViewport(0, 0,w, h);
-    glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glEnable(GL_DEPTH_TEST);
@@ -110,6 +106,10 @@ GLFWwindow *GL_Renderer::createWindow() {
 
 void GL_Renderer::clear() const {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void GL_Renderer::clearDrawCache() {
+    render_objects.clear();
 }
 
 

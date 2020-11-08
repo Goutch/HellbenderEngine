@@ -7,40 +7,45 @@
 #include <core/entity/Entity.h>
 #include <core/graphics/Graphics.h>
 #include <core/graphics/RenderTarget.h>
-#include <core/utility/Log.h>
-#include "Configs.h"
-Camera* Camera::main= nullptr;
+
+Camera *Camera::main = nullptr;
+
 void Camera::onAttach() {
     Component::onAttach();
-    if(Camera::main== nullptr)
-    {
-        Camera::main=this;
+    if (Camera::main == nullptr) {
+        Camera::main = this;
     }
-    setAspectRatio(Graphics::getRenderTarget()->getWidth(),Graphics::getRenderTarget()->getHeight());
+    setRenderTarget(Graphics::getRenderTarget());
 
-    Graphics::getRenderTarget()->onSizeChange.subscribe(this,&Camera::onRenderTargetSizeChange);
+    Graphics::getRenderTarget()->onSizeChange.subscribe(this, &Camera::onRenderTargetSizeChange);
 
     generateProjectionMatrix();
+}
+
+void Camera::setRenderTarget(RenderTarget *render_target) {
+    if (render_target != nullptr) {
+        render_target->onSizeChange.unsubscribe(this);
+    }
+    this->render_target = render_target;
+    setAspectRatio(render_target->getWidth(), render_target->getHeight());
+    render_target->onSizeChange.subscribe(this, &Camera::onRenderTargetSizeChange);
 }
 
 void Camera::onDetach() {
     Graphics::getRenderTarget()->onSizeChange.unsubscribe(this);
 }
 
-void Camera::onRenderTargetSizeChange(int width,int height)
-{
-    setAspectRatio(width,height);
+void Camera::onRenderTargetSizeChange(int width, int height) {
+    setAspectRatio(width, height);
     generateProjectionMatrix();
 }
 
 void Camera::generateProjectionMatrix() {
-    if(render_mode==RenderMode::PERSPECTIVE)
-    {
+    if (render_mode == RenderMode::PERSPECTIVE) {
         projection_matrix = glm::perspective<float>(glm::radians(fov), aspect_ratio, 0.1f, render_distance);
     }
-    if(render_mode==RenderMode::ORTHOGRAPHIC)
-    {
-        projection_matrix=glm::ortho(-0.5*aspect_ratio,0.5*aspect_ratio,-0.5,0.5,-1.0,1.0);
+    if (render_mode == RenderMode::ORTHOGRAPHIC) {
+        projection_matrix = glm::ortho(-0.5 * aspect_ratio, 0.5 * aspect_ratio, -0.5, 0.5, -1.0, 1.0);
     }
     calculateFrustumPlanes();
 }
@@ -82,10 +87,9 @@ float Camera::getFOV() const {
 
 void Camera::setFOV(float fov) {
     this->fov = fov;
-    if(render_mode==ORTHOGRAPHIC)
-    {
+    if (render_mode == ORTHOGRAPHIC) {
         Log::warning("Can't set field of view when camera is set to orthographic mode");
-    } else{
+    } else {
         generateProjectionMatrix();
     }
 }
@@ -131,17 +135,15 @@ bool Camera::isBoxInFrustum(const vec3 &position, float size_x, float size_y, fl
 }
 
 void Camera::setRenderMode(RenderMode mode) {
-    render_mode=mode;
+    render_mode = mode;
     generateProjectionMatrix();
-}
-
-void Camera::setOrthographic() {
-
 }
 
 void Camera::serialize(Serializer *serializer) const {
     Component::serialize(serializer);
 }
+
+
 
 
 

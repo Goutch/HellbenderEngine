@@ -16,16 +16,13 @@ public:
 
     ViewOptions viewOptions;
 
-
     void onWindowSizeChange(int width, int height);
 
     void start();
 
     void update(float delta);
 
-    void onRenderFinish(RenderTarget *renderTarget);
+    void onRender();
 
     void terminate();
-
-
 };

@@ -21,9 +21,9 @@ public:
 
     const ShaderProgram *shader_program;
 
-    const Framebuffer &getFramebuffer();
+    const Framebuffer &getFramebuffer() const;
 
-    const ShaderProgram &getShaderProgram();
+    const ShaderProgram &getShaderProgram() const;
 
     const mat4 &getProjectionMatrix();
 

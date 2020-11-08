@@ -30,7 +30,7 @@ void Editor::start() {
     ImGui_ImplGlfw_InitForOpenGL(Graphics::getWindow(), true);
     ImGui_ImplOpenGL3_Init("#version 430 core");
     setStyle();
-    HBE::onRenderFinish.subscribe(this, &Editor::onRenderFinish);
+    HBE::onRender.subscribe(this, &Editor::onRender);
     Graphics::onWindowSizeChange.subscribe(this, &Editor::onWindowSizeChange);
     Graphics::getWindowSize(window_width, window_height);
     Configs::setWindowTitle("Editor");
@@ -38,7 +38,7 @@ void Editor::start() {
 }
 
 
-void Editor::onRenderFinish(RenderTarget *renderTarget) {
+void Editor::onRender() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     NewFrame();

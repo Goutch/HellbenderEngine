@@ -9,8 +9,9 @@ int HBE::fps_counter = 0;
 float HBE::fps_timer = 0;
 Event<> HBE::onInit;
 Event<float> HBE::onUpdate;
-Event<Scene*> HBE::onSceneChange;
-Event<RenderTarget*> HBE::onRenderFinish;
+Event<Scene *> HBE::onSceneChange;
+Event<> HBE::onRender;
+
 void HBE::init() {
     window = Graphics::init();
     Input::init(window);
@@ -47,8 +48,12 @@ void HBE::run() {
         current_scene->update(delta_t);
         onUpdate.invoke(delta_t);
         current_scene->draw();
-        Graphics::render(Camera::main->getProjectionMatrix(), Camera::main->getViewMatrix());
-        onRenderFinish.invoke(Graphics::getRenderTarget());
+        Graphics::render(Graphics::getRenderTarget(),Camera::main->getProjectionMatrix(), Camera::main->getViewMatrix());
+        if (!Configs::getCustomRendering())
+            Graphics::present(Graphics::getRenderTarget());
+        onRender.invoke();
+        Graphics::clearDrawCache();
+
         delta_t = update_clock.ns() / SECONDS_TO_NANOSECOND;
         update_clock.reset();
 #if DEBUG_MODE
@@ -69,9 +74,8 @@ void HBE::quit() {
 }
 
 float HBE::getTime() {
-    if(time)
-    {
-        return time->ms()/SECOND_TO_MILISECOND;
+    if (time) {
+        return time->ms() / SECOND_TO_MILISECOND;
     }
     return 0;
 }
