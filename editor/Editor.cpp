@@ -3,6 +3,8 @@
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
 
+
+#include <glad/glad.h>
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -99,19 +101,21 @@ void Editor::setStyle() {
     StyleColorsDark();
 #define HI   ImVec4(0.502f, 0.075f, 0.256f, 1)
 #define MED  ImVec4(0.455f, 0.198f, 0.301f, 1)
-#define LOW  ImVec4(0.232f, 0.201f, 0.271f, 1)
+#define LOW  ImVec4(0.355f, 0.201f, 0.271f, 1)
 
 #define LOW_BG ImVec4(0.100f, 0.120f, 0.170f, 1)
 #define BG  ImVec4(0.200f, 0.220f, 0.270f, 1)
 #define HI_BG  ImVec4(0.300f, 0.320f, 0.370f, 1)
+
 #define TEXT ImVec4(0.860f, 0.930f, 0.890f, 1)
+
 #define INVISIBLE ImVec4(0,0,0,0)
     auto &style = ImGui::GetStyle();
 
 
     style.Colors[ImGuiCol_Tab]                      = MED;
-    style.Colors[ImGuiCol_TabActive]                = MED;
-    style.Colors[ImGuiCol_TabUnfocusedActive]       = HI;
+    style.Colors[ImGuiCol_TabActive]                = HI;
+    style.Colors[ImGuiCol_TabUnfocusedActive]       = MED;
     style.Colors[ImGuiCol_TabUnfocused]             = MED;
     style.Colors[ImGuiCol_TabHovered]               = HI;
 
@@ -135,14 +139,14 @@ void Editor::setStyle() {
     style.Colors[ImGuiCol_ScrollbarBg]              = BG;
     style.Colors[ImGuiCol_ScrollbarGrab]            = ImVec4(0.09f, 0.15f, 0.16f, 1.00f);
     style.Colors[ImGuiCol_ScrollbarGrabHovered]     = MED;
-    style.Colors[ImGuiCol_ScrollbarGrabActive]      = MED;
+    style.Colors[ImGuiCol_ScrollbarGrabActive]      = HI;
     style.Colors[ImGuiCol_CheckMark]                = ImVec4(0.71f, 0.22f, 0.27f, 1.00f);
     style.Colors[ImGuiCol_SliderGrab]               = ImVec4(0.47f, 0.77f, 0.83f, 0.14f);
     style.Colors[ImGuiCol_SliderGrabActive]         = ImVec4(0.71f, 0.22f, 0.27f, 1.00f);
     style.Colors[ImGuiCol_Button]                   = ImVec4(0.47f, 0.77f, 0.83f, 0.14f);
-    style.Colors[ImGuiCol_ButtonHovered]            = HI;
-    style.Colors[ImGuiCol_ButtonActive]             = MED;
-    style.Colors[ImGuiCol_Header]                   = MED;
+    style.Colors[ImGuiCol_ButtonHovered]            = MED;
+    style.Colors[ImGuiCol_ButtonActive]             = HI;
+    style.Colors[ImGuiCol_Header]                   = LOW;
     style.Colors[ImGuiCol_HeaderHovered]            = MED;
     style.Colors[ImGuiCol_HeaderActive]             = HI;
     //style.Colors[ImGuiCol_Column]                   = ImVec4(0.14f, 0.16f, 0.19f, 1.00f);

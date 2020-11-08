@@ -5,49 +5,56 @@
 #include <imgui.h>
 #include "SceneHierarchy.h"
 #include "HBE.h"
-const char* SceneHierarchy::name="Scene Hierarchy";
-std::list<Entity*> SceneHierarchy::selected_entities;
-void drawTree(Entity* e)
-{
-    std::vector<Entity*> children=e->getChildren();
-    if(children.empty())
-    {
-        ImGui::BulletText("%s", e->getName().c_str());
-        ImGui::SameLine();
-        /*bool selected;
-        if(ImGui::Selectable(e->getName().c_str(),selected))
-        {
-            SceneHierarchy::selected_entities.push_back(e);
-        }*/
-    }
-    else
-    {
-        bool open=ImGui::TreeNode(e->getName().c_str());
-        ImGui::SameLine();
-        /*bool selected;
-        if(ImGui::Selectable(e->getName().c_str(),))
-        {
-            SceneHierarchy::selected_entities.push_back(e);
-        }*/
-        if(open)
-        {
 
-            for (auto e:children) {
-                drawTree(e);
-            }
-            ImGui::TreePop();
-        }
-    }
-}
-void SceneHierarchy::draw(bool& active) {
+const char *SceneHierarchy::name = "Scene Hierarchy";
+std::unordered_set<Entity *> SceneHierarchy::selected_entities;
 
-    if(active)
-    {
-        ImGui::Begin(name,&active,ImGuiWindowFlags_NoCollapse);
-        std::vector<Entity*> entities=HBE::scene->getEntities();
-        for (auto e:entities) {
-            if(e->getParent()== nullptr)
+void drawTree(Entity *e) {
+    std::vector<Entity *> children = e->getChildren();
+
+    bool selected = SceneHierarchy::selected_entities.find(e)!=SceneHierarchy::selected_entities.end();
+    ImGui::TreeAdvanceToLabelPos();
+    bool open = ImGui::TreeNodeEx(e->getName().c_str(),ImGuiTreeNodeFlags_OpenOnArrow|
+                                  (selected?ImGuiTreeNodeFlags_Selected : ImGuiTreeNodeFlags_None)|
+                                  (children.empty() ? ImGuiTreeNodeFlags_Leaf : ImGuiTreeNodeFlags_None));
+    if(!ImGui::IsItemToggledOpen()&&ImGui::IsItemClicked()){
+
+        if(Input::getKey(KEY::LEFT_CONTROL))
+        {
+            if(SceneHierarchy::selected_entities.find(e)==SceneHierarchy::selected_entities.end())
             {
+                SceneHierarchy::selected_entities.emplace(e);
+            }
+            else
+            {
+                SceneHierarchy::selected_entities.erase(e);
+            }
+        } else if( Input::getKey(KEY::LEFT_SHIFT))
+        {
+            //todo: shift key selection
+        } else{
+            SceneHierarchy::selected_entities.clear();
+            SceneHierarchy::selected_entities.emplace(e);
+        }
+
+    }
+
+    if (open) {
+        for (auto e:children) {
+            drawTree(e);
+        }
+        ImGui::TreePop();
+    }
+
+}
+
+void SceneHierarchy::draw(bool &active) {
+
+    if (active) {
+        ImGui::Begin(name, &active, ImGuiWindowFlags_NoCollapse);
+        std::vector<Entity *> entities = HBE::scene->getEntities();
+        for (auto e:entities) {
+            if (e->getParent() == nullptr) {
                 drawTree(e);
             }
         }

@@ -6,9 +6,11 @@
 GLFWwindow *Input::window = nullptr;
 float Input::wheel_offset =0.0f;
 bool Input::getKeyDown(KEY code) {
+    return glfwGetKey(window, code) == GLFW_KEY_DOWN;
+}
+bool Input::getKey(KEY code) {
     return glfwGetKey(window, code) == GLFW_PRESS;
 }
-
 void Input::getMousePosition(double &x, double &y) {
     glfwGetCursorPos(window, &x, &y);
 }
@@ -33,4 +35,6 @@ void Input::setCursorPosition(double x, double y) {
 void Input::scrollCallback(GLFWwindow *window, double x_offset, double y_offset) {
     wheel_offset=y_offset;
 }
+
+
 

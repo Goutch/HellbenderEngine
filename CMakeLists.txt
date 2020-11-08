@@ -55,6 +55,7 @@ set(IMGUI
 		dependencies/imgui/imstb_rectpack.h
 		dependencies/imgui/imstb_textedit.h
 		dependencies/imgui/imstb_truetype.h )
+
 add_executable (${PROJECT_NAME}
 		${IMGUI}
 		main.cpp
@@ -69,7 +70,9 @@ add_executable (${PROJECT_NAME}
 		editor/Terminal.cpp
 		editor/Terminal.h
 		editor/SceneView.cpp
-		editor/SceneView.h editor/Inspector.cpp editor/Inspector.h)
+		editor/SceneView.h
+		editor/Inspector.cpp
+		editor/Inspector.h)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC HBE)
 

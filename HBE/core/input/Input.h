@@ -138,6 +138,7 @@ public:
 
     static void getMousePosition(double &x, double &y);
 
+    static bool getKey(KEY code);
     static bool getKeyDown(KEY code);
 
     static void getMouseWheelInput(float &value);

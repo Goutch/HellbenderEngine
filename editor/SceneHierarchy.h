@@ -5,7 +5,8 @@
 class SceneHierarchy {
 
 public:
-    static std::list<Entity*> selected_entities;
+    static std::unordered_set<Entity*> selected_entities;
+
     static const char* name;
     static void draw(bool& active);
 };
