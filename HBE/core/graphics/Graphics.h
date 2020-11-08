@@ -9,7 +9,7 @@ using namespace glm;
 
 class Renderer;
 
-class GLFWwindow;
+struct GLFWwindow;
 
 class RenderTarget;
 
