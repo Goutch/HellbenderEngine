@@ -54,7 +54,7 @@ public:
     static Event<Scene*> onSceneChange;
     static Event<> onRender;
 
-    static Scene *current_scene;
+    static Scene *scene;
 
     static void init();
 

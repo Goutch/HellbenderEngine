@@ -4,28 +4,28 @@
 void Component::subscribeDraw() {
     if (!subscribed_draw) {
         subscribed_draw = true;
-        HBE::current_scene->subscribeDraw(this);
+        HBE::scene->subscribeDraw(this);
     }
 }
 
 void Component::unsubscribeDraw() {
     if (subscribed_draw) {
         subscribed_draw = false;
-        HBE::current_scene->unsubscribeDraw(this);
+        HBE::scene->unsubscribeDraw(this);
     }
 }
 
 void Component::subscribeUpdate() {
     if (!subscribed_update) {
         subscribed_update = true;
-        HBE::current_scene->subscribeUpdate(this);
+        HBE::scene->subscribeUpdate(this);
     }
 }
 
 void Component::unsubscribeUpdate() {
     if (subscribed_update) {
         subscribed_update = false;
-        HBE::current_scene->unsubscribeUpdate(this);
+        HBE::scene->unsubscribeUpdate(this);
     }
 }
 

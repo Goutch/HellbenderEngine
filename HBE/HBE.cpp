@@ -2,7 +2,7 @@
 #include "GLFW/glfw3.h"
 #include "scripting/ScriptManager.h"
 
-Scene *HBE::current_scene = nullptr;
+Scene *HBE::scene = nullptr;
 GLFWwindow *HBE::window = nullptr;
 Clock *HBE::time = nullptr;
 int HBE::fps_counter = 0;
@@ -15,21 +15,21 @@ Event<> HBE::onRender;
 void HBE::init() {
     window = Graphics::init();
     Input::init(window);
-    current_scene = new Scene();
-    current_scene->init();
+    scene = new Scene();
+    scene->init();
     ScriptManager::init();
     onInit.invoke();
 }
 
 Scene *HBE::setScene(std::string path) {
-    if (current_scene != nullptr) {
-        current_scene->terminate();
-        delete current_scene;
+    if (scene != nullptr) {
+        scene->terminate();
+        delete scene;
     }
-    current_scene = new Scene();
-    current_scene->init();
-    onSceneChange.invoke(current_scene);
-    return current_scene;
+    scene = new Scene();
+    scene->init();
+    onSceneChange.invoke(scene);
+    return scene;
 }
 
 void HBE::run() {
@@ -37,17 +37,17 @@ void HBE::run() {
     Clock update_clock = Clock();
     float delta_t = 0.0f;
     if (Camera::main == nullptr) {
-        current_scene->instantiate<Camera>();
+        scene->instantiate<Camera>();
     }
-    while (!glfwWindowShouldClose(window) && current_scene != nullptr) {
+    while (!glfwWindowShouldClose(window) && scene != nullptr) {
         glfwSwapBuffers(window);
         glfwPollEvents();
         if (Input::getKeyDown(KEY::ESCAPE))
             quit();
         JobManager::updateJobsStatus();
-        current_scene->update(delta_t);
+        scene->update(delta_t);
         onUpdate.invoke(delta_t);
-        current_scene->draw();
+        scene->draw();
         Graphics::render(Graphics::getRenderTarget(),Camera::main->getProjectionMatrix(), Camera::main->getViewMatrix());
         if (!Configs::getCustomRendering())
             Graphics::present(Graphics::getRenderTarget());
@@ -61,7 +61,7 @@ void HBE::run() {
 #endif
     }
     delete time;
-    delete current_scene;
+    delete scene;
 }
 
 void HBE::terminate() {

@@ -6,7 +6,7 @@
 #include "unordered_set"
 
 class Scene :public Resource{
-    std::unordered_set<Entity *> entities;
+    std::vector<Entity *> entities;
     std::unordered_set<Component *> update_listeners;
     std::unordered_set<Component *> draw_listeners;
 public:
@@ -25,6 +25,7 @@ public:
 
     void terminate();
 
+    const std::vector<Entity*>& getEntities();
 
     Entity *instantiate(std::string name, Entity *parent = nullptr);
 
@@ -33,14 +34,14 @@ public:
     template<class ComponentType>
     ComponentType *instantiate(std::string name,Entity* parent= nullptr) {
         Entity *e = new Entity(name, parent);
-        entities.insert(e);
+        entities.push_back(e);
         e->init();
         return e->attach<ComponentType>();
     }
     template<class ComponentType>
     ComponentType *instantiate(Entity* parent= nullptr) {
         Entity *e = new Entity(parent);
-        entities.insert(e);
+        entities.push_back(e);
         e->init();
         return e->attach<ComponentType>();
     }

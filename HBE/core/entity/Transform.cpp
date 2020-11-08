@@ -3,7 +3,7 @@
 //
 
 #include "Transform.h"
-
+#include "Entity.h"
 
 Transform::Transform() {
 
@@ -16,38 +16,7 @@ Transform::Transform(vec3 position, vec3 rotation, vec3 scale) {
 }
 
 mat4 Transform::getMatrix() const {
-    return parent == nullptr ? transform_matrix : parent->getMatrix() * transform_matrix;
-}
-
-void Transform::addChild(Transform *child) {
-    if (children.find(child) == children.end()) {
-        children.insert(child);
-        child->parent = this;
-    }
-}
-
-void Transform::removeChild(Transform *child) {
-    if (children.find(child) != children.end()) {
-        children.erase(child);
-        child->parent = nullptr;
-    }
-}
-
-void Transform::setParent(Transform *parent) {
-    if (parent != nullptr) {
-        parent->addChild(this);
-    } else {
-        this->parent = nullptr;
-    }
-
-}
-
-const std::set<Transform *> &Transform::getChildren() const {
-    return children;
-}
-
-const Transform *Transform::getParent() const {
-    return parent;
+    return transform_matrix;
 }
 
 void Transform::translate(const vec3 &translation) {
@@ -66,11 +35,11 @@ void Transform::rotate(float angle, vec3 axis) {
 }
 
 quat Transform::getRotation() const {
-    return parent == nullptr ? rotation : rotation * parent->getRotation();
+    return rotation;
 }
 
 vec3 Transform::getEulerRotation() const {
-    return glm::eulerAngles(rotation);
+    return glm::eulerAngles(rotation) ;
 }
 
 void Transform::setRotation(const quat &rotation) {
@@ -84,7 +53,7 @@ void Transform::setRotation(const quat &rotation) {
 }
 
 vec3 Transform::getPosition() const {
-    return parent == nullptr ? transform_matrix[3] : (vec3) (parent->getMatrix() * transform_matrix)[3];
+    return transform_matrix[3];
 }
 
 vec3 Transform::getLocalPosition() const {
@@ -117,28 +86,27 @@ void Transform::setScale(vec3 scale) {
     transform_matrix[2] = normalize(transform_matrix[2]) * scale.z;
 }
 
-
-vec3 Transform::getForward() const {
-    return glm::normalize(transform_matrix[2]);
+vec3 Transform::getLocalForward() const {
+   return glm::normalize(transform_matrix[2]);
 }
 
-vec3 Transform::getBackward() const {
+vec3 Transform::getLocalBackward() const {
     return -glm::normalize(transform_matrix[2]);
 }
 
-vec3 Transform::getRight() const {
+vec3 Transform::getLocalRight() const {
     return glm::normalize(transform_matrix[0]);
 }
 
-vec3 Transform::getLeft() const {
+vec3 Transform::getLocalLeft() const {
     return -glm::normalize(transform_matrix[0]);
 }
 
-vec3 Transform::getUp() const {
+vec3 Transform::getLocalUp() const {
     return glm::normalize(transform_matrix[1]);
 }
 
-vec3 Transform::getDown() const {
+vec3 Transform::getLocalDown() const {
     return -glm::normalize(transform_matrix[1]);
 }
 

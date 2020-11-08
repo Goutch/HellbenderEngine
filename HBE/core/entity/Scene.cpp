@@ -40,20 +40,31 @@ void Scene::terminate() {
 
 Entity *Scene::instantiate(std::string name, Entity *parent) {
     Entity *e = new Entity(name, parent);
-    entities.insert(e);
+    entities.push_back(e);
     e->init();
     return e;
 }
 Entity *Scene::instantiate(Entity *parent) {
     Entity* e =new Entity(parent);
-    entities.insert(e);
+    entities.push_back(e);
     e->init();
     return e;
 }
 
 
 void Scene::destroy(Entity *e) {
-    entities.erase(e);
+    auto it=entities.begin();
+    while (it!=entities.end()) {
+        if(*it==e)
+        {
+            break;
+        }
+        ++it;
+    }
+    if(it!=entities.end())
+    {
+        entities.erase(it);
+    }
     e->onDestroy();
     delete e;
 }
@@ -87,6 +98,10 @@ void Scene::serialize(Serializer *serializer) const {
     }
     serializer->endArray();
     serializer->end();
+}
+
+const std::vector<Entity *> &Scene::getEntities() {
+    return entities;
 }
 
 
