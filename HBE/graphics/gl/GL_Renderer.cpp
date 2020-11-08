@@ -32,6 +32,7 @@ void GL_Renderer::drawInstanced(const Mesh &mesh, const Material &material) {
 
 void GL_Renderer::render(const mat4 &projection_matrix, const mat4 &view_matrix) {
     glEnable(GL_DEPTH_TEST);
+    glViewport(0, 0, Graphics::getRenderTarget()->getWidth(), Graphics::getRenderTarget()->getHeight());
     for (auto ro:render_objects) {
         ro.material->bind();
         ro.material->getShader().setUniform("projection_matrix", projection_matrix);
@@ -55,13 +56,13 @@ void GL_Renderer::render(const mat4 &projection_matrix, const mat4 &view_matrix)
     render_objects.clear();
 }
 
-void GL_Renderer::renderTarget(RenderTarget &layer) {
+void GL_Renderer::renderTarget(RenderTarget &render_target) {
     glDisable(GL_DEPTH_TEST);
-    glViewport(0, 0, layer.getWidth(), layer.getHeight());
-    const ShaderProgram &shader = layer.getShaderProgram();
-    const Framebuffer &framebuffer = layer.getFramebuffer();
+    glViewport(0, 0, render_target.getWidth(), render_target.getHeight());
+    const ShaderProgram &shader = render_target.getShaderProgram();
+    const Framebuffer &framebuffer = render_target.getFramebuffer();
     shader.bind();
-    layer.setShaderUniforms();
+    render_target.setShaderUniforms();
     framebuffer.bindTexture();
     Graphics::DEFAULT_QUAD->bind();
     Graphics::DEFAULT_QUAD->hasIndexBuffer() ?
@@ -77,7 +78,9 @@ void GL_Renderer::init() {
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
         Log::error("Failed to load glad");
     }
-    glViewport(0, 0, WIDTH, HEIGHT);
+    int w,h;
+    Graphics::getWindowSize(w,h);
+    glViewport(0, 0,w, h);
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -90,10 +93,7 @@ void GL_Renderer::init() {
 #endif
 }
 
-void Graphics::onWindowTitleChange(std::string title)
-{
-    glfwSetWindowTitle(window,title.c_str());
-}
+
 
 GLFWwindow *GL_Renderer::createWindow() {
     if (!glfwInit()) {
@@ -104,7 +104,6 @@ GLFWwindow *GL_Renderer::createWindow() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     window = glfwCreateWindow(WIDTH, HEIGHT, Configs::getWindowTitle().c_str(), nullptr, nullptr);
-    Configs::onWindowTitleChange.subscribe(&Graphics::onWindowTitleChange);
     glfwMakeContextCurrent(window);
     return window;
 }

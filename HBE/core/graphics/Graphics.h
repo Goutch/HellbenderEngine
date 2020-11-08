@@ -46,6 +46,8 @@ public:
 
     static void render(const mat4 &projection_matrix, const mat4 &view_matrix);
 
+    static void clear();
+
     static RenderTarget *getRenderTarget();
 
     static void terminate();

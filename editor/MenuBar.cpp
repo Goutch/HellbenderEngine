@@ -22,13 +22,16 @@ void MenuBar::draw(ViewOptions& viewOptions) {
         }
         if (ImGui::BeginMenu("View")) {
             if (ImGui::RadioButton(SceneHierarchy::name,viewOptions.scene_hierarchy_active)) {
-                viewOptions.scene_hierarchy_active= false;
+                viewOptions.scene_hierarchy_active=!viewOptions.scene_hierarchy_active;
             }
             if (ImGui::RadioButton(SceneView::name,viewOptions.scene_view_active)) {
-                viewOptions.scene_view_active= false;
+                viewOptions.scene_view_active=!viewOptions.scene_view_active;
             }
             if (ImGui::RadioButton(Terminal::name,viewOptions.terminal_active)) {
-                viewOptions.terminal_active= false;
+                viewOptions.terminal_active=!viewOptions.terminal_active;
+            }
+            if (ImGui::RadioButton(Terminal::name,viewOptions.inspector_active)) {
+                viewOptions.inspector_active=!viewOptions.inspector_active;
             }
             ImGui::EndMenu();
         }

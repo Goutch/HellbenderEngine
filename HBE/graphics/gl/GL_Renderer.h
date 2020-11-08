@@ -31,7 +31,7 @@ public:
 
     void render(const mat4 &projection_matrix, const mat4 &view_matrix) override;
 
-    void renderTarget(RenderTarget &layer) override;
+    void renderTarget(RenderTarget &render_target) override;
 
     GLFWwindow *createWindow() override;
 };

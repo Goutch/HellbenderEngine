@@ -4,11 +4,14 @@
 
 #include <imgui.h>
 #include "Terminal.h"
-const char* Terminal::name="Terminal";
-void Terminal::draw(bool& active) {
 
-    ImGui::Begin(name,&active);
+const char *Terminal::name = "Terminal";
+
+void Terminal::draw(bool &active) {
+    if (active) {
+        ImGui::Begin(name, &active,ImGuiWindowFlags_NoCollapse);
 
 
-    ImGui::End();
+        ImGui::End();
+    }
 }

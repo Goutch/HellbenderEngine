@@ -2,15 +2,15 @@
 // Created by User on 07-Nov.-2020.
 //
 
-#include <imgui.h>
-#include "SceneHierarchy.h"
-const char* SceneHierarchy::name="Scene Hierarchy";
-void SceneHierarchy::draw(bool& active) {
+#include "Inspector.h"
+#include "imgui.h"
+const char *Inspector::name = "Inspector";
 
+void Inspector::draw(bool active) {
     if(active)
     {
         ImGui::Begin(name,&active,ImGuiWindowFlags_NoCollapse);
+
         ImGui::End();
     }
-
 }

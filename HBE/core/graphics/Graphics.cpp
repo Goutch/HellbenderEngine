@@ -29,6 +29,7 @@ Renderer *Graphics::renderer = nullptr;
 GLFWwindow *Graphics::window = nullptr;
 RenderTarget *Graphics::render_target = nullptr;
 Event<int,int> Graphics::onWindowSizeChange;
+
 GLFWwindow *Graphics::init() {
     renderer = Renderer::create();
     window = renderer->createWindow();
@@ -36,6 +37,7 @@ GLFWwindow *Graphics::init() {
     if (!Configs::getVerticalSync())
         glfwSwapInterval(0);
     Configs::onVerticalSyncChange.subscribe(Graphics::onVerticalSyncChange);
+    Configs::onWindowTitleChange.subscribe(&Graphics::onWindowTitleChange);
     renderer->init();
 
     glfwSetWindowSizeCallback(window, Graphics::onWindowSizeChangeCallback);
@@ -49,7 +51,10 @@ void Graphics::onVerticalSyncChange(bool v_sync) {
 }
 
 void Graphics::onWindowSizeChangeCallback(GLFWwindow *window, int width, int height) {
-    render_target->setSize(width, height);
+    if(!Configs::getCustomRendering())
+    {
+        render_target->setSize(width, height);
+    }
     onWindowSizeChange.invoke(width,height);
 }
 
@@ -66,9 +71,9 @@ void Graphics::render(const mat4 &projection_matrix, const mat4 &view_matrix) {
     renderer->clear();
     renderer->render(projection_matrix, view_matrix);
     render_target->getFramebuffer().unbind();
-    renderer->clear();
     if(!Configs::getCustomRendering())
     {
+        renderer->clear();
         renderer->renderTarget(*render_target);
     }
 }
@@ -123,6 +128,14 @@ GLFWwindow *Graphics::getWindow() {
 
 void Graphics::getWindowSize(int &width, int &height) {
     glfwGetWindowSize(window,&width,&height);
+}
+
+void Graphics::clear() {
+    renderer->clear();
+}
+
+void Graphics::onWindowTitleChange(std::string title) {
+    glfwSetWindowTitle(window,title.c_str());
 }
 
 
