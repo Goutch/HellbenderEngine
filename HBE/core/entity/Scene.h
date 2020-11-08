@@ -30,12 +30,12 @@ public:
 
     Entity *instantiate(Entity *parent = nullptr);
 
-    template<class T>
-    T *instantiate(std::string name,Entity* parent= nullptr) {
+    template<class ComponentType>
+    ComponentType *instantiate(std::string name,Entity* parent= nullptr) {
         Entity *e = new Entity(name, parent);
         entities.insert(e);
         e->init();
-        return e->attach<T>();
+        return e->attach<ComponentType>();
     }
     template<class ComponentType>
     ComponentType *instantiate(Entity* parent= nullptr) {
