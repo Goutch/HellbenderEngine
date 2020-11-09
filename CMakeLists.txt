@@ -57,22 +57,22 @@ set(IMGUI
 		dependencies/imgui/imstb_truetype.h)
 
 add_executable (${PROJECT_NAME}
-		#${IMGUI}
+		${IMGUI}
 		main.cpp
-		#editor/Editor.cpp
-		#editor/Editor.h
-		#editor/Terminal.cpp
-		#editor/Terminal.h
-		#editor/SceneHierarchy.cpp
-		#editor/SceneHierarchy.h
-		#editor/MenuBar.cpp
-		#editor/MenuBar.h
-		#editor/Terminal.cpp
-		#editor/Terminal.h
-		#editor/SceneView.cpp
-		#editor/SceneView.h
-		#editor/Inspector.cpp
-		#editor/Inspector.h
+		editor/Editor.cpp
+		editor/Editor.h
+		editor/Terminal.cpp
+		editor/Terminal.h
+		editor/SceneHierarchy.cpp
+		editor/SceneHierarchy.h
+		editor/MenuBar.cpp
+		editor/MenuBar.h
+		editor/Terminal.cpp
+		editor/Terminal.h
+		editor/SceneView.cpp
+		editor/SceneView.h
+		editor/Inspector.cpp
+		editor/Inspector.h
 		)
 
 target_link_libraries(${PROJECT_NAME} HBE)

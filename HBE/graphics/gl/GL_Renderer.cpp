@@ -77,7 +77,6 @@ void GL_Renderer::init() {
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
         Log::error("Failed to load glad");
     }
-    int w,h;
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glEnable(GL_DEPTH_TEST);

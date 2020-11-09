@@ -17,7 +17,7 @@ protected:
 
 public:
     static Mesh *create();
-
+    virtual ~Mesh(){};
     virtual void setIndices(const std::vector<unsigned int> &data) = 0;
 
     virtual void setBuffer(unsigned int position, const std::vector<int> &data) = 0;

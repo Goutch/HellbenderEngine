@@ -15,7 +15,7 @@ protected:
 public:
 
     Component() {};
-
+    virtual ~Component(){};
     void attach(Entity *entity) {
         this->entity = entity;
         onAttach();

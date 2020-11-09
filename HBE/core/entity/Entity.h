@@ -33,6 +33,7 @@ class HB_API Entity : public Transform, public Resource {
     Entity();
 
 public:
+    virtual ~Entity(){};
     virtual void init() {};
 
     virtual void onDestroy();

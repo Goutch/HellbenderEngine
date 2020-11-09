@@ -62,7 +62,7 @@ class HB_API Material:Resource{
     Material();
 public:
     static Material* create();
-
+    virtual ~Material(){};
     void bind() const;
     void unbind() const;
     void setShader(const ShaderProgram* shaderProgram);

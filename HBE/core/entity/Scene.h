@@ -15,7 +15,7 @@ public:
 
     Scene();
 
-    ~Scene();
+    virtual ~Scene();
 
     void init();
 

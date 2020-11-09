@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 include_directories(src)
 
-add_library(${PROJECT_NAME}
+add_library(${PROJECT_NAME} STATIC
         src/lapi.c
         src/lapi.h
         src/lauxlib.c
@@ -55,10 +55,10 @@ add_library(${PROJECT_NAME}
         src/ltablib.c
         src/ltm.c
         src/ltm.h
-        src/lua.c
-        src/lua.h
+        #src/lua.c
+        #src/lua.h
         src/lua.hpp
-        src/luac.c
+        #src/luac.c
         src/luaconf.h
         src/lualib.h
         src/lundump.c

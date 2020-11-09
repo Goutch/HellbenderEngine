@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="zlib"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\include\;CMake Files\include\assimp\;CMake Files\cmake-modules\;CMake Files\cmake\;CMake Files\contrib\;CMake Files\contrib\zlib\;CMake Files\code\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/user/Documents/Projects/HellbenderEngine/HBE/dependencies/assimp/build/contrib/zlib"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/home/user/Documents/Projects/HellbenderEngine/HBE/dependencies/assimp/build/contrib/zlib/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -f &quot;/home/user/Documents/Projects/HellbenderEngine/HBE/dependencies/assimp/build/contrib/zlib/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/home/user/Documents/Projects/HellbenderEngine/HBE/dependencies/assimp/build/contrib/zlib/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/home/user/Documents/Projects/HellbenderEngine/HBE/dependencies/assimp/build/contrib/zlib/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="zlibstatic">
+				<Option output="/home/user/Documents/Projects/HellbenderEngine/HBE/dependencies/assimp/build/contrib/zlib/libzlibstatic.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/user/Documents/Projects/HellbenderEngine/HBE/dependencies/assimp/build/contrib/zlib"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D_LARGEFILE64_SOURCE=1"/>
+					<Add directory="/home/user/Documents/Projects/HellbenderEngine/HBE/dependencies/assimp/build/include"/>
+					<Add directory="/home/user/Documents/Projects/HellbenderEngine/HBE/dependencies/assimp/build"/>
+					<Add directory="/home/user/Documents/Projects/assimp/include"/>
+					<Add directory="/home/user/Documents/Projects/assimp/code"/>
+					<Add directory="/home/user/Documents/Projects/assimp/."/>
+					<Add directory="/home/user/Documents/Projects/HellbenderEngine/HBE/dependencies/assimp/build/contrib/zlib"/>
+					<Add directory="/home/user/Documents/Projects/assimp"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/home/user/Documents/Projects/HellbenderEngine/HBE/dependencies/assimp/build/contrib/zlib/Makefile&quot;  VERBOSE=1 zlibstatic"/>
+					<CompileFile command="/usr/bin/make -f &quot;/home/user/Documents/Projects/HellbenderEngine/HBE/dependencies/assimp/build/contrib/zlib/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/home/user/Documents/Projects/HellbenderEngine/HBE/dependencies/assimp/build/contrib/zlib/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/home/user/Documents/Projects/HellbenderEngine/HBE/dependencies/assimp/build/contrib/zlib/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="zlibstatic/fast">
+				<Option output="/home/user/Documents/Projects/HellbenderEngine/HBE/dependencies/assimp/build/contrib/zlib/libzlibstatic.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/user/Documents/Projects/HellbenderEngine/HBE/dependencies/assimp/build/contrib/zlib"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D_LARGEFILE64_SOURCE=1"/>
+					<Add directory="/home/user/Documents/Projects/HellbenderEngine/HBE/dependencies/assimp/build/include"/>
+					<Add directory="/home/user/Documents/Projects/HellbenderEngine/HBE/dependencies/assimp/build"/>
+					<Add directory="/home/user/Documents/Projects/assimp/include"/>
+					<Add directory="/home/user/Documents/Projects/assimp/code"/>
+					<Add directory="/home/user/Documents/Projects/assimp/."/>
+					<Add directory="/home/user/Documents/Projects/HellbenderEngine/HBE/dependencies/assimp/build/contrib/zlib"/>
+					<Add directory="/home/user/Documents/Projects/assimp"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/home/user/Documents/Projects/HellbenderEngine/HBE/dependencies/assimp/build/contrib/zlib/Makefile&quot;  VERBOSE=1 zlibstatic/fast"/>
+					<CompileFile command="/usr/bin/make -f &quot;/home/user/Documents/Projects/HellbenderEngine/HBE/dependencies/assimp/build/contrib/zlib/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/home/user/Documents/Projects/HellbenderEngine/HBE/dependencies/assimp/build/contrib/zlib/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/home/user/Documents/Projects/HellbenderEngine/HBE/dependencies/assimp/build/contrib/zlib/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/user/Documents/Projects/HellbenderEngine/HBE/dependencies/assimp/build/contrib/zlib/zconf.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/adler32.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/compress.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/crc32.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/crc32.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/deflate.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/deflate.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/gzclose.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/gzguts.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/gzlib.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/gzread.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/gzwrite.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/infback.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/inffast.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/inffast.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/inffixed.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/inflate.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/inflate.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/inftrees.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/inftrees.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/trees.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/trees.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/uncompr.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/zlib.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/zutil.c">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/zutil.h">
+			<Option target="zlibstatic"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/assimp.pc.in">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/revision.h.in">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/include/assimp/config.h.in">
+			<Option virtualFolder="CMake Files\include\assimp\"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/cmake-modules/FindPkgMacros.cmake">
+			<Option virtualFolder="CMake Files\cmake-modules\"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/cmake-modules/FindRT.cmake">
+			<Option virtualFolder="CMake Files\cmake-modules\"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/cmake-modules/PrecompiledHeader.cmake">
+			<Option virtualFolder="CMake Files\cmake-modules\"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/cmake/assimp-plain-config.cmake.in">
+			<Option virtualFolder="CMake Files\cmake\"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\contrib\zlib\"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/zconf.h.cmakein">
+			<Option virtualFolder="CMake Files\contrib\zlib\"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/contrib/zlib/zlib.pc.cmakein">
+			<Option virtualFolder="CMake Files\contrib\zlib\"/>
+		</Unit>
+		<Unit filename="/home/user/Documents/Projects/assimp/code/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\code\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

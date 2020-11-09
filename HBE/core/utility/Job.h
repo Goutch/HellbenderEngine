@@ -7,6 +7,7 @@
 
 class  IJob {
 public:
+    virtual ~IJob(){};
     virtual bool isFinish() = 0;
 
     virtual void onFinish() = 0;

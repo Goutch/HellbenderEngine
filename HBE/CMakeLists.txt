@@ -3,17 +3,18 @@ set(CMAKE_CXX_STANDARD 17)
 
 project(HBE CXX)
 
-
-#add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
+set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall --std=c++17 -O3 -fPIC" )
+set( CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -Wall -O3 -fPIC" )
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/")
-
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb/")
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/lua/")
 
 #add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/")
-set(CMAKE_GENERATOR_PLATFORM x64)
+
+
 include_directories(.)
 set(CORE_FILES
         HBE.cpp
@@ -94,7 +95,7 @@ set(GL_FILES
         graphics/gl/GL_MultisamplingFramebuffer.cpp
         graphics/gl/GL_MultisamplingFramebuffer.h main.cpp)
 
-add_executable(${PROJECT_NAME}
+add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}
         ${GL_FILES}
         ${SCRIPTING_FILES}
@@ -114,9 +115,9 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     message("Using GNU")
     target_link_libraries(${PROJECT_NAME}
-            PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/contrib/zlib/libzlibstatic.a"
             PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/libassimp.a"
-            PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/libglfw3.a"
+            PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/contrib/zlib/libzlibstatic.a"
+            PUBLIC glfw
             PUBLIC glad
             PUBLIC stb
             PUBLIC lua)
@@ -127,9 +128,9 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     # using Visual Studio C++
     message("Using visual studio compiler")
     target_link_libraries(${PROJECT_NAME}
-            PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/contrib/zlib/zlibstatic.lib"
             PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/assimp-vc142-mt.lib"
-            PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/glfw3.lib"
+            PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/contrib/zlib/zlibstatic.lib"
+            PUBLIC glfw
             PUBLIC glad
             PUBLIC stb
             PUBLIC lua)

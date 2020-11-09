@@ -105,7 +105,7 @@ void Camera::calculateFrustumPlanes() {
 }
 
 bool Camera::isPointInFrustum(const vec3 &point) const {
-    for (int i = 0; i < frustum_planes.size(); i++) {
+    for (std::size_t i = 0; i < frustum_planes.size(); i++) {
         if (0 > frustum_planes[i].distance(point)) {
             return false;
         }
@@ -114,7 +114,7 @@ bool Camera::isPointInFrustum(const vec3 &point) const {
 }
 
 bool Camera::isSphereInFrustum(const vec3 &position, float radius) const {
-    for (int i = 0; i < frustum_planes.size(); i++) {
+    for (std::size_t i = 0; i < frustum_planes.size(); i++) {
         if (0 > frustum_planes[i].distance(position) + radius) {
             return false;
         }

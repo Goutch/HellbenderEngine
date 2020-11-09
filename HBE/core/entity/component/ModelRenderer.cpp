@@ -17,7 +17,7 @@ void ModelRenderer::onDraw() {
     if(model)
     {
         auto meshes = model->getMeshes();
-        for (int i = 0; i < meshes.size(); ++i) {
+        for (std::size_t  i = 0; i < meshes.size(); ++i) {
             Graphics::draw(*entity, *meshes[i].first, *meshes[i].second);
         }
     }

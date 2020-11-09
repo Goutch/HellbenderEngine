@@ -68,14 +68,14 @@ std::vector<std::pair<MeshData, MaterialData>> *ModelImporter::load(std::string 
     processNode(scene->mRootNode, scene, meshes);
 
 
-    for (int i = 0; i < meshes->size(); ++i) {
-        for (int j = 0; j < (*meshes)[i].second.diffuse_texture_paths.size(); ++j) {
+    for (size_t i = 0; i < meshes->size(); ++i) {
+        for (size_t j = 0; j < (*meshes)[i].second.diffuse_texture_paths.size(); ++j) {
             (*meshes)[i].second.diffuse_texture_paths[j]=directory+(*meshes)[i].second.diffuse_texture_paths[j];
         }
-        for (int j = 0; j < (*meshes)[i].second.normal_map_paths.size(); ++j) {
+        for (size_t j = 0; j < (*meshes)[i].second.normal_map_paths.size(); ++j) {
             (*meshes)[i].second.normal_map_paths[j]=directory+(*meshes)[i].second.normal_map_paths[j];
         }
-        for (int j = 0; j < (*meshes)[i].second.specular_map_paths.size(); ++j) {
+        for (size_t j = 0; j < (*meshes)[i].second.specular_map_paths.size(); ++j) {
             (*meshes)[i].second.specular_map_paths[j]=directory+(*meshes)[i].second.specular_map_paths[j];
         }
     }

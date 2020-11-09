@@ -11,7 +11,7 @@ class HB_API ShaderProgram:Resource {
     std::map<SHADER_TYPE,std::string> shaders;
 public:
     static ShaderProgram* create();
-
+    virtual ~ShaderProgram(){};
     virtual void bind() const = 0;
 
     virtual void unbind() const = 0;

@@ -42,7 +42,7 @@ void Model::loadAsync(std::string path) {
 void Model::constructModel(std::vector<std::pair<MeshData, MaterialData>> *meshes_data) {
     int vertex_count = 0;
     clearModels();
-    for (int i = 0; i < meshes_data->size(); ++i) {
+    for (std::size_t i = 0; i < meshes_data->size(); ++i) {
         meshes.emplace_back(Mesh::create(), Material::create());
         meshes[i].first->setIndices((*meshes_data)[i].first.indices);
         vertex_count += (*meshes_data)[i].first.indices.size();
@@ -70,7 +70,7 @@ void Model::constructModel(std::vector<std::pair<MeshData, MaterialData>> *meshe
 }
 
 void Model::clearModels() {
-    for (int i = 0; i < meshes.size(); ++i) {
+    for (std::size_t i = 0; i < meshes.size(); ++i) {
         delete meshes[i].first;
         delete meshes[i].second;
     }
