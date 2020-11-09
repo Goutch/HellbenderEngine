@@ -115,7 +115,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     message("Using GNU")
     target_link_libraries(${PROJECT_NAME}
-            PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/code/libassimp.a"
+            PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/libassimp.a"
             PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/contrib/zlib/libzlibstatic.a"
             PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/contrib/irrXML/libIrrXML.a"
             PUBLIC glfw
