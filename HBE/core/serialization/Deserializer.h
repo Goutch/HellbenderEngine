@@ -4,10 +4,10 @@
 
 #include <vector>
 #include "core/utility/Log.h"
-
+#include "Core.h"
 class lua_State;
 
-class Deserializer {
+class HB_API Deserializer {
 private:
     lua_State* L;
 public:

@@ -3,8 +3,9 @@
 #include "Component.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include "Core.h"
 class Camera;
-class CameraController: public Component {
+class HB_API CameraController: public Component {
     Camera* camera;
     float current_pitch=0.0f;
     float max_pitch=M_PI/2;

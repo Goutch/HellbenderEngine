@@ -6,9 +6,9 @@
 #include <set>
 #include "glm/glm.hpp"
 #include "glm/gtx/quaternion.hpp"
-
+#include "Core.h"
 using namespace glm;
-class Transform {
+class HB_API Transform {
 
 protected:
     quat rotation=glm::identity<quat>();

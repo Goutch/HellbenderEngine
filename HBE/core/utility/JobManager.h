@@ -1,8 +1,8 @@
 class IJob;
-
+#include "Core.h"
 #include "Job.h"
 #include "list"
-class JobManager {
+class HB_API JobManager {
 private:
     static std::list<IJob*> running_jobs;
 public:

@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 #include "glm/glm.hpp"
-
+#include "Core.h"
 using namespace glm;
 
 class Renderer;
@@ -24,7 +24,7 @@ class Material;
 template<typename... Args>
 class Event;
 
-class Graphics {
+class HB_API Graphics {
     static Renderer *renderer;
     static GLFWwindow *window;
     static RenderTarget *render_target;

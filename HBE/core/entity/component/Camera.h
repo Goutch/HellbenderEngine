@@ -4,7 +4,7 @@
 #include <array>
 #include <core/math/Plane.h>
 #include <core/entity/component/Component.h>
-
+#include "Core.h"
 class RenderTarget;
 
 enum ClearMode {
@@ -17,7 +17,7 @@ enum RenderMode {
     PERSPECTIVE,
 };
 
-class Camera : public Component {
+class HB_API Camera : public Component {
 private:
     float fov = 80;
     float aspect_ratio = 1;
@@ -29,7 +29,7 @@ private:
     std::array<Plane, 6> frustum_planes;
 
 public:
-    static Camera *main;
+    static  Camera *main;
 
     void onAttach() override;
 

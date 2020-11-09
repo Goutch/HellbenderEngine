@@ -4,10 +4,11 @@
 #include <vector>
 #include "glm/glm.hpp"
 #include "Resource.h"
+#include "Core.h"
 
 using namespace glm;
 
-class Mesh {
+class HB_API Mesh {
 protected:
     unsigned int vertex_count = 0;
     unsigned int index_count = 0;

@@ -3,8 +3,9 @@
 #include "string"
 #include "stack"
 #include "glm/glm.hpp"
+#include "Core.h"
 using namespace glm;
-class Serializer {
+class HB_API Serializer {
     int depth=0;
     std::ofstream file;
     std::string indentation;

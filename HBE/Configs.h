@@ -1,8 +1,8 @@
 #pragma once
 
 #include "core/utility/Event.h"
-
-class Configs {
+#include "Core.h"
+class HB_API Configs {
 public:
     enum CAMERA_MODE {PERSPECTIVE,ORTHOGRAPHIC};
 private:

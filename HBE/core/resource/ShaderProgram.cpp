@@ -21,9 +21,6 @@ void ShaderProgram::serialize(Serializer *serializer) const {
             case SHADER_TYPE::FRAGMENT:
                 serializer->addField("fragment_path",s.second);
                 break;
-            case SHADER_TYPE::COMPUTE:
-                serializer->addField("compute_path",s.second);
-                break;
         }
     }
     serializer->end();

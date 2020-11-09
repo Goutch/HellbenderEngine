@@ -7,76 +7,30 @@
 #include <sstream>
 #include <glm/gtc/type_ptr.hpp>
 
-void GL_ShaderProgram::setShaders(std::string vertex_path, std::string fragment_path) {
-    Log::status("Compiling vertex shader:" + vertex_path);
-    std::string sourcevs;
-    sourcevs = getSource(vertex_path);
-    unsigned int vs = compileShader(GL_VERTEX_SHADER, sourcevs);
-
-    Log::status("Compiling fragment shader:" + fragment_path);
-    std::string sourcefs;
-    sourcefs = getSource(fragment_path);
-    unsigned int fs = compileShader(GL_FRAGMENT_SHADER, sourcefs);
+void GL_ShaderProgram::setShaders(const std::string& vertex,const std::string& fragment , bool is_file) {
+    std::string source_vs;
+    std::string source_fs;
+    if(is_file)
+    {
+        source_vs = getSource(vertex);
+        source_fs = getSource(fragment);
+    } else{
+        source_fs=fragment;
+        source_vs=vertex;
+    }
+    unsigned int vs = compileShader(GL_VERTEX_SHADER, source_vs);
+    unsigned int fs = compileShader(GL_FRAGMENT_SHADER, source_fs);
 
     glAttachShader(program_id, vs);
     glAttachShader(program_id, fs);
     glLinkProgram(program_id);
     glValidateProgram(program_id);
-    Log::debug("program id=" + std::to_string(program_id));
     glDeleteShader(vs);
     glDeleteShader(fs);
 }
 
 GL_ShaderProgram::GL_ShaderProgram() {
     program_id = glCreateProgram();
-}
-
-GL_ShaderProgram::GL_ShaderProgram(const std::string &vertexShader, const std::string &fragmentShader) {
-    program_id = glCreateProgram();
-    setShaders(vertexShader, fragmentShader);
-}
-
-GL_ShaderProgram::GL_ShaderProgram(const std::string &vertexShader, const std::string &geometryShader,
-                                   const std::string &fragmentShader,
-                                   bool source) {
-
-    if (!source)Log::status("Compiling vertex getShader:" + vertexShader);
-    std::string sourcevs;
-    !source ? sourcevs = getSource(vertexShader) : sourcevs = vertexShader;
-    unsigned int vs = compileShader(GL_VERTEX_SHADER, sourcevs);
-
-    if (!source)Log::status("Compiling geometry getShader:" + geometryShader);
-    std::string sourcegs;
-    !source ? sourcegs = getSource(geometryShader) : sourcegs = geometryShader;
-    unsigned int gs = compileShader(GL_GEOMETRY_SHADER, sourcegs);
-
-    if (!source)Log::status("Compiling fragment getShader:" + fragmentShader);
-    std::string sourcefs;
-    !source ? sourcefs = getSource(fragmentShader) : sourcefs = fragmentShader;
-    unsigned int fs = compileShader(GL_FRAGMENT_SHADER, sourcefs);
-
-    glAttachShader(program_id, vs);
-    glAttachShader(program_id, gs);
-    glAttachShader(program_id, fs);
-    glLinkProgram(program_id);
-    glValidateProgram(program_id);
-    Log::debug("program id=" + std::to_string(program_id));
-    glDeleteShader(vs);
-    glDeleteShader(gs);
-    glDeleteShader(fs);
-
-}
-void GL_ShaderProgram::setComputeShader(std::string compute_path) {
-    Log::status("Compiling compute shader:" + compute_path);
-    std::string source_cs;
-    source_cs = getSource(compute_path);
-    unsigned int cs = compileShader(GL_COMPUTE_SHADER, source_cs);
-
-    glAttachShader(program_id, cs);
-    glLinkProgram(program_id);
-    glValidateProgram(program_id);
-    Log::debug("program id=" + std::to_string(program_id));
-    glDeleteShader(cs);
 }
 
 GL_ShaderProgram::~GL_ShaderProgram() {

@@ -1,6 +1,7 @@
 #pragma once
 #include "glm/glm.hpp"
-struct Plane {
+#include "Core.h"
+struct HB_API Plane {
     glm::vec3 normal;
     float d;
     Plane(){}

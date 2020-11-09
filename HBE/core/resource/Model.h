@@ -3,7 +3,8 @@
 #include <core/utility/Log.h>
 #include "core/utility/ModelImporter.h"
 #include "Resource.h"
-class Model :Resource{
+#include "Core.h"
+class HB_API Model :Resource{
     std::string path;
     std::vector<std::pair<Mesh *,Material *>> meshes;
     void clearModels();

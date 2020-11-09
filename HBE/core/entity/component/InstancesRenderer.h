@@ -4,8 +4,8 @@
 #include <core/resource/Mesh.h>
 #include <core/entity/Transform.h>
 #include "Component.h"
-
-class InstancesRenderer : public Component {
+#include "Core.h"
+class HB_API InstancesRenderer : public Component {
 
     Mesh *mesh;
     const Material *material;

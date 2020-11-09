@@ -2,7 +2,8 @@
 
 #include <string>
 #include "Resource.h"
-class Texture :Resource{
+#include "Core.h"
+class HB_API Texture :Resource{
 private:
     std::string path;
 protected:

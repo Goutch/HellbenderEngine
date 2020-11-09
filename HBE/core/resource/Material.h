@@ -5,6 +5,7 @@
 #include "core/graphics/Graphics.h"
 #include "unordered_map"
 #include "Resource.h"
+#include "Core.h"
 enum GLSL_TYPE{
     FLOAT,
     VEC2,
@@ -16,7 +17,7 @@ enum GLSL_TYPE{
 
 using namespace glm;
 
-struct MaterialProperty
+struct HB_API MaterialProperty
 {
     GLSL_TYPE type;
     void* value;
@@ -50,7 +51,7 @@ struct MaterialProperty
         value=new mat4(v);
     }
 };
-class Material:Resource{
+class HB_API Material:Resource{
     const ShaderProgram *shader= nullptr;
     const Texture *texture = nullptr;
     const Texture *normal_map = nullptr;

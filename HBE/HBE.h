@@ -35,6 +35,7 @@
 #include <core/serialization/Serializer.h>
 
 #include <glm/glm.hpp>
+#include "Core.h"
 using namespace glm;
 class GLFWwindow;
 
@@ -42,7 +43,7 @@ class Scene;
 
 class Clock;
 
-class HBE {
+class HB_API HBE {
     static GLFWwindow *window;
     static Clock* time;
     static int fps_counter;

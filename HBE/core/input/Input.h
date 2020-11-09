@@ -1,7 +1,7 @@
 #pragma once
 
 struct GLFWwindow;
-
+#include "Core.h"
 enum KEY {
     UNKNOWN = -1,
     SPACE = 32,
@@ -126,7 +126,7 @@ enum KEY {
     MENU = 348,
 };
 
-class Input {
+class HB_API Input {
 
     static GLFWwindow *window;
     static float wheel_offset;

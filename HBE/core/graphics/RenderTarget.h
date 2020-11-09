@@ -6,10 +6,10 @@ class ShaderProgram;
 
 #include "glm/glm.hpp"
 #include "core/utility/Event.h"
-
+#include "Core.h"
 using namespace glm;
 
-class RenderTarget {
+class HB_API RenderTarget {
     unsigned int width;
     unsigned int heigth;
     mat4 projection_matrix;

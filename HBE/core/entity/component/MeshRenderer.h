@@ -1,10 +1,10 @@
 #pragma once
 
-
+#include "Core.h"
 #include <core/entity/component/Component.h>
 class Material;
 class Mesh;
-class MeshRenderer : public Component {
+class HB_API MeshRenderer : public Component {
     const Mesh *mesh;
     const Material *material;
 

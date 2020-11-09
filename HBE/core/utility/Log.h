@@ -1,8 +1,8 @@
 #pragma once
-
+#include "Core.h"
 #include "string"
 #define error(s,...) error_(s, __LINE__,__FILE__,__func__)
-class Log {
+class HB_API Log {
 public:
     enum LogLevel{
         DEBUG = 5,

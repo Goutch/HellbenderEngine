@@ -1,13 +1,13 @@
 #pragma once
-
+#include "Core.h"
 #include <core/resource/Mesh.h>
-struct UsedBuffers
+struct HB_API UsedBuffers
 {
     bool vertex_position=true;
     bool vertex_uv=true;
     bool vertex_normal=true;
 };
-class Geometry {
+class HB_API Geometry {
 
 
 public:

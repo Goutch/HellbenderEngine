@@ -1,12 +1,12 @@
 #pragma once
-
+#include "Core.h"
 #include <functional>
 #include "lua.hpp"
 #include "string"
 #include "tuple"
 #include "vector"
 #include "core/utility/Event.h"
-class ScriptManager {
+class HB_API ScriptManager {
     static lua_State *L;
 
 public:

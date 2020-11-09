@@ -5,7 +5,8 @@
 #define SECONDS_TO_NANOSECOND 1000000000
 
 #define SECOND_TO_MILISECOND 1000
-class Clock {
+#include "Core.h"
+class HB_API Clock {
     std::chrono::high_resolution_clock ::time_point start_time;
 
 public:

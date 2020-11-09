@@ -3,10 +3,11 @@
 #include "glm/glm.hpp"
 #include "string"
 #include "map"
+#include "Core.h"
 enum class SHADER_TYPE{
     COMPUTE,VERTEX,FRAGMENT
 };
-class ShaderProgram:Resource {
+class HB_API ShaderProgram:Resource {
     std::map<SHADER_TYPE,std::string> shaders;
 public:
     static ShaderProgram* create();
@@ -15,9 +16,7 @@ public:
 
     virtual void unbind() const = 0;
 
-    virtual void setShaders(std::string vertex_path, std::string fragment_path) = 0;
-
-    virtual void setComputeShader(std::string compute_path) = 0;
+    virtual void setShaders(const std::string& vertex,const std::string& fragment,bool is_file=true) = 0;
 
     virtual void setUniform(std::string name, int i) const = 0;
 

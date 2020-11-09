@@ -2,12 +2,12 @@
 
 #include <core/resource/Resource.h>
 #include "glm/glm.hpp"
-
+#include "Core.h"
 using namespace glm;
 
 class Entity;
 
-class Component :Resource {
+class HB_API Component :Resource {
     bool subscribed_draw=false;
     bool subscribed_update=false;
 protected:

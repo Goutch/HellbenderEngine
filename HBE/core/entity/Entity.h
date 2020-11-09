@@ -6,8 +6,8 @@
 #include <core/entity/component/Component.h>
 #include <core/resource/Resource.h>
 
-
-class Entity : public Transform, public Resource {
+#include "Core.h"
+class HB_API Entity : public Transform, public Resource {
     friend class Scene;
 
     std::vector<Entity *> children;

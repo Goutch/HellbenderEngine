@@ -2,7 +2,7 @@
 
 #include "vector"
 #include "glm/glm.hpp"
-
+#include "Core.h"
 using namespace glm;
 
 class RenderTarget;

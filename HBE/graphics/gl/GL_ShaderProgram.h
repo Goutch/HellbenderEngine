@@ -20,19 +20,13 @@ private:
 
 public:
     GL_ShaderProgram();
-    GL_ShaderProgram(const std::string &vertexShader, const std::string &fragmentShader);
-
-    GL_ShaderProgram(const std::string &vertexShader,
-                     const std::string &geometryShader,
-                     const std::string &fragmentShader,
-                     bool source = false);
 
     ~GL_ShaderProgram();
 
     void bind() const override;
 
-    void setShaders(std::string vertex_path, std::string fragment_path) override;
-    void setComputeShader(std::string compute_path) override ;
+    void setShaders(const std::string& vertex,const std::string& fragment, bool is_file) override;
+
     void unbind() const override;
 
 

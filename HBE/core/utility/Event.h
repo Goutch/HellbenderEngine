@@ -3,9 +3,9 @@
 #include "unordered_set"
 #include "functional"
 #include "Function.h"
-
+#include "Core.h"
 template<typename... Args>
-class Event {
+class HB_API Event {
     std::unordered_set<void (*)(Args...)> static_callbacks;
     std::unordered_map<void *, std::function<void(Args...)>> instances_callbacks;
 public:

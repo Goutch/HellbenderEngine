@@ -4,8 +4,8 @@
 #include <string>
 #include "Entity.h"
 #include "unordered_set"
-
-class Scene :public Resource{
+#include "Core.h"
+class HB_API Scene :public Resource{
     std::vector<Entity *> entities;
     std::unordered_set<Component *> update_listeners;
     std::unordered_set<Component *> draw_listeners;

@@ -1,10 +1,10 @@
 #pragma once
 
-
+#include "Core.h"
 #include <core/entity/component/Component.h>
 class Material;
 class Model;
-class ModelRenderer : public Component {
+class HB_API ModelRenderer : public Component {
     const Model *model;
 
 public:

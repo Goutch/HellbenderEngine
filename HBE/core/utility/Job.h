@@ -1,11 +1,11 @@
 #pragma once
-
+#include "Core.h"
 #include <thread>
 #include "Function.h"
 #include <future>
 #include "Log.h"
 
-class IJob {
+class  IJob {
 public:
     virtual bool isFinish() = 0;
 
@@ -13,7 +13,7 @@ public:
 };
 
 template<typename Return, typename... Args>
-class Job : public IJob {
+class HB_API Job : public IJob {
     friend class JobManager;
     std::future<Return> result;
     std::function<void(Return)> finish_callback;

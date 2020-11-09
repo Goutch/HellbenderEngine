@@ -26,7 +26,7 @@ void Editor::start() {
     ImGuiIO &io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     ImGui_ImplGlfw_InitForOpenGL(Graphics::getWindow(), true);
-    ImGui_ImplOpenGL3_Init("#version 430 core");
+    ImGui_ImplOpenGL3_Init("#version 330 core");
     setStyle();
     HBE::onRender.subscribe(this, &Editor::onRender);
     Graphics::onWindowSizeChange.subscribe(this, &Editor::onWindowSizeChange);
