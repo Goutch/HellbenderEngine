@@ -115,8 +115,9 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     message("Using GNU")
     target_link_libraries(${PROJECT_NAME}
-            PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/libassimp.a"
+            PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/code/libassimp.a"
             PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/contrib/zlib/libzlibstatic.a"
+            PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/contrib/irrXML/libIrrXML.a"
             PUBLIC glfw
             PUBLIC glad
             PUBLIC stb
@@ -130,16 +131,17 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     target_link_libraries(${PROJECT_NAME}
             PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/assimp-vc142-mt.lib"
             PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/contrib/zlib/zlibstatic.lib"
+            #PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/contrib/irrXML/libIrrXML.lib"
             PUBLIC glfw
             PUBLIC glad
             PUBLIC stb
             PUBLIC lua)
 endif ()
-#target_link_libraries(${PROJECT_NAME} PUBLIC assimp)
-#target_link_libraries(${PROJECT_NAME} PUBLIC glfw)
-#target_link_libraries(${PROJECT_NAME} PUBLIC glad)
-#target_link_libraries(${PROJECT_NAME} PUBLIC stb)
-#target_link_libraries(${PROJECT_NAME} PUBLIC lua)
+target_link_libraries(${PROJECT_NAME} PUBLIC assimp)
+target_link_libraries(${PROJECT_NAME} PUBLIC glfw)
+target_link_libraries(${PROJECT_NAME} PUBLIC glad)
+target_link_libraries(${PROJECT_NAME} PUBLIC stb)
+target_link_libraries(${PROJECT_NAME} PUBLIC lua)
 
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE HB_BUILD)

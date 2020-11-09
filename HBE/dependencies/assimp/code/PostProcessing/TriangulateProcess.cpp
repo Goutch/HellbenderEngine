@@ -3,7 +3,7 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2020, assimp team
+Copyright (c) 2006-2019, assimp team
 
 All rights reserved.
 
@@ -64,7 +64,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Common/PolyTools.h"
 
 #include <memory>
-#include <cstdint>
 
 //#define AI_BUILD_TRIANGULATE_COLOR_FACE_WINDING
 //#define AI_BUILD_TRIANGULATE_DEBUG_POLYS
@@ -142,7 +141,7 @@ bool TriangulateProcess::TriangulateMesh( aiMesh* pMesh)
     }
 
     // Find out how many output faces we'll get
-    uint32_t numOut = 0, max_out = 0;
+    unsigned int numOut = 0, max_out = 0;
     bool get_normals = true;
     for( unsigned int a = 0; a < pMesh->mNumFaces; a++) {
         aiFace& face = pMesh->mFaces[a];
@@ -162,7 +161,7 @@ bool TriangulateProcess::TriangulateMesh( aiMesh* pMesh)
     // Just another check whether aiMesh::mPrimitiveTypes is correct
     ai_assert(numOut != pMesh->mNumFaces);
 
-    aiVector3D *nor_out = nullptr;
+    aiVector3D* nor_out = NULL;
 
     // if we don't have normals yet, but expect them to be a cheap side
     // product of triangulation anyway, allocate storage for them.
@@ -221,7 +220,7 @@ bool TriangulateProcess::TriangulateMesh( aiMesh* pMesh)
             nface.mNumIndices = face.mNumIndices;
             nface.mIndices    = face.mIndices;
 
-            face.mIndices = nullptr;
+            face.mIndices = NULL;
             continue;
         }
         // optimized code for quadrilaterals
@@ -273,7 +272,7 @@ bool TriangulateProcess::TriangulateMesh( aiMesh* pMesh)
             sface.mIndices[2] = temp[(start_vertex + 3) % 4];
 
             // prevent double deletion of the indices field
-            face.mIndices = nullptr;
+            face.mIndices = NULL;
             continue;
         }
         else
@@ -420,7 +419,7 @@ bool TriangulateProcess::TriangulateMesh( aiMesh* pMesh)
                     num = 0;
                     break;
 
-                    /*curOut -= (max-num); // undo all previous work 
+                    curOut -= (max-num); /* undo all previous work */
                     for (tmp = 0; tmp < max-2; ++tmp) {
                         aiFace& nface = *curOut++;
 
@@ -434,7 +433,7 @@ bool TriangulateProcess::TriangulateMesh( aiMesh* pMesh)
 
                     }
                     num = 0;
-                    break;*/
+                    break;
                 }
 
                 aiFace& nface = *curOut++;
@@ -491,7 +490,7 @@ bool TriangulateProcess::TriangulateMesh( aiMesh* pMesh)
             //  drop dumb 0-area triangles - deactivated for now:
             //FindDegenerates post processing step can do the same thing
             //if (std::fabs(GetArea2D(temp_verts[i[0]],temp_verts[i[1]],temp_verts[i[2]])) < 1e-5f) {
-            //    ASSIMP_LOG_VERBOSE_DEBUG("Dropping triangle with area 0");
+            //    ASSIMP_LOG_DEBUG("Dropping triangle with area 0");
             //    --curOut;
 
             //    delete[] f->mIndices;
@@ -512,7 +511,7 @@ bool TriangulateProcess::TriangulateMesh( aiMesh* pMesh)
         }
 
         delete[] face.mIndices;
-        face.mIndices = nullptr;
+        face.mIndices = NULL;
     }
 
 #ifdef AI_BUILD_TRIANGULATE_DEBUG_POLYS

@@ -3,7 +3,7 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2020, assimp team
+Copyright (c) 2006-2019, assimp team
 
 
 
@@ -85,7 +85,7 @@ int main (int argc, char* argv[])
 {
 	if (argc <= 1)	{
 		printf("assimp: No command specified. Use \'assimp help\' for a detailed command list\n");
-		return AssimpCmdError::Success;
+		return 0;
 	}
 
 	// assimp version
@@ -102,7 +102,7 @@ int main (int argc, char* argv[])
 			(flags & ASSIMP_CFLAGS_STLPORT ?		"-stlport " : ""),
 			aiGetVersionRevision());
 
-		return AssimpCmdError::Success;
+		return 0;
 	}
 
 	// assimp help
@@ -110,7 +110,7 @@ int main (int argc, char* argv[])
 	// because people could try them intuitively)
 	if (!strcmp(argv[1], "help") || !strcmp(argv[1], "--help") || !strcmp(argv[1], "-h")) {
 		printf("%s",AICMD_MSG_HELP);
-		return AssimpCmdError::Success;
+		return 0;
 	}
 
 	// assimp cmpdump
@@ -137,7 +137,7 @@ int main (int argc, char* argv[])
 		imp.GetExtensionList(s);
 
 		printf("%s\n",s.data);
-		return AssimpCmdError::Success;
+		return 0;
 	}
 
 #ifndef ASSIMP_BUILD_NO_EXPORT
@@ -155,7 +155,7 @@ int main (int argc, char* argv[])
 		}
 
 		printf("%s\n",s.data);
-		return AssimpCmdError::Success;
+		return 0;
 	}
 
 
@@ -166,19 +166,19 @@ int main (int argc, char* argv[])
 
 		if (argc<3) {
 			printf("Expected file format id\n");
-			return AssimpCmdError::NoFileFormatSpecified;
+			return -11;
 		}
 
 		for(size_t i = 0, end = exp.GetExportFormatCount(); i < end; ++i) {
 			const aiExportFormatDesc* const e = exp.GetExportFormatDescription(i);
 			if (!strcmp(e->id,argv[2])) {
 				printf("%s\n%s\n%s\n",e->id,e->fileExtension,e->description);
-				return AssimpCmdError::Success;
+				return 0;
 			}
 		}
 		
 		printf("Unknown file format id: \'%s\'\n",argv[2]);
-		return AssimpCmdError::UnknownFileFormat;
+		return -12;
 	}
 
 	// assimp export
@@ -194,11 +194,11 @@ int main (int argc, char* argv[])
 	if (! strcmp(argv[1], "knowext")) {
 		if (argc<3) {
 			printf("Expected file extension");
-			return AssimpCmdError::NoFileExtensionSpecified;
+			return -10;
 		}
 		const bool b = imp.IsExtensionSupported(argv[2]);
 		printf("File extension \'%s\'  is %sknown\n",argv[2],(b?"":"not "));
-		return b? AssimpCmdError::Success : AssimpCmdError::UnknownFileExtension;
+		return b?0:-1;
 	}
 
 	// assimp info
@@ -228,7 +228,7 @@ int main (int argc, char* argv[])
 	}
 
 	printf("Unrecognized command. Use \'assimp help\' for a detailed command list\n");
-	return AssimpCmdError::UnrecognizedCommand;
+	return 1;
 }
 
 
@@ -505,7 +505,7 @@ int ProcessStandardArguments(
 		fill.log = true;
 	}
 
-	return AssimpCmdError::Success;
+	return 0;
 }
 
 // ------------------------------------------------------------------------------
@@ -517,5 +517,5 @@ int Assimp_TestBatchLoad (
 		globalImporter->ReadFile(params[i],aiProcessPreset_TargetRealtime_MaxQuality);
 		// we're totally silent. scene destructs automatically.
 	}
-	return AssimpCmdError::Success;
+	return 0;
 }

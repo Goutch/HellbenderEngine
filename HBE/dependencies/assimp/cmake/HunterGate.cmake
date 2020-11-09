@@ -1,4 +1,4 @@
-# Copyright (c) 2013-2019, Ruslan Baratov
+# Copyright (c) 2013-2018, Ruslan Baratov
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -60,7 +60,7 @@ option(HUNTER_STATUS_PRINT "Print working status" ON)
 option(HUNTER_STATUS_DEBUG "Print a lot info" OFF)
 option(HUNTER_TLS_VERIFY "Enable/disable TLS certificate checking on downloads" ON)
 
-set(HUNTER_ERROR_PAGE "https://docs.hunter.sh/en/latest/reference/errors")
+set(HUNTER_WIKI "https://github.com/ruslo/hunter/wiki")
 
 function(hunter_gate_status_print)
   if(HUNTER_STATUS_PRINT OR HUNTER_STATUS_DEBUG)
@@ -79,9 +79,9 @@ function(hunter_gate_status_debug)
   endif()
 endfunction()
 
-function(hunter_gate_error_page error_page)
-  message("------------------------------ ERROR ------------------------------")
-  message("    ${HUNTER_ERROR_PAGE}/${error_page}.html")
+function(hunter_gate_wiki wiki_page)
+  message("------------------------------ WIKI -------------------------------")
+  message("    ${HUNTER_WIKI}/${wiki_page}")
   message("-------------------------------------------------------------------")
   message("")
   message(FATAL_ERROR "")
@@ -94,13 +94,14 @@ function(hunter_gate_internal_error)
   endforeach()
   message("[hunter ** INTERNAL **] [Directory:${CMAKE_CURRENT_LIST_DIR}]")
   message("")
-  hunter_gate_error_page("error.internal")
+  hunter_gate_wiki("error.internal")
 endfunction()
 
 function(hunter_gate_fatal_error)
-  cmake_parse_arguments(hunter "" "ERROR_PAGE" "" "${ARGV}")
-  if("${hunter_ERROR_PAGE}" STREQUAL "")
-    hunter_gate_internal_error("Expected ERROR_PAGE")
+  cmake_parse_arguments(hunter "" "WIKI" "" "${ARGV}")
+  string(COMPARE EQUAL "${hunter_WIKI}" "" have_no_wiki)
+  if(have_no_wiki)
+    hunter_gate_internal_error("Expected wiki")
   endif()
   message("")
   foreach(x ${hunter_UNPARSED_ARGUMENTS})
@@ -108,11 +109,11 @@ function(hunter_gate_fatal_error)
   endforeach()
   message("[hunter ** FATAL ERROR **] [Directory:${CMAKE_CURRENT_LIST_DIR}]")
   message("")
-  hunter_gate_error_page("${hunter_ERROR_PAGE}")
+  hunter_gate_wiki("${hunter_WIKI}")
 endfunction()
 
 function(hunter_gate_user_error)
-  hunter_gate_fatal_error(${ARGV} ERROR_PAGE "error.incorrect.input.data")
+  hunter_gate_fatal_error(${ARGV} WIKI "error.incorrect.input.data")
 endfunction()
 
 function(hunter_gate_self root version sha1 result)
@@ -194,7 +195,7 @@ function(hunter_gate_detect_root)
 
   hunter_gate_fatal_error(
       "Can't detect HUNTER_ROOT"
-      ERROR_PAGE "error.detect.hunter.root"
+      WIKI "error.detect.hunter.root"
   )
 endfunction()
 
@@ -213,7 +214,7 @@ function(hunter_gate_download dir)
         "Settings:"
         "  HUNTER_ROOT: ${HUNTER_GATE_ROOT}"
         "  HUNTER_SHA1: ${HUNTER_GATE_SHA1}"
-        ERROR_PAGE "error.run.install"
+        WIKI "error.run.install"
     )
   endif()
   string(COMPARE EQUAL "${dir}" "" is_bad)
@@ -399,7 +400,7 @@ macro(HunterGate)
       hunter_gate_fatal_error(
           "Please set HunterGate *before* 'project' command. "
           "Detected project: ${PROJECT_NAME}"
-          ERROR_PAGE "error.huntergate.before.project"
+          WIKI "error.huntergate.before.project"
       )
     endif()
 
@@ -469,7 +470,7 @@ macro(HunterGate)
             "HUNTER_ROOT (${HUNTER_GATE_ROOT}) contains spaces."
             "Set HUNTER_ALLOW_SPACES_IN_PATH=ON to skip this error"
             "(Use at your own risk!)"
-            ERROR_PAGE "error.spaces.in.hunter.root"
+            WIKI "error.spaces.in.hunter.root"
         )
       endif()
     endif()

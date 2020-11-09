@@ -4,7 +4,7 @@ Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
 Copyright (C) 2016 The Qt Company Ltd.
-Copyright (c) 2006-2020, assimp team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -70,7 +70,7 @@ aiAnimMesh *aiCreateAnimMesh(const aiMesh *mesh)
             animesh->mColors[i] = new aiColor4D[animesh->mNumVertices];
             std::memcpy(animesh->mColors[i], mesh->mColors[i], mesh->mNumVertices * sizeof(aiColor4D));
         } else {
-            animesh->mColors[i] = nullptr;
+            animesh->mColors[i] = NULL;
         }
     }
 
@@ -79,7 +79,7 @@ aiAnimMesh *aiCreateAnimMesh(const aiMesh *mesh)
             animesh->mTextureCoords[i] = new aiVector3D[animesh->mNumVertices];
             std::memcpy(animesh->mTextureCoords[i], mesh->mTextureCoords[i], mesh->mNumVertices * sizeof(aiVector3D));
         } else {
-            animesh->mTextureCoords[i] = nullptr;
+            animesh->mTextureCoords[i] = NULL;
         }
     }
     return animesh;

@@ -36,7 +36,7 @@
 #include <arm_neon.h>
 #endif
 
-#if defined (_MSC_VER) && !defined(__clang__)
+#ifdef _MSC_VER
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
 #endif
@@ -700,11 +700,11 @@ inline bool Writer<StringBuffer>::ScanWriteUnescapedString(StringStream& is, siz
 
 RAPIDJSON_NAMESPACE_END
 
-#if defined(_MSC_VER) && !defined(__clang__)
+#ifdef _MSC_VER
 RAPIDJSON_DIAG_POP
 #endif
 
-#if defined(__clang__)
+#ifdef __clang__
 RAPIDJSON_DIAG_POP
 #endif
 

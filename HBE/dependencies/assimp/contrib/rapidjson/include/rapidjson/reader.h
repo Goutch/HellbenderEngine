@@ -37,7 +37,7 @@
 #include <arm_neon.h>
 #endif
 
-#if defined(_MSC_VER) && !defined(__clang__)
+#ifdef _MSC_VER
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(4127)  // conditional expression is constant
 RAPIDJSON_DIAG_OFF(4702)  // unreachable code
@@ -2214,7 +2214,7 @@ RAPIDJSON_DIAG_POP
 RAPIDJSON_DIAG_POP
 #endif
 
-#if defined(_MSC_VER) && !defined(__clang__)
+#ifdef _MSC_VER
 RAPIDJSON_DIAG_POP
 #endif
 

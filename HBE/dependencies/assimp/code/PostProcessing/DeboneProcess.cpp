@@ -2,7 +2,7 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2020, assimp team
+Copyright (c) 2006-2019, assimp team
 
 
 All rights reserved.
@@ -414,8 +414,7 @@ void DeboneProcess::UpdateNode(aiNode* pNode) const
     }
 
     if( pNode->mNumMeshes > 0 ) {
-        delete[] pNode->mMeshes;
-        pNode->mMeshes = nullptr;
+        delete [] pNode->mMeshes; pNode->mMeshes = NULL;
     }
 
     pNode->mNumMeshes = static_cast<unsigned int>(newMeshList.size());

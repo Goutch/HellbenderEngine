@@ -2,7 +2,7 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2020, assimp team
+Copyright (c) 2006-2019, assimp team
 
 
 All rights reserved.
@@ -55,9 +55,7 @@ void CommentRemover::RemoveLineComments(const char* szComment,
     char* szBuffer, char chReplacement /* = ' ' */)
 {
     // validate parameters
-    ai_assert(nullptr != szComment);
-    ai_assert(nullptr != szBuffer);
-    ai_assert(*szComment);
+    ai_assert(NULL != szComment && NULL != szBuffer && *szComment);
 
     const size_t len = strlen(szComment);
     while (*szBuffer)   {
@@ -85,11 +83,8 @@ void CommentRemover::RemoveMultiLineComments(const char* szCommentStart,
     char chReplacement)
 {
     // validate parameters
-    ai_assert(nullptr != szCommentStart);
-    ai_assert(nullptr != szCommentEnd);
-    ai_assert(nullptr != szBuffer);
-    ai_assert(*szCommentStart);
-    ai_assert(*szCommentEnd);
+    ai_assert(NULL != szCommentStart && NULL != szCommentEnd &&
+        NULL != szBuffer && *szCommentStart && *szCommentEnd);
 
     const size_t len  = strlen(szCommentEnd);
     const size_t len2 = strlen(szCommentStart);
