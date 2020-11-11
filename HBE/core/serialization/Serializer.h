@@ -1,30 +1,38 @@
 #pragma once
-#include <fstream>
-#include "string"
-#include "stack"
+
+
 #include "glm/glm.hpp"
 #include "Core.h"
+
 using namespace glm;
+
 class HB_API Serializer {
-    int depth=0;
-    std::ofstream file;
-    std::string indentation;
-    std::stack<bool> arrays;
 public:
-    Serializer(std::string file_path);
+    Serializer();
+
     ~Serializer();
-    void begin(std::string name);
-    void end();
-    void beginArray(std::string name);
-    void endArray();
 
-    void addField(std::string name,std::string value);
-    void addField(std::string name,int value);
-    void addField(std::string name,float value);
-    void addField(std::string name,bool value);
-    void addField(std::string name,vec3 value);
-    void addField(std::string name,vec2 value);
-    void addField(std::string name,vec4 value);
-    void addField(std::string name,quat value);
+    virtual void begin(const std::string& name) = 0;
 
+    virtual void end() = 0;
+
+    virtual void beginArray(const std::string& name) = 0;
+
+    virtual void endArray()=0;
+
+    virtual void addField(const std::string &name,const std::string& value) = 0;
+
+    virtual void addField(const std::string &name, int value) = 0;
+
+    virtual void addField(const std::string &name, float value) = 0;
+
+    virtual void addField(const std::string &name, bool value) = 0;
+
+    virtual void addField(const std::string &name, vec3 value) = 0;
+
+    virtual void addField(const std::string &name, vec2 value) = 0;
+
+    virtual void addField(const std::string &name, vec4 value) = 0;
+
+    virtual void addField(const std::string &name, quat value) = 0;
 };

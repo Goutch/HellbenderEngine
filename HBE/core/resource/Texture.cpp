@@ -1,6 +1,8 @@
 #include <core/utility/Log.h>
-#include <graphics/gl/GL_Texture.h>
 #include "Texture.h"
+#include <graphics/gl/GL_Texture.h>
+
+#include "fstream"
 #include "core/serialization/Serializer.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"

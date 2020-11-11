@@ -111,6 +111,11 @@ void Entity::serialize(Serializer *serializer) const {
     serializer->addField("position", getPosition());
     serializer->addField("rotation", getRotation());
     serializer->addField("scale", getScale());
+    serializer->beginArray("Components");
+    for (auto c : components) {
+        c->serialize(serializer);
+    }
+    serializer->endArray();
     serializer->end();
 }
 

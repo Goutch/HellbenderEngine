@@ -7,7 +7,7 @@
 #include <core/entity/Entity.h>
 #include <core/graphics/Graphics.h>
 #include <core/graphics/RenderTarget.h>
-
+#include <core/serialization/Serializer.h>
 Camera *Camera::main = nullptr;
 
 void Camera::onAttach() {
@@ -140,7 +140,10 @@ void Camera::setRenderMode(RenderMode mode) {
 }
 
 void Camera::serialize(Serializer *serializer) const {
-    Component::serialize(serializer);
+    serializer->begin("Camera");
+    serializer->addField("fov",fov);
+
+    serializer->end();
 }
 
 

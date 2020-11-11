@@ -6,9 +6,9 @@
 #include "Core.h"
 class Camera;
 class HB_API CameraController: public Component {
+    const float MAX_PITCH= M_PI / 2;
     Camera* camera;
     float current_pitch=0.0f;
-    float max_pitch=M_PI/2;
     float units_per_seconds=10.0f;
 
     vec2 direction=vec2(1);

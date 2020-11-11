@@ -25,10 +25,10 @@ void CameraController::onUpdate(float delta) {
     entity->rotate(quat(vec3(0, change.x, 0)));
     //go back to cuurent pitch
     current_pitch += change.y;
-    if (current_pitch > max_pitch) {
-        current_pitch = max_pitch;
-    } else if (current_pitch < -max_pitch) {
-        current_pitch = -max_pitch;
+    if (current_pitch > MAX_PITCH) {
+        current_pitch = MAX_PITCH;
+    } else if (current_pitch < -MAX_PITCH) {
+        current_pitch = -MAX_PITCH;
     }
     entity->rotate(current_pitch, vec3(1, 0, 0));
 
@@ -73,5 +73,8 @@ void CameraController::onDetach() {
 }
 
 void CameraController::serialize(Serializer *serializer) const {
-    Component::serialize(serializer);
+    serializer->begin("CameraController");
+    serializer->addField("speed",units_per_seconds);
+    serializer->addField("current_pitch",current_pitch);
+    serializer->end();
 }
