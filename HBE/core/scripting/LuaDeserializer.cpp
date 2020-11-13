@@ -14,7 +14,7 @@ LuaDeserializer::~LuaDeserializer() {
 }
 
 template<typename T>
-std::vector<T> LuaDeserializer::getArray(std::string name) {
+std::vector<T> LuaDeserializer::getArray(const std::string& name) {
     std::vector<T> ts;
 
     lua_getfield(L, -1, name.c_str());
@@ -23,7 +23,7 @@ std::vector<T> LuaDeserializer::getArray(std::string name) {
 }
 
 template<typename T>
-T LuaDeserializer::get(std::string name) {
+T LuaDeserializer::get(const std::string& name) {
     std::vector<T> ts;
     lua_getfield(L, -1, name.c_str());
     if (lua_istable(L, -1)) {

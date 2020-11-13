@@ -1,12 +1,10 @@
-//
-// Created by User on 01-Nov.-2020.
-//
 
 #include "ModelRenderer.h"
 #include <core/graphics/Graphics.h>
 #include <core/utility/Log.h>
 #include "core/entity/Entity.h"
 #include "core/resource/Model.h"
+#include "core/serialization/Serializer.h"
 
 void ModelRenderer::onAttach() {
     Component::onAttach();
@@ -36,5 +34,6 @@ const Model *ModelRenderer::getModel() {
 }
 
 void ModelRenderer::serialize(Serializer *serializer) const {
-
+    serializer->begin("ModelRenderer");
+    serializer->end();
 }

@@ -35,6 +35,7 @@
 #include <core/serialization/Serializer.h>
 
 #include <glm/glm.hpp>
+#include "glm/gtx/quaternion.hpp"
 #include "Core.h"
 using namespace glm;
 class GLFWwindow;

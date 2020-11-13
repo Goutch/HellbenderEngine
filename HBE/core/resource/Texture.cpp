@@ -1,6 +1,6 @@
 #include <core/utility/Log.h>
 #include "Texture.h"
-#include <graphics/gl/GL_Texture.h>
+#include <platforms/gl/GL_Texture.h>
 
 #include "fstream"
 #include "core/serialization/Serializer.h"

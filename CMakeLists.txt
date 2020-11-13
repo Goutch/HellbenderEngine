@@ -73,7 +73,7 @@ add_executable (${PROJECT_NAME}
 		editor/SceneView.h
 		editor/Inspector.cpp
 		editor/Inspector.h
-		)
+        editor/EditorSerializer.cpp editor/EditorSerializer.h)
 
 target_link_libraries(${PROJECT_NAME} HBE)
 

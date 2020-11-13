@@ -14,7 +14,7 @@
 
 #if RENDERER == OPENGL_RENDERER
 
-#include "graphics/gl/GL_Renderer.h"
+#include "platforms/gl/GL_Renderer.h"
 
 #elif
 

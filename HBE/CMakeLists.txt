@@ -3,7 +3,10 @@ set(CMAKE_CXX_STANDARD 17)
 
 project(HBE CXX)
 
-
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++11 -O3 -fPIC")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -fPIC")
+endif ()
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb/")
@@ -11,10 +14,7 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb/")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/lua/")
 
 #add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/")
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++11 -O3 -fPIC")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -fPIC")
-endif ()
+
 include_directories(.)
 set(CORE_FILES
         HBE.cpp
@@ -73,25 +73,25 @@ set(CORE_FILES
         core/utility/Random.h
 
         core/serialization/Serializer.h
-        core/serialization/LuaDeserializer.cpp
-        core/serialization/LuaDeserializer.h)
+        core/scripting/LuaDeserializer.cpp
+        core/scripting/LuaDeserializer.h core/serialization/Deserializer.h)
 
 set(SCRIPTING_FILES
-        scripting/ScriptManager.cpp
-        scripting/ScriptManager.h)
+        core/scripting/ScriptManager.cpp
+        core/scripting/ScriptManager.h)
 
 set(GL_FILES
-        graphics/gl/GL_Core.h
-        graphics/gl/GL_Renderer.cpp
-        graphics/gl/GL_Texture.cpp
-        graphics/gl/GL_ShaderProgram.cpp
-        graphics/gl/GL_Mesh.cpp
-        graphics/gl/GL_Framebuffer.cpp
-        graphics/gl/GL_Framebuffer.h
-        graphics/gl/GL_Debug.cpp
-        graphics/gl/GL_Debug.h
-        graphics/gl/GL_MultisamplingFramebuffer.cpp
-        graphics/gl/GL_MultisamplingFramebuffer.h main.cpp)
+       platforms/gl/GL_Core.h
+       platforms/gl/GL_Renderer.cpp
+       platforms/gl/GL_Texture.cpp
+       platforms/gl/GL_ShaderProgram.cpp
+       platforms/gl/GL_Mesh.cpp
+       platforms/gl/GL_Framebuffer.cpp
+       platforms/gl/GL_Framebuffer.h
+       platforms/gl/GL_Debug.cpp
+       platforms/gl/GL_Debug.h
+       platforms/gl/GL_MultisamplingFramebuffer.cpp
+       platforms/gl/GL_MultisamplingFramebuffer.h main.cpp)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}
@@ -113,7 +113,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
     if (WIN32)
-        message(Probably using mingw compiler)
+        message("Using mingw compiler")
         target_link_libraries(${PROJECT_NAME}
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/mingw/libassimp.a"
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/mingw/libzlibstatic.a"

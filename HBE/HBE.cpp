@@ -1,6 +1,6 @@
 #include "HBE.h"
 #include "GLFW/glfw3.h"
-#include "scripting/ScriptManager.h"
+#include "core/scripting/ScriptManager.h"
 
 Scene *HBE::scene = nullptr;
 GLFWwindow *HBE::window = nullptr;

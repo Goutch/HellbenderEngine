@@ -82,5 +82,9 @@ void Model::serialize(Serializer *serializer) const {
     serializer->end();
 }
 
+const std::string &Model::getPath() {
+    return path;
+}
+
 
 

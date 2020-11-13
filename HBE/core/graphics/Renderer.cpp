@@ -4,7 +4,7 @@
 
 
 #include "Renderer.h"
-#include <graphics/gl/GL_Renderer.h>
+#include <platforms/gl/GL_Renderer.h>
 
 Renderer *Renderer::create() {
 #if RENDERER == OPENGL_RENDERER

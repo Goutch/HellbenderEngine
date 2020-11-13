@@ -1,6 +1,6 @@
 #include "Framebuffer.h"
-#include <graphics/gl/GL_MultisamplingFramebuffer.h>
-#include <graphics/gl/GL_Framebuffer.h>
+#include <platforms/gl/GL_MultisamplingFramebuffer.h>
+#include <platforms/gl/GL_Framebuffer.h>
 #include "Configs.h"
 
 Framebuffer *Framebuffer::create() {

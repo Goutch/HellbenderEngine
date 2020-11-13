@@ -1,6 +1,6 @@
 
 #include "ShaderProgram.h"
-#include <graphics/gl/GL_ShaderProgram.h>
+#include <platforms/gl/GL_ShaderProgram.h>
 #include "core/serialization/Serializer.h"
 ShaderProgram *ShaderProgram::create() {
 #if RENDERER == OPENGL_RENDERER

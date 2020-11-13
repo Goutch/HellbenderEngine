@@ -2,8 +2,9 @@
 
 
 #include "glm/glm.hpp"
+#include "glm/gtx/quaternion.hpp"
 #include "Core.h"
-
+#include "string"
 using namespace glm;
 
 class HB_API Serializer {

@@ -13,6 +13,7 @@ public:
     void setMaterial(Material *material, int mesh_index = 0);
 
     Model * load(std::string path);
+    const std::string& getPath();
     void loadAsync(std::string path);
     void constructModel(std::vector<std::pair<MeshData, MaterialData>> * meshes_data);
     const std::vector<std::pair<Mesh *,Material *>>& getMeshes() const;
