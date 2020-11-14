@@ -7,6 +7,8 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --std=c++11 -O3 -fPIC")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3 -fPIC")
 endif ()
+
+
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb/")
@@ -17,6 +19,7 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/lua/")
 
 include_directories(.)
 set(CORE_FILES
+
         HBE.cpp
         HBE.h
         Configs.cpp
@@ -81,19 +84,20 @@ set(SCRIPTING_FILES
         core/scripting/ScriptManager.h)
 
 set(GL_FILES
-       platforms/gl/GL_Core.h
-       platforms/gl/GL_Renderer.cpp
-       platforms/gl/GL_Texture.cpp
-       platforms/gl/GL_ShaderProgram.cpp
-       platforms/gl/GL_Mesh.cpp
-       platforms/gl/GL_Framebuffer.cpp
-       platforms/gl/GL_Framebuffer.h
-       platforms/gl/GL_Debug.cpp
-       platforms/gl/GL_Debug.h
-       platforms/gl/GL_MultisamplingFramebuffer.cpp
-       platforms/gl/GL_MultisamplingFramebuffer.h main.cpp)
+        platforms/gl/GL_Core.h
+        platforms/gl/GL_Renderer.cpp
+        platforms/gl/GL_Texture.cpp
+        platforms/gl/GL_ShaderProgram.cpp
+        platforms/gl/GL_Mesh.cpp
+        platforms/gl/GL_Framebuffer.cpp
+        platforms/gl/GL_Framebuffer.h
+        platforms/gl/GL_Debug.cpp
+        platforms/gl/GL_Debug.h
+        platforms/gl/GL_MultisamplingFramebuffer.cpp
+        platforms/gl/GL_MultisamplingFramebuffer.h)
 
-add_library(${PROJECT_NAME} SHARED
+add_executable(${PROJECT_NAME}
+        main.cpp
         ${CORE_FILES}
         ${GL_FILES}
         ${SCRIPTING_FILES}
@@ -140,14 +144,27 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     # using Visual Studio C++
     message("Using visual studio compiler")
-    target_link_libraries(${PROJECT_NAME}
-            PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/assimp-vc142-mt.lib"
-            PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/zlibstatic.lib"
-            PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/IrrXML.lib"
-            PUBLIC glfw
-            PUBLIC glad
-            PUBLIC stb
-            PUBLIC lua)
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        MESSAGE("debug mode ")
+        target_link_libraries(${PROJECT_NAME}
+                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/debug/assimp-vc142-mt.lib"
+                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/debug/zlibstatic.lib"
+                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/debug/IrrXML.lib"
+                PUBLIC glfw
+                PUBLIC glad
+                PUBLIC stb
+                PUBLIC lua)
+    else ()
+        MESSAGE("release mode")
+        target_link_libraries(${PROJECT_NAME}
+                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/release/assimp-vc142-mt.lib"
+                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/release/zlibstatic.lib"
+                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/release/IrrXML.lib"
+                PUBLIC glfw
+                PUBLIC glad
+                PUBLIC stb
+                PUBLIC lua)
+    endif ()
 endif ()
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE HB_BUILD)
