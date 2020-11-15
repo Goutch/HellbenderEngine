@@ -96,7 +96,7 @@ set(GL_FILES
         platforms/gl/GL_MultisamplingFramebuffer.cpp
         platforms/gl/GL_MultisamplingFramebuffer.h)
 
-add_executable(${PROJECT_NAME}
+add_library(${PROJECT_NAME} SHARED
         main.cpp
         ${CORE_FILES}
         ${GL_FILES}
