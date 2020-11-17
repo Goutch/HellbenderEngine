@@ -52,7 +52,7 @@ void SceneHierarchy::draw(bool &active) {
 
     if (active) {
         ImGui::Begin(name, &active, ImGuiWindowFlags_NoCollapse);
-        std::vector<Entity *> entities = HBE::scene->getEntities();
+        std::vector<Entity *> entities = Application::scene->getEntities();
         for (auto e:entities) {
             if (e->getParent() == nullptr) {
                 drawTree(e);

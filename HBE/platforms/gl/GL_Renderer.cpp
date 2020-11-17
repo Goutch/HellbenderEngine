@@ -10,11 +10,10 @@
 #include <core/entity/Transform.h>
 #include <Configs.h>
 #include "GLFW/glfw3.h"
-#include "CompilationConfigs.h"
 #include "core/graphics/Framebuffer.h"
 #include "core/graphics/RenderTarget.h"
 
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 
 #include "GL_Debug.h"
 
@@ -73,7 +72,6 @@ void GL_Renderer::present(const RenderTarget *render_target) {
 }
 
 void GL_Renderer::init() {
-
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
         Log::error("Failed to load glad");
     }
@@ -83,14 +81,14 @@ void GL_Renderer::init() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_MULTISAMPLE);
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
     GL_Debug::init();
 #endif
 }
 
 
 
-GLFWwindow *GL_Renderer::createWindow() {
+GLFWwindow *GL_Renderer::createWindow(int width, int height) {
     if (!glfwInit()) {
         Log::error("Failed to load glfw");
     }
@@ -98,7 +96,7 @@ GLFWwindow *GL_Renderer::createWindow() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(WIDTH, HEIGHT, Configs::getWindowTitle().c_str(), nullptr, nullptr);
+    window = glfwCreateWindow(width, height, Configs::getWindowTitle().c_str(), nullptr, nullptr);
     glfwMakeContextCurrent(window);
     return window;
 }

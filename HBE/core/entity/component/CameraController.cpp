@@ -1,35 +1,32 @@
-//
-// Created by User on 12-Jun.-2020.
-//
-#include <HBE.h>
-#include "CompilationConfigs.h"
 #include "CameraController.h"
-
-
+#include "core/input/Input.h"
+#include "Camera.h"
+#include "core/graphics/RenderTarget.h"
+#include "core/serialization/Serializer.h"
+#include "core/entity/Entity.h"
 void CameraController::onUpdate(float delta) {
+    float w,h;
+    w=camera->getRenderTarget()->getWidth();
+    h=camera->getRenderTarget()->getHeight();
     double x, y;
     Input::getMousePosition(x, y);
-    Input::setCursorPosition(static_cast<float>(WIDTH) / 2.0f, static_cast<float>(HEIGHT) / 2.0f);
+    Input::setCursorPosition(w / 2.0, h / 2.0f);
     last_x = x;
     last_y = y;
 
     float fov = camera->getFOV();
     vec2 change;
-    change.x = (((static_cast<float>(WIDTH) / 2.0f) - x) / static_cast<float>(WIDTH)) * glm::radians(fov);
-    change.y = (((static_cast<float>(HEIGHT) / 2.0f) - y) / static_cast<float>(HEIGHT)) *
-               (glm::radians(fov) * camera->getAspectRatio());
+    change.x = (((w / 2.0f) - x) / w) * glm::radians(fov);
+    change.y = (((h / 2.0f) - y) / h) *(glm::radians(fov) * camera->getAspectRatio());
 
     //go to pitch 0
     entity->rotate(quat(vec3(-current_pitch, 0, 0)));
     //rotate on y axis
     entity->rotate(quat(vec3(0, change.x, 0)));
-    //go back to cuurent pitch
+    //go back to current pitch
     current_pitch += change.y;
-    if (current_pitch > MAX_PITCH) {
-        current_pitch = MAX_PITCH;
-    } else if (current_pitch < -MAX_PITCH) {
-        current_pitch = -MAX_PITCH;
-    }
+    current_pitch=clamp(current_pitch,-MAX_PITCH,MAX_PITCH);
+
     entity->rotate(current_pitch, vec3(1, 0, 0));
 
 
@@ -74,7 +71,7 @@ void CameraController::onDetach() {
 
 void CameraController::serialize(Serializer *serializer) const {
     serializer->begin("CameraController");
-    serializer->addField("speed",units_per_seconds);
-    serializer->addField("current_pitch",current_pitch);
+    serializer->addField("speed", units_per_seconds);
+    serializer->addField("current_pitch", current_pitch);
     serializer->end();
 }

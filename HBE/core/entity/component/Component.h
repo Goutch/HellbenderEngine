@@ -1,11 +1,12 @@
 #pragma once
 
 #include <core/resource/Resource.h>
+
 #include "glm/glm.hpp"
 #include "Core.h"
 using namespace glm;
-
 class Entity;
+
 
 class HB_API Component :Resource {
     bool subscribed_draw=false;

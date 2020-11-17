@@ -3,7 +3,6 @@
 
 #include "Framebuffer.h"
 #include <core/entity/Transform.h>
-#include <CompilationConfigs.h>
 #include <core/utility/Log.h>
 #include <core/utility/Event.h>
 #include <core/utility/Geometry.h>
@@ -109,7 +108,7 @@ void main()
 })";
 GLFWwindow *Graphics::init() {
     renderer = Renderer::create();
-    window = renderer->createWindow();
+    window = renderer->createWindow(900, 600);
 
     if (!Configs::getVerticalSync())
         glfwSwapInterval(0);
@@ -192,7 +191,7 @@ void Graphics::initializeDefaultVariables() {
                                       default_screen_fragment_shader_code, false);
     DEFAULT_SCREEN_SHADER = default_screen_shader;
     //DEFAULT_RENDER_TARGET
-    render_target = new RenderTarget(WIDTH, HEIGHT, *DEFAULT_SCREEN_SHADER);
+    render_target = new RenderTarget(900, 600, *DEFAULT_SCREEN_SHADER);
 }
 
 RenderTarget *Graphics::getRenderTarget() {

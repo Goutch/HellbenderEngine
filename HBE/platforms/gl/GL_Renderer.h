@@ -35,6 +35,6 @@ public:
 
     void clearDrawCache() override;
 
-    GLFWwindow *createWindow() override;
+    GLFWwindow *createWindow(int width, int height) override;
 };
 

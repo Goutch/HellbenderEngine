@@ -18,6 +18,21 @@
 
 #if defined(HB_BUILD)
     #define HB_API EXPORT
+    #define GLAD_GLAPI_EXPORT
+    #define GLAD_GLAPI_EXPORT_BUILD
 #else
     #define HB_API IMPORT
+    #define GLAD_GLAPI_EXPORT
 #endif
+
+#ifdef NDEBUG
+    #define RELEASE_MODE
+#else
+    #define DEBUG_MODE
+#endif
+
+enum {
+    OPENGL_RENDERER=0,
+    VULKAN_RENDERER=1,
+};
+#define RENDERER OPENGL_RENDERER

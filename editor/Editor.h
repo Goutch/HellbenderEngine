@@ -1,6 +1,6 @@
 #pragma once
 
-#include "HBE.h"
+
 #include "imgui.h"
 struct ViewOptions {
     bool terminal_active = true;

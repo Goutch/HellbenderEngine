@@ -1,10 +1,10 @@
 #pragma once
 
-
+#include "Core.h"
 #include <vector>
 #include <string>
+
 #include "glm/glm.hpp"
-#include "Core.h"
 using namespace glm;
 
 class Renderer;

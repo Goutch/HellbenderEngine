@@ -1,12 +1,10 @@
 #pragma once
-
-#include "Component.h"
-#define _USE_MATH_DEFINES
-#include <math.h>
 #include "Core.h"
+#include "Component.h"
+
 class Camera;
 class HB_API CameraController: public Component {
-    const float MAX_PITCH= M_PI / 2;
+    const float MAX_PITCH= glm::radians(90.0f);
     Camera* camera;
     float current_pitch=0.0f;
     float units_per_seconds=10.0f;

@@ -1,31 +1,31 @@
 #include "Component.h"
-#include "HBE.h"
+#include "Application.h"
 
 void Component::subscribeDraw() {
     if (!subscribed_draw) {
         subscribed_draw = true;
-        HBE::scene->subscribeDraw(this);
+        Application::scene->subscribeDraw(this);
     }
 }
 
 void Component::unsubscribeDraw() {
     if (subscribed_draw) {
         subscribed_draw = false;
-        HBE::scene->unsubscribeDraw(this);
+        Application::scene->unsubscribeDraw(this);
     }
 }
 
 void Component::subscribeUpdate() {
     if (!subscribed_update) {
         subscribed_update = true;
-        HBE::scene->subscribeUpdate(this);
+        Application::scene->subscribeUpdate(this);
     }
 }
 
 void Component::unsubscribeUpdate() {
     if (subscribed_update) {
         subscribed_update = false;
-        HBE::scene->unsubscribeUpdate(this);
+        Application::scene->unsubscribeUpdate(this);
     }
 }
 

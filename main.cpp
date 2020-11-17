@@ -1,22 +1,23 @@
 #include "HBE.h"
 #include "editor/Editor.h"
+
 int main() {
+
     Configs::setWindowTitle("3D view");
-
-    HBE::init();
-    auto teapot=Model::create();
-    auto teapot_renderer=HBE::scene->instantiate<ModelRenderer>("Teapot");
-    auto teapot_child=HBE::scene->instantiate(teapot_renderer->getEntity());
+    Application::init();
+    auto teapot = Model::create();
+    auto teapot_renderer = Application::scene->instantiate<ModelRenderer>("Teapot");
+    auto teapot_child = Application::scene->instantiate(teapot_renderer->getEntity());
     teapot_renderer->setModel(*teapot);
-    teapot->loadAsync("../res/models/teapot.obj");
-    auto camera=HBE::scene->instantiate<Camera>("Camera");
-    camera->getEntity()->setPosition(vec3(0,0,15));
+    teapot->loadAsync("../../res/models/teapot.obj");
+    auto camera = Application::scene->instantiate<Camera>("Camera");
+    camera->getEntity()->setPosition(vec3(0, 0, 15));
 
-   //Editor e;
-   //e.start();
-    HBE::run();
+    Editor e;
+    e.start();
+    Application::run();
 
-   // e.terminate();
+    e.terminate();
     delete teapot;
-    HBE::terminate();
+    Application::terminate();
 }

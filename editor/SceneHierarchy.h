@@ -1,7 +1,7 @@
 #pragma once
 #include "string"
 #include "list"
-#include "HBE.h"
+#include "Application.h"
 class SceneHierarchy {
 
 public:

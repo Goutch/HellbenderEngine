@@ -146,6 +146,10 @@ void Camera::serialize(Serializer *serializer) const {
     serializer->end();
 }
 
+const RenderTarget *Camera::getRenderTarget() {
+    return render_target;
+}
+
 
 
 

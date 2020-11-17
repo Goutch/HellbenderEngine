@@ -3,11 +3,10 @@
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
 
-
-#include <glad/glad.h>
+#include "HBE.h"
 #include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
 #include "MenuBar.h"
 #include "Terminal.h"
 #include "SceneView.h"
@@ -26,9 +25,9 @@ void Editor::start() {
     ImGuiIO &io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     ImGui_ImplGlfw_InitForOpenGL(Graphics::getWindow(), true);
-    ImGui_ImplOpenGL3_Init("#version 330 core");
+    ImGui_ImplOpenGL3_Init("#version 430 core");
     setStyle();
-    HBE::onRender.subscribe(this, &Editor::onRender);
+    Application::onRender.subscribe(this, &Editor::onRender);
     Graphics::onWindowSizeChange.subscribe(this, &Editor::onWindowSizeChange);
     Graphics::getWindowSize(window_width, window_height);
     Configs::setWindowTitle("Editor");

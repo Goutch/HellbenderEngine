@@ -1,7 +1,7 @@
-
 #pragma once
-#include <CompilationConfigs.h>
+#include <Core.h>
 #include <Configs.h>
+#include <Application.h>
 
 #include <core/resource/ShaderProgram.h>
 #include <core/resource/Mesh.h>
@@ -25,6 +25,8 @@
 #include <core/input/Input.h>
 #include <core/math/Plane.h>
 
+#include <core/scripting/ScriptManager.h>
+
 #include <core/utility/Event.h>
 #include <core/utility/Clock.h>
 #include <core/utility/JobManager.h>
@@ -36,41 +38,5 @@
 
 #include <glm/glm.hpp>
 #include "glm/gtx/quaternion.hpp"
-#include "Core.h"
+
 using namespace glm;
-class GLFWwindow;
-
-class Scene;
-
-class Clock;
-
-class HB_API HBE {
-    static GLFWwindow *window;
-    static Clock* time;
-    static int fps_counter;
-    static float fps_timer;
-
-public:
-    static Event<> onInit;
-    static Event<float> onUpdate;
-    static Event<Scene*> onSceneChange;
-    static Event<> onRender;
-
-    static Scene *scene;
-
-    static void init();
-
-    static void run();
-
-    static Scene *setScene(std::string path);
-
-    static void quit();
-
-    static void terminate();
-
-    static float getTime();
-private:
-    static void printFPS(float);
-};
-
-

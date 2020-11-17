@@ -25,7 +25,7 @@ public:
 
     virtual void init() = 0;
 
-    virtual GLFWwindow *createWindow() = 0;
+    virtual GLFWwindow *createWindow(int width, int height) = 0;
 
     virtual void render(const RenderTarget* render_target,const mat4 &projection_matrix, const mat4 &view_matrix = mat4(1.0f)) = 0;
 
