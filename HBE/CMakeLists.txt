@@ -10,8 +10,6 @@ endif ()
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb/")
-
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/lua/")
 
 
@@ -73,6 +71,8 @@ set(CORE_FILES
 
         core/scripting/LuaDeserializer.cpp
         core/scripting/LuaDeserializer.h
+        core/scripting/ScriptManager.cpp
+        core/scripting/ScriptManager.h
 
         core/serialization/Serializer.h
         core/serialization/Deserializer.h
@@ -127,10 +127,6 @@ set(IMGUI_FILES
         dependencies/imgui/imstb_textedit.h
         dependencies/imgui/imstb_truetype.h)
 
-set(SCRIPTING_FILES
-        core/scripting/ScriptManager.cpp
-        core/scripting/ScriptManager.h)
-
 set(GL_FILES
         platforms/gl/GL_Core.h
         platforms/gl/GL_Renderer.cpp
@@ -148,7 +144,6 @@ add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}
         ${IMGUI_FILES}
         ${GL_FILES}
-        ${SCRIPTING_FILES}
       )
 
 target_include_directories(${PROJECT_NAME}
@@ -174,7 +169,6 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/mingw/libIrrXML.a"
                 PUBLIC glfw
                 PUBLIC glad
-                PUBLIC stb
                 PUBLIC lua)
     else ()
         message("Using GCC Compiler")
@@ -184,7 +178,6 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/gcc/libIrrXML.a"
                 PUBLIC glfw
                 PUBLIC glad
-                PUBLIC stb
                 PUBLIC lua)
     endif ()
 
@@ -202,7 +195,6 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/debug/IrrXML.lib"
                 PUBLIC glfw
                 PUBLIC glad
-                PUBLIC stb
                 PUBLIC lua)
     else ()
         MESSAGE("release mode")
@@ -212,7 +204,6 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/release/IrrXML.lib"
                 PUBLIC glfw
                 PUBLIC glad
-                PUBLIC stb
                 PUBLIC lua)
     endif ()
 endif ()
