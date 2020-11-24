@@ -2,7 +2,7 @@
 
 
 # Goals 
-**My goal with HellbenderEngine is primary to learn about engines and graphics while creating an easy to use engine.**
+**HellbenderEngine is primary to learn about engines and graphics while creating an easy to use engine.**
 
 # features
 - Entity system implementation
