@@ -1,7 +1,46 @@
 # HellbenderEngine
 
-This is HellbenderEngine, It is no where near being finished.My goal with HellbenderEngine is primary to learn about engine developement.
 
-For now  it only support Opengl rendering but I plan to tinker with Vulkan support somewhere in the future.
+## Goals 
+**My goal with HellbenderEngine is primary to learn about engines and graphics while creating an easy to use engine.**
 
-Checkout the [wiki](https://github.com/Goutch/HellbenderEngine/wiki) for code examples.
+# features
+- Entity system implementation
+	- Camera
+	- CameraController
+	- MeshRenderer
+	- ModelRenderer
+- Basic 3D mesh rendering with OpenGL
+- Basic keyboard and mouse input handling.
+- Resource loading
+	 - Model loading
+	 - Texture loading
+- Material system
+- Job System
+- Event system
+	
+## In progress:
+ - Serialization :
+	 - Scene , entities and components,
+	 - Resources, models,textures,
+	 - Project file
+ - Minimal editor functionality (in progress)
+	 - Scene hierarchy
+	 - Entity inspector to modify components
+
+## Long term goals
+
+ - Vulkan support
+ - Lua Scripting
+ - Deffered rendering
+
+## Getting started
+### Compiling
+These are 3 tested compilers : 
+- GCC
+- VC
+- MINGW
+
+### Wiki
+- [Home](https://github.com/Goutch/HellbenderEngine/wiki) 
+- [Hello Triangle](https://github.com/Goutch/HellbenderEngine/wiki/Hello-triangle)
