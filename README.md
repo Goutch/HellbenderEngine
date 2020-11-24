@@ -2,8 +2,8 @@
 
 # Goals 
 - **Easy to build on API.**
-- **Leave the user in control of the visual style**
-- **Built for programmers**
+- **Leave the user in control of the visual style.**
+- **Built for programmers.**
 
 # features
 - Entity system implementation
