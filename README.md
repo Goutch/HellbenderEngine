@@ -1,8 +1,9 @@
 # HellbenderEngine
 
-
 # Goals 
-**HellbenderEngine is primary to learn about engines and graphics while creating an easy to use engine.**
+- **Easy to build on API.**
+- **Leave the user in control of the visual style**
+- **Built for programmers**
 
 # features
 - Entity system implementation
