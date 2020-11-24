@@ -6,26 +6,33 @@
 - **Built for programmers.**
 
 # features
-- Entity system implementation
+#### HB Engine library:
+- Entity and components
 	- Camera
 	- CameraController
 	- MeshRenderer
 	- ModelRenderer
-- Basic 3D mesh rendering with OpenGL
-- Basic keyboard and mouse input handling.
+- 3D mesh rendering with OpenGL
+- keyboard and mouse input handling
 - Resource loading
-	 - Model loading
-	 - Texture loading
+	 - Model
+	 - Texture
+	 - Shaders
 - Material system
 - Job System
 - Event system
-	
+
+#### HB Editor: (in progress)
+ - Basic Scene view
+ 	- add/destroy entities
+	- multi selection
+ - Entity inspector 
 ## In progress:
  - Serialization :
-	 - Scene , entities and components,
+	 - Scene , entities and components
 	 - Resources, models,textures,
 	 - Project file
- - Minimal editor functionality (in progress)
+ - Minimal editor functionality
 	 - Scene hierarchy
 	 - Entity inspector to modify components
 
