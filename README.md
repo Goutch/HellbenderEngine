@@ -33,6 +33,7 @@
  - Vulkan support
  - Lua Scripting
  - Deffered rendering
+ - Bullet physics
 
 ## Getting started
 ### Compiling
