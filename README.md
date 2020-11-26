@@ -2,7 +2,7 @@
 
 # Goals 
 - **Easy to use and modular API.**
-- **Leave the user in control of the visual style.**
+- **Minimal dependencies and Lightweight.**
 - **Built for programmers.**
 
 # features
