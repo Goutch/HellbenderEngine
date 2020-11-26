@@ -1,7 +1,7 @@
 # HellbenderEngine
 
 # Goals 
-- **Easy to build on API.**
+- **Easy to use and modular API.**
 - **Leave the user in control of the visual style.**
 - **Built for programmers.**
 
