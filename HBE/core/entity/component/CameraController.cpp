@@ -11,8 +11,6 @@ void CameraController::onUpdate(float delta) {
     double x, y;
     Input::getMousePosition(x, y);
     Input::setCursorPosition(w / 2.0, h / 2.0f);
-    last_x = x;
-    last_y = y;
 
     float fov = camera->getFOV();
     vec2 change;
@@ -64,14 +62,22 @@ void CameraController::onAttach() {
     subscribeUpdate();
 }
 
-void CameraController::onDetach() {
-    Component::onDetach();
+CameraController::~CameraController() {
     Input::setCursorVisible(true);
 }
 
 void CameraController::serialize(Serializer *serializer) const {
-    serializer->begin("CameraController");
+    serializer->begin(toString());
     serializer->addField("speed", units_per_seconds);
     serializer->addField("current_pitch", current_pitch);
     serializer->end();
 }
+
+std::string CameraController::toString() const{
+    return "CameraController";
+}
+
+void CameraController::deserialize(Deserializer *deserializer) {
+
+}
+

@@ -1,7 +1,7 @@
 
 
 #include <core/utility/JobManager.h>
-#include "Resource.h"
+#include "core/serialization/Serializable.h"
 #include "Model.h"
 #include "core/serialization/Serializer.h"
 
@@ -84,6 +84,10 @@ void Model::serialize(Serializer *serializer) const {
 
 const std::string &Model::getPath() {
     return path;
+}
+
+void Model::deserialize(Deserializer *deserializer) {
+
 }
 
 

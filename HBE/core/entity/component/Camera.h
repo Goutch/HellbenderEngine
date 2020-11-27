@@ -9,33 +9,31 @@
 
 class RenderTarget;
 
-enum ClearMode {
-    NO_CLEAR,
-    CLEAR_COLOR,
-    SKYBOX,
-};
 enum RenderMode {
     ORTHOGRAPHIC,
     PERSPECTIVE,
 };
 
 class HB_API Camera : public Component {
+public:
+    static Camera *main;
 private:
     float fov = 80;
     float aspect_ratio = 1;
     float render_distance = 500;
-    RenderTarget *render_target = nullptr;
-    ClearMode clear_mode = CLEAR_COLOR;
     RenderMode render_mode = PERSPECTIVE;
+    RenderTarget *render_target = nullptr;
+
     mat4 projection_matrix = mat4(1.0f);
     std::array<Plane, 6> frustum_planes;
 
 public:
-    static Camera *main;
+
+    std::string toString() const override;
 
     void onAttach() override;
 
-    void onDetach() override;
+    ~Camera() override;
 
     void setAspectRatio(float width, float height);
 
@@ -72,6 +70,8 @@ public:
     void onRenderTargetSizeChange(int width, int height);
 
     void serialize(Serializer *serializer) const override;
+
+    void deserialize(Deserializer *deserializer) override;
 
 private:
     void generateProjectionMatrix();

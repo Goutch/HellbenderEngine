@@ -8,38 +8,62 @@
 
 const char *SceneHierarchy::name = "Scene Hierarchy";
 std::unordered_set<Entity *> SceneHierarchy::selected_entities;
+std::list<Entity *> SceneHierarchy::delete_query;
 
-void drawTree(Entity *e) {
+void drawNewEntityMenu(Entity *parent) {
+    if (ImGui::BeginMenu("New")) {
+        if (ImGui::MenuItem("Empty"))
+            Application::scene->instantiate()->setParent(parent);
+        if (ImGui::MenuItem("Cube")) {
+            MeshRenderer *mr = Application::scene->instantiate<MeshRenderer>();
+            mr->getEntity()->setParent(parent);
+            mr->setMesh(*Graphics::DEFAULT_CUBE);
+            mr->setMaterial(*Graphics::DEFAULT_MESH_MATERIAL);
+        }
+        ImGui::EndMenu();
+    }
+}
+
+void SceneHierarchy::drawTree(Entity *e) {
     std::vector<Entity *> children = e->getChildren();
 
-    bool selected = SceneHierarchy::selected_entities.find(e)!=SceneHierarchy::selected_entities.end();
+    bool selected = selected_entities.find(e) != selected_entities.end();
     ImGui::TreeAdvanceToLabelPos();
-    bool open = ImGui::TreeNodeEx(e->getName().c_str(),ImGuiTreeNodeFlags_OpenOnArrow|
-                                  (selected?ImGuiTreeNodeFlags_Selected : ImGuiTreeNodeFlags_None)|
-                                  (children.empty() ? ImGuiTreeNodeFlags_Leaf : ImGuiTreeNodeFlags_None));
-    if(!ImGui::IsItemToggledOpen()&&ImGui::IsItemClicked()){
+    bool open = ImGui::TreeNodeEx(e->getName().c_str(), ImGuiTreeNodeFlags_OpenOnArrow |
+                                                        ImGuiTreeNodeFlags_SpanAvailWidth|
+                                                        (selected ? ImGuiTreeNodeFlags_Selected : ImGuiTreeNodeFlags_None) |
+                                                        (children.empty() ? ImGuiTreeNodeFlags_Leaf : ImGuiTreeNodeFlags_None));
+    if (!ImGui::IsItemToggledOpen() && ImGui::IsItemClicked()) {
 
-        if(Input::getKey(KEY::LEFT_CONTROL))
-        {
-            if(SceneHierarchy::selected_entities.find(e)==SceneHierarchy::selected_entities.end())
-            {
-                SceneHierarchy::selected_entities.emplace(e);
+        if (Input::getKey(KEY::LEFT_CONTROL)) {
+            if (selected_entities.find(e) == selected_entities.end()) {
+                selected_entities.emplace(e);
+            } else {
+                selected_entities.erase(e);
             }
-            else
-            {
-                SceneHierarchy::selected_entities.erase(e);
-            }
-        } else if( Input::getKey(KEY::LEFT_SHIFT))
-        {
+        } else if (Input::getKey(KEY::LEFT_SHIFT)) {
             //todo: shift key selection
-        } else{
-            SceneHierarchy::selected_entities.clear();
-            SceneHierarchy::selected_entities.emplace(e);
+        } else {
+            selected_entities.clear();
+            selected_entities.emplace(e);
         }
 
     }
-
-    if (open) {
+    if (ImGui::BeginPopupContextItem()) {
+        drawNewEntityMenu(e);
+        /*if (ImGui::MenuItem("Delete")) {
+            if (!selected) {
+                delete_query.push_back(e);
+            } else {
+                for (auto selected_entity :SceneHierarchy::selected_entities)
+                    delete_query.push_back(selected_entity);
+                SceneHierarchy::selected_entities.clear();
+            }
+        }*/
+        ImGui::EndPopup();
+        if (open)
+            ImGui::TreePop();
+    } else if (open) {
         for (auto e:children) {
             drawTree(e);
         }
@@ -49,16 +73,25 @@ void drawTree(Entity *e) {
 }
 
 void SceneHierarchy::draw(bool &active) {
-
     if (active) {
         ImGui::Begin(name, &active, ImGuiWindowFlags_NoCollapse);
-        std::vector<Entity *> entities = Application::scene->getEntities();
+        std::vector<Entity *> entities = Application::scene->getSceneTree();
         for (auto e:entities) {
-            if (e->getParent() == nullptr) {
-                drawTree(e);
-            }
+            drawTree(e);
+        }
+
+        if (ImGui::BeginPopupContextWindow(0, 1, false)) {
+            drawNewEntityMenu(nullptr);
+            ImGui::EndPopup();
         }
         ImGui::End();
     }
 
+}
+
+void SceneHierarchy::update() {
+    for (Entity *e :delete_query) {
+        Application::scene->destroy(e);
+    }
+    delete_query.clear();
 }

@@ -8,6 +8,7 @@
 #include <core/graphics/Graphics.h>
 #include <core/graphics/RenderTarget.h>
 #include <core/serialization/Serializer.h>
+#include "core/utility/Log.h"
 Camera *Camera::main = nullptr;
 
 void Camera::onAttach() {
@@ -31,7 +32,7 @@ void Camera::setRenderTarget(RenderTarget *render_target) {
     render_target->onSizeChange.subscribe(this, &Camera::onRenderTargetSizeChange);
 }
 
-void Camera::onDetach() {
+Camera::~Camera() {
     Graphics::getRenderTarget()->onSizeChange.unsubscribe(this);
 }
 
@@ -140,15 +141,27 @@ void Camera::setRenderMode(RenderMode mode) {
 }
 
 void Camera::serialize(Serializer *serializer) const {
-    serializer->begin("Camera");
-    serializer->addField("fov",fov);
-
+    serializer->begin(toString());
+    serializer->addField("fov", fov);
+    serializer->addField("render_distance",render_distance);
+    serializer->addField("render_mode",render_mode);
+    serializer->addField("render_distance",render_distance);
+    //todo : render target serialization
     serializer->end();
 }
+void Camera::deserialize(Deserializer *deserializer) {
 
+}
 const RenderTarget *Camera::getRenderTarget() {
     return render_target;
 }
+
+std::string Camera::toString() const {
+    return "Camera";
+}
+
+
+
 
 
 

@@ -3,42 +3,40 @@
 //
 
 #include "Entity.h"
-#include <core/utility/Log.h>
+#include <Application.h>
 #include "core/serialization/Serializer.h"
+#include "core/serialization/Deserializer.h"
+#include "core/serialization/ComponentRegistry.h"
 
 unsigned int Entity::current_id = 0;
 
-Entity::Entity() {
+Entity::Entity(Scene *scene, Entity *parent) {
+    this->scene = scene;
     setName("Entity_" + std::to_string(current_id++));
+    scene->scene_tree.emplace_back(this);
+    if (parent != nullptr)
+        setParent(parent);
 }
 
-Entity::Entity(Entity *parent) {
-    setName("Entity_" + std::to_string(current_id++));
-    setParent(parent);
-}
 
-Entity::Entity(std::string name) {
+Entity::Entity(Scene *scene, std::string name, Entity *parent) {
+    this->scene = scene;
     setName(name);
+    scene->scene_tree.emplace_back(this);
+    if (parent != nullptr)
+        setParent(parent);
 }
 
-Entity::Entity(std::string name, Entity *parent) {
-    setName(name);
-    setParent(parent);
-}
 
-Entity::Entity(vec3 position, vec3 rotation, vec3 scale) : Transform(position, rotation, scale) {
-    setName("Entity_" + std::to_string(current_id++));
-}
-
-Entity::Entity(std::string name, vec3 position, vec3 rotation, vec3 scale) : Transform(position, rotation, scale) {
-    setName(name);
-}
-
-Entity::Entity(std::string name, Entity *parent, vec3 position, vec3 rotation, vec3 scale) : Transform(position,
-                                                                                                       rotation,
-                                                                                                       scale) {
-    setName(name);
-    setParent(parent);
+void Entity::destroy() {
+    for (Entity *c :children) {
+        Application::scene->destroy(c);
+    }
+    children.clear();
+    for (Component *component:components) {
+        delete component;
+    }
+    if (parent != nullptr)parent->removeChild(this);
 }
 
 const std::string &Entity::getName() const {
@@ -49,23 +47,15 @@ void Entity::setName(const std::string &name) {
     this->name = name;
 }
 
-void Entity::onDestroy() {
-    for (Component *component:components) {
-        delete component;
-    }
-    if (parent != nullptr)parent->removeChild(this);
-}
-
 void Entity::addChild(Entity *child) {
-
-    if (std::find(children.begin(),children.end(),child) == children.end()) {
+    if (std::find(children.begin(), children.end(), child) == children.end()) {
         children.push_back(child);
         child->parent = this;
     }
 }
 
 void Entity::removeChild(Entity *child) {
-    auto it=std::find(children.begin(),children.end(),child);
+    auto it = std::find(children.begin(), children.end(), child);
     if (it != children.end()) {
         children.erase(it);
         child->parent = nullptr;
@@ -73,12 +63,16 @@ void Entity::removeChild(Entity *child) {
 }
 
 void Entity::setParent(Entity *parent) {
-    if (parent != nullptr) {
-        parent->addChild(this);
+    if (this->parent == nullptr) {
+        scene->scene_tree.erase(std::find(scene->scene_tree.begin(), scene->scene_tree.end(), this));
     } else {
-        this->parent = nullptr;
+        this->parent->removeChild(this);
     }
-
+    if (parent == nullptr) {
+        scene->scene_tree.push_back(this);
+    } else {
+        parent->addChild(this);
+    }
 }
 
 const std::vector<Entity *> &Entity::getChildren() const {
@@ -111,12 +105,47 @@ void Entity::serialize(Serializer *serializer) const {
     serializer->addField("position", getPosition());
     serializer->addField("rotation", getRotation());
     serializer->addField("scale", getScale());
-    serializer->beginArray("Components");
+    serializer->begin("Components");
     for (auto c : components) {
+        c->serialize(serializer);
+    }
+    serializer->end();
+    serializer->beginArray("Children");
+    for (auto c:children) {
         c->serialize(serializer);
     }
     serializer->endArray();
     serializer->end();
+}
+
+void Entity::deserialize(Deserializer *deserializer) {
+    name = deserializer->getString("name");
+    setPosition(deserializer->getVec3("position"));
+    vec4 rotation_vec4 = deserializer->getVec4("rotation");
+    quat rotation_quat = quat();
+    rotation_quat.x = rotation_vec4.x;
+    rotation_quat.y = rotation_vec4.y;
+    rotation_quat.x = rotation_vec4.z;
+    rotation_quat.y = rotation_vec4.w;
+    setRotation(rotation_quat);
+    setScale(deserializer->getVec3("scale"));
+
+    deserializer->getObject("Components");
+    for (int i = 0; i < deserializer->getSize(); ++i) {
+        std::string component_name = deserializer->getNext();
+        deserializer->getObject(component_name);
+        Component *c = ComponentRegistry::attach(component_name, this);
+        c->deserialize(deserializer);
+        deserializer->popObject();
+    }
+    deserializer->popObject();
+
+    deserializer->getArray("Children");
+    for (int i = 0; i < deserializer->getSize(); ++i) {
+        Entity *c = scene->instantiate(this);
+        c->deserialize(deserializer);
+    }
+    deserializer->popArray();
 }
 
 vec3 Entity::getForward() const {
@@ -143,6 +172,15 @@ vec3 Entity::getDown() const {
     return -glm::normalize(getMatrix()[1]);
 
 }
+
+std::list<Component *> Entity::getComponents() {
+    return components;
+}
+
+
+
+
+
 
 
 

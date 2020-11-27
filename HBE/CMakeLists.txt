@@ -15,6 +15,7 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/lua/")
 
 include_directories(.)
 set(CORE_FILES
+        HBE.h
         Application.cpp
         Application.h
         Configs.cpp
@@ -23,7 +24,6 @@ set(CORE_FILES
 
         core/resource/ShaderProgram.h
         core/resource/Texture.h
-        core/resource/Resource.cpp
         core/resource/Texture.cpp
         core/resource/Material.cpp
         core/resource/Material.h
@@ -76,8 +76,9 @@ set(CORE_FILES
 
         core/serialization/Serializer.h
         core/serialization/Deserializer.h
-        core/serialization/ClassRegistry.cpp
-        core/serialization/ClassRegistry.h HBE.h)
+        core/serialization/ComponentRegistry.cpp
+        core/serialization/ComponentRegistry.h
+        core/serialization/Serializable.cpp)
 
 set(IMGUI_FILES
         #dependencies/imgui/backends/imgui_impl_allegro5.cpp

@@ -6,6 +6,7 @@
 class GL_Mesh : public Mesh {
     unsigned int vao;
     unsigned int ebo;
+    unsigned int vbo;
     std::unordered_map<unsigned int, unsigned int> buffers;
 public:
     GL_Mesh();

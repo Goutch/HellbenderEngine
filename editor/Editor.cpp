@@ -28,12 +28,16 @@ void Editor::start() {
     ImGui_ImplOpenGL3_Init("#version 430 core");
     setStyle();
     Application::onRender.subscribe(this, &Editor::onRender);
+    Application::onUpdate.subscribe(this, &Editor::onUpdate);
     Graphics::onWindowSizeChange.subscribe(this, &Editor::onWindowSizeChange);
     Graphics::getWindowSize(window_width, window_height);
     Configs::setWindowTitle("Editor");
 
 }
 
+void Editor::onUpdate(float delta) {
+    SceneHierarchy::update();
+}
 
 void Editor::onRender() {
     ImGui_ImplOpenGL3_NewFrame();
@@ -44,20 +48,18 @@ void Editor::onRender() {
     bool show = false;
     SetNextWindowBgAlpha(1.0);
     SetNextWindowPos(ImVec2(.0f, .0f), ImGuiCond_Always);
-    SetNextWindowSize(ImVec2(window_width+2, window_height+2), ImGuiCond_Always);
-    if(Begin("Editor", &show,
-                 ImGuiWindowFlags_NoTitleBar |
-                 ImGuiWindowFlags_MenuBar|
-                 ImGuiWindowFlags_NoResize |
-                 ImGuiWindowFlags_NoMove |
-                 ImGuiWindowFlags_NoCollapse))
-    {
+    SetNextWindowSize(ImVec2(window_width + 2, window_height + 2), ImGuiCond_Always);
+    if (Begin("Editor", &show,
+              ImGuiWindowFlags_NoTitleBar |
+              ImGuiWindowFlags_MenuBar |
+              ImGuiWindowFlags_NoResize |
+              ImGuiWindowFlags_NoMove |
+              ImGuiWindowFlags_NoCollapse)) {
         dockspace_id = GetID("DockSpace");
-        if (ImGui::DockBuilderGetNode(dockspace_id) == NULL)
-        {
+        if (ImGui::DockBuilderGetNode(dockspace_id) == NULL) {
             ImGui::DockBuilderRemoveNode(dockspace_id); // Clear out existing layout
             ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace); // Add empty node
-            ImGui::DockBuilderSetNodeSize(dockspace_id, ImVec2(window_width,window_height));
+            ImGui::DockBuilderSetNodeSize(dockspace_id, ImVec2(window_width, window_height));
 
             ImGuiID dock_main_id = dockspace_id;
             ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.20f, NULL, &dock_main_id);
@@ -112,67 +114,67 @@ void Editor::setStyle() {
     auto &style = ImGui::GetStyle();
 
 
-    style.Colors[ImGuiCol_Tab]                      = MED;
-    style.Colors[ImGuiCol_TabActive]                = HI;
-    style.Colors[ImGuiCol_TabUnfocusedActive]       = MED;
-    style.Colors[ImGuiCol_TabUnfocused]             = MED;
-    style.Colors[ImGuiCol_TabHovered]               = HI;
+    style.Colors[ImGuiCol_Tab] = MED;
+    style.Colors[ImGuiCol_TabActive] = HI;
+    style.Colors[ImGuiCol_TabUnfocusedActive] = MED;
+    style.Colors[ImGuiCol_TabUnfocused] = MED;
+    style.Colors[ImGuiCol_TabHovered] = HI;
 
-    style.Colors[ImGuiCol_TitleBg]                  = BG;
-    style.Colors[ImGuiCol_TitleBgActive]            = LOW;
-    style.Colors[ImGuiCol_TitleBgCollapsed]         = BG;
+    style.Colors[ImGuiCol_TitleBg] = BG;
+    style.Colors[ImGuiCol_TitleBgActive] = LOW;
+    style.Colors[ImGuiCol_TitleBgCollapsed] = BG;
 
-    style.Colors[ImGuiCol_Border]                   = MED;
-    style.Colors[ImGuiCol_BorderShadow]             = INVISIBLE;
+    style.Colors[ImGuiCol_Border] = MED;
+    style.Colors[ImGuiCol_BorderShadow] = INVISIBLE;
 
-    style.Colors[ImGuiCol_Text]                     = TEXT;
-    style.Colors[ImGuiCol_TextDisabled]             = TEXT;
-    style.Colors[ImGuiCol_WindowBg]                 = ImVec4(0.13f, 0.14f, 0.17f, 1.00f);
+    style.Colors[ImGuiCol_Text] = TEXT;
+    style.Colors[ImGuiCol_TextDisabled] = TEXT;
+    style.Colors[ImGuiCol_WindowBg] = ImVec4(0.13f, 0.14f, 0.17f, 1.00f);
     //style.Colors[ImGuiCol_ChildWindowBg]            = BG( 0.58f);
-    style.Colors[ImGuiCol_PopupBg]                  = BG;
+    style.Colors[ImGuiCol_PopupBg] = BG;
 
-    style.Colors[ImGuiCol_FrameBg]                  = BG;
-    style.Colors[ImGuiCol_FrameBgHovered]           = MED;
-    style.Colors[ImGuiCol_FrameBgActive]            = MED;
-    style.Colors[ImGuiCol_MenuBarBg]                = BG;
-    style.Colors[ImGuiCol_ScrollbarBg]              = BG;
-    style.Colors[ImGuiCol_ScrollbarGrab]            = ImVec4(0.09f, 0.15f, 0.16f, 1.00f);
-    style.Colors[ImGuiCol_ScrollbarGrabHovered]     = MED;
-    style.Colors[ImGuiCol_ScrollbarGrabActive]      = HI;
-    style.Colors[ImGuiCol_CheckMark]                = ImVec4(0.71f, 0.22f, 0.27f, 1.00f);
-    style.Colors[ImGuiCol_SliderGrab]               = ImVec4(0.47f, 0.77f, 0.83f, 0.14f);
-    style.Colors[ImGuiCol_SliderGrabActive]         = ImVec4(0.71f, 0.22f, 0.27f, 1.00f);
-    style.Colors[ImGuiCol_Button]                   = ImVec4(0.47f, 0.77f, 0.83f, 0.14f);
-    style.Colors[ImGuiCol_ButtonHovered]            = MED;
-    style.Colors[ImGuiCol_ButtonActive]             = HI;
-    style.Colors[ImGuiCol_Header]                   = LOW;
-    style.Colors[ImGuiCol_HeaderHovered]            = MED;
-    style.Colors[ImGuiCol_HeaderActive]             = HI;
+    style.Colors[ImGuiCol_FrameBg] = BG;
+    style.Colors[ImGuiCol_FrameBgHovered] = MED;
+    style.Colors[ImGuiCol_FrameBgActive] = MED;
+    style.Colors[ImGuiCol_MenuBarBg] = BG;
+    style.Colors[ImGuiCol_ScrollbarBg] = BG;
+    style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.09f, 0.15f, 0.16f, 1.00f);
+    style.Colors[ImGuiCol_ScrollbarGrabHovered] = MED;
+    style.Colors[ImGuiCol_ScrollbarGrabActive] = HI;
+    style.Colors[ImGuiCol_CheckMark] = ImVec4(0.71f, 0.22f, 0.27f, 1.00f);
+    style.Colors[ImGuiCol_SliderGrab] = ImVec4(0.47f, 0.77f, 0.83f, 0.14f);
+    style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.71f, 0.22f, 0.27f, 1.00f);
+    style.Colors[ImGuiCol_Button] = ImVec4(0.47f, 0.77f, 0.83f, 0.14f);
+    style.Colors[ImGuiCol_ButtonHovered] = MED;
+    style.Colors[ImGuiCol_ButtonActive] = HI;
+    style.Colors[ImGuiCol_Header] = LOW;
+    style.Colors[ImGuiCol_HeaderHovered] = MED;
+    style.Colors[ImGuiCol_HeaderActive] = HI;
     //style.Colors[ImGuiCol_Column]                   = ImVec4(0.14f, 0.16f, 0.19f, 1.00f);
     //style.Colors[ImGuiCol_ColumnHovered]            = MED;
     //style.Colors[ImGuiCol_ColumnActive]             = MED;
-    style.Colors[ImGuiCol_ResizeGrip]               = LOW;
-    style.Colors[ImGuiCol_ResizeGripHovered]        = MED;
-    style.Colors[ImGuiCol_ResizeGripActive]         = HI;
-    style.Colors[ImGuiCol_PlotLines]                = TEXT;
-    style.Colors[ImGuiCol_PlotLinesHovered]         = MED;
-    style.Colors[ImGuiCol_PlotHistogram]            = TEXT;
-    style.Colors[ImGuiCol_PlotHistogramHovered]     = MED;
-    style.Colors[ImGuiCol_TextSelectedBg]           = MED;
-    style.Colors[ImGuiCol_ModalWindowDarkening]     = BG;
+    style.Colors[ImGuiCol_ResizeGrip] = LOW;
+    style.Colors[ImGuiCol_ResizeGripHovered] = MED;
+    style.Colors[ImGuiCol_ResizeGripActive] = HI;
+    style.Colors[ImGuiCol_PlotLines] = TEXT;
+    style.Colors[ImGuiCol_PlotLinesHovered] = MED;
+    style.Colors[ImGuiCol_PlotHistogram] = TEXT;
+    style.Colors[ImGuiCol_PlotHistogramHovered] = MED;
+    style.Colors[ImGuiCol_TextSelectedBg] = MED;
+    style.Colors[ImGuiCol_ModalWindowDarkening] = BG;
 
-    style.WindowPadding            = ImVec2(6, 4);
-    style.WindowRounding           = 0.0f;
-    style.FramePadding             = ImVec2(5, 2);
-    style.FrameRounding            = 3.0f;
-    style.ItemSpacing              = ImVec2(7, 1);
-    style.ItemInnerSpacing         = ImVec2(1, 1);
-    style.TouchExtraPadding        = ImVec2(0, 0);
-    style.IndentSpacing            = 6.0f;
-    style.ScrollbarSize            = 12.0f;
-    style.ScrollbarRounding        = 16.0f;
-    style.GrabMinSize              = 20.0f;
-    style.GrabRounding             = 2.0f;
+    style.WindowPadding = ImVec2(6, 4);
+    style.WindowRounding = 0.0f;
+    style.FramePadding = ImVec2(5, 2);
+    style.FrameRounding = 3.0f;
+    style.ItemSpacing = ImVec2(7, 1);
+    style.ItemInnerSpacing = ImVec2(1, 1);
+    style.TouchExtraPadding = ImVec2(0, 0);
+    style.IndentSpacing = 6.0f;
+    style.ScrollbarSize = 12.0f;
+    style.ScrollbarRounding = 16.0f;
+    style.GrabMinSize = 20.0f;
+    style.GrabRounding = 2.0f;
 
     style.WindowTitleAlign.x = 0.50f;
 
@@ -180,3 +182,5 @@ void Editor::setStyle() {
     style.FrameBorderSize = 0.0f;
     style.WindowBorderSize = 0.0f;
 }
+
+

@@ -49,3 +49,8 @@ void Texture::serialize(Serializer *serializer) const {
     serializer->addField("path",path);
     serializer->end();
 }
+
+void Texture::deserialize(Deserializer *deserializer) {
+
+}
+

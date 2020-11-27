@@ -18,12 +18,14 @@
 #elif
 
 #endif
+#include "core/resource/Material.h"
 
 const Mesh *Graphics::DEFAULT_CUBE = nullptr;
 const Mesh *Graphics::DEFAULT_QUAD = nullptr;
 const ShaderProgram *Graphics::DEFAULT_MESH_SHADER = nullptr;
 const ShaderProgram *Graphics::DEFAULT_SCREEN_SHADER = nullptr;
 const ShaderProgram *Graphics::DEFAULT_INSTANCED_SHADER = nullptr;
+const Material *Graphics::DEFAULT_MESH_MATERIAL= nullptr;
 Renderer *Graphics::renderer = nullptr;
 GLFWwindow *Graphics::window = nullptr;
 RenderTarget *Graphics::render_target = nullptr;
@@ -157,6 +159,7 @@ void Graphics::present(const RenderTarget *render_target) {
 void Graphics::terminate() {
     Configs::onVerticalSyncChange.unsubscribe(Graphics::onVerticalSyncChange);
     delete DEFAULT_MESH_SHADER;
+    delete DEFAULT_MESH_MATERIAL;
     delete DEFAULT_SCREEN_SHADER;
     delete DEFAULT_INSTANCED_SHADER;
     delete DEFAULT_QUAD;
@@ -180,6 +183,9 @@ void Graphics::initializeDefaultVariables() {
     default_mesh_shader->setShaders(default_mesh_vertex_shader_code,
                                     default_mesh_fragment_shader_code,false);
     DEFAULT_MESH_SHADER = default_mesh_shader;
+    Material* default_mesh_material=Material::create();
+    default_mesh_material->setShader(DEFAULT_MESH_SHADER);
+    DEFAULT_MESH_MATERIAL=default_mesh_material;
     //DEFAULT_INSTANCED_SHADER
     ShaderProgram *default_instanced_shader = ShaderProgram::create();
     default_instanced_shader->setShaders(default_instanced_vertex_shader_code,

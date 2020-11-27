@@ -4,47 +4,43 @@
 #include <string>
 #include <list>
 #include <core/entity/component/Component.h>
-#include <core/resource/Resource.h>
+#include <core/serialization/Serializable.h>
 
 #include "Core.h"
-class HB_API Entity : public Transform, public Resource {
+#include "vector"
+
+class Scene;
+
+class HB_API Entity : public Transform, public Serializable {
     friend class Scene;
+
+    Scene *scene;
+    static unsigned int current_id;
 
     std::vector<Entity *> children;
     Entity *parent = nullptr;
-    static unsigned int current_id;
     unsigned int id;
     std::string name;
     std::list<Component *> components;
 
+    Entity(Scene *scene, Entity *parent = nullptr);
 
-    Entity(Entity *parent);
+    Entity(Scene *scene, std::string name, Entity *parent = nullptr);
 
-    Entity(std::string name);
 
-    Entity(std::string name, Entity *parent);
-
-    Entity(std::string name, vec3 position, vec3 rotation = vec3(0), vec3 scale = vec3(1));
-
-    Entity(std::string name, Entity *parent, vec3 position, vec3 rotation = vec3(0), vec3 scale = vec3(1));
-
-    Entity(vec3 position, vec3 rotation = vec3(0), vec3 scale = vec3(1));
-
-    Entity();
-
+    void destroy();
+    void removeChild(Entity *child);
 public:
-    virtual ~Entity(){};
+
     virtual void init() {};
 
-    virtual void onDestroy();
-
     void setName(const std::string &name);
+
+    std::list<Component *> getComponents();
 
     const std::string &getName() const;
 
     void addChild(Entity *child);
-
-    void removeChild(Entity *child);
 
     const std::vector<Entity *> &getChildren() const;
 
@@ -61,11 +57,17 @@ public:
     vec3 getEulerRotation() const override;
 
     vec3 getForward() const;
+
     vec3 getBackward() const;
+
     vec3 getRight() const;
+
     vec3 getLeft() const;
+
     vec3 getUp() const;
+
     vec3 getDown() const;
+
     template<class ComponentType>
     ComponentType *attach() {
         ComponentType *component_type_object = new ComponentType();
@@ -81,7 +83,7 @@ public:
             ComponentType *component_type_object = dynamic_cast<ComponentType *>(component);
             if (component_type_object) {
                 components.remove(component);
-                component->onDetach();
+                delete component_type_object;
                 break;
             }
         }
@@ -90,12 +92,14 @@ public:
     template<class ComponentType>
     ComponentType *getComponent() {
         for (Component *component:components) {
-            ComponentType *componentType = dynamic_cast<ComponentType *>(component);
-            if (componentType)
-                return componentType;
+            ComponentType *component_type = dynamic_cast<ComponentType *>(component);
+            if (component_type)
+                return component_type;
         }
         return nullptr;
     }
 
     void serialize(Serializer *serializer) const override;
+
+    void deserialize(Deserializer *deserializer) override;
 };

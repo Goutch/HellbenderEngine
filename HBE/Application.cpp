@@ -7,6 +7,12 @@
 #include "core/utility/Clock.h"
 #include "Configs.h"
 #include "core/utility/JobManager.h"
+#include <core/serialization/ComponentRegistry.h>
+#include <core/entity/component/MeshRenderer.h>
+#include <core/entity/component/ModelRenderer.h>
+#include <core/entity/component/CameraController.h>
+#include <core/entity/component/InstancesRenderer.h>
+
 Scene *Application::scene = nullptr;
 GLFWwindow *Application::window = nullptr;
 Clock *Application::time = nullptr;
@@ -16,9 +22,16 @@ Event<> Application::onInit;
 Event<float> Application::onUpdate;
 Event<Scene *> Application::onSceneChange;
 Event<> Application::onRender;
-
+void registerComponents(){
+    ComponentRegistry::registerComponent<Camera>("Camera");
+    ComponentRegistry::registerComponent<MeshRenderer>("MeshRenderer");
+    ComponentRegistry::registerComponent<ModelRenderer>("ModelRenderer");
+    ComponentRegistry::registerComponent<InstancesRenderer>("InstancesRenderer");
+    ComponentRegistry::registerComponent<CameraController>("CameraController");
+};
 void Application::init() {
     window = Graphics::init();
+    registerComponents();
     Input::init(window);
     scene = new Scene();
     scene->init();
@@ -72,6 +85,7 @@ void Application::run() {
 void Application::terminate() {
     ScriptManager::terminate();
     Graphics::terminate();
+    ComponentRegistry::terminate();
 }
 
 void Application::quit() {

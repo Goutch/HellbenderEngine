@@ -1,50 +1,45 @@
-//
-// Created by user on 11/6/20.
-//
-
 #include "LuaDeserializer.h"
 #include <lua.hpp>
 LuaDeserializer::LuaDeserializer(std::string path) {
     L = luaL_newstate();
-
 }
 
 LuaDeserializer::~LuaDeserializer() {
     lua_close(L);
 }
 
-template<typename T>
-std::vector<T> LuaDeserializer::getArray(const std::string& name) {
-    std::vector<T> ts;
+void LuaDeserializer::getObject(const std::string &name) {
 
-    lua_getfield(L, -1, name.c_str());
-
-    return ts;
 }
 
-template<typename T>
-T LuaDeserializer::get(const std::string& name) {
-    std::vector<T> ts;
-    lua_getfield(L, -1, name.c_str());
-    if (lua_istable(L, -1)) {
-        lua_pushnil(L);
-        int key_index = -2;
-        int value_index = -1;
-        T *value;
-        while (lua_next(L, key_index) != 0) {
-            switch (lua_type(L, key_index)) {
-                case LUA_TNUMBER://is unamed
-                    printf("%g", lua_tonumber(L, key_index));
-                    break;
-                default:
-                    Log::error(name+" data is not an array");
-                    break;
-            }
-            value = static_cast<T>(lua_topointer(L, value_index));
-            ts.push_back(*value);
-            lua_pop(L, 1);
-        }
+void LuaDeserializer::popObject() {
 
-    }
-    return *ts;
+}
+
+void LuaDeserializer::popArray() {
+
+}
+
+mat4 LuaDeserializer::getMat4(const std::string &name) {
+    return glm::mat4();
+}
+
+vec3 LuaDeserializer::getVec3(const std::string &name) {
+    return glm::vec3();
+}
+
+vec2 LuaDeserializer::getVec2(const std::string &name) {
+    return glm::vec2();
+}
+
+float LuaDeserializer::getFloat(const std::string &name) {
+    return 0;
+}
+
+int LuaDeserializer::getInt(const std::string &name) {
+    return 0;
+}
+
+std::string LuaDeserializer::getString(const std::string &name) {
+    return std::string();
 }

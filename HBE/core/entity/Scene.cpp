@@ -1,9 +1,7 @@
-//
-// Created by User on 07-Jun.-2020.
-//
-
 #include "Scene.h"
 #include "core/serialization/Serializer.h"
+#include "core/serialization/Deserializer.h"
+#include "core/utility/Log.h"
 Scene::Scene() {
 
 }
@@ -39,33 +37,36 @@ void Scene::terminate() {
 
 
 Entity *Scene::instantiate(std::string name, Entity *parent) {
-    Entity *e = new Entity(name, parent);
-    entities.push_back(e);
+    Entity *e = new Entity(this, name, parent);
+    entities.emplace(e);
     e->init();
     return e;
 }
+
 Entity *Scene::instantiate(Entity *parent) {
-    Entity* e =new Entity(parent);
-    entities.push_back(e);
+    Entity *e = new Entity(this, parent);
+    entities.emplace(e);
     e->init();
     return e;
 }
 
 
 void Scene::destroy(Entity *e) {
-    auto it=entities.begin();
-    while (it!=entities.end()) {
-        if(*it==e)
-        {
-            break;
-        }
-        ++it;
-    }
-    if(it!=entities.end())
+    Log::debug("destroy "+e->getName());
+    entities.erase(entities.find(e));
+    if(e->parent== nullptr)
     {
-        entities.erase(it);
+        auto it = std::find(scene_tree.begin(), scene_tree.end(), e);
+        if (it != scene_tree.end()) {
+            scene_tree.erase(it);
+        }
     }
-    e->onDestroy();
+    else
+    {
+        e->parent->removeChild(e);
+
+    }
+    e->destroy();
     delete e;
 }
 
@@ -92,17 +93,22 @@ void Scene::unsubscribeUpdate(Component *component) {
 void Scene::serialize(Serializer *serializer) const {
     serializer->begin("Scene");
     serializer->beginArray("entities");
-    for (auto e: entities)
-    {
+    for (auto e: entities) {
         e->serialize(serializer);
     }
     serializer->endArray();
     serializer->end();
 }
 
-const std::vector<Entity *> &Scene::getEntities() {
-    return entities;
+void Scene::deserialize(Deserializer *deserializer) {
+
 }
+
+const std::vector<Entity *> &Scene::getSceneTree() {
+    return scene_tree;
+}
+
+
 
 
 

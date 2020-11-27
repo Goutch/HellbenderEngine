@@ -1,11 +1,10 @@
 #pragma once
 
 class Serializer;
-#include "core/utility/Job.h"
-#include "core/utility/ModelImporter.h"
-#include "list"
+class Deserializer;
 #include "Core.h"
-class HB_API Resource {
+class HB_API Serializable {
 public:
     virtual void serialize(Serializer *serializer) const = 0;
+    virtual void deserialize(Deserializer *deserializer) = 0;
 };

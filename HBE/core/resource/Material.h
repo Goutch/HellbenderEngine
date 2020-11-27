@@ -4,7 +4,7 @@
 #include "ShaderProgram.h"
 #include "core/graphics/Graphics.h"
 #include "unordered_map"
-#include "Resource.h"
+#include "core/serialization/Serializable.h"
 #include "Core.h"
 enum GLSL_TYPE{
     FLOAT,
@@ -51,7 +51,7 @@ struct HB_API MaterialProperty
         value=new mat4(v);
     }
 };
-class HB_API Material:Resource{
+class HB_API Material: Serializable{
     const ShaderProgram *shader= nullptr;
     const Texture *texture = nullptr;
     const Texture *normal_map = nullptr;
@@ -79,4 +79,7 @@ public:
     void setProperty(std::string name, vec4 &value);
 
     void serialize(Serializer* serializer) const override;
+
+private:
+    void deserialize(Deserializer *deserializer) override;
 };

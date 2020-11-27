@@ -2,9 +2,9 @@
 #include <core/resource/Mesh.h>
 #include <core/utility/Log.h>
 #include "core/utility/ModelImporter.h"
-#include "Resource.h"
+#include "core/serialization/Serializable.h"
 #include "Core.h"
-class HB_API Model :Resource{
+class HB_API Model : public Serializable{
     std::string path;
     std::vector<std::pair<Mesh *,Material *>> meshes;
     void clearModels();
@@ -21,5 +21,6 @@ public:
     ~Model();
 
     void serialize(Serializer* serializer) const override;
+    void deserialize(Deserializer *deserializer) override;
 };
 

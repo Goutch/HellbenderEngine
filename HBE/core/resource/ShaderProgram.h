@@ -1,5 +1,6 @@
 #pragma once
-#include "Resource.h"
+#include "core/serialization/Serializable.h"
+
 #include "glm/glm.hpp"
 #include "string"
 #include "map"
@@ -7,7 +8,7 @@
 enum class SHADER_TYPE{
     COMPUTE,VERTEX,FRAGMENT
 };
-class HB_API ShaderProgram:Resource {
+class HB_API ShaderProgram: public Serializable {
     std::map<SHADER_TYPE,std::string> shaders;
 public:
     static ShaderProgram* create();
@@ -56,6 +57,9 @@ public:
 
     virtual void setUniform(std::string name, const glm::mat4 &m) const = 0;
     void serialize(Serializer* serializer) const override;
+
+private:
+    void deserialize(Deserializer *deserializer) override;
 };
 
 

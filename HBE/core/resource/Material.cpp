@@ -168,4 +168,8 @@ void Material::serialize(Serializer *serializer) const {
     serializer->end();
 }
 
+void Material::deserialize(Deserializer *deserializer) {
+
+}
+
 

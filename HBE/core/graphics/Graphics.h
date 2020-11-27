@@ -32,6 +32,7 @@ public:
     static Event<int, int> onWindowSizeChange;
     static const ShaderProgram *DEFAULT_SCREEN_SHADER;
     static const ShaderProgram *DEFAULT_MESH_SHADER;
+    static const Material *DEFAULT_MESH_MATERIAL;
     static const ShaderProgram *DEFAULT_INSTANCED_SHADER;
     static const Mesh *DEFAULT_QUAD;
     static const Mesh *DEFAULT_CUBE;

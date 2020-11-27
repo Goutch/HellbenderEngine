@@ -28,3 +28,7 @@ void ShaderProgram::serialize(Serializer *serializer) const {
     }
     serializer->end();
 }
+
+void ShaderProgram::deserialize(Deserializer *deserializer) {
+
+}

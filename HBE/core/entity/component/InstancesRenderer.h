@@ -5,10 +5,11 @@
 #include <core/entity/Transform.h>
 #include "Component.h"
 #include "Core.h"
+
 class HB_API InstancesRenderer : public Component {
 
-    Mesh *mesh;
-    const Material *material;
+    Mesh *mesh = nullptr;
+    const Material *material = nullptr;
 
     void onAttach() override;
 
@@ -19,6 +20,10 @@ public:
 
     void setMesh(Mesh &mesh);
 
-    void serialize(Serializer* serializer) const override;
+    std::string toString() const override;
+    void serialize(Serializer *serializer) const override;
+
+    void deserialize(Deserializer *deserializer);
+
 };
 

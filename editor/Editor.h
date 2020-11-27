@@ -1,6 +1,5 @@
+
 #pragma once
-
-
 #include "imgui.h"
 struct ViewOptions {
     bool terminal_active = true;
@@ -20,7 +19,7 @@ public:
 
     void start();
 
-    void update(float delta);
+    void onUpdate(float delta);
 
     void onRender();
 

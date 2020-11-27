@@ -3,7 +3,6 @@
 
 #include <vector>
 #include "glm/glm.hpp"
-#include "Resource.h"
 #include "Core.h"
 
 using namespace glm;

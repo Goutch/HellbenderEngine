@@ -12,6 +12,7 @@
 #include "GLFW/glfw3.h"
 #include "core/graphics/Framebuffer.h"
 #include "core/graphics/RenderTarget.h"
+#include "core/utility/Log.h"
 
 #ifdef DEBUG_MODE
 

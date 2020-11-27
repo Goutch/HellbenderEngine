@@ -16,4 +16,6 @@ public:
     const Model* getModel();
 
     void serialize(Serializer* serializer) const override;
+
+    std::string toString()const override;
 };

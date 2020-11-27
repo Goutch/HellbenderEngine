@@ -12,16 +12,13 @@ void ModelRenderer::onAttach() {
 }
 
 void ModelRenderer::onDraw() {
-    if(model)
-    {
+    if (model) {
         auto meshes = model->getMeshes();
-        for (std::size_t  i = 0; i < meshes.size(); ++i) {
+        for (std::size_t i = 0; i < meshes.size(); ++i) {
             Graphics::draw(*entity, *meshes[i].first, *meshes[i].second);
         }
-    }
-    else
-    {
-        Log::warning("Model renderer "+getEntity()->getName()+" does not have a model");
+    } else {
+        Log::warning("Model renderer " + getEntity()->getName() + " does not have a model");
     }
 }
 
@@ -34,6 +31,11 @@ const Model *ModelRenderer::getModel() {
 }
 
 void ModelRenderer::serialize(Serializer *serializer) const {
-    serializer->begin("ModelRenderer");
+    serializer->begin(toString());
+
     serializer->end();
+}
+
+std::string ModelRenderer::toString()const {
+    return "ModelRenderer";
 }

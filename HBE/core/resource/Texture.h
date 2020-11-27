@@ -1,12 +1,12 @@
 #pragma once
 
 #include <string>
-#include "Resource.h"
+#include "core/serialization/Serializable.h"
 #include "Core.h"
-class HB_API Texture :Resource{
-private:
-    std::string path;
+
+class HB_API Texture : Serializable {
 protected:
+    std::string path;
     int width = 1;
     int height = 1;
 public:
@@ -16,7 +16,9 @@ public:
         R8,
         DEPTH32,
     };
-    static void load(std::string path,unsigned char *buffer,int& width,int& height);
+
+    static void load(std::string path, unsigned char *buffer, int &width, int &height);
+
     static Texture *create();
 
     Texture *load(std::string path);
@@ -24,7 +26,8 @@ public:
     static void save(Texture *texture, std::string path);
 
 
-    virtual unsigned int getTextureID() const=0;
+    virtual unsigned int getTextureID() const = 0;
+
     virtual void setData(unsigned char *data, int width, int height, TEXTURE_TYPE texture_type) = 0;
 
     virtual ~Texture() {};
@@ -33,6 +36,9 @@ public:
 
     virtual void unbind(unsigned int slot = 0) const = 0;
 
-    void serialize(Serializer* serializer) const override;
+    void serialize(Serializer *serializer) const override;
+
+    void deserialize(Deserializer *deserializer) override;
+
 };
 

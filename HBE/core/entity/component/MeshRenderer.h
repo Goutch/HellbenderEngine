@@ -18,6 +18,8 @@ public:
     void setMesh(const Mesh &mesh);
     const Mesh* getMesh();
 
+    std::string toString() const override;
+
     void serialize(Serializer* serializer) const override;
 };
 

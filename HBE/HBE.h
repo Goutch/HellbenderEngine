@@ -20,6 +20,7 @@
 #include <core/entity/component/CameraController.h>
 #include <core/entity/component/ModelRenderer.h>
 
+
 #include <core/graphics/Graphics.h>
 #include <core/graphics/RenderTarget.h>
 #include <core/input/Input.h>
@@ -35,6 +36,7 @@
 #include <core/utility/Random.h>
 
 #include <core/serialization/Serializer.h>
+#include <core/serialization/ComponentRegistry.h>
 
 #include <glm/glm.hpp>
 #include "glm/gtx/quaternion.hpp"

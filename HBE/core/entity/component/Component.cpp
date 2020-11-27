@@ -29,7 +29,11 @@ void Component::unsubscribeUpdate() {
     }
 }
 
-void Component::onDetach() {
+std::string Component::toString() const{
+    return "UnamedComponent";
+}
+
+Component::~Component() {
     if (subscribed_update)unsubscribeUpdate();
     if (subscribed_draw)unsubscribeDraw();
 }
