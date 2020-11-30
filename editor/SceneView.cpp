@@ -2,9 +2,11 @@
 #include <imgui.h>
 #include "SceneView.h"
 #include "HBE.h"
+using namespace HBE;
 float SceneView::last_window_width=0;
 float SceneView::last_window_height=0;
 const char* SceneView::name="Scene View";
+
 void SceneView::draw(bool& active) {
     if(active)
     {
@@ -16,7 +18,8 @@ void SceneView::draw(bool& active) {
         {
             Graphics::getRenderTarget()->setSize(w,h);
         }
-
+        last_window_width=w;
+        last_window_height=h;
         unsigned int tex_id=Graphics::getRenderTarget()->getTextureID();
 
         ImGui::GetWindowDrawList()->AddImage(

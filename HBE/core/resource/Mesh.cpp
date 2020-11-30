@@ -2,11 +2,14 @@
 #include "Mesh.h"
 #include <platforms/gl/GL_Mesh.h>
 #include "core/serialization/Serializer.h"
-Mesh* Mesh::create() {
+
+namespace HBE {
+    Mesh *Mesh::create() {
 #if RENDERER == OPENGL_RENDERER
-    return new GL_Mesh();
+        return new GL_Mesh();
 #elif RENDERER == VULKAN_RENDERER
 
 #endif
-    return nullptr;
+        return nullptr;
+    }
 }

@@ -1,6 +1,7 @@
 
 #pragma once
 #include "imgui.h"
+
 struct ViewOptions {
     bool terminal_active = true;
     bool scene_view_active = true;

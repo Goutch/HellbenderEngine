@@ -4,23 +4,33 @@
 #include "core/utility/ModelImporter.h"
 #include "core/serialization/Serializable.h"
 #include "Core.h"
-class HB_API Model : public Serializable{
-    std::string path;
-    std::vector<std::pair<Mesh *,Material *>> meshes;
-    void clearModels();
-public:
-    static Model* create();
-    void setMaterial(Material *material, int mesh_index = 0);
+namespace HBE {
+    class HB_API Model : public Serializable {
+        std::string path;
+        std::vector<std::pair<Mesh *, Material *>> meshes;
 
-    Model * load(std::string path);
-    const std::string& getPath();
-    void loadAsync(std::string path);
-    void constructModel(std::vector<std::pair<MeshData, MaterialData>> * meshes_data);
-    const std::vector<std::pair<Mesh *,Material *>>& getMeshes() const;
+        void clearModels();
 
-    ~Model();
+    public:
+        static Model *create();
 
-    void serialize(Serializer* serializer) const override;
-    void deserialize(Deserializer *deserializer) override;
-};
+        void setMaterial(Material *material, int mesh_index = 0);
 
+        Model *load(std::string path);
+
+        const std::string &getPath();
+
+        void loadAsync(std::string path);
+
+        void constructModel(std::vector<std::pair<MeshData, MaterialData>> *meshes_data);
+
+        const std::vector<std::pair<Mesh *, Material *>> &getMeshes() const;
+
+        ~Model();
+
+        void serialize(Serializer *serializer) const override;
+
+        void deserialize(Deserializer *deserializer) override;
+    };
+
+}

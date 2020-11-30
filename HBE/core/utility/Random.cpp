@@ -3,11 +3,12 @@
 //
 
 #include "Random.h"
+namespace HBE {
+    float Random::range(float min, float max) {
+        return min + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (max - min)));
+    }
 
-float Random::range(float min, float max) {
-    return min + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (max - min)));
-}
-
-int Random::range(int min, int max) {
-    return min+(rand()%(max-min));
+    int Random::range(int min, int max) {
+        return min + (rand() % (max - min));
+    }
 }

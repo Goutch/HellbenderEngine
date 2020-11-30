@@ -16,7 +16,7 @@
 
 using namespace ImGui;
 
-
+using namespace HBE;
 void Editor::start() {
 
     Configs::setCustomRendering(true);

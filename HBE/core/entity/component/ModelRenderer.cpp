@@ -5,37 +5,38 @@
 #include "core/entity/Entity.h"
 #include "core/resource/Model.h"
 #include "core/serialization/Serializer.h"
-
-void ModelRenderer::onAttach() {
-    Component::onAttach();
-    subscribeDraw();
-}
-
-void ModelRenderer::onDraw() {
-    if (model) {
-        auto meshes = model->getMeshes();
-        for (std::size_t i = 0; i < meshes.size(); ++i) {
-            Graphics::draw(*entity, *meshes[i].first, *meshes[i].second);
-        }
-    } else {
-        Log::warning("Model renderer " + getEntity()->getName() + " does not have a model");
+namespace HBE {
+    void ModelRenderer::onAttach() {
+        Component::onAttach();
+        subscribeDraw();
     }
-}
 
-void ModelRenderer::setModel(const Model &model) {
-    this->model = &model;
-}
+    void ModelRenderer::onDraw() {
+        if (model) {
+            auto meshes = model->getMeshes();
+            for (std::size_t i = 0; i < meshes.size(); ++i) {
+                Graphics::draw(*entity->transform, *meshes[i].first, *meshes[i].second);
+            }
+        } else {
+            Log::warning("Model renderer " + entity->getName() + " does not have a model");
+        }
+    }
 
-const Model *ModelRenderer::getModel() {
-    return model;
-}
+    void ModelRenderer::setModel(const Model &model) {
+        this->model = &model;
+    }
 
-void ModelRenderer::serialize(Serializer *serializer) const {
-    serializer->begin(toString());
+    const Model *ModelRenderer::getModel() {
+        return model;
+    }
 
-    serializer->end();
-}
+    void ModelRenderer::serialize(Serializer *serializer) const {
+        serializer->begin(toString());
 
-std::string ModelRenderer::toString()const {
-    return "ModelRenderer";
+        serializer->end();
+    }
+
+    std::string ModelRenderer::toString() const {
+        return "ModelRenderer";
+    }
 }

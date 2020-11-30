@@ -4,65 +4,68 @@
 #include "Function.h"
 #include <future>
 #include "Log.h"
+namespace HBE {
+    class IJob {
+    public:
+        virtual ~IJob() {};
 
-class  IJob {
-public:
-    virtual ~IJob(){};
-    virtual bool isFinish() = 0;
+        virtual bool isFinish() = 0;
 
-    virtual void onFinish() = 0;
-};
+        virtual void onFinish() = 0;
+    };
 
-template<typename Return, typename... Args>
-class HB_API Job : public IJob {
-    friend class JobManager;
-    std::future<Return> result;
-    std::function<void(Return)> finish_callback;
-    bool has_callback = false;
-    bool running = false;
-    Job(){};
-public:
-    void run(Return(*static_function)(Args...), Args... args) {
-        if (!running) {
-            running = true;
-            this->result = std::async(std::launch::async, static_function, args...);
-        } else {
-            Log::warning("Trying to start a job already running!");
+    template<typename Return, typename... Args>
+    class HB_API Job : public IJob {
+        friend class JobManager;
+
+        std::future<Return> result;
+        std::function<void(Return)> finish_callback;
+        bool has_callback = false;
+        bool running = false;
+
+        Job() {};
+    public:
+        void run(Return(*static_function)(Args...), Args... args) {
+            if (!running) {
+                running = true;
+                this->result = std::async(std::launch::async, static_function, args...);
+            } else {
+                Log::warning("Trying to start a job already running!");
+            }
         }
-    }
 
-    template<typename Object>
-    void run(Object *instance, Return(Object::* member_function)(Args...), Args... args) {
-        if (!running) {
-            running = true;
-            this->result = std::async(member_function, instance, args...);
-        } else {
-            Log::warning("Trying to start a job already running!");
+        template<typename Object>
+        void run(Object *instance, Return(Object::* member_function)(Args...), Args... args) {
+            if (!running) {
+                running = true;
+                this->result = std::async(member_function, instance, args...);
+            } else {
+                Log::warning("Trying to start a job already running!");
+            }
         }
-    }
 
-    void setCallback(void(*static_callback)(Return)) {
-        has_callback = true;
-        finish_callback = std::bind(static_callback);
-    }
+        void setCallback(void(*static_callback)(Return)) {
+            has_callback = true;
+            finish_callback = std::bind(static_callback);
+        }
 
-    template<typename Object>
-    void setCallback(Object *instance, void(Object::* member_function)(Return)) {
-        has_callback = true;
-        finish_callback = Attach(member_function, instance);
-    }
+        template<typename Object>
+        void setCallback(Object *instance, void(Object::* member_function)(Return)) {
+            has_callback = true;
+            finish_callback = Attach(member_function, instance);
+        }
 
-    bool isFinish() {
-        return result.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready;
-    }
+        bool isFinish() {
+            return result.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready;
+        }
 
-    void onFinish() {
-        running = false;
-        if (has_callback)
-            finish_callback(result.get());
-        has_callback = false;
-    }
+        void onFinish() {
+            running = false;
+            if (has_callback)
+                finish_callback(result.get());
+            has_callback = false;
+        }
 
-};
-
+    };
+}
 

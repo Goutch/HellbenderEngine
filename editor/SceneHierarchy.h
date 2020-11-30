@@ -2,6 +2,7 @@
 #include "string"
 #include "list"
 #include "Application.h"
+using namespace HBE;
 class SceneHierarchy {
     static std::list<Entity*> delete_query;
 public:

@@ -1,78 +1,84 @@
 #pragma once
-
-
 #include <array>
 #include <core/math/Plane.h>
 #include <core/entity/component/Component.h>
 #include <glm/glm.hpp>
 #include "Core.h"
+namespace HBE {
+    class RenderTarget;
 
-class RenderTarget;
+    enum RenderMode {
+        ORTHOGRAPHIC = 0,
+        PERSPECTIVE = 1,
+    };
 
-enum RenderMode {
-    ORTHOGRAPHIC,
-    PERSPECTIVE,
-};
+    class HB_API Camera : public Component {
+    public:
+        static Camera *main;
+    private:
+        float fov = 80;
+        float orthographic_zoom = 1.0f;
+        float aspect_ratio = 1;
+        float render_distance = 500;
+        RenderMode render_mode = PERSPECTIVE;
+        RenderTarget *render_target = nullptr;
 
-class HB_API Camera : public Component {
-public:
-    static Camera *main;
-private:
-    float fov = 80;
-    float aspect_ratio = 1;
-    float render_distance = 500;
-    RenderMode render_mode = PERSPECTIVE;
-    RenderTarget *render_target = nullptr;
+        mat4 projection_matrix = mat4(1.0f);
+        std::array<Plane, 6> frustum_planes;
 
-    mat4 projection_matrix = mat4(1.0f);
-    std::array<Plane, 6> frustum_planes;
+    public:
 
-public:
+        std::string toString() const override;
 
-    std::string toString() const override;
+        void onAttach() override;
 
-    void onAttach() override;
+        ~Camera() override;
 
-    ~Camera() override;
+        void setAspectRatio(float width, float height);
 
-    void setAspectRatio(float width, float height);
+        void setAspectRatio(float aspect_ratio);
 
-    void setAspectRatio(float aspect_ratio);
+        float getAspectRatio();
 
-    float getAspectRatio();
+        void setRenderDistance(float render_distance);
 
-    void setRenderDistance(float render_distance);
+        float getRenderDistance();
 
-    float getRenderDistance();
+        const mat4 &getProjectionMatrix() const;
 
-    const mat4 &getProjectionMatrix() const;
+        mat4 getViewMatrix() const;
 
-    mat4 getViewMatrix() const;
+        float getFOV() const;
 
-    float getFOV() const;
+        void setFOV(float fov);
 
-    void setFOV(float fov);
+        void setOrthographicZoom(float zoom);
 
-    void setRenderTarget(RenderTarget *render_target);
+        float getOrthographicZoom();
 
-    const RenderTarget *getRenderTarget();
+        void setRenderTarget(RenderTarget *render_target);
 
-    void calculateFrustumPlanes();
+        const RenderTarget *getRenderTarget();
 
-    bool isPointInFrustum(const vec3 &point) const;
+        void calculateFrustumPlanes();
 
-    bool isBoxInFrustum(const vec3 &position, float size_x, float size_y, float size_z) const;
+        bool isPointInFrustum(const vec3 &point) const;
 
-    bool isSphereInFrustum(const vec3 &position, float radius) const;
+        bool isBoxInFrustum(const vec3 &position, float size_x, float size_y, float size_z) const;
 
-    void setRenderMode(RenderMode mode);
+        bool isSphereInFrustum(const vec3 &position, float radius) const;
 
-    void onRenderTargetSizeChange(int width, int height);
+        void setRenderMode(RenderMode mode);
 
-    void serialize(Serializer *serializer) const override;
+        RenderMode getRenderMode();
 
-    void deserialize(Deserializer *deserializer) override;
+        void onRenderTargetSizeChange(int width, int height);
 
-private:
-    void generateProjectionMatrix();
-};
+        void serialize(Serializer *serializer) const override;
+
+        void deserialize(Deserializer *deserializer) override;
+
+    private:
+        void generateProjectionMatrix();
+    };
+}

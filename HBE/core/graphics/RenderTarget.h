@@ -1,44 +1,44 @@
 #pragma once
-
-class Framebuffer;
-
-class ShaderProgram;
-
 #include "glm/glm.hpp"
 #include "core/utility/Event.h"
 #include "Core.h"
+
 using namespace glm;
+namespace HBE {
+    class Framebuffer;
 
-class HB_API RenderTarget {
-    unsigned int width;
-    unsigned int heigth;
-    mat4 projection_matrix;
-    Framebuffer *framebuffer;
-public:
-    Event<int, int> onSizeChange;
+    class ShaderProgram;
 
-    RenderTarget(unsigned int width, unsigned int height, const ShaderProgram &shader_program);
+    class HB_API RenderTarget {
+        unsigned int width;
+        unsigned int heigth;
+        mat4 projection_matrix;
+        Framebuffer *framebuffer;
+    public:
+        Event<int, int> onSizeChange;
 
-    const ShaderProgram *shader_program;
+        RenderTarget(unsigned int width, unsigned int height, const ShaderProgram &shader_program);
 
-    const Framebuffer &getFramebuffer() const;
+        const ShaderProgram *shader_program;
 
-    const ShaderProgram &getShaderProgram() const;
+        const Framebuffer &getFramebuffer() const;
 
-    const mat4 &getProjectionMatrix();
+        const ShaderProgram &getShaderProgram() const;
 
-    unsigned int getWidth() const;
+        const mat4 &getProjectionMatrix();
 
-    unsigned int getHeight() const;
+        unsigned int getWidth() const;
 
-    void setSize(unsigned int width, unsigned int height);
+        unsigned int getHeight() const;
 
-    void setShaderUniforms() const;
+        void setSize(unsigned int width, unsigned int height);
 
-    void setProjectionMatrix(mat4 projection_matrix);
+        void setShaderUniforms() const;
 
-    void setShaderProgram(ShaderProgram &shader_program);
+        void setProjectionMatrix(mat4 projection_matrix);
 
-    unsigned int getTextureID();
-};
+        void setShaderProgram(ShaderProgram &shader_program);
 
+        unsigned int getTextureID();
+    };
+}

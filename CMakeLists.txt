@@ -23,8 +23,6 @@ add_executable (${PROJECT_NAME}
 		editor/SceneView.h
 		editor/Inspector.cpp
 		editor/Inspector.h
-       	editor/EditorSerializer.cpp
-		editor/EditorSerializer.h
 		)
 target_include_directories(${PROJECT_NAME}
 		PUBLIC HBE/

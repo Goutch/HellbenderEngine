@@ -46,7 +46,7 @@ set(CORE_FILES
         core/entity/Scene.cpp
         core/entity/Scene.h
         core/entity/Entity.cpp
-        core/entity/Transform.cpp
+        core/entity/component/Transform.cpp
         core/entity/component/Camera.cpp
         core/entity/component/Component.h
         core/entity/component/CameraController.cpp
@@ -77,8 +77,7 @@ set(CORE_FILES
         core/serialization/Serializer.h
         core/serialization/Deserializer.h
         core/serialization/ComponentRegistry.cpp
-        core/serialization/ComponentRegistry.h
-        core/serialization/Serializable.cpp)
+        core/serialization/ComponentRegistry.h)
 
 set(IMGUI_FILES
         #dependencies/imgui/backends/imgui_impl_allegro5.cpp

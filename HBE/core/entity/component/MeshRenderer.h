@@ -2,25 +2,28 @@
 
 #include "Core.h"
 #include <core/entity/component/Component.h>
-class Material;
-class Mesh;
-class HB_API MeshRenderer : public Component {
-    const Mesh *mesh;
-    const Material *material;
 
-public:
-    void onAttach() override;
+namespace HBE {
+    class Material;
+    class Mesh;
 
-    void onDraw() override;
+    class HB_API MeshRenderer : public Component {
+        const Mesh *mesh;
+        const Material *material;
 
-    void setMaterial(const Material &material);
+    public:
+        void onAttach() override;
 
-    void setMesh(const Mesh &mesh);
-    const Mesh* getMesh();
+        void onDraw() override;
 
-    std::string toString() const override;
+        void setMaterial(const Material &material);
 
-    void serialize(Serializer* serializer) const override;
-};
+        void setMesh(const Mesh &mesh);
 
+        const Mesh *getMesh();
 
+        std::string toString() const override;
+
+        void serialize(Serializer *serializer) const override;
+    };
+}

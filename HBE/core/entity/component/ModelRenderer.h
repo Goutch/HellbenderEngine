@@ -2,20 +2,24 @@
 
 #include "Core.h"
 #include <core/entity/component/Component.h>
-class Material;
-class Model;
-class HB_API ModelRenderer : public Component {
-    const Model *model;
 
-public:
-    void onAttach() override;
+namespace HBE {
+    class Material;
+    class Model;
+    class HB_API ModelRenderer : public Component {
+        const Model *model;
 
-    void onDraw() override;
+    public:
+        void onAttach() override;
 
-    void setModel(const Model &model);
-    const Model* getModel();
+        void onDraw() override;
 
-    void serialize(Serializer* serializer) const override;
+        void setModel(const Model &model);
 
-    std::string toString()const override;
-};
+        const Model *getModel();
+
+        void serialize(Serializer *serializer) const override;
+
+        std::string toString() const override;
+    };
+}

@@ -2,29 +2,135 @@
 #include "Inspector.h"
 #include "SceneHierarchy.h"
 #include "imgui.h"
+#include "HBE.h"
 
 const char *Inspector::name = "Inspector";
+
+bool beginDrawComponent(std::string &component_name) {
+    ImGui::TreePush();
+    if (ImGui::CollapsingHeader(component_name.c_str(), ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed)) {
+        ImGui::TreePush();
+
+        return true;
+    }
+    ImGui::TreePop();
+    return false;
+
+}
+
+void endDrawComponent() {
+    ImGui::TreePop();
+    ImGui::TreePop();
+}
+
+void drawTransform(Entity *e) {
+    std::string name = std::string("Transform");
+    Transform *transform = e->transform;
+    vec3 position = transform->getPosition();
+    ImGui::Text("Position");
+    if (ImGui::DragFloat3("##position", &position[0])) {
+        transform->setPosition(position);
+    }
+    quat rotation = e->transform->getRotation();
+    vec3 eulerRot = glm::eulerAngles(rotation);
+    ImGui::Text("Rotation");
+    if (ImGui::DragFloat3("##rotation", &eulerRot[0], M_PI/3600)) {
+        transform->rotate(quat(eulerRot));
+    }
+
+    vec3 scale = transform->getScale();
+    ImGui::Text("Scale");
+    if (ImGui::DragFloat3("##scale", &scale[0], 0.1f)) {
+        if (abs(scale.x) > 0.01f &&
+            abs(scale.y) > 0.01f &&
+            abs(scale.z) > 0.01f)
+            transform->setScale(scale);
+    }
+}
+
+void drawCameraComponent(Entity *e) {
+    Camera *camera = e->getComponent<Camera>();
+
+    RenderMode render_mode = camera->getRenderMode();
+    ImGui::Text("Mode:");
+    if (ImGui::BeginCombo("##render_mode", render_mode == PERSPECTIVE ? "Perspective" : "Orthographic", ImGuiComboFlags_NoArrowButton)) {
+        bool is_selected = (render_mode == PERSPECTIVE);
+        if (ImGui::Selectable("Perspective", is_selected))
+            camera->setRenderMode(RenderMode::PERSPECTIVE);
+        if (is_selected)
+            ImGui::SetItemDefaultFocus();
+
+        is_selected = (render_mode == ORTHOGRAPHIC); // You can store your selection however you want, outside or inside your objects
+        if (ImGui::Selectable("Orthographic", is_selected))
+            camera->setRenderMode(RenderMode::ORTHOGRAPHIC);
+        if (is_selected)
+            ImGui::SetItemDefaultFocus();
+
+        ImGui::EndCombo();
+    }
+
+    float render_dist = camera->getRenderDistance();
+    ImGui::Text("Render distance:");
+    if (ImGui::InputFloat("##render_distance", &render_dist)) {
+        camera->setRenderDistance(render_dist);
+    }
+
+    if (render_mode == RenderMode::PERSPECTIVE) {
+        float fov = camera->getFOV();
+        ImGui::Text("Field of view:");
+        if (ImGui::SliderFloat("##fov", &fov, 40.0f, 170.0f)) {
+            camera->setFOV(fov);
+        }
+    } else {
+        ImGui::Text("Zoom:");
+        float zoom = camera->getOrthographicZoom();
+        if (ImGui::InputFloat("##zoom", &zoom)) {
+            camera->setOrthographicZoom(zoom);
+        }
+    }
+}
 
 void Inspector::draw(bool active) {
     if (active) {
         ImGui::Begin(name, &active, ImGuiWindowFlags_NoCollapse);
+
         if (!SceneHierarchy::selected_entities.empty()) {
-            int count = 0;
             for (Entity *e:SceneHierarchy::selected_entities) {
                 ImGui::BeginGroup();
-                if (ImGui::CollapsingHeader(e->getName().c_str()), ImGuiTreeNodeFlags_DefaultOpen|ImGuiTreeNodeFlags_Framed) {
+                if (ImGui::CollapsingHeader(e->getName().c_str(),
+                                            ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_Framed)) {
                     for (Component *c:e->getComponents()) {
-                        ImGui::BeginGroup();
-                        if (ImGui::CollapsingHeader(c->toString().c_str()), ImGuiTreeNodeFlags_DefaultOpen|ImGuiTreeNodeFlags_Framed) {
-                            ImGui::Text("patate");
+                        std::string name = c->toString();
+                        if (beginDrawComponent(name)) {
+                            if (name == "Transform") {
+                                drawTransform(e);
+                            }
+                            if (name == "Camera") {
+                                drawCameraComponent(e);
+                            } else if (name == "MeshRenderer") {
+
+                            } else if (name == "ModelRenderer") {
+
+                            }
+                            endDrawComponent();
                         }
-                        ImGui::EndGroup();
                     }
                 }
-                ImGui::EndGroup();
-                count++;
             }
+            ImGui::EndGroup();
+            ImGuiStyle &style = ImGui::GetStyle();
+            float padding_x = style.WindowPadding.x / 2;
+
+            ImGui::GetWindowDrawList()->AddRect(ImVec2(ImGui::GetItemRectMin().x - padding_x, ImGui::GetItemRectMin().y - 1),
+                                                ImVec2(ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x + padding_x,
+                                                       ImGui::GetItemRectMax().y + 5),
+                                                ImColor(ImGui::GetStyle().Colors[ImGuiCol_FrameBg]),
+                                                ImGui::GetStyle().FrameRounding,
+                                                ImDrawCornerFlags_All,
+                                                1.f);
         }
         ImGui::End();
     }
 }
+
+

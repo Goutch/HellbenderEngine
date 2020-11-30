@@ -6,17 +6,18 @@
 #include "SceneHierarchy.h"
 #include "HBE.h"
 
+using namespace HBE;
 const char *SceneHierarchy::name = "Scene Hierarchy";
 std::unordered_set<Entity *> SceneHierarchy::selected_entities;
 std::list<Entity *> SceneHierarchy::delete_query;
 
-void drawNewEntityMenu(Entity *parent) {
+void drawNewEntityMenu(Transform *parent) {
     if (ImGui::BeginMenu("New")) {
         if (ImGui::MenuItem("Empty"))
-            Application::scene->instantiate()->setParent(parent);
+            Application::scene->instantiate()->transform->setParent(parent);
         if (ImGui::MenuItem("Cube")) {
             MeshRenderer *mr = Application::scene->instantiate<MeshRenderer>();
-            mr->getEntity()->setParent(parent);
+            mr->entity->transform->setParent(parent);
             mr->setMesh(*Graphics::DEFAULT_CUBE);
             mr->setMaterial(*Graphics::DEFAULT_MESH_MATERIAL);
         }
@@ -25,12 +26,12 @@ void drawNewEntityMenu(Entity *parent) {
 }
 
 void SceneHierarchy::drawTree(Entity *e) {
-    std::vector<Entity *> children = e->getChildren();
+    std::vector<Transform *> children = e->transform->getChildren();
 
     bool selected = selected_entities.find(e) != selected_entities.end();
     ImGui::TreeAdvanceToLabelPos();
     bool open = ImGui::TreeNodeEx(e->getName().c_str(), ImGuiTreeNodeFlags_OpenOnArrow |
-                                                        ImGuiTreeNodeFlags_SpanAvailWidth|
+                                                        ImGuiTreeNodeFlags_SpanAvailWidth |
                                                         (selected ? ImGuiTreeNodeFlags_Selected : ImGuiTreeNodeFlags_None) |
                                                         (children.empty() ? ImGuiTreeNodeFlags_Leaf : ImGuiTreeNodeFlags_None));
     if (!ImGui::IsItemToggledOpen() && ImGui::IsItemClicked()) {
@@ -50,8 +51,8 @@ void SceneHierarchy::drawTree(Entity *e) {
 
     }
     if (ImGui::BeginPopupContextItem()) {
-        drawNewEntityMenu(e);
-        /*if (ImGui::MenuItem("Delete")) {
+        drawNewEntityMenu(e->transform);
+        if (ImGui::MenuItem("Delete")) {
             if (!selected) {
                 delete_query.push_back(e);
             } else {
@@ -59,13 +60,13 @@ void SceneHierarchy::drawTree(Entity *e) {
                     delete_query.push_back(selected_entity);
                 SceneHierarchy::selected_entities.clear();
             }
-        }*/
+        }
         ImGui::EndPopup();
         if (open)
             ImGui::TreePop();
     } else if (open) {
-        for (auto e:children) {
-            drawTree(e);
+        for (auto transform:children) {
+            drawTree(transform->entity);
         }
         ImGui::TreePop();
     }
@@ -77,7 +78,8 @@ void SceneHierarchy::draw(bool &active) {
         ImGui::Begin(name, &active, ImGuiWindowFlags_NoCollapse);
         std::vector<Entity *> entities = Application::scene->getSceneTree();
         for (auto e:entities) {
-            drawTree(e);
+            if (e->transform->getParent() == nullptr)
+                drawTree(e);
         }
 
         if (ImGui::BeginPopupContextWindow(0, 1, false)) {

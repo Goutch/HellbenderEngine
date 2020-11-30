@@ -3,17 +3,19 @@
 #include <platforms/gl/GL_Framebuffer.h>
 #include "Configs.h"
 
-Framebuffer *Framebuffer::create() {
+namespace HBE {
+    Framebuffer *Framebuffer::create() {
 #if RENDERER == OPENGL_RENDERER
-    if (Configs::getAntialiasing()) {
-        return new GL_MultisamplingFramebuffer();
-    } else{
-        return new GL_Framebuffer();
-    }
+        if (Configs::getAntialiasing()) {
+            return new GL_MultisamplingFramebuffer();
+        } else {
+            return new GL_Framebuffer();
+        }
 
 #elif RENDERER == VULKAN_RENDERER
 
 #endif
-    return nullptr;
-}
+        return nullptr;
+    }
 
+}

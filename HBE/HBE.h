@@ -11,8 +11,8 @@
 
 #include <core/entity/Entity.h>
 #include <core/entity/Scene.h>
-#include <core/entity/Transform.h>
 
+#include <core/entity/component/Transform.h>
 #include <core/entity/component/Component.h>
 #include <core/entity/component/MeshRenderer.h>
 #include <core/entity/component/InstancesRenderer.h>
@@ -36,6 +36,8 @@
 #include <core/utility/Random.h>
 
 #include <core/serialization/Serializer.h>
+#include <core/serialization/Deserializer.h>
+#include <core/serialization/Serializable.h>
 #include <core/serialization/ComponentRegistry.h>
 
 #include <glm/glm.hpp>

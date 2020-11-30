@@ -6,11 +6,13 @@
 #include "Renderer.h"
 #include <platforms/gl/GL_Renderer.h>
 
-Renderer *Renderer::create() {
+namespace HBE {
+    Renderer *Renderer::create() {
 #if RENDERER == OPENGL_RENDERER
-    return new GL_Renderer();
+        return new GL_Renderer();
 #elif RENDERER == VULKAN_RENDERER
 
 #endif
-}
+    }
 
+}

@@ -1,67 +1,67 @@
 #include "Configs.h"
+namespace HBE {
+    Event<std::string> Configs::onWindowTitleChange;
+    std::string Configs::window_title = "CHANGE WITH Configs::setWindowTitle";
 
-Event<std::string> Configs::onWindowTitleChange;
-std::string Configs::window_title = "CHANGE WITH Configs::setWindowTitle";
+    std::string Configs::icon_path = "../Hellbender_logo.png";
 
-std::string Configs::icon_path="../Hellbender_logo.png";
+    bool Configs::antialiasing = true;
+    Event<bool> Configs::onAntialiasingChange;
 
-bool Configs::antialiasing = true;
-Event<bool> Configs::onAntialiasingChange;
+    bool Configs::vertical_sync = true;
+    Event<bool> Configs::onVerticalSyncChange;
 
-bool Configs::vertical_sync = true;
-Event<bool> Configs::onVerticalSyncChange;
+    Configs::CAMERA_MODE Configs::default_camera_mode = Configs::CAMERA_MODE::PERSPECTIVE;
+    Event<Configs::CAMERA_MODE> Configs::onDefaultCameraModeChange;
 
-Configs::CAMERA_MODE Configs::default_camera_mode = Configs::CAMERA_MODE::PERSPECTIVE;
-Event<Configs::CAMERA_MODE> Configs::onDefaultCameraModeChange;
+    bool Configs::custom_rendering = false;
 
-bool Configs::custom_rendering = false;
+    void Configs::setAntialiasing(bool antialiasing) {
+        Configs::antialiasing = antialiasing;
+        onAntialiasingChange.invoke(antialiasing);
+    }
 
-void Configs::setAntialiasing(bool antialiasing) {
-    Configs::antialiasing = antialiasing;
-    onAntialiasingChange.invoke(antialiasing);
+    bool Configs::getAntialiasing() {
+        return antialiasing;
+    }
+
+    bool Configs::getVerticalSync() {
+        return vertical_sync;
+    }
+
+    void Configs::setVerticalSync(bool v_sync) {
+        onVerticalSyncChange.invoke(v_sync);
+        vertical_sync = v_sync;
+    }
+
+    Configs::CAMERA_MODE Configs::getDefaultCameraMode() {
+        return default_camera_mode;
+    }
+
+    void Configs::setDefaultCameraMode(CAMERA_MODE mode) {
+        default_camera_mode = mode;
+        onDefaultCameraModeChange.invoke(default_camera_mode);
+    }
+
+    void Configs::setWindowTitle(std::string title) {
+        window_title = title;
+        onWindowTitleChange.invoke(title);
+    }
+
+    std::string Configs::getWindowTitle() {
+        return window_title;
+    }
+
+    std::string Configs::getWindowIconPath() {
+        return icon_path;
+    }
+
+    void Configs::setCustomRendering(bool is_custom) {
+        custom_rendering = is_custom;
+    }
+
+    bool Configs::getCustomRendering() {
+        return custom_rendering;
+    }
+
 }
-
-bool Configs::getAntialiasing() {
-    return antialiasing;
-}
-
-bool Configs::getVerticalSync() {
-    return vertical_sync;
-}
-
-void Configs::setVerticalSync(bool v_sync) {
-    onVerticalSyncChange.invoke(v_sync);
-    vertical_sync = v_sync;
-}
-
-Configs::CAMERA_MODE Configs::getDefaultCameraMode() {
-    return default_camera_mode;
-}
-
-void Configs::setDefaultCameraMode(CAMERA_MODE mode) {
-    default_camera_mode = mode;
-    onDefaultCameraModeChange.invoke(default_camera_mode);
-}
-
-void Configs::setWindowTitle(std::string title) {
-    window_title = title;
-    onWindowTitleChange.invoke(title);
-}
-
-std::string Configs::getWindowTitle() {
-    return window_title;
-}
-
-std::string Configs::getWindowIconPath() {
-    return icon_path;
-}
-
-void Configs::setCustomRendering(bool is_custom) {
-    custom_rendering = is_custom;
-}
-
-bool Configs::getCustomRendering() {
-    return custom_rendering;
-}
-
-
