@@ -13,6 +13,7 @@
 	- MeshRenderer
 	- ModelRenderer
 - 3D mesh rendering with OpenGL
+- Instancing
 - keyboard and mouse input handling
 - Resource loading
 	 - Model
