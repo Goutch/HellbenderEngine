@@ -132,7 +132,7 @@ void main()
     }
 
     void Graphics::onWindowSizeChangeCallback(GLFWwindow *window, int width, int height) {
-        if (!Configs::getCustomRendering()) {
+        if (!Configs::isCustonRenderingOn()) {
             render_target->setSize(width, height);
         }
         onWindowSizeChange.invoke(width, height);

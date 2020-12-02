@@ -15,4 +15,12 @@ namespace HBE {
             delete key_value_pair.second;
         }
     }
+
+    std::list<std::string> ComponentRegistry::getComponentsName() {
+        std::list<std::string> name_list;
+        for (auto componentInfo:types) {
+            name_list.push_back(componentInfo.first);
+        }
+        return name_list;
+    }
 }

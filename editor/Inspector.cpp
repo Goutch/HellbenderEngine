@@ -3,12 +3,23 @@
 #include "SceneHierarchy.h"
 #include "imgui.h"
 #include "HBE.h"
+#include <cmath>
 
 const char *Inspector::name = "Inspector";
+std::list<Component *> Inspector::components_to_detach;
 
-bool beginDrawComponent(std::string &component_name) {
+bool beginDrawComponent(Component *component) {
+
     ImGui::TreePush();
-    if (ImGui::CollapsingHeader(component_name.c_str(), ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed)) {
+    if (ImGui::CollapsingHeader(component->toString().c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
+            ImGui::OpenPopup(("Detach_" + component->toString()).c_str());
+        }
+        if (ImGui::BeginPopup(("Detach_" + component->toString()).c_str())) {
+            if (ImGui::Selectable("Detach"))
+                Inspector::components_to_detach.push_back(component);
+            ImGui::EndPopup();
+        }
         ImGui::TreePush();
 
         return true;
@@ -34,7 +45,7 @@ void drawTransform(Entity *e) {
     quat rotation = e->transform->getRotation();
     vec3 eulerRot = glm::eulerAngles(rotation);
     ImGui::Text("Rotation");
-    if (ImGui::DragFloat3("##rotation", &eulerRot[0], M_PI/3600)) {
+    if (ImGui::DragFloat3("##rotation", &eulerRot[0], M_PI / 3600)) {
         transform->rotate(quat(eulerRot));
     }
 
@@ -101,7 +112,7 @@ void Inspector::draw(bool active) {
                                             ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_Framed)) {
                     for (Component *c:e->getComponents()) {
                         std::string name = c->toString();
-                        if (beginDrawComponent(name)) {
+                        if (beginDrawComponent(c)) {
                             if (name == "Transform") {
                                 drawTransform(e);
                             }
@@ -115,6 +126,21 @@ void Inspector::draw(bool active) {
                             endDrawComponent();
                         }
                     }
+                    ImGui::TreePush();
+                    if (ImGui::Button("Attach Component")) {
+                        ImGui::OpenPopup("Attach");
+                    }
+                    if (ImGui::BeginPopup("Attach")) {
+                        std::list<std::string> names = ComponentRegistry::getComponentsName();
+                        for (const std::string &name:names) {
+                            if (ImGui::Selectable(name.c_str()))
+                                ComponentRegistry::attach(name, e);
+
+                        }
+                        ImGui::EndPopup();
+                    }
+
+                    ImGui::TreePop();
                 }
             }
             ImGui::EndGroup();
@@ -130,6 +156,10 @@ void Inspector::draw(bool active) {
                                                 1.f);
         }
         ImGui::End();
+        for (Component *c :components_to_detach) {
+            c->entity->detach(c);
+        }
+        components_to_detach.clear();
     }
 }
 

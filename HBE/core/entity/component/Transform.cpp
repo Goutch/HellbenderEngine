@@ -8,13 +8,13 @@
 #include "Application.h"
 
 namespace HBE {
-    void Transform::onDestroy() {
+    void Transform::onDetach() {
         if (parent != nullptr)
             parent->removeChild(this);
         for (auto t : children) {
             Application::scene->destroy(t->entity);
         }
-        Component::onDestroy();
+        Component::onDetach();
     }
 
     const std::vector<Transform *> &Transform::getChildren() const {

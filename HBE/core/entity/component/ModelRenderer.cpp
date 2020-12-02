@@ -5,6 +5,7 @@
 #include "core/entity/Entity.h"
 #include "core/resource/Model.h"
 #include "core/serialization/Serializer.h"
+
 namespace HBE {
     void ModelRenderer::onAttach() {
         Component::onAttach();
@@ -17,8 +18,6 @@ namespace HBE {
             for (std::size_t i = 0; i < meshes.size(); ++i) {
                 Graphics::draw(*entity->transform, *meshes[i].first, *meshes[i].second);
             }
-        } else {
-            Log::warning("Model renderer " + entity->getName() + " does not have a model");
         }
     }
 

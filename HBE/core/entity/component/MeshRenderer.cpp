@@ -7,6 +7,7 @@
 #include "MeshRenderer.h"
 
 #include "core/serialization/Serializer.h"
+
 namespace HBE {
     void MeshRenderer::onAttach() {
         Component::onAttach();
@@ -14,7 +15,8 @@ namespace HBE {
     }
 
     void MeshRenderer::onDraw() {
-        Graphics::draw(*entity->transform, *mesh, *material);
+        if (mesh&&material)
+            Graphics::draw(*entity->transform, *mesh, *material);
     }
 
     void MeshRenderer::setMesh(const Mesh &mesh) {

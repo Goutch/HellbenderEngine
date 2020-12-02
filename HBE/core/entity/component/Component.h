@@ -33,7 +33,7 @@ namespace HBE {
 
         virtual void onDraw() {};
 
-        virtual void onDestroy() {};
+        virtual void onDetach() {};
 
         virtual void subscribeUpdate() final;
 

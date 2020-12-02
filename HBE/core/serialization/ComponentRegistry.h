@@ -24,11 +24,11 @@ namespace HBE {
     public:
         template<typename ComponentType>
         static void registerComponent(std::string name) {
-            if (types.find(name) != types.end()) {
+            if (types.find(name) == types.end()) {
                 types.emplace(name, new ComponentInfo<ComponentType>());
             }
         }
-
+        static std::list<std::string> getComponentsName();
         static Component *attach(const std::string &component_name, Entity *entity);
 
         static void terminate();

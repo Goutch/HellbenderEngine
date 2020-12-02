@@ -46,6 +46,6 @@ namespace HBE {
 
         static void setCustomRendering(bool is_custom);
 
-        static bool getCustomRendering();
+        static bool isCustonRenderingOn();
     };
 }

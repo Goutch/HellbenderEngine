@@ -13,8 +13,8 @@ namespace HBE {
         static Clock *time;
         static int fps_counter;
         static float fps_timer;
-
     public:
+        static Event<> onRegisterComponents;
         static Event<> onInit;
         static Event<float> onUpdate;
         static Event<Scene *> onSceneChange;
@@ -36,6 +36,8 @@ namespace HBE {
 
     private:
         static void printFPS(float);
+        static void registerComponents();
+
     };
 
 

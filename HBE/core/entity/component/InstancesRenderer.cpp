@@ -1,6 +1,7 @@
 
 #include "InstancesRenderer.h"
 #include "core/serialization/Serializer.h"
+
 namespace HBE {
     void InstancesRenderer::onAttach() {
         Component::onAttach();
@@ -8,8 +9,8 @@ namespace HBE {
     }
 
     void InstancesRenderer::onDraw() {
-        Component::onDraw();
-        Graphics::drawInstanced(*mesh, *material);
+        if (mesh && material)
+            Graphics::drawInstanced(*mesh, *material);
     }
 
     void InstancesRenderer::setMaterial(const Material &material) {

@@ -7,6 +7,7 @@
 #include "core/serialization/Serializer.h"
 #include "core/serialization/Deserializer.h"
 #include "core/serialization/ComponentRegistry.h"
+
 namespace HBE {
     unsigned int Entity::current_id = 0;
 
@@ -41,7 +42,7 @@ namespace HBE {
 
     void Entity::destroy() {
         for (Component *component:components) {
-            component->onDestroy();
+            component->onDetach();
         }
         for (Component *component:components) {
             delete component;
@@ -91,6 +92,26 @@ namespace HBE {
         return components;
     }
 
+    void Entity::detach(Component *component) {
+        if(component->toString()!="Transform")
+        {
+            for (Component *c :components) {
+                if (c == component) {
+                    components.remove(c);
+                    c->onDetach();
+                    delete c;
+                    break;
+                }
+            }
+        } else{
+            Log::warning("Detaching transform component is not permitted");
+        }
+    }
+
+    template<>
+    void Entity::detach<Transform>() {
+        Log::warning("Detaching transform component is not permitted");
+    };
 }
 
 

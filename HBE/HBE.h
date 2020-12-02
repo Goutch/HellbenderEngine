@@ -1,4 +1,5 @@
 #pragma once
+#define _USE_MATH_DEFINES
 #include <Core.h>
 #include <Configs.h>
 #include <Application.h>

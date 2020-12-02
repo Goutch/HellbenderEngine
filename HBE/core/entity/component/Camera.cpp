@@ -35,7 +35,10 @@ namespace HBE {
     }
 
     Camera::~Camera() {
-        Graphics::getRenderTarget()->onSizeChange.unsubscribe(this);
+        render_target->onSizeChange.unsubscribe(this);
+        if (main == this) {
+            main = nullptr;
+        }
     }
 
     void Camera::onRenderTargetSizeChange(int width, int height) {

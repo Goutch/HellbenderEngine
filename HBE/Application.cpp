@@ -22,14 +22,15 @@ namespace HBE {
     Event<float> Application::onUpdate;
     Event<Scene *> Application::onSceneChange;
     Event<> Application::onRender;
-
-    void registerComponents() {
+    Event<> Application::onRegisterComponents;
+    void Application::registerComponents() {
         ComponentRegistry::registerComponent<Camera>("Camera");
         ComponentRegistry::registerComponent<MeshRenderer>("MeshRenderer");
         ComponentRegistry::registerComponent<ModelRenderer>("ModelRenderer");
         ComponentRegistry::registerComponent<InstancesRenderer>("InstancesRenderer");
         ComponentRegistry::registerComponent<CameraController>("CameraController");
-    };
+        onRegisterComponents.invoke();
+    }
 
     void Application::init() {
         window = Graphics::init();
@@ -68,8 +69,11 @@ namespace HBE {
             scene->update(delta_t);
             onUpdate.invoke(delta_t);
             scene->draw();
-            Graphics::render(Graphics::getRenderTarget(), Camera::main->getProjectionMatrix(), Camera::main->getViewMatrix());
-            if (!Configs::getCustomRendering())
+            if(Camera::main)
+            {
+                Graphics::render(Graphics::getRenderTarget(), Camera::main->getProjectionMatrix(), Camera::main->getViewMatrix());
+            }
+            if (!Configs::isCustonRenderingOn())
                 Graphics::present(Graphics::getRenderTarget());
             onRender.invoke();
             Graphics::clearDrawCache();

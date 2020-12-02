@@ -60,7 +60,7 @@ namespace HBE {
         custom_rendering = is_custom;
     }
 
-    bool Configs::getCustomRendering() {
+    bool Configs::isCustonRenderingOn() {
         return custom_rendering;
     }
 

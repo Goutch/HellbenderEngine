@@ -10,7 +10,7 @@
 #include "vector"
 namespace HBE {
     class Scene;
-    class HB_API Entity final : public Serializable {
+    class HB_API Entity : public Serializable {
         friend class Scene;
 
         static unsigned int current_id;
@@ -25,9 +25,9 @@ namespace HBE {
 
         Entity(std::string name, Entity *parent = nullptr);
 
-        Entity(Transform *parent = nullptr);
+        Entity(Transform *parent);
 
-        Entity(std::string name, Transform *parent = nullptr);
+        Entity(std::string name, Transform *parent);
 
         void destroy();
 
@@ -61,10 +61,10 @@ namespace HBE {
                 }
             }
         };
-        /*template<class ComponentType=Transform>
-        void Entity::detach() {
-            Log::warning("Detaching transform component is not possible");
-        };*/
+        template<> void detach<Transform>();
+        void detach(Component* component);
+
+
         template<class ComponentType>
         ComponentType *getComponent() {
             for (Component *component:components) {

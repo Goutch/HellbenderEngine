@@ -18,7 +18,7 @@ namespace HBE {
         std::vector<Transform *> children;
         Transform *parent = nullptr;
     public:
-        void onDestroy() override;
+        void onDetach() override;
 
         std::string toString() const override;
 
