@@ -12,6 +12,7 @@
 	- CameraController
 	- MeshRenderer
 	- ModelRenderer
+	- MeshInstancesRenderer
 - 3D mesh rendering with OpenGL
 - Instancing
 - keyboard and mouse input handling
@@ -23,19 +24,17 @@
 - Job System
 - Event system
 
-#### HB Editor: (in progress)
+#### HB Editor: (Not a priority)
  - Basic Scene view
  	- add/destroy entities
 	- multi selection
- - Entity inspector 
+ - Basic Entity inspector 
 ## In progress:
  - Serialization :
 	 - Scene , entities and components
 	 - Resources, models,textures,
 	 - Project file
- - Minimal editor functionality
-	 - Scene hierarchy
-	 - Entity inspector to modify components
+ - Projects samples.
 
 ## Long term goals
 
@@ -43,6 +42,7 @@
  - Lua Scripting
  - Deffered rendering
  - Bullet physics
+ - Particules system
 
 ## Getting started
 ### Compiling
