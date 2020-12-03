@@ -54,3 +54,7 @@ These are 3 tested compilers :
 ### Wiki
 - [Home](https://github.com/Goutch/HellbenderEngine/wiki) 
 - [Hello Triangle](https://github.com/Goutch/HellbenderEngine/wiki/Hello-triangle)
+
+## Qestions and Answers
+Q: Why there is no lighting system?
+A: I am waiting to implement the deffered rendering before I add any lights.
