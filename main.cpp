@@ -12,7 +12,7 @@ int main() {
     teapot->loadAsync("../../res/models/teapot.obj");
     auto camera = Application::scene->instantiate<Camera>("MainCamera");
     camera->entity->transform->setPosition(vec3(0, 0, 15));
-
+    Graphics::setDefaultDrawFlags(DRAW_FLAGS_CULL_FACE_FRONT);
     Editor e;
     e.start();
     Application::run();

@@ -20,47 +20,71 @@
 
 #endif
 namespace HBE {
-    void GL_Renderer::draw(const Transform &transform, const Mesh &mesh, const Material &material) {
-        render_objects.push_back({&transform, &mesh, &material});
+    void GL_Renderer::draw(const Transform &transform, const Mesh &mesh, const Material &material, DRAW_FLAGS draw_flags) {
+        auto it_draw_flags = render_cache.try_emplace(draw_flags).first;
+        auto it_mesh = it_draw_flags->second.try_emplace(&mesh).first;
+        auto it_material = it_mesh->second.try_emplace(&material).first;
+        it_material->second.push_back(&transform);
     }
 
-    void GL_Renderer::drawInstanced(const Mesh &mesh, const Material &material) {
-        render_objects.push_back({nullptr, &mesh, &material});
+    void GL_Renderer::drawInstanced(const Mesh &mesh, const Material &material, DRAW_FLAGS draw_flags) {
+        auto it_draw_flags = render_cache.try_emplace(draw_flags).first;
+        auto it_mesh = it_draw_flags->second.try_emplace(&mesh).first;
+        auto it_material = it_mesh->second.try_emplace(&material).first;
+        it_material->second.push_back(nullptr);
     }
 
     void GL_Renderer::render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix) {
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
+
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glViewport(0, 0, render_target->getWidth(), render_target->getHeight());
-        for (auto render_object:render_objects) {
-            render_object.material->bind();
-            render_object.material->getShader().setUniform("projection_matrix", projection_matrix);
-            render_object.material->getShader().setUniform("view_matrix", view_matrix);
-            if (render_object.transform)
-                render_object.material->getShader().setUniform("transform_matrix", render_object.transform->getMatrix());
-            render_object.mesh->bind();
-            if (render_object.mesh->getInstanceCount() == 1) {
-                render_object.mesh->hasIndexBuffer() ?
-                glDrawElements(GL_TRIANGLES, render_object.mesh->getIndexCount(), GL_UNSIGNED_INT, 0) :
-                glDrawArrays(GL_TRIANGLES, 0, render_object.mesh->getVertexCount());
-            } else if (render_object.mesh->getInstanceCount() > 1) {
-                render_object.mesh->hasIndexBuffer() ?
-                glDrawElementsInstanced(GL_TRIANGLES, render_object.mesh->getIndexCount(), GL_UNSIGNED_INT, 0, render_object.mesh->getInstanceCount())
-                                                     :
-                glDrawArraysInstanced(GL_TRIANGLES, 0, render_object.mesh->getVertexCount(), render_object.mesh->getInstanceCount());
+        for (auto draw_flags_kv:render_cache) {
+            //CULLING
+            DRAW_FLAGS draw_flags = draw_flags_kv.first;
+            if (!(draw_flags & DRAW_FLAGS_CULL_FACE_FRONT) && !(draw_flags & DRAW_FLAGS_CULL_FACE_BACK)) {
+                glDisable(GL_CULL_FACE);
+            } else if (draw_flags & DRAW_FLAGS_CULL_FACE_BACK) {
+                glEnable(GL_CULL_FACE);
+                glCullFace(GL_BACK);
+            } else if (draw_flags & DRAW_FLAGS_CULL_FACE_BACK) {
+                glEnable(GL_CULL_FACE);
+                glCullFace(GL_FRONT);
             }
-
-            render_object.mesh->unbind();
-            render_object.material->unbind();
+            for (auto mesh_kv :draw_flags_kv.second) {
+                const Mesh *mesh = mesh_kv.first;
+                mesh->bind();
+                for (auto material_kv:mesh_kv.second) {
+                    const Material *material = material_kv.first;
+                    material->bind();
+                    material->getShader().setUniform("projection_matrix", projection_matrix);
+                    material->getShader().setUniform("view_matrix", view_matrix);
+                    for (const Transform *transform:material_kv.second) {
+                        if (transform)material->getShader().setUniform("transform_matrix", transform->getMatrix());
+                        if (mesh->getInstanceCount() == 1) {
+                            mesh->hasIndexBuffer() ?
+                            glDrawElements(GL_TRIANGLES, mesh->getIndexCount(), GL_UNSIGNED_INT, 0) :
+                            glDrawArrays(GL_TRIANGLES, 0, mesh->getVertexCount());
+                        } else if (mesh->getInstanceCount() > 1) {
+                            mesh->hasIndexBuffer() ?
+                            glDrawElementsInstanced(GL_TRIANGLES, mesh->getIndexCount(), GL_UNSIGNED_INT, 0, mesh->getInstanceCount())
+                                                   :
+                            glDrawArraysInstanced(GL_TRIANGLES, 0, mesh->getVertexCount(), mesh->getInstanceCount());
+                        }
+                    }
+                    material->unbind();
+                }
+                mesh->unbind();
+            }
         }
     }
 
     void GL_Renderer::present(const RenderTarget *render_target) {
         glDisable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
         glViewport(0, 0, render_target->getWidth(), render_target->getHeight());
         const ShaderProgram &shader = render_target->getShaderProgram();
         const Framebuffer &framebuffer = render_target->getFramebuffer();
@@ -80,9 +104,6 @@ namespace HBE {
         if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
             Log::error("Failed to load glad");
         }
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
-        glEnable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_MULTISAMPLE);
@@ -92,7 +113,7 @@ namespace HBE {
     }
 
 
-    GLFWwindow *GL_Renderer::createWindow(int width, int height) {
+    GLFWwindow *GL_Renderer::createWindow(int32 width, int32 height) {
         if (!glfwInit()) {
             Log::error("Failed to load glfw");
         }
@@ -110,7 +131,7 @@ namespace HBE {
     }
 
     void GL_Renderer::clearDrawCache() {
-        render_objects.clear();
+        render_cache.clear();
     }
 
 

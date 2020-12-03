@@ -1,8 +1,12 @@
 #pragma once
 
 #include <core/graphics/Renderer.h>
-#include "list"
+#include "unordered_map"
+
 namespace HBE {
+
+#define MAP(T1,T2) std::unordered_map<T1,T2>
+
     class ShaderProgram;
 
     class Transform;
@@ -14,9 +18,9 @@ namespace HBE {
             const Transform *transform;
             const Mesh *mesh;
             const Material *material;
+            const DRAW_FLAGS draw_flags;
         };
-        std::list<RenderObject> render_objects;
-
+        MAP(DRAW_FLAGS,MAP(const Mesh*,MAP(const Material*,std::list<const Transform*>))) render_cache;
     private:
         GLFWwindow *window;
     public:
@@ -24,9 +28,9 @@ namespace HBE {
 
         void init() override;
 
-        void draw(const Transform &transform, const Mesh &mesh, const Material &material) override;
+        void draw(const Transform &transform, const Mesh &mesh, const Material &material, DRAW_FLAGS draw_flags) override;
 
-        void drawInstanced(const Mesh &mesh, const Material &material) override;
+        void drawInstanced(const Mesh &mesh, const Material &material, DRAW_FLAGS draw_flags) override;
 
         void render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix) override;
 
@@ -34,7 +38,7 @@ namespace HBE {
 
         void clearDrawCache() override;
 
-        GLFWwindow *createWindow(int width, int height) override;
+        GLFWwindow *createWindow(int32 width, int32 height) override;
     };
 
 }

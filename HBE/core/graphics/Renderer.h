@@ -3,6 +3,8 @@
 #include "vector"
 #include "glm/glm.hpp"
 #include "Core.h"
+#include "Graphics.h"
+
 using namespace glm;
 struct GLFWwindow;
 
@@ -17,6 +19,7 @@ namespace HBE {
     class Framebuffer;
 
     class Material;
+
     class Renderer {
     public:
         static Renderer *create();
@@ -25,7 +28,7 @@ namespace HBE {
 
         virtual void init() = 0;
 
-        virtual GLFWwindow *createWindow(int width, int height) = 0;
+        virtual GLFWwindow *createWindow(int32 width, int32 height) = 0;
 
         virtual void render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix = mat4(1.0f)) = 0;
 
@@ -33,9 +36,9 @@ namespace HBE {
 
         virtual void clearDrawCache() = 0;
 
-        virtual void draw(const Transform &transform, const Mesh &mesh, const Material &material) = 0;
+        virtual void draw(const Transform &transform, const Mesh &mesh, const Material &material, DRAW_FLAGS flags) = 0;
 
-        virtual void drawInstanced(const Mesh &mesh, const Material &material) = 0;
+        virtual void drawInstanced(const Mesh &mesh, const Material &material, DRAW_FLAGS drawFlags) = 0;
 
         virtual void clear() const = 0;
     };

@@ -28,6 +28,7 @@ namespace HBE {
     const ShaderProgram *Graphics::DEFAULT_SCREEN_SHADER = nullptr;
     const ShaderProgram *Graphics::DEFAULT_INSTANCED_SHADER = nullptr;
     const Material *Graphics::DEFAULT_MESH_MATERIAL = nullptr;
+    DRAW_FLAGS Graphics::default_draw_Flags;
     Renderer *Graphics::renderer = nullptr;
     GLFWwindow *Graphics::window = nullptr;
     RenderTarget *Graphics::render_target = nullptr;
@@ -131,19 +132,19 @@ void main()
         glfwSwapInterval(v_sync);
     }
 
-    void Graphics::onWindowSizeChangeCallback(GLFWwindow *window, int width, int height) {
+    void Graphics::onWindowSizeChangeCallback(GLFWwindow *window, int32 width, int32 height) {
         if (!Configs::isCustonRenderingOn()) {
             render_target->setSize(width, height);
         }
         onWindowSizeChange.invoke(width, height);
     }
 
-    void Graphics::draw(const Transform &transform, const Mesh &mesh, const Material &material) {
-        renderer->draw(transform, mesh, material);
+    void Graphics::draw(const Transform &transform, const Mesh &mesh, const Material &material, DRAW_FLAGS draw_flags) {
+        renderer->draw(transform, mesh, material,draw_flags);
     }
 
-    void Graphics::drawInstanced(const Mesh &mesh, const Material &material) {
-        renderer->drawInstanced(mesh, material);
+    void Graphics::drawInstanced(const Mesh &mesh, const Material &material, DRAW_FLAGS draw_flags) {
+        renderer->drawInstanced(mesh, material,draw_flags);
     }
 
     void Graphics::render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix) {
@@ -201,6 +202,8 @@ void main()
         DEFAULT_SCREEN_SHADER = default_screen_shader;
         //DEFAULT_RENDER_TARGET
         render_target = new RenderTarget(900, 600, *DEFAULT_SCREEN_SHADER);
+
+        default_draw_Flags=DRAW_FLAGS_CULL_FACE_BACK;
     }
 
     RenderTarget *Graphics::getRenderTarget() {
@@ -211,7 +214,7 @@ void main()
         return window;
     }
 
-    void Graphics::getWindowSize(int &width, int &height) {
+    void Graphics::getWindowSize(int32 &width, int32 &height) {
         glfwGetWindowSize(window, &width, &height);
     }
 
@@ -225,6 +228,10 @@ void main()
 
     void Graphics::clearDrawCache() {
         renderer->clearDrawCache();
+    }
+
+    void Graphics::setDefaultDrawFlags(DRAW_FLAGS draw_flags) {
+        default_draw_Flags=draw_flags;
     }
 
 }
