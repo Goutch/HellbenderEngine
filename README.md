@@ -1,4 +1,8 @@
 # HellbenderEngine
+# Why?
+- **Learn graphics and engines.**
+- **I Like c++.**
+- **I Want to do a lot of procedural generation and raytracing.**
 
 # Goals 
 - **Easy to use and modular API.**
