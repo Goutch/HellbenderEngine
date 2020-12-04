@@ -1,6 +1,6 @@
 # HellbenderEngine
 # Why?
-- **Learn graphics and engines.**
+- **I want to Learn graphics and engines.**
 - **I Like c++.**
 - **I Want to do a lot of procedural generation and raytracing.**
 
