@@ -64,4 +64,4 @@ Q: Why should I use this engine instead of unity/unreal?
 A: Tou shouldn't unless you want to use an open source engine.  
 
 Q: Why there is no lighting system?  
-A: I am waiting to implement the deffered rendering before I add any lights.  
+A: I am waiting to implement a deffered rendering system before I add any lights.  
