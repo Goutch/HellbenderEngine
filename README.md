@@ -10,7 +10,7 @@
 - **Built for programmers.**
 
 # features
-#### HB Engine library:
+#### HB Graphic Engine library: (Priority)
 - Entity and components
 	- Camera
 	- CameraController
