@@ -60,8 +60,8 @@ These are 3 tested compilers :
 - [Hello Triangle](https://github.com/Goutch/HellbenderEngine/wiki/Hello-triangle)
 
 ## Qestions and Answers
-Q: Why should I use this engine instead of unity/unreal?
-A: Tou shouldn't unless you want to use an open source engine.
+Q: Why should I use this engine instead of unity/unreal?  
+A: Tou shouldn't unless you want to use an open source engine.  
 
-Q: Why there is no lighting system?
-A: I am waiting to implement the deffered rendering before I add any lights.
+Q: Why there is no lighting system?  
+A: I am waiting to implement the deffered rendering before I add any lights.  
