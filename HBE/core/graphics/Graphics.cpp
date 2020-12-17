@@ -15,8 +15,8 @@
 
 #include "platforms/gl/GL_Renderer.h"
 
-#elif
-
+#elif RENDERER == VULKAN_RENDERER
+#include "platforms/vk/VK_Renderer.h"
 #endif
 
 #include "core/resource/Material.h"
@@ -170,7 +170,7 @@ void main()
         delete DEFAULT_CUBE;
         delete render_target;
         delete renderer;
-        glfwTerminate();
+
     }
 
     void Graphics::initializeDefaultVariables() {

@@ -24,7 +24,7 @@ namespace HBE {
     public:
         static Renderer *create();
 
-        virtual ~Renderer() {};
+        virtual ~Renderer() { };
 
         virtual void init() = 0;
 

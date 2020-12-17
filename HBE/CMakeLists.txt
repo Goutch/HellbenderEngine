@@ -139,11 +139,14 @@ set(GL_FILES
         platforms/gl/GL_Debug.h
         platforms/gl/GL_MultisamplingFramebuffer.cpp
         platforms/gl/GL_MultisamplingFramebuffer.h)
+set(VK_FILES
+        platforms/vk/VK_Renderer.cpp)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}
         ${IMGUI_FILES}
         ${GL_FILES}
+        ${VK_FILES}
       )
 
 target_include_directories(${PROJECT_NAME}

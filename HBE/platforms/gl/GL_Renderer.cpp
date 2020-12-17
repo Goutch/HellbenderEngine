@@ -134,6 +134,11 @@ namespace HBE {
         render_cache.clear();
     }
 
+    GL_Renderer::~GL_Renderer() {
+        glfwDestroyWindow(window);
+        glfwTerminate();
+    }
+
 
 }
 

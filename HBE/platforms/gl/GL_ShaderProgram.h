@@ -29,7 +29,6 @@ namespace HBE {
 
         void unbind() const override;
 
-
         int uniformLocation(std::string) const;
 
         void setUniform(std::string name, int i) const;

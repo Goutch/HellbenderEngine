@@ -34,10 +34,12 @@
 #endif
 
 enum {
-    OPENGL_RENDERER = 0,
-    VULKAN_RENDERER = 1,
+    OPENGL_RENDERER = 1,
+    VULKAN_RENDERER = 0,
 };
-#define RENDERER OPENGL_RENDERER
+
+#define RENDERER VULKAN_RENDERER
+
 namespace HBE {
     typedef uint32_t uint32;
     typedef int32_t int32;

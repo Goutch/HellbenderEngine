@@ -25,7 +25,7 @@ namespace HBE {
         GLFWwindow *window;
     public:
         void clear() const override;
-
+        ~GL_Renderer() override;
         void init() override;
 
         void draw(const Transform &transform, const Mesh &mesh, const Material &material, DRAW_FLAGS draw_flags) override;
