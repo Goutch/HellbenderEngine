@@ -1,8 +1,8 @@
 # HellbenderEngine
 # Why?
 - **I want to Learn graphics and engines.**
-- **I Like c++.**
-- **I Want to do a lot of procedural generation and raytracing.**
+- **I like c++.**
+- **I want to do a lot of procedural generation and raytracing.**
 
 # Goals 
 - **Easy to use and modular API.**
@@ -34,6 +34,7 @@
 	- multi selection
  - Basic Entity inspector 
 ## In progress:
+ - Compute shaders support.
  - Serialization :
 	 - Scene , entities and components
 	 - Resources, models,textures,
@@ -43,7 +44,7 @@
 ## Long term goals
 
  - Vulkan support
- - Lua Scripting
+ - Scripting
  - Deffered rendering
  - Bullet physics
  - Particules system
