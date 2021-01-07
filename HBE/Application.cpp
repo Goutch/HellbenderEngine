@@ -43,6 +43,7 @@ namespace HBE {
     }
 
     Scene *Application::setScene(std::string path) {
+        //todo:scene loading
         if (scene != nullptr) {
             scene->terminate();
             delete scene;
