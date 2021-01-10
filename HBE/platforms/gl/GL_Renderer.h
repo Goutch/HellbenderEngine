@@ -2,10 +2,11 @@
 
 #include <core/graphics/Renderer.h>
 #include "unordered_map"
+#include "list"
 
 namespace HBE {
 
-#define MAP(T1,T2) std::unordered_map<T1,T2>
+#define MAP_LIST(T1,T2) std::unordered_map<T1,T2>
 
     class ShaderProgram;
 
@@ -20,7 +21,7 @@ namespace HBE {
             const Material *material;
             const DRAW_FLAGS draw_flags;
         };
-        MAP(DRAW_FLAGS,MAP(const Mesh*,MAP(const Material*,std::list<const Transform*>))) render_cache;
+        MAP_LIST(DRAW_FLAGS,MAP_LIST(const Mesh*,MAP_LIST(const Material*,std::list<const Transform*>))) render_cache;
     private:
         GLFWwindow *window;
     public:

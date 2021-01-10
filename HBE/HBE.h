@@ -27,8 +27,6 @@
 #include <core/input/Input.h>
 #include <core/math/Plane.h>
 
-#include <core/scripting/ScriptManager.h>
-
 #include <core/utility/Event.h>
 #include <core/utility/Clock.h>
 #include <core/utility/JobManager.h>

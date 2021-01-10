@@ -1,7 +1,6 @@
 #include "Application.h"
 #include "core/graphics/Graphics.h"
 #include "core/input/Input.h"
-#include "core/scripting/ScriptManager.h"
 #include "core/entity/component/Camera.h"
 #include "GLFW/glfw3.h"
 #include "core/utility/Clock.h"
@@ -38,7 +37,6 @@ namespace HBE {
         Input::init(window);
         scene = new Scene();
         scene->init();
-        ScriptManager::init();
         onInit.invoke();
     }
 
@@ -90,7 +88,6 @@ namespace HBE {
     }
 
     void Application::terminate() {
-        ScriptManager::terminate();
         Graphics::terminate();
         ComponentRegistry::terminate();
     }

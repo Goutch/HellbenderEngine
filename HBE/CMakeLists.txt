@@ -10,7 +10,6 @@ endif ()
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/lua/")
 
 
 include_directories(.)
@@ -63,16 +62,12 @@ set(CORE_FILES
         core/utility/Geometry.cpp
         core/utility/Geometry.h
         core/utility/Clock.cpp
-        core/utility/ModelImporter.cpp core/utility/ModelImporter.h
+        core/utility/ModelImporter.cpp
+        core/utility/ModelImporter.h
         core/utility/JobManager.cpp
         core/utility/JobManager.h
         core/utility/Random.cpp
         core/utility/Random.h
-
-        core/scripting/LuaDeserializer.cpp
-        core/scripting/LuaDeserializer.h
-        core/scripting/ScriptManager.cpp
-        core/scripting/ScriptManager.h
 
         core/serialization/Serializer.h
         core/serialization/Deserializer.h
@@ -139,8 +134,8 @@ set(GL_FILES
         platforms/gl/GL_Debug.h
         platforms/gl/GL_MultisamplingFramebuffer.cpp
         platforms/gl/GL_MultisamplingFramebuffer.h)
-set(VK_FILES
-        platforms/vk/VK_Renderer.cpp)
+
+#set(VK_FILES platforms/vk/VK_Renderer.cpp)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}
@@ -171,8 +166,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/mingw/libzlibstatic.a"
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/mingw/libIrrXML.a"
                 PUBLIC glfw
-                PUBLIC glad
-                PUBLIC lua)
+                PUBLIC glad)
     else ()
         message("Using GCC Compiler")
         target_link_libraries(${PROJECT_NAME}
@@ -180,8 +174,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/gcc/libzlibstatic.a"
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/gcc/libIrrXML.a"
                 PUBLIC glfw
-                PUBLIC glad
-                PUBLIC lua)
+                PUBLIC glad)
     endif ()
 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
@@ -197,8 +190,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/debug/zlibstatic.lib"
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/debug/IrrXML.lib"
                 PUBLIC glfw
-                PUBLIC glad
-                PUBLIC lua)
+                PUBLIC glad)
     else ()
         MESSAGE("release mode")
         target_link_libraries(${PROJECT_NAME}
@@ -206,8 +198,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/release/zlibstatic.lib"
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/release/IrrXML.lib"
                 PUBLIC glfw
-                PUBLIC glad
-                PUBLIC lua)
+                PUBLIC glad)
     endif ()
 endif ()
 

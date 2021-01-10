@@ -61,7 +61,7 @@ namespace HBE {
                 }
             }
         };
-        template<> void detach<Transform>();
+
         void detach(Component* component);
 
 
