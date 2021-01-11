@@ -1,13 +1,14 @@
 # HellbenderEngine
-# Why?
-- **I want to Learn graphics and engines.**
-- **I like c++.**
-- **I want to do a lot of procedural generation and raytracing.**
 
 # Goals 
 - **Easy to use and modular API.**
 - **Minimal dependencies and lightweight.**
 - **Built for programmers.**
+
+# Why?
+- **I want to Learn graphics and engines.**
+- **I like to code in c++.**
+- **I want to do a lot of procedural generation and raytracing.**
 
 # features
 #### HB Graphic Engine library: (Priority)
@@ -46,10 +47,12 @@
  - Vulkan support
  - Scripting
  - Deffered rendering
- - Bullet physics
+ - PBR
+ - Physics
  - Particules system
 
 ## Getting started
+
 ### Compiling
 These are 3 tested compilers : 
 - GCC
@@ -62,7 +65,7 @@ These are 3 tested compilers :
 
 ## Qestions and Answers
 Q: Why should I use this engine instead of unity/unreal?  
-A: Tou shouldn't unless you want to use an open source engine.  
+A: You shouldn't this is a toy engine for me.  
 
 Q: Why there is no lighting system?  
 A: I am waiting to implement a deffered rendering system before I add any lights.  
