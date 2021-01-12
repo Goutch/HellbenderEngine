@@ -1,6 +1,7 @@
 # HellbenderEngine
 
 # Goals 
+- **Cross platforms**
 - **Easy to use and modular API.**
 - **Minimal dependencies and lightweight.**
 - **Built for programmers.**
