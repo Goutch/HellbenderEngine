@@ -9,7 +9,7 @@
 # Why?
 - **I want to Learn graphics and engines.**
 - **I like to code in c++.**
-- **I want to do a lot of procedural generation and raytracing.**
+- **I want to do procedural generation and raytracing.**
 
 # features
 #### HB Graphic Engine library: (Priority)
