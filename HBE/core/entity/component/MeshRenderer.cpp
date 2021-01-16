@@ -17,6 +17,8 @@ namespace HBE {
     void MeshRenderer::onDraw() {
         if (mesh&&material)
             Graphics::draw(*entity->transform, *mesh, *material);
+        else
+            Log::warning(entity->getName()+" does not have a material and/or a mesh assigned");
     }
 
     void MeshRenderer::setMesh(const Mesh &mesh) {

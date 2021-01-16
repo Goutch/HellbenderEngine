@@ -26,6 +26,7 @@ namespace HBE {
     class Event;
 
     enum {
+        DRAW_FLAGS_NONE=0,
         DRAW_FLAGS_CULL_FACE_BACK = 1,
         DRAW_FLAGS_CULL_FACE_FRONT = 1 << 1,
         DRAW_FLAGS_TRANSPARENT = 1 << 2,

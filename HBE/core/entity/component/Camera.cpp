@@ -56,7 +56,7 @@ namespace HBE {
                                                   ((static_cast<float>(render_target->getWidth()) / 2)) / orthographic_zoom,
                                                   -(static_cast<float>(render_target->getHeight()) / 2) / orthographic_zoom,
                                                   (static_cast<float>(render_target->getHeight()) / 2) / orthographic_zoom,
-                                                  0.0, render_distance);
+                                                  -render_distance, render_distance);
         }
         calculateFrustumPlanes();
     }
