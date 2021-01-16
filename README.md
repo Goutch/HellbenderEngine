@@ -63,7 +63,7 @@ These are 3 tested compilers :
 ### Wiki
 - [Home](https://github.com/Goutch/HellbenderEngine/wiki) 
 - [Hello Triangle](https://github.com/Goutch/HellbenderEngine/wiki/Hello-triangle)
-
+- [Custom Component](https://github.com/Goutch/HellbenderEngine/wiki/Custom-component)
 ## Qestions and Answers
 Q: Why should I use this engine instead of unity/unreal?  
 A: You shouldn't this is a toy engine for me.  
