@@ -5,13 +5,15 @@
 #include "string"
 #include "map"
 #include "Core.h"
+#include "map"
+#include "Shader.h"
+
+
 namespace HBE {
-    enum class SHADER_TYPE {
-        COMPUTE, VERTEX, FRAGMENT
-    };
+
 
     class HB_API ShaderProgram : public Serializable {
-        std::map<SHADER_TYPE, std::string> shaders;
+        std::map<SHADER_TYPE, Shader*> shaders;
     public:
         static ShaderProgram *create();
 
@@ -21,7 +23,7 @@ namespace HBE {
 
         virtual void unbind() const = 0;
 
-        virtual void setShaders(const std::string &vertex, const std::string &fragment, bool is_file = true) = 0;
+        virtual void setShaders(const std::map<SHADER_TYPE,Shader*>& shaders)=0;
 
         virtual void setUniform(std::string name, int i) const = 0;
 

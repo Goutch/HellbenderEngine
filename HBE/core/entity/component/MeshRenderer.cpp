@@ -1,7 +1,3 @@
-//
-// Created by User on 03-Jun.-2020.
-//
-
 #include <core/graphics/Graphics.h>
 #include "core/entity/Entity.h"
 #include "MeshRenderer.h"

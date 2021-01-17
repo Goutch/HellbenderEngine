@@ -1,6 +1,11 @@
 
 #include "Mesh.h"
+#if RENDERER == OPENGL_RENDERER
 #include <platforms/gl/GL_Mesh.h>
+#elif RENDERER == VULKAN_RENDERER
+
+#endif
+
 #include "core/serialization/Serializer.h"
 
 namespace HBE {

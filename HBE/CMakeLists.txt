@@ -84,13 +84,15 @@ set(GL_FILES
         platforms/gl/GL_Debug.cpp
         platforms/gl/GL_Debug.h
         platforms/gl/GL_MultisamplingFramebuffer.cpp
-        platforms/gl/GL_MultisamplingFramebuffer.h)
+        platforms/gl/GL_MultisamplingFramebuffer.h
+        platforms/gl/GL_Shader.cpp
+        platforms/gl/GL_Shader.h)
 
 
 find_package(Vulkan)
 if(VULKAN_FOUND)
     include_directories(${Vulkan_INCLUDE_DIRS})
-    set(VK_FILES platforms/vk/VK_Renderer.cpp)
+    set(VK_FILES platforms/vk/VK_Renderer.cpp core/resource/Shader.cpp core/resource/Shader.h)
 endif()
 
 

@@ -1,5 +1,6 @@
 
 #include "ShaderProgram.h"
+#include "Shader.h"
 #include <platforms/gl/GL_ShaderProgram.h>
 #include "core/serialization/Serializer.h"
 namespace HBE {
@@ -25,6 +26,8 @@ namespace HBE {
                 case SHADER_TYPE::COMPUTE:
 
                     break;
+                case SHADER_TYPE::GEOMETRY:
+                    break;
             }
         }
         serializer->end();
@@ -33,4 +36,6 @@ namespace HBE {
     void ShaderProgram::deserialize(Deserializer *deserializer) {
 
     }
+
+
 }

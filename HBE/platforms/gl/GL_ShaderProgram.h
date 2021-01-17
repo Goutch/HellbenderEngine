@@ -10,10 +10,6 @@ using namespace glm;
 namespace HBE {
     class GL_ShaderProgram : public ShaderProgram {
     private:
-        unsigned int compileShader(unsigned int type, const std::string &source);
-
-        std::string getSource(const std::string &path);
-
         mutable std::unordered_map<std::string, int> uniforms;
 
         unsigned int program_id;
@@ -25,7 +21,7 @@ namespace HBE {
 
         void bind() const override;
 
-        void setShaders(const std::string &vertex, const std::string &fragment, bool is_file) override;
+        void setShaders(const std::map<SHADER_TYPE,Shader*>& shaders) override;
 
         void unbind() const override;
 

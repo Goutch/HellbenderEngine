@@ -56,7 +56,7 @@ namespace HBE {
                 meshes[i].first->setBuffer(2, (*meshes_data)[i].first.normals);
             }
 
-            meshes[i].second->setShader(Graphics::DEFAULT_MESH_SHADER);
+            meshes[i].second->setShader(Graphics::DEFAULT_MESH_SHADER_PROGRAM);
 
             if (!(*meshes_data)[i].second.diffuse_texture_paths.empty()) {
                 auto t = Texture::create();

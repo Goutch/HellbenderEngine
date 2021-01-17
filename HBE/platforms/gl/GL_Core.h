@@ -5,3 +5,4 @@
 #include "GL_Framebuffer.h"
 #include "GL_MultisamplingFramebuffer.h"
 #include "GL_Mesh.h"
+#include "GL_Shader.h"

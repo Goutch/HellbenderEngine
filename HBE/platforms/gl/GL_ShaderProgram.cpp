@@ -1,31 +1,16 @@
-#define GLEW_STATIC
-
 #include "glad/glad.h"
 #include "GL_ShaderProgram.h"
 #include "core/utility/Log.h"
-#include <fstream>
-#include <sstream>
+
 #include <glm/gtc/type_ptr.hpp>
 namespace HBE {
-    void GL_ShaderProgram::setShaders(const std::string &vertex, const std::string &fragment, bool is_file) {
-        std::string source_vs;
-        std::string source_fs;
-        if (is_file) {
-            source_vs = getSource(vertex);
-            source_fs = getSource(fragment);
-        } else {
-            source_fs = fragment;
-            source_vs = vertex;
-        }
-        unsigned int vs = compileShader(GL_VERTEX_SHADER, source_vs);
-        unsigned int fs = compileShader(GL_FRAGMENT_SHADER, source_fs);
 
-        glAttachShader(program_id, vs);
-        glAttachShader(program_id, fs);
+    void GL_ShaderProgram::setShaders(const std::map<SHADER_TYPE,Shader*>& shaders) {
+        for (const auto type_shader_pair:shaders) {
+            glAttachShader(program_id, type_shader_pair.second->getHandle());
+        }
         glLinkProgram(program_id);
         glValidateProgram(program_id);
-        glDeleteShader(vs);
-        glDeleteShader(fs);
     }
 
     GL_ShaderProgram::GL_ShaderProgram() {
@@ -134,44 +119,8 @@ namespace HBE {
     }
 
 
-    unsigned int GL_ShaderProgram::compileShader(unsigned int type, const std::string &source) {
-        unsigned int id = glCreateShader(type);
-        const char *src = source.c_str();
-        glShaderSource(id, 1, &src, nullptr);
-        glCompileShader(id);
-        int result;
-        glGetShaderiv(id, GL_COMPILE_STATUS, &result);
-        if (result == GL_FALSE) {
-            int length;
-            glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
-            char *message = (char *) malloc(length * sizeof(char));
-            glGetShaderInfoLog(id, length, &length, message);
-            Log::error(message);
-            free(message);
-        }
-        return id;
-    }
 
-    std::string GL_ShaderProgram::getSource(const std::string &path) {
-        try {
-            std::ifstream file;
-            file.open(path);
-            if (file.is_open()) {
-                std::stringstream strStream;
-                strStream << file.rdbuf();
-                std::string str = strStream.str();
-                file.close();
-                return str;
-            } else {
-                Log::error("Unable to find file:" + path);
-            }
 
-        }
-        catch (std::exception &e) {
-            Log::error("failed to read file " + path + "\n" + e.what());
-        }
-        return "";
-    }
 
 }
 

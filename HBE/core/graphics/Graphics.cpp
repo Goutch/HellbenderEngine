@@ -24,9 +24,9 @@
 namespace HBE {
     const Mesh *Graphics::DEFAULT_CUBE = nullptr;
     const Mesh *Graphics::DEFAULT_QUAD = nullptr;
-    const ShaderProgram *Graphics::DEFAULT_MESH_SHADER = nullptr;
-    const ShaderProgram *Graphics::DEFAULT_SCREEN_SHADER = nullptr;
-    const ShaderProgram *Graphics::DEFAULT_INSTANCED_SHADER = nullptr;
+    const ShaderProgram *Graphics::DEFAULT_MESH_SHADER_PROGRAM = nullptr;
+    const ShaderProgram *Graphics::DEFAULT_SCREEN_SHADER_PROGRAM = nullptr;
+    const ShaderProgram *Graphics::DEFAULT_INSTANCED_SHADER_PROGRAM = nullptr;
     const Material *Graphics::DEFAULT_MESH_MATERIAL = nullptr;
     DRAW_FLAGS Graphics::default_draw_Flags;
     Renderer *Graphics::renderer = nullptr;
@@ -162,10 +162,10 @@ void main()
 
     void Graphics::terminate() {
         Configs::onVerticalSyncChange.unsubscribe(Graphics::onVerticalSyncChange);
-        delete DEFAULT_MESH_SHADER;
+        delete DEFAULT_MESH_SHADER_PROGRAM;
         delete DEFAULT_MESH_MATERIAL;
-        delete DEFAULT_SCREEN_SHADER;
-        delete DEFAULT_INSTANCED_SHADER;
+        delete DEFAULT_SCREEN_SHADER_PROGRAM;
+        delete DEFAULT_INSTANCED_SHADER_PROGRAM;
         delete DEFAULT_QUAD;
         delete DEFAULT_CUBE;
         delete render_target;
@@ -174,36 +174,52 @@ void main()
     }
 
     void Graphics::initializeDefaultVariables() {
-        //DEFAULT_CUBE
+        //-----------------------------------DEFAULT_CUBE---------------------------------
         Mesh *cube = Mesh::create();
         Geometry::createCube(*cube, 1, 1, 1);
         DEFAULT_CUBE = cube;
-        //DEFAULT_QUAD
+        //-----------------------------------DEFAULT_QUAD---------------------------------
         Mesh *quad = Mesh::create();
         Geometry::createQuad(*quad, 1, 1);
         DEFAULT_QUAD = quad;
-        //DEFAULT_MESH_SHADER
-        ShaderProgram *default_mesh_shader = ShaderProgram::create();
-        default_mesh_shader->setShaders(default_mesh_vertex_shader_code,
-                                        default_mesh_fragment_shader_code, false);
-        DEFAULT_MESH_SHADER = default_mesh_shader;
-        Material *default_mesh_material = Material::create();
-        default_mesh_material->setShader(DEFAULT_MESH_SHADER);
-        DEFAULT_MESH_MATERIAL = default_mesh_material;
-        //DEFAULT_INSTANCED_SHADER
-        ShaderProgram *default_instanced_shader = ShaderProgram::create();
-        default_instanced_shader->setShaders(default_instanced_vertex_shader_code,
-                                             default_mesh_fragment_shader_code, false);
-        DEFAULT_INSTANCED_SHADER = default_instanced_shader;
-        //DEFAULT_SCREEN_SHADER
-        ShaderProgram *default_screen_shader = ShaderProgram::create();
-        default_screen_shader->setShaders(default_screen_vertex_shader_code,
-                                          default_screen_fragment_shader_code, false);
-        DEFAULT_SCREEN_SHADER = default_screen_shader;
-        //DEFAULT_RENDER_TARGET
-        render_target = new RenderTarget(900, 600, *DEFAULT_SCREEN_SHADER);
 
-        default_draw_Flags=DRAW_FLAGS_CULL_FACE_BACK;
+        //-----------------------------------DEFAULT_MESH_MATERIAL--------------------------
+        Shader* default_mesh_vertex_shader=Shader::create(SHADER_TYPE::VERTEX,default_mesh_vertex_shader_code);
+        Shader* default_mesh_fragment_shader=Shader::create(SHADER_TYPE::FRAGMENT,default_mesh_fragment_shader_code);
+        ShaderProgram *default_mesh_shader_program = ShaderProgram::create();
+        default_mesh_shader_program->setShaders({{SHADER_TYPE::VERTEX,default_mesh_vertex_shader},{SHADER_TYPE::FRAGMENT,default_mesh_fragment_shader}});
+        delete default_mesh_vertex_shader;
+        delete default_mesh_fragment_shader;
+        DEFAULT_MESH_SHADER_PROGRAM = default_mesh_shader_program;
+        Material *default_mesh_material = Material::create();
+        default_mesh_material->setShader(DEFAULT_MESH_SHADER_PROGRAM);
+        DEFAULT_MESH_MATERIAL = default_mesh_material;
+
+        //-----------------------------------DEFAULT_INSTANCED_SHADER_PROGRAM----------------
+        Shader* default_instanced_vertex_shader=Shader::create(SHADER_TYPE::VERTEX,default_instanced_vertex_shader_code);
+        Shader* default_instanced_fragment_shader=Shader::create(SHADER_TYPE::FRAGMENT,default_mesh_fragment_shader_code);
+        ShaderProgram *default_instanced_shader_program = ShaderProgram::create();
+        default_instanced_shader_program->setShaders({{SHADER_TYPE::VERTEX,default_instanced_vertex_shader},{SHADER_TYPE::FRAGMENT,default_instanced_fragment_shader}});
+        delete default_instanced_vertex_shader;
+        delete default_instanced_fragment_shader;
+        DEFAULT_INSTANCED_SHADER_PROGRAM = default_instanced_shader_program;
+
+        //------------------------------------DEFAULT_SCREEN_SHADER_PROGRAM---------------------------
+        Shader* default_screen_vertex_shader=Shader::create(SHADER_TYPE::VERTEX,default_screen_vertex_shader_code);
+        Shader* default_screen_fragment_shader=Shader::create(SHADER_TYPE::FRAGMENT,default_screen_fragment_shader_code);
+        ShaderProgram *default_screen_shader_program = ShaderProgram::create();
+        default_screen_shader_program->setShaders({{SHADER_TYPE::VERTEX,default_screen_vertex_shader},{SHADER_TYPE::FRAGMENT,default_screen_fragment_shader}});
+        delete default_screen_vertex_shader;
+        delete default_screen_fragment_shader;
+        DEFAULT_SCREEN_SHADER_PROGRAM = default_screen_shader_program;
+        //------------------------------------DEFAULT_RENDER_TARGET------------------------------
+        int32 width,height;
+        Graphics::getWindowSize(width,height);
+        render_target = new RenderTarget(width, height, *DEFAULT_SCREEN_SHADER_PROGRAM);
+
+        default_draw_Flags=DRAW_FLAGS_NONE;
+
+        Log::message("init finish");
     }
 
     RenderTarget *Graphics::getRenderTarget() {

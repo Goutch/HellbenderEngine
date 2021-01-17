@@ -4,7 +4,7 @@
 #include "core/serialization/Serializer.h"
 namespace HBE {
     Material::Material() {
-        shader = Graphics::DEFAULT_MESH_SHADER;
+        shader = Graphics::DEFAULT_MESH_SHADER_PROGRAM;
     }
 
     void Material::bind() const {
