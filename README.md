@@ -11,7 +11,7 @@
 - **I like to code in c++.**
 - **I want to do procedural generation and raytracing.**
 
-# features
+# Features
 #### HB Graphic Engine library: (Priority)
 - Entity and components
 	- Camera
@@ -30,7 +30,7 @@
 - Job System
 - Event system
 
-## Long term goals
+## Planned features
 
  - Vulkan support
  - Deffered rendering
@@ -50,6 +50,7 @@ These are 3 tested compilers :
 - [Home](https://github.com/Goutch/HellbenderEngine/wiki) 
 - [Hello Triangle](https://github.com/Goutch/HellbenderEngine/wiki/Hello-triangle)
 - [Custom Component](https://github.com/Goutch/HellbenderEngine/wiki/Custom-component)
+
 ## Qestions and Answers
 Q: Why should I use this engine instead of unity/unreal?  
 A: You shouldn't this is a toy engine for me.  
