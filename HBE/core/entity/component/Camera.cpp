@@ -156,7 +156,6 @@ namespace HBE {
     void Camera::serialize(Serializer *serializer) const {
         serializer->begin(toString());
         serializer->addField("fov", fov);
-        serializer->addField("clear_color",clear_color);
         serializer->addField("render_distance", render_distance);
         //serializer->addField("render_mode",render_mode);
         //todo : render target serialization
@@ -186,14 +185,6 @@ namespace HBE {
 
     float Camera::getOrthographicZoom() {
         return orthographic_zoom;
-    }
-
-    const vec4 &Camera::getClearColor() {
-        return clear_color;
-    }
-
-    void Camera::setClearColor(vec4 color) {
-        clear_color = color;
     }
 }
 

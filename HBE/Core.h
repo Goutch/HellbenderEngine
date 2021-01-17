@@ -38,7 +38,7 @@ enum {
     VULKAN_RENDERER = 0,
 };
 
-#define RENDERER OPENHL_RENDERER
+#define RENDERER OPENGL_RENDERER
 
 namespace HBE {
     typedef uint32_t uint32;
