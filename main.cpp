@@ -1,10 +1,24 @@
 #include "HBE.h"
+
 using namespace HBE;
+
+class Rotator : public Component {
+public:
+    void onAttach() override
+    {
+        //Note: there is no need to unsubscribe in the onDetach function.
+        subscribeUpdate();
+    }
+    void onUpdate(float delta) override {
+        entity->transform->rotate(delta, vec3(0, 1, 0));
+    }
+};
+
 int main() {
     Application::init();
-
+    Graphics::setDefaultDrawFlags(DRAW_FLAGS_NONE);
     //-----------------------CAMERA--------------------------
-    //Instantiate an entity with the camera component attached
+    //InstanTiate an entity with the camera component attached
     Camera *camera = Application::scene->instantiate<Camera>();
 
     //Set rendering mode to 2 dimensions
@@ -13,9 +27,12 @@ int main() {
     //-----------------------TRIANGLE ENTITY------------------
     //Create triangle entity
     Entity *triangle_entity = Application::scene->instantiate();
+
+    //Attach the custom Component to the entity
+    triangle_entity->attach<Rotator>();
+
     //Attach mesh renderer component
     MeshRenderer *mesh_renderer = triangle_entity->attach<MeshRenderer>();
-
 
     //Create the resources the mesh renderer need
     Mesh *mesh = Mesh::create();
