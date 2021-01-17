@@ -30,23 +30,9 @@
 - Job System
 - Event system
 
-#### HB Editor: (Not a priority)
- - Basic Scene view
- 	- add/destroy entities
-	- multi selection
- - Basic Entity inspector 
-## In progress:
- - Compute shaders support.
- - Serialization :
-	 - Scene , entities and components
-	 - Resources, models,textures,
-	 - Project file
- - Projects samples.
-
 ## Long term goals
 
  - Vulkan support
- - Scripting
  - Deffered rendering
  - PBR
  - Physics
