@@ -22,7 +22,7 @@ namespace HBE {
         static Texture *create();
 
         Texture *load(std::string path);
-        
+
         virtual unsigned int getTextureID() const = 0;
 
         virtual void setData(unsigned char *data, int width, int height, TEXTURE_TYPE texture_type) = 0;

@@ -52,11 +52,12 @@ namespace HBE {
             projection_matrix = glm::perspective<float>(glm::radians(fov), aspect_ratio, 0.1f, render_distance);
         }
         if (render_mode == RenderMode::ORTHOGRAPHIC) {
-            projection_matrix = glm::ortho<float>(-((static_cast<float>(render_target->getWidth()) / 2)) / orthographic_zoom,
-                                                  ((static_cast<float>(render_target->getWidth()) / 2)) / orthographic_zoom,
-                                                  -(static_cast<float>(render_target->getHeight()) / 2) / orthographic_zoom,
-                                                  (static_cast<float>(render_target->getHeight()) / 2) / orthographic_zoom,
-                                                  -render_distance, render_distance);
+            projection_matrix = glm::ortho<float>(
+                    -((static_cast<float>(render_target->getWidth()) / 2)) / orthographic_zoom,
+                    ((static_cast<float>(render_target->getWidth()) / 2)) / orthographic_zoom,
+                    -(static_cast<float>(render_target->getHeight()) / 2) / orthographic_zoom,
+                    (static_cast<float>(render_target->getHeight()) / 2) / orthographic_zoom,
+                    -render_distance, render_distance);
         }
         calculateFrustumPlanes();
     }
@@ -108,8 +109,10 @@ namespace HBE {
     void Camera::calculateFrustumPlanes() {
         mat4 m = projection_matrix * getViewMatrix();
         frustum_planes[0].set((vec4(m[0][3] + m[0][0], m[1][3] + m[1][0], m[2][3] + m[2][0], m[3][3] + m[3][0])));//left
-        frustum_planes[1].set((vec4(m[0][3] - m[0][0], m[1][3] - m[1][0], m[2][3] - m[2][0], m[3][3] - m[3][0])));//right
-        frustum_planes[3].set((vec4(m[0][3] + m[0][1], m[1][3] + m[1][1], m[2][3] + m[2][1], m[3][3] + m[3][1])));//bottom
+        frustum_planes[1].set(
+                (vec4(m[0][3] - m[0][0], m[1][3] - m[1][0], m[2][3] - m[2][0], m[3][3] - m[3][0])));//right
+        frustum_planes[3].set(
+                (vec4(m[0][3] + m[0][1], m[1][3] + m[1][1], m[2][3] + m[2][1], m[3][3] + m[3][1])));//bottom
         frustum_planes[2].set((vec4(m[0][3] - m[0][1], m[1][3] - m[1][1], m[2][3] - m[2][1], m[3][3] - m[3][1])));//top
         frustum_planes[4].set((vec4(m[0][3] + m[0][2], m[1][3] + m[1][2], m[2][3] + m[2][2], m[3][3] + m[3][2])));//near
         frustum_planes[5].set((vec4(m[0][3] - m[0][2], m[1][3] - m[1][2], m[2][3] - m[2][2], m[3][3] - m[3][2])));//far
@@ -153,6 +156,7 @@ namespace HBE {
     void Camera::serialize(Serializer *serializer) const {
         serializer->begin(toString());
         serializer->addField("fov", fov);
+        serializer->addField("clear_color",clear_color);
         serializer->addField("render_distance", render_distance);
         //serializer->addField("render_mode",render_mode);
         //todo : render target serialization
@@ -182,6 +186,14 @@ namespace HBE {
 
     float Camera::getOrthographicZoom() {
         return orthographic_zoom;
+    }
+
+    const vec4 &Camera::getClearColor() {
+        return clear_color;
+    }
+
+    void Camera::setClearColor(vec4 color) {
+        clear_color = color;
     }
 }
 
