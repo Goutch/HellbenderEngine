@@ -1,6 +1,6 @@
 
 
-#include <core/utility/JobManager.h>
+#include <core/threading/JobManager.h>
 #include "core/serialization/Serializable.h"
 #include "Model.h"
 #include "core/serialization/Serializer.h"

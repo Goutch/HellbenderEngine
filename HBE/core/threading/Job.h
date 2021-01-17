@@ -1,9 +1,9 @@
 #pragma once
 #include "Core.h"
 #include <thread>
-#include "Function.h"
+#include "core/utility/Function.h"
 #include <future>
-#include "Log.h"
+#include "core/utility/Log.h"
 namespace HBE {
     class IJob {
     public:

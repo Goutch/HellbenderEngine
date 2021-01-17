@@ -3,10 +3,14 @@ set(CMAKE_CXX_STANDARD 17)
 
 project(HBE CXX)
 
+
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --std=c++17 -O3 -fPIC")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3 -fPIC")
 endif ()
+
+
+
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
@@ -63,8 +67,8 @@ set(CORE_FILES
         core/utility/Clock.cpp
         core/utility/ModelImporter.cpp
         core/utility/ModelImporter.h
-        core/utility/JobManager.cpp
-        core/utility/JobManager.h
+        core/threading/JobManager.cpp
+        core/threading/JobManager.h
         core/utility/Random.cpp
         core/utility/Random.h
 
@@ -86,7 +90,13 @@ set(GL_FILES
         platforms/gl/GL_MultisamplingFramebuffer.cpp
         platforms/gl/GL_MultisamplingFramebuffer.h)
 
-#set(VK_FILES platforms/vk/VK_Renderer.cpp)
+
+find_package(Vulkan)
+if(VULKAN_FOUND)
+    include_directories(${Vulkan_INCLUDE_DIRS})
+    set(VK_FILES platforms/vk/VK_Renderer.cpp)
+endif()
+
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}
@@ -102,8 +112,7 @@ target_include_directories(${PROJECT_NAME}
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/include"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/include/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb/"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/lua/src/"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/imgui/")
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/lua/src/")
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     message("Using Clang")

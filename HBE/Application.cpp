@@ -5,7 +5,7 @@
 #include "GLFW/glfw3.h"
 #include "core/utility/Clock.h"
 #include "Configs.h"
-#include "core/utility/JobManager.h"
+#include "core/threading/JobManager.h"
 #include <core/serialization/ComponentRegistry.h>
 #include <core/entity/component/MeshRenderer.h>
 #include <core/entity/component/ModelRenderer.h>
