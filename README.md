@@ -32,6 +32,7 @@
 
 ## Planned features
 
+ - Scene serialization
  - Vulkan support
  - Deffered rendering
  - PBR
