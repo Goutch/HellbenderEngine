@@ -33,13 +33,6 @@
 #define DEBUG_MODE
 #endif
 
-enum {
-    OPENGL_RENDERER = 1,
-    VULKAN_RENDERER = 0,
-};
-
-#define RENDERER OPENGL_RENDERER
-
 namespace HBE {
     typedef uint32_t uint32;
     typedef int32_t int32;

@@ -26,6 +26,7 @@ set(CORE_FILES
         core/resource/Material.cpp
         core/resource/Material.h
         core/resource/Model.cpp
+        core/resource/Shader.cpp
         core/resource/ShaderProgram.cpp
         core/resource/Mesh.cpp
 
@@ -73,26 +74,33 @@ set(CORE_FILES
         core/serialization/ComponentRegistry.cpp
         core/serialization/ComponentRegistry.h)
 
-set(GL_FILES
-        platforms/gl/GL_Core.h
-        platforms/gl/GL_Renderer.cpp
-        platforms/gl/GL_Texture.cpp
-        platforms/gl/GL_ShaderProgram.cpp
-        platforms/gl/GL_Mesh.cpp
-        platforms/gl/GL_Framebuffer.cpp
-        platforms/gl/GL_Framebuffer.h
-        platforms/gl/GL_Debug.cpp
-        platforms/gl/GL_Debug.h
-        platforms/gl/GL_MultisamplingFramebuffer.cpp
-        platforms/gl/GL_MultisamplingFramebuffer.h
-        platforms/gl/GL_Shader.cpp
-        platforms/gl/GL_Shader.h)
+
 
 
 find_package(Vulkan)
 if(VULKAN_FOUND)
     include_directories(${Vulkan_INCLUDE_DIRS})
-    set(VK_FILES platforms/vk/VK_Renderer.cpp core/resource/Shader.cpp core/resource/Shader.h)
+    set(VK_FILES
+            platforms/vk/VK_Renderer.cpp
+            core/resource/Shader.cpp
+            core/resource/Shader.h)
+    add_compile_definitions(VULKAN_RENDERER)
+else()
+    add_compile_definitions(OPENGL_RENDERER)
+    set(GL_FILES
+            platforms/gl/GL_Core.h
+            platforms/gl/GL_Renderer.cpp
+            platforms/gl/GL_Texture.cpp
+            platforms/gl/GL_ShaderProgram.cpp
+            platforms/gl/GL_Mesh.cpp
+            platforms/gl/GL_Framebuffer.cpp
+            platforms/gl/GL_Framebuffer.h
+            platforms/gl/GL_Debug.cpp
+            platforms/gl/GL_Debug.h
+            platforms/gl/GL_MultisamplingFramebuffer.cpp
+            platforms/gl/GL_MultisamplingFramebuffer.h
+            platforms/gl/GL_Shader.cpp
+            platforms/gl/GL_Shader.h)
 endif()
 
 
@@ -123,16 +131,14 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/mingw/libassimp.a"
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/mingw/libzlibstatic.a"
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/mingw/libIrrXML.a"
-                PUBLIC glfw
-                PUBLIC glad)
+                PUBLIC glfw)
     else ()
         message("Using GCC Compiler")
         target_link_libraries(${PROJECT_NAME}
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/gcc/libassimp.a"
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/gcc/libzlibstatic.a"
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/gcc/libIrrXML.a"
-                PUBLIC glfw
-                PUBLIC glad)
+                PUBLIC glfw)
     endif ()
 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
@@ -147,17 +153,20 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/debug/assimp-vc142-mt.lib"
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/debug/zlibstatic.lib"
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/debug/IrrXML.lib"
-                PUBLIC glfw
-                PUBLIC glad)
+                PUBLIC glfw)
     else ()
         MESSAGE("release mode")
         target_link_libraries(${PROJECT_NAME}
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/release/assimp-vc142-mt.lib"
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/release/zlibstatic.lib"
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/release/IrrXML.lib"
-                PUBLIC glfw
-                PUBLIC glad)
+                PUBLIC glfw)
     endif ()
 endif ()
+if(VULKAN_FOUND)
+    target_link_libraries(${PROJECT_NAME} PUBLIC ${Vulkan_LIBRARY})
+else()
+    target_link_libraries(${PROJECT_NAME} PUBLIC glad)
+endif()
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE HB_BUILD)

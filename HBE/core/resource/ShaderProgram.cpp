@@ -5,10 +5,12 @@
 #include "core/serialization/Serializer.h"
 namespace HBE {
     ShaderProgram *ShaderProgram::create() {
-#if RENDERER == OPENGL_RENDERER
+#ifdef OPENGL_RENDERER
         return new GL_ShaderProgram();
-#elif RENDERER == VULKAN_RENDERER
+#else
+#ifdef VULKAN_RENDERER
 
+#endif
 #endif
         return nullptr;
     }

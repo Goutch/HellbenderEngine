@@ -11,12 +11,14 @@
 #include <Configs.h>
 #include <GLFW/glfw3.h>
 
-#if RENDERER == OPENGL_RENDERER
+#ifdef OPENGL_RENDERER
 
 #include "platforms/gl/GL_Renderer.h"
 
-#elif RENDERER == VULKAN_RENDERER
+#else
+#ifdef VULKAN_RENDERER
 #include "platforms/vk/VK_Renderer.h"
+#endif
 #endif
 
 #include "core/resource/Material.h"

@@ -1,3 +1,4 @@
+#define OPENGL_RENDERER
 #include "HBE.h"
 
 using namespace HBE;

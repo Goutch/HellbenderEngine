@@ -4,8 +4,11 @@
 
 #include "fstream"
 #include "core/serialization/Serializer.h"
+
 #define STB_IMAGE_IMPLEMENTATION
+
 #include "stb_image.h"
+
 namespace HBE {
     Texture *Texture::load(std::string path) {
         this->path = path;
@@ -26,10 +29,12 @@ namespace HBE {
     }
 
     Texture *Texture::create() {
-#if RENDERER == OPENGL_RENDERER
+#ifdef OPENGL_RENDERER
         return new GL_Texture();
-#elif RENDERER == VULKAN_RENDERER
+#else
+#ifdef VULKAN_RENDERER
 
+#endif
 #endif
         return nullptr;
     }

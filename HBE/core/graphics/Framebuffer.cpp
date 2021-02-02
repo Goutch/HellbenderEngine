@@ -5,15 +5,16 @@
 
 namespace HBE {
     Framebuffer *Framebuffer::create() {
-#if RENDERER == OPENGL_RENDERER
+#ifdef OPENGL_RENDERER
         if (Configs::getAntialiasing()) {
             return new GL_MultisamplingFramebuffer();
         } else {
             return new GL_Framebuffer();
         }
 
-#elif RENDERER == VULKAN_RENDERER
-
+#else
+#ifdef VULKAN_RENDERER
+#endif
 #endif
         return nullptr;
     }
