@@ -9,6 +9,7 @@
 
 namespace HBE {
     VK_Renderer::VK_Renderer() {
+
         window = dynamic_cast<VK_Window*>(Graphics::getWindow());
         instance = new VK_Instance();
     }

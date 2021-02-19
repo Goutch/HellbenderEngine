@@ -119,7 +119,7 @@ void main()
         window = Window::create(900, 600);
         renderer = Renderer::create();
         window->onWindowSizeChange.subscribe(&Graphics::onWindowSizeChange);
-        initializeDefaultVariables();
+        //initializeDefaultVariables();
     }
 
     void Graphics::onWindowSizeChange(i32 width, i32 height) {

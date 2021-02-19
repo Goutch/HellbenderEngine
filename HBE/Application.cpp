@@ -77,8 +77,6 @@ namespace HBE {
             if (Camera::main)
                 Graphics::render(Graphics::getRenderTarget(), Camera::main->getProjectionMatrix(),
                                  Camera::main->getViewMatrix());
-            else
-                Log::warning("No main camera to render!");
             if (!Configs::isPresentAutomatic())
                 Graphics::present(Graphics::getRenderTarget());
             onRender.invoke();

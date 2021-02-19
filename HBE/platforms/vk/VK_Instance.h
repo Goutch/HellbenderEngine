@@ -2,7 +2,7 @@
 
 #include <vector>
 #include "Core.h"
-#include "vulkan/vulkan.hpp"
+#include "vulkan/vulkan.h"
 
 namespace HBE {
     class VK_Instance {
@@ -14,5 +14,8 @@ namespace HBE {
 
         ~VK_Instance();
 
+    private:
+        void getRequiredExtensions(std::vector<const char *> &required_extensions);
+        bool checkExtensionsSupported(std::vector<const char *> &required_extensions);
     };
 }

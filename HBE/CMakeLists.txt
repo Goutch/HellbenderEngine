@@ -10,7 +10,7 @@ endif ()
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
 
-#find_package(Vulkan)
+find_package(Vulkan)
 if(VULKAN_FOUND)
     include_directories(${Vulkan_INCLUDE_DIRS})
     set(VK_FILES
@@ -103,7 +103,7 @@ set(CORE_FILES
         core/serialization/Serializer.h
         core/serialization/Deserializer.h
         core/serialization/ComponentRegistry.cpp
-        core/serialization/ComponentRegistry.h core/graphics/Window.cpp)
+        core/serialization/ComponentRegistry.h core/graphics/Window.cpp platforms/vk/VK_ValidationLayers.cpp platforms/vk/VK_ValidationLayers.h)
 
 
 add_library(${PROJECT_NAME} SHARED
