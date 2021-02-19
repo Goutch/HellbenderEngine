@@ -9,7 +9,6 @@
 #include <core/graphics/RenderTarget.h>
 #include "core/resource/ShaderProgram.h"
 #include <Configs.h>
-#include <GLFW/glfw3.h>
 
 #ifdef OPENGL_RENDERER
 
@@ -17,11 +16,14 @@
 
 #else
 #ifdef VULKAN_RENDERER
+
 #include "platforms/vk/VK_Renderer.h"
+
 #endif
 #endif
 
 #include "core/resource/Material.h"
+#include "Window.h"
 
 namespace HBE {
     const Mesh *Graphics::DEFAULT_CUBE = nullptr;
@@ -32,10 +34,8 @@ namespace HBE {
     const Material *Graphics::DEFAULT_MESH_MATERIAL = nullptr;
     DRAW_FLAGS Graphics::default_draw_Flags;
     Renderer *Graphics::renderer = nullptr;
-    GLFWwindow *Graphics::window = nullptr;
+    Window *Graphics::window = nullptr;
     RenderTarget *Graphics::render_target = nullptr;
-    Event<int, int> Graphics::onWindowSizeChange;
-
 
     const char *default_mesh_vertex_shader_code = R"(#version 330 core
 layout (location = 0) in vec3 vertex_position;
@@ -114,39 +114,26 @@ void main()
     gl_Position = projection_matrix*view_matrix*instance_transform*vec4(vertex_position, 1.0);
 })";
 
-    GLFWwindow *Graphics::init() {
+
+    void Graphics::init() {
+        window = Window::create(900, 600);
         renderer = Renderer::create();
-        window = renderer->createWindow(900, 600);
-
-        if (!Configs::getVerticalSync())
-            glfwSwapInterval(0);
-        Configs::onVerticalSyncChange.subscribe(Graphics::onVerticalSyncChange);
-        Configs::onWindowTitleChange.subscribe(&Graphics::onWindowTitleChange);
-        renderer->init();
-
-        glfwSetWindowSizeCallback(window, Graphics::onWindowSizeChangeCallback);
+        window->onWindowSizeChange.subscribe(&Graphics::onWindowSizeChange);
         initializeDefaultVariables();
-
-        return window;
     }
 
-    void Graphics::onVerticalSyncChange(bool v_sync) {
-        glfwSwapInterval(v_sync);
-    }
-
-    void Graphics::onWindowSizeChangeCallback(GLFWwindow *window, int32 width, int32 height) {
-        if (!Configs::isCustonRenderingOn()) {
+    void Graphics::onWindowSizeChange(i32 width, i32 height) {
+        if (!Configs::isPresentAutomatic()) {
             render_target->setSize(width, height);
         }
-        onWindowSizeChange.invoke(width, height);
     }
 
     void Graphics::draw(const Transform &transform, const Mesh &mesh, const Material &material, DRAW_FLAGS draw_flags) {
-        renderer->draw(transform, mesh, material,draw_flags);
+        renderer->draw(transform, mesh, material, draw_flags);
     }
 
     void Graphics::drawInstanced(const Mesh &mesh, const Material &material, DRAW_FLAGS draw_flags) {
-        renderer->drawInstanced(mesh, material,draw_flags);
+        renderer->drawInstanced(mesh, material, draw_flags);
     }
 
     void Graphics::render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix) {
@@ -163,7 +150,6 @@ void main()
     }
 
     void Graphics::terminate() {
-        Configs::onVerticalSyncChange.unsubscribe(Graphics::onVerticalSyncChange);
         delete DEFAULT_MESH_SHADER_PROGRAM;
         delete DEFAULT_MESH_MATERIAL;
         delete DEFAULT_SCREEN_SHADER_PROGRAM;
@@ -172,7 +158,7 @@ void main()
         delete DEFAULT_CUBE;
         delete render_target;
         delete renderer;
-
+        delete window;
     }
 
     void Graphics::initializeDefaultVariables() {
@@ -186,10 +172,11 @@ void main()
         DEFAULT_QUAD = quad;
 
         //-----------------------------------DEFAULT_MESH_MATERIAL--------------------------
-        Shader* default_mesh_vertex_shader=Shader::create(SHADER_TYPE::VERTEX,default_mesh_vertex_shader_code);
-        Shader* default_mesh_fragment_shader=Shader::create(SHADER_TYPE::FRAGMENT,default_mesh_fragment_shader_code);
+        Shader *default_mesh_vertex_shader = Shader::create(SHADER_TYPE::VERTEX, default_mesh_vertex_shader_code);
+        Shader *default_mesh_fragment_shader = Shader::create(SHADER_TYPE::FRAGMENT, default_mesh_fragment_shader_code);
         ShaderProgram *default_mesh_shader_program = ShaderProgram::create();
-        default_mesh_shader_program->setShaders({{SHADER_TYPE::VERTEX,default_mesh_vertex_shader},{SHADER_TYPE::FRAGMENT,default_mesh_fragment_shader}});
+        default_mesh_shader_program->setShaders({{SHADER_TYPE::VERTEX,   default_mesh_vertex_shader},
+                                                 {SHADER_TYPE::FRAGMENT, default_mesh_fragment_shader}});
         delete default_mesh_vertex_shader;
         delete default_mesh_fragment_shader;
         DEFAULT_MESH_SHADER_PROGRAM = default_mesh_shader_program;
@@ -198,28 +185,33 @@ void main()
         DEFAULT_MESH_MATERIAL = default_mesh_material;
 
         //-----------------------------------DEFAULT_INSTANCED_SHADER_PROGRAM----------------
-        Shader* default_instanced_vertex_shader=Shader::create(SHADER_TYPE::VERTEX,default_instanced_vertex_shader_code);
-        Shader* default_instanced_fragment_shader=Shader::create(SHADER_TYPE::FRAGMENT,default_mesh_fragment_shader_code);
+        Shader *default_instanced_vertex_shader = Shader::create(SHADER_TYPE::VERTEX,
+                                                                 default_instanced_vertex_shader_code);
+        Shader *default_instanced_fragment_shader = Shader::create(SHADER_TYPE::FRAGMENT,
+                                                                   default_mesh_fragment_shader_code);
         ShaderProgram *default_instanced_shader_program = ShaderProgram::create();
-        default_instanced_shader_program->setShaders({{SHADER_TYPE::VERTEX,default_instanced_vertex_shader},{SHADER_TYPE::FRAGMENT,default_instanced_fragment_shader}});
+        default_instanced_shader_program->setShaders({{SHADER_TYPE::VERTEX,   default_instanced_vertex_shader},
+                                                      {SHADER_TYPE::FRAGMENT, default_instanced_fragment_shader}});
         delete default_instanced_vertex_shader;
         delete default_instanced_fragment_shader;
         DEFAULT_INSTANCED_SHADER_PROGRAM = default_instanced_shader_program;
 
         //------------------------------------DEFAULT_SCREEN_SHADER_PROGRAM---------------------------
-        Shader* default_screen_vertex_shader=Shader::create(SHADER_TYPE::VERTEX,default_screen_vertex_shader_code);
-        Shader* default_screen_fragment_shader=Shader::create(SHADER_TYPE::FRAGMENT,default_screen_fragment_shader_code);
+        Shader *default_screen_vertex_shader = Shader::create(SHADER_TYPE::VERTEX, default_screen_vertex_shader_code);
+        Shader *default_screen_fragment_shader = Shader::create(SHADER_TYPE::FRAGMENT,
+                                                                default_screen_fragment_shader_code);
         ShaderProgram *default_screen_shader_program = ShaderProgram::create();
-        default_screen_shader_program->setShaders({{SHADER_TYPE::VERTEX,default_screen_vertex_shader},{SHADER_TYPE::FRAGMENT,default_screen_fragment_shader}});
+        default_screen_shader_program->setShaders({{SHADER_TYPE::VERTEX,   default_screen_vertex_shader},
+                                                   {SHADER_TYPE::FRAGMENT, default_screen_fragment_shader}});
         delete default_screen_vertex_shader;
         delete default_screen_fragment_shader;
         DEFAULT_SCREEN_SHADER_PROGRAM = default_screen_shader_program;
         //------------------------------------DEFAULT_RENDER_TARGET------------------------------
-        int32 width,height;
-        Graphics::getWindowSize(width,height);
+        i32 width, height;
+        window->getSize(width, height);
         render_target = new RenderTarget(width, height, *DEFAULT_SCREEN_SHADER_PROGRAM);
 
-        default_draw_Flags=DRAW_FLAGS_NONE;
+        default_draw_Flags = DRAW_FLAGS_NONE;
 
         Log::message("init finish");
     }
@@ -228,20 +220,12 @@ void main()
         return render_target;
     }
 
-    GLFWwindow *Graphics::getWindow() {
+    Window *Graphics::getWindow() {
         return window;
-    }
-
-    void Graphics::getWindowSize(int32 &width, int32 &height) {
-        glfwGetWindowSize(window, &width, &height);
     }
 
     void Graphics::clear() {
         renderer->clear();
-    }
-
-    void Graphics::onWindowTitleChange(std::string title) {
-        glfwSetWindowTitle(window, title.c_str());
     }
 
     void Graphics::clearDrawCache() {
@@ -249,7 +233,7 @@ void main()
     }
 
     void Graphics::setDefaultDrawFlags(DRAW_FLAGS draw_flags) {
-        default_draw_Flags=draw_flags;
+        default_draw_Flags = draw_flags;
     }
 
 }

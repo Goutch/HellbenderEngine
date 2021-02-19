@@ -1,6 +1,3 @@
-//
-// Created by User on 02-Jun.-2020.
-//
 
 #include "GL_Renderer.h"
 #include "glad/glad.h"
@@ -100,7 +97,7 @@ namespace HBE {
         shader.unbind();
     }
 
-    void GL_Renderer::init() {
+    GL_Renderer::GL_Renderer() {
         if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
             Log::error("Failed to load glad");
         }
@@ -113,19 +110,6 @@ namespace HBE {
     }
 
 
-    GLFWwindow *GL_Renderer::createWindow(int32 width, int32 height) {
-        if (!glfwInit()) {
-            Log::error("Failed to load glfw");
-        }
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-        window = glfwCreateWindow(width, height, Configs::getWindowTitle().c_str(), nullptr, nullptr);
-        glfwMakeContextCurrent(window);
-        return window;
-    }
-
     void GL_Renderer::clear() const {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
@@ -133,12 +117,6 @@ namespace HBE {
     void GL_Renderer::clearDrawCache() {
         render_cache.clear();
     }
-
-    GL_Renderer::~GL_Renderer() {
-        glfwDestroyWindow(window);
-        glfwTerminate();
-    }
-
 
 }
 

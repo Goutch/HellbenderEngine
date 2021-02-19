@@ -8,7 +8,6 @@
 
 using namespace glm;
 
-struct GLFWwindow;
 namespace HBE {
     class Renderer;
 
@@ -22,11 +21,13 @@ namespace HBE {
 
     class Material;
 
+    class Window;
+
     template<typename... Args>
     class Event;
 
     enum {
-        DRAW_FLAGS_NONE=0,
+        DRAW_FLAGS_NONE = 0,
         DRAW_FLAGS_CULL_FACE_BACK = 1,
         DRAW_FLAGS_CULL_FACE_FRONT = 1 << 1,
         DRAW_FLAGS_TRANSPARENT = 1 << 2,
@@ -36,10 +37,9 @@ namespace HBE {
     class HB_API Graphics {
         static DRAW_FLAGS default_draw_Flags;
         static Renderer *renderer;
-        static GLFWwindow *window;
+        static Window *window;
         static RenderTarget *render_target;
     public:
-        static Event<int, int> onWindowSizeChange;
         static const ShaderProgram *DEFAULT_SCREEN_SHADER_PROGRAM;
         static const ShaderProgram *DEFAULT_MESH_SHADER_PROGRAM;
         static const Material *DEFAULT_MESH_MATERIAL;
@@ -47,11 +47,15 @@ namespace HBE {
         static const Mesh *DEFAULT_QUAD;
         static const Mesh *DEFAULT_CUBE;
 
-        static GLFWwindow *init();
+        /*
+         * Initialze graphic context and window
+         */
+        static void init();
 
-        static GLFWwindow *getWindow();
+        static Window *getWindow();
 
-        static void draw(const Transform &transform, const Mesh &mesh, const Material &material, DRAW_FLAGS = default_draw_Flags);
+        static void
+        draw(const Transform &transform, const Mesh &mesh, const Material &material, DRAW_FLAGS = default_draw_Flags);
 
         static void drawInstanced(const Mesh &mesh, const Material &material, DRAW_FLAGS = default_draw_Flags);
 
@@ -65,13 +69,11 @@ namespace HBE {
 
         static void terminate();
 
-        static void getWindowSize(int32 &width, int32 &height);
+        static void getWindowSize(i32 &width, i32 &height);
 
         static void onWindowTitleChange(std::string title);
 
-        static void onWindowSizeChangeCallback(GLFWwindow *window, int32 width, int32 height);
-
-        static void onVerticalSyncChange(bool v_sync);
+        static void onWindowSizeChange(i32 width,i32 height);
 
         static void clearDrawCache();
 

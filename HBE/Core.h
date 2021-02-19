@@ -1,8 +1,5 @@
 #pragma once
 
-
-#include <cstdint>
-
 #if defined(_MSC_VER)
 //  Microsoft
 #define EXPORT __declspec(dllexport)
@@ -12,7 +9,7 @@
 #define EXPORT __attribute__((visibility("default")))
 #define IMPORT
 #else
-    //do nothing and hope for the best
+//do nothing and hope for the best
 #define EXPORT
 #define IMPORT
 #pragma warning Unknown dynamic link import/export semantics.
@@ -33,11 +30,3 @@
 #define DEBUG_MODE
 #endif
 
-namespace HBE {
-    typedef uint32_t uint32;
-    typedef int32_t int32;
-    typedef uint16_t uint16;
-    typedef int16_t int16;
-    typedef uint8_t uint8;
-    typedef int8_t int8;
-}

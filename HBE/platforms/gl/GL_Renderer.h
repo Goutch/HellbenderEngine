@@ -5,7 +5,7 @@
 #include "list"
 
 namespace HBE {
-
+class GL_Window;
 #define MAP_LIST(T1,T2) std::unordered_map<T1,T2>
 
     class ShaderProgram;
@@ -23,11 +23,10 @@ namespace HBE {
         };
         MAP_LIST(DRAW_FLAGS,MAP_LIST(const Mesh*,MAP_LIST(const Material*,std::list<const Transform*>))) render_cache;
     private:
-        GLFWwindow *window;
+        GL_Window *window;
     public:
+        GL_Renderer();
         void clear() const override;
-        ~GL_Renderer() override;
-        void init() override;
 
         void draw(const Transform &transform, const Mesh &mesh, const Material &material, DRAW_FLAGS draw_flags) override;
 
@@ -38,8 +37,6 @@ namespace HBE {
         void present(const RenderTarget *render_target) override;
 
         void clearDrawCache() override;
-
-        GLFWwindow *createWindow(int32 width, int32 height) override;
     };
 
 }

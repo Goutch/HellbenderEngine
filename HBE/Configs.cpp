@@ -14,7 +14,7 @@ namespace HBE {
     Configs::CAMERA_MODE Configs::default_camera_mode = Configs::CAMERA_MODE::PERSPECTIVE;
     Event<Configs::CAMERA_MODE> Configs::onDefaultCameraModeChange;
 
-    bool Configs::custom_rendering = false;
+    bool Configs::present_automaticaly = false;
 
     void Configs::setAntialiasing(bool antialiasing) {
         Configs::antialiasing = antialiasing;
@@ -56,12 +56,12 @@ namespace HBE {
         return icon_path;
     }
 
-    void Configs::setCustomRendering(bool is_custom) {
-        custom_rendering = is_custom;
+    void Configs::setPresentAutomatic(bool is_automatic) {
+        present_automaticaly = is_automatic;
     }
 
-    bool Configs::isCustonRenderingOn() {
-        return custom_rendering;
+    bool Configs::isPresentAutomatic() {
+        return present_automaticaly;
     }
 
 }

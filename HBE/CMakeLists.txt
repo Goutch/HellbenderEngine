@@ -8,8 +8,38 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3 -fPIC")
 endif ()
 
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
+
+#find_package(Vulkan)
+if(VULKAN_FOUND)
+    include_directories(${Vulkan_INCLUDE_DIRS})
+    set(VK_FILES
+            platforms/vk/VK_Renderer.cpp
+            platforms/vk/VK_Instance.cpp
+            platforms/vk/VK_Instance.h
+            platforms/vk/VK_Window.cpp
+            platforms/vk/VK_Window.h)
+    add_compile_definitions(VULKAN_RENDERER)
+else()
+    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/")
+    add_compile_definitions(OPENGL_RENDERER)
+    set(GL_FILES
+            platforms/gl/GL_Renderer.cpp
+            platforms/gl/GL_Texture.cpp
+            platforms/gl/GL_ShaderProgram.cpp
+            platforms/gl/GL_Mesh.cpp
+            platforms/gl/GL_Framebuffer.cpp
+            platforms/gl/GL_Framebuffer.h
+            platforms/gl/GL_Debug.cpp
+            platforms/gl/GL_Debug.h
+            platforms/gl/GL_MultisamplingFramebuffer.cpp
+            platforms/gl/GL_MultisamplingFramebuffer.h
+            platforms/gl/GL_Shader.cpp
+            platforms/gl/GL_Shader.h
+            platforms/gl/GL_Window.cpp
+            platforms/gl/GL_Window.h)
+endif()
+
 
 include_directories(.)
 set(CORE_FILES
@@ -30,6 +60,7 @@ set(CORE_FILES
         core/resource/ShaderProgram.cpp
         core/resource/Mesh.cpp
 
+        core/graphics/Window.h
         core/graphics/Framebuffer.h
         core/graphics/Framebuffer.cpp
         core/graphics/Renderer.h
@@ -72,36 +103,7 @@ set(CORE_FILES
         core/serialization/Serializer.h
         core/serialization/Deserializer.h
         core/serialization/ComponentRegistry.cpp
-        core/serialization/ComponentRegistry.h)
-
-
-
-
-find_package(Vulkan)
-if(VULKAN_FOUND)
-    include_directories(${Vulkan_INCLUDE_DIRS})
-    set(VK_FILES
-            platforms/vk/VK_Renderer.cpp
-            core/resource/Shader.cpp
-            core/resource/Shader.h)
-    add_compile_definitions(VULKAN_RENDERER)
-else()
-    add_compile_definitions(OPENGL_RENDERER)
-    set(GL_FILES
-            platforms/gl/GL_Core.h
-            platforms/gl/GL_Renderer.cpp
-            platforms/gl/GL_Texture.cpp
-            platforms/gl/GL_ShaderProgram.cpp
-            platforms/gl/GL_Mesh.cpp
-            platforms/gl/GL_Framebuffer.cpp
-            platforms/gl/GL_Framebuffer.h
-            platforms/gl/GL_Debug.cpp
-            platforms/gl/GL_Debug.h
-            platforms/gl/GL_MultisamplingFramebuffer.cpp
-            platforms/gl/GL_MultisamplingFramebuffer.h
-            platforms/gl/GL_Shader.cpp
-            platforms/gl/GL_Shader.h)
-endif()
+        core/serialization/ComponentRegistry.h core/graphics/Window.cpp)
 
 
 add_library(${PROJECT_NAME} SHARED
@@ -109,7 +111,7 @@ add_library(${PROJECT_NAME} SHARED
         ${IMGUI_FILES}
         ${GL_FILES}
         ${VK_FILES}
-      )
+        )
 
 target_include_directories(${PROJECT_NAME}
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/contrib/zlib/"
@@ -117,8 +119,7 @@ target_include_directories(${PROJECT_NAME}
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/include/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/include"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/include/"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb/"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/lua/src/")
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb/")
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     message("Using Clang")
@@ -147,7 +148,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     # using Visual Studio C++
     message("Using visual studio compiler")
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         MESSAGE("debug mode ")
         target_link_libraries(${PROJECT_NAME}
                 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/debug/assimp-vc142-mt.lib"
@@ -163,10 +164,10 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
                 PUBLIC glfw)
     endif ()
 endif ()
-if(VULKAN_FOUND)
+if (VULKAN_FOUND)
     target_link_libraries(${PROJECT_NAME} PUBLIC ${Vulkan_LIBRARY})
-else()
+else ()
     target_link_libraries(${PROJECT_NAME} PUBLIC glad)
-endif()
+endif ()
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE HB_BUILD)
