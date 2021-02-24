@@ -55,6 +55,3 @@ These are 3 tested compilers :
 ## Qestions and Answers
 Q: Why should I use this engine instead of unity/unreal?  
 A: You shouldn't this is a toy engine for me.  
-
-Q: Why there is no lighting system?  
-A: I am waiting to implement a deffered rendering system before I add any lights.  
