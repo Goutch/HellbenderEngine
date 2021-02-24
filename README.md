@@ -12,7 +12,7 @@
 - **I want to do procedural generation and raytracing.**
 
 # Features
-#### HB Graphic Engine library: (Priority)
+#### HB Graphic Engine library:
 - Entity and components
 	- Camera
 	- CameraController
