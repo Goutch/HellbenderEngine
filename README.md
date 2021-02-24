@@ -1,11 +1,10 @@
 # HellbenderEngine
 
 # Goals 
-- ***Simple and easy to read***
+- **Simple and easy to read for programmers**
 - **Cross platforms**
 - **Easy to use and modular API.**
 - **Minimal dependencies and lightweight.**
-- **Built for programmers.**
 
 # Why?
 - **I want to Learn graphics and engines.**
