@@ -4,7 +4,7 @@
 #include "core/utility/Event.h"
 struct GLFWwindow;
 namespace HBE {
-    class Window {
+    class HB_API Window {
 
     public:
         virtual bool shouldClose() = 0;

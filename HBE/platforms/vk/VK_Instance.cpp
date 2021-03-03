@@ -26,11 +26,16 @@ namespace HBE {
         getRequiredExtensions(required_extensions);
         create_info.enabledExtensionCount = static_cast<uint32_t>(required_extensions.size());
         create_info.ppEnabledExtensionNames = required_extensions.data();
-        create_info.enabledLayerCount = 0;
+
 
         if (checkExtensionsSupported(required_extensions)) {
 #ifdef DEBUG_MODE
-
+            validation_layers = new VK_ValidationLayers();
+            auto layers = validation_layers->getLayersNames();
+            create_info.enabledLayerCount = layers.size();
+            create_info.ppEnabledLayerNames = layers.data();
+#else
+            create_info.enabledLayerCount = 0;
 #endif
             if (vkCreateInstance(&create_info, nullptr, &handle) != VK_SUCCESS) {
                 Log::error("Failed to create vulkan instance!");
@@ -63,7 +68,7 @@ namespace HBE {
                                                instance_supported_extensions.data());
 
 
-        std::string extension_support_message="\nLooking for required vulkan extensions:";
+        std::string extension_support_message = "\nLooking for required vulkan extensions:";
         bool succes = true;
         for (auto extension_name:extensions) {
             extension_support_message += "\n\t";
@@ -71,14 +76,14 @@ namespace HBE {
             bool found = false;
             for (const auto &supported_extension:instance_supported_extensions) {
                 if (strcmp(extension_name, supported_extension.extensionName) == 0) {
-                    extension_support_message +="...FOUND!";
+                    extension_support_message += "...FOUND!";
                     found = true;
                     break;
                 }
             }
             if (!found) {
                 succes = false;
-                extension_support_message +="...MISSING!";
+                extension_support_message += "...MISSING!";
             }
         }
         Log::message(extension_support_message);
@@ -86,6 +91,9 @@ namespace HBE {
     }
 
     VK_Instance::~VK_Instance() {
+#ifdef DEBUG_MODE
+        delete validation_layers;
+#endif
         vkDestroyInstance(handle, nullptr);
     }
 }

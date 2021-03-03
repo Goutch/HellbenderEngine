@@ -3,12 +3,12 @@
 #include <vector>
 #include "Core.h"
 #include "vulkan/vulkan.h"
+#include "VK_ValidationLayers.h"
 
 namespace HBE {
     class VK_Instance {
-        uint32_t extension_count;
         VkInstance handle;
-
+        VK_ValidationLayers* validation_layers= nullptr;
     public:
         VK_Instance();
 
