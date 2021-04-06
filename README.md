@@ -32,6 +32,7 @@
 
 ## Planned features
 
+ - Pure ECS
  - Scene serialization
  - Vulkan support
  - Deffered rendering
