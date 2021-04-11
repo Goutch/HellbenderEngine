@@ -218,8 +218,6 @@ void main()
         render_target = new RenderTarget(width, height, *DEFAULT_SCREEN_SHADER_PROGRAM);
 
         default_draw_Flags=DRAW_FLAGS_NONE;
-
-        Log::message("init finish");
     }
 
     RenderTarget *Graphics::getRenderTarget() {
