@@ -5,9 +5,9 @@
 #include <core/serialization/Serializable.h>
 #include "glm/gtc/matrix_transform.hpp"
 #include "Framebuffer.h"
-#include "core/resource/ShaderProgram.h"
+#include "core/resource/GraphicPipeline.h"
 namespace HBE {
-    RenderTarget::RenderTarget(unsigned int width, unsigned int height, const ShaderProgram &shader_program) {
+    RenderTarget::RenderTarget(unsigned int width, unsigned int height, const GraphicPipeline &shader_program) {
         this->shader_program = &shader_program;
         framebuffer = Framebuffer::create();
         setSize(width, height);
@@ -26,11 +26,11 @@ namespace HBE {
         return *framebuffer;
     }
 
-    const ShaderProgram &RenderTarget::getShaderProgram() const {
+    const GraphicPipeline &RenderTarget::getShaderProgram() const {
         return *shader_program;
     }
 
-    void RenderTarget::setShaderProgram(ShaderProgram &shader_program) {
+    void RenderTarget::setShaderProgram(GraphicPipeline &shader_program) {
         this->shader_program = &shader_program;
     }
 

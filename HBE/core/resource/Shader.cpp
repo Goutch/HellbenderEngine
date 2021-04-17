@@ -17,6 +17,7 @@ namespace HBE {
         this->type = type;
     }
 
+
     Shader *Shader::create(SHADER_TYPE type, const std::string &source) {
 #ifdef OPENGL_RENDERER
         return new GL_Shader(type, source);

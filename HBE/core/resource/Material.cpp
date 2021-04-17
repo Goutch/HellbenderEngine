@@ -65,7 +65,7 @@ namespace HBE {
         shader->unbind();
     }
 
-    void Material::setShader(const ShaderProgram *shader) {
+    void Material::setShader(const GraphicPipeline *shader) {
         this->shader = shader;
     }
 
@@ -81,7 +81,7 @@ namespace HBE {
         this->specular_map = specular_map;
     }
 
-    const ShaderProgram &Material::getShader() const {
+    const GraphicPipeline &Material::getShader() const {
         return *shader;
     }
 

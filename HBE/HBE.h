@@ -4,7 +4,7 @@
 #include <Configs.h>
 #include <Application.h>
 
-#include <core/resource/ShaderProgram.h>
+#include <core/resource/GraphicPipeline.h>
 #include <core/resource/Mesh.h>
 #include <core/resource/Texture.h>
 #include <core/resource/Material.h>

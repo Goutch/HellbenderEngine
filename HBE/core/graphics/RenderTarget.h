@@ -7,7 +7,7 @@ using namespace glm;
 namespace HBE {
     class Framebuffer;
 
-    class ShaderProgram;
+    class GraphicPipeline;
 
     class HB_API RenderTarget {
         unsigned int width;
@@ -17,13 +17,13 @@ namespace HBE {
     public:
         Event<int, int> onSizeChange;
 
-        RenderTarget(unsigned int width, unsigned int height, const ShaderProgram &shader_program);
+        RenderTarget(unsigned int width, unsigned int height, const GraphicPipeline &shader_program);
 
-        const ShaderProgram *shader_program;
+        const GraphicPipeline *shader_program;
 
         const Framebuffer &getFramebuffer() const;
 
-        const ShaderProgram &getShaderProgram() const;
+        const GraphicPipeline &getShaderProgram() const;
 
         const mat4 &getProjectionMatrix();
 
@@ -37,7 +37,7 @@ namespace HBE {
 
         void setProjectionMatrix(mat4 projection_matrix);
 
-        void setShaderProgram(ShaderProgram &shader_program);
+        void setShaderProgram(GraphicPipeline &shader_program);
 
         unsigned int getTextureID();
     };

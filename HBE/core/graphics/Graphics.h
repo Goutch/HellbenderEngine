@@ -13,7 +13,7 @@ namespace HBE {
 
     class RenderTarget;
 
-    class ShaderProgram;
+    class GraphicPipeline;
 
     class Mesh;
 
@@ -40,10 +40,10 @@ namespace HBE {
         static Window *window;
         static RenderTarget *render_target;
     public:
-        static const ShaderProgram *DEFAULT_SCREEN_SHADER_PROGRAM;
-        static const ShaderProgram *DEFAULT_MESH_SHADER_PROGRAM;
+        static const GraphicPipeline *DEFAULT_SCREEN_SHADER_PROGRAM;
+        static const GraphicPipeline *DEFAULT_MESH_SHADER_PROGRAM;
         static const Material *DEFAULT_MESH_MATERIAL;
-        static const ShaderProgram *DEFAULT_INSTANCED_SHADER_PROGRAM;
+        static const GraphicPipeline *DEFAULT_INSTANCED_SHADER_PROGRAM;
         static const Mesh *DEFAULT_QUAD;
         static const Mesh *DEFAULT_CUBE;
 

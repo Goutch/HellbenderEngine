@@ -1,9 +1,10 @@
 #pragma once
+
 #include "core/serialization/Serializable.h"
 
 #include "glm/glm.hpp"
 #include "string"
-#include "map"
+#include "vector"
 #include "Core.h"
 #include "map"
 #include "Shader.h"
@@ -12,18 +13,17 @@
 namespace HBE {
 
 
-    class HB_API ShaderProgram : public Serializable {
-        std::map<SHADER_TYPE, Shader*> shaders;
+    class HB_API GraphicPipeline{
     public:
-        static ShaderProgram *create();
+        static GraphicPipeline *create();
 
-        virtual ~ShaderProgram() {};
+        virtual ~GraphicPipeline() {};
 
         virtual void bind() const = 0;
 
         virtual void unbind() const = 0;
 
-        virtual void setShaders(const std::map<SHADER_TYPE,Shader*>& shaders)=0;
+        virtual void setShaders(const std::vector<Shader *> &shaders) = 0;
 
         virtual void setUniform(std::string name, int i) const = 0;
 
@@ -62,10 +62,5 @@ namespace HBE {
         virtual void setUniformVec4Array(unsigned int location, const glm::vec4 *v, unsigned int count) const = 0;
 
         virtual void setUniform(std::string name, const glm::mat4 &m) const = 0;
-
-        void serialize(Serializer *serializer) const override;
-
-    private:
-        void deserialize(Deserializer *deserializer) override;
     };
 }

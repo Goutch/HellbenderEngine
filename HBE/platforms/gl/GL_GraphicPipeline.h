@@ -4,24 +4,24 @@
 #include "glm/glm.hpp"
 #include <unordered_map>
 #include <vector>
-#include <core/resource/ShaderProgram.h>
+#include <core/resource/GraphicPipeline.h>
 
 using namespace glm;
 namespace HBE {
-    class GL_ShaderProgram : public ShaderProgram {
+    class GL_GraphicPipeline : public GraphicPipeline {
     private:
         mutable std::unordered_map<std::string, int> uniforms;
 
         unsigned int program_id;
 
     public:
-        GL_ShaderProgram();
+        GL_GraphicPipeline();
 
-        ~GL_ShaderProgram();
+        ~GL_GraphicPipeline();
 
         void bind() const override;
 
-        void setShaders(const std::map<SHADER_TYPE,Shader*>& shaders) override;
+        void setShaders(const std::vector<Shader*>& shaders) override;
 
         void unbind() const override;
 
