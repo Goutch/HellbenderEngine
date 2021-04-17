@@ -4,12 +4,13 @@
 #include <fstream>
 #include <sstream>
 #include "core/utility/Log.h"
-#if RENDERER == OPENGL_RENDERER
+#ifdef OPENGL_RENDERER
 #include <platforms/gl/GL_Shader.h>
-#elif RENDERER == VULKAN_RENDERER
+#else
+#ifdef VULKAN_RENDERER
 
 #endif
-
+#endif
 namespace HBE {
 
     Shader::Shader(SHADER_TYPE type, const std::string &source) {
@@ -18,12 +19,14 @@ namespace HBE {
 
 
     Shader *Shader::create(SHADER_TYPE type, const std::string &source) {
-#if RENDERER == OPENGL_RENDERER
+#ifdef OPENGL_RENDERER
         return new GL_Shader(type, source);
-#elif RENDERER == VULKAN_RENDERER
-        Log::error("Shaders are not implemented in vulkan")
-        return nullptr;
+#else
+#ifdef VULKAN_RENDERER
+        Log::error("Shaders are not implemented in vulkan");
 #endif
+#endif
+        return nullptr;
     }
 
     std::string Shader::getSource(const std::string &path) {

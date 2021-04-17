@@ -4,15 +4,24 @@
 
 
 #include "Renderer.h"
+#ifdef OPENGL_RENDERER
 #include <platforms/gl/GL_Renderer.h>
+#else
+#ifdef VULKAN_RENDERER
+#include <platforms/vk/VK_Renderer.h>
+#endif
+#endif
 
 namespace HBE {
     Renderer *Renderer::create() {
-#if RENDERER == OPENGL_RENDERER
+#ifdef OPENGL_RENDERER
         return new GL_Renderer();
-#elif RENDERER == VULKAN_RENDERER
-
+#else
+#ifdef VULKAN_RENDERER
+        return new VK_Renderer();
 #endif
+#endif
+        return nullptr;
     }
 
 }

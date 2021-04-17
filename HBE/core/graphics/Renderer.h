@@ -6,7 +6,6 @@
 #include "Graphics.h"
 
 using namespace glm;
-struct GLFWwindow;
 
 namespace HBE {
 
@@ -20,17 +19,16 @@ namespace HBE {
 
     class Material;
 
+    class Window;
+
     class Renderer {
     public:
         static Renderer *create();
 
-        virtual ~Renderer() { };
+        virtual ~Renderer() {};
 
-        virtual void init() = 0;
-
-        virtual GLFWwindow *createWindow(int32 width, int32 height) = 0;
-
-        virtual void render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix = mat4(1.0f)) = 0;
+        virtual void render(const RenderTarget *render_target, const mat4 &projection_matrix,
+                            const mat4 &view_matrix = mat4(1.0f)) = 0;
 
         virtual void present(const RenderTarget *render_target) = 0;
 

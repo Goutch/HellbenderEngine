@@ -1,7 +1,9 @@
 #pragma once
 
 struct GLFWwindow;
+
 #include "Core.h"
+
 namespace HBE {
     enum KEY {
         UNKNOWN = -1,
@@ -135,13 +137,13 @@ namespace HBE {
         static void scrollCallback(GLFWwindow *window, double x_offset, double y_offset);
 
     public:
-        static void init(GLFWwindow *window);
+        static void init();
 
         static void getMousePosition(double &x, double &y);
 
-        static bool getKey(KEY code);
+        static void pollEvents();
 
-        static bool getKeyDown(KEY code);
+        static bool getKey(KEY code);
 
         static void getMouseWheelInput(float &value);
 

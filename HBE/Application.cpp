@@ -11,9 +11,11 @@
 #include <core/entity/component/ModelRenderer.h>
 #include <core/entity/component/CameraController.h>
 #include <core/entity/component/InstancesRenderer.h>
+#include <core/graphics/Window.h>
+
 namespace HBE {
     Scene *Application::scene = nullptr;
-    GLFWwindow *Application::window = nullptr;
+    Window *Application::window = nullptr;
     Clock *Application::time = nullptr;
     int Application::fps_counter = 0;
     float Application::fps_timer = 0;
@@ -22,6 +24,7 @@ namespace HBE {
     Event<Scene *> Application::onSceneChange;
     Event<> Application::onRender;
     Event<> Application::onRegisterComponents;
+
     void Application::registerComponents() {
         ComponentRegistry::registerComponent<Camera>("Camera");
         ComponentRegistry::registerComponent<MeshRenderer>("MeshRenderer");
@@ -29,15 +32,6 @@ namespace HBE {
         ComponentRegistry::registerComponent<InstancesRenderer>("InstancesRenderer");
         ComponentRegistry::registerComponent<CameraController>("CameraController");
         onRegisterComponents.invoke();
-    }
-
-    void Application::init() {
-        window = Graphics::init();
-        registerComponents();
-        Input::init(window);
-        scene = new Scene();
-        scene->init();
-        onInit.invoke();
     }
 
     Scene *Application::setScene(std::string path) {
@@ -52,27 +46,38 @@ namespace HBE {
         return scene;
     }
 
+
+
+    void Application::init() {
+        Graphics::init();
+        window = Graphics::getWindow();
+        registerComponents();
+        Input::init();
+        if (!scene)
+            setScene("");
+        onInit.invoke();
+    }
+
     void Application::run() {
+
         time = new Clock();
         Clock update_clock = Clock();
         float delta_t = 0.0f;
-        if (Camera::main == nullptr) {
-            scene->instantiate<Camera>();
-        }
-        while (!glfwWindowShouldClose(window) && scene != nullptr) {
-            glfwSwapBuffers(window);
-            glfwPollEvents();
-            if (Input::getKeyDown(KEY::ESCAPE))
+
+        while (!window->shouldClose() && scene != nullptr) {
+            window->swapBuffers();
+            Input::pollEvents();
+
+            if (Input::getKey(KEY::ESCAPE))
                 quit();
             JobManager::updateJobsStatus();
             scene->update(delta_t);
             onUpdate.invoke(delta_t);
             scene->draw();
-            if(Camera::main)
-            {
-                Graphics::render(Graphics::getRenderTarget(), Camera::main->getProjectionMatrix(), Camera::main->getViewMatrix());
-            }
-            if (!Configs::isCustonRenderingOn())
+            if (Camera::main)
+                Graphics::render(Graphics::getRenderTarget(), Camera::main->getProjectionMatrix(),
+                                 Camera::main->getViewMatrix());
+            if (!Configs::isPresentAutomatic())
                 Graphics::present(Graphics::getRenderTarget());
             onRender.invoke();
             Graphics::clearDrawCache();
@@ -93,7 +98,7 @@ namespace HBE {
     }
 
     void Application::quit() {
-        glfwSetWindowShouldClose(window, true);
+        window->requestClose();
     }
 
     float Application::getTime() {

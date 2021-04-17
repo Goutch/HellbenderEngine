@@ -5,11 +5,12 @@
 #include "core/entity/Scene.h"
 
 
-struct GLFWwindow;
+
 namespace HBE {
+    class Window;
     class Clock;
     class HB_API Application {
-        static GLFWwindow *window;
+        static Window *window;
         static Clock *time;
         static int fps_counter;
         static float fps_timer;

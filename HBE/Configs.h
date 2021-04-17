@@ -14,7 +14,7 @@ namespace HBE {
         static bool antialiasing;
         static bool vertical_sync;
         static CAMERA_MODE default_camera_mode;
-        static bool custom_rendering;
+        static bool present_automaticaly;
 
     public:
         static Event<std::string> onWindowTitleChange;
@@ -44,8 +44,8 @@ namespace HBE {
 
         static std::string getWindowIconPath();
 
-        static void setCustomRendering(bool is_custom);
+        static void setPresentAutomatic(bool is_automatic);
 
-        static bool isCustonRenderingOn();
+        static bool isPresentAutomatic();
     };
 }
