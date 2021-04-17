@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Texture.h"
-#include "ShaderProgram.h"
+#include "GraphicPipeline.h"
 #include "core/graphics/Graphics.h"
 #include "unordered_map"
 #include "core/serialization/Serializable.h"
@@ -54,7 +54,7 @@ namespace HBE {
     };
 
     class HB_API Material : Serializable {
-        const ShaderProgram *shader = nullptr;
+        const GraphicPipeline *shader = nullptr;
         const Texture *texture = nullptr;
         const Texture *normal_map = nullptr;
         const Texture *specular_map = nullptr;
@@ -73,7 +73,7 @@ namespace HBE {
 
         void unbind() const;
 
-        void setShader(const ShaderProgram *shaderProgram);
+        void setShader(const GraphicPipeline *shaderProgram);
 
         void setTexture(const Texture *texture);
 
@@ -81,7 +81,7 @@ namespace HBE {
 
         void setNormalMap(const Texture *texture);
 
-        const ShaderProgram &getShader() const;
+        const GraphicPipeline &getShader() const;
 
         void setColor(vec4 color);
 

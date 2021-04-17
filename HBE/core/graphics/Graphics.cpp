@@ -7,7 +7,7 @@
 #include <core/utility/Event.h>
 #include <core/utility/Geometry.h>
 #include <core/graphics/RenderTarget.h>
-#include "core/resource/ShaderProgram.h"
+#include "core/resource/GraphicPipeline.h"
 #include <Configs.h>
 #include <GLFW/glfw3.h>
 
@@ -24,9 +24,9 @@
 namespace HBE {
     const Mesh *Graphics::DEFAULT_CUBE = nullptr;
     const Mesh *Graphics::DEFAULT_QUAD = nullptr;
-    const ShaderProgram *Graphics::DEFAULT_MESH_SHADER_PROGRAM = nullptr;
-    const ShaderProgram *Graphics::DEFAULT_SCREEN_SHADER_PROGRAM = nullptr;
-    const ShaderProgram *Graphics::DEFAULT_INSTANCED_SHADER_PROGRAM = nullptr;
+    const GraphicPipeline *Graphics::DEFAULT_MESH_SHADER_PROGRAM = nullptr;
+    const GraphicPipeline *Graphics::DEFAULT_SCREEN_SHADER_PROGRAM = nullptr;
+    const GraphicPipeline *Graphics::DEFAULT_INSTANCED_SHADER_PROGRAM = nullptr;
     const Material *Graphics::DEFAULT_MESH_MATERIAL = nullptr;
     DRAW_FLAGS Graphics::default_draw_Flags;
     Renderer *Graphics::renderer = nullptr;
@@ -186,8 +186,8 @@ void main()
         //-----------------------------------DEFAULT_MESH_MATERIAL--------------------------
         Shader* default_mesh_vertex_shader=Shader::create(SHADER_TYPE::VERTEX,default_mesh_vertex_shader_code);
         Shader* default_mesh_fragment_shader=Shader::create(SHADER_TYPE::FRAGMENT,default_mesh_fragment_shader_code);
-        ShaderProgram *default_mesh_shader_program = ShaderProgram::create();
-        default_mesh_shader_program->setShaders({{SHADER_TYPE::VERTEX,default_mesh_vertex_shader},{SHADER_TYPE::FRAGMENT,default_mesh_fragment_shader}});
+        GraphicPipeline *default_mesh_shader_program = GraphicPipeline::create();
+        default_mesh_shader_program->setShaders({default_mesh_vertex_shader,default_mesh_fragment_shader});
         delete default_mesh_vertex_shader;
         delete default_mesh_fragment_shader;
         DEFAULT_MESH_SHADER_PROGRAM = default_mesh_shader_program;
@@ -198,8 +198,8 @@ void main()
         //-----------------------------------DEFAULT_INSTANCED_SHADER_PROGRAM----------------
         Shader* default_instanced_vertex_shader=Shader::create(SHADER_TYPE::VERTEX,default_instanced_vertex_shader_code);
         Shader* default_instanced_fragment_shader=Shader::create(SHADER_TYPE::FRAGMENT,default_mesh_fragment_shader_code);
-        ShaderProgram *default_instanced_shader_program = ShaderProgram::create();
-        default_instanced_shader_program->setShaders({{SHADER_TYPE::VERTEX,default_instanced_vertex_shader},{SHADER_TYPE::FRAGMENT,default_instanced_fragment_shader}});
+        GraphicPipeline *default_instanced_shader_program = GraphicPipeline::create();
+        default_instanced_shader_program->setShaders({default_instanced_vertex_shader,default_instanced_fragment_shader});
         delete default_instanced_vertex_shader;
         delete default_instanced_fragment_shader;
         DEFAULT_INSTANCED_SHADER_PROGRAM = default_instanced_shader_program;
@@ -207,8 +207,8 @@ void main()
         //------------------------------------DEFAULT_SCREEN_SHADER_PROGRAM---------------------------
         Shader* default_screen_vertex_shader=Shader::create(SHADER_TYPE::VERTEX,default_screen_vertex_shader_code);
         Shader* default_screen_fragment_shader=Shader::create(SHADER_TYPE::FRAGMENT,default_screen_fragment_shader_code);
-        ShaderProgram *default_screen_shader_program = ShaderProgram::create();
-        default_screen_shader_program->setShaders({{SHADER_TYPE::VERTEX,default_screen_vertex_shader},{SHADER_TYPE::FRAGMENT,default_screen_fragment_shader}});
+        GraphicPipeline *default_screen_shader_program = GraphicPipeline::create();
+        default_screen_shader_program->setShaders({default_screen_vertex_shader,default_screen_fragment_shader});
         delete default_screen_vertex_shader;
         delete default_screen_fragment_shader;
         DEFAULT_SCREEN_SHADER_PROGRAM = default_screen_shader_program;

@@ -4,7 +4,7 @@
 
 #include "GL_Renderer.h"
 #include "glad/glad.h"
-#include <core/resource/ShaderProgram.h>
+#include <core/resource/GraphicPipeline.h>
 #include <core/resource/Material.h>
 #include <core/resource/Mesh.h>
 #include <core/entity/component/Transform.h>
@@ -86,7 +86,7 @@ namespace HBE {
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
         glViewport(0, 0, render_target->getWidth(), render_target->getHeight());
-        const ShaderProgram &shader = render_target->getShaderProgram();
+        const GraphicPipeline &shader = render_target->getShaderProgram();
         const Framebuffer &framebuffer = render_target->getFramebuffer();
         shader.bind();
         render_target->setShaderUniforms();

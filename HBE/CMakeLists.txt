@@ -20,13 +20,13 @@ set(CORE_FILES
         Core.h
         Configs.h
 
-        core/resource/ShaderProgram.h
+        core/resource/GraphicPipeline.h
         core/resource/Texture.h
         core/resource/Texture.cpp
         core/resource/Material.cpp
         core/resource/Material.h
         core/resource/Model.cpp
-        core/resource/ShaderProgram.cpp
+        core/resource/GraphicPipeline.cpp
         core/resource/Mesh.cpp
 
         core/graphics/Framebuffer.h
@@ -71,13 +71,13 @@ set(CORE_FILES
         core/serialization/Serializer.h
         core/serialization/Deserializer.h
         core/serialization/ComponentRegistry.cpp
-        core/serialization/ComponentRegistry.h)
+        core/serialization/ComponentRegistry.h core/resource/ComputeShader.h)
 
 set(GL_FILES
         platforms/gl/GL_Core.h
         platforms/gl/GL_Renderer.cpp
         platforms/gl/GL_Texture.cpp
-        platforms/gl/GL_ShaderProgram.cpp
+        platforms/gl/GL_GraphicPipeline.cpp
         platforms/gl/GL_Mesh.cpp
         platforms/gl/GL_Framebuffer.cpp
         platforms/gl/GL_Framebuffer.h
@@ -86,7 +86,7 @@ set(GL_FILES
         platforms/gl/GL_MultisamplingFramebuffer.cpp
         platforms/gl/GL_MultisamplingFramebuffer.h
         platforms/gl/GL_Shader.cpp
-        platforms/gl/GL_Shader.h)
+        platforms/gl/GL_Shader.h platforms/gl/GL_ComputeShaderUtils.cpp platforms/gl/GL_ComputeShaderUtils.h core/resource/ComputeShader.cpp)
 
 
 find_package(Vulkan)

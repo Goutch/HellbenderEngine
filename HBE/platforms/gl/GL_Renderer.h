@@ -8,7 +8,7 @@ namespace HBE {
 
 #define MAP_LIST(T1,T2) std::unordered_map<T1,T2>
 
-    class ShaderProgram;
+    class GraphicPipeline;
 
     class Transform;
 

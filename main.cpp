@@ -1,5 +1,7 @@
 #include "HBE.h"
+
 using namespace HBE;
+
 int main() {
     Application::init();
 
@@ -15,7 +17,6 @@ int main() {
     Entity *triangle_entity = Application::scene->instantiate();
     //Attach mesh renderer component
     MeshRenderer *mesh_renderer = triangle_entity->attach<MeshRenderer>();
-
 
     //Create the resources the mesh renderer need
     Mesh *mesh = Mesh::create();

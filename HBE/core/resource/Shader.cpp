@@ -16,6 +16,7 @@ namespace HBE {
         this->type = type;
     }
 
+
     Shader *Shader::create(SHADER_TYPE type, const std::string &source) {
 #if RENDERER == OPENGL_RENDERER
         return new GL_Shader(type, source);
@@ -23,7 +24,6 @@ namespace HBE {
         Log::error("Shaders are not implemented in vulkan")
         return nullptr;
 #endif
-
     }
 
     std::string Shader::getSource(const std::string &path) {
