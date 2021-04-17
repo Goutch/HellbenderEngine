@@ -10,7 +10,7 @@ endif ()
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
 
-find_package(Vulkan)
+#find_package(Vulkan)
 if(VULKAN_FOUND)
     include_directories(${Vulkan_INCLUDE_DIRS})
     set(VK_FILES
@@ -18,7 +18,9 @@ if(VULKAN_FOUND)
             platforms/vk/VK_Instance.cpp
             platforms/vk/VK_Instance.h
             platforms/vk/VK_Window.cpp
-            platforms/vk/VK_Window.h)
+            platforms/vk/VK_Window.h
+            platforms/vk/VK_ValidationLayers.cpp
+            platforms/vk/VK_ValidationLayers.h)
     add_compile_definitions(VULKAN_RENDERER)
 else()
     add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/")
@@ -26,7 +28,7 @@ else()
     set(GL_FILES
             platforms/gl/GL_Renderer.cpp
             platforms/gl/GL_Texture.cpp
-            platforms/gl/GL_ShaderProgram.cpp
+            platforms/gl/GL_GraphicPipeline.cpp
             platforms/gl/GL_Mesh.cpp
             platforms/gl/GL_Framebuffer.cpp
             platforms/gl/GL_Framebuffer.h
@@ -50,15 +52,15 @@ set(CORE_FILES
         Core.h
         Configs.h
 
-        core/resource/GraphicPipeline.h
+
         core/resource/Texture.h
         core/resource/Texture.cpp
         core/resource/Material.cpp
         core/resource/Material.h
         core/resource/Model.cpp
         core/resource/GraphicPipeline.cpp
+        core/resource/GraphicPipeline.h
         core/resource/Shader.cpp
-        core/resource/ShaderProgram.cpp
         core/resource/Mesh.cpp
         core/resource/ComputeShader.h
 
@@ -108,35 +110,7 @@ set(CORE_FILES
         core/serialization/ComponentRegistry.h
         core/graphics/Window.cpp
         core/serialization/ComponentRegistry.h
-
-platforms/vk/VK_ValidationLayers.cpp
-        platforms/vk/VK_ValidationLayers.h)
-
-set(GL_FILES
-        platforms/gl/GL_Core.h
-        platforms/gl/GL_Renderer.cpp
-        platforms/gl/GL_Texture.cpp
-        platforms/gl/GL_GraphicPipeline.cpp
-        platforms/gl/GL_Mesh.cpp
-        platforms/gl/GL_Framebuffer.cpp
-        platforms/gl/GL_Framebuffer.h
-        platforms/gl/GL_Debug.cpp
-        platforms/gl/GL_Debug.h
-        platforms/gl/GL_MultisamplingFramebuffer.cpp
-        platforms/gl/GL_MultisamplingFramebuffer.h
-        platforms/gl/GL_Shader.cpp
-        platforms/gl/GL_Shader.h
-        platforms/gl/GL_ComputeShaderUtils.cpp
-        platforms/gl/GL_ComputeShaderUtils.h)
-
-
-find_package(Vulkan)
-if(VULKAN_FOUND)
-    include_directories(${Vulkan_INCLUDE_DIRS})
-    set(VK_FILES
-            platforms/vk/VK_Renderer.cpp)
-endif()
-
+)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}
