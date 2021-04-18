@@ -1,7 +1,7 @@
 #pragma once
 #include <platforms/gl/GL_GraphicPipeline.h>
 #include "GraphicPipeline.h"
-
+#include "Core.h"
 namespace HBE {
     class HB_API ComputeShader : public GraphicPipeline {
     private:

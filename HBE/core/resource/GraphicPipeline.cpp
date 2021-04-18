@@ -1,9 +1,11 @@
 
 #include "GraphicPipeline.h"
-#include "Shader.h"
-#include <platforms/gl/GL_GraphicPipeline.h>
-#include "core/serialization/Serializer.h"
 
+#ifdef OPENGL_RENDERER
+#include <platforms/gl/GL_GraphicPipeline.h>
+#endif
+
+#include "core/utility/Log.h"
 namespace HBE {
     GraphicPipeline *GraphicPipeline::create() {
 #ifdef OPENGL_RENDERER

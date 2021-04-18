@@ -1,19 +1,22 @@
-#include "Core.h"
-#include "Configs.h"
+
 #include "Shader.h"
 #include <fstream>
-#include <sstream>
+
+#include "core/graphics/Graphics.h"
 #include "core/utility/Log.h"
+#include "core/graphics/Renderer.h"
 #ifdef OPENGL_RENDERER
 #include <platforms/gl/GL_Shader.h>
 #else
 #ifdef VULKAN_RENDERER
-
+#include <platforms/vk/VK_Shader.h>
+#include "platforms/vk/VK_Renderer.h"
+#include "platforms/vk/VK_Device.h"
 #endif
 #endif
 namespace HBE {
 
-    Shader::Shader(SHADER_TYPE type, const std::string &source) {
+    Shader::Shader(SHADER_TYPE type) {
         this->type = type;
     }
 
@@ -23,7 +26,8 @@ namespace HBE {
         return new GL_Shader(type, source);
 #else
 #ifdef VULKAN_RENDERER
-        Log::error("Shaders are not implemented in vulkan");
+        VK_Renderer* renderer=static_cast<VK_Renderer*>(Graphics::getRenderer());
+        return new VK_Shader(renderer->getDevice().getHandle(),type, source);
 #endif
 #endif
         return nullptr;
@@ -49,5 +53,9 @@ namespace HBE {
         }
         return "";
 
+    }
+
+    SHADER_TYPE Shader::getType() {
+        return type;
     }
 }

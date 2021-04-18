@@ -1,5 +1,6 @@
 
 #include "Mesh.h"
+#include "core/utility/Log.h"
 #ifdef OPENGL_RENDERER
 #include <platforms/gl/GL_Mesh.h>
 #else
@@ -15,6 +16,7 @@ namespace HBE {
         return new GL_Mesh();
 #else
 #ifdef VULKAN_RENDERER
+        Log::error("Mesh not implemented in Vulkan");
 #endif
 #endif
         return nullptr;

@@ -5,7 +5,7 @@
 #include "core/utility/Log.h"
 #include "Configs.h"
 #include "GLFW/glfw3.h"
-
+#include "VK_ValidationLayers.h"
 
 namespace HBE {
 
@@ -27,25 +27,30 @@ namespace HBE {
         create_info.enabledExtensionCount = static_cast<uint32_t>(required_extensions.size());
         create_info.ppEnabledExtensionNames = required_extensions.data();
 
-
-        if (checkExtensionsSupported(required_extensions)) {
-#ifdef DEBUG_MODE
-            validation_layers = new VK_ValidationLayers();
-            auto layers = validation_layers->getLayersNames();
-            create_info.enabledLayerCount = layers.size();
-            create_info.ppEnabledLayerNames = layers.data();
-#else
-            create_info.enabledLayerCount = 0;
-#endif
-            if (vkCreateInstance(&create_info, nullptr, &handle) != VK_SUCCESS) {
-                Log::error("Failed to create vulkan instance!");
-            }
-        } else {
+        if (!checkExtensionsSupported(required_extensions))
             Log::error("Missing extensions to create vulkan instance");
+
+        if (ENABLE_VALIDATION_LAYERS) {
+            validation_layers = new VK_ValidationLayers();
+            if (!validation_layers->checkValidationLayerSupport())
+                Log::error("Vulkan validation layers not supported");
+            create_info.enabledLayerCount = validation_layers->validation_layer_names.size();
+            create_info.ppEnabledLayerNames = validation_layers->validation_layer_names.data();
+
+
+            create_info.pNext = (VkDebugUtilsMessengerCreateInfoEXT *) &validation_layers->getCreateInfo();
+        } else {
+            create_info.enabledLayerCount = 0;
+            create_info.pNext = nullptr;
         }
+
+        if (vkCreateInstance(&create_info, nullptr, &handle) != VK_SUCCESS)
+            Log::error("Failed to create vulkan instance!");
+
+        if (ENABLE_VALIDATION_LAYERS)
+            validation_layers->init(handle);
+
         Log::message("Created vulkan instance succesfully");
-
-
     }
 
     void VK_Instance::getRequiredExtensions(std::vector<const char *> &required_extensions) {
@@ -55,9 +60,8 @@ namespace HBE {
         for (unsigned int i = 0; i < glfw_extension_count; ++i) {
             required_extensions.push_back(glfw_extensions[i]);
         }
-#ifdef DEBUG_MODE
-        required_extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-#endif
+        if (ENABLE_VALIDATION_LAYERS)
+            required_extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     }
 
     bool VK_Instance::checkExtensionsSupported(std::vector<const char *> &extensions) {
@@ -91,10 +95,13 @@ namespace HBE {
     }
 
     VK_Instance::~VK_Instance() {
-#ifdef DEBUG_MODE
-        delete validation_layers;
-#endif
+        if (ENABLE_VALIDATION_LAYERS)
+            delete validation_layers;
         vkDestroyInstance(handle, nullptr);
+    }
+
+    const VkInstance &VK_Instance::getHandle() {
+        return handle;
     }
 }
 

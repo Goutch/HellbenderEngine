@@ -10,8 +10,8 @@ endif ()
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
 
-#find_package(Vulkan)
-if(VULKAN_FOUND)
+find_package(Vulkan)
+if (VULKAN_FOUND)
     include_directories(${Vulkan_INCLUDE_DIRS})
     set(VK_FILES
             platforms/vk/VK_Renderer.cpp
@@ -20,9 +20,9 @@ if(VULKAN_FOUND)
             platforms/vk/VK_Window.cpp
             platforms/vk/VK_Window.h
             platforms/vk/VK_ValidationLayers.cpp
-            platforms/vk/VK_ValidationLayers.h)
+            platforms/vk/VK_ValidationLayers.h platforms/vk/VK_PhysicalDevice.cpp platforms/vk/VK_PhysicalDevice.h platforms/vk/VK_Device.cpp platforms/vk/VK_Device.h platforms/vk/VK_Swapchain.cpp platforms/vk/VK_Swapchain.h platforms/vk/VK_Surface.cpp platforms/vk/VK_Surface.h platforms/vk/VK_GraphicPipeline.cpp platforms/vk/VK_GraphicPipeline.h platforms/vk/VK_Shader.cpp platforms/vk/VK_Shader.h)
     add_compile_definitions(VULKAN_RENDERER)
-else()
+else ()
     add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/")
     add_compile_definitions(OPENGL_RENDERER)
     set(GL_FILES
@@ -40,7 +40,7 @@ else()
             platforms/gl/GL_Shader.h
             platforms/gl/GL_Window.cpp
             platforms/gl/GL_Window.h)
-endif()
+endif ()
 
 
 include_directories(.)
@@ -110,7 +110,7 @@ set(CORE_FILES
         core/serialization/ComponentRegistry.h
         core/graphics/Window.cpp
         core/serialization/ComponentRegistry.h
-)
+        )
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

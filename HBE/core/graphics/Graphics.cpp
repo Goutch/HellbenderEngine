@@ -119,10 +119,10 @@ void main()
         window = Window::create(900, 600);
         renderer = Renderer::create();
         window->onWindowSizeChange.subscribe(&Graphics::onWindowSizeChange);
-        initializeDefaultVariables();
+        //initializeDefaultVariables();
     }
 
-    void Graphics::onWindowSizeChange(i32 width, i32 height) {
+    void Graphics::onWindowSizeChange(int width, int height) {
         if (!Configs::isPresentAutomatic()) {
             render_target->setSize(width, height);
         }
@@ -201,7 +201,7 @@ void main()
         delete default_screen_fragment_shader;
         DEFAULT_SCREEN_SHADER_PROGRAM = default_screen_shader_program;
         //------------------------------------DEFAULT_RENDER_TARGET------------------------------
-        i32 width, height;
+        int width, height;
         window->getSize(width, height);
         render_target = new RenderTarget(width, height, *DEFAULT_SCREEN_SHADER_PROGRAM);
 
@@ -226,6 +226,10 @@ void main()
 
     void Graphics::setDefaultDrawFlags(DRAW_FLAGS draw_flags) {
         default_draw_Flags = draw_flags;
+    }
+
+    Renderer *Graphics::getRenderer() {
+        return renderer;
     }
 
 }

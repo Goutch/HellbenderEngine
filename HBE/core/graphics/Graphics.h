@@ -69,15 +69,13 @@ namespace HBE {
 
         static void terminate();
 
-        static void getWindowSize(i32 &width, i32 &height);
-
-        static void onWindowTitleChange(std::string title);
-
-        static void onWindowSizeChange(i32 width,i32 height);
+        static void onWindowSizeChange(int width,int height);
 
         static void clearDrawCache();
 
         static void setDefaultDrawFlags(DRAW_FLAGS drawFlags);
+
+        static Renderer *getRenderer();
 
     private:
         static void initializeDefaultVariables();
