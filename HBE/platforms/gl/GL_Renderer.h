@@ -5,15 +5,19 @@
 #include "list"
 
 namespace HBE {
-class GL_Window;
-#define MAP_LIST(T1,T2) std::unordered_map<T1,T2>
+    class GL_Window;
+
+#define MAP_LIST(T1, T2) std::unordered_map<T1,T2>
 
     class GraphicPipeline;
 
     class Transform;
 
+    class GL_ResourceFactory;
+
     class Mesh;
-    class GL_Renderer : public Renderer {
+
+    class GL_Renderer: public Renderer {
     private:
         struct RenderObject {
             const Transform *transform;
@@ -21,14 +25,21 @@ class GL_Window;
             const Material *material;
             const DRAW_FLAGS draw_flags;
         };
-        MAP_LIST(DRAW_FLAGS,MAP_LIST(const Mesh*,MAP_LIST(const Material*,std::list<const Transform*>))) render_cache;
+        MAP_LIST(DRAW_FLAGS,
+                 MAP_LIST(const Mesh*, MAP_LIST(const Material*, std::list<const Transform*>))) render_cache;
     private:
         GL_Window *window;
+        GL_ResourceFactory *factory;
     public:
+
         GL_Renderer();
+
+        virtual ~GL_Renderer();
+
         void clear() const override;
 
-        void draw(const Transform &transform, const Mesh &mesh, const Material &material, DRAW_FLAGS draw_flags) override;
+        void
+        draw(const Transform &transform, const Mesh &mesh, const Material &material, DRAW_FLAGS draw_flags) override;
 
         void drawInstanced(const Mesh &mesh, const Material &material, DRAW_FLAGS draw_flags) override;
 
@@ -37,6 +48,8 @@ class GL_Window;
         void present(const RenderTarget *render_target) override;
 
         void clearDrawCache() override;
+
+        const IResourceFactory *getResourceFactory() const override;
     };
 
 }

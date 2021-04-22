@@ -12,26 +12,34 @@
 #include "VK_Device.h"
 #include "VK_Surface.h"
 #include "VK_Swapchain.h"
+#include "VK_ResourceFactory.h"
+
 namespace HBE {
     VK_Renderer::VK_Renderer() {
         window = dynamic_cast<VK_Window*>(Graphics::getWindow());
-        int witdh,height;
-        window->getSize(witdh,height);
+        int width,height;
+        window->getSize(width,height);
 
         instance = new VK_Instance();
         surface=new VK_Surface(instance->getHandle(),window->getHandle());
         physical_device=new VK_PhysicalDevice(instance->getHandle(),surface->getHandle());
         device=new VK_Device(*physical_device);
         swapchain=new VK_Swapchain(witdh,height,surface->getHandle(),*device);
+        factory=new VK_ResourceFactory(device);
     }
 
 
     VK_Renderer::~VK_Renderer() {
+        delete factory;
         delete swapchain;
         delete device;
         delete physical_device;
         delete surface;
         delete instance;
+    }
+
+    const IResourceFactory *VK_Renderer::getResourceFactory() {
+        return factory;
     }
 
     void VK_Renderer::render(const HBE::RenderTarget *render_target,
@@ -65,9 +73,6 @@ namespace HBE {
 
     }
 
-    const VK_Device &VK_Renderer::getDevice() {
-        return *device;
-    }
 
 
 }

@@ -4,7 +4,11 @@
 #include "core/utility/Log.h"
 
 namespace HBE{
-    GL_Shader::GL_Shader(SHADER_TYPE type,const std::string& source) : Shader(type,source) {
+    GL_Shader::~GL_Shader() {
+        glDeleteShader(handle);
+    }
+
+    void GL_Shader::setSource(const std::string &source, SHADER_TYPE type) {
         unsigned int gl_shader_type;
         switch (type) {
             case HBE::SHADER_TYPE::VERTEX:
@@ -39,13 +43,8 @@ namespace HBE{
         }
     }
 
-
-    GL_Shader::~GL_Shader() {
-        glDeleteShader(handle);
-    }
-
-    unsigned int GL_Shader::getHandle() {
-        return handle;
+    const void *GL_Shader::getHandle() const{
+        return &handle;
     }
 
 

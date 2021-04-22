@@ -5,17 +5,17 @@
 #include "string"
 
 namespace HBE {
-    class GL_Shader : public Shader {
+    class GL_Shader : public IShader {
     protected:
         unsigned int handle;
     public:
-        GL_Shader(SHADER_TYPE type,const std::string& source);
+        const void *getHandle()const override;
 
-        ~GL_Shader() override;
+        virtual ~GL_Shader() override;
 
-        unsigned int getHandle() override;
+        void setSource(const std::string &source, SHADER_TYPE type) override;
 
-        static std::string getSource(const std::string &path);
+
     };
 }
 

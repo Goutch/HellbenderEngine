@@ -10,14 +10,17 @@
 #include "core/graphics/Framebuffer.h"
 #include "core/graphics/RenderTarget.h"
 #include "core/utility/Log.h"
-
+#include "GL_ResourceFactory.h"
 #ifdef DEBUG_MODE
 
 #include "GL_Debug.h"
 
 #endif
+
+
 namespace HBE {
-    void GL_Renderer::draw(const Transform &transform, const Mesh &mesh, const Material &material, DRAW_FLAGS draw_flags) {
+    void
+    GL_Renderer::draw(const Transform &transform, const Mesh &mesh, const Material &material, DRAW_FLAGS draw_flags) {
         auto it_draw_flags = render_cache.try_emplace(draw_flags).first;
         auto it_mesh = it_draw_flags->second.try_emplace(&mesh).first;
         auto it_material = it_mesh->second.try_emplace(&material).first;
@@ -31,7 +34,8 @@ namespace HBE {
         it_material->second.push_back(nullptr);
     }
 
-    void GL_Renderer::render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix) {
+    void
+    GL_Renderer::render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix) {
 
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
@@ -66,7 +70,8 @@ namespace HBE {
                             glDrawArrays(GL_TRIANGLES, 0, mesh->getVertexCount());
                         } else if (mesh->getInstanceCount() > 1) {
                             mesh->hasIndexBuffer() ?
-                            glDrawElementsInstanced(GL_TRIANGLES, mesh->getIndexCount(), GL_UNSIGNED_INT, 0, mesh->getInstanceCount())
+                            glDrawElementsInstanced(GL_TRIANGLES, mesh->getIndexCount(), GL_UNSIGNED_INT, 0,
+                                                    mesh->getInstanceCount())
                                                    :
                             glDrawArraysInstanced(GL_TRIANGLES, 0, mesh->getVertexCount(), mesh->getInstanceCount());
                         }
@@ -107,6 +112,7 @@ namespace HBE {
 #ifdef DEBUG_MODE
         GL_Debug::init();
 #endif
+        factory = new GL_ResourceFactory();
     }
 
 
@@ -116,6 +122,14 @@ namespace HBE {
 
     void GL_Renderer::clearDrawCache() {
         render_cache.clear();
+    }
+
+    GL_Renderer::~GL_Renderer() {
+        delete factory;
+    }
+
+    const IResourceFactory *GL_Renderer::getResourceFactory() const {
+        return factory;
     }
 
 }

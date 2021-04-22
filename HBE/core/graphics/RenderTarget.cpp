@@ -56,11 +56,6 @@ namespace HBE {
         shader_program->setUniform("projection_matrix", projection_matrix);
         shader_program->setUniform("resolution", glm::vec2(width, heigth));
     }
-
-
-    unsigned int RenderTarget::getTextureID() {
-        return framebuffer->getTextureID();
-    }
 }
 
 

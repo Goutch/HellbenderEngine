@@ -17,8 +17,6 @@ namespace HBE {
 
         ~GL_MultisamplingFramebuffer() override;
 
-        unsigned int getTextureID() override;
-
         void setResolution(int width, int height) override;
 
         void bindTexture() const override;

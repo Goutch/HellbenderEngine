@@ -2,24 +2,31 @@
 
 #include "Core.h"
 #include "string"
+#include "Resource.h"
+#include "map"
+#include "IShader.h"
+#include "memory"
 
 namespace HBE {
-    enum class SHADER_TYPE {
-        COMPUTE, VERTEX, FRAGMENT, GEOMETRY
-    };
-
-    class HB_API Shader {
-    protected:
+    class HB_API Shader : public Resource {
+        IShader *instance;
         SHADER_TYPE type;
-
-        Shader(SHADER_TYPE type);
-
     public:
-        static std::string getSource(const std::string &path);
+        Shader(const std::string &source, SHADER_TYPE type);
 
-        static Shader *create(SHADER_TYPE type, const std::string &source);
+        Shader();
+
+        void load(const std::string &path, SHADER_TYPE type);
+
+        void setSource(const std::string &source, SHADER_TYPE type);
+        const void* getHandle() const;
         SHADER_TYPE getType();
-        virtual ~Shader() {};
+
+        ~Shader();
+
+    private:
+        void getSource(const std::string &path, std::string &buffer);
+
     };
 }
 

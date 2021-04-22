@@ -2,11 +2,11 @@
 #include <platforms/gl/GL_GraphicPipeline.h>
 #include "GraphicPipeline.h"
 #include "Core.h"
+
 namespace HBE {
     class HB_API ComputeShader : public GraphicPipeline {
     private:
         ComputeShader() {}
-
     public:
         virtual void dispatch(int x, int y, int z);
 
@@ -14,7 +14,7 @@ namespace HBE {
             Shader *compute = Shader::create(SHADER_TYPE::COMPUTE, source);
 #if RENDERER == OPENGL_RENDERER
             GraphicPipeline *graphicPipeline = new GL_GraphicPipeline();
-            graphicPipeline->setShaders({compute});
+            graphicPipeline->loadShaders({compute});
             delete compute;
             return dynamic_cast<ComputeShader *>(graphicPipeline);
 #elif RENDERER == VULKAN_RENDERER

@@ -19,9 +19,8 @@ namespace HBE {
 
     void GL_Mesh::setIndices(const std::vector<unsigned int> &data) {
         bind();
-        index_count = data.size();
-        if (!has_index_buffer) {
-            has_index_buffer = true;
+        if (!ebo_created) {
+            ebo_created = true;
             glGenBuffers(1, &ebo);
         }
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
@@ -46,7 +45,6 @@ namespace HBE {
     }
 
     void GL_Mesh::setInstancedBuffer(unsigned int position, const std::vector<mat4> &data) {
-        instance_count = data.size();
         bind();
 
         unsigned int vbo = getVBO(position);
@@ -85,7 +83,6 @@ namespace HBE {
                             const unsigned int byte_size,
                             unsigned int count_per_vertex) {
         bind();
-        vertex_count = data_count;
         unsigned int vbo = getVBO(position);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, data_count * byte_size, data, GL_STATIC_DRAW);
@@ -109,7 +106,6 @@ namespace HBE {
 
     void GL_Mesh::setBuffer(unsigned int position, const std::vector<int> &data) {
         unsigned int vbo = getVBO(position);
-        vertex_count = data.size();
         bind();
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(GL_INT), data.data(), GL_STATIC_DRAW);;
@@ -120,7 +116,6 @@ namespace HBE {
 
     void GL_Mesh::setBuffer(unsigned int position, const std::vector<unsigned int> &data) {
         unsigned int vbo = getVBO(position);
-        vertex_count = data.size();
         bind();
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(GL_UNSIGNED_INT), data.data(), GL_STATIC_DRAW);;

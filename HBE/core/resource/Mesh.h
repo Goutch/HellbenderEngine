@@ -5,47 +5,50 @@
 #include "glm/glm.hpp"
 #include "Core.h"
 
+
 using namespace glm;
 namespace HBE {
-    class HB_API Mesh {
-    protected:
+    class IMesh;
+
+    class HB_API Mesh final {
+        IMesh *instance;
+
         unsigned int vertex_count = 0;
         unsigned int index_count = 0;
         bool has_index_buffer = false;
         unsigned int instance_count = 1;
-
     public:
-        static Mesh *create();
+        Mesh();
 
-        virtual ~Mesh() {};
+        virtual ~Mesh();
 
-        virtual void setIndices(const std::vector<unsigned int> &data) = 0;
+        void setIndices(const std::vector<unsigned int> &data);
 
-        virtual void setBuffer(unsigned int position, const std::vector<int> &data) = 0;
+        void setBuffer(unsigned int position, const std::vector<int> &data);
 
-        virtual void setBuffer(unsigned int position, const std::vector<float> &data) = 0;
+        void setBuffer(unsigned int position, const std::vector<float> &data);
 
-        virtual void setBuffer(unsigned int position, const std::vector<vec2> &data) = 0;
+        void setBuffer(unsigned int position, const std::vector<vec2> &data);
 
-        virtual void setBuffer(unsigned int position, const std::vector<vec3> &data) = 0;
+        void setBuffer(unsigned int position, const std::vector<vec3> &data);
 
-        virtual void setBuffer(unsigned int position, const std::vector<vec4> &data) = 0;
+        void setBuffer(unsigned int position, const std::vector<vec4> &data);
 
-        virtual void setBuffer(unsigned int position, const std::vector<unsigned int> &data) = 0;
+        void setBuffer(unsigned int position, const std::vector<unsigned int> &data);
 
-        virtual void setInstancedBuffer(unsigned int position, const std::vector<mat4> &data) = 0;
+        void setInstancedBuffer(unsigned int position, const std::vector<mat4> &data);
 
-        unsigned int getVertexCount() const { return vertex_count; }
+        unsigned int getVertexCount() const;
 
-        unsigned int getIndexCount() const { return index_count; }
+        unsigned int getIndexCount() const;
 
-        unsigned int getInstanceCount() const { return instance_count; }
+        unsigned int getInstanceCount() const;
 
-        bool hasIndexBuffer() const { return has_index_buffer; }
+        bool hasIndexBuffer() const;
 
-        virtual void bind() const = 0;
+        virtual void bind() const;
 
-        virtual void unbind() const = 0;
+        virtual void unbind() const;
 
     };
 }

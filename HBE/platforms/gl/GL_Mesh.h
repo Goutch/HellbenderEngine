@@ -1,12 +1,14 @@
 #pragma once
 
-#include <core/resource/Mesh.h>
+#include <core/resource/IMesh.h>
 #include "unordered_map"
+
 namespace HBE {
-    class GL_Mesh : public Mesh {
+    class GL_Mesh : public IMesh {
         unsigned int vao;
         unsigned int ebo;
         unsigned int vbo;
+        bool ebo_created=false;
         std::unordered_map<unsigned int, unsigned int> buffers;
     public:
         GL_Mesh();

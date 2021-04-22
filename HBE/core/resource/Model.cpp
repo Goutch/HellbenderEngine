@@ -10,7 +10,7 @@ namespace HBE {
     }
 
     Model::~Model() {
-        clearModels();
+        clearMeshes();
     }
 
 
@@ -26,10 +26,6 @@ namespace HBE {
         meshes[mesh_index].second = material;
     }
 
-    Model *Model::create() {
-        return new Model();
-    }
-
     void Model::loadAsync(std::string path) {
         this->path = path;
         Log::status("Loading async:" + path);
@@ -41,9 +37,9 @@ namespace HBE {
 
     void Model::constructModel(std::vector<std::pair<MeshData, MaterialData>> *meshes_data) {
         int vertex_count = 0;
-        clearModels();
+        clearMeshes();
         for (std::size_t i = 0; i < meshes_data->size(); ++i) {
-            meshes.emplace_back(Mesh::create(), Material::create());
+            meshes.emplace_back(new Mesh(), new Material());
             meshes[i].first->setIndices((*meshes_data)[i].first.indices);
             vertex_count += (*meshes_data)[i].first.indices.size();
             if (!(*meshes_data)[i].first.positions.empty()) {
@@ -56,10 +52,10 @@ namespace HBE {
                 meshes[i].first->setBuffer(2, (*meshes_data)[i].first.normals);
             }
 
-            meshes[i].second->setShader(Graphics::DEFAULT_MESH_SHADER_PROGRAM);
+            meshes[i].second->setPipeline(Graphics::DEFAULT_MESH_PIPELINE);
 
             if (!(*meshes_data)[i].second.diffuse_texture_paths.empty()) {
-                auto t = Texture::create();
+                auto t = new Texture();
                 t->load((*meshes_data)[i].second.diffuse_texture_paths[0]);
                 meshes[i].second->setTexture(t);
             }
@@ -69,26 +65,17 @@ namespace HBE {
 
     }
 
-    void Model::clearModels() {
+    void Model::clearMeshes() {
         for (std::size_t i = 0; i < meshes.size(); ++i) {
             delete meshes[i].first;
             delete meshes[i].second;
         }
     }
 
-    void Model::serialize(Serializer *serializer) const {
-        serializer->begin("Model");
-        serializer->addField("path", path);
-        serializer->end();
-    }
-
     const std::string &Model::getPath() {
         return path;
     }
 
-    void Model::deserialize(Deserializer *deserializer) {
-
-    }
 
 }
 

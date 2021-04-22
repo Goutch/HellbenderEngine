@@ -64,10 +64,6 @@ namespace HBE {
     void GL_Framebuffer::bindTexture() const {
         glBindTexture(GL_TEXTURE_2D, texture);
     }
-
-    unsigned int GL_Framebuffer::getTextureID() {
-        return texture;
-    }
 }
 
 

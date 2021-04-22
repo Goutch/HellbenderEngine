@@ -7,8 +7,19 @@
 #include "core/utility/Log.h"
 #include "VK_Renderer.h"
 #include "VK_Device.h"
-namespace HBE{
-    HBE::VK_Shader::VK_Shader(const VkDevice& device_handle,SHADER_TYPE type, const std::string &source) : Shader(type) {
+
+namespace HBE {
+    HBE::VK_Shader::VK_Shader(const VkDevice &device_handle) {
+        this->device_handle = &device_handle;
+
+    }
+
+    VK_Shader::~VK_Shader() {
+        vkDestroyShaderModule(*device_handle, handle, nullptr);
+    }
+
+
+    void VK_Shader::setSource(const std::string &source, SHADER_TYPE type) {
         shaderc_compiler_t compiler = shaderc_compiler_initialize();
         shaderc_shader_kind kind;
         switch (type) {
@@ -17,6 +28,9 @@ namespace HBE{
                 break;
             case SHADER_TYPE::VERTEX:
                 kind = shaderc_shader_kind::shaderc_glsl_vertex_shader;
+                break;
+            case SHADER_TYPE::GEOMETRY:
+                kind = shaderc_shader_kind::shaderc_glsl_geometry_shader;
                 break;
             case SHADER_TYPE::COMPUTE:
                 kind = shaderc_shader_kind::shaderc_glsl_compute_shader;
@@ -44,18 +58,13 @@ namespace HBE{
         createInfo.codeSize = size;
         createInfo.pCode = reinterpret_cast<const uint32_t *>(bytes);
         VkShaderModule shaderModule;
-        this->device_handle=&device_handle;
-        if (vkCreateShaderModule(device_handle, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
+        if (vkCreateShaderModule(*device_handle, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
             Log::error("failed to create shader module!");
         }
     }
 
-    VK_Shader::~VK_Shader() {
-        vkDestroyShaderModule(*device_handle,handle, nullptr);
-    }
-
-    VkShaderModule &VK_Shader::getHandle() {
-        return handle;
+    const void *VK_Shader::getHandle() const {
+        return &handle;
     }
 
 }

@@ -4,42 +4,48 @@
 #include "glm/glm.hpp"
 #include <unordered_map>
 #include <vector>
-#include <core/resource/GraphicPipeline.h>
+#include <core/resource/IGraphicPipeline.h>
 
 using namespace glm;
 namespace HBE {
-    class GL_GraphicPipeline : public GraphicPipeline {
+    class GL_GraphicPipeline : public IGraphicPipeline {
     private:
         mutable std::unordered_map<std::string, int> uniforms;
 
         unsigned int program_id;
 
     public:
+        void setDrawFlags(DRAW_FLAGS flags) override;
+
+        DRAW_FLAGS getDrawFlags() const override;
+
+        void setShaders(const Shader *vertex, const Shader *fragment) override;
+
+        void setShaders(const Shader *vertex, const Shader *geometry, const Shader *fragment) override;
+
         GL_GraphicPipeline();
 
-        ~GL_GraphicPipeline();
+        virtual ~GL_GraphicPipeline();
 
         void bind() const override;
-
-        void setShaders(const std::vector<Shader*>& shaders) override;
 
         void unbind() const override;
 
         int uniformLocation(std::string) const;
 
-        void setUniform(std::string name, int i) const;
+        void setUniform(const std::string& name, int i) const;
 
-        void setUniform(std::string name, float f) const;
+        void setUniform(const std::string& name, float f) const;
 
-        void setUniform(std::string name, const glm::vec2 &v) const;
+        void setUniform(const std::string& name, const glm::vec2 &v) const;
 
-        void setUniform(std::string name, const glm::vec3 &v) const;
+        void setUniform(const std::string& name, const glm::vec3 &v) const;
 
-        void setUniform(std::string name, const glm::vec4 &v) const;
+        void setUniform(const std::string& name, const glm::vec4 &v) const;
 
-        void setUniform(std::string name, const glm::mat3 &m) const;
+        void setUniform(const std::string& name, const glm::mat3 &m) const;
 
-        void setUniform(std::string name, const glm::mat4 &m) const;
+        void setUniform(const std::string& name, const glm::mat4 &m) const;
 
         void setUniform(unsigned int location, int i) const;
 

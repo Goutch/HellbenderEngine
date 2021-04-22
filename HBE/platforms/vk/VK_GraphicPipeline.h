@@ -1,30 +1,43 @@
 #pragma once
 
-#include <core/resource/GraphicPipeline.h>
+#include <core/resource/IGraphicPipeline.h>
+#include "vulkan/vulkan.h"
+namespace HBE {
+    class VK_Device;
 
-namespace HBE
-{
-    class VK_GraphicPipeline: public GraphicPipeline {
+    class VK_GraphicPipeline : public IGraphicPipeline {
+        const VK_Device *device;
+        VkPipelineLayout handle;
     public:
+        VK_GraphicPipeline(const VK_Device *device);
+
+        void setDrawFlags(DRAW_FLAGS flags) override;
+
+        DRAW_FLAGS getDrawFlags() const override;
+
+        void setShaders(const Shader *vertex, const Shader *fragment) override;
+
+        void setShaders(const Shader *vertex, const Shader *geometry, const Shader *fragment) override;
+
         ~VK_GraphicPipeline() override;
 
         void bind() const override;
 
         void unbind() const override;
 
-        void setShaders(const std::vector<Shader *> &shaders) override;
+        void setUniform(const std::string &name, int i) const override;
 
-        void setUniform(std::string name, int i) const override;
+        void setUniform(const std::string &name, float f) const override;
 
-        void setUniform(std::string name, float f) const override;
+        void setUniform(const std::string &name, const glm::vec2 &v) const override;
 
-        void setUniform(std::string name, const glm::vec2 &v) const override;
+        void setUniform(const std::string &name, const glm::vec3 &v) const override;
 
-        void setUniform(std::string name, const glm::vec3 &v) const override;
+        void setUniform(const std::string &name, const glm::vec4 &v) const override;
 
-        void setUniform(std::string name, const glm::vec4 &v) const override;
+        void setUniform(const std::string &name, const glm::mat3 &m) const override;
 
-        void setUniform(std::string name, const glm::mat3 &m) const override;
+        void setUniform(const std::string &name, const glm::mat4 &m) const override;
 
         void setUniform(unsigned int location, int i) const override;
 
@@ -50,6 +63,5 @@ namespace HBE
 
         void setUniformVec4Array(unsigned int location, const glm::vec4 *v, unsigned int count) const override;
 
-        void setUniform(std::string name, const glm::mat4 &m) const override;
     };
 }
