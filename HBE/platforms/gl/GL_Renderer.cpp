@@ -11,6 +11,7 @@
 #include "core/graphics/RenderTarget.h"
 #include "core/utility/Log.h"
 #include "GL_ResourceFactory.h"
+
 #ifdef DEBUG_MODE
 
 #include "GL_Debug.h"
@@ -20,31 +21,36 @@
 
 namespace HBE {
     void
-    GL_Renderer::draw(const Transform &transform, const Mesh &mesh, const Material &material, DRAW_FLAGS draw_flags) {
-        auto it_draw_flags = render_cache.try_emplace(draw_flags).first;
-        auto it_mesh = it_draw_flags->second.try_emplace(&mesh).first;
-        auto it_material = it_mesh->second.try_emplace(&material).first;
-        it_material->second.push_back(&transform);
+    GL_Renderer::draw(const Transform &transform, const Mesh &mesh, const Material &material) {
+        auto it_material = render_cache.try_emplace(&material).first;
+        auto it_mesh = it_material->second.try_emplace(&mesh).first;
+        it_mesh->second.push_back(&transform);
     }
 
-    void GL_Renderer::drawInstanced(const Mesh &mesh, const Material &material, DRAW_FLAGS draw_flags) {
-        auto it_draw_flags = render_cache.try_emplace(draw_flags).first;
-        auto it_mesh = it_draw_flags->second.try_emplace(&mesh).first;
-        auto it_material = it_mesh->second.try_emplace(&material).first;
-        it_material->second.push_back(nullptr);
+    void GL_Renderer::drawInstanced(const Mesh &mesh, const Material &material) {
+        auto it_material = render_cache.try_emplace(&material).first;
+        auto it_mesh = it_material->second.try_emplace(&mesh).first;
+        it_mesh->second.push_back(nullptr);
     }
 
     void
     GL_Renderer::render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix) {
-
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glViewport(0, 0, render_target->getWidth(), render_target->getHeight());
-        for (auto draw_flags_kv:render_cache) {
-            //CULLING
-            DRAW_FLAGS draw_flags = draw_flags_kv.first;
+
+
+        for (auto material_kv:render_cache) {
+            const Material *material = material_kv.first;
+            const GraphicPipeline *pipeline = material->getPipeline();
+            material->bind();
+
+            pipeline->setUniform("projection_matrix", projection_matrix);
+            pipeline->setUniform("view_matrix", view_matrix);
+
+            DRAW_FLAGS draw_flags = pipeline->getDrawFlags();
             if (!(draw_flags & DRAW_FLAGS_CULL_FACE_FRONT) && !(draw_flags & DRAW_FLAGS_CULL_FACE_BACK)) {
                 glDisable(GL_CULL_FACE);
             } else if (draw_flags & DRAW_FLAGS_CULL_FACE_BACK) {
@@ -54,33 +60,29 @@ namespace HBE {
                 glEnable(GL_CULL_FACE);
                 glCullFace(GL_FRONT);
             }
-            for (auto mesh_kv :draw_flags_kv.second) {
+            for (auto mesh_kv :material_kv.second) {
                 const Mesh *mesh = mesh_kv.first;
                 mesh->bind();
-                for (auto material_kv:mesh_kv.second) {
-                    const Material *material = material_kv.first;
-                    material->bind();
-                    material->getShader().setUniform("projection_matrix", projection_matrix);
-                    material->getShader().setUniform("view_matrix", view_matrix);
-                    for (const Transform *transform:material_kv.second) {
-                        if (transform)material->getShader().setUniform("transform_matrix", transform->getMatrix());
-                        if (mesh->getInstanceCount() == 1) {
-                            mesh->hasIndexBuffer() ?
-                            glDrawElements(GL_TRIANGLES, mesh->getIndexCount(), GL_UNSIGNED_INT, 0) :
-                            glDrawArrays(GL_TRIANGLES, 0, mesh->getVertexCount());
-                        } else if (mesh->getInstanceCount() > 1) {
-                            mesh->hasIndexBuffer() ?
-                            glDrawElementsInstanced(GL_TRIANGLES, mesh->getIndexCount(), GL_UNSIGNED_INT, 0,
-                                                    mesh->getInstanceCount())
-                                                   :
-                            glDrawArraysInstanced(GL_TRIANGLES, 0, mesh->getVertexCount(), mesh->getInstanceCount());
-                        }
+                for (const Transform *transform:mesh_kv.second) {
+                    if (transform)pipeline->setUniform("transform_matrix", transform->getMatrix());
+                    if (mesh->getInstanceCount() == 1) {
+                        mesh->hasIndexBuffer() ?
+                        glDrawElements(GL_TRIANGLES, mesh->getIndexCount(), GL_UNSIGNED_INT, 0) :
+                        glDrawArrays(GL_TRIANGLES, 0, mesh->getVertexCount());
+                    } else if (mesh->getInstanceCount() > 1) {
+                        mesh->hasIndexBuffer() ?
+                        glDrawElementsInstanced(GL_TRIANGLES, mesh->getIndexCount(), GL_UNSIGNED_INT, 0,
+                                                mesh->getInstanceCount())
+                                               :
+                        glDrawArraysInstanced(GL_TRIANGLES, 0, mesh->getVertexCount(), mesh->getInstanceCount());
                     }
-                    material->unbind();
                 }
                 mesh->unbind();
+
             }
+            material->unbind();
         }
+
     }
 
     void GL_Renderer::present(const RenderTarget *render_target) {

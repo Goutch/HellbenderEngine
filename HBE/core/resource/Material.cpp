@@ -83,8 +83,8 @@ namespace HBE {
         this->specular_map = specular_map;
     }
 
-    const GraphicPipeline &Material::getShader() const {
-        return *pipeline;
+    const GraphicPipeline *Material::getPipeline() const {
+        return pipeline;
     }
 
     void Material::setColor(vec4 color) {

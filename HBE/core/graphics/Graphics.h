@@ -47,9 +47,9 @@ namespace HBE {
         static Window *getWindow();
 
         static void
-        draw(const Transform &transform, const Mesh &mesh, const Material &material, DRAW_FLAGS = default_draw_flags);
+        draw(const Transform &transform, const Mesh &mesh, const Material &material);
 
-        static void drawInstanced(const Mesh &mesh, const Material &material, DRAW_FLAGS = default_draw_flags);
+        static void drawInstanced(const Mesh &mesh, const Material &material);
 
         static void render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix);
 

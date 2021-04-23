@@ -118,12 +118,12 @@ void main()
         }
     }
 
-    void Graphics::draw(const Transform &transform, const Mesh &mesh, const Material &material, DRAW_FLAGS draw_flags) {
-        renderer->draw(transform, mesh, material, draw_flags);
+    void Graphics::draw(const Transform &transform, const Mesh &mesh, const Material &material) {
+        renderer->draw(transform, mesh, material);
     }
 
-    void Graphics::drawInstanced(const Mesh &mesh, const Material &material, DRAW_FLAGS draw_flags) {
-        renderer->drawInstanced(mesh, material, draw_flags);
+    void Graphics::drawInstanced(const Mesh &mesh, const Material &material) {
+        renderer->drawInstanced(mesh, material);
     }
 
     void Graphics::render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix) {

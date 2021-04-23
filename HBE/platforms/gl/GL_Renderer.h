@@ -17,7 +17,7 @@ namespace HBE {
 
     class Mesh;
 
-    class GL_Renderer: public Renderer {
+    class GL_Renderer : public Renderer {
     private:
         struct RenderObject {
             const Transform *transform;
@@ -25,8 +25,7 @@ namespace HBE {
             const Material *material;
             const DRAW_FLAGS draw_flags;
         };
-        MAP_LIST(DRAW_FLAGS,
-                 MAP_LIST(const Mesh*, MAP_LIST(const Material*, std::list<const Transform*>))) render_cache;
+        MAP_LIST(const Material*,MAP_LIST(const Mesh*, std::list<const Transform*>)) render_cache;
     private:
         GL_Window *window;
         GL_ResourceFactory *factory;
@@ -39,9 +38,9 @@ namespace HBE {
         void clear() const override;
 
         void
-        draw(const Transform &transform, const Mesh &mesh, const Material &material, DRAW_FLAGS draw_flags) override;
+        draw(const Transform &transform, const Mesh &mesh, const Material &material) override;
 
-        void drawInstanced(const Mesh &mesh, const Material &material, DRAW_FLAGS draw_flags) override;
+        void drawInstanced(const Mesh &mesh, const Material &material) override;
 
         void render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix) override;
 

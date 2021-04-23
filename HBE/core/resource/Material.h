@@ -10,7 +10,7 @@
 
 using namespace glm;
 namespace HBE {
-    enum GLSL_TYPE{
+    enum GLSL_TYPE {
         FLOAT,
         VEC2,
         VEC3,
@@ -18,6 +18,7 @@ namespace HBE {
         MAT4,
         INT,
     };
+
     struct HB_API MaterialProperty {
         GLSL_TYPE type;
         void *value;
@@ -53,8 +54,9 @@ namespace HBE {
         }
     };
 
-    class HB_API Material final: Serializable , public Resource{
+    class HB_API Material final : Serializable, public Resource {
         friend class Resource;
+
         const GraphicPipeline *pipeline = nullptr;
         const Texture *texture = nullptr;
         const Texture *normal_map = nullptr;
@@ -74,7 +76,7 @@ namespace HBE {
 
         void setNormalMap(const Texture *texture);
 
-        const GraphicPipeline &getShader() const;
+        const GraphicPipeline *getPipeline() const;
 
         void setColor(vec4 color);
 
