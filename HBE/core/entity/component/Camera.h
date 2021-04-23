@@ -22,7 +22,7 @@ namespace HBE {
         float render_distance = 500;
         RenderMode render_mode = PERSPECTIVE;
         RenderTarget *render_target = nullptr;
-
+        vec4 clear_color;
         mat4 projection_matrix = mat4(1.0f);
         std::array<Plane, 6> frustum_planes;
 
@@ -78,6 +78,7 @@ namespace HBE {
 
         void deserialize(Deserializer *deserializer) override;
 
+        void setClearColor(vec4 clear_color);
     private:
         void generateProjectionMatrix();
     };

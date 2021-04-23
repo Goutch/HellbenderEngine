@@ -186,6 +186,11 @@ namespace HBE {
     float Camera::getOrthographicZoom() {
         return orthographic_zoom;
     }
+
+    void Camera::setClearColor(vec4 clear_color) {
+        this->clear_color=clear_color;
+    }
+
 }
 
 

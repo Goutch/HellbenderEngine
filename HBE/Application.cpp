@@ -68,8 +68,6 @@ namespace HBE {
             window->swapBuffers();
             Input::pollEvents();
 
-            if (Input::getKey(KEY::ESCAPE))
-                quit();
             JobManager::updateJobsStatus();
             scene->update(delta_t);
             onUpdate.invoke(delta_t);
