@@ -16,7 +16,8 @@ namespace HBE {
         if (model) {
             auto meshes = model->getMeshes();
             for (std::size_t i = 0; i < meshes.size(); ++i) {
-                Graphics::draw(*entity->transform, *meshes[i].first, *meshes[i].second);
+                if (meshes[i].first && meshes[i].second)
+                    Graphics::draw(*entity->transform, *meshes[i].first, *meshes[i].second);
             }
         }
     }

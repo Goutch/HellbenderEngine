@@ -26,29 +26,25 @@ int main() {
     //-----------------------CAMERA--------------------------
     //Instantiate an entity with the camera component attached
     auto *camera = Application::scene->instantiate<Camera>();
-
-    //Set rendering mode to 2 dimensions
-    camera->setRenderMode(ORTHOGRAPHIC);
+    camera->entity->transform->translate(vec3(0, 1, 10));
+    //Set rendering mode to 3 dimensions
+    camera->setRenderMode(PERSPECTIVE);
 
     //-----------------------TRIANGLE-------------------------
-    //Instantiate an entity with the MeshRenderer component attached
-    auto *mesh_renderer = Application::scene->instantiate<MeshRenderer>();
+    //Instantiate an entity with the ModelRenderer component attached
+    auto *model_renderer = Application::scene->instantiate<ModelRenderer>();
     //Attach custom component
-    mesh_renderer->entity->attach<Rotator>();
+    model_renderer->entity->attach<Rotator>();
     //Assign Mesh
-    auto mesh = new Mesh();
-    std::vector<vec3> vertex_positions = {
-            vec3(-200, -100, 0.),
-            vec3(200, -100, 0.),
-            vec3(0., 200, 0.),
-    };
-    mesh->setBuffer(0, vertex_positions);
-    mesh_renderer->setMesh(*mesh);
+    auto model = new Model();
+    model->loadAsync("../../res/models/teapot.obj");
+
+    model_renderer->setModel(*model);
     //Assign material
     auto material = new Material();
     material->setPipeline(Graphics::DEFAULT_MESH_PIPELINE);
     material->setColor(vec4(1, 0, 0, 1));
-    mesh_renderer->setMaterial(*material);
+    model->setMaterial(material);
 
     //-----------------------EVENTS------------------
     Application::onUpdate.subscribe(&onUpdate);
@@ -56,7 +52,7 @@ int main() {
     Application::run();
     //-----------------------CLEANUP------------------
     Application::onUpdate.unsubscribe(&onUpdate);
-    delete mesh;
+    delete model;
     delete material;
 
     //-----------------------TERMINATE------------------

@@ -4,6 +4,7 @@
 #include "core/serialization/Serializable.h"
 #include "Model.h"
 #include "core/serialization/Serializer.h"
+
 namespace HBE {
     const std::vector<std::pair<Mesh *, Material *>> &Model::getMeshes() const {
         return meshes;
@@ -23,6 +24,8 @@ namespace HBE {
     }
 
     void Model::setMaterial(Material *material, int mesh_index) {
+        if (meshes.size() <= mesh_index)
+            meshes.resize(mesh_index + 1);
         meshes[mesh_index].second = material;
     }
 
@@ -67,9 +70,12 @@ namespace HBE {
 
     void Model::clearMeshes() {
         for (std::size_t i = 0; i < meshes.size(); ++i) {
-            delete meshes[i].first;
-            delete meshes[i].second;
+            if (meshes[i].first)
+                delete meshes[i].first;
+            if (meshes[i].second)
+                delete meshes[i].second;
         }
+        meshes.clear();
     }
 
     const std::string &Model::getPath() {
