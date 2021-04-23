@@ -40,11 +40,6 @@ int main() {
     model->loadAsync("../../res/models/teapot.obj");
 
     model_renderer->setModel(*model);
-    //Assign material
-    auto material = new Material();
-    material->setPipeline(Graphics::DEFAULT_MESH_PIPELINE);
-    material->setColor(vec4(1, 0, 0, 1));
-    model->setMaterial(material);
 
     //-----------------------EVENTS------------------
     Application::onUpdate.subscribe(&onUpdate);
@@ -53,8 +48,6 @@ int main() {
     //-----------------------CLEANUP------------------
     Application::onUpdate.unsubscribe(&onUpdate);
     delete model;
-    delete material;
-
     //-----------------------TERMINATE------------------
     Application::terminate();
 }
