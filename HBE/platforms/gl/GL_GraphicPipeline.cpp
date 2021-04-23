@@ -35,21 +35,8 @@ namespace HBE {
     }
 
     void GL_GraphicPipeline::setShaders(const Shader *vertex, const Shader *geometry, const Shader *fragment) {
-        glAttachShader(program_id, *(unsigned int *) (vertex->getHandle()));
-        glAttachShader(program_id, *(unsigned int *) (geometry->getHandle()));
-        glAttachShader(program_id, *(unsigned int *) (fragment->getHandle()));
-        glLinkProgram(program_id);
-        glValidateProgram(program_id);
-        /*int result;
-        glGetShaderiv(program_id, GL_COMPILE_STATUS, &result);
-        if (result == GL_FALSE) {
-            int length;
-            glGetShaderiv(program_id, GL_INFO_LOG_LENGTH, &length);
-            char *message = new char[length];
-            glGetShaderInfoLog(program_id, length, &length, message);
-            Log::error(message);
-            delete[] message;
-        }*/
+        //todo:OpenGL geometry shader support
+        Log::error("Geometry shader not implemented in OpenGL renderer");
     }
 
     GL_GraphicPipeline::GL_GraphicPipeline() {

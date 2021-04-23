@@ -10,6 +10,8 @@ namespace HBE {
 
     class IShader;
 
+    class IComputePipeline;
+
     class IResourceFactory {
     public:
         virtual ~IResourceFactory() = default;
@@ -21,5 +23,7 @@ namespace HBE {
         virtual ITexture *createTexture() const = 0;
 
         virtual IMesh *createMesh() const = 0;
+
+        virtual IComputePipeline *createComputePipeline() const = 0;
     };
 }

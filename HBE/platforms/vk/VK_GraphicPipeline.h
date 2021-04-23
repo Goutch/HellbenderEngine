@@ -7,7 +7,7 @@ namespace HBE {
 
     class VK_GraphicPipeline : public IGraphicPipeline {
         const VK_Device *device;
-        VkPipelineLayout handle;
+        VkPipelineLayout pipeline_layout_handle;
     public:
         VK_GraphicPipeline(const VK_Device *device);
 

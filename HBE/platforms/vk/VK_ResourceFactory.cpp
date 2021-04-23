@@ -1,26 +1,35 @@
 #include "VK_ResourceFactory.h"
 #include "VK_GraphicPipeline.h"
+#include "VK_Texture.h"
+#include "VK_Mesh.h"
 #include "VK_Shader.h"
+#include "VK_Device.h"
+
 namespace HBE {
 
-    VK_ResourceFactory::VK_ResourceFactory(VK_Device *device) {
+    VK_ResourceFactory::VK_ResourceFactory(const VK_Device *device) {
         this->device = device;
     }
 
-    GraphicPipeline *HBE::VK_ResourceFactory::createGraphicsPipeline() const {
+    IGraphicPipeline *VK_ResourceFactory::createGraphicsPipeline() const {
         return new VK_GraphicPipeline(device);
     }
 
-    Texture *HBE::VK_ResourceFactory::createTexture() const {
+    ITexture *VK_ResourceFactory::createTexture() const {
         return new VK_Texture(device);
     }
 
-    Mesh *HBE::VK_ResourceFactory::createMesh() const {
+    IMesh *VK_ResourceFactory::createMesh() const {
         return new VK_Mesh(device);
     }
 
     IShader *VK_ResourceFactory::createShader() const {
-        return new VK_Shader();
+        return new VK_Shader(device);
+    }
+
+    IComputePipeline *VK_ResourceFactory::createComputePipeline() const {
+        Log::error("Compute shaders not implemented in Vulkan");
+        return nullptr;
     }
 
 

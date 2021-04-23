@@ -9,15 +9,14 @@
 #include "VK_Device.h"
 
 namespace HBE {
-    HBE::VK_Shader::VK_Shader(const VkDevice &device_handle) {
-        this->device_handle = &device_handle;
 
-    }
 
     VK_Shader::~VK_Shader() {
-        vkDestroyShaderModule(*device_handle, handle, nullptr);
+        vkDestroyShaderModule(device->getHandle(), handle, nullptr);
     }
-
+    VK_Shader::VK_Shader(const VK_Device *device) {
+        this->device=device;
+    }
 
     void VK_Shader::setSource(const std::string &source, SHADER_TYPE type) {
         shaderc_compiler_t compiler = shaderc_compiler_initialize();
@@ -58,7 +57,7 @@ namespace HBE {
         createInfo.codeSize = size;
         createInfo.pCode = reinterpret_cast<const uint32_t *>(bytes);
         VkShaderModule shaderModule;
-        if (vkCreateShaderModule(*device_handle, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
+        if (vkCreateShaderModule(device->getHandle(), &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
             Log::error("failed to create shader module!");
         }
     }
@@ -66,5 +65,7 @@ namespace HBE {
     const void *VK_Shader::getHandle() const {
         return &handle;
     }
+
+
 
 }

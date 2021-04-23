@@ -3,13 +3,16 @@
 #include <core/resource/Material.h>
 #include <core/resource/Model.h>
 #include "core/resource/IResourceFactory.h"
-#include "VK_Device.h"
 
 namespace HBE {
+
+    class VK_Device;
+
     class VK_ResourceFactory : public IResourceFactory {
-        VK_Device *device;
+        const VK_Device *device;
     public:
-        VK_ResourceFactory(VK_Device *device);
+
+        VK_ResourceFactory(const VK_Device *device);
 
         IGraphicPipeline *createGraphicsPipeline() const override;
 
@@ -18,6 +21,8 @@ namespace HBE {
         IMesh *createMesh() const override;
 
         IShader *createShader() const override;
+
+        IComputePipeline *createComputePipeline() const override;
     };
 }
 

@@ -14,6 +14,8 @@ namespace HBE {
 
         IMesh *createMesh() const override;
 
+        IComputePipeline *createComputePipeline() const override;
+
         IShader *createShader() const override;
     };
 }

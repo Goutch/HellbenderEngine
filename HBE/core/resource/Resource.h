@@ -4,7 +4,6 @@ namespace HBE{
     {
         Resource & operator=(const Resource&) = delete;
         Resource(const Resource&) = delete;
-
     protected:
         Resource() = default;
     };

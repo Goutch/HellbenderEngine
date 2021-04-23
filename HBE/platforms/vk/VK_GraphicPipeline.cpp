@@ -1,7 +1,3 @@
-//
-// Created by user on 4/17/2021.
-//
-
 #include <core/graphics/Graphics.h>
 #include "VK_GraphicPipeline.h"
 #include "vulkan/vulkan.h"
@@ -18,7 +14,7 @@ namespace HBE {
     }
 
     VK_GraphicPipeline::~VK_GraphicPipeline() {
-        vkDestroyPipelineLayout(device->getHandle(), handle, nullptr);
+        vkDestroyPipelineLayout(device->getHandle(), pipeline_layout_handle, nullptr);
     }
 
     void VK_GraphicPipeline::bind() const {
@@ -148,43 +144,18 @@ namespace HBE {
         pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
         pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
 
-        if (vkCreatePipelineLayout(device->getHandle(), &pipelineLayoutInfo, nullptr, &handle) != VK_SUCCESS) {
+        if (vkCreatePipelineLayout(device->getHandle(), &pipelineLayoutInfo, nullptr, &pipeline_layout_handle) != VK_SUCCESS) {
             Log::error("failed to create pipeline layout!");
         }
+
+
+
     }
 
     void VK_GraphicPipeline::setShaders(const Shader *vertex, const Shader *geometry,
                                         const Shader *fragment) {
+        //todo:vulkan geometry shader support
         Log::error("Geometry shader not implemented in vulkan renderer");
-    }
-
-
-    void VK_GraphicPipeline::setUniform(const std::string name, int i) const {
-
-    }
-
-    void VK_GraphicPipeline::setUniform(const std::string name, float f) const {
-
-    }
-
-    void VK_GraphicPipeline::setUniform(const std::string name, const glm::vec2 &v) const {
-
-    }
-
-    void VK_GraphicPipeline::setUniform(const std::string name, const glm::vec3 &v) const {
-
-    }
-
-    void VK_GraphicPipeline::setUniform(const std::string name, const glm::vec4 &v) const {
-
-    }
-
-    void VK_GraphicPipeline::setUniform(const std::string name, const glm::mat3 &m) const {
-
-    }
-
-    void VK_GraphicPipeline::setUniform(const std::string name, const glm::mat4 &m) const {
-
     }
 
     void VK_GraphicPipeline::setUniform(unsigned int location, int i) const {
@@ -232,6 +203,34 @@ namespace HBE {
     }
 
     void VK_GraphicPipeline::setUniformVec4Array(unsigned int location, const glm::vec4 *v, unsigned int count) const {
+
+    }
+
+    void VK_GraphicPipeline::setUniform(const std::string &name, int i) const {
+
+    }
+
+    void VK_GraphicPipeline::setUniform(const std::string &name, float f) const {
+
+    }
+
+    void VK_GraphicPipeline::setUniform(const std::string &name, const vec2 &v) const {
+
+    }
+
+    void VK_GraphicPipeline::setUniform(const std::string &name, const vec3 &v) const {
+
+    }
+
+    void VK_GraphicPipeline::setUniform(const std::string &name, const vec4 &v) const {
+
+    }
+
+    void VK_GraphicPipeline::setUniform(const std::string &name, const mat3 &m) const {
+
+    }
+
+    void VK_GraphicPipeline::setUniform(const std::string &name, const mat4 &m) const {
 
     }
 

@@ -16,16 +16,16 @@
 
 namespace HBE {
     VK_Renderer::VK_Renderer() {
-        window = dynamic_cast<VK_Window*>(Graphics::getWindow());
-        int width,height;
-        window->getSize(width,height);
+        window = dynamic_cast<VK_Window *>(Graphics::getWindow());
+        int width, height;
+        window->getSize(width, height);
 
         instance = new VK_Instance();
-        surface=new VK_Surface(instance->getHandle(),window->getHandle());
-        physical_device=new VK_PhysicalDevice(instance->getHandle(),surface->getHandle());
-        device=new VK_Device(*physical_device);
-        swapchain=new VK_Swapchain(witdh,height,surface->getHandle(),*device);
-        factory=new VK_ResourceFactory(device);
+        surface = new VK_Surface(instance->getHandle(), window->getHandle());
+        physical_device = new VK_PhysicalDevice(instance->getHandle(), surface->getHandle());
+        device = new VK_Device(*physical_device);
+        swapchain = new VK_Swapchain(width, height, surface->getHandle(), *device);
+        factory = new VK_ResourceFactory(device);
     }
 
 
@@ -38,7 +38,7 @@ namespace HBE {
         delete instance;
     }
 
-    const IResourceFactory *VK_Renderer::getResourceFactory() {
+    const IResourceFactory *VK_Renderer::getResourceFactory() const {
         return factory;
     }
 
@@ -58,21 +58,18 @@ namespace HBE {
 
     void VK_Renderer::draw(const HBE::Transform &transform,
                            const HBE::Mesh &mesh,
-                           const HBE::Material &material,
-                           HBE::DRAW_FLAGS flags) {
+                           const HBE::Material &material) {
 
     }
 
     void VK_Renderer::drawInstanced(const HBE::Mesh &mesh,
-                                    const HBE::Material &material,
-                                    HBE::DRAW_FLAGS drawFlags) {
+                                    const HBE::Material &material) {
 
     }
 
     void VK_Renderer::clear() const {
 
     }
-
 
 
 }

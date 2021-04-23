@@ -26,16 +26,16 @@ namespace HBE {
 
         void clearDrawCache() override;
 
-        void draw(const Transform &transform, const Mesh &mesh, const Material &material, DRAW_FLAGS flags) override;
+        void draw(const Transform &transform, const Mesh &mesh, const Material &material) override;
 
-        void drawInstanced(const Mesh &mesh, const Material &material, DRAW_FLAGS drawFlags) override;
+        void drawInstanced(const Mesh &mesh, const Material &material) override;
 
         void clear() const override;
 
         VK_Renderer();
         ~VK_Renderer();
 
-        const IResourceFactory *getResourceFactory() override;
+        const IResourceFactory *getResourceFactory() const override;
     };
 }
 
