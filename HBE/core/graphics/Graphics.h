@@ -3,7 +3,7 @@
 #include "Core.h"
 #include <vector>
 #include <string>
-
+#include "DrawFlags.h"
 #include "glm/glm.hpp"
 
 using namespace glm;
@@ -26,38 +26,30 @@ namespace HBE {
     template<typename... Args>
     class Event;
 
-    enum {
-        DRAW_FLAGS_NONE = 0,
-        DRAW_FLAGS_CULL_FACE_BACK = 1,
-        DRAW_FLAGS_CULL_FACE_FRONT = 1 << 1,
-        DRAW_FLAGS_TRANSPARENT = 1 << 2,
-    };
-    typedef uint32 DRAW_FLAGS;
-
     class HB_API Graphics {
-        static DRAW_FLAGS default_draw_Flags;
+        static DRAW_FLAGS default_draw_flags;
         static Renderer *renderer;
         static Window *window;
         static RenderTarget *render_target;
     public:
-        static const GraphicPipeline *DEFAULT_SCREEN_SHADER_PROGRAM;
-        static const GraphicPipeline *DEFAULT_MESH_SHADER_PROGRAM;
+        static const GraphicPipeline *DEFAULT_SCREEN_PIPELINE;
+        static const GraphicPipeline *DEFAULT_MESH_PIPELINE;
         static const Material *DEFAULT_MESH_MATERIAL;
-        static const GraphicPipeline *DEFAULT_INSTANCED_SHADER_PROGRAM;
+        static const GraphicPipeline *DEFAULT_INSTANCED_PIPELINE;
         static const Mesh *DEFAULT_QUAD;
         static const Mesh *DEFAULT_CUBE;
 
         /*
-         * Initialze graphic context and window
+         * Initialize graphic context and window
          */
         static void init();
 
         static Window *getWindow();
 
         static void
-        draw(const Transform &transform, const Mesh &mesh, const Material &material, DRAW_FLAGS = default_draw_Flags);
+        draw(const Transform &transform, const Mesh &mesh, const Material &material);
 
-        static void drawInstanced(const Mesh &mesh, const Material &material, DRAW_FLAGS = default_draw_Flags);
+        static void drawInstanced(const Mesh &mesh, const Material &material);
 
         static void render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix);
 
@@ -69,15 +61,15 @@ namespace HBE {
 
         static void terminate();
 
-        static void getWindowSize(i32 &width, i32 &height);
-
-        static void onWindowTitleChange(std::string title);
-
-        static void onWindowSizeChange(i32 width,i32 height);
+        static void onWindowSizeChange(int width,int height);
 
         static void clearDrawCache();
 
         static void setDefaultDrawFlags(DRAW_FLAGS drawFlags);
+
+        static DRAW_FLAGS getDefaultDrawFlags();
+
+        static Renderer *getRenderer();
 
     private:
         static void initializeDefaultVariables();

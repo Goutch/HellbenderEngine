@@ -1,44 +1,52 @@
-#include "Core.h"
-#include "Configs.h"
+
 #include "Shader.h"
 #include <fstream>
-#include <sstream>
+#include "sstream"
+#include "core/graphics/Graphics.h"
 #include "core/utility/Log.h"
-#ifdef OPENGL_RENDERER
-#include <platforms/gl/GL_Shader.h>
-#else
-#ifdef VULKAN_RENDERER
+#include "core/graphics/Renderer.h"
+#include "core/resource/IResourceFactory.h"
 
-#endif
-#endif
 namespace HBE {
 
-    Shader::Shader(SHADER_TYPE type, const std::string &source) {
+    Shader::~Shader() {
+        delete instance;
+    }
+
+    Shader::Shader() {
+        instance = Graphics::getRenderer()->getResourceFactory()->createShader();
+    }
+
+    Shader::Shader(const std::string &source, SHADER_TYPE type) {
+        instance = Graphics::getRenderer()->getResourceFactory()->createShader();
         this->type = type;
+        setSource(source, type);
     }
 
 
-    Shader *Shader::create(SHADER_TYPE type, const std::string &source) {
-#ifdef OPENGL_RENDERER
-        return new GL_Shader(type, source);
-#else
-#ifdef VULKAN_RENDERER
-        Log::error("Shaders are not implemented in vulkan");
-#endif
-#endif
-        return nullptr;
+    SHADER_TYPE Shader::getType() {
+        return type;
     }
 
-    std::string Shader::getSource(const std::string &path) {
+    void Shader::load(const std::string &path, SHADER_TYPE type) {
+        std::string source;
+        getSource(path, source);
+        instance->setSource(source, type);
+    }
+
+    void Shader::setSource(const std::string &source, SHADER_TYPE type) {
+        instance->setSource(source, type);
+    }
+
+    void Shader::getSource(const std::string &path, std::string &buffer) {
         try {
             std::ifstream file;
             file.open(path);
             if (file.is_open()) {
                 std::stringstream strStream;
                 strStream << file.rdbuf();
-                std::string str = strStream.str();
+                buffer = strStream.str();
                 file.close();
-                return str;
             } else {
                 Log::error("Unable to find file:" + path);
             }
@@ -47,7 +55,10 @@ namespace HBE {
         catch (std::exception &e) {
             Log::error("failed to read file " + path + "\n" + e.what());
         }
-        return "";
-
     }
+
+    const void *Shader::getHandle() const {
+        return instance->getHandle();
+    }
+
 }

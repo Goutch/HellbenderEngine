@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/graphics/Window.h"
-
+#include "vulkan/vulkan.h"
 struct GLFWwindow;
 namespace HBE {
     class VK_Window : public Window {

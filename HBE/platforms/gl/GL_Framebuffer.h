@@ -15,11 +15,8 @@ namespace HBE {
         GL_Framebuffer();
 
         GL_Framebuffer(int width, int height);
-
-
+        
         ~GL_Framebuffer();
-
-        unsigned int getTextureID() override;
 
         void setResolution(int width, int height) override;
 

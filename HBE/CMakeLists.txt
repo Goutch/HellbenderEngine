@@ -11,7 +11,7 @@ endif ()
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
 
 #find_package(Vulkan)
-if(VULKAN_FOUND)
+if (VULKAN_FOUND)
     include_directories(${Vulkan_INCLUDE_DIRS})
     set(VK_FILES
             platforms/vk/VK_Renderer.cpp
@@ -20,9 +20,27 @@ if(VULKAN_FOUND)
             platforms/vk/VK_Window.cpp
             platforms/vk/VK_Window.h
             platforms/vk/VK_ValidationLayers.cpp
-            platforms/vk/VK_ValidationLayers.h)
+            platforms/vk/VK_ValidationLayers.h
+            platforms/vk/VK_PhysicalDevice.cpp
+            platforms/vk/VK_PhysicalDevice.h
+            platforms/vk/VK_Device.cpp
+            platforms/vk/VK_Device.h
+            platforms/vk/VK_Swapchain.cpp
+            platforms/vk/VK_Swapchain.h
+            platforms/vk/VK_Surface.cpp
+            platforms/vk/VK_Surface.h
+            platforms/vk/VK_GraphicPipeline.cpp
+            platforms/vk/VK_GraphicPipeline.h
+            platforms/vk/VK_Shader.cpp
+            platforms/vk/VK_Shader.h
+            platforms/vk/VK_ResourceFactory.cpp
+            platforms/vk/VK_ResourceFactory.h
+            platforms/vk/VK_Texture.cpp
+            platforms/vk/VK_Texture.h
+            platforms/vk/VK_Mesh.cpp
+            platforms/vk/VK_Mesh.h platforms/vk/VK_RenderPass.cpp platforms/vk/VK_RenderPass.h)
     add_compile_definitions(VULKAN_RENDERER)
-else()
+else ()
     add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/")
     add_compile_definitions(OPENGL_RENDERER)
     set(GL_FILES
@@ -39,8 +57,10 @@ else()
             platforms/gl/GL_Shader.cpp
             platforms/gl/GL_Shader.h
             platforms/gl/GL_Window.cpp
-            platforms/gl/GL_Window.h)
-endif()
+            platforms/gl/GL_Window.h
+            platforms/gl/GL_ResourceFactory.cpp
+            platforms/gl/GL_ResourceFactory.h)
+endif ()
 
 
 include_directories(.)
@@ -52,7 +72,6 @@ set(CORE_FILES
         Core.h
         Configs.h
 
-
         core/resource/Texture.h
         core/resource/Texture.cpp
         core/resource/Material.cpp
@@ -61,8 +80,6 @@ set(CORE_FILES
         core/resource/GraphicPipeline.cpp
         core/resource/GraphicPipeline.h
         core/resource/Shader.cpp
-        core/resource/Mesh.cpp
-        core/resource/ComputeShader.h
 
         core/graphics/Window.h
         core/graphics/Framebuffer.h
@@ -110,7 +127,17 @@ set(CORE_FILES
         core/serialization/ComponentRegistry.h
         core/graphics/Window.cpp
         core/serialization/ComponentRegistry.h
-)
+        core/resource/IResourceFactory.h
+        core/resource/IMesh.h
+        core/resource/Mesh.cpp
+        core/resource/Resource.h
+        core/resource/ITexture.h
+        core/resource/IGraphicPipeline.h
+        core/resource/IShader.h
+        core/resource/ShaderDB.cpp
+        core/resource/ShaderDB.h
+        core/graphics/DrawFlags.h
+        core/resource/IComputePipeline.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

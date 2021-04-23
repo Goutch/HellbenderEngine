@@ -4,16 +4,15 @@
 #include "core/utility/ModelImporter.h"
 #include "core/serialization/Serializable.h"
 #include "Core.h"
+
 namespace HBE {
-    class HB_API Model : public Serializable {
+    class HB_API Model final : public Resource{
         std::string path;
         std::vector<std::pair<Mesh *, Material *>> meshes;
 
-        void clearModels();
+        void clearMeshes();
 
     public:
-        static Model *create();
-
         void setMaterial(Material *material, int mesh_index = 0);
 
         Model *load(std::string path);
@@ -28,9 +27,6 @@ namespace HBE {
 
         ~Model();
 
-        void serialize(Serializer *serializer) const override;
-
-        void deserialize(Deserializer *deserializer) override;
     };
 
 }

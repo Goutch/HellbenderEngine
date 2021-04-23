@@ -87,7 +87,4 @@ namespace HBE {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    unsigned int GL_MultisamplingFramebuffer::getTextureID() {
-        return texture;
-    }
 }

@@ -4,12 +4,13 @@
 
 #include "GL_Texture.h"
 #include "glad/glad.h"
+
 namespace HBE {
     GL_Texture::GL_Texture() {
         glGenTextures(1, &texture_id);
     }
 
-    void GL_Texture::setData(unsigned char *data, int width, int height, Texture::TEXTURE_TYPE texture_type) {
+    void GL_Texture::setData(unsigned char *data, int width, int height, TEXTURE_FORMAT texture_type) {
         bind();
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -17,20 +18,21 @@ namespace HBE {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         switch (texture_type) {
-            case TEXTURE_TYPE::R8: {
+            case TEXTURE_FORMAT::R8: {
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, data);
                 break;
             }
-            case TEXTURE_TYPE::RGBA8: {
+            case TEXTURE_FORMAT::RGBA8: {
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
                 break;
             }
-            case TEXTURE_TYPE::RGB8: {
+            case TEXTURE_FORMAT::RGB8: {
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
                 break;
             }
-            case TEXTURE_TYPE::DEPTH32: {
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, data);
+            case TEXTURE_FORMAT::DEPTH32: {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT,
+                             data);
                 break;
             }
         }
@@ -45,11 +47,6 @@ namespace HBE {
     void GL_Texture::unbind(unsigned int slot) const {
         glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D, texture_id);
-    }
-
-
-    unsigned int GL_Texture::getTextureID() const {
-        return texture_id;
     }
 
     GL_Texture::~GL_Texture() {

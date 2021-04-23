@@ -10,7 +10,7 @@
 
 using namespace glm;
 namespace HBE {
-    enum GLSL_TYPE{
+    enum GLSL_TYPE {
         FLOAT,
         VEC2,
         VEC3,
@@ -18,6 +18,7 @@ namespace HBE {
         MAT4,
         INT,
     };
+
     struct HB_API MaterialProperty {
         GLSL_TYPE type;
         void *value;
@@ -53,27 +54,21 @@ namespace HBE {
         }
     };
 
-    class HB_API Material : Serializable {
-        const GraphicPipeline *shader = nullptr;
+    class HB_API Material final : Serializable, public Resource {
+        friend class Resource;
+
+        const GraphicPipeline *pipeline = nullptr;
         const Texture *texture = nullptr;
         const Texture *normal_map = nullptr;
         const Texture *specular_map = nullptr;
         glm::vec4 color = glm::vec4(1, 1, 1, 1);
-        bool is_transparent = false;
         std::unordered_map<std::string, MaterialProperty> properties;
-
-        Material();
-
     public:
-        static Material *create();
-
-        virtual ~Material() {};
-
         void bind() const;
 
         void unbind() const;
 
-        void setShader(const GraphicPipeline *shaderProgram);
+        void setPipeline(const GraphicPipeline *pipeline);
 
         void setTexture(const Texture *texture);
 
@@ -81,7 +76,7 @@ namespace HBE {
 
         void setNormalMap(const Texture *texture);
 
-        const GraphicPipeline &getShader() const;
+        const GraphicPipeline *getPipeline() const;
 
         void setColor(vec4 color);
 
@@ -98,6 +93,8 @@ namespace HBE {
         void setProperty(std::string name, vec4 &value);
 
         void serialize(Serializer *serializer) const override;
+
+        Material();
 
     private:
         void deserialize(Deserializer *deserializer) override;

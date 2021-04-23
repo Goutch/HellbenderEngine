@@ -19,8 +19,6 @@ namespace HBE {
 
         virtual ~Framebuffer() {};
 
-        virtual unsigned int getTextureID() = 0;
-
         virtual void bindTexture() const = 0;;
 
         virtual void unbindTexture() const = 0;

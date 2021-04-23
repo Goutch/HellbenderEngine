@@ -1,16 +1,25 @@
 #include <core/utility/Log.h>
 #include "Texture.h"
-#include <platforms/gl/GL_Texture.h>
-
 #include "fstream"
-#include "core/serialization/Serializer.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 
 #include "stb_image.h"
+#include "ITexture.h"
+#include "core/graphics/Graphics.h"
+#include "core/graphics/Renderer.h"
+#include "core/resource/IResourceFactory.h"
 
 namespace HBE {
-    Texture *Texture::load(std::string path) {
+    Texture::~Texture() {
+        delete instance;
+    }
+
+    Texture::Texture() {
+        instance = Graphics::getRenderer()->getResourceFactory()->createTexture();
+    }
+
+    void Texture::load(std::string path) {
         this->path = path;
         std::ifstream file(path.c_str());
         if (file.good()) {
@@ -18,45 +27,28 @@ namespace HBE {
             int nb_channels;
             stbi_set_flip_vertically_on_load(true);
             buffer = stbi_load(path.c_str(), &width, &height, &nb_channels, 4);
-            setData(buffer, width, height, TEXTURE_TYPE::RGBA8);
+            setData(buffer, width, height, TEXTURE_FORMAT::RGBA8);
             if (buffer) {
                 stbi_image_free(buffer);
             }
         } else {
             Log::error("Failed to load texture:" + path);
         }
-        return this;
     }
 
-    Texture *Texture::create() {
-#ifdef OPENGL_RENDERER
-        return new GL_Texture();
-#else
-#ifdef VULKAN_RENDERER
-
-#endif
-#endif
-        return nullptr;
+    void Texture::setData(unsigned char *data, int width, int height, TEXTURE_FORMAT texture_type) {
+        this->width = width;
+        this->height = height;
+        instance->setData(data, width, height, texture_type);
     }
 
-    void Texture::load(std::string path, unsigned char *buffer, int &width, int &height) {
-        std::ifstream file(path.c_str());
-        if (file.good()) {
-            int nb_channels;
-            stbi_set_flip_vertically_on_load(true);
-            buffer = stbi_load(path.c_str(), &width, &height, &nb_channels, 4);
-        } else {
-            Log::error("Failed to load texture:" + path);
-        }
+    void Texture::bind(unsigned int slot) const {
+        instance->bind(slot);
     }
 
-    void Texture::serialize(Serializer *serializer) const {
-        serializer->begin("Texture");
-        serializer->addField("path", path);
-        serializer->end();
+    void Texture::unbind(unsigned int slot) const {
+        instance->unbind(slot);
     }
 
-    void Texture::deserialize(Deserializer *deserializer) {
 
-    }
 }
