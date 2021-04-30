@@ -90,7 +90,7 @@ namespace HBE {
 
     VkSurfaceFormatKHR VK_Swapchain::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &available_formats) {
         for (const auto &available_format:available_formats) {
-            if (available_format.format == VK_FORMAT_B8G8R8A8_SRGB &&
+            if (available_format.format == VK_FORMAT_R8G8B8A8_SRGB &&
                 available_format.colorSpace == VK_COLORSPACE_SRGB_NONLINEAR_KHR) {
                 return available_format;
             }
@@ -121,7 +121,7 @@ namespace HBE {
 
     void VK_Swapchain::createImageViews() {
         swapchain_image_views.resize(swapchain_images.size());
-        for (int i = 0; i < swapchain_image_views.size(); ++i) {
+        for (size_t i = 0; i < swapchain_image_views.size(); ++i) {
             VkImageViewCreateInfo create_info{};
             create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
             create_info.image = swapchain_images[i];

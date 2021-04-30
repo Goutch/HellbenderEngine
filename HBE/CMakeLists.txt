@@ -10,7 +10,7 @@ endif ()
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
 
-#find_package(Vulkan)
+find_package(Vulkan)
 if (VULKAN_FOUND)
     include_directories(${Vulkan_INCLUDE_DIRS})
     set(VK_FILES
@@ -38,7 +38,12 @@ if (VULKAN_FOUND)
             platforms/vk/VK_Texture.cpp
             platforms/vk/VK_Texture.h
             platforms/vk/VK_Mesh.cpp
-            platforms/vk/VK_Mesh.h platforms/vk/VK_RenderPass.cpp platforms/vk/VK_RenderPass.h)
+            platforms/vk/VK_Mesh.h
+            platforms/vk/VK_RenderPass.cpp
+            platforms/vk/VK_RenderPass.h
+            platforms/vk/ShaderCompiler.cpp
+            platforms/vk/ShaderCompiler.h)
+
     add_compile_definitions(VULKAN_RENDERER)
 else ()
     add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/")
@@ -200,7 +205,7 @@ endif ()
 if (VULKAN_FOUND)
     target_link_libraries(${PROJECT_NAME} PUBLIC ${Vulkan_LIBRARY})
 else ()
-    target_link_libraries(${PROJECT_NAME} PUBLIC glad)
+    target_link_libraries(${PROJECT_NAME} PUBLIC glad )
 endif ()
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE HB_BUILD)

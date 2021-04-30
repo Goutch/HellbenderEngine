@@ -3,11 +3,10 @@
 //
 
 #include "VK_Shader.h"
-#include "shaderc/shaderc.hpp"
 #include "core/utility/Log.h"
 #include "VK_Renderer.h"
 #include "VK_Device.h"
-
+#include "ShaderCompiler.h"
 namespace HBE {
 
 
@@ -19,43 +18,13 @@ namespace HBE {
     }
 
     void VK_Shader::setSource(const std::string &source, SHADER_TYPE type) {
-        shaderc_compiler_t compiler = shaderc_compiler_initialize();
-        shaderc_shader_kind kind;
-        switch (type) {
-            case SHADER_TYPE::FRAGMENT:
-                kind = shaderc_shader_kind::shaderc_glsl_fragment_shader;
-                break;
-            case SHADER_TYPE::VERTEX:
-                kind = shaderc_shader_kind::shaderc_glsl_vertex_shader;
-                break;
-            case SHADER_TYPE::GEOMETRY:
-                kind = shaderc_shader_kind::shaderc_glsl_geometry_shader;
-                break;
-            case SHADER_TYPE::COMPUTE:
-                kind = shaderc_shader_kind::shaderc_glsl_compute_shader;
-                break;
-        }
-        shaderc_compilation_result_t result = shaderc_compile_into_spv(compiler,
-                                                                       source.c_str(),
-                                                                       source.size(), kind,
-                                                                       "",
-                                                                       "main",
-                                                                       nullptr);
-        const char *bytes = shaderc_result_get_bytes(result);
-        size_t size = shaderc_result_get_length(result);
 
-        if (shaderc_result_get_num_errors(result) > 0) {
-            Log::error(shaderc_result_get_error_message(result));
-        }
-        if (shaderc_result_get_num_warnings(result) > 0) {
-            Log::warning(shaderc_result_get_error_message(result));
-        }
-
-
+        std::vector<glm::uint32_t> spirv;
+        ShaderCompiler::GLSLToSpirV(source, spirv, type);
         VkShaderModuleCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-        createInfo.codeSize = size;
-        createInfo.pCode = reinterpret_cast<const uint32_t *>(bytes);
+        createInfo.codeSize = spirv.size();
+        createInfo.pCode = reinterpret_cast<const uint32_t *>(spirv.data());
         VkShaderModule shaderModule;
         if (vkCreateShaderModule(device->getHandle(), &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
             Log::error("failed to create shader module!");

@@ -24,7 +24,7 @@ namespace HBE {
     }
 
     void Model::setMaterial(Material *material, int mesh_index) {
-        if (meshes.size() <= mesh_index)
+        if (meshes.size() <= (unsigned int)mesh_index)
             meshes.resize(mesh_index + 1);
         meshes[mesh_index].second = material;
     }
