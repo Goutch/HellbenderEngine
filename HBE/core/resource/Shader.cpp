@@ -17,7 +17,7 @@ namespace HBE {
         instance = Graphics::getRenderer()->getResourceFactory()->createShader();
     }
 
-    Shader::Shader(const std::string &source, SHADER_TYPE type) {
+    Shader::Shader(const std::vector<char> &source, SHADER_TYPE type) {
         instance = Graphics::getRenderer()->getResourceFactory()->createShader();
         this->type = type;
         setSource(source, type);
@@ -29,23 +29,25 @@ namespace HBE {
     }
 
     void Shader::load(const std::string &path, SHADER_TYPE type) {
-        std::string source;
+        std::vector<char> source;
         getSource(path, source);
         instance->setSource(source, type);
     }
 
-    void Shader::setSource(const std::string &source, SHADER_TYPE type) {
+    void Shader::setSource(const std::vector<char> &source, SHADER_TYPE type) {
         instance->setSource(source, type);
     }
 
-    void Shader::getSource(const std::string &path, std::string &buffer) {
+
+    void Shader::getSource(const std::string &path, std::vector<char> &buffer) {
         try {
             std::ifstream file;
-            file.open(path);
+            file.open(path,std::ios::ate | std::ios::binary);
             if (file.is_open()) {
-                std::stringstream strStream;
-                strStream << file.rdbuf();
-                buffer = strStream.str();
+                size_t size=(size_t) file.tellg();
+                buffer.resize(size);
+                file.seekg(0);
+                file.read(buffer.data(), size);
                 file.close();
             } else {
                 Log::error("Unable to find file:" + path);

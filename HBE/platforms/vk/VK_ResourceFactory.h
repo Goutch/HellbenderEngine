@@ -7,12 +7,13 @@
 namespace HBE {
 
     class VK_Device;
-
+    class VK_Renderer;
     class VK_ResourceFactory : public IResourceFactory {
         const VK_Device *device;
+        const VK_Renderer *renderer;
     public:
 
-        VK_ResourceFactory(const VK_Device *device);
+        VK_ResourceFactory(const VK_Device *device,const VK_Renderer* renderer);
 
         IGraphicPipeline *createGraphicsPipeline() const override;
 

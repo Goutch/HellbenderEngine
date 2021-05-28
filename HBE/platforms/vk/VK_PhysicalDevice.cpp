@@ -12,6 +12,7 @@ namespace HBE {
         this->surface_handle = &surface_handle;
         Log::status("Looking for suitable GPU:");
         pickBestPhysicalDevice();
+        support_details=querySwapchainSupportDetails(handle);
     }
 
     void VK_PhysicalDevice::pickBestPhysicalDevice() {
@@ -140,7 +141,7 @@ namespace HBE {
         return device_required_extensions;
     }
 
-    SwapchainSupportDetails VK_PhysicalDevice::querySwapchainSupportDetails(VkPhysicalDevice const &physical_device) {
+    SwapchainSupportDetails VK_PhysicalDevice::querySwapchainSupportDetails(VkPhysicalDevice const &physical_device) const {
         SwapchainSupportDetails details;
 
         vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device, *surface_handle, &details.capabilities);
@@ -176,8 +177,8 @@ namespace HBE {
         return details;
     }
 
-    SwapchainSupportDetails VK_PhysicalDevice::getSwapchainSupportDetails() {
-        return querySwapchainSupportDetails(handle);
+    const SwapchainSupportDetails& VK_PhysicalDevice::getSwapchainSupportDetails() const{
+        return support_details;
     }
 
 }

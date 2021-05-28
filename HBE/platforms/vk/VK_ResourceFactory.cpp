@@ -7,12 +7,13 @@
 
 namespace HBE {
 
-    VK_ResourceFactory::VK_ResourceFactory(const VK_Device *device) {
+    VK_ResourceFactory::VK_ResourceFactory(const VK_Device *device, const VK_Renderer *renderer) {
         this->device = device;
+        this->renderer = renderer;
     }
 
     IGraphicPipeline *VK_ResourceFactory::createGraphicsPipeline() const {
-        return new VK_GraphicPipeline(device);
+        return new VK_GraphicPipeline(device,renderer);
     }
 
     ITexture *VK_ResourceFactory::createTexture() const {

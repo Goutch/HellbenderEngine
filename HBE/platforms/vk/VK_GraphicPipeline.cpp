@@ -7,18 +7,23 @@
 #include "platforms/vk/VK_Device.h"
 #include "vulkan/vulkan.h"
 #include "core/resource/Shader.h"
-
+#include "VK_RenderPass.h"
+#include "VK_CommandPool.h"
+#include "VK_Renderer.h"
 namespace HBE {
-    VK_GraphicPipeline::VK_GraphicPipeline(const VK_Device *device) {
+    VK_GraphicPipeline::VK_GraphicPipeline(const VK_Device *device, const VK_Renderer *renderer) {
         this->device = device;
+        this->renderer = renderer;
     }
 
     VK_GraphicPipeline::~VK_GraphicPipeline() {
+        vkDestroyPipeline(device->getHandle(), handle, nullptr);
         vkDestroyPipelineLayout(device->getHandle(), pipeline_layout_handle, nullptr);
     }
 
-    void VK_GraphicPipeline::bind() const {
 
+    void VK_GraphicPipeline::bind() const {
+        vkCmdBindPipeline(*renderer->getCurrentCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, handle);
     }
 
     void VK_GraphicPipeline::unbind() const {
@@ -34,14 +39,17 @@ namespace HBE {
     }
 
     void VK_GraphicPipeline::setShaders(const Shader *vertex, const Shader *fragment) {
+
+
         VkPipelineShaderStageCreateInfo shaderStages[2];
         shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         shaderStages[0].stage = VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT;
-        shaderStages[0].module = *(VkShaderModule *) (vertex->getHandle());
+        shaderStages[0].module = *((const VkShaderModule *) (vertex->getHandle()));
         shaderStages[0].pName = "main";
+
         shaderStages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         shaderStages[1].stage = VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT;
-        shaderStages[1].module = *(VkShaderModule *) (fragment->getHandle());
+        shaderStages[1].module = *((const VkShaderModule *) (fragment->getHandle()));
         shaderStages[1].pName = "main";
 
         //--------------------------Vertex input-----------------------------------
@@ -56,7 +64,6 @@ namespace HBE {
         inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
         inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
         inputAssembly.primitiveRestartEnable = VK_FALSE;
-
 
         //-------------------Viewports and scissors--------------------
         VkViewport viewport{};
@@ -126,7 +133,7 @@ namespace HBE {
         colorBlending.blendConstants[2] = 0.0f; // Optional
         colorBlending.blendConstants[3] = 0.0f; // Optional
 
-        VkDynamicState dynamicStates[] = {
+       /* VkDynamicState dynamicStates[] = {
                 VK_DYNAMIC_STATE_VIEWPORT,
                 VK_DYNAMIC_STATE_LINE_WIDTH
         };
@@ -134,7 +141,7 @@ namespace HBE {
         VkPipelineDynamicStateCreateInfo dynamicState{};
         dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
         dynamicState.dynamicStateCount = 2;
-        dynamicState.pDynamicStates = dynamicStates;
+        dynamicState.pDynamicStates = dynamicStates;*/
 
 
         VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
@@ -144,12 +151,37 @@ namespace HBE {
         pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
         pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
 
-        if (vkCreatePipelineLayout(device->getHandle(), &pipelineLayoutInfo, nullptr, &pipeline_layout_handle) != VK_SUCCESS) {
+        if (vkCreatePipelineLayout(device->getHandle(), &pipelineLayoutInfo, nullptr, &pipeline_layout_handle) !=
+            VK_SUCCESS) {
             Log::error("failed to create pipeline layout!");
         }
 
+        VkGraphicsPipelineCreateInfo pipelineInfo{};
+        pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+        pipelineInfo.stageCount = 2;
+        pipelineInfo.pStages = shaderStages;
 
+        pipelineInfo.pVertexInputState = &vertexInputInfo;
+        pipelineInfo.pInputAssemblyState = &inputAssembly;
+        pipelineInfo.pViewportState = &viewportState;
+        pipelineInfo.pRasterizationState = &rasterizer;
+        pipelineInfo.pMultisampleState = &multisampling;
+        pipelineInfo.pDepthStencilState = nullptr; // Optional
+        pipelineInfo.pColorBlendState = &colorBlending;
+        pipelineInfo.pDynamicState = nullptr; // Optional
 
+        pipelineInfo.layout = pipeline_layout_handle;
+
+        pipelineInfo.renderPass = renderer->getRenderPass().getHandle();
+        pipelineInfo.subpass = 0;
+
+        pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
+        pipelineInfo.basePipelineIndex = -1; // Optional
+
+        if (vkCreateGraphicsPipelines(device->getHandle(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &handle) !=
+            VK_SUCCESS) {
+            throw std::runtime_error("failed to create graphics pipeline!");
+        }
     }
 
     void VK_GraphicPipeline::setShaders(const Shader *vertex, const Shader *geometry,

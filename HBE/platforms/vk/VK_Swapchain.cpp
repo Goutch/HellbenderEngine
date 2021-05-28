@@ -8,12 +8,15 @@
 #include "VK_Swapchain.h"
 #include "VK_Device.h"
 #include "VK_PhysicalDevice.h"
+#include "VK_RenderPass.h"
+
 namespace HBE {
 
     VK_Swapchain::VK_Swapchain(uint32_t width,
                                uint32_t height,
-                               VkSurfaceKHR &surface_handle,
-                               VK_Device &device) {
+                               const VkSurfaceKHR &surface_handle,
+                               const VK_Device &device,
+                               const VK_RenderPass &render_pass) {
         this->width = width;
         this->height = height;
 
@@ -68,11 +71,12 @@ namespace HBE {
         }
 
         vkGetSwapchainImagesKHR(device.getHandle(), handle, &image_count, nullptr);
-        swapchain_images.resize(image_count);
-        vkGetSwapchainImagesKHR(device.getHandle(), handle, &image_count, swapchain_images.data());
+        images.resize(image_count);
+        vkGetSwapchainImagesKHR(device.getHandle(), handle, &image_count, images.data());
         frame_buffers.resize(image_count);
 
         createImageViews();
+        createFramebuffers(render_pass);
         Log::status(std::string("Created swapchain with extent:") + std::to_string(extent.width) + "x" +
                     std::to_string(extent.height));
     }
@@ -82,7 +86,7 @@ namespace HBE {
         for (auto framebuffer : frame_buffers) {
             vkDestroyFramebuffer(device->getHandle(), framebuffer, nullptr);
         }
-        for (auto imageView : swapchain_image_views) {
+        for (auto imageView : image_views) {
             vkDestroyImageView(device->getHandle(), imageView, nullptr);
         }
         vkDestroySwapchainKHR(device->getHandle(), handle, nullptr);
@@ -120,11 +124,11 @@ namespace HBE {
     }
 
     void VK_Swapchain::createImageViews() {
-        swapchain_image_views.resize(swapchain_images.size());
-        for (size_t i = 0; i < swapchain_image_views.size(); ++i) {
+        image_views.resize(images.size());
+        for (size_t i = 0; i < image_views.size(); ++i) {
             VkImageViewCreateInfo create_info{};
             create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-            create_info.image = swapchain_images[i];
+            create_info.image = images[i];
             create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
             create_info.format = format;
             create_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
@@ -136,14 +140,14 @@ namespace HBE {
             create_info.subresourceRange.levelCount = 1;
             create_info.subresourceRange.baseArrayLayer = 0;
             create_info.subresourceRange.layerCount = 1;
-            if (vkCreateImageView(device->getHandle(), &create_info, nullptr, &swapchain_image_views[i]) !=
+            if (vkCreateImageView(device->getHandle(), &create_info, nullptr, &image_views[i]) !=
                 VK_SUCCESS) {
                 Log::error("Failed to create image views");
             }
         }
     }
 
-    VkExtent2D VK_Swapchain::getExtent() {
+    const VkExtent2D &VK_Swapchain::getExtent() const {
         return extent;
     }
 
@@ -151,15 +155,15 @@ namespace HBE {
         return handle;
     }
 
-    VkFormat VK_Swapchain::getFormat() {
+    const VkFormat &VK_Swapchain::getFormat() const {
         return format;
     }
 
-    /*void VK_Swapchain::createFramebuffers(VK_RenderPass &render_pass) {
-        frame_buffers.resize(swapchain_image_views.size());
-        for (int i = 0; i < swapchain_image_views.size(); ++i) {
+    void VK_Swapchain::createFramebuffers(const VK_RenderPass &render_pass) {
+        frame_buffers.resize(image_views.size());
+        for (size_t i = 0; i < image_views.size(); ++i) {
             VkImageView attachments[] = {
-                    swapchain_image_views[i]
+                    image_views[i]
             };
             VkFramebufferCreateInfo framebuffer_create_info{};
             framebuffer_create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -170,14 +174,15 @@ namespace HBE {
             framebuffer_create_info.height = extent.height;
             framebuffer_create_info.layers = 1;
 
+
             if (vkCreateFramebuffer(device->getHandle(), &framebuffer_create_info, nullptr, &frame_buffers[i]) !=
                 VK_SUCCESS) {
                 Log::error("Failed to create framebuffer!");
             }
         }
-    }*/
+    }
 
-    std::vector<VkFramebuffer> &VK_Swapchain::getFrameBuffers() {
+    const std::vector<VkFramebuffer> &VK_Swapchain::getFrameBuffers() const{
         return frame_buffers;
     }
 

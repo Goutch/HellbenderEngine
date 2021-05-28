@@ -7,7 +7,7 @@ namespace HBE {
 
     std::unordered_map<std::string, Shader *> ShaderDB::shaders;
 
-    void ShaderDB::add(const std::string &name, const std::string &source, SHADER_TYPE type) {
+    void ShaderDB::add(const std::string &name, const std::vector<char> &source, SHADER_TYPE type) {
         if (contains(name)) {
             shaders.erase(name);
         }

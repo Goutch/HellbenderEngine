@@ -109,7 +109,7 @@ void main()
         window = Window::create(900, 600);
         renderer = Renderer::create();
         window->onWindowSizeChange.subscribe(&Graphics::onWindowSizeChange);
-        initializeDefaultVariables();
+        //initializeDefaultVariables();
     }
 
     void Graphics::onWindowSizeChange(int width, int height) {
@@ -154,7 +154,7 @@ void main()
 
     void Graphics::initializeDefaultVariables() {
         //-----------------------------------DEFAULT_CUBE---------------------------------
-        Mesh *cube = new Mesh();
+       /* Mesh *cube = new Mesh();
         Geometry::createCube(*cube, 1, 1, 1);
         DEFAULT_CUBE = cube;
         //-----------------------------------DEFAULT_QUAD---------------------------------
@@ -196,7 +196,7 @@ void main()
         window->getSize(width, height);
         render_target = new RenderTarget(width, height, *DEFAULT_SCREEN_PIPELINE);
 
-        default_draw_flags = DRAW_FLAGS_NONE;
+        default_draw_flags = DRAW_FLAGS_NONE;*/
     }
 
     RenderTarget *Graphics::getRenderTarget() {

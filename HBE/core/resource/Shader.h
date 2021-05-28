@@ -12,20 +12,20 @@ namespace HBE {
         IShader *instance;
         SHADER_TYPE type;
     public:
-        Shader(const std::string &source, SHADER_TYPE type);
+        Shader(const std::vector<char> &source, SHADER_TYPE type);
 
         Shader();
 
         void load(const std::string &path, SHADER_TYPE type);
 
-        void setSource(const std::string &source, SHADER_TYPE type);
+        void setSource(const std::vector<char> &source, SHADER_TYPE type);
         const void* getHandle() const;
         SHADER_TYPE getType();
 
         ~Shader();
 
     private:
-        void getSource(const std::string &path, std::string &buffer);
+        void getSource(const std::string &path, std::vector<char> &buffer);
 
     };
 }

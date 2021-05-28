@@ -2,14 +2,19 @@
 
 #include <core/resource/IGraphicPipeline.h>
 #include "vulkan/vulkan.h"
+
+
 namespace HBE {
     class VK_Device;
-
+    class VK_RenderPass;
+    class VK_Renderer;
     class VK_GraphicPipeline : public IGraphicPipeline {
         const VK_Device *device;
+        const VK_Renderer *renderer;
         VkPipelineLayout pipeline_layout_handle;
+        VkPipeline handle;
     public:
-        VK_GraphicPipeline(const VK_Device *device);
+        VK_GraphicPipeline(const VK_Device *device,const VK_Renderer* renderer);
 
         void setDrawFlags(DRAW_FLAGS flags) override;
 

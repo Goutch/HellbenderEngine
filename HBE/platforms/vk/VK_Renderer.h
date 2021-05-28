@@ -2,6 +2,8 @@
 
 #include "core/graphics/Renderer.h"
 #include "vulkan/vulkan.hpp"
+#include "VK_Semaphore.h"
+
 
 namespace HBE {
     class VK_Window;
@@ -11,6 +13,8 @@ namespace HBE {
     class VK_Surface;
     class VK_Swapchain;
     class VK_ResourceFactory;
+    class VK_RenderPass;
+    class VK_CommandPool;
     class VK_Renderer : public Renderer {
         VK_Window *window;
         VK_Instance *instance;
@@ -19,6 +23,13 @@ namespace HBE {
         VK_Device* device;
         VK_ResourceFactory* factory;
         VK_Swapchain* swapchain;
+        VK_RenderPass* render_pass;
+        VK_CommandPool* command_pool;
+
+        VK_Semaphore* render_finished_semaphore;
+        VK_Semaphore* image_available_semaphore;
+
+        const VkCommandBuffer* current_command_buffer= nullptr;
     public:
         void render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix) override;
 
@@ -36,6 +47,10 @@ namespace HBE {
         ~VK_Renderer();
 
         const IResourceFactory *getResourceFactory() const override;
+
+        const VkCommandBuffer* getCurrentCommandBuffer() const ;
+
+        const VK_RenderPass& getRenderPass() const;
     };
 }
 

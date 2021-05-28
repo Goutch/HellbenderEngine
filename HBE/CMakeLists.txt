@@ -9,7 +9,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif ()
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
-
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/)
 find_package(Vulkan)
 if (VULKAN_FOUND)
     include_directories(${Vulkan_INCLUDE_DIRS})
@@ -42,7 +42,8 @@ if (VULKAN_FOUND)
             platforms/vk/VK_RenderPass.cpp
             platforms/vk/VK_RenderPass.h
             platforms/vk/ShaderCompiler.cpp
-            platforms/vk/ShaderCompiler.h)
+            platforms/vk/ShaderCompiler.h
+            platforms/vk/VK_Semaphore.cpp platforms/vk/VK_Semaphore.h)
 
     add_compile_definitions(VULKAN_RENDERER)
 else ()
@@ -142,7 +143,7 @@ set(CORE_FILES
         core/resource/ShaderDB.cpp
         core/resource/ShaderDB.h
         core/graphics/DrawFlags.h
-        core/resource/IComputePipeline.h)
+        core/resource/IComputePipeline.h platforms/vk/VK_CommandPool.cpp platforms/vk/VK_CommandPool.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}
@@ -157,27 +158,36 @@ target_include_directories(${PROJECT_NAME}
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/include/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/include"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/include/"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb/")
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb/"
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/")
+
+
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/")
+set(GLSLANG_LIBS
+        OSDependent
+        OGLCompiler
+        SPIRV
+        glslang
+       )
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    message("Using Clang")
+    message("Using Clang not supported")
 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-
     if (WIN32)
         message("Using mingw compiler")
         target_link_libraries(${PROJECT_NAME}
-                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/mingw/libassimp.a"
-                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/mingw/libzlibstatic.a"
-                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/mingw/libIrrXML.a"
-                PUBLIC glfw)
+                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/mingw/libassimp.a"
+                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/mingw/libzlibstatic.a"
+                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/mingw/libIrrXML.a"
+
+                )
     else ()
         message("Using GCC Compiler")
         target_link_libraries(${PROJECT_NAME}
-                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/gcc/libassimp.a"
-                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/gcc/libzlibstatic.a"
-                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/gcc/libIrrXML.a"
-                PUBLIC glfw)
+                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/gcc/libassimp.a"
+                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/gcc/libzlibstatic.a"
+                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/gcc/libIrrXML.a")
     endif ()
 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
@@ -187,25 +197,24 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     # using Visual Studio C++
     message("Using visual studio compiler")
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        MESSAGE("debug mode ")
+        MESSAGE("debug mode")
         target_link_libraries(${PROJECT_NAME}
-                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/debug/assimp-vc142-mt.lib"
-                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/debug/zlibstatic.lib"
-                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/debug/IrrXML.lib"
-                PUBLIC glfw)
+                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/debug/assimp-vc142-mt.lib"
+                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/debug/zlibstatic.lib"
+                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/debug/IrrXML.lib")
     else ()
         MESSAGE("release mode")
         target_link_libraries(${PROJECT_NAME}
-                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/release/assimp-vc142-mt.lib"
-                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/release/zlibstatic.lib"
-                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/release/IrrXML.lib"
-                PUBLIC glfw)
+                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/release/assimp-vc142-mt.lib"
+                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/release/zlibstatic.lib"
+                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/release/IrrXML.lib")
     endif ()
 endif ()
 if (VULKAN_FOUND)
-    target_link_libraries(${PROJECT_NAME} PUBLIC ${Vulkan_LIBRARY})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${Vulkan_LIBRARY})
 else ()
-    target_link_libraries(${PROJECT_NAME} PUBLIC glad )
+    target_link_libraries(${PROJECT_NAME} PRIVATE glad)
 endif ()
+target_link_libraries(${PROJECT_NAME} PUBLIC glfw ${GLSLANG_LIBS})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE HB_BUILD)

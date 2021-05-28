@@ -59,8 +59,20 @@ namespace HBE {
         return handle;
     }
 
-    VK_PhysicalDevice &VK_Device::getPhysicalDevice() {
+    const VkQueue &VK_Device::getGraphicsQueue() const {
+        return graphics_queue;
+    }
+
+    const VK_PhysicalDevice &VK_Device::getPhysicalDevice() const {
         return *physical_device;
+    }
+
+    const VkQueue &VK_Device::getPresentQueue() const {
+        return present_queue;
+    }
+
+    void VK_Device::wait() {
+        vkDeviceWaitIdle(handle);
     }
 
 }

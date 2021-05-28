@@ -22,15 +22,14 @@ namespace HBE {
     public:
         VK_Device(VK_PhysicalDevice &physical_device);
 
-        VK_Swapchain &getSwapchain();
-
-        VK_GraphicPipeline &getGraphicPipeline();
-
-        VK_RenderPass &getRenderPass();
-
         const VkDevice &getHandle() const;
 
-        VK_PhysicalDevice &getPhysicalDevice();
+        const VK_PhysicalDevice &getPhysicalDevice() const;
+
+        const VkQueue& getGraphicsQueue() const;
+        const VkQueue& getPresentQueue() const;
+
+        void wait();
 
         ~VK_Device();
     };

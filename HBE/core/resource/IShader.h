@@ -1,7 +1,7 @@
 #pragma once
 
 #include "string"
-
+#include "vector"
 namespace HBE {
     enum class SHADER_TYPE {
         COMPUTE, VERTEX, FRAGMENT, GEOMETRY, NONE
@@ -11,7 +11,7 @@ namespace HBE {
     public:
         virtual ~IShader() = default;
 
-        virtual void setSource(const std::string &source, SHADER_TYPE type) = 0;
+        virtual void setSource(const std::vector<char> &source, SHADER_TYPE type) = 0;
 
         virtual const void *getHandle() const = 0;
     };

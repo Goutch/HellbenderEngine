@@ -2,7 +2,7 @@
 #include "Core.h"
 #include "string"
 namespace HBE {
-#define error(s, ...) error_(s, __LINE__,__FILE__,__func__)
+    #define error(s, ...) error_(s, __LINE__,__FILE__,__func__)
 
     class HB_API Log {
     public:

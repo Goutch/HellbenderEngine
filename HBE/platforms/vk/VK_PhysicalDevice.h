@@ -31,6 +31,7 @@ namespace HBE {
         VkPhysicalDeviceProperties properties;
         VkPhysicalDeviceFeatures features;
         QueueFamilyIndices queue_family_indices{};
+        SwapchainSupportDetails support_details;
     public:
         VK_PhysicalDevice(const VkInstance &vk_instance_handle, VkSurfaceKHR &surface_handle);
 
@@ -44,7 +45,7 @@ namespace HBE {
 
         const std::vector<const char *> &getRequiredExtensions() const;
 
-        SwapchainSupportDetails getSwapchainSupportDetails();
+        const SwapchainSupportDetails& getSwapchainSupportDetails() const ;
 
     private:
         void pickBestPhysicalDevice();
@@ -53,7 +54,7 @@ namespace HBE {
 
         QueueFamilyIndices getSupportedQueueFamilies(const VkPhysicalDevice &physical_device);
 
-        SwapchainSupportDetails querySwapchainSupportDetails(const VkPhysicalDevice &physical_device);
+        SwapchainSupportDetails querySwapchainSupportDetails(const VkPhysicalDevice &physical_device) const;
 
         bool isDeviceSuitable(const VkPhysicalDevice &physical_device);
 
