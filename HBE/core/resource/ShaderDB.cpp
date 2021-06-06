@@ -32,7 +32,6 @@ namespace HBE {
         }
         shaders.emplace(name, new Shader());
         shaders.at(name)->load(path, type);
-
     }
 
     void ShaderDB::terminate() {

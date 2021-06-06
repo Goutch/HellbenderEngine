@@ -59,8 +59,7 @@ namespace HBE {
         }
     }
 
-    const void *Shader::getHandle() const {
-        return instance->getHandle();
+    const IShader *Shader::getInstance() const {
+        return instance;
     }
-
 }

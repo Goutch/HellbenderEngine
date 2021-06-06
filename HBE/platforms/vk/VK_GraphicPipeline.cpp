@@ -10,6 +10,7 @@
 #include "VK_RenderPass.h"
 #include "VK_CommandPool.h"
 #include "VK_Renderer.h"
+
 namespace HBE {
     VK_GraphicPipeline::VK_GraphicPipeline(const VK_Device *device, const VK_Renderer *renderer) {
         this->device = device;
@@ -40,17 +41,19 @@ namespace HBE {
 
     void VK_GraphicPipeline::setShaders(const Shader *vertex, const Shader *fragment) {
 
+        VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
+        vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
+        vertShaderStageInfo.module =  (dynamic_cast<const VK_Shader *>(vertex->getInstance())->getHandle());
+        vertShaderStageInfo.pName = "main";
 
-        VkPipelineShaderStageCreateInfo shaderStages[2];
-        shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        shaderStages[0].stage = VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT;
-        shaderStages[0].module = *((const VkShaderModule *) (vertex->getHandle()));
-        shaderStages[0].pName = "main";
+        VkPipelineShaderStageCreateInfo fragShaderStageInfo{};
+        fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+        fragShaderStageInfo.module = (dynamic_cast<const VK_Shader *>(fragment->getInstance())->getHandle());
+        fragShaderStageInfo.pName = "main";
 
-        shaderStages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        shaderStages[1].stage = VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT;
-        shaderStages[1].module = *((const VkShaderModule *) (fragment->getHandle()));
-        shaderStages[1].pName = "main";
+        VkPipelineShaderStageCreateInfo shaderStages[2] = {vertShaderStageInfo, fragShaderStageInfo};
 
         //--------------------------Vertex input-----------------------------------
         VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
@@ -133,15 +136,15 @@ namespace HBE {
         colorBlending.blendConstants[2] = 0.0f; // Optional
         colorBlending.blendConstants[3] = 0.0f; // Optional
 
-       /* VkDynamicState dynamicStates[] = {
-                VK_DYNAMIC_STATE_VIEWPORT,
-                VK_DYNAMIC_STATE_LINE_WIDTH
-        };
+        /* VkDynamicState dynamicStates[] = {
+                  VK_DYNAMIC_STATE_VIEWPORT,
+                  VK_DYNAMIC_STATE_LINE_WIDTH
+          };
 
-        VkPipelineDynamicStateCreateInfo dynamicState{};
-        dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-        dynamicState.dynamicStateCount = 2;
-        dynamicState.pDynamicStates = dynamicStates;*/
+          VkPipelineDynamicStateCreateInfo dynamicState{};
+          dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+          dynamicState.dynamicStateCount = 2;
+          dynamicState.pDynamicStates = dynamicStates;*/
 
 
         VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
@@ -169,7 +172,7 @@ namespace HBE {
         pipelineInfo.pDepthStencilState = nullptr; // Optional
         pipelineInfo.pColorBlendState = &colorBlending;
         pipelineInfo.pDynamicState = nullptr; // Optional
-
+        pipelineInfo.pTessellationState = VK_NULL_HANDLE;
         pipelineInfo.layout = pipeline_layout_handle;
 
         pipelineInfo.renderPass = renderer->getRenderPass().getHandle();

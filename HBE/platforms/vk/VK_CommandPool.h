@@ -10,20 +10,18 @@ namespace HBE {
     class VK_CommandPool {
         VkCommandPool handle;
         const VK_Device *device;
-        const VK_Swapchain* swapchain;
         std::vector<VkCommandBuffer> command_buffers;
 
-        void createCommandBuffers();
+        void createCommandBuffers(int n);
 
     public:
         ~VK_CommandPool();
 
-        VK_CommandPool(const VK_Device *device, const VK_Swapchain *swapchain);
+        VK_CommandPool(const VK_Device *device, int n);
 
         void begin(int i) const;
 
         void end(int i) const;
-
 
         const std::vector<VkCommandBuffer> &getBuffers() const;
     };

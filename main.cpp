@@ -1,12 +1,14 @@
 #include "HBE.h"
 
 using namespace HBE;
-
+static Material *material;
 
 void onUpdate(float delta) {
     //Shut down app if escape key is pressed
     if (Input::getKey(KEY::ESCAPE))
         Application::quit();
+
+
 }
 
 int main() {
@@ -22,12 +24,13 @@ int main() {
     vs->load("../../res/shaders/vert.spv", SHADER_TYPE::VERTEX);
     fs->load("../../res/shaders/frag.spv", SHADER_TYPE::FRAGMENT);
     GraphicPipeline *pipeline = new GraphicPipeline();
-    pipeline->setShaders(vs, fs);
+    pipeline->setShaders(vs,fs);
 
-    Material *mat = new Material();
-    mat->setPipeline(pipeline);
-
-
+    material = new Material();
+    material->setPipeline(pipeline);
+    Transform transform;
+    Mesh mesh;
+    Graphics::draw(transform, mesh,*material);
     //-----------------------EVENTS------------------
     Application::onUpdate.subscribe(&onUpdate);
     //-----------------------LOOP--------------------
@@ -39,7 +42,7 @@ int main() {
     delete vs;
     delete fs;
     delete pipeline;
-    delete mat;
+    delete material;
     //-----------------------TERMINATE------------------
     Application::terminate();
 

@@ -19,9 +19,9 @@ namespace HBE {
         void load(const std::string &path, SHADER_TYPE type);
 
         void setSource(const std::vector<char> &source, SHADER_TYPE type);
-        const void* getHandle() const;
-        SHADER_TYPE getType();
 
+        SHADER_TYPE getType();
+        const IShader* getInstance() const;
         ~Shader();
 
     private:

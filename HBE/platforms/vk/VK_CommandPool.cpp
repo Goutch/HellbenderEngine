@@ -8,10 +8,8 @@ namespace HBE {
     HBE::VK_CommandPool::~VK_CommandPool() {
         vkDestroyCommandPool(device->getHandle(), handle, nullptr);
     }
-
-    HBE::VK_CommandPool::VK_CommandPool(const HBE::VK_Device *device, const VK_Swapchain *swapchain) {
+    VK_CommandPool::VK_CommandPool(const VK_Device *device, int n) {
         this->device = device;
-        this->swapchain = swapchain;
         QueueFamilyIndices queueFamilyIndices = device->getPhysicalDevice().getQueueFamilyIndices();
 
         VkCommandPoolCreateInfo poolInfo{};
@@ -22,11 +20,11 @@ namespace HBE {
         if (vkCreateCommandPool(device->getHandle(), &poolInfo, nullptr, &handle) != VK_SUCCESS) {
             Log::error("failed to create command pool!");
         }
-        createCommandBuffers();
+        createCommandBuffers(n);
     }
 
-    void HBE::VK_CommandPool::createCommandBuffers() {
-        command_buffers.resize(swapchain->getFrameBuffers().size());
+    void HBE::VK_CommandPool::createCommandBuffers(int n) {
+        command_buffers.resize(n);
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         allocInfo.commandPool = handle;
@@ -59,5 +57,7 @@ namespace HBE {
     const std::vector<VkCommandBuffer> &HBE::VK_CommandPool::getBuffers() const {
         return command_buffers;
     }
+
+
 }
 

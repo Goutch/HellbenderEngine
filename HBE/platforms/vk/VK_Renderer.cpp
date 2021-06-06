@@ -27,15 +27,21 @@ namespace HBE {
         surface = new VK_Surface(instance->getHandle(), window->getHandle());
         physical_device = new VK_PhysicalDevice(instance->getHandle(), surface->getHandle());
         device = new VK_Device(*physical_device);
-        render_pass=new VK_RenderPass(device);
-        swapchain = new VK_Swapchain(width, height, surface->getHandle(), *device,*render_pass);
-        command_pool = new VK_CommandPool(device,swapchain);
-        factory = new VK_ResourceFactory(device,this);
+        swapchain = new VK_Swapchain(width, height, surface->getHandle(), *device);
+        render_pass = new VK_RenderPass(device, swapchain);
+        command_pool = new VK_CommandPool(device, render_pass->getFrameBuffers().size());
+        factory = new VK_ResourceFactory(device, this);
+        image_available_semaphore = new VK_Semaphore(*device);
+        render_finished_semaphore = new VK_Semaphore(*device);
     }
 
 
     VK_Renderer::~VK_Renderer() {
         device->wait();
+        delete render_finished_semaphore;
+        delete image_available_semaphore;
+        delete command_pool;
+        delete render_pass;
         delete factory;
         delete swapchain;
         delete device;
@@ -57,7 +63,8 @@ namespace HBE {
 
     void VK_Renderer::present(const HBE::RenderTarget *render_target) {
         uint32_t imageIndex;
-        vkAcquireNextImageKHR(device->getHandle(), swapchain->getHandle(), UINT64_MAX, image_available_semaphore->getHandle(), VK_NULL_HANDLE, &imageIndex);
+        vkAcquireNextImageKHR(device->getHandle(), swapchain->getHandle(), UINT64_MAX,
+                              image_available_semaphore->getHandle(), VK_NULL_HANDLE, &imageIndex);
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -93,6 +100,9 @@ namespace HBE {
         presentInfo.pResults = nullptr; // Optional
 
         vkQueuePresentKHR(device->getPresentQueue(), &presentInfo);
+
+        vkQueueWaitIdle(device->getPresentQueue());
+
     }
 
     void VK_Renderer::clearDrawCache() {
@@ -102,11 +112,11 @@ namespace HBE {
     void VK_Renderer::draw(const HBE::Transform &transform,
                            const HBE::Mesh &mesh,
                            const HBE::Material &material) {
-        const std::vector<VkCommandBuffer>& command_buffers=command_pool->getBuffers();
+        const std::vector<VkCommandBuffer> &command_buffers = command_pool->getBuffers();
         for (size_t i = 0; i < command_buffers.size(); ++i) {
-            current_command_buffer=&command_buffers[i];
+            current_command_buffer = &command_buffers[i];
             command_pool->begin(i);
-            render_pass->begin(command_buffers[i],swapchain->getFrameBuffers()[i],swapchain->getExtent());
+            render_pass->begin(command_buffers[i], i);
             material.getPipeline()->bind();
             vkCmdDraw(command_pool->getBuffers()[i], 3, 1, 0, 0);
             material.getPipeline()->unbind();
@@ -124,11 +134,11 @@ namespace HBE {
 
     }
 
-    const VK_RenderPass & VK_Renderer::getRenderPass() const {
+    const VK_RenderPass &VK_Renderer::getRenderPass() const {
         return *render_pass;
     }
 
-    const VkCommandBuffer *VK_Renderer::getCurrentCommandBuffer() const{
+    const VkCommandBuffer *VK_Renderer::getCurrentCommandBuffer() const {
         return current_command_buffer;
     }
 

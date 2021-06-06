@@ -9,8 +9,6 @@ namespace HBE {
     protected:
         unsigned int handle;
     public:
-        const void *getHandle()const override;
-
         virtual ~GL_Shader() override;
 
         void setSource(const std::string &source, SHADER_TYPE type) override;

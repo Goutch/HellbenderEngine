@@ -8,8 +8,7 @@
 namespace HBE {
 
     VK_Shader::~VK_Shader() {
-        if (handle)
-            vkDestroyShaderModule(device->getHandle(), handle, nullptr);
+        vkDestroyShaderModule(device->getHandle(), handle, nullptr);
     }
 
     VK_Shader::VK_Shader(const VK_Device *device) {
@@ -17,8 +16,10 @@ namespace HBE {
     }
 
     void VK_Shader::setSource(const std::vector<char> &source, SHADER_TYPE type) {
+
         std::vector<uint32_t> spirv;
-        ShaderCompiler::GLSLToSpirV(source,spirv,type);
+        //ShaderCompiler::GLSLToSpirV(source,spirv,type);
+
         VkShaderModuleCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
         createInfo.codeSize = source.size();
@@ -29,9 +30,10 @@ namespace HBE {
         }
     }
 
-    const void *VK_Shader::getHandle() const {
-        return &handle;
+    const VkShaderModule &VK_Shader::getHandle() const{
+        return handle;
     }
+
 
 
 }

@@ -14,8 +14,6 @@ namespace HBE {
 
     class VK_Swapchain {
         VkSwapchainKHR handle;
-        const VkInstance *instance_handle = nullptr;
-        const VkSurfaceKHR *surface_handle = nullptr;
         const VK_PhysicalDevice *physical_device = nullptr;
         const VK_Device *device = nullptr;
         uint32_t image_count;
@@ -23,7 +21,6 @@ namespace HBE {
         uint32_t height;
         std::vector<VkImage> images;
         std::vector<VkImageView> image_views;
-        std::vector<VkFramebuffer> frame_buffers;
         VkExtent2D extent;
         VkFormat format;
 
@@ -31,8 +28,7 @@ namespace HBE {
         VK_Swapchain(uint32_t width,
                      uint32_t height,
                      const VkSurfaceKHR &surface_handle,
-                     const VK_Device &device,
-                     const VK_RenderPass& render_pass);
+                     const VK_Device &device);
 
         ~VK_Swapchain();
 
@@ -50,9 +46,7 @@ namespace HBE {
 
         const VkFormat &getFormat() const;
 
-        const std::vector<VkFramebuffer> &getFrameBuffers() const ;
-
-        void createFramebuffers(const VK_RenderPass &render_pass);
+        const std::vector<VkImageView> &getImagesViews() const;
 
 
     };

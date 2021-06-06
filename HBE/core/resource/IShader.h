@@ -12,8 +12,6 @@ namespace HBE {
         virtual ~IShader() = default;
 
         virtual void setSource(const std::vector<char> &source, SHADER_TYPE type) = 0;
-
-        virtual const void *getHandle() const = 0;
     };
 }
 

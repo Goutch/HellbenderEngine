@@ -15,12 +15,10 @@ namespace HBE {
     VK_Swapchain::VK_Swapchain(uint32_t width,
                                uint32_t height,
                                const VkSurfaceKHR &surface_handle,
-                               const VK_Device &device,
-                               const VK_RenderPass &render_pass) {
+                               const VK_Device &device) {
         this->width = width;
         this->height = height;
 
-        this->surface_handle = &surface_handle;
         this->physical_device = &device.getPhysicalDevice();
         this->device = &device;
         SwapchainSupportDetails details = physical_device->getSwapchainSupportDetails();
@@ -73,19 +71,15 @@ namespace HBE {
         vkGetSwapchainImagesKHR(device.getHandle(), handle, &image_count, nullptr);
         images.resize(image_count);
         vkGetSwapchainImagesKHR(device.getHandle(), handle, &image_count, images.data());
-        frame_buffers.resize(image_count);
 
         createImageViews();
-        createFramebuffers(render_pass);
+
         Log::status(std::string("Created swapchain with extent:") + std::to_string(extent.width) + "x" +
                     std::to_string(extent.height));
     }
 
 
     VK_Swapchain::~VK_Swapchain() {
-        for (auto framebuffer : frame_buffers) {
-            vkDestroyFramebuffer(device->getHandle(), framebuffer, nullptr);
-        }
         for (auto imageView : image_views) {
             vkDestroyImageView(device->getHandle(), imageView, nullptr);
         }
@@ -94,7 +88,7 @@ namespace HBE {
 
     VkSurfaceFormatKHR VK_Swapchain::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &available_formats) {
         for (const auto &available_format:available_formats) {
-            if (available_format.format == VK_FORMAT_R8G8B8A8_SRGB &&
+            if (available_format.format == VK_FORMAT_B8G8R8A8_SRGB &&
                 available_format.colorSpace == VK_COLORSPACE_SRGB_NONLINEAR_KHR) {
                 return available_format;
             }
@@ -159,34 +153,9 @@ namespace HBE {
         return format;
     }
 
-    void VK_Swapchain::createFramebuffers(const VK_RenderPass &render_pass) {
-        frame_buffers.resize(image_views.size());
-        for (size_t i = 0; i < image_views.size(); ++i) {
-            VkImageView attachments[] = {
-                    image_views[i]
-            };
-            VkFramebufferCreateInfo framebuffer_create_info{};
-            framebuffer_create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-            framebuffer_create_info.renderPass = render_pass.getHandle();
-            framebuffer_create_info.attachmentCount = 1;
-            framebuffer_create_info.pAttachments = attachments;
-            framebuffer_create_info.width = extent.width;
-            framebuffer_create_info.height = extent.height;
-            framebuffer_create_info.layers = 1;
-
-
-            if (vkCreateFramebuffer(device->getHandle(), &framebuffer_create_info, nullptr, &frame_buffers[i]) !=
-                VK_SUCCESS) {
-                Log::error("Failed to create framebuffer!");
-            }
-        }
+    const std::vector<VkImageView> &VK_Swapchain::getImagesViews() const {
+        return image_views;
     }
-
-    const std::vector<VkFramebuffer> &VK_Swapchain::getFrameBuffers() const{
-        return frame_buffers;
-    }
-
-
 }
 
 

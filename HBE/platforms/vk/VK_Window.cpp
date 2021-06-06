@@ -24,8 +24,6 @@ namespace HBE {
 
         glfwSetWindowUserPointer(handle, (void *) this);
         glfwSetWindowSizeCallback(handle, windowSizeCallback);
-
-
     }
 
     VK_Window::~VK_Window() {

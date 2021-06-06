@@ -5,11 +5,15 @@
 #include "VK_RenderPass.h"
 #include "vulkan/vulkan.h"
 #include "VK_Device.h"
+#include "core/utility/Log.h"
+#include "VK_Swapchain.h"
 namespace HBE{
-    HBE::VK_RenderPass::VK_RenderPass(const VK_Device* device) {
+
+    VK_RenderPass::VK_RenderPass(const VK_Device *device, const VK_Swapchain *swapchain) {
         this->device=device;
+        this->swapchain=swapchain;
         VkAttachmentDescription colorAttachment{};
-        colorAttachment.format = VK_FORMAT_B8G8R8A8_UNORM;
+        colorAttachment.format = swapchain->getFormat();
         colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
         colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
         colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -50,19 +54,22 @@ namespace HBE{
         if (vkCreateRenderPass(device->getHandle(), &render_pass_info, nullptr, &handle) != VK_SUCCESS) {
             throw std::runtime_error("failed to create render pass!");
         }
+        createFramebuffers();
     }
     VK_RenderPass::~VK_RenderPass() {
+        for (auto framebuffer : frame_buffers) {
+            vkDestroyFramebuffer(device->getHandle(), framebuffer, nullptr);
+        }
         vkDestroyRenderPass(device->getHandle(), handle, nullptr);
     }
-
-    void VK_RenderPass::begin(const VkCommandBuffer& command_buffer,const VkFramebuffer& framebuffer,const VkExtent2D& extent) const {
+    void VK_RenderPass::begin(VkCommandBuffer const &command_buffer, int i) const {
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
         renderPassInfo.renderPass = handle;
-        renderPassInfo.framebuffer = framebuffer;
+        renderPassInfo.framebuffer = frame_buffers[i];
 
         renderPassInfo.renderArea.offset = {0, 0};
-        renderPassInfo.renderArea.extent = extent;
+        renderPassInfo.renderArea.extent = swapchain->getExtent();
 
         VkClearValue clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
         renderPassInfo.clearValueCount = 1;
@@ -78,6 +85,39 @@ namespace HBE{
     void VK_RenderPass::end(const VkCommandBuffer& command_buffer) const {
         vkCmdEndRenderPass(command_buffer);
     }
+
+    void VK_RenderPass::createFramebuffers() {
+        auto image_views=swapchain->getImagesViews();
+        extent=swapchain->getExtent();
+        frame_buffers.resize(image_views.size());
+        for (size_t i = 0; i < image_views.size(); ++i) {
+            VkImageView attachments[] = {
+                    image_views[i]
+            };
+            VkFramebufferCreateInfo framebuffer_create_info{};
+            framebuffer_create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+            framebuffer_create_info.renderPass = handle;
+            framebuffer_create_info.attachmentCount = 1;
+            framebuffer_create_info.pAttachments = attachments;
+            framebuffer_create_info.width = extent.width;
+            framebuffer_create_info.height = extent.height;
+            framebuffer_create_info.layers = 1;
+
+
+            if (vkCreateFramebuffer(device->getHandle(), &framebuffer_create_info, nullptr, &frame_buffers[i]) !=
+                VK_SUCCESS) {
+                Log::error("Failed to create framebuffer!");
+            }
+        }
+    }
+
+    std::vector<VkFramebuffer> &VK_RenderPass::getFrameBuffers() {
+        return frame_buffers;
+    }
+
+
+
+
 }
 
 
