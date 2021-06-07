@@ -42,7 +42,7 @@ namespace HBE {
     void Shader::getSource(const std::string &path, std::vector<char> &buffer) {
         try {
             std::ifstream file;
-            file.open(path,std::ios::ate | std::ios::binary);
+            file.open(path,std::ios::ate);
             if (file.is_open()) {
                 size_t size=(size_t) file.tellg();
                 buffer.resize(size);

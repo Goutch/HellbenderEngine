@@ -18,11 +18,11 @@ int main() {
     Shader *vs = new Shader();
     Shader *fs = new Shader();
 
-   /* vs->load("../../res/shaders/VK.vert", SHADER_TYPE::VERTEX);
-    fs->load("../../res/shaders/VK.frag", SHADER_TYPE::FRAGMENT);*/
+    vs->load("../../res/shaders/VK.vert", SHADER_TYPE::VERTEX);
+    fs->load("../../res/shaders/VK.frag", SHADER_TYPE::FRAGMENT);
 
-    vs->load("../../res/shaders/vert.spv", SHADER_TYPE::VERTEX);
-    fs->load("../../res/shaders/frag.spv", SHADER_TYPE::FRAGMENT);
+   /*vs->load("../../res/shaders/vert.spv", SHADER_TYPE::VERTEX);
+    fs->load("../../res/shaders/frag.spv", SHADER_TYPE::FRAGMENT);*/
     GraphicPipeline *pipeline = new GraphicPipeline();
     pipeline->setShaders(vs,fs);
 

@@ -18,22 +18,21 @@ namespace HBE {
     void VK_Shader::setSource(const std::vector<char> &source, SHADER_TYPE type) {
 
         std::vector<uint32_t> spirv;
-        //ShaderCompiler::GLSLToSpirV(source,spirv,type);
+        ShaderCompiler::GLSLToSpirV(source, spirv, type);
 
         VkShaderModuleCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-        createInfo.codeSize = source.size();
-        createInfo.pCode = reinterpret_cast<const uint32_t*>(source.data());
+        createInfo.codeSize = spirv.size() * sizeof(uint32_t);
+        createInfo.pCode = reinterpret_cast<const uint32_t *>(spirv.data());
 
         if (vkCreateShaderModule(device->getHandle(), &createInfo, nullptr, &handle) != VK_SUCCESS) {
             Log::error("failed to create shader module!");
         }
     }
 
-    const VkShaderModule &VK_Shader::getHandle() const{
+    const VkShaderModule &VK_Shader::getHandle() const {
         return handle;
     }
-
 
 
 }

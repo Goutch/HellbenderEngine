@@ -6,7 +6,6 @@ namespace HBE {
         DRAW_FLAGS_CULL_FACE_FRONT = 1 << 1,
         DRAW_FLAGS_Z_TEST = 1 << 2,
         DRAW_FLAGS_TRANSPARENT = 1 << 3,
-
     };
     typedef uint32_t DRAW_FLAGS;
 }
