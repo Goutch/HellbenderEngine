@@ -43,7 +43,7 @@ if (VULKAN_FOUND)
             platforms/vk/VK_RenderPass.h
             platforms/vk/ShaderCompiler.cpp
             platforms/vk/ShaderCompiler.h
-            platforms/vk/VK_Semaphore.cpp platforms/vk/VK_Semaphore.h)
+            platforms/vk/VK_Semaphore.cpp platforms/vk/VK_Semaphore.h platforms/vk/VK_Fence.cpp platforms/vk/VK_Fence.h)
 
     add_compile_definitions(VULKAN_RENDERER)
 else ()

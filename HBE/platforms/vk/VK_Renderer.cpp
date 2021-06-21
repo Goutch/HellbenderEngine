@@ -1,5 +1,3 @@
-
-
 #include "VK_Renderer.h"
 
 #define GLFW_INCLUDE_VULKAN
@@ -11,12 +9,11 @@
 #include "VK_Swapchain.h"
 #include "VK_Device.h"
 #include "VK_Surface.h"
-#include "VK_Swapchain.h"
 #include "VK_ResourceFactory.h"
-#include "vulkan/vulkan.h"
 #include "VK_RenderPass.h"
 #include "VK_CommandPool.h"
-
+#include "VK_Fence.h"
+#include ""
 namespace HBE {
     VK_Renderer::VK_Renderer() {
         window = dynamic_cast<VK_Window *>(Graphics::getWindow());
@@ -31,15 +28,30 @@ namespace HBE {
         render_pass = new VK_RenderPass(device, swapchain);
         command_pool = new VK_CommandPool(device, render_pass->getFrameBuffers().size());
         factory = new VK_ResourceFactory(device, this);
-        image_available_semaphore = new VK_Semaphore(*device);
-        render_finished_semaphore = new VK_Semaphore(*device);
+
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+            image_available_semaphores.push_back(new VK_Semaphore(*device));
+            render_finished_semaphores.push_back(new VK_Semaphore(*device));
+            in_flight_fences.push_back(new VK_Fence(*device));
+        }
+        for (size_t i = 0; i < swapchain->getImagesViews().size(); ++i) {
+            images_in_flight.push_back(new VK_Fence(*device));
+        }
+        Application.OnSuspend
+
     }
 
 
     VK_Renderer::~VK_Renderer() {
         device->wait();
-        delete render_finished_semaphore;
-        delete image_available_semaphore;
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+            delete image_available_semaphores[i];
+            delete render_finished_semaphores[i];
+            delete in_flight_fences[i];
+        }
+        for (std::size_t i = 0; i < images_in_flight.size(); ++i) {
+            delete images_in_flight[i];
+        }
         delete command_pool;
         delete render_pass;
         delete factory;
@@ -62,14 +74,27 @@ namespace HBE {
     }
 
     void VK_Renderer::present(const HBE::RenderTarget *render_target) {
-        uint32_t imageIndex;
-        vkAcquireNextImageKHR(device->getHandle(), swapchain->getHandle(), UINT64_MAX,
-                              image_available_semaphore->getHandle(), VK_NULL_HANDLE, &imageIndex);
+        in_flight_fences[current_frame]->wait();
+        in_flight_fences[current_frame]->reset();
 
+        uint32_t imageIndex;
+        vkAcquireNextImageKHR(device->getHandle(),
+                              swapchain->getHandle(),
+                              UINT64_MAX,
+                              image_available_semaphores[current_frame]->getHandle(),
+                              VK_NULL_HANDLE,
+                              &imageIndex);
+        // Check if a previous frame is using this image (i.e. there is its fence to wait on)
+        if (images_in_flight[imageIndex] != VK_NULL_HANDLE) {
+            images_in_flight[imageIndex]->wait();
+        }
+
+        // Mark the image as now being in use by this frame
+        images_in_flight[imageIndex] = in_flight_fences[current_frame];
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-        VkSemaphore waitSemaphores[] = {image_available_semaphore->getHandle()};
+        VkSemaphore waitSemaphores[] = {image_available_semaphores[current_frame]->getHandle()};
         VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
         submitInfo.waitSemaphoreCount = 1;
         submitInfo.pWaitSemaphores = waitSemaphores;
@@ -78,14 +103,14 @@ namespace HBE {
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &command_pool->getBuffers()[imageIndex];
 
-        VkSemaphore signalSemaphores[] = {render_finished_semaphore->getHandle()};
+        VkSemaphore signalSemaphores[] = {render_finished_semaphores[current_frame]->getHandle()};
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores;
 
-        if (vkQueueSubmit(device->getGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS) {
+        in_flight_fences[current_frame]->reset();
+        if (vkQueueSubmit(device->getGraphicsQueue(), 1, &submitInfo, in_flight_fences[current_frame]->getHandle()) != VK_SUCCESS) {
             throw std::runtime_error("failed to submit draw command buffer!");
         }
-
 
         VkPresentInfoKHR presentInfo{};
         presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -101,8 +126,7 @@ namespace HBE {
 
         vkQueuePresentKHR(device->getPresentQueue(), &presentInfo);
 
-        vkQueueWaitIdle(device->getPresentQueue());
-
+        current_frame = (current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
     }
 
     void VK_Renderer::clearDrawCache() {

@@ -1,5 +1,4 @@
 
-
 #include "VK_CommandPool.h"
 #include "core/utility/Log.h"
 #include "VK_Device.h"
