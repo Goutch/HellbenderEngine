@@ -2,13 +2,13 @@
 
 using namespace HBE;
 static Material *material;
-
+static GraphicPipeline* pipeline;
 void onUpdate(float delta) {
     //Shut down app if escape key is pressed
     if (Input::getKey(KEY::ESCAPE))
+    {
         Application::quit();
-
-
+    }
 }
 
 int main() {
@@ -25,6 +25,8 @@ int main() {
     fs->load("../../res/shaders/frag.spv", SHADER_TYPE::FRAGMENT);*/
     GraphicPipeline *pipeline = new GraphicPipeline();
     pipeline->setShaders(vs,fs);
+    delete vs;
+    delete fs;
 
     material = new Material();
     material->setPipeline(pipeline);
@@ -37,10 +39,6 @@ int main() {
     Application::run();
     //-----------------------CLEANUP------------------
     Application::onUpdate.unsubscribe(&onUpdate);
-
-
-    delete vs;
-    delete fs;
     delete pipeline;
     delete material;
     //-----------------------TERMINATE------------------

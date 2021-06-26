@@ -13,10 +13,12 @@
 #include "VK_RenderPass.h"
 #include "VK_CommandPool.h"
 #include "VK_Fence.h"
-#include ""
+#include "Application.h"
+
 namespace HBE {
     VK_Renderer::VK_Renderer() {
         window = dynamic_cast<VK_Window *>(Graphics::getWindow());
+
         int width, height;
         window->getSize(width, height);
 
@@ -34,23 +36,22 @@ namespace HBE {
             render_finished_semaphores.push_back(new VK_Semaphore(*device));
             in_flight_fences.push_back(new VK_Fence(*device));
         }
-        for (size_t i = 0; i < swapchain->getImagesViews().size(); ++i) {
-            images_in_flight.push_back(new VK_Fence(*device));
-        }
-        Application.OnSuspend
-
+        images_in_flight_fences.resize(swapchain->getImagesViews().size(), nullptr);
+        Application::onWindowClosed.subscribe(this,&VK_Renderer::onWindowClosed);
     }
 
+    void VK_Renderer::onWindowClosed()
+    {
+        device->wait();
+    }
 
     VK_Renderer::~VK_Renderer() {
+        Application::onWindowClosed.unsubscribe(this);
         device->wait();
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
             delete image_available_semaphores[i];
             delete render_finished_semaphores[i];
             delete in_flight_fences[i];
-        }
-        for (std::size_t i = 0; i < images_in_flight.size(); ++i) {
-            delete images_in_flight[i];
         }
         delete command_pool;
         delete render_pass;
@@ -85,12 +86,12 @@ namespace HBE {
                               VK_NULL_HANDLE,
                               &imageIndex);
         // Check if a previous frame is using this image (i.e. there is its fence to wait on)
-        if (images_in_flight[imageIndex] != VK_NULL_HANDLE) {
-            images_in_flight[imageIndex]->wait();
+        if (images_in_flight_fences[imageIndex] != nullptr) {
+            images_in_flight_fences[imageIndex]->wait();
         }
 
         // Mark the image as now being in use by this frame
-        images_in_flight[imageIndex] = in_flight_fences[current_frame];
+        images_in_flight_fences[imageIndex] = in_flight_fences[current_frame];
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
@@ -108,7 +109,8 @@ namespace HBE {
         submitInfo.pSignalSemaphores = signalSemaphores;
 
         in_flight_fences[current_frame]->reset();
-        if (vkQueueSubmit(device->getGraphicsQueue(), 1, &submitInfo, in_flight_fences[current_frame]->getHandle()) != VK_SUCCESS) {
+        if (vkQueueSubmit(device->getGraphicsQueue(), 1, &submitInfo, in_flight_fences[current_frame]->getHandle()) !=
+            VK_SUCCESS) {
             throw std::runtime_error("failed to submit draw command buffer!");
         }
 
@@ -165,7 +167,5 @@ namespace HBE {
     const VkCommandBuffer *VK_Renderer::getCurrentCommandBuffer() const {
         return current_command_buffer;
     }
-
-
 }
 

@@ -32,7 +32,7 @@ namespace HBE {
         std::vector<VK_Semaphore*> image_available_semaphores;
         std::vector<VK_Semaphore*> render_finished_semaphores;
         std::vector<VK_Fence*> in_flight_fences;
-        std::vector<VK_Fence*> images_in_flight;
+        std::vector<VK_Fence*> images_in_flight_fences;
         const VkCommandBuffer* current_command_buffer= nullptr;
     public:
         void render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix) override;
@@ -55,6 +55,10 @@ namespace HBE {
         const VkCommandBuffer* getCurrentCommandBuffer() const ;
 
         const VK_RenderPass& getRenderPass() const;
+
+        void onApplicationQuit();
+
+        void onWindowClosed();
     };
 }
 

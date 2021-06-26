@@ -24,7 +24,8 @@ namespace HBE {
     Event<Scene *> Application::onSceneChange;
     Event<> Application::onRender;
     Event<> Application::onRegisterComponents;
-
+    Event<> Application::onWindowClosed;
+    Event<> Application::onQuit;
     void Application::registerComponents() {
         ComponentRegistry::registerComponent<Camera>("Camera");
         ComponentRegistry::registerComponent<MeshRenderer>("MeshRenderer");
@@ -86,6 +87,8 @@ namespace HBE {
             printFPS(delta_t);
 #endif
         }
+        onWindowClosed.invoke();
+        onQuit.invoke();
         delete time;
         delete scene;
     }

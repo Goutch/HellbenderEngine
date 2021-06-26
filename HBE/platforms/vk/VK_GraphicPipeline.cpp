@@ -28,7 +28,7 @@ namespace HBE {
     }
 
     void VK_GraphicPipeline::unbind() const {
-
+        vkCmdBindPipeline(*renderer->getCurrentCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, handle);
     }
 
     void VK_GraphicPipeline::setDrawFlags(DRAW_FLAGS flags) {

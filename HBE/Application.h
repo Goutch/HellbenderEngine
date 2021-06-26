@@ -20,6 +20,8 @@ namespace HBE {
         static Event<float> onUpdate;
         static Event<Scene *> onSceneChange;
         static Event<> onRender;
+        static Event<> onWindowClosed;
+        static Event<> onQuit;
 
         static Scene *scene;
 
@@ -38,6 +40,7 @@ namespace HBE {
     private:
         static void printFPS(float);
         static void registerComponents();
+
 
     };
 
