@@ -23,7 +23,7 @@ namespace HBE {
         std::vector<VkImageView> image_views;
         VkExtent2D extent;
         VkFormat format;
-
+        VK_RenderPass* render_pass;
     public:
         VK_Swapchain(uint32_t width,
                      uint32_t height,
@@ -48,6 +48,6 @@ namespace HBE {
 
         const std::vector<VkImageView> &getImagesViews() const;
 
-
+        const VK_RenderPass& getRenderPass() const;
     };
 }

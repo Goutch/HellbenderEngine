@@ -52,7 +52,7 @@ namespace HBE{
         render_pass_info.pDependencies = &dependency;
 
         if (vkCreateRenderPass(device->getHandle(), &render_pass_info, nullptr, &handle) != VK_SUCCESS) {
-            throw std::runtime_error("failed to create render pass!");
+            Log::error("failed to create render pass!");
         }
         createFramebuffers();
     }
@@ -111,13 +111,9 @@ namespace HBE{
         }
     }
 
-    std::vector<VkFramebuffer> &VK_RenderPass::getFrameBuffers() {
+    const std::vector<VkFramebuffer> & VK_RenderPass::getFrameBuffers() const {
         return frame_buffers;
     }
-
-
-
-
 }
 
 

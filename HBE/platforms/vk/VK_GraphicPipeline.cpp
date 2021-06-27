@@ -10,7 +10,7 @@
 #include "VK_RenderPass.h"
 #include "VK_CommandPool.h"
 #include "VK_Renderer.h"
-
+#include "VK_Swapchain.h"
 namespace HBE {
     VK_GraphicPipeline::VK_GraphicPipeline(const VK_Device *device, const VK_Renderer *renderer) {
         this->device = device;
@@ -175,7 +175,7 @@ namespace HBE {
         pipelineInfo.pTessellationState = VK_NULL_HANDLE;
         pipelineInfo.layout = pipeline_layout_handle;
 
-        pipelineInfo.renderPass = renderer->getRenderPass().getHandle();
+        pipelineInfo.renderPass = renderer->getSwapchain().getRenderPass().getHandle();
         pipelineInfo.subpass = 0;
 
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
@@ -183,7 +183,7 @@ namespace HBE {
 
         if (vkCreateGraphicsPipelines(device->getHandle(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &handle) !=
             VK_SUCCESS) {
-            throw std::runtime_error("failed to create graphics pipeline!");
+            Log::error("failed to create graphics pipeline!");
         }
     }
 

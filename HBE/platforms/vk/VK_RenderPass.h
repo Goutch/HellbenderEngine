@@ -17,7 +17,7 @@ namespace HBE{
         void begin(const VkCommandBuffer& command_buffer,int i) const;
         void end(const VkCommandBuffer& command_buffer) const;
         const VkRenderPass& getHandle() const;
-        std::vector<VkFramebuffer>& getFrameBuffers();
+        const std::vector<VkFramebuffer> & getFrameBuffers() const;
     private:
         void createFramebuffers();
 

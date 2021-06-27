@@ -20,19 +20,21 @@ namespace HBE {
         }
         setRenderTarget(Graphics::getRenderTarget());
 
-        Graphics::getRenderTarget()->onSizeChange.subscribe(this, &Camera::onRenderTargetSizeChange);
-
         generateProjectionMatrix();
     }
 
     void Camera::setRenderTarget(RenderTarget *render_target) {
-        if (render_target != nullptr) {
-            render_target->onSizeChange.unsubscribe(this);
+        if (this->render_target != nullptr) {
+            this->render_target->onSizeChange.unsubscribe(this);
         }
         this->render_target = render_target;
-        setAspectRatio(render_target->getWidth(), render_target->getHeight());
-        render_target->onSizeChange.subscribe(this, &Camera::onRenderTargetSizeChange);
+        if (render_target != nullptr) {
+            setAspectRatio(render_target->getWidth(), render_target->getHeight());
+            render_target->onSizeChange.subscribe(this, &Camera::onRenderTargetSizeChange);
+        }
+
     }
+
 
     Camera::~Camera() {
         render_target->onSizeChange.unsubscribe(this);
@@ -188,7 +190,7 @@ namespace HBE {
     }
 
     void Camera::setClearColor(vec4 clear_color) {
-        this->clear_color=clear_color;
+        this->clear_color = clear_color;
     }
 
 }

@@ -1,6 +1,3 @@
-
-
-
 #include "VK_Swapchain.h"
 #include "core/utility/Log.h"
 #include <algorithm>
@@ -21,7 +18,7 @@ namespace HBE {
 
         this->physical_device = &device.getPhysicalDevice();
         this->device = &device;
-        SwapchainSupportDetails details = physical_device->getSwapchainSupportDetails();
+        SwapchainSupportDetails details = physical_device->querySwapchainSupportDetails(physical_device->getHandle());
         image_count = details.capabilities.minImageCount + 1;
         if (details.capabilities.maxImageCount > 0 && image_count > details.capabilities.maxImageCount)
             image_count = details.capabilities.maxImageCount;
@@ -76,10 +73,13 @@ namespace HBE {
 
         Log::status(std::string("Created swapchain with extent:") + std::to_string(extent.width) + "x" +
                     std::to_string(extent.height));
+
+        render_pass = new VK_RenderPass(&device, this);
     }
 
 
     VK_Swapchain::~VK_Swapchain() {
+        delete render_pass;
         for (auto imageView : image_views) {
             vkDestroyImageView(device->getHandle(), imageView, nullptr);
         }
@@ -108,11 +108,14 @@ namespace HBE {
         if (capabilities.currentExtent.width != UINT32_MAX) {
             return capabilities.currentExtent;
         } else {
-            VkExtent2D actualExtent = {width, height};
-            actualExtent.width = std::max(capabilities.maxImageExtent.width,
-                                          std::min(capabilities.maxImageExtent.width, actualExtent.width));
-            actualExtent.height = std::max(capabilities.maxImageExtent.height,
-                                           std::min(capabilities.maxImageExtent.height, actualExtent.height));
+            VkExtent2D actualExtent = {
+                    static_cast<uint32_t>(width),
+                    static_cast<uint32_t>(height)
+            };
+
+            actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
+            actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
+
             return actualExtent;
         }
     }
@@ -143,6 +146,10 @@ namespace HBE {
 
     const VkExtent2D &VK_Swapchain::getExtent() const {
         return extent;
+    }
+
+    const VK_RenderPass& VK_Swapchain::getRenderPass() const {
+        return *render_pass;
     }
 
     VkSwapchainKHR &VK_Swapchain::getHandle() {

@@ -18,7 +18,6 @@ namespace HBE {
             Log::error("Vulkan is not supported");
         }
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
         //glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         handle = glfwCreateWindow(width, height, Configs::getWindowTitle().c_str(), nullptr, nullptr);
 
@@ -43,7 +42,11 @@ namespace HBE {
     }
 
     void VK_Window::getSize(int &width, int &height) {
-        return glfwGetWindowSize(handle, &width, &height);
+        glfwGetWindowSize(handle, &width, &height);
+        while (width == 0 || height == 0) {
+            glfwGetFramebufferSize(handle, &width, &height);
+            glfwWaitEvents();
+        }
     }
 
     GLFWwindow *VK_Window::getHandle() {

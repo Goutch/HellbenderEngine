@@ -45,7 +45,9 @@ namespace HBE {
 
         const std::vector<const char *> &getRequiredExtensions() const;
 
-        const SwapchainSupportDetails& getSwapchainSupportDetails() const ;
+        const SwapchainSupportDetails &getSwapchainSupportDetails() const;
+
+        SwapchainSupportDetails querySwapchainSupportDetails(const VkPhysicalDevice &physical_device) const;
 
     private:
         void pickBestPhysicalDevice();
@@ -54,7 +56,6 @@ namespace HBE {
 
         QueueFamilyIndices getSupportedQueueFamilies(const VkPhysicalDevice &physical_device);
 
-        SwapchainSupportDetails querySwapchainSupportDetails(const VkPhysicalDevice &physical_device) const;
 
         bool isDeviceSuitable(const VkPhysicalDevice &physical_device);
 

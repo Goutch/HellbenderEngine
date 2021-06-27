@@ -22,7 +22,7 @@ namespace HBE {
         static Event<> onRender;
         static Event<> onWindowClosed;
         static Event<> onQuit;
-
+        static Event<> onDraw;
         static Scene *scene;
 
         static void init();

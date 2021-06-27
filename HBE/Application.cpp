@@ -21,6 +21,7 @@ namespace HBE {
     float Application::fps_timer = 0;
     Event<> Application::onInit;
     Event<float> Application::onUpdate;
+    Event<> Application::onDraw;
     Event<Scene *> Application::onSceneChange;
     Event<> Application::onRender;
     Event<> Application::onRegisterComponents;
@@ -73,13 +74,16 @@ namespace HBE {
             scene->update(delta_t);
             onUpdate.invoke(delta_t);
             scene->draw();
+            onDraw.invoke();
             if (Camera::main)
                 Graphics::render(Graphics::getRenderTarget(), Camera::main->getProjectionMatrix(),
                                  Camera::main->getViewMatrix());
+            onRender.invoke();
+
             if (!Configs::isPresentAutomatic())
                 Graphics::present(Graphics::getRenderTarget());
-            onRender.invoke();
             Graphics::clearDrawCache();
+
 
             delta_t = update_clock.ns() / SECONDS_TO_NANOSECOND;
             update_clock.reset();

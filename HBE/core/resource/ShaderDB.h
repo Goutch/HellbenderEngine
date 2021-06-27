@@ -6,19 +6,23 @@
 
 namespace HBE {
     class HB_API ShaderDB {
-        static std::unordered_map<std::string, Shader*> shaders;
+        static std::unordered_map<std::string, Shader *> shaders;
     public:
-        static void add(const std::string &name,const std::vector<char> &source, SHADER_TYPE type);
+        static void add(const char *name, const std::vector<char> &source, SHADER_TYPE type);
 
-        static void load(const std::string &name, std::string &path, SHADER_TYPE type);
+        static void add(const char *name, const char *source, SHADER_TYPE type);
 
-        static const Shader *get(const std::string &name);
+        static void load(const char *name, const char *path, SHADER_TYPE type);
 
-        static void remove(const std::string &name);
+        static const Shader *get(const char *name);
 
-        static bool contains(const std::string &name);
+        static void remove(const char *name);
+
+        static bool contains(const char *name);
 
         static void terminate();
+
+
     };
 
 }
