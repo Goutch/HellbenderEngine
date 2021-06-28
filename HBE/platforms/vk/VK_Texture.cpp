@@ -16,6 +16,7 @@ namespace HBE{
 
     VK_Texture::VK_Texture(const HBE::VK_Device *device) {
         this->device = device;
+
     }
 }
 

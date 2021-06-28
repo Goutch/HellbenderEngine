@@ -5,6 +5,8 @@
 namespace HBE {
     class VK_Texture : public ITexture {
         const VK_Device* device;
+        VkImage handle;
+        HBE::TEXTURE_FORMAT format;
     public:
         VK_Texture(const VK_Device* device);
         ~VK_Texture() override = default;

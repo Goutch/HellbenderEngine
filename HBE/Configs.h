@@ -2,6 +2,7 @@
 
 #include "core/utility/Event.h"
 #include "Core.h"
+#include <string>
 namespace HBE {
     class HB_API Configs {
     public:

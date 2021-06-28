@@ -1,4 +1,5 @@
 #include "Configs.h"
+
 namespace HBE {
     Event<std::string> Configs::onWindowTitleChange;
     std::string Configs::window_title = "CHANGE WITH Configs::setWindowTitle";
