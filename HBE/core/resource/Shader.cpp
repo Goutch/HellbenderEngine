@@ -2,27 +2,10 @@
 #include "Shader.h"
 #include <fstream>
 #include "sstream"
-#include "core/graphics/Graphics.h"
-#include "core/utility/Log.h"
 #include "core/graphics/Renderer.h"
-#include "core/resource/IResourceFactory.h"
+#include "core/resource/ResourceFactory.h"
 
 namespace HBE {
-
-    Shader::~Shader() {
-        delete instance;
-    }
-
-    Shader::Shader() {
-        instance = Graphics::getRenderer()->getResourceFactory()->createShader();
-    }
-
-    Shader::Shader(const std::vector<char> &source, SHADER_TYPE type) {
-        instance = Graphics::getRenderer()->getResourceFactory()->createShader();
-        this->type = type;
-        setSource(source, type);
-    }
-
 
     SHADER_TYPE Shader::getType() {
         return type;
@@ -31,13 +14,8 @@ namespace HBE {
     void Shader::load(const std::string &path, SHADER_TYPE type) {
         std::vector<char> source;
         getSource(path, source);
-        instance->setSource(source, type);
+        setSource(source,type);
     }
-
-    void Shader::setSource(const std::vector<char> &source, SHADER_TYPE type) {
-        instance->setSource(source, type);
-    }
-
 
     void Shader::getSource(const std::string &path, std::vector<char> &buffer) {
         try {
@@ -57,9 +35,5 @@ namespace HBE {
         catch (std::exception &e) {
             Log::error("failed to read file " + path + "\n" + e.what());
         }
-    }
-
-    const IShader *Shader::getInstance() const {
-        return instance;
     }
 }

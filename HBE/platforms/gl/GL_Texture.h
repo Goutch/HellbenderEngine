@@ -1,8 +1,8 @@
 #pragma once
 
-#include <core/resource/ITexture.h>
+#include <core/resource/Texture.h>
 namespace HBE {
-    class GL_Texture : public ITexture {
+    class GL_Texture : public Texture {
 
     private:
         unsigned int texture_id;

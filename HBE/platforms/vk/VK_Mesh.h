@@ -1,19 +1,20 @@
 #pragma once
 
-#include "core/resource/IMesh.h"
-
+#include "core/resource/Mesh.h"
+#include "vector"
 namespace HBE {
     class VK_Device;
 
-    class VK_Mesh : public IMesh {
+    class VK_Mesh : public Mesh {
         const VK_Device *device;
     public:
-
         VK_Mesh(const VK_Device *device);
 
-        ~VK_Mesh() override = default;
+        ~VK_Mesh() = default;
 
         void setIndices(const std::vector<unsigned int> &data) override;
+
+        void setVertices(void *vertices, size_t count,const VertexLayout *layout) override;
 
         void setBuffer(unsigned int position, const std::vector<int> &data) override;
 

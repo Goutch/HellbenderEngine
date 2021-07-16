@@ -1,16 +1,16 @@
 #include <core/graphics/Graphics.h>
 #include "VK_GraphicPipeline.h"
-#include "vulkan/vulkan.h"
 #include "VK_Shader.h"
 #include "core/graphics/Window.h"
-#include "core/utility/Log.h"
+
 #include "platforms/vk/VK_Device.h"
-#include "vulkan/vulkan.h"
-#include "core/resource/Shader.h"
+
 #include "VK_RenderPass.h"
 #include "VK_CommandPool.h"
 #include "VK_Renderer.h"
 #include "VK_Swapchain.h"
+#include "VK_VertexLayout.h"
+
 namespace HBE {
     VK_GraphicPipeline::VK_GraphicPipeline(const VK_Device *device, const VK_Renderer *renderer) {
         this->device = device;
@@ -39,29 +39,29 @@ namespace HBE {
         return 0;
     }
 
-    void VK_GraphicPipeline::setShaders(const Shader *vertex, const Shader *fragment) {
-
+    void VK_GraphicPipeline::setShaders(const Shader *vertex, const Shader *fragment, const VertexLayout *layout) {
         VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
         vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-        vertShaderStageInfo.module =  (dynamic_cast<const VK_Shader *>(vertex->getInstance())->getHandle());
+        vertShaderStageInfo.module = (dynamic_cast<const VK_Shader *>(vertex)->getHandle());
         vertShaderStageInfo.pName = "main";
 
         VkPipelineShaderStageCreateInfo fragShaderStageInfo{};
         fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-        fragShaderStageInfo.module = (dynamic_cast<const VK_Shader *>(fragment->getInstance())->getHandle());
+        fragShaderStageInfo.module = (dynamic_cast<const VK_Shader *>(fragment)->getHandle());
         fragShaderStageInfo.pName = "main";
 
         VkPipelineShaderStageCreateInfo shaderStages[2] = {vertShaderStageInfo, fragShaderStageInfo};
 
-        //--------------------------Vertex input-----------------------------------
+        //--------------------------VertexLayout input-----------------------------------
+        const VK_VertexLayout *vk_layout = (const VK_VertexLayout *) layout;
         VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-        vertexInputInfo.vertexBindingDescriptionCount = 0;
-        vertexInputInfo.pVertexBindingDescriptions = nullptr; // Optional
-        vertexInputInfo.vertexAttributeDescriptionCount = 0;
-        vertexInputInfo.pVertexAttributeDescriptions = nullptr; // Optional
+        vertexInputInfo.vertexBindingDescriptionCount = 1;
+        vertexInputInfo.pVertexBindingDescriptions = &vk_layout->getBindingDescription();
+        vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(vk_layout->getAttributeDescriptions().size());
+        vertexInputInfo.pVertexAttributeDescriptions = vk_layout->getAttributeDescriptions().data();
 
         VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
         inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -188,7 +188,7 @@ namespace HBE {
     }
 
     void VK_GraphicPipeline::setShaders(const Shader *vertex, const Shader *geometry,
-                                        const Shader *fragment) {
+                                        const Shader *fragment, const VertexLayout *layout) {
         //todo:vulkan geometry shader support
         Log::error("Geometry shader not implemented in vulkan renderer");
     }

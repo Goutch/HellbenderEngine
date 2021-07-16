@@ -4,30 +4,33 @@
 #include "core/serialization/Serializable.h"
 #include "Core.h"
 #include "Resource.h"
+
 namespace HBE {
     enum TEXTURE_FORMAT {
+        R8,
+        RG8,
         RGB8,
         RGBA8,
-        R8,
-        DEPTH32,
+        R32,
+        RG32,
+        RGB32,
+        RGBA23,
     };
-    class ITexture;
-    class HB_API Texture final : public Resource {
-        ITexture* instance;
+
+    class HB_API Texture : public Resource {
         std::string path;
         int width = 1;
         int height = 1;
     public:
-        Texture();
-        ~Texture();
+        virtual ~Texture()=default;
 
         void load(std::string path);
 
-        virtual void setData(unsigned char *data, int width, int height, TEXTURE_FORMAT texture_type);
+        virtual void setData(unsigned char *data, int width, int height, TEXTURE_FORMAT format) = 0;
 
-        virtual void bind(unsigned int slot = 0) const ;
+        virtual void bind(unsigned int slot) const = 0;
 
-        virtual void unbind(unsigned int slot = 0) const ;
+        virtual void unbind(unsigned int slot) const = 0;
     };
 
 }

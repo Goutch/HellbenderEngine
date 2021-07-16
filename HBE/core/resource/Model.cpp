@@ -4,6 +4,7 @@
 #include "core/serialization/Serializable.h"
 #include "Model.h"
 #include "core/serialization/Serializer.h"
+#include "Resources.h"
 
 namespace HBE {
     const std::vector<std::pair<Mesh *, Material *>> &Model::getMeshes() const {
@@ -24,7 +25,7 @@ namespace HBE {
     }
 
     void Model::setMaterial(Material *material, int mesh_index) {
-        if (meshes.size() <= (unsigned int)mesh_index)
+        if (meshes.size() <= (unsigned int) mesh_index)
             meshes.resize(mesh_index + 1);
         meshes[mesh_index].second = material;
     }
@@ -42,7 +43,7 @@ namespace HBE {
         int vertex_count = 0;
         clearMeshes();
         for (std::size_t i = 0; i < meshes_data->size(); ++i) {
-            meshes.emplace_back(new Mesh(), new Material());
+            meshes.emplace_back(Resources::create<Mesh>(), new Material());
             meshes[i].first->setIndices((*meshes_data)[i].first.indices);
             vertex_count += (*meshes_data)[i].first.indices.size();
             if (!(*meshes_data)[i].first.positions.empty()) {
@@ -58,7 +59,7 @@ namespace HBE {
             meshes[i].second->setPipeline(Graphics::DEFAULT_MESH_PIPELINE);
 
             if (!(*meshes_data)[i].second.diffuse_texture_paths.empty()) {
-                auto t = new Texture();
+                auto t = Resources::create<Texture>();
                 t->load((*meshes_data)[i].second.diffuse_texture_paths[0]);
                 meshes[i].second->setTexture(t);
             }

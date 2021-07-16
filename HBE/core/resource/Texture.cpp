@@ -5,19 +5,11 @@
 #define STB_IMAGE_IMPLEMENTATION
 
 #include "stb_image.h"
-#include "ITexture.h"
 #include "core/graphics/Graphics.h"
 #include "core/graphics/Renderer.h"
-#include "core/resource/IResourceFactory.h"
+#include "core/resource/ResourceFactory.h"
 
 namespace HBE {
-    Texture::~Texture() {
-        delete instance;
-    }
-
-    Texture::Texture() {
-        instance = Graphics::getRenderer()->getResourceFactory()->createTexture();
-    }
 
     void Texture::load(std::string path) {
         this->path = path;
@@ -36,19 +28,9 @@ namespace HBE {
         }
     }
 
-    void Texture::setData(unsigned char *data, int width, int height, TEXTURE_FORMAT texture_type) {
+    void Texture::setData(unsigned char *data, int width, int height, TEXTURE_FORMAT format) {
         this->width = width;
         this->height = height;
-        instance->setData(data, width, height, texture_type);
+        setData(data,width,height,format);
     }
-
-    void Texture::bind(unsigned int slot) const {
-        instance->bind(slot);
-    }
-
-    void Texture::unbind(unsigned int slot) const {
-        instance->unbind(slot);
-    }
-
-
 }

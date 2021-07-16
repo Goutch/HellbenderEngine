@@ -43,7 +43,14 @@ if (VULKAN_FOUND)
             platforms/vk/VK_RenderPass.h
             platforms/vk/ShaderCompiler.cpp
             platforms/vk/ShaderCompiler.h
-            platforms/vk/VK_Semaphore.cpp platforms/vk/VK_Semaphore.h platforms/vk/VK_Fence.cpp platforms/vk/VK_Fence.h)
+            platforms/vk/VK_Semaphore.cpp
+            platforms/vk/VK_Semaphore.h
+            platforms/vk/VK_Fence.cpp
+            platforms/vk/VK_Fence.h
+            platforms/vk/VK_VertexLayout.cpp
+            platforms/vk/VK_VertexLayout.h
+            platforms/vk/VK_CommandPool.cpp
+            platforms/vk/VK_CommandPool.h)
 
     add_compile_definitions(VULKAN_RENDERER)
 else ()
@@ -83,9 +90,13 @@ set(CORE_FILES
         core/resource/Material.cpp
         core/resource/Material.h
         core/resource/Model.cpp
-        core/resource/GraphicPipeline.cpp
-        core/resource/GraphicPipeline.h
         core/resource/Shader.cpp
+        core/resource/VertexLayout.h
+        core/resource/ResourceFactory.h
+        core/resource/Mesh.cpp
+        core/resource/Resource.h
+        core/resource/GraphicPipeline.h
+        core/resource/ComputePipeline.h
 
         core/graphics/Window.h
         core/graphics/Framebuffer.h
@@ -96,6 +107,8 @@ set(CORE_FILES
         core/graphics/RenderTarget.cpp
         core/graphics/RenderTarget.h
         core/graphics/Renderer.cpp
+        core/graphics/Window.cpp
+        core/graphics/DrawFlags.h
 
         core/input/Input.h
         core/input/Input.cpp
@@ -131,19 +144,9 @@ set(CORE_FILES
         core/serialization/Deserializer.h
         core/serialization/ComponentRegistry.cpp
         core/serialization/ComponentRegistry.h
-        core/graphics/Window.cpp
         core/serialization/ComponentRegistry.h
-        core/resource/IResourceFactory.h
-        core/resource/IMesh.h
-        core/resource/Mesh.cpp
-        core/resource/Resource.h
-        core/resource/ITexture.h
-        core/resource/IGraphicPipeline.h
-        core/resource/IShader.h
-        core/resource/ShaderDB.cpp
-        core/resource/ShaderDB.h
-        core/graphics/DrawFlags.h
-        core/resource/IComputePipeline.h platforms/vk/VK_CommandPool.cpp platforms/vk/VK_CommandPool.h)
+
+        core/resource/GLSL_TYPE.h core/resource/Resources.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

@@ -6,19 +6,10 @@
 #include "unordered_map"
 #include "core/serialization/Serializable.h"
 #include "Core.h"
-
+#include "GLSL_TYPE.h"
 
 using namespace glm;
 namespace HBE {
-    enum GLSL_TYPE {
-        FLOAT,
-        VEC2,
-        VEC3,
-        VEC4,
-        MAT4,
-        INT,
-    };
-
     struct HB_API MaterialProperty {
         GLSL_TYPE type;
         void *value;
@@ -34,27 +25,27 @@ namespace HBE {
         }
 
         MaterialProperty(vec2 v) {
-            type = GLSL_TYPE::VEC2;
+            type = GLSL_TYPE::VEC2F;
             value = new vec2(v);
         }
 
         MaterialProperty(vec3 v) {
-            type = GLSL_TYPE::VEC3;
+            type = GLSL_TYPE::VEC3F;
             value = new vec3(v);
         }
 
         MaterialProperty(vec4 v) {
-            type = GLSL_TYPE::VEC4;
+            type = GLSL_TYPE::VEC4F;
             value = new vec4(v);
         }
 
         MaterialProperty(mat4 v) {
-            type = GLSL_TYPE::MAT4;
+            type = GLSL_TYPE::MAT4F;
             value = new mat4(v);
         }
     };
 
-    class HB_API Material final : Serializable, public Resource {
+    class HB_API Material final :public Resource {
         friend class Resource;
 
         const GraphicPipeline *pipeline = nullptr;
@@ -92,11 +83,7 @@ namespace HBE {
 
         void setProperty(std::string name, vec4 &value);
 
-        void serialize(Serializer *serializer) const override;
-
         Material();
 
-    private:
-        void deserialize(Deserializer *deserializer) override;
     };
 }

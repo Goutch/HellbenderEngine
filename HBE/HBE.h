@@ -1,5 +1,6 @@
 #pragma once
 #define _USE_MATH_DEFINES
+
 #include <Core.h>
 #include <Configs.h>
 #include <Application.h>
@@ -9,7 +10,9 @@
 #include <core/resource/Texture.h>
 #include <core/resource/Material.h>
 #include <core/resource/Model.h>
-#include <core/resource/ShaderDB.h>
+#include <core/resource/Shader.h>
+#include <core/resource/Resources.h>
+#include <core/resource/VertexLayout.h>
 
 #include <core/entity/Entity.h>
 #include <core/entity/Scene.h>

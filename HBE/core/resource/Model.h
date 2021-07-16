@@ -6,7 +6,7 @@
 #include "Core.h"
 
 namespace HBE {
-    class HB_API Model final : public Resource{
+    class HB_API Model : public Resource {
         std::string path;
         std::vector<std::pair<Mesh *, Material *>> meshes;
 
@@ -25,7 +25,7 @@ namespace HBE {
 
         const std::vector<std::pair<Mesh *, Material *>> &getMeshes() const;
 
-        ~Model();
+        virtual ~Model();
 
     };
 

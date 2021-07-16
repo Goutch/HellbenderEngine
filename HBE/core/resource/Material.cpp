@@ -12,23 +12,48 @@ namespace HBE {
             pipeline->bind();
             for (auto p:properties) {
                 switch (p.second.type) {
+                    //todo:
                     case GLSL_TYPE::FLOAT:
                         pipeline->setUniform(p.first, *static_cast<float *>(p.second.value));
                         break;
-                    case GLSL_TYPE::VEC2:
+                    case GLSL_TYPE::VEC2F:
                         pipeline->setUniform(p.first, *static_cast<vec2 *>(p.second.value));
                         break;
-                    case GLSL_TYPE::VEC3:
+                    case GLSL_TYPE::VEC3F:
                         pipeline->setUniform(p.first, *static_cast<vec3 *>(p.second.value));
                         break;
-                    case GLSL_TYPE::VEC4:
+                    case GLSL_TYPE::VEC4F:
                         pipeline->setUniform(p.first, *static_cast<vec4 *>(p.second.value));
                         break;
-                    case GLSL_TYPE::MAT4:
+                    case GLSL_TYPE::MAT4F:
                         pipeline->setUniform(p.first, *static_cast<mat4 *>(p.second.value));
                         break;
                     case GLSL_TYPE::INT:
                         pipeline->setUniform(p.first, *static_cast<int *>(p.second.value));
+                        break;
+                    case UINT:
+                        break;
+                    case VEC2I:
+                        break;
+                    case VEC3I:
+                        break;
+                    case VEC4I:
+                        break;
+                    case VEC2UI:
+                        break;
+                    case VEC3UI:
+                        break;
+                    case VEC4UI:
+                        break;
+                    case MAT3F:
+                        break;
+                    case MAT3I:
+                        break;
+                    case MAT4I:
+                        break;
+                    case MAT3UI:
+                        break;
+                    case MAT4UI:
                         break;
                 }
             }
@@ -144,16 +169,6 @@ namespace HBE {
         } else {
             it->second = MaterialProperty(value);
         }
-    }
-
-    void Material::serialize(Serializer *serializer) const {
-        serializer->begin("Material");
-
-        serializer->end();
-    }
-
-    void Material::deserialize(Deserializer *deserializer) {
-
     }
 }
 

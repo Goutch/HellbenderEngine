@@ -1,28 +1,33 @@
 #pragma once
 
-#include <core/resource/IGraphicPipeline.h>
+#include <core/resource/GraphicPipeline.h>
+#include <core/resource/VertexLayout.h>
 #include "vulkan/vulkan.h"
-
 
 namespace HBE {
     class VK_Device;
+
     class VK_RenderPass;
+
     class VK_Renderer;
-    class VK_GraphicPipeline : public IGraphicPipeline {
-        const VK_Device *device;
-        const VK_Renderer *renderer;
-        VkPipelineLayout pipeline_layout_handle;
-        VkPipeline handle;
+
+    class VK_VertexLayout;
+
+    class VK_GraphicPipeline : public GraphicPipeline {
+        const VK_Device *device = nullptr;
+        const VK_Renderer *renderer = nullptr;
+        VkPipelineLayout pipeline_layout_handle{};
+        VkPipeline handle = VK_NULL_HANDLE;
     public:
-        VK_GraphicPipeline(const VK_Device *device,const VK_Renderer* renderer);
+        VK_GraphicPipeline(const VK_Device *device, const VK_Renderer *renderer);
 
         void setDrawFlags(DRAW_FLAGS flags) override;
 
         DRAW_FLAGS getDrawFlags() const override;
 
-        void setShaders(const Shader *vertex, const Shader *fragment) override;
+        void setShaders(const Shader *vertex, const Shader *fragment, const VertexLayout *layout);
 
-        void setShaders(const Shader *vertex, const Shader *geometry, const Shader *fragment) override;
+        void setShaders(const Shader *vertex, const Shader *geometry, const Shader *fragment, const VertexLayout *layout);
 
         ~VK_GraphicPipeline() override;
 

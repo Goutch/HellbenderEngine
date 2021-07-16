@@ -3,8 +3,7 @@
 #include "VK_Texture.h"
 #include "VK_Mesh.h"
 #include "VK_Shader.h"
-#include "VK_Device.h"
-
+#include "VK_VertexLayout.h"
 namespace HBE {
 
     VK_ResourceFactory::VK_ResourceFactory(const VK_Device *device, const VK_Renderer *renderer) {
@@ -12,27 +11,29 @@ namespace HBE {
         this->renderer = renderer;
     }
 
-    IGraphicPipeline *VK_ResourceFactory::createGraphicsPipeline() const {
-        return new VK_GraphicPipeline(device,renderer);
+    GraphicPipeline *VK_ResourceFactory::createGraphicsPipeline() const {
+        return new VK_GraphicPipeline(device, renderer);
     }
 
-    ITexture *VK_ResourceFactory::createTexture() const {
+    Texture *VK_ResourceFactory::createTexture() const {
         return new VK_Texture(device);
     }
 
-    IMesh *VK_ResourceFactory::createMesh() const {
+    Mesh *VK_ResourceFactory::createMesh() const {
         return new VK_Mesh(device);
     }
 
-    IShader *VK_ResourceFactory::createShader() const {
+    Shader *VK_ResourceFactory::createShader() const {
         return new VK_Shader(device);
     }
 
-    IComputePipeline *VK_ResourceFactory::createComputePipeline() const {
+    ComputePipeline *VK_ResourceFactory::createComputePipeline() const {
         Log::error("Compute shaders not implemented in Vulkan");
         return nullptr;
     }
 
-
+    VertexLayout *VK_ResourceFactory::createVertexLayout() const {
+        return new VK_VertexLayout();
+    }
 }
 

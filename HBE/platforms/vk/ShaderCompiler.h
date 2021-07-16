@@ -1,7 +1,7 @@
 #pragma once
 #include "vector"
 #include "string"
-#include "core/resource/IShader.h"
+#include "core/resource/Shader.h"
 namespace HBE{
     class ShaderCompiler {
     public:

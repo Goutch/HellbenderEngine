@@ -1,12 +1,15 @@
 
+#include <array>
 #include "VK_Mesh.h"
 #include "VK_Device.h"
 
 namespace HBE {
     VK_Mesh::VK_Mesh(const HBE::VK_Device *device) {
-        this->device=device;
+        this->device = device;
     }
+    void VK_Mesh::setVertices(void *vertices, size_t count, const VertexLayout *layout) {
 
+    }
     void VK_Mesh::setIndices(const std::vector<unsigned int> &data) {
 
     }
@@ -46,6 +49,10 @@ namespace HBE {
     void VK_Mesh::unbind() const {
 
     }
+
+
+
+
 }
 
 

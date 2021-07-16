@@ -12,7 +12,7 @@
 #include <core/entity/component/CameraController.h>
 #include <core/entity/component/InstancesRenderer.h>
 #include <core/graphics/Window.h>
-
+#include <core/graphics/Renderer.h>
 namespace HBE {
     Scene *Application::scene = nullptr;
     Window *Application::window = nullptr;
@@ -74,6 +74,7 @@ namespace HBE {
             scene->update(delta_t);
             onUpdate.invoke(delta_t);
             scene->draw();
+            Graphics::getRenderer()->beginFrame();
             onDraw.invoke();
             if (Camera::main)
                 Graphics::render(Graphics::getRenderTarget(), Camera::main->getProjectionMatrix(),

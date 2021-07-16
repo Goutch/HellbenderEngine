@@ -387,7 +387,7 @@ __inline const char* GetBuiltInVariableString(TBuiltInVariable v)
     case EbvClipDistance:         return "ClipDistance";
     case EbvCullDistance:         return "CullDistance";
     case EbvNormal:               return "Normal";
-    case EbvVertex:               return "Vertex";
+    case EbvVertex:               return "VertexLayout";
     case EbvMultiTexCoord0:       return "MultiTexCoord0";
     case EbvMultiTexCoord1:       return "MultiTexCoord1";
     case EbvMultiTexCoord2:       return "MultiTexCoord2";

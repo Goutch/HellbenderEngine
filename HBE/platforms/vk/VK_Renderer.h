@@ -48,6 +48,8 @@ namespace HBE {
 
         void present(const RenderTarget *render_target) override;
 
+        void beginFrame() override;
+
         void endFrame() override;
 
         void draw(const Transform &transform, const Mesh &mesh, const Material &material) override;
@@ -60,7 +62,7 @@ namespace HBE {
 
         ~VK_Renderer();
 
-        const IResourceFactory *getResourceFactory() const override;
+        const ResourceFactory *getResourceFactory() const override;
 
         const VkCommandBuffer *getCurrentCommandBuffer() const;
 

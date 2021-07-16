@@ -1,12 +1,12 @@
 #pragma once
 
-#include "core/resource/IShader.h"
+#include "core/resource/Shader.h"
 #include "vulkan/vulkan.h"
 #include "string"
 namespace HBE {
     class VK_Renderer;
     class VK_Device;
-    class VK_Shader : public IShader {
+    class VK_Shader : public Shader {
         const VK_Device* device;
         VkShaderModule handle;
     public:

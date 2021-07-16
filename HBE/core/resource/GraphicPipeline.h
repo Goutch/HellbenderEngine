@@ -1,76 +1,67 @@
 #pragma once
 
-#include "core/serialization/Serializable.h"
-
-#include "glm/glm.hpp"
 #include "string"
 #include "vector"
-#include "Core.h"
-#include "map"
-
-#include "Resource.h"
+#include "glm/glm.hpp"
 #include "core/graphics/DrawFlags.h"
+
 namespace HBE {
-
     class Shader;
-
-    class IGraphicPipeline;
-
-    class HB_API GraphicPipeline final : public Resource {
-        IGraphicPipeline *instance;
+    class VertexLayout;
+    class GraphicPipeline {
     public:
-        GraphicPipeline();
+        virtual ~GraphicPipeline() = default;
 
-        ~GraphicPipeline();
+        virtual void bind() const = 0;
 
-        void setShaders(const Shader *vertex, const Shader *geometry,const Shader *fragment);
+        virtual void unbind() const = 0;
 
-        void setShaders(const Shader *vertex, const Shader *fragment);
+        virtual void setDrawFlags(DRAW_FLAGS flags) = 0;
 
-        void bind() const;
+        virtual DRAW_FLAGS getDrawFlags() const = 0;
 
-        void unbind() const;
+        virtual void setShaders(const Shader *vertex, const Shader *fragment, const VertexLayout *layout) = 0;
 
-        void setDrawFlags(DRAW_FLAGS flags);
+        virtual void setShaders(const Shader *vertex, const Shader *geometry, const Shader *fragment,
+                                const VertexLayout *layout) = 0;
 
-        DRAW_FLAGS getDrawFlags() const;
+        virtual void setUniform(const std::string &name, int i) const = 0;
 
-        void setUniform(const std::string &name, int i) const;
+        virtual void setUniform(const std::string &name, float f) const = 0;
 
-        void setUniform(const std::string &name, float f) const;
+        virtual void setUniform(const std::string &name, const glm::vec2 &v) const = 0;
 
-        void setUniform(const std::string &name, const glm::vec2 &v) const;
+        virtual void setUniform(const std::string &name, const glm::vec3 &v) const = 0;
 
-        void setUniform(const std::string &name, const glm::vec3 &v) const;
+        virtual void setUniform(const std::string &name, const glm::vec4 &v) const = 0;
 
-        void setUniform(const std::string &name, const glm::vec4 &v) const;
+        virtual void setUniform(const std::string &name, const glm::mat3 &m) const = 0;
 
-        void setUniform(const std::string &name, const glm::mat3 &m) const;
+        virtual void setUniform(const std::string &name, const glm::mat4 &m) const = 0;
 
-        void setUniform(const std::string &name, const glm::mat4 &m) const;
+        virtual void setUniform(unsigned int location, int i) const = 0;
 
-        void setUniform(unsigned int location, int i) const;
+        virtual void setUniform(unsigned int location, float f) const = 0;
 
-        void setUniform(unsigned int location, float f) const;
+        virtual void setUniform(unsigned int location, const glm::vec2 &v) const = 0;
 
-        void setUniform(unsigned int location, const glm::vec2 &v) const;
+        virtual void setUniform(unsigned int location, const glm::vec3 &v) const = 0;
 
-        void setUniform(unsigned int location, const glm::vec3 &v) const;
+        virtual void setUniform(unsigned int location, const glm::vec4 &v) const = 0;
 
-        void setUniform(unsigned int location, const glm::vec4 &v) const;
+        virtual void setUniform(unsigned int location, const glm::mat3 &m) const = 0;
 
-        void setUniform(unsigned int location, const glm::mat3 &m) const;
+        virtual void setUniform(unsigned int location, const glm::mat4 &m) const = 0;
 
-        void setUniform(unsigned int location, const glm::mat4 &m) const;
+        virtual void setUniformIntArray(unsigned int location, int *i, unsigned int count) const = 0;
 
-        void setUniformIntArray(unsigned int location, int *i, unsigned int count) const;
+        virtual void setUniformFloatArray(unsigned int location, float *f, unsigned int count) const = 0;
 
-        void setUniformFloatArray(unsigned int location, float *f, unsigned int count) const;
+        virtual void setUniformVec2Array(unsigned int location, const glm::vec2 *v, unsigned int count) const = 0;
 
-        void setUniformVec2Array(unsigned int location, const glm::vec2 *v, unsigned int count) const;
+        virtual void setUniformVec3Array(unsigned int location, const glm::vec3 *v, unsigned int count) const = 0;
 
-        void setUniformVec3Array(unsigned int location, const glm::vec3 *v, unsigned int count) const;
+        virtual void setUniformVec4Array(unsigned int location, const glm::vec4 *v, unsigned int count) const = 0;
 
-        void setUniformVec4Array(unsigned int location, const glm::vec4 *v, unsigned int count) const;
     };
 }

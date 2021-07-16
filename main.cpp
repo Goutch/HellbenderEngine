@@ -1,41 +1,54 @@
 #include "HBE.h"
 
 using namespace HBE;
-static Material *material;
-static GraphicPipeline* pipeline;
-static Transform* transform;
-static Mesh* mesh;
+using namespace Resources;
+static Transform *transform;
+
+
 void onUpdate(float delta) {
     //Shut down app if escape key is pressed
-    if (Input::getKey(KEY::ESCAPE))
-    {
+    if (Input::getKey(KEY::ESCAPE)) {
         Application::quit();
     }
 }
-void onDraw()
-{
-    Graphics::draw(*transform, *mesh,*material);
+
+void onDraw() {
+    Graphics::draw(*transform, *get<Mesh>("mesh"), *get<Material>("material"));
 }
+
+struct Vertex {
+    vec2 position;
+    vec3 color;
+};
 
 int main() {
 
     Application::init();
     //-----------------------SETUP--------------------
 
-    ShaderDB::load("vert","../../res/shaders/VK.vert",SHADER_TYPE::VERTEX);
-    ShaderDB::load("frag","../../res/shaders/VK.frag",SHADER_TYPE::FRAGMENT);
 
-   /*vs->load("../../res/shaders/vert.spv", SHADER_TYPE::VERTEX);
-    fs->load("../../res/shaders/frag.spv", SHADER_TYPE::FRAGMENT);*/
-    GraphicPipeline *pipeline = new GraphicPipeline();
-    pipeline->setShaders(ShaderDB::get("vert"),ShaderDB::get("frag"));
+    auto frag = createInRegistry<Shader>("frag");
+    auto vert = createInRegistry<Shader>("vert");
+    auto pipeline = createInRegistry<GraphicPipeline>("pipeline");
+    auto layout = createInRegistry<VertexLayout>("layout");
+    auto mesh = createInRegistry<Mesh>("mesh");
+    Material* material = createInRegistry<Material>("material");
 
+    frag->load("../../res/shaders/VK.vert", SHADER_TYPE::VERTEX);
+    vert->load("../../res/shaders/VK.frag", SHADER_TYPE::FRAGMENT);
+    layout->setLayoutTypes({GLSL_TYPE::VEC2F, GLSL_TYPE::VEC3F});
+    pipeline->setShaders(vert, frag, layout);
 
+    const std::vector<Vertex> vertices = {
+            {{0.0f,  -0.5f}, {1.0f, 0.0f, 0.0f}},
+            {{0.5f,  0.5f},  {0.0f, 1.0f, 0.0f}},
+            {{-0.5f, 0.5f},  {0.0f, 0.0f, 1.0f}}
+    };
+    mesh->setVertices((void *) vertices.data(), vertices.size(), layout);
     material = new Material();
     material->setPipeline(pipeline);
 
-    transform=new Transform();
-    mesh=new Mesh();
+    transform = new Transform();
     //-----------------------EVENTS------------------
     Application::onUpdate.subscribe(&onUpdate);
     Application::onDraw.subscribe(&onDraw);
@@ -44,9 +57,6 @@ int main() {
     //-----------------------CLEANUP------------------
     Application::onUpdate.unsubscribe(&onUpdate);
     Application::onDraw.unsubscribe(&onDraw);
-    delete pipeline;
-    delete material;
-    delete mesh;
     delete transform;
     //-----------------------TERMINATE------------------
     Application::terminate();

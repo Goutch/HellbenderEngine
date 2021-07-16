@@ -21,7 +21,7 @@ namespace HBE {
 
     class Window;
 
-    class IResourceFactory;
+    class ResourceFactory;
 
     class Renderer {
     public:
@@ -36,12 +36,14 @@ namespace HBE {
 
         virtual void endFrame() = 0;
 
+        virtual void beginFrame() = 0;
+
         virtual void draw(const Transform &transform, const Mesh &mesh, const Material &material) = 0;
 
         virtual void drawInstanced(const Mesh &mesh, const Material &material) = 0;
 
         virtual void clear() const = 0;
 
-        virtual const IResourceFactory *getResourceFactory() const = 0;
+        virtual const ResourceFactory *getResourceFactory() const = 0;
     };
 }

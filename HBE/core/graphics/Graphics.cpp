@@ -9,11 +9,11 @@
 #include <core/graphics/RenderTarget.h>
 #include "core/resource/GraphicPipeline.h"
 #include <Configs.h>
+#include <core/resource/Model.h>
 #include "Renderer.h"
 #include "core/resource/Material.h"
 #include "Window.h"
-#include "core/resource/ShaderDB.h"
-
+#include "core/resource/Resources.h"
 namespace HBE {
     const Mesh *Graphics::DEFAULT_CUBE = nullptr;
     const Mesh *Graphics::DEFAULT_QUAD = nullptr;
@@ -140,7 +140,13 @@ void main()
     }
 
     void Graphics::terminate() {
-        ShaderDB::terminate();
+        ResourcesRegistry<Mesh>::clear();
+        ResourcesRegistry<Texture>::clear();
+        ResourcesRegistry<GraphicPipeline>::clear();
+        ResourcesRegistry<ComputePipeline>::clear();
+        ResourcesRegistry<Model>::clear();
+        ResourcesRegistry<Shader>::clear();
+        ResourcesRegistry<VertexLayout>::clear();
         delete DEFAULT_MESH_PIPELINE;
         delete DEFAULT_MESH_MATERIAL;
         delete DEFAULT_SCREEN_PIPELINE;

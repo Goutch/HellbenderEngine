@@ -2,28 +2,31 @@
 
 #include <core/resource/Material.h>
 #include <core/resource/Model.h>
-#include "core/resource/IResourceFactory.h"
+#include "core/resource/ResourceFactory.h"
 
 namespace HBE {
 
     class VK_Device;
+
     class VK_Renderer;
-    class VK_ResourceFactory : public IResourceFactory {
+
+    class VK_ResourceFactory : public ResourceFactory {
         const VK_Device *device;
         const VK_Renderer *renderer;
     public:
+        VK_ResourceFactory(const VK_Device *device, const VK_Renderer *renderer);
 
-        VK_ResourceFactory(const VK_Device *device,const VK_Renderer* renderer);
+        GraphicPipeline *createGraphicsPipeline() const override;
 
-        IGraphicPipeline *createGraphicsPipeline() const override;
+        Texture *createTexture() const override;
 
-        ITexture *createTexture() const override;
+        Mesh *createMesh() const override;
 
-        IMesh *createMesh() const override;
+        Shader *createShader() const override;
 
-        IShader *createShader() const override;
+        ComputePipeline *createComputePipeline() const override;
 
-        IComputePipeline *createComputePipeline() const override;
+        VertexLayout *createVertexLayout() const;
     };
 }
 
