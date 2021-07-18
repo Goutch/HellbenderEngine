@@ -26,27 +26,31 @@ namespace HBE {
         static std::unordered_map<std::string, T *> registry;
     public:
         static void clear() {
-            for (auto n_t:registry) {
+            for (auto n_t:ResourcesRegistry<T>::registry) {
                 delete n_t.second;
             }
-            registry.clear();
+            ResourcesRegistry<T>::registry.clear();
+        }
+
+        static bool exist(std::string &name) {
+            return ResourcesRegistry<T>::registry.find(name) != registry.end();
         }
 
         static void add(std::string &name, T *t) {
-            registry.emplace(name, t);
+            ResourcesRegistry<T>::registry.emplace(name, t);
         }
 
         static T *get(std::string &name) {
 #ifdef DEBUG_MODE
-            if (registry.find(name) == registry.end()) {
+            if (!exist(name)) {
                 Log::error("Cant find resource:" + name);
             }
 #endif
-            return registry.at(name);
+            return ResourcesRegistry<T>::registry.at(name);
         }
 
         static void remove(std::string &name) {
-            registry.erase(name);
+            ResourcesRegistry<T>::registry.erase(name);
         }
     };
 
@@ -56,6 +60,11 @@ namespace HBE {
     namespace Resources {
         template<class T>
         static T *get(std::string unique_name) {
+#ifdef DEBUG_MODE
+            if (!ResourcesRegistry<T>::exist(unique_name)) {
+                Log::warning("Cant find resource:" + unique_name);
+            }
+#endif
             return ResourcesRegistry<T>::get(unique_name);
         }
 
@@ -104,14 +113,23 @@ namespace HBE {
          */
         template<class T>
         static T *createInRegistry(std::string unique_name) {
+#ifdef DEBUG_MODE
+            if (ResourcesRegistry<T>::exist(unique_name)) {
+                delete get<T>(unique_name);
+                ResourcesRegistry<T>::remove(unique_name);
+                Log::warning("Resource with name:\"" + unique_name + "\" already exist in registry, deleted old resource.");
+            }
+#endif
             auto ptr = create<T>();
-            ResourcesRegistry<T>::add(unique_name,ptr);
+            ResourcesRegistry<T>::add(unique_name, ptr);
             return ptr;
         }
+
         template<>
         Material *create<Material>() {
             return new Material();
         }
+
         template<>
         Mesh *create<Mesh>() {
             return Graphics::getRenderer()->getResourceFactory()->createMesh();

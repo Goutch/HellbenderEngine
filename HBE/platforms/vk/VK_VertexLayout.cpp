@@ -13,7 +13,7 @@ namespace HBE {
         int location = 0;
         attribute_descriptions.resize(layout.size());
         for (size_t i = 0; i < layout.size(); ++i) {
-            attribute_descriptions[i].binding = i;
+            attribute_descriptions[i].binding = 0;
             attribute_descriptions[i].location = location;
             attribute_descriptions[i].offset = offset;
             switch (layout[i]) {

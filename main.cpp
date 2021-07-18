@@ -32,10 +32,10 @@ int main() {
     auto pipeline = createInRegistry<GraphicPipeline>("pipeline");
     auto layout = createInRegistry<VertexLayout>("layout");
     auto mesh = createInRegistry<Mesh>("mesh");
-    Material* material = createInRegistry<Material>("material");
+    Material *material = createInRegistry<Material>("material");
 
-    frag->load("../../res/shaders/VK.vert", SHADER_TYPE::VERTEX);
-    vert->load("../../res/shaders/VK.frag", SHADER_TYPE::FRAGMENT);
+    vert->load("../../res/shaders/VK.vert", SHADER_TYPE::VERTEX);
+    frag->load("../../res/shaders/VK.frag", SHADER_TYPE::FRAGMENT);
     layout->setLayoutTypes({GLSL_TYPE::VEC2F, GLSL_TYPE::VEC3F});
     pipeline->setShaders(vert, frag, layout);
 
@@ -45,9 +45,7 @@ int main() {
             {{-0.5f, 0.5f},  {0.0f, 0.0f, 1.0f}}
     };
     mesh->setVertices((void *) vertices.data(), vertices.size(), layout);
-    material = new Material();
     material->setPipeline(pipeline);
-
     transform = new Transform();
     //-----------------------EVENTS------------------
     Application::onUpdate.subscribe(&onUpdate);
