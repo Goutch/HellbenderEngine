@@ -1,30 +1,31 @@
 #include "VK_ResourceFactory.h"
 #include "VK_GraphicPipeline.h"
+#include "VK_Renderer.h"
+#include "VK_Device.h"
 #include "VK_Texture.h"
+#include "VK_CommandPool.h"
 #include "VK_Mesh.h"
 #include "VK_Shader.h"
 #include "VK_VertexLayout.h"
 namespace HBE {
-
-    VK_ResourceFactory::VK_ResourceFactory(const VK_Device *device, const VK_Renderer *renderer) {
-        this->device = device;
+    VK_ResourceFactory::VK_ResourceFactory(const VK_Renderer *renderer) {
         this->renderer = renderer;
     }
 
     GraphicPipeline *VK_ResourceFactory::createGraphicsPipeline() const {
-        return new VK_GraphicPipeline(device, renderer);
+        return new VK_GraphicPipeline(renderer->getDevice(), renderer);
     }
 
     Texture *VK_ResourceFactory::createTexture() const {
-        return new VK_Texture(device);
+        return new VK_Texture(renderer->getDevice());
     }
 
     Mesh *VK_ResourceFactory::createMesh() const {
-        return new VK_Mesh(device);
+        return new VK_Mesh(renderer->getDevice(),renderer->getCommandPool());
     }
 
     Shader *VK_ResourceFactory::createShader() const {
-        return new VK_Shader(device);
+        return new VK_Shader(renderer->getDevice());
     }
 
     ComputePipeline *VK_ResourceFactory::createComputePipeline() const {
@@ -35,5 +36,7 @@ namespace HBE {
     VertexLayout *VK_ResourceFactory::createVertexLayout() const {
         return new VK_VertexLayout();
     }
+
+
 }
 

@@ -119,7 +119,7 @@ namespace HBE {
         return attribute_descriptions;
     }
 
-    int VK_VertexLayout::getBytesPerVertex() {
+    int VK_VertexLayout::getBytesPerVertex() const {
         int bytes_per_vertex = 0;
         for (size_t i = 0; i < layout.size(); ++i) {
             switch (layout[i]) {

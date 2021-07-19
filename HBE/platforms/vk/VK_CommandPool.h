@@ -10,6 +10,7 @@ namespace HBE {
     class VK_Swapchain;
 
     class VK_CommandPool {
+        mutable int current=-1;
         VkCommandPool handle;
         const VK_Device *device;
         std::vector<VkCommandBuffer> command_buffers;
@@ -25,6 +26,8 @@ namespace HBE {
         void end(int i) const;
 
         const std::vector<VkCommandBuffer> &getBuffers() const;
+
+        const VkCommandBuffer &getCurrentBuffer() const;
 
         void clear();
 

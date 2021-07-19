@@ -2,19 +2,28 @@
 
 #include "core/resource/Mesh.h"
 #include "vector"
+#include "vulkan/vulkan.h"
+#include "set"
+#include "VK_CommandPool.h"
+
 namespace HBE {
     class VK_Device;
 
     class VK_Mesh : public Mesh {
+        const VK_CommandPool *command_pool;
         const VK_Device *device;
-    public:
-        VK_Mesh(const VK_Device *device);
+        std::set<unsigned int> positions;
+        mutable std::unordered_map<unsigned int,VkBuffer> buffers;
+        mutable std::unordered_map<unsigned int,VkDeviceMemory> memories;
 
-        ~VK_Mesh() = default;
+    public:
+        VK_Mesh(const VK_Device *device, const VK_CommandPool *command_pool);
+
+        ~VK_Mesh() override;
 
         void setIndices(const std::vector<unsigned int> &data) override;
 
-        void setVertices(void *vertices, size_t count,const VertexLayout *layout) override;
+        void setVertices(int position, void *vertices, size_t count, const VertexLayout *layout) override;
 
         void setBuffer(unsigned int position, const std::vector<int> &data) override;
 
@@ -34,6 +43,7 @@ namespace HBE {
 
         void unbind() const override;
 
+        uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
     };
 
 }

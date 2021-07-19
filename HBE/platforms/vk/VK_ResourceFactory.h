@@ -6,15 +6,12 @@
 
 namespace HBE {
 
-    class VK_Device;
-
     class VK_Renderer;
 
     class VK_ResourceFactory : public ResourceFactory {
-        const VK_Device *device;
-        const VK_Renderer *renderer;
+        const VK_Renderer* renderer;
     public:
-        VK_ResourceFactory(const VK_Device *device, const VK_Renderer *renderer);
+        VK_ResourceFactory(const VK_Renderer *renderer);
 
         GraphicPipeline *createGraphicsPipeline() const override;
 

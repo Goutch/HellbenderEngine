@@ -12,6 +12,6 @@ namespace HBE {
 
         virtual void setLayoutTypes(std::vector<GLSL_TYPE> layout) = 0;
 
-        virtual int getBytesPerVertex()=0;
+        virtual int getBytesPerVertex() const=0;
     };
 }

@@ -8,11 +8,10 @@ namespace HBE {
     class ComputeBuffer;
 
     class ComputePipeline : public Resource {
-        virtual setShader(const Shader *shader) = 0;
+        virtual void setShader(const Shader *shader) = 0;
 
-        virtual setComputeBuffer(ComputeBuffer
-        * buffer)=0;
+        virtual void setComputeBuffer(ComputeBuffer* buffer)=0;
 
-        virtual void dispatch(int x, int y, int z) = 0
+        virtual void dispatch(int x, int y, int z) = 0;
     };
 }

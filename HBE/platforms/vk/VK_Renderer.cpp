@@ -28,7 +28,6 @@ namespace HBE {
         device = new VK_Device(*physical_device);
         swapchain = new VK_Swapchain(width, height, surface->getHandle(), *device);
         command_pool = new VK_CommandPool(device, MAX_FRAMES_IN_FLIGHT);
-        factory = new VK_ResourceFactory(device, this);
 
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
             image_available_semaphores.push_back(new VK_Semaphore(*device));
@@ -38,6 +37,8 @@ namespace HBE {
         images_in_flight_fences.resize(swapchain->getRenderPass().getFrameBuffers().size(), nullptr);
         Application::onWindowClosed.subscribe(this, &VK_Renderer::onWindowClosed);
         window->onWindowSizeChange.subscribe(this, &VK_Renderer::onWindowSizeChange);
+
+        factory = new VK_ResourceFactory(this);
     }
 
     void VK_Renderer::onWindowSizeChange(int width, int height) {
@@ -89,6 +90,7 @@ namespace HBE {
                              const mat4 &view_matrix) {
 
     }
+
     void VK_Renderer::beginFrame() {
         //wait for last frame i to finish
         frames_in_flight_fences[current_frame]->wait();
@@ -113,7 +115,10 @@ namespace HBE {
         }
 
         images_in_flight_fences[current_image] = frames_in_flight_fences[current_frame];
+
+
     }
+
     void VK_Renderer::present(const HBE::RenderTarget *render_target) {
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -150,7 +155,7 @@ namespace HBE {
         presentInfo.pImageIndices = &current_image;
         presentInfo.pResults = nullptr; // Optional
 
-        VkResult result= vkQueuePresentKHR(device->getPresentQueue(), &presentInfo);
+        VkResult result = vkQueuePresentKHR(device->getPresentQueue(), &presentInfo);
 
         if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || windowResized) {
             windowResized = false;
@@ -162,22 +167,23 @@ namespace HBE {
     }
 
     void VK_Renderer::endFrame() {
+
         current_frame = (current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
     }
 
     void VK_Renderer::draw(const HBE::Transform &transform,
                            const HBE::Mesh &mesh,
                            const HBE::Material &material) {
-
-        const std::vector<VkCommandBuffer> &command_buffers = command_pool->getBuffers();
         command_pool->begin(current_frame);
-        swapchain->getRenderPass().begin(command_buffers[current_frame], current_image);
-        material.getPipeline()->bind();
-        vkCmdDraw(command_buffers[current_frame], 3, 1, 0, 0);
-        material.getPipeline()->unbind();
-        swapchain->getRenderPass().end(command_buffers[current_frame]);
-        command_pool->end(current_frame);
+        swapchain->getRenderPass().begin(command_pool->getCurrentBuffer(), current_image);
 
+        material.getPipeline()->bind();
+        mesh.bind();
+        vkCmdDraw(command_pool->getCurrentBuffer(), static_cast<glm::uint32_t>(mesh.getVertexCount()), 1, 0, 0);
+        mesh.unbind();
+        material.getPipeline()->unbind();
+        swapchain->getRenderPass().end(command_pool->getCurrentBuffer());
+        command_pool->end(current_frame);
     }
 
     void VK_Renderer::drawInstanced(const HBE::Mesh &mesh,
@@ -189,12 +195,16 @@ namespace HBE {
 
     }
 
-    const VkCommandBuffer *VK_Renderer::getCurrentCommandBuffer() const {
-        return &command_pool->getBuffers()[current_frame];
-    }
-
     const VK_Swapchain &VK_Renderer::getSwapchain() const {
         return *swapchain;
+    }
+
+    const VK_Device *VK_Renderer::getDevice() const {
+        return device;
+    }
+
+    const VK_CommandPool *VK_Renderer::getCommandPool() const {
+        return command_pool;
     }
 
 

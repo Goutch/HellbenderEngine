@@ -12,12 +12,16 @@ namespace HBE {
     class VertexLayout;
 
     class HB_API Mesh : public Resource {
+    protected:
         unsigned int vertex_count = 0;
         unsigned int index_count = 0;
         bool has_index_buffer = false;
         unsigned int instance_count = 1;
     public:
-
+        virtual ~Mesh()
+        {
+            Log::message("mesh destroyed");
+        };
 
         unsigned int getVertexCount() const;
 
@@ -27,7 +31,7 @@ namespace HBE {
 
         bool hasIndexBuffer() const;
 
-        virtual void setVertices(void *vertices, size_t count, const VertexLayout *layout) = 0;
+        virtual void setVertices(int position, void *vertices, size_t count, const VertexLayout *layout) = 0;
 
         virtual void setIndices(const std::vector<unsigned int> &data) = 0;
 

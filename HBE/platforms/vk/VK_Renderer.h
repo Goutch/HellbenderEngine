@@ -25,7 +25,8 @@ namespace HBE {
 
     class VK_Fence;
 
-    class VK_Renderer : public Renderer {
+    class
+    VK_Renderer : public Renderer {
         const unsigned int MAX_FRAMES_IN_FLIGHT = 2;
 
         VK_Window *window;
@@ -64,8 +65,9 @@ namespace HBE {
 
         const ResourceFactory *getResourceFactory() const override;
 
-        const VkCommandBuffer *getCurrentCommandBuffer() const;
+        const VK_CommandPool *getCommandPool() const;
 
+        const VK_Device *getDevice() const;
         void onWindowClosed();
 
         void onWindowSizeChange(int width, int height);

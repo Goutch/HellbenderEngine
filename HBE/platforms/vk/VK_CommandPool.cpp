@@ -46,6 +46,7 @@ namespace HBE {
 
 
     void HBE::VK_CommandPool::begin(int i) const {
+        current=i;
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
         beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT; // Optional
@@ -72,6 +73,10 @@ namespace HBE {
 
     void VK_CommandPool::reset(int i) {
         vkResetCommandBuffer(command_buffers[i],0);
+    }
+
+    const VkCommandBuffer &VK_CommandPool::getCurrentBuffer() const {
+        return command_buffers[current];
     }
 
 

@@ -3,7 +3,7 @@
 #include "VK_Shader.h"
 #include "core/graphics/Window.h"
 
-#include "platforms/vk/VK_Device.h"
+#include "VK_Device.h"
 
 #include "VK_RenderPass.h"
 #include "VK_CommandPool.h"
@@ -24,11 +24,11 @@ namespace HBE {
 
 
     void VK_GraphicPipeline::bind() const {
-        vkCmdBindPipeline(*renderer->getCurrentCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, handle);
+        vkCmdBindPipeline(renderer->getCommandPool()->getCurrentBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, handle);
     }
 
     void VK_GraphicPipeline::unbind() const {
-        vkCmdBindPipeline(*renderer->getCurrentCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, handle);
+        vkCmdBindPipeline(renderer->getCommandPool()->getCurrentBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, handle);
     }
 
     void VK_GraphicPipeline::setDrawFlags(DRAW_FLAGS flags) {

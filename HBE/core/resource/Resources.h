@@ -8,36 +8,39 @@
 #include "core/graphics/Renderer.h"
 #include "core/graphics/Graphics.h"
 
+#include "core/resource/Shader.h"
+#include "core/resource/GraphicPipeline.h"
+#include "core/resource/VertexLayout.h"
+#include "core/resource/ComputePipeline.h"
+#include "core/resource/Mesh.h"
+#include "core/resource/Material.h"
+#include "core/resource/Texture.h"
+#include "core/resource/Model.h"
+
 namespace HBE {
-    class GraphicPipeline;
-
-    class Texture;
-
-    class Mesh;
-
-    class Shader;
-
-    class ComputePipeline;
-
-    class VertexLayout;
 
     template<typename T>
     class ResourcesRegistry {
         static std::unordered_map<std::string, T *> registry;
     public:
         static void clear() {
-            for (auto n_t:ResourcesRegistry<T>::registry) {
+            Log::message("clear with count:" + std::to_string(ResourcesRegistry<T>::registry.size()));
+            for (auto &n_t:ResourcesRegistry<T>::registry) {
+                Log::message("destroy res: " + n_t.first);
                 delete n_t.second;
             }
             ResourcesRegistry<T>::registry.clear();
         }
 
         static bool exist(std::string &name) {
+            Log::message("exist with count:" + std::to_string(ResourcesRegistry<T>::registry.size()));
             return ResourcesRegistry<T>::registry.find(name) != registry.end();
         }
 
         static void add(std::string &name, T *t) {
             ResourcesRegistry<T>::registry.emplace(name, t);
+            Log::message("added:" + name);
+            Log::message("add with count:" + std::to_string(ResourcesRegistry<T>::registry.size()));
         }
 
         static T *get(std::string &name) {
@@ -46,10 +49,13 @@ namespace HBE {
                 Log::error("Cant find resource:" + name);
             }
 #endif
+            Log::message("get with count:" + std::to_string(ResourcesRegistry<T>::registry.size()));
             return ResourcesRegistry<T>::registry.at(name);
         }
 
         static void remove(std::string &name) {
+            Log::message("remove with count:" + std::to_string(ResourcesRegistry<T>::registry.size()));
+            delete get(name);
             ResourcesRegistry<T>::registry.erase(name);
         }
     };
@@ -68,8 +74,25 @@ namespace HBE {
             return ResourcesRegistry<T>::get(unique_name);
         }
 
+
         template<class T>
-        static void remove(std::string unique_name) {
+        static void destroy() {
+            ResourcesRegistry<T>::clear();
+        }
+
+        static void destroyAll() {
+            Resources::destroy<Mesh>();
+            Resources::destroy<Texture>();
+            Resources::destroy<GraphicPipeline>();
+            Resources::destroy<ComputePipeline>();
+            Resources::destroy<Model>();
+            Resources::destroy<Shader>();
+            Resources::destroy<VertexLayout>();
+            Resources::destroy<Material>();
+        }
+
+        template<class T>
+        static void destroy(std::string unique_name) {
             return ResourcesRegistry<T>::remove(unique_name);
         }
 
@@ -128,6 +151,11 @@ namespace HBE {
         template<>
         Material *create<Material>() {
             return new Material();
+        }
+
+        template<>
+        Model *create<Model>() {
+            return new Model();
         }
 
         template<>

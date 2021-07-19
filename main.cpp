@@ -32,7 +32,7 @@ int main() {
     auto pipeline = createInRegistry<GraphicPipeline>("pipeline");
     auto layout = createInRegistry<VertexLayout>("layout");
     auto mesh = createInRegistry<Mesh>("mesh");
-    Material *material = createInRegistry<Material>("material");
+    auto *material = createInRegistry<Material>("material");
 
     vert->load("../../res/shaders/VK.vert", SHADER_TYPE::VERTEX);
     frag->load("../../res/shaders/VK.frag", SHADER_TYPE::FRAGMENT);
@@ -40,11 +40,11 @@ int main() {
     pipeline->setShaders(vert, frag, layout);
 
     const std::vector<Vertex> vertices = {
-            {{0.0f,  -0.5f}, {1.0f, 0.0f, 0.0f}},
-            {{0.5f,  0.5f},  {0.0f, 1.0f, 0.0f}},
-            {{-0.5f, 0.5f},  {0.0f, 0.0f, 1.0f}}
+            {{0.0f, -0.5f}, {1.0f, 1.0f, 1.0f}},
+            {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+            {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
     };
-    mesh->setVertices((void *) vertices.data(), vertices.size(), layout);
+    mesh->setVertices(0, (void *) vertices.data(), vertices.size(), layout);
     material->setPipeline(pipeline);
     transform = new Transform();
     //-----------------------EVENTS------------------

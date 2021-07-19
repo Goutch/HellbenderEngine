@@ -10,7 +10,7 @@ namespace HBE {
         VkVertexInputBindingDescription binding_description{};
         std::vector<VkVertexInputAttributeDescription> attribute_descriptions;
     public:
-        int getBytesPerVertex() override;
+        int getBytesPerVertex() const override;
 
         void setLayoutTypes(std::vector<GLSL_TYPE> layout);
 

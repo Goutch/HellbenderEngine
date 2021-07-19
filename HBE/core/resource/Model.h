@@ -1,3 +1,4 @@
+#pragma once
 #include <core/resource/Material.h>
 #include <core/resource/Mesh.h>
 #include <core/utility/Log.h>
