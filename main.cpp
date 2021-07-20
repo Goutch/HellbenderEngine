@@ -1,7 +1,7 @@
 #include "HBE.h"
 
 using namespace HBE;
-using namespace Resources;
+
 static Transform *transform;
 
 
@@ -13,7 +13,7 @@ void onUpdate(float delta) {
 }
 
 void onDraw() {
-    Graphics::draw(*transform, *get<Mesh>("mesh"), *get<Material>("material"));
+    Graphics::draw(*transform, *Resources::get<Mesh>("mesh"), *Resources::get<Material>("material"));
 }
 
 struct Vertex {
@@ -27,12 +27,12 @@ int main() {
     //-----------------------SETUP--------------------
 
 
-    auto frag = createInRegistry<Shader>("frag");
-    auto vert = createInRegistry<Shader>("vert");
-    auto pipeline = createInRegistry<GraphicPipeline>("pipeline");
-    auto layout = createInRegistry<VertexLayout>("layout");
-    auto mesh = createInRegistry<Mesh>("mesh");
-    auto *material = createInRegistry<Material>("material");
+    auto frag = Resources::createInRegistry<Shader>("frag");
+    auto vert = Resources::createInRegistry<Shader>("vert");
+    auto pipeline = Resources::createInRegistry<GraphicPipeline>("pipeline");
+    auto layout = Resources::createInRegistry<VertexLayout>("layout");
+    auto mesh = Resources::createInRegistry<Mesh>("mesh");
+    auto *material = Resources::createInRegistry<Material>("material");
 
     vert->load("../../res/shaders/VK.vert", SHADER_TYPE::VERTEX);
     frag->load("../../res/shaders/VK.frag", SHADER_TYPE::FRAGMENT);
@@ -57,6 +57,7 @@ int main() {
     Application::onDraw.unsubscribe(&onDraw);
     delete transform;
     //-----------------------TERMINATE------------------
+
     Application::terminate();
 
 }

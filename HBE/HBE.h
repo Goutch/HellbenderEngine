@@ -4,6 +4,7 @@
 #include <Core.h>
 #include <Configs.h>
 #include <Application.h>
+#include <Core.h>
 
 #include <core/resource/GraphicPipeline.h>
 #include <core/resource/Mesh.h>

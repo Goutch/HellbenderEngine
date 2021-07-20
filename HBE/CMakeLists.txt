@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 project(HBE CXX)
 
@@ -146,7 +146,7 @@ set(CORE_FILES
         core/serialization/ComponentRegistry.h
         core/serialization/ComponentRegistry.h
 
-        core/resource/GLSL_TYPE.h core/resource/Resources.h)
+        core/resource/GLSL_TYPE.h core/resource/Resources.h core/resource/ResourcesRegistry.cpp core/resource/ResourcesRegistry.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

@@ -141,7 +141,7 @@ void main()
     }
 
     void Graphics::terminate() {
-        Resources::destroyAll();
+
         delete DEFAULT_MESH_PIPELINE;
         delete DEFAULT_MESH_MATERIAL;
         delete DEFAULT_SCREEN_PIPELINE;

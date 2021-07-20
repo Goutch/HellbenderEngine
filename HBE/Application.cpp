@@ -13,20 +13,23 @@
 #include <core/entity/component/InstancesRenderer.h>
 #include <core/graphics/Window.h>
 #include <core/graphics/Renderer.h>
+#include <core/resource/Resources.h>
+
 namespace HBE {
     Scene *Application::scene = nullptr;
     Window *Application::window = nullptr;
     Clock *Application::time = nullptr;
     int Application::fps_counter = 0;
     float Application::fps_timer = 0;
-    Event<> Application::onInit;
-    Event<float> Application::onUpdate;
-    Event<> Application::onDraw;
-    Event<Scene *> Application::onSceneChange;
-    Event<> Application::onRender;
-    Event<> Application::onRegisterComponents;
-    Event<> Application::onWindowClosed;
-    Event<> Application::onQuit;
+    Event<> Application::onInit = Event<>();
+    Event<float> Application::onUpdate = Event<float>();
+    Event<> Application::onDraw = Event<>();
+    Event<Scene *> Application::onSceneChange = Event<Scene *>();
+    Event<> Application::onRender = Event<>();
+    Event<> Application::onRegisterComponents = Event<>();
+    Event<> Application::onWindowClosed = Event<>();
+    Event<> Application::onQuit = Event<>();
+
     void Application::registerComponents() {
         ComponentRegistry::registerComponent<Camera>("Camera");
         ComponentRegistry::registerComponent<MeshRenderer>("MeshRenderer");
@@ -47,7 +50,6 @@ namespace HBE {
         onSceneChange.invoke(scene);
         return scene;
     }
-
 
 
     void Application::init() {
@@ -99,6 +101,7 @@ namespace HBE {
     }
 
     void Application::terminate() {
+        Resources::destroyAll();
         Graphics::terminate();
         ComponentRegistry::terminate();
     }

@@ -43,7 +43,7 @@ namespace HBE {
                                                     VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
         if (vkAllocateMemory(device->getHandle(), &alloc_info, nullptr, &memories[position]) != VK_SUCCESS) {
-            throw std::runtime_error("failed to allocate vertex buffer memory!");
+            Log::error("failed to allocate vertex buffer memory!");
         }
         vkBindBufferMemory(device->getHandle(), buffers[position], memories[position], 0);
         void *data;

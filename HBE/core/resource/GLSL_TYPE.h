@@ -1,6 +1,6 @@
 #pragma once
 namespace HBE {
-    enum GLSL_TYPE {
+    enum HB_API GLSL_TYPE {
         INT,
         UINT,
         FLOAT,

@@ -4,8 +4,6 @@
 #include "core/utility/Event.h"
 #include "core/entity/Scene.h"
 
-
-
 namespace HBE {
     class Window;
     class Clock;

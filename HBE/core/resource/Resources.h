@@ -1,13 +1,10 @@
 #pragma once
 
-
-#include "core/utility/Log.h"
-#include "unordered_map"
+#include "Core.h"
 #include "memory"
 #include "ResourceFactory.h"
 #include "core/graphics/Renderer.h"
 #include "core/graphics/Graphics.h"
-
 #include "core/resource/Shader.h"
 #include "core/resource/GraphicPipeline.h"
 #include "core/resource/VertexLayout.h"
@@ -16,68 +13,32 @@
 #include "core/resource/Material.h"
 #include "core/resource/Texture.h"
 #include "core/resource/Model.h"
+#include "core/resource/ResourcesRegistry.h"
 
 namespace HBE {
-
-    template<typename T>
-    class ResourcesRegistry {
-        static std::unordered_map<std::string, T *> registry;
-    public:
-        static void clear() {
-            Log::message("clear with count:" + std::to_string(ResourcesRegistry<T>::registry.size()));
-            for (auto &n_t:ResourcesRegistry<T>::registry) {
-                Log::message("destroy res: " + n_t.first);
-                delete n_t.second;
-            }
-            ResourcesRegistry<T>::registry.clear();
-        }
-
-        static bool exist(std::string &name) {
-            Log::message("exist with count:" + std::to_string(ResourcesRegistry<T>::registry.size()));
-            return ResourcesRegistry<T>::registry.find(name) != registry.end();
-        }
-
-        static void add(std::string &name, T *t) {
-            ResourcesRegistry<T>::registry.emplace(name, t);
-            Log::message("added:" + name);
-            Log::message("add with count:" + std::to_string(ResourcesRegistry<T>::registry.size()));
-        }
-
-        static T *get(std::string &name) {
-#ifdef DEBUG_MODE
-            if (!exist(name)) {
-                Log::error("Cant find resource:" + name);
-            }
-#endif
-            Log::message("get with count:" + std::to_string(ResourcesRegistry<T>::registry.size()));
-            return ResourcesRegistry<T>::registry.at(name);
-        }
-
-        static void remove(std::string &name) {
-            Log::message("remove with count:" + std::to_string(ResourcesRegistry<T>::registry.size()));
-            delete get(name);
-            ResourcesRegistry<T>::registry.erase(name);
-        }
-    };
-
-    template<typename T>
-    std::unordered_map<std::string, T *> ResourcesRegistry<T>::registry;
-
     namespace Resources {
         template<class T>
         static T *get(std::string unique_name) {
 #ifdef DEBUG_MODE
-            if (!ResourcesRegistry<T>::exist(unique_name)) {
+            if (!ResourcesRegistry::exist(unique_name)) {
                 Log::warning("Cant find resource:" + unique_name);
             }
 #endif
-            return ResourcesRegistry<T>::get(unique_name);
+            return (T *) ResourcesRegistry::get(unique_name);
         }
 
+        static Resource *get(std::string unique_name) {
+#ifdef DEBUG_MODE
+            if (!ResourcesRegistry::exist(unique_name)) {
+                Log::warning("Cant find resource:" + unique_name);
+            }
+#endif
+            return ResourcesRegistry::get(unique_name);
+        }
 
         template<class T>
         static void destroy() {
-            ResourcesRegistry<T>::clear();
+            ResourcesRegistry::clear();
         }
 
         static void destroyAll() {
@@ -93,7 +54,7 @@ namespace HBE {
 
         template<class T>
         static void destroy(std::string unique_name) {
-            return ResourcesRegistry<T>::remove(unique_name);
+            return ResourcesRegistry::remove(unique_name);
         }
 
         /**
@@ -104,7 +65,7 @@ namespace HBE {
          */
         template<class T>
         static void add(std::string unique_name, T *t) {
-            return ResourcesRegistry<T>::remove(unique_name);
+            return ResourcesRegistry::remove(unique_name);
         }
 
         /**
@@ -137,14 +98,14 @@ namespace HBE {
         template<class T>
         static T *createInRegistry(std::string unique_name) {
 #ifdef DEBUG_MODE
-            if (ResourcesRegistry<T>::exist(unique_name)) {
+            if (ResourcesRegistry::exist(unique_name)) {
                 delete get<T>(unique_name);
-                ResourcesRegistry<T>::remove(unique_name);
+                ResourcesRegistry::remove(unique_name);
                 Log::warning("Resource with name:\"" + unique_name + "\" already exist in registry, deleted old resource.");
             }
 #endif
             auto ptr = create<T>();
-            ResourcesRegistry<T>::add(unique_name, ptr);
+            ResourcesRegistry::add(unique_name, reinterpret_cast<Resource*>(ptr));
             return ptr;
         }
 
