@@ -65,9 +65,9 @@ namespace HBE {
 
         const ResourceFactory *getResourceFactory() const override;
 
-        const VK_CommandPool *getCommandPool() const;
+        VK_CommandPool *getCommandPool();
 
-        const VK_Device *getDevice() const;
+        VK_Device *getDevice();
         void onWindowClosed();
 
         void onWindowSizeChange(int width, int height);

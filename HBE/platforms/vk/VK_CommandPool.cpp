@@ -15,7 +15,7 @@ namespace HBE {
         command_buffers.clear();
     }
 
-    VK_CommandPool::VK_CommandPool(const VK_Device *device, int n) {
+    VK_CommandPool::VK_CommandPool(const VK_Device *device, int command_buffers_count) {
         this->device = device;
         QueueFamilyIndices queueFamilyIndices = device->getPhysicalDevice().getQueueFamilyIndices();
 
@@ -23,16 +23,17 @@ namespace HBE {
         poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
         poolInfo.queueFamilyIndex = queueFamilyIndices.graphics_family.value();
 
-        poolInfo.flags = VkCommandPoolCreateFlagBits::VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; // Optional
+        poolInfo.flags = VkCommandPoolCreateFlagBits::VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT |
+                         VkCommandPoolCreateFlagBits::VK_COMMAND_POOL_CREATE_TRANSIENT_BIT;
 
         if (vkCreateCommandPool(device->getHandle(), &poolInfo, nullptr, &handle) != VK_SUCCESS) {
             Log::error("failed to create command pool!");
         }
-        createCommandBuffers(n);
+        createCommandBuffers(command_buffers_count);
     }
 
-    void HBE::VK_CommandPool::createCommandBuffers(int n) {
-        command_buffers.resize(n);
+    void HBE::VK_CommandPool::createCommandBuffers(int count) {
+        command_buffers.resize(count);
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         allocInfo.commandPool = handle;
@@ -46,7 +47,7 @@ namespace HBE {
 
 
     void HBE::VK_CommandPool::begin(int i) const {
-        current=i;
+        current = i;
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
         beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT; // Optional
@@ -72,11 +73,15 @@ namespace HBE {
     }
 
     void VK_CommandPool::reset(int i) {
-        vkResetCommandBuffer(command_buffers[i],0);
+        vkResetCommandBuffer(command_buffers[i], 0);
     }
 
     const VkCommandBuffer &VK_CommandPool::getCurrentBuffer() const {
         return command_buffers[current];
+    }
+
+    const VkCommandPool &VK_CommandPool::getHandle() const {
+        return handle;
     }
 
 

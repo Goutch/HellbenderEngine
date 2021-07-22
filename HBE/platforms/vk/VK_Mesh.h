@@ -8,16 +8,14 @@
 
 namespace HBE {
     class VK_Device;
-
+    class VK_Buffer;
     class VK_Mesh : public Mesh {
         const VK_CommandPool *command_pool;
-        const VK_Device *device;
-        std::set<unsigned int> positions;
-        mutable std::unordered_map<unsigned int,VkBuffer> buffers;
-        mutable std::unordered_map<unsigned int,VkDeviceMemory> memories;
+        VK_Device *device;
+        mutable std::unordered_map<unsigned int,VK_Buffer*> buffers;
 
     public:
-        VK_Mesh(const VK_Device *device, const VK_CommandPool *command_pool);
+        VK_Mesh(VK_Device *device, const VK_CommandPool *command_pool);
 
         ~VK_Mesh() override;
 
@@ -42,8 +40,6 @@ namespace HBE {
         void bind() const override;
 
         void unbind() const override;
-
-        uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
     };
 
 }

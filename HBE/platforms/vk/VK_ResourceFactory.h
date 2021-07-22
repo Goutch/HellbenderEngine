@@ -9,9 +9,9 @@ namespace HBE {
     class VK_Renderer;
 
     class VK_ResourceFactory : public ResourceFactory {
-        const VK_Renderer* renderer;
+        VK_Renderer* renderer;
     public:
-        VK_ResourceFactory(const VK_Renderer *renderer);
+        VK_ResourceFactory(VK_Renderer *renderer);
 
         GraphicPipeline *createGraphicsPipeline() const override;
 

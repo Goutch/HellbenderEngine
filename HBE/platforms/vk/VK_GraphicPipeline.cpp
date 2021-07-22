@@ -12,7 +12,7 @@
 #include "VK_VertexLayout.h"
 
 namespace HBE {
-    VK_GraphicPipeline::VK_GraphicPipeline(const VK_Device *device, const VK_Renderer *renderer) {
+    VK_GraphicPipeline::VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer) {
         this->device = device;
         this->renderer = renderer;
     }

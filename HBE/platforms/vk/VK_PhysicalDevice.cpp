@@ -12,7 +12,7 @@ namespace HBE {
         this->surface_handle = &surface_handle;
         Log::status("Looking for suitable GPU:");
         pickBestPhysicalDevice();
-        support_details=querySwapchainSupportDetails(handle);
+        support_details = querySwapchainSupportDetails(handle);
     }
 
     void VK_PhysicalDevice::pickBestPhysicalDevice() {
@@ -84,14 +84,25 @@ namespace HBE {
 
 
         for (uint32_t i = 0; i < queue_family_count; ++i) {
+
+            //present
+            VkBool32 present_supported = false;
+            vkGetPhysicalDeviceSurfaceSupportKHR(physical_device, i, *surface_handle, &present_supported);
+            if (present_supported) {
+                indices.present_family = i;
+            }
             //graphics
             if (supported_queue_families.at(i).queueFlags & VK_QUEUE_GRAPHICS_BIT) {
                 indices.graphics_family = i;
             }
-            //present
-            VkBool32 present_supported = false;
-            vkGetPhysicalDeviceSurfaceSupportKHR(physical_device, i, *surface_handle, &present_supported);
-            if (present_supported)indices.present_family = i;
+                //compute
+            else if (supported_queue_families.at(i).queueFlags & VK_QUEUE_COMPUTE_BIT) {
+                indices.compute_family = i;
+            }
+                //tranfer
+            else if ((supported_queue_families.at(i).queueFlags & VK_QUEUE_TRANSFER_BIT)) {
+                indices.transfer_family = i;
+            }
             //complete?
             if (indices.isComplete())break;
         }
@@ -177,7 +188,7 @@ namespace HBE {
         return details;
     }
 
-    const SwapchainSupportDetails& VK_PhysicalDevice::getSwapchainSupportDetails() const{
+    const SwapchainSupportDetails &VK_PhysicalDevice::getSwapchainSupportDetails() const {
         return support_details;
     }
 

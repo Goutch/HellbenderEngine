@@ -50,7 +50,13 @@ if (VULKAN_FOUND)
             platforms/vk/VK_VertexLayout.cpp
             platforms/vk/VK_VertexLayout.h
             platforms/vk/VK_CommandPool.cpp
-            platforms/vk/VK_CommandPool.h)
+            platforms/vk/VK_CommandPool.h
+            platforms/vk/VK_Buffer.cpp
+            platforms/vk/VK_Buffer.h
+            platforms/vk/VK_Memory.cpp
+            platforms/vk/VK_Memory.h
+            platforms/vk/VK_Allocator.cpp
+            platforms/vk/VK_Allocator.h)
 
     add_compile_definitions(VULKAN_RENDERER)
 else ()
@@ -97,6 +103,10 @@ set(CORE_FILES
         core/resource/Resource.h
         core/resource/GraphicPipeline.h
         core/resource/ComputePipeline.h
+        core/resource/GLSL_TYPE.h
+        core/resource/Resources.h
+        core/resource/ResourcesRegistry.cpp
+        core/resource/ResourcesRegistry.h
 
         core/graphics/Window.h
         core/graphics/Framebuffer.h
@@ -146,7 +156,7 @@ set(CORE_FILES
         core/serialization/ComponentRegistry.h
         core/serialization/ComponentRegistry.h
 
-        core/resource/GLSL_TYPE.h core/resource/Resources.h core/resource/ResourcesRegistry.cpp core/resource/ResourcesRegistry.h)
+)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

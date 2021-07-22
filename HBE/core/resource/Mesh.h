@@ -18,10 +18,7 @@ namespace HBE {
         bool has_index_buffer = false;
         unsigned int instance_count = 1;
     public:
-        virtual ~Mesh()
-        {
-            Log::message("mesh destroyed");
-        };
+        virtual ~Mesh() = default;
 
         unsigned int getVertexCount() const;
 

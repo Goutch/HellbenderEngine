@@ -15,11 +15,10 @@ namespace HBE {
         const VK_Device *device;
         std::vector<VkCommandBuffer> command_buffers;
 
-
     public:
         ~VK_CommandPool();
 
-        VK_CommandPool(const VK_Device *device, int n);
+        VK_CommandPool(const VK_Device *device, int command_buffers_count);
 
         void begin(int i) const;
 
@@ -33,8 +32,10 @@ namespace HBE {
 
         void free(int i);
 
-        void createCommandBuffers(int n);
+        void createCommandBuffers(int count);
 
         void reset(int i);
+
+        const VkCommandPool& getHandle() const;
     };
 }

@@ -14,12 +14,12 @@ namespace HBE {
     class VK_VertexLayout;
 
     class VK_GraphicPipeline : public GraphicPipeline {
-        const VK_Device *device = nullptr;
-        const VK_Renderer *renderer = nullptr;
+        VK_Device *device = nullptr;
+        VK_Renderer *renderer = nullptr;
         VkPipelineLayout pipeline_layout_handle{};
         VkPipeline handle = VK_NULL_HANDLE;
     public:
-        VK_GraphicPipeline(const VK_Device *device, const VK_Renderer *renderer);
+        VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer);
 
         void setDrawFlags(DRAW_FLAGS flags) override;
 

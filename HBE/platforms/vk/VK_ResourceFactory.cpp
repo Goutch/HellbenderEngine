@@ -7,8 +7,9 @@
 #include "VK_Mesh.h"
 #include "VK_Shader.h"
 #include "VK_VertexLayout.h"
+
 namespace HBE {
-    VK_ResourceFactory::VK_ResourceFactory(const VK_Renderer *renderer) {
+    VK_ResourceFactory::VK_ResourceFactory(VK_Renderer *renderer) {
         this->renderer = renderer;
     }
 
@@ -21,7 +22,7 @@ namespace HBE {
     }
 
     Mesh *VK_ResourceFactory::createMesh() const {
-        return new VK_Mesh(renderer->getDevice(),renderer->getCommandPool());
+        return new VK_Mesh(renderer->getDevice(), renderer->getCommandPool());
     }
 
     Shader *VK_ResourceFactory::createShader() const {

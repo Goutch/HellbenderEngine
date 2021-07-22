@@ -18,13 +18,7 @@ namespace HBE {
         Resource() = default;
 
     public:
-        virtual ~Resource()
-        {
-            Log::message("res destroyed");
-        };
-
-
-
+        virtual ~Resource() = default;
     };
 
 }

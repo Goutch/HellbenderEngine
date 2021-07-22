@@ -14,6 +14,7 @@
 #include "VK_CommandPool.h"
 #include "VK_Fence.h"
 #include "Application.h"
+#include "VK_Allocator.h"
 
 namespace HBE {
     VK_Renderer::VK_Renderer() {
@@ -199,11 +200,11 @@ namespace HBE {
         return *swapchain;
     }
 
-    const VK_Device *VK_Renderer::getDevice() const {
+    VK_Device *VK_Renderer::getDevice() {
         return device;
     }
 
-    const VK_CommandPool *VK_Renderer::getCommandPool() const {
+    VK_CommandPool *VK_Renderer::getCommandPool() {
         return command_pool;
     }
 

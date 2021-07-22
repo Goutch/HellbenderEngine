@@ -149,7 +149,6 @@ void main()
         delete DEFAULT_QUAD;
         delete DEFAULT_CUBE;
         delete render_target;
-        Log::message("destroy renderer");
         delete renderer;
         delete window;
     }
