@@ -8,6 +8,7 @@ namespace HBE {
 	VK_Allocator::VK_Allocator(const VK_Device *device) {
 		this->device = device;
 		this->command_pool = new VK_CommandPool(device, 1);
+		vkGetPhysicalDeviceMemoryProperties(device->getPhysicalDevice().getHandle(), &memory_propeties);
 	}
 
 	VK_Allocator::~VK_Allocator() {
@@ -20,8 +21,6 @@ namespace HBE {
 	}
 
 	uint32_t VK_Allocator::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
-		VkPhysicalDeviceMemoryProperties memory_propeties;
-		vkGetPhysicalDeviceMemoryProperties(device->getPhysicalDevice().getHandle(), &memory_propeties);
 		for (uint32_t i = 0; i < memory_propeties.memoryTypeCount; i++) {
 			if ((typeFilter & (1 << i)) && (memory_propeties.memoryTypes[i].propertyFlags & properties) == properties) {
 				return i;
@@ -86,22 +85,24 @@ namespace HBE {
 				if (available >= size) {
 					block_it->alloc_count++;
 					Log::debug("memory_type=" + std::to_string(memory_type) + "|position=" + std::to_string(position) + "|alignment=" + std::to_string(memRequirements.alignment) + "|size=" + std::to_string(size));
+					block_it->remaining -= size;
 					return *block_it->allocations.emplace(allocation_it, Allocation{
 							.size=size,
-							.offset=0,
+							.offset=position,
 							.block=*block_it});
 				} else {
 					position = allocation_it->offset + allocation_it->size;
-					position += memRequirements.alignment - (position % memRequirements.alignment);
+					position += (memRequirements.alignment - (position % memRequirements.alignment));
 				}
 			}
-			//todo:handle alignment
-			if (block_it->size - position >= size) {
+			VkDeviceSize end = block_it->size - (block_it->size % memRequirements.alignment);
+			if (end - position >= size) {
 				block_it->alloc_count++;
 				Log::debug("memory_type=" + std::to_string(memory_type) + "|position=" + std::to_string(position) + "|alignment=" + std::to_string(memRequirements.alignment) + "|size=" + std::to_string(size));
+				block_it->remaining -= size;
 				return block_it->allocations.emplace_back(Allocation{
 						.size=size,
-						.offset=0,
+						.offset=position,
 						.block=*block_it});
 			}
 		}
@@ -113,7 +114,8 @@ namespace HBE {
 				.memory=VK_NULL_HANDLE,
 				.memory_type=memory_type,
 				.index=index,
-				.alloc_count=0});
+				.alloc_count=0,
+				.remaining=(size > BLOCK_SIZE ? size : BLOCK_SIZE) - size});
 
 
 		VkMemoryAllocateInfo allocInfo{};
@@ -136,8 +138,8 @@ namespace HBE {
 		vkDestroyBuffer(device->getHandle(), buffer, nullptr);
 		allocation.block.alloc_count--;
 		uint32_t memory_type = allocation.block.memory_type;
-		Log::debug("free|memory_type=" + std::to_string(memory_type) + "position=" + std::to_string(allocation.offset) + "|size=" + std::to_string(allocation.size));
-
+		Log::debug("free|memory_type=" + std::to_string(memory_type) + "|position=" + std::to_string(allocation.offset) + "|size=" + std::to_string(allocation.size));
+		//todo: remove from list allocs
 		if (allocation.block.alloc_count == 0) {
 			vkFreeMemory(device->getHandle(), allocation.block.memory, nullptr);
 
