@@ -46,7 +46,7 @@ namespace HBE {
     }
 
 
-    void HBE::VK_CommandPool::begin(int i) const {
+    void HBE::VK_CommandPool::begin(uint32_t i) const {
         current = i;
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -58,7 +58,7 @@ namespace HBE {
         }
     }
 
-    void HBE::VK_CommandPool::end(int i) const {
+    void HBE::VK_CommandPool::end(uint32_t i) const {
         if (vkEndCommandBuffer(command_buffers[i]) != VK_SUCCESS) {
             Log::error("failed to record command buffer!");
         }
@@ -68,11 +68,9 @@ namespace HBE {
         return command_buffers;
     }
 
-    void VK_CommandPool::free(int i) {
-        vkFreeCommandBuffers(device->getHandle(), handle, 1, &command_buffers[i]);
-    }
 
-    void VK_CommandPool::reset(int i) {
+
+    void VK_CommandPool::reset(uint32_t i) {
         vkResetCommandBuffer(command_buffers[i], 0);
     }
 

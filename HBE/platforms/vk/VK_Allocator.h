@@ -19,7 +19,7 @@ namespace HBE {
         VkDeviceSize size;
         std::list<Allocation> allocations;
         VkDeviceMemory memory=VK_NULL_HANDLE;
-        VkMemoryPropertyFlags property_flags;
+        uint32_t memory_type;
         uint32_t index;
         uint32_t alloc_count=0;
     };
@@ -28,7 +28,7 @@ namespace HBE {
         VK_CommandPool *command_pool;
         const VK_Device *device;
         const VkDeviceSize BLOCK_SIZE = 134217728; //1024*1024*128 = 128mb
-        std::unordered_map<VkMemoryPropertyFlags,std::vector<Block>> blocks;
+        std::unordered_map<uint32_t,std::vector<Block>> blocks;
     public:
 
         VK_Allocator(const VK_Device *device);
@@ -36,6 +36,7 @@ namespace HBE {
         ~VK_Allocator();
 
         Allocation& alloc(VkBuffer &buffer, VkDeviceSize size,VkBufferUsageFlags usage, VkMemoryPropertyFlags properties);
+
         void free(VkBuffer &buffer,Allocation& allocation);
         void copy(VK_Buffer *src, VK_Buffer *dest);
 

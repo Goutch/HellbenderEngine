@@ -5,138 +5,149 @@
 #include "VK_Device.h"
 
 namespace HBE {
-    VK_Allocator::VK_Allocator(const VK_Device *device) {
-        this->device = device;
-        this->command_pool = new VK_CommandPool(device, 1);
-    }
+	VK_Allocator::VK_Allocator(const VK_Device *device) {
+		this->device = device;
+		this->command_pool = new VK_CommandPool(device, 1);
+	}
 
-    VK_Allocator::~VK_Allocator() {
-        delete command_pool;
-        for (auto it = blocks.begin(); it != blocks.end(); ++it) {
-            for (Block block:it->second) {
-                vkFreeMemory(device->getHandle(), block.memory, nullptr);
-            }
-        }
-    }
+	VK_Allocator::~VK_Allocator() {
+		delete command_pool;
+		for (auto it = blocks.begin(); it != blocks.end(); ++it) {
+			for (Block block:it->second) {
+				vkFreeMemory(device->getHandle(), block.memory, nullptr);
+			}
+		}
+	}
 
-    uint32_t VK_Allocator::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
-        VkPhysicalDeviceMemoryProperties memory_propeties;
-        vkGetPhysicalDeviceMemoryProperties(device->getPhysicalDevice().getHandle(), &memory_propeties);
-        for (uint32_t i = 0; i < memory_propeties.memoryTypeCount; i++) {
-            if ((typeFilter & (1 << i)) && (memory_propeties.memoryTypes[i].propertyFlags & properties) == properties) {
-                return i;
-            }
-        }
-        Log::error("Failed to find suitable memory type");
-        return 0;
-    }
+	uint32_t VK_Allocator::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
+		VkPhysicalDeviceMemoryProperties memory_propeties;
+		vkGetPhysicalDeviceMemoryProperties(device->getPhysicalDevice().getHandle(), &memory_propeties);
+		for (uint32_t i = 0; i < memory_propeties.memoryTypeCount; i++) {
+			if ((typeFilter & (1 << i)) && (memory_propeties.memoryTypes[i].propertyFlags & properties) == properties) {
+				return i;
+			}
+		}
+		Log::error("Failed to find suitable memory type");
+		return 0;
+	}
 
-    //https://www.khronos.org/registry/vulkan/specs/1.2-extensions/man/html/VkMemoryPropertyFlagBits.html
-    Allocation &VK_Allocator::alloc(VkBuffer &buffer, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties) {
-        VkBufferCreateInfo bufferInfo{};
-        bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-        bufferInfo.size = size;
-        bufferInfo.usage = usage;
-        bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-
-        if (vkCreateBuffer(device->getHandle(), &bufferInfo, nullptr, &buffer) != VK_SUCCESS) {
-            Log::error("failed to create buffer!");
-        }
-
-        Allocation &allocation = getAllocation(buffer, size, properties);
-        vkBindBufferMemory(device->getHandle(), buffer, allocation.block.memory, allocation.offset);
-        return allocation;
-    }
-
-    void VK_Allocator::copy(VK_Buffer *src, VK_Buffer *dest) {
-        command_pool->begin(0);
-        VkBufferCopy copyRegion{};
-        copyRegion.srcOffset = 0; // Optional
-        copyRegion.dstOffset = 0; // Optional
-        copyRegion.size = src->getSize();
-        vkCmdCopyBuffer(command_pool->getCurrentBuffer(), src->getHandle(), dest->getHandle(), 1, &copyRegion);
-
-        command_pool->end(0);
-
-        VkSubmitInfo submitInfo{};
-        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &command_pool->getCurrentBuffer();
-
-        //todo use transfer queue
-        vkQueueSubmit(device->getGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
-        vkQueueWaitIdle(device->getGraphicsQueue());
-    }
+	//https://www.khronos.org/registry/vulkan/specs/1.2-extensions/man/html/VkMemoryPropertyFlagBits.html
+	Allocation &VK_Allocator::alloc(VkBuffer &buffer, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties) {
+		VkBufferCreateInfo bufferInfo{};
+		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		bufferInfo.size = size;
+		bufferInfo.usage = usage;
+		bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
 
-    Allocation &VK_Allocator::getAllocation(VkBuffer &buffer, VkDeviceSize size, VkMemoryPropertyFlags properties) {
-        VkDeviceSize position = 0;
-        if (blocks.find(properties) == blocks.end())
-            blocks.emplace(properties, std::vector<Block>());
-        for (auto block_it = blocks[properties].begin(); block_it != blocks[properties].end(); ++block_it) {
-            for (auto allocation_it = block_it->allocations.begin(); allocation_it != block_it->allocations.end(); ++allocation_it) {
-                if (allocation_it->offset - position <= size) {
-                    block_it->alloc_count++;
-                    return *block_it->allocations.emplace(allocation_it, Allocation{
-                            .size=size,
-                            .offset=0,
-                            .block=*block_it});
-                } else {
-                    position = allocation_it->offset + allocation_it->size;
-                }
-            }
-            if (block_it->size - position <= size) {
-                block_it->alloc_count++;
-                return block_it->allocations.emplace_back(Allocation{
-                        .size=size,
-                        .offset=0,
-                        .block=*block_it});
-            }
-        }
+		if (vkCreateBuffer(device->getHandle(), &bufferInfo, nullptr, &buffer) != VK_SUCCESS) {
+			Log::error("failed to create buffer!");
+		}
 
-        uint32_t index = blocks[properties].size();
-        Block &block = blocks[properties].emplace_back(Block{
-                .size= size > BLOCK_SIZE ? size : BLOCK_SIZE,
-                .allocations=std::list<Allocation>(),
-                .memory=VK_NULL_HANDLE,
-                .property_flags=properties,
-                .index=index,
-                .alloc_count=0});
+		Allocation &allocation = getAllocation(buffer, size, properties);
+		vkBindBufferMemory(device->getHandle(), buffer, allocation.block.memory, allocation.offset);
+		return allocation;
+	}
 
-        VkMemoryRequirements memRequirements;
-        vkGetBufferMemoryRequirements(device->getHandle(), buffer, &memRequirements);
+	void VK_Allocator::copy(VK_Buffer *src, VK_Buffer *dest) {
+		command_pool->begin(0);
+		VkBufferCopy copyRegion{};
+		copyRegion.srcOffset = 0; // Optional
+		copyRegion.dstOffset = 0; // Optional
+		copyRegion.size = src->getSize();
+		vkCmdCopyBuffer(command_pool->getCurrentBuffer(), src->getHandle(), dest->getHandle(), 1, &copyRegion);
 
-        VkMemoryAllocateInfo allocInfo{};
-        allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        allocInfo.allocationSize = block.size;
-        allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
+		command_pool->end(0);
 
-        if (vkAllocateMemory(device->getHandle(), &allocInfo, nullptr, &block.memory) != VK_SUCCESS) {
-            Log::error("failed to allocate buffer memory!");
-        }
-        block.alloc_count++;
-        return block.allocations.emplace_back(Allocation{
-                .size=size,
-                .offset=0,
-                .block=block});
-    }
+		VkSubmitInfo submitInfo{};
+		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &command_pool->getCurrentBuffer();
 
-    void VK_Allocator::free(VkBuffer &buffer, Allocation &allocation) {
+		//todo use transfer queue
+		vkQueueSubmit(device->getGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+		vkQueueWaitIdle(device->getGraphicsQueue());
+	}
 
-        vkDestroyBuffer(device->getHandle(), buffer, nullptr);
-        allocation.block.alloc_count--;
-        VkMemoryPropertyFlags flags = allocation.block.property_flags;
-        if (allocation.block.alloc_count == 0) {
-            vkFreeMemory(device->getHandle(), allocation.block.memory, nullptr);
 
-            auto it = blocks[flags].erase(blocks[flags].begin() + allocation.block.index);
+	Allocation &VK_Allocator::getAllocation(VkBuffer &buffer, VkDeviceSize size, VkMemoryPropertyFlags properties) {
 
-            for (; it != blocks[flags].end(); ++it) {
-                it->index--;
-            }
+		VkMemoryRequirements memRequirements;
+		vkGetBufferMemoryRequirements(device->getHandle(), buffer, &memRequirements);
+		uint32_t memory_type = findMemoryType(memRequirements.memoryTypeBits, properties);
+		if (blocks.find(memory_type) == blocks.end())
+			blocks.emplace(memory_type, std::vector<Block>());
+		for (auto block_it = blocks[memory_type].begin(); block_it != blocks[memory_type].end(); ++block_it) {
+			VkDeviceSize position = 0;
+			for (auto allocation_it = block_it->allocations.begin(); allocation_it != block_it->allocations.end(); ++allocation_it) {
+				VkDeviceSize end = allocation_it->offset - (allocation_it->offset % memRequirements.alignment);
+				VkDeviceSize available = (end - position);
 
-        }
+				if (available >= size) {
+					block_it->alloc_count++;
+					Log::debug("memory_type=" + std::to_string(memory_type) + "|position=" + std::to_string(position) + "|alignment=" + std::to_string(memRequirements.alignment) + "|size=" + std::to_string(size));
+					return *block_it->allocations.emplace(allocation_it, Allocation{
+							.size=size,
+							.offset=0,
+							.block=*block_it});
+				} else {
+					position = allocation_it->offset + allocation_it->size;
+					position += memRequirements.alignment - (position % memRequirements.alignment);
+				}
+			}
+			//todo:handle alignment
+			if (block_it->size - position >= size) {
+				block_it->alloc_count++;
+				Log::debug("memory_type=" + std::to_string(memory_type) + "|position=" + std::to_string(position) + "|alignment=" + std::to_string(memRequirements.alignment) + "|size=" + std::to_string(size));
+				return block_it->allocations.emplace_back(Allocation{
+						.size=size,
+						.offset=0,
+						.block=*block_it});
+			}
+		}
+		Log::debug("memory_type=" + std::to_string(memory_type) + "|new blocK!|alignment=" + std::to_string(memRequirements.alignment) + "|size=" + std::to_string(size));
+		uint32_t index = blocks[memory_type].size();
+		Block &block = blocks[memory_type].emplace_back(Block{
+				.size= size > BLOCK_SIZE ? size : BLOCK_SIZE,
+				.allocations=std::list<Allocation>(),
+				.memory=VK_NULL_HANDLE,
+				.memory_type=memory_type,
+				.index=index,
+				.alloc_count=0});
 
-    }
+
+		VkMemoryAllocateInfo allocInfo{};
+		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+		allocInfo.allocationSize = block.size;
+		allocInfo.memoryTypeIndex = memory_type;
+
+		if (vkAllocateMemory(device->getHandle(), &allocInfo, nullptr, &block.memory) != VK_SUCCESS) {
+			Log::error("failed to allocate buffer memory!");
+		}
+		block.alloc_count++;
+		return block.allocations.emplace_back(Allocation{
+				.size=size,
+				.offset=0,
+				.block=block});
+	}
+
+	void VK_Allocator::free(VkBuffer &buffer, Allocation &allocation) {
+
+		vkDestroyBuffer(device->getHandle(), buffer, nullptr);
+		allocation.block.alloc_count--;
+		uint32_t memory_type = allocation.block.memory_type;
+		Log::debug("free|memory_type=" + std::to_string(memory_type) + "position=" + std::to_string(allocation.offset) + "|size=" + std::to_string(allocation.size));
+
+		if (allocation.block.alloc_count == 0) {
+			vkFreeMemory(device->getHandle(), allocation.block.memory, nullptr);
+
+			auto it = blocks[memory_type].erase(blocks[memory_type].begin() + allocation.block.index);
+
+			for (; it != blocks[memory_type].end(); ++it) {
+				it->index--;
+			}
+
+		}
+
+	}
 }

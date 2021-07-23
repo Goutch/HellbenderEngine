@@ -37,8 +37,8 @@ if (VULKAN_FOUND)
             platforms/vk/VK_ResourceFactory.h
             platforms/vk/VK_Texture.cpp
             platforms/vk/VK_Texture.h
-            platforms/vk/VK_Mesh.cpp
             platforms/vk/VK_Mesh.h
+            platforms/vk/VK_Mesh.cpp
             platforms/vk/VK_RenderPass.cpp
             platforms/vk/VK_RenderPass.h
             platforms/vk/ShaderCompiler.cpp
@@ -96,10 +96,10 @@ set(CORE_FILES
         core/resource/Material.cpp
         core/resource/Material.h
         core/resource/Model.cpp
+        core/resource/Mesh.cpp
         core/resource/Shader.cpp
         core/resource/VertexLayout.h
         core/resource/ResourceFactory.h
-        core/resource/Mesh.cpp
         core/resource/Resource.h
         core/resource/GraphicPipeline.h
         core/resource/ComputePipeline.h

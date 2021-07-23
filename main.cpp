@@ -39,12 +39,17 @@ int main() {
     layout->setLayoutTypes({GLSL_TYPE::VEC2F, GLSL_TYPE::VEC3F});
     pipeline->setShaders(vert, frag, layout);
 
-    const std::vector<Vertex> vertices = {
-            {{0.0f, -0.5f}, {1.0f, 1.0f, 1.0f}},
-            {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-            {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
-    };
+	const std::vector<Vertex> vertices = {
+			{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+			{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+			{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+			{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+	};
+	const std::vector<uint32_t> indices = {
+			0, 1, 2, 2, 3, 0
+	};
     mesh->setVertices(0, (void *) vertices.data(), vertices.size(), layout);
+    mesh->setIndices(indices);
     material->setPipeline(pipeline);
     transform = new Transform();
     //-----------------------EVENTS------------------
