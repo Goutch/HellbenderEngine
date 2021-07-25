@@ -76,8 +76,8 @@ namespace HBE {
             scene->update(delta_t);
             onUpdate.invoke(delta_t);
             scene->draw();
-            Graphics::getRenderer()->beginFrame();
             onDraw.invoke();
+			Graphics::beginFrame();
             if (Camera::main)
                 Graphics::render(Graphics::getRenderTarget(), Camera::main->getProjectionMatrix(),
                                  Camera::main->getViewMatrix());
@@ -85,7 +85,7 @@ namespace HBE {
 
             if (!Configs::isPresentAutomatic())
                 Graphics::present(Graphics::getRenderTarget());
-            Graphics::clearDrawCache();
+			Graphics::endFrame();
 
 
             delta_t = update_clock.ns() / SECONDS_TO_NANOSECOND;

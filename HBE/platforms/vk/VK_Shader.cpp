@@ -15,7 +15,7 @@ namespace HBE {
         this->device = device;
     }
 
-    void VK_Shader::setSource(const std::vector<char> &source, SHADER_TYPE type) {
+    void VK_Shader::setSource(const std::string &source, SHADER_TYPE type) {
 
         std::vector<uint32_t> spirv;
         ShaderCompiler::GLSLToSpirV(source, spirv, type);

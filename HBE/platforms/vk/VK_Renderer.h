@@ -3,6 +3,7 @@
 #include "core/graphics/Renderer.h"
 #include "vulkan/vulkan.h"
 #include "VK_Semaphore.h"
+#include "unordered_map"
 
 namespace HBE {
     class VK_Window;
@@ -25,9 +26,18 @@ namespace HBE {
 
     class VK_Fence;
 
-    class
-    VK_Renderer : public Renderer {
-        const unsigned int MAX_FRAMES_IN_FLIGHT = 2;
+
+
+    class VK_Renderer : public Renderer {
+#define MAP_LIST(T1, T2) std::unordered_map<T1,T2>
+		struct RenderObject {
+			const Transform *transform;
+			const Mesh *mesh;
+			const Material *material;
+		};
+		MAP_LIST(const Material*,MAP_LIST(const Mesh*, std::list<const Transform*>)) render_cache;
+
+        static const uint32_t MAX_FRAMES_IN_FLIGHT = 2;
 
         VK_Window *window;
         VK_Instance *instance;

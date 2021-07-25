@@ -14,7 +14,7 @@ namespace HBE {
         VK_Shader(const VK_Device* device);
         ~VK_Shader();
 
-        void setSource(const std::vector<char> &source, SHADER_TYPE type) override;
+        void setSource(const std::string &source, SHADER_TYPE type) override;
         const VkShaderModule &getHandle()const;
 
     };

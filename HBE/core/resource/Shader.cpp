@@ -14,7 +14,7 @@ namespace HBE {
     void Shader::load(const std::string &path, SHADER_TYPE type) {
         std::vector<char> source;
         getSource(path, source);
-        setSource(source,type);
+        setSource(source.data(),type);
     }
 
     void Shader::getSource(const std::string &path, std::vector<char> &buffer) {

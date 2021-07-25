@@ -34,9 +34,10 @@ namespace HBE {
 
         virtual void present(const RenderTarget *render_target) = 0;
 
+		virtual void beginFrame() = 0;
         virtual void endFrame() = 0;
 
-        virtual void beginFrame() = 0;
+
 
         virtual void draw(const Transform &transform, const Mesh &mesh, const Material &material) = 0;
 

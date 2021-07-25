@@ -46,8 +46,6 @@ namespace HBE {
     };
 
     class HB_API Material final :public Resource {
-        friend class Resource;
-
         const GraphicPipeline *pipeline = nullptr;
         const Texture *texture = nullptr;
         const Texture *normal_map = nullptr;

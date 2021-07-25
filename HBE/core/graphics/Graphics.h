@@ -62,8 +62,8 @@ namespace HBE {
         static void terminate();
 
         static void onWindowSizeChange(int width,int height);
-
-        static void clearDrawCache();
+		static void beginFrame();
+        static void endFrame();
 
         static void setDefaultDrawFlags(DRAW_FLAGS drawFlags);
 

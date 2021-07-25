@@ -18,7 +18,7 @@ namespace HBE {
     public:
         void load(const std::string &path, SHADER_TYPE type);
 
-        virtual void setSource(const std::vector<char> &source, SHADER_TYPE type) = 0;
+        virtual void setSource(const std::string &source, SHADER_TYPE type) = 0;
 
         SHADER_TYPE getType();
 

@@ -46,7 +46,7 @@ namespace HBE {
         this->width = width;
         this->heigth = height;
 
-        framebuffer->setResolution(width, height);
+        //framebuffer->setResolution(width, height);
 
         onSizeChange.invoke(width, height);
     }

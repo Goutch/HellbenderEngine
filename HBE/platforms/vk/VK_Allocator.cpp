@@ -38,7 +38,6 @@ namespace HBE {
 		bufferInfo.usage = usage;
 		bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-
 		if (vkCreateBuffer(device->getHandle(), &bufferInfo, nullptr, &buffer) != VK_SUCCESS) {
 			Log::error("failed to create buffer!");
 		}
@@ -51,8 +50,8 @@ namespace HBE {
 	void VK_Allocator::copy(VK_Buffer *src, VK_Buffer *dest) {
 		command_pool->begin(0);
 		VkBufferCopy copyRegion{};
-		copyRegion.srcOffset = 0; // Optional
-		copyRegion.dstOffset = 0; // Optional
+		copyRegion.srcOffset = 0; // buffer offset not memory
+		copyRegion.dstOffset = 0; // buffer offset not memory
 		copyRegion.size = src->getSize();
 		vkCmdCopyBuffer(command_pool->getCurrentBuffer(), src->getHandle(), dest->getHandle(), 1, &copyRegion);
 
@@ -70,7 +69,6 @@ namespace HBE {
 
 
 	Allocation &VK_Allocator::getAllocation(VkBuffer &buffer, VkDeviceSize size, VkMemoryPropertyFlags properties) {
-
 		VkMemoryRequirements memRequirements;
 		vkGetBufferMemoryRequirements(device->getHandle(), buffer, &memRequirements);
 		uint32_t memory_type = findMemoryType(memRequirements.memoryTypeBits, properties);
@@ -86,10 +84,13 @@ namespace HBE {
 					block_it->alloc_count++;
 					Log::debug("memory_type=" + std::to_string(memory_type) + "|position=" + std::to_string(position) + "|alignment=" + std::to_string(memRequirements.alignment) + "|size=" + std::to_string(size));
 					block_it->remaining -= size;
-					return *block_it->allocations.emplace(allocation_it, Allocation{
+					std::list<Allocation>::iterator new_alloc_it = block_it->allocations.emplace(allocation_it, Allocation{
 							.size=size,
 							.offset=position,
 							.block=*block_it});
+					new_alloc_it->position_in_block = new_alloc_it;
+					return *new_alloc_it;
+
 				} else {
 					position = allocation_it->offset + allocation_it->size;
 					position += (memRequirements.alignment - (position % memRequirements.alignment));
@@ -100,10 +101,13 @@ namespace HBE {
 				block_it->alloc_count++;
 				Log::debug("memory_type=" + std::to_string(memory_type) + "|position=" + std::to_string(position) + "|alignment=" + std::to_string(memRequirements.alignment) + "|size=" + std::to_string(size));
 				block_it->remaining -= size;
-				return block_it->allocations.emplace_back(Allocation{
-						.size=size,
-						.offset=position,
-						.block=*block_it});
+				const std::list<Allocation>::iterator &new_alloc_it = block_it->allocations.emplace(block_it->allocations.end(),
+																									Allocation{
+																											.size=size,
+																											.offset=position,
+																											.block=*block_it});
+				new_alloc_it->position_in_block = new_alloc_it;
+				return *new_alloc_it;
 			}
 		}
 		Log::debug("memory_type=" + std::to_string(memory_type) + "|new blocK!|alignment=" + std::to_string(memRequirements.alignment) + "|size=" + std::to_string(size));
@@ -127,10 +131,12 @@ namespace HBE {
 			Log::error("failed to allocate buffer memory!");
 		}
 		block.alloc_count++;
-		return block.allocations.emplace_back(Allocation{
+		auto new_alloc_it = block.allocations.emplace(block.allocations.end(), Allocation{
 				.size=size,
 				.offset=0,
 				.block=block});
+		new_alloc_it->position_in_block = new_alloc_it;
+		return *new_alloc_it;
 	}
 
 	void VK_Allocator::free(VkBuffer &buffer, Allocation &allocation) {
@@ -138,8 +144,12 @@ namespace HBE {
 		vkDestroyBuffer(device->getHandle(), buffer, nullptr);
 		allocation.block.alloc_count--;
 		uint32_t memory_type = allocation.block.memory_type;
-		Log::debug("free|memory_type=" + std::to_string(memory_type) + "|position=" + std::to_string(allocation.offset) + "|size=" + std::to_string(allocation.size));
-		//todo: remove from list allocs
+
+		Log::debug("free|memory_type=" +
+				   std::to_string(memory_type) +
+				   "|position=" + std::to_string(allocation.offset) +
+				   "|size=" + std::to_string(allocation.size));
+
 		if (allocation.block.alloc_count == 0) {
 			vkFreeMemory(device->getHandle(), allocation.block.memory, nullptr);
 
@@ -148,7 +158,10 @@ namespace HBE {
 			for (; it != blocks[memory_type].end(); ++it) {
 				it->index--;
 			}
-
+		}
+		else
+		{
+			allocation.block.allocations.erase(allocation.position_in_block);
 		}
 
 	}

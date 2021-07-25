@@ -16,8 +16,15 @@
 #include "Application.h"
 #include "VK_Allocator.h"
 #include "VK_Mesh.h"
+#include "core/resource/Material.h"
 
 namespace HBE {
+	struct UniformBufferObject {
+		mat4 transform;
+		mat4 view;
+	};
+
+
 	VK_Renderer::VK_Renderer() {
 		window = dynamic_cast<VK_Window *>(Graphics::getWindow());
 
@@ -90,14 +97,39 @@ namespace HBE {
 	void VK_Renderer::render(const HBE::RenderTarget *render_target,
 							 const mat4 &projection_matrix,
 							 const mat4 &view_matrix) {
+		command_pool->begin(current_frame);
+		swapchain->getRenderPass().begin(command_pool->getCurrentBuffer(), current_image);
+		for (const auto& material_kv:render_cache) {
+			const Material *material = material_kv.first;
+			const GraphicPipeline *pipeline = material->getPipeline();
+			material->bind();
 
+			pipeline->setUniform("projection_matrix", projection_matrix);
+			pipeline->setUniform("view_matrix", view_matrix);
+
+			for (const auto& mesh_kv :material_kv.second) {
+				const Mesh *mesh = mesh_kv.first;
+				mesh->bind();
+				for (const Transform *transform:mesh_kv.second) {
+					pipeline->setUniform("transform_matrix", transform->getMatrix());
+					if (mesh->hasIndexBuffer()) {
+						vkCmdDrawIndexed(command_pool->getCurrentBuffer(), mesh->getIndexCount(), 1, 0, 0, 0);
+					} else {
+						vkCmdDraw(command_pool->getCurrentBuffer(), mesh->getVertexCount(), 1, 0, 0);
+					}
+				}
+				mesh->unbind();
+			}
+			material->unbind();
+		}
+		swapchain->getRenderPass().end(command_pool->getCurrentBuffer());
+		command_pool->end(current_frame);
 	}
 
 	void VK_Renderer::beginFrame() {
 		//wait for last frame i to finish
 		frames_in_flight_fences[current_frame]->wait();
 
-		//getImageIndex
 		VkResult result = vkAcquireNextImageKHR(device->getHandle(),
 												swapchain->getHandle(),
 												UINT64_MAX,
@@ -171,26 +203,13 @@ namespace HBE {
 	void VK_Renderer::endFrame() {
 
 		current_frame = (current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
+		render_cache.clear();
 	}
 
-	void VK_Renderer::draw(const HBE::Transform &transform,
-						   const HBE::Mesh &mesh,
-						   const HBE::Material &material) {
-		command_pool->begin(current_frame);
-		swapchain->getRenderPass().begin(command_pool->getCurrentBuffer(), current_image);
-
-		material.getPipeline()->bind();
-		mesh.bind();
-		if (mesh.hasIndexBuffer()) {
-			vkCmdDrawIndexed(command_pool->getCurrentBuffer(), mesh.getIndexCount(), 1, 0, 0, 0);
-		} else {
-			vkCmdDraw(command_pool->getCurrentBuffer(), mesh.getVertexCount(), 1, 0, 0);
-		}
-
-		mesh.unbind();
-		material.getPipeline()->unbind();
-		swapchain->getRenderPass().end(command_pool->getCurrentBuffer());
-		command_pool->end(current_frame);
+	void VK_Renderer::draw(const Transform &transform, const Mesh &mesh, const Material &material) {
+		auto it_material = render_cache.try_emplace(&material).first;
+		auto it_mesh = it_material->second.try_emplace(&mesh).first;
+		it_mesh->second.push_back(&transform);
 	}
 
 	void VK_Renderer::drawInstanced(const HBE::Mesh &mesh,

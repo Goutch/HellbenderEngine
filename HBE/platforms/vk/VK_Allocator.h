@@ -14,6 +14,7 @@ namespace HBE {
         const VkDeviceSize size;
         const VkDeviceSize offset;
         Block& block;
+		std::list<Allocation>::iterator position_in_block;
     };
     struct Block {
         VkDeviceSize size;
