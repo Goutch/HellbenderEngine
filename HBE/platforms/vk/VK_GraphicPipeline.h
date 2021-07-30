@@ -2,76 +2,91 @@
 
 #include <core/resource/GraphicPipeline.h>
 #include <core/resource/VertexLayout.h>
+#include <array>
+#include "VK_Renderer.h"
 #include "vulkan/vulkan.h"
+#include "unordered_map"
 
 namespace HBE {
-    class VK_Device;
+	class VK_Device;
 
-    class VK_RenderPass;
+	class VK_RenderPass;
 
-    class VK_Renderer;
+	class VK_Renderer;
 
-    class VK_VertexLayout;
+	class VK_VertexLayout;
 
-    class VK_GraphicPipeline : public GraphicPipeline {
-        VK_Device *device = nullptr;
-        VK_Renderer *renderer = nullptr;
-        VkPipelineLayout pipeline_layout_handle{};
-        VkPipeline handle = VK_NULL_HANDLE;
-    public:
-        VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer);
+	class VK_DescriptorSet;
 
-        void setDrawFlags(DRAW_FLAGS flags) override;
+	class VK_Buffer;
 
-        DRAW_FLAGS getDrawFlags() const override;
+	class VK_GraphicPipeline : public GraphicPipeline {
+		VK_Device *device = nullptr;
+		VK_Renderer *renderer = nullptr;
+		VkPipelineLayout pipeline_layout_handle{};
+		VkPipeline handle = VK_NULL_HANDLE;
+		std::array<std::unordered_map<glm::uint32_t, VK_Buffer *>, MAX_FRAMES_IN_FLIGHT> vertex_uniform_buffers;
+		std::array<std::unordered_map<glm::uint32_t, VK_Buffer *>, MAX_FRAMES_IN_FLIGHT> frag_uniform_buffers;
+	public:
+		VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer);
 
-        void setShaders(const Shader *vertex, const Shader *fragment, const VertexLayout *layout);
+		void setDrawFlags(DRAW_FLAGS flags) override;
 
-        void setShaders(const Shader *vertex, const Shader *geometry, const Shader *fragment, const VertexLayout *layout);
+		DRAW_FLAGS getDrawFlags() const override;
 
-        ~VK_GraphicPipeline() override;
+		void setShaders(const Shader *vertex, const Shader *fragment, const VertexLayout *layout);
 
-        void bind() const override;
+		void setShaders(const Shader *vertex, const Shader *geometry, const Shader *fragment, const VertexLayout *layout);
 
-        void unbind() const override;
+		~VK_GraphicPipeline() override;
 
-        void setUniform(const std::string &name, int i) const override;
+		void bind() const override;
 
-        void setUniform(const std::string &name, float f) const override;
+		void unbind() const override;
 
-        void setUniform(const std::string &name, const glm::vec2 &v) const override;
 
-        void setUniform(const std::string &name, const glm::vec3 &v) const override;
 
-        void setUniform(const std::string &name, const glm::vec4 &v) const override;
+		void setUniform(const std::string &name, void *data) const override;
 
-        void setUniform(const std::string &name, const glm::mat3 &m) const override;
+		void setUniform(const std::string &name, int i) const override;
 
-        void setUniform(const std::string &name, const glm::mat4 &m) const override;
+		void setUniform(const std::string &name, float f) const override;
 
-        void setUniform(unsigned int location, int i) const override;
+		void setUniform(const std::string &name, const glm::vec2 &v) const override;
 
-        void setUniform(unsigned int location, float f) const override;
+		void setUniform(const std::string &name, const glm::vec3 &v) const override;
 
-        void setUniform(unsigned int location, const glm::vec2 &v) const override;
+		void setUniform(const std::string &name, const glm::vec4 &v) const override;
 
-        void setUniform(unsigned int location, const glm::vec3 &v) const override;
+		void setUniform(const std::string &name, const glm::mat3 &m) const override;
 
-        void setUniform(unsigned int location, const glm::vec4 &v) const override;
+		void setUniform(const std::string &name, const glm::mat4 &m) const override;
 
-        void setUniform(unsigned int location, const glm::mat3 &m) const override;
+		void setUniform(uint32_t binding, void *data) const override;
 
-        void setUniform(unsigned int location, const glm::mat4 &m) const override;
+		void setUniform(unsigned int location, int i) const override;
 
-        void setUniformIntArray(unsigned int location, int *i, unsigned int count) const override;
+		void setUniform(unsigned int location, float f) const override;
 
-        void setUniformFloatArray(unsigned int location, float *f, unsigned int count) const override;
+		void setUniform(unsigned int location, const glm::vec2 &v) const override;
 
-        void setUniformVec2Array(unsigned int location, const glm::vec2 *v, unsigned int count) const override;
+		void setUniform(unsigned int location, const glm::vec3 &v) const override;
 
-        void setUniformVec3Array(unsigned int location, const glm::vec3 *v, unsigned int count) const override;
+		void setUniform(unsigned int location, const glm::vec4 &v) const override;
 
-        void setUniformVec4Array(unsigned int location, const glm::vec4 *v, unsigned int count) const override;
+		void setUniform(unsigned int location, const glm::mat3 &m) const override;
 
-    };
+		void setUniform(unsigned int location, const glm::mat4 &m) const override;
+
+		void setUniformIntArray(unsigned int location, int *i, unsigned int count) const override;
+
+		void setUniformFloatArray(unsigned int location, float *f, unsigned int count) const override;
+
+		void setUniformVec2Array(unsigned int location, const glm::vec2 *v, unsigned int count) const override;
+
+		void setUniformVec3Array(unsigned int location, const glm::vec3 *v, unsigned int count) const override;
+
+		void setUniformVec4Array(unsigned int location, const glm::vec4 *v, unsigned int count) const override;
+
+	};
 }

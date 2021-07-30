@@ -9,9 +9,12 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif ()
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/)
+
+
 find_package(Vulkan)
 if (VULKAN_FOUND)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/)
     include_directories(${Vulkan_INCLUDE_DIRS})
     set(VK_FILES
             platforms/vk/VK_Renderer.cpp
@@ -56,9 +59,15 @@ if (VULKAN_FOUND)
             platforms/vk/VK_Memory.cpp
             platforms/vk/VK_Memory.h
             platforms/vk/VK_Allocator.cpp
-            platforms/vk/VK_Allocator.h)
+            platforms/vk/VK_Allocator.h
+            platforms/vk/VK_DescriptorSet.cpp
+            platforms/vk/VK_DescriptorSet.h platforms/vk/VK_CONSTANTS.h)
 
     add_compile_definitions(VULKAN_RENDERER)
+
+
+    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/")
+    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/")
 else ()
     add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/")
     add_compile_definitions(OPENGL_RENDERER)
@@ -156,7 +165,7 @@ set(CORE_FILES
         core/serialization/ComponentRegistry.h
         core/serialization/ComponentRegistry.h
 
-)
+        )
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}
@@ -165,6 +174,7 @@ add_library(${PROJECT_NAME} SHARED
         ${VK_FILES}
         )
 
+
 target_include_directories(${PROJECT_NAME}
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/contrib/zlib/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm/"
@@ -172,16 +182,9 @@ target_include_directories(${PROJECT_NAME}
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/include"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/include/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb/"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/")
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/"
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/")
 
-
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/")
-set(GLSLANG_LIBS
-        OSDependent
-        OGLCompiler
-        SPIRV
-        glslang
-       )
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     message("Using Clang not supported")
@@ -224,10 +227,25 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     endif ()
 endif ()
 if (VULKAN_FOUND)
+    set(GLSLANG_LIBS
+            OSDependent
+            OGLCompiler
+            SPIRV
+            glslang
+            )
     target_link_libraries(${PROJECT_NAME} PRIVATE ${Vulkan_LIBRARY})
+    target_link_libraries(${PROJECT_NAME}
+            PRIVATE spirv-cross-glsl
+            PRIVATE spirv-cross-cpp
+            PRIVATE spirv-cross-c-shared
+            PRIVATE spirv-cross-reflect
+            PRIVATE spirv-cross-msl
+            PRIVATE spirv-cross-util
+            PRIVATE spirv-cross-core)
+
 else ()
     target_link_libraries(${PROJECT_NAME} PRIVATE glad)
 endif ()
-target_link_libraries(${PROJECT_NAME} PUBLIC glfw ${GLSLANG_LIBS})
+target_link_libraries(${PROJECT_NAME} PUBLIC glfw ${GLSLANG_LIBS} )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE HB_BUILD)

@@ -165,8 +165,8 @@ void main()
 		 DEFAULT_QUAD = quad;
 
 		 //-----------------------------------DEFAULT_MESH_MATERIAL--------------------------
-		 ShaderDB::add("default/vert_unlit", default_mesh_vertex_shader_code, SHADER_TYPE::VERTEX);
-		 ShaderDB::add("default/frag_unlit", default_mesh_fragment_shader_code, SHADER_TYPE::FRAGMENT);
+		 ShaderDB::add("default/vert_unlit", default_mesh_vertex_shader_code, SHADER_STAGE::VERTEX);
+		 ShaderDB::add("default/frag_unlit", default_mesh_fragment_shader_code, SHADER_STAGE::FRAGMENT);
 		 GraphicPipeline *default_graphic_pipeline = new GraphicPipeline();
 		 default_graphic_pipeline->setShaders(
 				 ShaderDB::get("default/vert_unlit"),
@@ -178,7 +178,7 @@ void main()
 		 DEFAULT_MESH_MATERIAL = default_mesh_material;
 
 		 //-----------------------------------DEFAULT_INSTANCED_PIPELINE----------------
-		 ShaderDB::add("default/vert_unlit_instanced", default_instanced_vertex_shader_code, SHADER_TYPE::VERTEX);
+		 ShaderDB::add("default/vert_unlit_instanced", default_instanced_vertex_shader_code, SHADER_STAGE::VERTEX);
 		 GraphicPipeline *default_instanced_shader_program = new GraphicPipeline();
 		 default_instanced_shader_program->setShaders(
 				 ShaderDB::get("default/vert_unlit_instanced"),
@@ -188,8 +188,8 @@ void main()
 		//------------------------------------DEFAULT_SCREEN_PIPELINE---------------------------
 		/*auto screen_vertex = Resources::createInRegistry<Shader>("default/screen_vertex");
 		auto screen_frag = Resources::createInRegistry<Shader>("default/screen_frag");
-		screen_vertex->setSource(default_screen_vertex_shader_code, SHADER_TYPE::VERTEX);
-		screen_frag->setSource(default_screen_fragment_shader_code, SHADER_TYPE::FRAGMENT);
+		screen_vertex->setSource(default_screen_vertex_shader_code, SHADER_STAGE::VERTEX);
+		screen_frag->setSource(default_screen_fragment_shader_code, SHADER_STAGE::FRAGMENT);
 		auto default_screen_pipeline = Resources::createInRegistry<GraphicPipeline>("default/screen_pipeline");
 		auto default_screen_layout = Resources::createInRegistry<VertexLayout>("default/screen_layout");
 		default_screen_layout->setLayoutTypes({GLSL_TYPE::VEC2F, GLSL_TYPE::VEC2F});

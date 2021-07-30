@@ -98,20 +98,18 @@ namespace HBE {
 							 const mat4 &projection_matrix,
 							 const mat4 &view_matrix) {
 		command_pool->begin(current_frame);
+		UniformBufferObject ubo{};
 		swapchain->getRenderPass().begin(command_pool->getCurrentBuffer(), current_image);
 		for (const auto& material_kv:render_cache) {
 			const Material *material = material_kv.first;
 			const GraphicPipeline *pipeline = material->getPipeline();
 			material->bind();
-
-			pipeline->setUniform("projection_matrix", projection_matrix);
-			pipeline->setUniform("view_matrix", view_matrix);
-
 			for (const auto& mesh_kv :material_kv.second) {
 				const Mesh *mesh = mesh_kv.first;
 				mesh->bind();
 				for (const Transform *transform:mesh_kv.second) {
-					pipeline->setUniform("transform_matrix", transform->getMatrix());
+					ubo.transform=transform->getMatrix();
+					pipeline->setUniform(0,&ubo);
 					if (mesh->hasIndexBuffer()) {
 						vkCmdDrawIndexed(command_pool->getCurrentBuffer(), mesh->getIndexCount(), 1, 0, 0, 0);
 					} else {
@@ -231,6 +229,10 @@ namespace HBE {
 
 	VK_CommandPool *VK_Renderer::getCommandPool() {
 		return command_pool;
+	}
+
+	uint32_t VK_Renderer::getCurrentFrame() const {
+		return current_frame;
 	}
 
 

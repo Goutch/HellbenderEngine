@@ -6,23 +6,24 @@
 #include "map"
 #include "memory"
 #include "vector"
-
+#include "GLSL_TYPE.h"
 namespace HBE {
-    enum class SHADER_TYPE {
-        COMPUTE, VERTEX, FRAGMENT, GEOMETRY, NONE
+    enum class SHADER_STAGE {
+        COMPUTE, VERTEX, FRAGMENT, GEOMETRY
     };
 
     class HB_API Shader : public Resource {
-
-        SHADER_TYPE type;
+	protected:
+        SHADER_STAGE type;
     public:
-        void load(const std::string &path, SHADER_TYPE type);
+        void load(const std::string &path, SHADER_STAGE type);
 
-        virtual void setSource(const std::string &source, SHADER_TYPE type) = 0;
+        virtual void setSource(const std::string &source, SHADER_STAGE type) = 0;
 
-        SHADER_TYPE getType();
+        SHADER_STAGE getType();
 
         virtual ~Shader() = default;
+
 
     private:
         void getSource(const std::string &path, std::vector<char> &buffer);

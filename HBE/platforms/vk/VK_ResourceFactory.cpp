@@ -25,9 +25,9 @@ namespace HBE {
         return new VK_Mesh(renderer->getDevice(), renderer->getCommandPool());
     }
 
-    Shader *VK_ResourceFactory::createShader() const {
-        return new VK_Shader(renderer->getDevice());
-    }
+	Shader *VK_ResourceFactory::createShader() const {
+		return new VK_Shader(renderer->getDevice());
+	}
 
     ComputePipeline *VK_ResourceFactory::createComputePipeline() const {
         Log::error("Compute shaders not implemented in Vulkan");

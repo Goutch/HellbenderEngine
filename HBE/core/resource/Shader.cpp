@@ -7,11 +7,11 @@
 
 namespace HBE {
 
-    SHADER_TYPE Shader::getType() {
+    SHADER_STAGE Shader::getType() {
         return type;
     }
 
-    void Shader::load(const std::string &path, SHADER_TYPE type) {
+    void Shader::load(const std::string &path, SHADER_STAGE type) {
         std::vector<char> source;
         getSource(path, source);
         setSource(source.data(),type);

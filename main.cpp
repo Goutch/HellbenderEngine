@@ -29,8 +29,8 @@ int main() {
 	auto mesh = Resources::createInRegistry<Mesh>("mesh");
 	auto material = Resources::createInRegistry<Material>("material");
 
-	vert->load("../../res/shaders/VK.vert", SHADER_TYPE::VERTEX);
-	frag->load("../../res/shaders/VK.frag", SHADER_TYPE::FRAGMENT);
+	vert->load("../../res/shaders/VK.vert", SHADER_STAGE::VERTEX);
+	frag->load("../../res/shaders/VK.frag", SHADER_STAGE::FRAGMENT);
 	layout->setLayoutTypes({GLSL_TYPE::VEC2F, GLSL_TYPE::VEC3F});
 	pipeline->setShaders(vert, frag, layout);
 
@@ -53,6 +53,7 @@ int main() {
 
 	auto camera = Application::scene->instantiate<Camera>();
 	camera->setRenderMode(RenderMode::ORTHOGRAPHIC);
+
 	//-----------------------EVENTS------------------
 	Application::onUpdate.subscribe(&onUpdate);
 
