@@ -13,6 +13,7 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
 
 find_package(Vulkan)
 if (VULKAN_FOUND)
+    message("Found vulkan at ${Vulkan_INCLUDE_DIRS}!")
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/)
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/)
     include_directories(${Vulkan_INCLUDE_DIRS})
@@ -61,7 +62,7 @@ if (VULKAN_FOUND)
             platforms/vk/VK_Allocator.cpp
             platforms/vk/VK_Allocator.h
             platforms/vk/VK_DescriptorSet.cpp
-            platforms/vk/VK_DescriptorSet.h platforms/vk/VK_CONSTANTS.h)
+            platforms/vk/VK_DescriptorSet.h platforms/vk/VK_CONSTANTS.h platforms/vk/VK_DescriptorPool.cpp platforms/vk/VK_DescriptorPool.h)
 
     add_compile_definitions(VULKAN_RENDERER)
 
