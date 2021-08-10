@@ -44,7 +44,7 @@ namespace HBE {
 		virtual void setUniform(const std::string &name, const glm::mat4 &m) const = 0;
 
 
-		virtual void setUniform(uint32_t binding, void *data) const = 0;
+		virtual void setUniform(uint32_t binding, void *data, uint32_t byte_count) const = 0;
 
 		virtual void setUniform(unsigned int location, int i) const = 0;
 

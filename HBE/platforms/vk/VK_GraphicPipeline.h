@@ -3,9 +3,9 @@
 #include <core/resource/GraphicPipeline.h>
 #include <core/resource/VertexLayout.h>
 #include <array>
-#include "VK_Renderer.h"
 #include "vulkan/vulkan.h"
 #include "unordered_map"
+
 
 namespace HBE {
 	class VK_Device;
@@ -16,17 +16,18 @@ namespace HBE {
 
 	class VK_VertexLayout;
 
-	class VK_DescriptorSet;
+	class VK_DescriptorPool;
 
 	class VK_Buffer;
 
 	class VK_GraphicPipeline : public GraphicPipeline {
 		VK_Device *device = nullptr;
 		VK_Renderer *renderer = nullptr;
+		VK_DescriptorPool *descriptor_pool = nullptr;
 		VkPipelineLayout pipeline_layout_handle{};
 		VkPipeline handle = VK_NULL_HANDLE;
-		std::array<std::unordered_map<glm::uint32_t, VK_Buffer *>, MAX_FRAMES_IN_FLIGHT> vertex_uniform_buffers;
-		std::array<std::unordered_map<glm::uint32_t, VK_Buffer *>, MAX_FRAMES_IN_FLIGHT> frag_uniform_buffers;
+
+
 	public:
 		VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer);
 
@@ -45,7 +46,6 @@ namespace HBE {
 		void unbind() const override;
 
 
-
 		void setUniform(const std::string &name, void *data) const override;
 
 		void setUniform(const std::string &name, int i) const override;
@@ -62,7 +62,7 @@ namespace HBE {
 
 		void setUniform(const std::string &name, const glm::mat4 &m) const override;
 
-		void setUniform(uint32_t binding, void *data) const override;
+		void setUniform(uint32_t binding, void *data, uint32_t byte_count) const override;
 
 		void setUniform(unsigned int location, int i) const override;
 

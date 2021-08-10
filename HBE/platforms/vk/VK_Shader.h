@@ -5,7 +5,7 @@
 #include "string"
 #include "VK_Buffer.h"
 #include "VK_CONSTANTS.h"
-
+#include "VK_DescriptorSetLayout.h"
 
 namespace HBE {
 	class VK_Renderer;
@@ -16,10 +16,8 @@ namespace HBE {
 
 	class VK_Shader : public Shader {
 		const VK_Device *device;
-		VkShaderModule handle;
-		std::unordered_map<uint32_t, VkDescriptorSetLayout> descriptor_sets_layouts;
-		std::unordered_map<uint32_t, VkDeviceSize> uniform_sizes;
-		std::unordered_map<std::string, uint32_t> bindings;
+		VkShaderModule handle = VK_NULL_HANDLE;
+		std::vector<VK_DescriptorSetLayout*> descriptor_sets_layouts;
 
 	public:
 
@@ -29,8 +27,8 @@ namespace HBE {
 		void setSource(const std::string &source, SHADER_STAGE stage) override;
 		const VkShaderModule &getHandle() const;
 
-		std::unordered_map<uint32_t, VkDescriptorSetLayout> getDescriptorSetsLayouts() const;
-		VkDeviceSize getBindingSize(uint32_t binding) const;
+		const std::vector<VK_DescriptorSetLayout*> & getDescriptorSetsLayouts() const;
+
 
 	};
 }

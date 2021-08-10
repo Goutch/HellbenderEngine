@@ -10,7 +10,7 @@ namespace HBE {
     void Material::bind() const {
         if (pipeline != nullptr) {
             pipeline->bind();
-            for (auto p:properties) {
+            /*for (auto p:properties) {
                 switch (p.second.type) {
                     //todo:
                     case GLSL_TYPE::FLOAT:
@@ -26,7 +26,7 @@ namespace HBE {
                         pipeline->setUniform(p.first, *static_cast<vec4 *>(p.second.value));
                         break;
                     case GLSL_TYPE::MAT4F:
-                        pipeline->setUniform(p.first, *static_cast<mat4 *>(p.second.value));
+						pipeline->setUniform(p.first, *static_cast<mat4 *>(p.second.value), 0);
                         break;
                     case GLSL_TYPE::INT:
                         pipeline->setUniform(p.first, *static_cast<int *>(p.second.value));
@@ -56,7 +56,7 @@ namespace HBE {
                     case MAT4UI:
                         break;
                 }
-            }
+            }*/
             pipeline->setUniform("material_color", color);
             if (texture) {
                 pipeline->setUniform("has_texture", true);

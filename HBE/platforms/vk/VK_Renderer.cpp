@@ -22,6 +22,7 @@ namespace HBE {
 	struct UniformBufferObject {
 		mat4 transform;
 		mat4 view;
+		mat4 projection;
 	};
 
 
@@ -99,17 +100,19 @@ namespace HBE {
 							 const mat4 &view_matrix) {
 		command_pool->begin(current_frame);
 		UniformBufferObject ubo{};
+		ubo.view = view_matrix;
+		ubo.projection = projection_matrix;
 		swapchain->getRenderPass().begin(command_pool->getCurrentBuffer(), current_image);
-		for (const auto& material_kv:render_cache) {
+		for (const auto &material_kv:render_cache) {
 			const Material *material = material_kv.first;
 			const GraphicPipeline *pipeline = material->getPipeline();
 			material->bind();
-			for (const auto& mesh_kv :material_kv.second) {
+			for (const auto &mesh_kv :material_kv.second) {
 				const Mesh *mesh = mesh_kv.first;
 				mesh->bind();
 				for (const Transform *transform:mesh_kv.second) {
-					ubo.transform=transform->getMatrix();
-					pipeline->setUniform(0,&ubo);
+					ubo.transform = transform->getMatrix();
+					pipeline->setUniform(0, &ubo, 0);
 					if (mesh->hasIndexBuffer()) {
 						vkCmdDrawIndexed(command_pool->getCurrentBuffer(), mesh->getIndexCount(), 1, 0, 0, 0);
 					} else {

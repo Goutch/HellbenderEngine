@@ -13,7 +13,7 @@ void onUpdate(float delta) {
 }
 
 struct Vertex {
-	vec2 position;
+	vec3 position;
 	vec3 color;
 };
 
@@ -31,14 +31,14 @@ int main() {
 
 	vert->load("../../res/shaders/VK.vert", SHADER_STAGE::VERTEX);
 	frag->load("../../res/shaders/VK.frag", SHADER_STAGE::FRAGMENT);
-	layout->setLayoutTypes({GLSL_TYPE::VEC2F, GLSL_TYPE::VEC3F});
+	layout->setLayoutTypes({GLSL_TYPE::VEC3F, GLSL_TYPE::VEC3F});
 	pipeline->setShaders(vert, frag, layout);
 
 	const std::vector<Vertex> vertices = {
-			{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-			{{0.5f,  -0.5f}, {0.0f, 1.0f, 0.0f}},
-			{{0.5f,  0.5f},  {0.0f, 0.0f, 1.0f}},
-			{{-0.5f, 0.5f},  {1.0f, 1.0f, 1.0f}}
+			{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+			{{0.5f,  -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+			{{0.5f,  0.5f,  0.0f}, {0.0f, 0.0f, 1.0f}},
+			{{-0.5f, 0.5f,  0.0f}, {1.0f, 1.0f, 1.0f}}
 	};
 	const std::vector<uint32_t> indices = {
 			0, 1, 2, 2, 3, 0
@@ -52,8 +52,9 @@ int main() {
 	meshRenderer->setMesh(*mesh);
 
 	auto camera = Application::scene->instantiate<Camera>();
-	camera->setRenderMode(RenderMode::ORTHOGRAPHIC);
-
+	camera->setRenderMode(RenderMode::PERSPECTIVE);
+	camera->entity->transform->setPosition(vec3(0, 0, 5));
+	camera->entity->attach<CameraController>();
 	//-----------------------EVENTS------------------
 	Application::onUpdate.subscribe(&onUpdate);
 

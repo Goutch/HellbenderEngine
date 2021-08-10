@@ -4,12 +4,14 @@
 #include "core/graphics/Window.h"
 
 #include "VK_Device.h"
-
+#include "VK_Renderer.h"
 #include "VK_RenderPass.h"
 #include "VK_CommandPool.h"
-
+#include "VK_Buffer.h"
 #include "VK_Swapchain.h"
 #include "VK_VertexLayout.h"
+#include "VK_DescriptorPool.h"
+#include "VK_DescriptorSetLayout.h"
 
 namespace HBE {
 	VK_GraphicPipeline::VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer) {
@@ -18,18 +20,7 @@ namespace HBE {
 	}
 
 	VK_GraphicPipeline::~VK_GraphicPipeline() {
-		for (auto &vertex_uniform_buffer_array : vertex_uniform_buffers) {
-			for (size_t i = 0; i < vertex_uniform_buffer_array.size(); ++i) {
-				delete vertex_uniform_buffer_array[i];
-			}
-			vertex_uniform_buffer_array.clear();
-		}
-		for (auto &frag_uniform_buffer_array : frag_uniform_buffers) {
-			for (size_t i = 0; i < frag_uniform_buffer_array.size(); ++i) {
-				delete frag_uniform_buffer_array[i];
-			}
-			frag_uniform_buffer_array.clear();
-		}
+		delete descriptor_pool;
 		vkDestroyPipeline(device->getHandle(), handle, nullptr);
 		vkDestroyPipelineLayout(device->getHandle(), pipeline_layout_handle, nullptr);
 	}
@@ -37,6 +28,14 @@ namespace HBE {
 
 	void VK_GraphicPipeline::bind() const {
 		vkCmdBindPipeline(renderer->getCommandPool()->getCurrentBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, handle);
+		vkCmdBindDescriptorSets(renderer->getCommandPool()->getCurrentBuffer(),
+								VK_PIPELINE_BIND_POINT_GRAPHICS,
+								pipeline_layout_handle,
+								0,
+								descriptor_pool->getSets(renderer->getCurrentFrame()).size(),
+								descriptor_pool->getSets(renderer->getCurrentFrame()).data(),
+								0,
+								nullptr);
 	}
 
 	void VK_GraphicPipeline::unbind() const {
@@ -160,41 +159,36 @@ namespace HBE {
 		  dynamicState.dynamicStateCount = 2;
 		  dynamicState.pDynamicStates = dynamicStates;*/
 
-		const auto &vertex_sets_layouts = vk_vertex->getDescriptorSetsLayouts();
-		const auto &frag_sets_layouts = vk_frag->getDescriptorSetsLayouts();
+		const std::vector<VK_DescriptorSetLayout*> &vertex_sets_layouts = vk_vertex->getDescriptorSetsLayouts();
+		const std::vector<VK_DescriptorSetLayout*> &frag_sets_layouts = vk_frag->getDescriptorSetsLayouts();
 
-		std::vector<VkDescriptorSetLayout> descriptor_set_layouts;
+
+		if (descriptor_pool) delete descriptor_pool;
+		std::vector<const VK_DescriptorSetLayout *> descriptor_set_layouts;
 		descriptor_set_layouts.resize(vertex_sets_layouts.size() + frag_sets_layouts.size());
+		for (int i = 0; i < descriptor_set_layouts.size(); ++i) {
+			if (i < vertex_sets_layouts.size()) {
+				descriptor_set_layouts[i] = vertex_sets_layouts[i];
+			} else {
+				descriptor_set_layouts[i] = frag_sets_layouts[i - vertex_sets_layouts.size()];
+			}
+		}
+		descriptor_pool = new VK_DescriptorPool(device, descriptor_set_layouts);
+		std::vector<VkDescriptorSetLayout> descriptor_set_layouts_handles;
+		descriptor_set_layouts_handles.resize(vertex_sets_layouts.size() + frag_sets_layouts.size());
 		int count = 0;
-		for (auto layout:vertex_sets_layouts) {
-			descriptor_set_layouts[count] = layout.second;
+		for (const VK_DescriptorSetLayout *set_layout:vertex_sets_layouts) {
+			descriptor_set_layouts_handles[count] = set_layout->getHandle();
 			count++;
 		}
-		for (auto layout:frag_sets_layouts) {
-			descriptor_set_layouts[count] = layout.second;
+		for (const VK_DescriptorSetLayout *set_layout:frag_sets_layouts) {
+			descriptor_set_layouts_handles[count] = set_layout->getHandle();
 			count++;
 		}
-
-
-		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-			vertex_uniform_buffers[i].clear();
-			for (auto layout:vertex_sets_layouts) {
-				VkDeviceSize size = vk_vertex->getBindingSize(layout.first);
-				vertex_uniform_buffers[i].emplace(layout.first, new VK_Buffer(device, size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_Buffer::MAPPABLE));
-			}
-		}
-		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-			frag_uniform_buffers[i].clear();
-			for (auto layout:frag_sets_layouts) {
-				VkDeviceSize size = vk_vertex->getBindingSize(layout.first);
-				frag_uniform_buffers[i].emplace(layout.first, new VK_Buffer(device, size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_Buffer::MAPPABLE));
-			}
-		}
-
 		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		pipelineLayoutInfo.setLayoutCount = descriptor_set_layouts.size(); // Optional
-		pipelineLayoutInfo.pSetLayouts = descriptor_set_layouts.data(); // Optional
+		pipelineLayoutInfo.setLayoutCount = descriptor_set_layouts_handles.size(); // Optional
+		pipelineLayoutInfo.pSetLayouts = descriptor_set_layouts_handles.data(); // Optional
 		pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
 		pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
 
@@ -314,8 +308,15 @@ namespace HBE {
 
 	}
 
-	void VK_GraphicPipeline::setUniform(uint32_t binding, void *data) const{
-		vertex_uniform_buffers[renderer->getCurrentFrame()].at(binding)->update(data);
+	void VK_GraphicPipeline::setUniform(uint32_t binding, void *data, uint32_t byte_count) const {
+		for (VK_Buffer *buffer:descriptor_pool->getBuffers(binding)) {
+
+			/*if (buffer->getAllocation() == byte_count) {
+				Log::error("size of uniform does not match buffer size");
+			}*/
+
+			buffer->update(data);
+		}
 	}
 
 	void VK_GraphicPipeline::setUniform(const std::string &name, void *data) const {

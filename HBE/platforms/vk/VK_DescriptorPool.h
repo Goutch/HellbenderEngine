@@ -1,24 +1,31 @@
 #pragma once
 
+#include <unordered_map>
 #include "vulkan/vulkan.h"
+#include "VK_CONSTANTS.h"
+#include "VK_Buffer.h"
+#include "array"
 
 namespace HBE {
-    class VK_Device;
+	class VK_Device;
 
-    class VK_DescriptorPool {
+	class VK_DescriptorSetLayout;
 
+	class VK_DescriptorPool {
+		VK_Device *device;
+		VkDescriptorPool handle;
+		std::array<std::vector<VkDescriptorSet>, MAX_FRAMES_IN_FLIGHT> descriptor_sets;
+		std::unordered_map<uint32_t, std::vector<VK_Buffer *>> buffers;
+		std::vector<const VK_DescriptorSetLayout *> layouts;
+	public:
+		~VK_DescriptorPool();
+		VK_DescriptorPool(VK_Device *device, std::vector<const VK_DescriptorSetLayout *> &layouts);
+		std::vector<VkDescriptorSet> &getSets(uint32_t i);
+		std::vector<VK_Buffer *> &getBuffers(uint32_t binding);
+	private:
 
-        VK_Device *device;
-        VkDescriptorPool handle;
-        std::vector<VkDescriptorSet> descriptor_sets;
-    public:
-        ~VK_DescriptorPool();
+		void createDescriptorSets();
 
-        VK_DescriptorPool(VK_Device *device, std::vector<VkDescriptorSetLayout> &layouts, uint32_t descriptor_sets_count);
-
-    private:
-
-        void createDescriptorSets(std::vector<VkDescriptorSetLayout> &layouts);
-    };
+	};
 }
 
