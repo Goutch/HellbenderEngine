@@ -11,10 +11,8 @@
 #include <Configs.h>
 #include <core/resource/Model.h>
 #include "Renderer.h"
-#include "core/resource/Material.h"
 #include "Window.h"
 #include "core/resource/Resources.h"
-#include "core/resource/VertexLayout.h"
 
 namespace HBE {
 	const Mesh *Graphics::DEFAULT_CUBE = nullptr;

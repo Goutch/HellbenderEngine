@@ -17,10 +17,10 @@
 #include "VK_Allocator.h"
 #include "VK_Mesh.h"
 #include "core/resource/Material.h"
+#include "VK_GraphicPipeline.h"
 
 namespace HBE {
 	struct UniformBufferObject {
-		mat4 transform;
 		mat4 view;
 		mat4 projection;
 	};
@@ -105,14 +105,14 @@ namespace HBE {
 		swapchain->getRenderPass().begin(command_pool->getCurrentBuffer(), current_image);
 		for (const auto &material_kv:render_cache) {
 			const Material *material = material_kv.first;
-			const GraphicPipeline *pipeline = material->getPipeline();
+			const VK_GraphicPipeline *pipeline = (VK_GraphicPipeline *) material->getPipeline();
 			material->bind();
+			pipeline->setUniform("ubo", &ubo);
 			for (const auto &mesh_kv :material_kv.second) {
 				const Mesh *mesh = mesh_kv.first;
 				mesh->bind();
 				for (const Transform *transform:mesh_kv.second) {
-					ubo.transform = transform->getMatrix();
-					pipeline->setUniform(0, &ubo, 0);
+					pipeline->setUniform("pc", transform->getMatrix());
 					if (mesh->hasIndexBuffer()) {
 						vkCmdDrawIndexed(command_pool->getCurrentBuffer(), mesh->getIndexCount(), 1, 0, 0, 0);
 					} else {

@@ -4,6 +4,17 @@ using namespace HBE;
 
 static Transform *transform;
 
+class Rotator : public Component {
+public:
+	void onAttach() override {
+		//Note: there is no need to unsubscribe in the onDetach function this is handled in the component class.
+		subscribeUpdate();
+	}
+
+	void onUpdate(float delta) override {
+		entity->transform->rotate(delta, vec3(0, 1, 0));
+	}
+};
 
 void onUpdate(float delta) {
 	//Shut down app if escape key is pressed
@@ -47,14 +58,26 @@ int main() {
 	mesh->setIndices(indices);
 	material->setPipeline(pipeline);
 
+	/*auto meshRenderer2 = Application::scene->instantiate<MeshRenderer>();
+	meshRenderer2->setMaterial(*material);
+	meshRenderer2->setMesh(*mesh);
+	meshRenderer2->entity->transform->setPosition(vec3(2, 0, 0));
+	meshRenderer2->entity->attach<Rotator>();*/
+
 	auto meshRenderer = Application::scene->instantiate<MeshRenderer>();
 	meshRenderer->setMaterial(*material);
 	meshRenderer->setMesh(*mesh);
+	meshRenderer->entity->transform->translate(vec3(1, 0, 0));
+
+	auto mr2 = Application::scene->instantiate<MeshRenderer>();
+	mr2->setMaterial(*material);
+	mr2->setMesh(*mesh);
+	mr2->entity->attach<Rotator>();
 
 	auto camera = Application::scene->instantiate<Camera>();
 	camera->setRenderMode(RenderMode::PERSPECTIVE);
 	camera->entity->transform->setPosition(vec3(0, 0, 5));
-	camera->entity->attach<CameraController>();
+	//camera->entity->attach<CameraController>();
 	//-----------------------EVENTS------------------
 	Application::onUpdate.subscribe(&onUpdate);
 

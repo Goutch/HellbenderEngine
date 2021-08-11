@@ -54,6 +54,8 @@ namespace HBE {
 
 		const VK_Shader *vk_vertex = (dynamic_cast<const VK_Shader *>(vertex));
 		const VK_Shader *vk_frag = (dynamic_cast<const VK_Shader *>(fragment));
+		shaders.emplace_back(vk_vertex);
+		shaders.emplace_back(vk_frag);
 		VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
 		vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 		vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
@@ -82,13 +84,14 @@ namespace HBE {
 		inputAssembly.primitiveRestartEnable = VK_FALSE;
 
 		//-------------------Viewports and scissors--------------------
-		VkViewport viewport{};
-		viewport.x = 0.0f;
-		viewport.y = 0.0f;
+
 		int width, height;
 		Graphics::getWindow()->getSize(width, height);
+		VkViewport viewport{};
+		viewport.x = 0.0f;
+		viewport.y = (float) height;
 		viewport.width = (float) width;
-		viewport.height = (float) height;
+		viewport.height = (float) -height;
 		viewport.minDepth = 0.0f;
 		viewport.maxDepth = 1.0f;
 
@@ -110,7 +113,7 @@ namespace HBE {
 		rasterizer.rasterizerDiscardEnable = VK_FALSE;
 		rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
 		rasterizer.lineWidth = 1.0f;
-		rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+		rasterizer.cullMode = VK_CULL_MODE_NONE;
 		rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
 		rasterizer.depthBiasEnable = VK_FALSE;
 		rasterizer.depthBiasConstantFactor = 0.0f; // Optional
@@ -159,8 +162,8 @@ namespace HBE {
 		  dynamicState.dynamicStateCount = 2;
 		  dynamicState.pDynamicStates = dynamicStates;*/
 
-		const std::vector<VK_DescriptorSetLayout*> &vertex_sets_layouts = vk_vertex->getDescriptorSetsLayouts();
-		const std::vector<VK_DescriptorSetLayout*> &frag_sets_layouts = vk_frag->getDescriptorSetsLayouts();
+		const std::vector<VK_DescriptorSetLayout *> &vertex_sets_layouts = vk_vertex->getDescriptorSetsLayouts();
+		const std::vector<VK_DescriptorSetLayout *> &frag_sets_layouts = vk_frag->getDescriptorSetsLayouts();
 
 
 		if (descriptor_pool) delete descriptor_pool;
@@ -185,12 +188,27 @@ namespace HBE {
 			descriptor_set_layouts_handles[count] = set_layout->getHandle();
 			count++;
 		}
+
+		const std::vector<VkPushConstantRange> &vertex_push_constants = vk_vertex->getPushConstantRanges();
+		const std::vector<VkPushConstantRange> &frag_push_constants = vk_frag->getPushConstantRanges();
+
+		std::vector<VkPushConstantRange> push_constant_ranges;
+		push_constant_ranges.resize(vertex_push_constants.size() + frag_push_constants.size());
+		for (int i = 0; i < push_constant_ranges.size(); ++i) {
+			if (i < vertex_push_constants.size()) {
+				push_constant_ranges[i] = vertex_push_constants[i];
+			} else {
+				push_constant_ranges[i] = frag_push_constants[i - vertex_push_constants.size()];
+			}
+		}
+
+
 		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		pipelineLayoutInfo.setLayoutCount = descriptor_set_layouts_handles.size(); // Optional
-		pipelineLayoutInfo.pSetLayouts = descriptor_set_layouts_handles.data(); // Optional
-		pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
-		pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
+		pipelineLayoutInfo.setLayoutCount = descriptor_set_layouts_handles.size();
+		pipelineLayoutInfo.pSetLayouts = descriptor_set_layouts_handles.data();
+		pipelineLayoutInfo.pushConstantRangeCount = push_constant_ranges.size();
+		pipelineLayoutInfo.pPushConstantRanges = push_constant_ranges.data();
 
 		if (vkCreatePipelineLayout(device->getHandle(), &pipelineLayoutInfo, nullptr, &pipeline_layout_handle) !=
 			VK_SUCCESS) {
@@ -305,22 +323,29 @@ namespace HBE {
 	}
 
 	void VK_GraphicPipeline::setUniform(const std::string &name, const mat4 &m) const {
-
+		setUniform(name,(void*)&m[0]);
 	}
 
-	void VK_GraphicPipeline::setUniform(uint32_t binding, void *data, uint32_t byte_count) const {
+	void VK_GraphicPipeline::setUniform(uint32_t binding, void *data) const {
 		for (VK_Buffer *buffer:descriptor_pool->getBuffers(binding)) {
-
-			/*if (buffer->getAllocation() == byte_count) {
-				Log::error("size of uniform does not match buffer size");
-			}*/
-
 			buffer->update(data);
 		}
 	}
 
 	void VK_GraphicPipeline::setUniform(const std::string &name, void *data) const {
-
+		for (const VK_Shader *shader:shaders) {
+			auto it = shader->getInputs().find(name);
+			if (it != shader->getInputs().end()) {
+				if (it->second.type == VK_Shader::UNIFORM_BUFFER) {
+					setUniform(it->second.binding,data);
+					return;
+				} else if (it->second.type == VK_Shader::PUSH_CONSTANT) {
+					VkPushConstantRange range = shader->getPushConstantRanges()[it->second.index];
+					vkCmdPushConstants(renderer->getCommandPool()->getCurrentBuffer(), pipeline_layout_handle, shader->getStage(), range.offset, range.size, data);
+					return;
+				}
+			}
+		}
 	}
 
 

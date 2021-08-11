@@ -20,14 +20,14 @@ namespace HBE {
 
 	class VK_Buffer;
 
+	class VK_Shader;
 	class VK_GraphicPipeline : public GraphicPipeline {
 		VK_Device *device = nullptr;
 		VK_Renderer *renderer = nullptr;
 		VK_DescriptorPool *descriptor_pool = nullptr;
 		VkPipelineLayout pipeline_layout_handle{};
 		VkPipeline handle = VK_NULL_HANDLE;
-
-
+		std::vector<const VK_Shader*> shaders;
 	public:
 		VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer);
 
@@ -62,7 +62,7 @@ namespace HBE {
 
 		void setUniform(const std::string &name, const glm::mat4 &m) const override;
 
-		void setUniform(uint32_t binding, void *data, uint32_t byte_count) const override;
+		void setUniform(uint32_t binding, void *data) const override;
 
 		void setUniform(unsigned int location, int i) const override;
 
