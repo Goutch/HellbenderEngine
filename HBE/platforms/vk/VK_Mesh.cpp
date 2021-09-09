@@ -43,7 +43,7 @@ namespace HBE {
 									   reinterpret_cast<const void *>(indices.data()),
 									   buffer_size,
 									   VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-									   VK_Buffer::NONE);
+									   AllocFlags::NONE);
 	}
 
 	void VK_Mesh::setBuffer(uint32_t position, const std::vector<int> &data) {

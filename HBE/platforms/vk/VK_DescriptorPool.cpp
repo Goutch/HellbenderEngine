@@ -14,7 +14,7 @@ namespace HBE {
 		for (size_t i = 0; i < layouts.size(); ++i) {
 			for (uint32_t j = 0; j < MAX_FRAMES_IN_FLIGHT; ++j) {
 				buffers.emplace(layouts[i]->getBinding(),std::vector<VK_Buffer*>());
-				buffers[layouts[i]->getBinding()].emplace_back( new VK_Buffer(device, layouts[i]->getSize(), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_Buffer::MAPPABLE));
+				buffers[layouts[i]->getBinding()].emplace_back( new VK_Buffer(device, layouts[i]->getSize(), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, AllocFlags::MAPPABLE));
 			}
 		}
 		VkDescriptorPoolSize poolSize{};
@@ -38,10 +38,10 @@ namespace HBE {
 
 	void VK_DescriptorPool::createDescriptorSets() {
 		VkDescriptorSetLayout *flat_layouts = new VkDescriptorSetLayout[layouts.size()];
-		for (int i = 0; i < layouts.size(); ++i) {
+		for (size_t i = 0; i < layouts.size(); ++i) {
 			flat_layouts[i] = layouts[i]->getHandle();
 		}
-		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+		for (uint32_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
 			VkDescriptorSetAllocateInfo allocInfo{};
 			allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 			allocInfo.descriptorPool = handle;
@@ -75,7 +75,7 @@ namespace HBE {
 
 	VK_DescriptorPool::~VK_DescriptorPool() {
 		for (auto buffer_vector:buffers) {
-			for (int i = 0; i < buffer_vector.second.size(); ++i) {
+			for (size_t i = 0; i < buffer_vector.second.size(); ++i) {
 				delete buffer_vector.second[i];
 			}
 		}

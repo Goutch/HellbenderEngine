@@ -234,18 +234,18 @@ if (VULKAN_FOUND)
             SPIRV
             glslang
             )
-    target_link_libraries(${PROJECT_NAME} PRIVATE ${Vulkan_LIBRARY})
+    target_link_libraries(${PROJECT_NAME} PUBLIC ${Vulkan_LIBRARY})
     target_link_libraries(${PROJECT_NAME}
-            PRIVATE spirv-cross-glsl
-            PRIVATE spirv-cross-cpp
-            PRIVATE spirv-cross-c-shared
-            PRIVATE spirv-cross-reflect
-            PRIVATE spirv-cross-msl
-            PRIVATE spirv-cross-util
-            PRIVATE spirv-cross-core)
+            PUBLIC spirv-cross-glsl
+            PUBLIC spirv-cross-cpp
+            PUBLIC spirv-cross-c-shared
+            PUBLIC spirv-cross-reflect
+            PUBLIC spirv-cross-msl
+            PUBLIC spirv-cross-util
+            PUBLIC spirv-cross-core)
 
 else ()
-    target_link_libraries(${PROJECT_NAME} PRIVATE glad)
+    target_link_libraries(${PROJECT_NAME} PUBLIC glad)
 endif ()
 target_link_libraries(${PROJECT_NAME} PUBLIC glfw ${GLSLANG_LIBS} )
 

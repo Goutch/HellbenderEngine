@@ -2,31 +2,26 @@
 
 #include "vulkan/vulkan.h"
 #include "core/utility/Log.h"
-
+#include "VK_Allocator.h"
 namespace HBE {
 	class VK_Device;
 
 	struct Allocation;
 
 	class VK_Buffer {
-	public:
-		enum Flags {
-			NONE = 0,
-			MAPPABLE = 1,
-		};
 	private:
 		VK_Device *device;
 		VkBuffer handle;
 		Allocation *allocation;
-		Flags flags;
+		VkDeviceSize size;
 	public:
 		VK_Buffer &operator=(const VK_Buffer &) = delete;
 
 		VK_Buffer(const VK_Buffer &) = delete;
 
-		VK_Buffer(VK_Device *device, const void *data, VkDeviceSize size, VkBufferUsageFlags usage, Flags flags = NONE);
+		VK_Buffer(VK_Device *device, const void *data, VkDeviceSize size, VkBufferUsageFlags usage, AllocFlags flags = NONE);
 
-		VK_Buffer(VK_Device *device, VkDeviceSize size, VkBufferUsageFlags usage, Flags flags = NONE);
+		VK_Buffer(VK_Device *device, VkDeviceSize size, VkBufferUsageFlags usage, AllocFlags flags = NONE);
 
 		~VK_Buffer();
 

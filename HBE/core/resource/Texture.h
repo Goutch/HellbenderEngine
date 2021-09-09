@@ -11,10 +11,10 @@ namespace HBE {
         RG8,
         RGB8,
         RGBA8,
-        R32,
-        RG32,
-        RGB32,
-        RGBA23,
+        R32F,
+        RG32F,
+        RGB32F,
+        RGBA32F,
     };
 
     class HB_API Texture : public Resource {

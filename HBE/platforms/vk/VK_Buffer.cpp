@@ -1,33 +1,33 @@
 
 #include "VK_Buffer.h"
 #include "VK_Device.h"
-#include "VK_Allocator.h"
+
 
 namespace HBE {
-	VkMemoryPropertyFlags choseProperties(VK_Buffer::Flags flags) {
-		VkMemoryPropertyFlags properties = 0;
-		if (flags & VK_Buffer::MAPPABLE) {
-			properties |= VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-		} else {
-			properties |= VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-		}
 
-		return properties;
-	}
 
-	VK_Buffer::VK_Buffer(VK_Device *device, VkDeviceSize size, VkBufferUsageFlags usage, Flags flags) {
+	VK_Buffer::VK_Buffer(VK_Device *device, VkDeviceSize size, VkBufferUsageFlags usage, AllocFlags flags) {
 		this->device = device;
-		this->flags = flags;
+		this->size=size;
+		VkBufferCreateInfo bufferInfo{};
+		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		bufferInfo.size = size;
+		bufferInfo.usage = flags & MAPPABLE ? usage : usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+		bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-		VkMemoryPropertyFlags properties = choseProperties(flags);
-		if (flags & MAPPABLE) {
-			this->allocation = &device->getAllocator().alloc(handle, size, usage, properties);
-		} else {
-			this->allocation = &device->getAllocator().alloc(handle, size, usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT, properties);
+		if (vkCreateBuffer(device->getHandle(), &bufferInfo, nullptr, &handle) != VK_SUCCESS) {
+			Log::error("failed to create buffer!");
 		}
+
+
+		VkMemoryRequirements requirements;
+		vkGetBufferMemoryRequirements(device->getHandle(), handle, &requirements);
+
+		this->allocation = &device->getAllocator().alloc(requirements, flags);
+		vkBindBufferMemory(device->getHandle(), handle, allocation->block.memory, allocation->offset);
 	}
 
-	VK_Buffer::VK_Buffer(VK_Device *device, const void *data, VkDeviceSize size, VkBufferUsageFlags usage, Flags flags) : VK_Buffer(device, size, usage, flags) {
+	VK_Buffer::VK_Buffer(VK_Device *device, const void *data, VkDeviceSize size, VkBufferUsageFlags usage, AllocFlags flags) : VK_Buffer(device, size, usage, flags) {
 		update(data);
 	}
 
@@ -37,15 +37,16 @@ namespace HBE {
 	}
 
 	VK_Buffer::~VK_Buffer() {
-		device->getAllocator().free(handle, *allocation);
+		vkDestroyBuffer(device->getHandle(), handle, nullptr);
+		device->getAllocator().free(*allocation);
 	}
 
 	void VK_Buffer::copy(VK_Buffer *other) {
-		device->getAllocator().copy(other, this);
+		device->getAllocator().copy(other->getHandle(), this->getHandle(), size);
 	}
 
 	VkDeviceSize VK_Buffer::getSize() const {
-		return allocation->size;
+		return size;
 	}
 
 	Allocation &VK_Buffer::getAllocation() {
@@ -54,7 +55,7 @@ namespace HBE {
 
 
 	void VK_Buffer::update(const void *data) {
-		if (flags & MAPPABLE) {
+		if (allocation->flags & MAPPABLE) {
 			void *buffer_data;
 			vkMapMemory(device->getHandle(), allocation->block.memory, allocation->offset, allocation->size, 0, &buffer_data);
 			memcpy(buffer_data, data, (size_t) allocation->size);

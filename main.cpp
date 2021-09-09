@@ -39,6 +39,8 @@ int main() {
 	auto layout = Resources::createInRegistry<VertexLayout>("layout");
 	auto mesh = Resources::createInRegistry<Mesh>("mesh");
 	auto material = Resources::createInRegistry<Material>("material");
+	auto texture = Resources::createInRegistry<Texture>("texture");
+
 
 	vert->load("../../res/shaders/VK.vert", SHADER_STAGE::VERTEX);
 	frag->load("../../res/shaders/VK.frag", SHADER_STAGE::FRAGMENT);
@@ -77,6 +79,11 @@ int main() {
 	auto camera = Application::scene->instantiate<Camera>();
 	camera->setRenderMode(RenderMode::PERSPECTIVE);
 	camera->entity->transform->setPosition(vec3(0, 0, 5));
+
+	//unsigned char *texture_data = new unsigned char[4]{255, 255, 255, 255};
+	//texture->setData(texture_data, 1, 1, TEXTURE_FORMAT::RGBA8);
+	texture->load("../../res/textures/Hellbender_logo.png");
+
 	//camera->entity->attach<CameraController>();
 	//-----------------------EVENTS------------------
 	Application::onUpdate.subscribe(&onUpdate);
@@ -86,6 +93,7 @@ int main() {
 	//-----------------------CLEANUP------------------
 	Application::onUpdate.unsubscribe(&onUpdate);
 	delete transform;
+	//delete texture_data;
 	//-----------------------TERMINATE------------------
 
 	Application::terminate();
