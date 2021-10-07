@@ -31,7 +31,7 @@ namespace HBE {
 
         static bool getAntialiasing();
 
-        static Event<bool> onVerticalSyncChange;
+        static Event<> onVerticalSyncChange;
 
         static void setVerticalSync(bool v_sync);
 

@@ -3,7 +3,7 @@
 struct GLFWwindow;
 
 #include "Core.h"
-
+#include "queue"
 namespace HBE {
     enum KEY {
         UNKNOWN = -1,
@@ -133,9 +133,12 @@ namespace HBE {
 
         static GLFWwindow *window;
         static float wheel_offset;
-
+		static bool pressed[348];
+		static bool repeat[348];
+		static bool released[348];
+		static bool down[348];
         static void scrollCallback(GLFWwindow *window, double x_offset, double y_offset);
-
+		static std::queue<short> reset_queue;
     public:
         static void init();
 
@@ -144,12 +147,15 @@ namespace HBE {
         static void pollEvents();
 
         static bool getKey(KEY code);
-
+		static bool getKeyDown(KEY code);
         static void getMouseWheelInput(float &value);
 
         static void setCursorVisible(bool visible);
 
         static void setCursorPosition(double x, double y);
-    };
+		static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+		static bool getKeyUp(KEY code);
+		bool getKeyRepeat(KEY code);
+	};
 
 }

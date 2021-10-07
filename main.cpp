@@ -13,6 +13,11 @@ public:
 
 	void onUpdate(float delta) override {
 		entity->transform->rotate(delta, vec3(0, 1, 0));
+		if(Input::getKeyDown(KEY::V))
+		{
+			Log::debug("setVsync");
+			Configs::setVerticalSync(!Configs::getVerticalSync());
+		}
 	}
 };
 

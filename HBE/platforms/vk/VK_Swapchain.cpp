@@ -6,7 +6,7 @@
 #include "VK_Device.h"
 #include "VK_PhysicalDevice.h"
 #include "VK_RenderPass.h"
-
+#include "Configs.h"
 namespace HBE {
 
     VK_Swapchain::VK_Swapchain(uint32_t width,
@@ -15,68 +15,78 @@ namespace HBE {
                                const VK_Device &device) {
         this->width = width;
         this->height = height;
-
         this->physical_device = &device.getPhysicalDevice();
         this->device = &device;
-        SwapchainSupportDetails details = physical_device->querySwapchainSupportDetails(physical_device->getHandle());
-        image_count = details.capabilities.minImageCount + 1;
-        if (details.capabilities.maxImageCount > 0 && image_count > details.capabilities.maxImageCount)
-            image_count = details.capabilities.maxImageCount;
-        VkSurfaceFormatKHR surface_format = chooseSwapSurfaceFormat(details.formats);
-        VkPresentModeKHR present_mode = chooseSwapPresentMode(details.present_modes);
-        extent = chooseSwapExtent(details.capabilities);
-        format = surface_format.format;
+		this->surface_handle = &surface_handle;
 
-
-        VkSwapchainCreateInfoKHR create_info{};
-        create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-        create_info.surface = surface_handle;
-        create_info.imageExtent = extent;
-        create_info.minImageCount = image_count;
-        create_info.imageFormat = format;
-        create_info.imageColorSpace = surface_format.colorSpace;
-        create_info.imageArrayLayers = 1;
-        create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-
-
-        QueueFamilyIndices indices = physical_device->getQueueFamilyIndices();
-
-        uint32_t queue_family_indices[] = {
-                indices.graphics_family.value(),
-                indices.present_family.value()
-        };
-        if (indices.graphics_family != indices.present_family) {
-            create_info.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-            create_info.queueFamilyIndexCount = 2;
-            create_info.pQueueFamilyIndices = queue_family_indices;
-        } else {
-            create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-            create_info.queueFamilyIndexCount = 0;
-            create_info.pQueueFamilyIndices = nullptr;
-        }
-        create_info.preTransform = details.capabilities.currentTransform;
-        create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-        create_info.presentMode = present_mode;
-        create_info.clipped = VK_TRUE;
-        //todo set to oldSwapchain when resize;
-        create_info.oldSwapchain = VK_NULL_HANDLE;
-
-        if (vkCreateSwapchainKHR(device.getHandle(), &create_info, nullptr, &handle) != VK_SUCCESS) {
-            Log::error("Failed to create swap chain!");
-        }
-
-        vkGetSwapchainImagesKHR(device.getHandle(), handle, &image_count, nullptr);
-        images.resize(image_count);
-        vkGetSwapchainImagesKHR(device.getHandle(), handle, &image_count, images.data());
-
-        createImageViews();
-
-        Log::status(std::string("Created swapchain with extent:") + std::to_string(extent.width) + "x" +
-                    std::to_string(extent.height));
-
-        render_pass = new VK_RenderPass(&device, this);
+		recreate();
     }
 
+	void VK_Swapchain::recreate() {
+		if(render_pass!= nullptr)delete render_pass;
+		for (auto imageView : image_views) {
+			vkDestroyImageView(device->getHandle(), imageView, nullptr);
+		}
+		vkDestroySwapchainKHR(device->getHandle(), handle, nullptr);
+
+		SwapchainSupportDetails details = physical_device->querySwapchainSupportDetails(physical_device->getHandle());
+		image_count = details.capabilities.minImageCount + 1;
+		if (details.capabilities.maxImageCount > 0 && image_count > details.capabilities.maxImageCount)
+			image_count = details.capabilities.maxImageCount;
+		VkSurfaceFormatKHR surface_format = chooseSwapSurfaceFormat(details.formats);
+		VkPresentModeKHR present_mode = chooseSwapPresentMode(details.present_modes);
+		extent = chooseSwapExtent(details.capabilities);
+		format = surface_format.format;
+
+
+		VkSwapchainCreateInfoKHR create_info{};
+		create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+		create_info.surface = *surface_handle;
+		create_info.imageExtent = extent;
+		create_info.minImageCount = image_count;
+		create_info.imageFormat = format;
+		create_info.imageColorSpace = surface_format.colorSpace;
+		create_info.imageArrayLayers = 1;
+		create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+
+		QueueFamilyIndices indices = physical_device->getQueueFamilyIndices();
+
+		uint32_t queue_family_indices[] = {
+				indices.graphics_family.value(),
+				indices.present_family.value()
+		};
+		if (indices.graphics_family != indices.present_family) {
+			create_info.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+			create_info.queueFamilyIndexCount = 2;
+			create_info.pQueueFamilyIndices = queue_family_indices;
+		} else {
+			create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+			create_info.queueFamilyIndexCount = 0;
+			create_info.pQueueFamilyIndices = nullptr;
+		}
+		create_info.preTransform = details.capabilities.currentTransform;
+		create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+		create_info.presentMode = present_mode;
+		create_info.clipped = VK_TRUE;
+		//todo set to oldSwapchain when resize;
+		create_info.oldSwapchain = VK_NULL_HANDLE;
+
+		if (vkCreateSwapchainKHR(device->getHandle(), &create_info, nullptr, &handle) != VK_SUCCESS) {
+			Log::error("Failed to create swap chain!");
+		}
+
+		vkGetSwapchainImagesKHR(device->getHandle(), handle, &image_count, nullptr);
+		images.resize(image_count);
+		vkGetSwapchainImagesKHR(device->getHandle(), handle, &image_count, images.data());
+
+		createImageViews();
+
+		Log::status(std::string("Created swapchain with extent:") + std::to_string(extent.width) + "x" +
+					std::to_string(extent.height));
+
+		render_pass = new VK_RenderPass(device, this);
+	}
 
     VK_Swapchain::~VK_Swapchain() {
         delete render_pass;
@@ -97,9 +107,10 @@ namespace HBE {
     }
 
     VkPresentModeKHR VK_Swapchain::chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &available_present_modes) {
-        for (const auto &available_present_mode:available_present_modes) {
-            if (available_present_mode == VK_PRESENT_MODE_MAILBOX_KHR)
-                return available_present_mode;
+		VkPresentModeKHR preferred= Configs::getVerticalSync()?VK_PRESENT_MODE_FIFO_KHR:VK_PRESENT_MODE_MAILBOX_KHR;
+       for (const auto &available_present_mode:available_present_modes) {
+            if (available_present_mode == preferred)
+                return preferred;
         }
         return VK_PRESENT_MODE_FIFO_KHR;
     }
@@ -163,6 +174,8 @@ namespace HBE {
     const std::vector<VkImageView> &VK_Swapchain::getImagesViews() const {
         return image_views;
     }
+
+
 }
 
 

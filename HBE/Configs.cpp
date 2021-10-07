@@ -10,7 +10,7 @@ namespace HBE {
     Event<bool> Configs::onAntialiasingChange;
 
     bool Configs::vertical_sync = true;
-    Event<bool> Configs::onVerticalSyncChange;
+    Event<> Configs::onVerticalSyncChange;
 
     Configs::CAMERA_MODE Configs::default_camera_mode = Configs::CAMERA_MODE::PERSPECTIVE;
     Event<Configs::CAMERA_MODE> Configs::onDefaultCameraModeChange;
@@ -31,8 +31,8 @@ namespace HBE {
     }
 
     void Configs::setVerticalSync(bool v_sync) {
-        onVerticalSyncChange.invoke(v_sync);
-        vertical_sync = v_sync;
+		vertical_sync = v_sync;
+        onVerticalSyncChange.invoke();
     }
 
     Configs::CAMERA_MODE Configs::getDefaultCameraMode() {

@@ -8,11 +8,26 @@
 
 namespace HBE {
     GLFWwindow *Input::window = nullptr;
+    bool Input::repeat[348];
+	bool Input::pressed[348];
+    bool Input::released[348];
+    bool Input::down[348];
     float Input::wheel_offset = 0.0f;
+    std::queue<short> Input::reset_queue;
 
     bool Input::getKey(KEY code) {
-        return glfwGetKey(window, code) == GLFW_PRESS;
+        return pressed[code];
     }
+	bool Input::getKeyRepeat(KEY code) {
+		return repeat[code];
+	}
+	bool Input::getKeyDown(KEY code) {
+		return down[code];
+	}
+
+	bool Input::getKeyUp(KEY code) {
+		return released[code];
+	}
 
     void Input::getMousePosition(double &x, double &y) {
         glfwGetCursorPos(window, &x, &y);
@@ -21,6 +36,11 @@ namespace HBE {
     void Input::init() {
         Input::window = static_cast<GLFWwindow *>(Graphics::getWindow()->getHandle());
         glfwSetScrollCallback(window, scrollCallback);
+		glfwSetKeyCallback(window,keyCallback);
+		for (int i = 0; i < 348; ++i) {
+			down[i]=false;
+			released[i]=false;
+		}
     }
 
     void Input::getMouseWheelInput(float &value) {
@@ -40,12 +60,41 @@ namespace HBE {
         wheel_offset = y_offset;
     }
 
+    void Input::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+	{
+		released[key]=false;
+		down[key]=false;
+		repeat[key]=false;
+		if (action == GLFW_PRESS)
+		{
+			down[key]=true;
+			pressed[key]=true;
+			reset_queue.emplace(key);
+		}
+		if (action == GLFW_REPEAT)
+		{
+			repeat[key]=true;
+		}
+		if (action == GLFW_RELEASE)
+		{
+			repeat[key]=false;
+			pressed[key]=false;
+			released[key]=true;
+			reset_queue.emplace(key);
+		}
+	}
+
     void Input::pollEvents() {
+		while (!reset_queue.empty())
+		{
+			released[reset_queue.front()]=false;
+			down[reset_queue.front()]=false;
+			reset_queue.pop();
+		}
         glfwPollEvents();
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_KEY_DOWN) {
-            Log::message("patate3");
-        }
     }
+
+
 }
 
 

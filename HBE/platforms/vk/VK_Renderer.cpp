@@ -45,10 +45,12 @@ namespace HBE {
 			frames_in_flight_fences.push_back(new VK_Fence(*device));
 		}
 		images_in_flight_fences.resize(swapchain->getRenderPass().getFrameBuffers().size(), nullptr);
-		Application::onWindowClosed.subscribe(this, &VK_Renderer::onWindowClosed);
-		window->onWindowSizeChange.subscribe(this, &VK_Renderer::onWindowSizeChange);
 
 		factory = new VK_ResourceFactory(this);
+
+		Application::onWindowClosed.subscribe(this, &VK_Renderer::onWindowClosed);
+		Configs::onVerticalSyncChange.subscribe(this,&VK_Renderer::reCreateSwapchain);
+		window->onWindowSizeChange.subscribe(this, &VK_Renderer::onWindowSizeChange);
 	}
 
 	void VK_Renderer::onWindowSizeChange(int width, int height) {
@@ -61,9 +63,8 @@ namespace HBE {
 		device->wait();
 
 		command_pool->clear();
-		delete swapchain;
 
-		swapchain = new VK_Swapchain(width, height, surface->getHandle(), *device);
+		swapchain->recreate();
 
 		command_pool->createCommandBuffers(MAX_FRAMES_IN_FLIGHT);
 	}
@@ -75,6 +76,7 @@ namespace HBE {
 	VK_Renderer::~VK_Renderer() {
 		window->onWindowSizeChange.unsubscribe(this);
 		Application::onWindowClosed.unsubscribe(this);
+		Configs::onVerticalSyncChange.unsubscribe(this);
 		device->wait();
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 			delete image_available_semaphores[i];
