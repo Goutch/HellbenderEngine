@@ -1,5 +1,5 @@
 #pragma once
-
+#include "Core.h"
 #include "string"
 #include "vector"
 #include "glm/glm.hpp"
@@ -10,7 +10,7 @@ namespace HBE {
 
 	class VertexLayout;
 
-	class GraphicPipeline {
+	class HB_API GraphicPipeline {
 	public:
 		virtual ~GraphicPipeline() = default;
 

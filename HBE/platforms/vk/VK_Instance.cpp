@@ -16,13 +16,14 @@ namespace HBE {
         app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
         app_info.pEngineName = "Hellbender";
         app_info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-        app_info.apiVersion = VK_API_VERSION_1_0;
+        app_info.apiVersion = VK_API_VERSION_1_1;
 
         VkInstanceCreateInfo create_info{};
         create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         create_info.pApplicationInfo = &app_info;
 
         std::vector<const char *> required_extensions;
+
         getRequiredExtensions(required_extensions);
         create_info.enabledExtensionCount = static_cast<uint32_t>(required_extensions.size());
         create_info.ppEnabledExtensionNames = required_extensions.data();

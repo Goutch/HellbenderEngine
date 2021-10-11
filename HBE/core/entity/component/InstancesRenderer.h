@@ -1,10 +1,10 @@
 #pragma once
-
-#include <core/resource/Material.h>
-#include <core/resource/Mesh.h>
-#include <core/entity/component/Transform.h>
-#include "Component.h"
 #include "Core.h"
+#include "core/resource/Material.h"
+#include "core/resource/Mesh.h"
+#include "core/entity/component/Transform.h"
+#include "Component.h"
+
 namespace HBE {
     class HB_API InstancesRenderer : public Component {
 

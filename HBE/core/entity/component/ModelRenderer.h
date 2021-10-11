@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core.h"
-#include <core/entity/component/Component.h>
+#include "core/entity/component/Component.h"
 
 namespace HBE {
     class Material;

@@ -1,13 +1,10 @@
 #pragma once
-
-#include <core/serialization/Serializable.h>
-
-#include "glm/glm.hpp"
 #include "Core.h"
+#include "core/serialization/Serializable.h"
+#include "glm/glm.hpp"
 #include "string"
 
 using namespace glm;
-
 
 namespace HBE {
     class Entity;

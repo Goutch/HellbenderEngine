@@ -2,6 +2,7 @@
 
 #include "Core.h"
 #include <cstdlib>
+
 namespace HBE {
     class HB_API Random {
     public:

@@ -1,6 +1,6 @@
 #pragma once
 #include "Core.h"
-#include <core/resource/Mesh.h>
+#include "core/resource/Mesh.h"
 namespace HBE {
     struct HB_API UsedBuffers {
         bool vertex_position = true;

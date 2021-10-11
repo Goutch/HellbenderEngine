@@ -1,12 +1,11 @@
 #pragma once
+#include "Core.h"
 #include <string>
 #include <list>
-#include <core/entity/component/Component.h>
-#include <core/serialization/Serializable.h>
-#include <core/utility/Log.h>
-#include <core/entity/component/Transform.h>
-
-#include "Core.h"
+#include "core/entity/component/Component.h"
+#include "core/serialization/Serializable.h"
+#include "core/utility/Log.h"
+#include "core/entity/component/Transform.h"
 #include "vector"
 namespace HBE {
     class Scene;

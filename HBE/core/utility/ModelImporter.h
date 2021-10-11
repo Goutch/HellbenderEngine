@@ -1,9 +1,10 @@
 #pragma once
+#include "Core.h"
 #include "vector"
 
 #include "glm/glm.hpp"
 #include "string"
-#include "Core.h"
+
 using namespace glm;
 namespace HBE {
     struct HB_API MeshData {

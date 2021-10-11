@@ -1,19 +1,16 @@
-//
-// Created by User on 2020-01-02.
-//
-
 #pragma once
+#include "Core.h"
 #include <set>
 #include "glm/glm.hpp"
 #include "glm/gtx/quaternion.hpp"
-#include "Core.h"
 #include "Component.h"
 #include "vector"
+
 using namespace glm;
 namespace HBE {
     class HB_API Transform : public Component {
-        mat4 transform_matrix = glm::mat4(1.0f);
-        vec3 scale = vec3(1.0f);
+        glm::mat4 transform_matrix = glm::mat4(1.0f);
+        glm::vec3 scale = glm::vec3(1.0f);
 
         std::vector<Transform *> children;
         Transform *parent = nullptr;
@@ -48,7 +45,7 @@ namespace HBE {
 
         void setRotation(const quat &rotation);
 
-        vec3 getScale() const;
+        glm::vec3 getScale() const;
 
         void setScale(vec3 scale);
 

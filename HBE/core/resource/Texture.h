@@ -1,8 +1,7 @@
 #pragma once
-
+#include "Core.h"
 #include <string>
 #include "core/serialization/Serializable.h"
-#include "Core.h"
 #include "Resource.h"
 
 namespace HBE {

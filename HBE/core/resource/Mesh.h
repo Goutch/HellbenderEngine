@@ -1,9 +1,7 @@
-
 #pragma once
-
+#include "Core.h"
 #include <vector>
 #include "glm/glm.hpp"
-#include "Core.h"
 #include "Resource.h"
 
 using namespace glm;

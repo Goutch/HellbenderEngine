@@ -2,14 +2,13 @@ cmake_minimum_required(VERSION 3.15)
 set(CMAKE_CXX_STANDARD 20)
 
 project(HBE CXX)
-
+add_compile_definitions(HB_BUILD)
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --std=c++17 -O3 -fPIC")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3 -fPIC")
 endif ()
-
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
-
 
 find_package(Vulkan)
 if (VULKAN_FOUND)
@@ -100,13 +99,16 @@ set(CORE_FILES
         Core.h
         Configs.h
 
-        core/resource/Texture.h
         core/resource/Texture.cpp
+        core/resource/Texture.h
         core/resource/Material.cpp
         core/resource/Material.h
         core/resource/Model.cpp
+        core/resource/Model.h
         core/resource/Mesh.cpp
+        core/resource/Mesh.h
         core/resource/Shader.cpp
+        core/resource/Shader.h
         core/resource/VertexLayout.h
         core/resource/ResourceFactory.h
         core/resource/Resource.h
@@ -135,7 +137,9 @@ set(CORE_FILES
         core/entity/Scene.cpp
         core/entity/Scene.h
         core/entity/Entity.cpp
+        core/entity/Entity.h
         core/entity/component/Transform.cpp
+        core/entity/component/Transform.h
         core/entity/component/Camera.cpp
         core/entity/component/Component.h
         core/entity/component/CameraController.cpp
@@ -165,7 +169,8 @@ set(CORE_FILES
         core/serialization/ComponentRegistry.h
         core/serialization/ComponentRegistry.h
 
-        )
+        core/Tester.cpp
+        core/Tester.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}
@@ -173,10 +178,11 @@ add_library(${PROJECT_NAME} SHARED
         ${GL_FILES}
         ${VK_FILES}
         )
-
-add_compile_definitions(GLM_FORCE_DEFAULT_ALIGNED_GENTYPES)
+target_compile_definitions(${PROJECT_NAME} PRIVATE HB_BUILD)
+target_compile_definitions(${PROJECT_NAME} PUBLIC GLM_FORCE_DEFAULT_ALIGNED_GENTYPES)
 
 target_include_directories(${PROJECT_NAME}
+        PUBLIC "${${CMAKE_CURRENT_SOURCE_DIR}}"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/contrib/zlib/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/include/"
@@ -248,5 +254,3 @@ else ()
     target_link_libraries(${PROJECT_NAME} PUBLIC glad)
 endif ()
 target_link_libraries(${PROJECT_NAME} PUBLIC glfw ${GLSLANG_LIBS} )
-
-target_compile_definitions(${PROJECT_NAME} PRIVATE HB_BUILD)

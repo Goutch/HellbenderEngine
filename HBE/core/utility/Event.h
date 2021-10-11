@@ -1,10 +1,10 @@
 #pragma once
-
+#include "Core.h"
 #include "unordered_set"
 #include "functional"
 #include "Function.h"
 #include "unordered_map"
-#include "Core.h"
+
 namespace HBE {
     template<typename... Args>
 

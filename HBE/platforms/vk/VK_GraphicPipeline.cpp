@@ -43,7 +43,7 @@ namespace HBE {
 	}
 
 	void VK_GraphicPipeline::setDrawFlags(DRAW_FLAGS flags) {
-
+        //todo:
 	}
 
 	DRAW_FLAGS VK_GraphicPipeline::getDrawFlags() const {

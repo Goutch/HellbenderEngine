@@ -1,9 +1,10 @@
 #pragma once
-#include <array>
-#include <core/math/Plane.h>
-#include <core/entity/component/Component.h>
-#include <glm/glm.hpp>
 #include "Core.h"
+#include <array>
+#include "core/math/Plane.h"
+#include "core/entity/component/Component.h"
+#include "glm/glm.hpp"
+
 namespace HBE {
     class RenderTarget;
 

@@ -55,7 +55,7 @@ include(GNUInstallDirs)
 include(CMakeDependentOption)
 
 option(BUILD_SHARED_LIBS "Build Shared Libraries" OFF)
-option(BUILD_EXTERNAL "Build external dependencies in /External" ON)
+option(BUILD_EXTERNAL "Build external dependencies in /External" OFF)
 
 set(LIB_TYPE STATIC)
 

@@ -1,4 +1,4 @@
-
+#include "Core.h"
 #include "GLSL_TYPE.h"
 
 namespace HBE {
@@ -15,7 +15,7 @@ namespace HBE {
 
     class VertexLayout;
 
-    class ResourceFactory {
+    class HB_API ResourceFactory {
     public:
         virtual ~ResourceFactory() = default;
 

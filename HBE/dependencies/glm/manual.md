@@ -538,7 +538,7 @@ Some platforms (Dreamcast) doesn't support double precision floating point value
 
 ### <a name="section2_14"></a> 2.14. GLM\_FORCE\_SWIZZLE: Enable swizzle operators
 
-GraphicPipeline languages like GLSL often feature so-called swizzle expressions, which may be used to freely select and arrange a vector's components. For example, `variable.x`, `variable.xzy` and `variable.zxyy` respectively form a scalar, a 3D vector and a 4D vector.  The result of a swizzle expression in GLSL can be either an R-value or an L-value. Swizzle expressions can be written with characters from exactly one of `xyzw` (usually for positions), `rgba` (usually for colors), and `stpq` (usually for texture coordinates).
+Shader languages like GLSL often feature so-called swizzle expressions, which may be used to freely select and arrange a vector's components. For example, `variable.x`, `variable.xzy` and `variable.zxyy` respectively form a scalar, a 3D vector and a 4D vector.  The result of a swizzle expression in GLSL can be either an R-value or an L-value. Swizzle expressions can be written with characters from exactly one of `xyzw` (usually for positions), `rgba` (usually for colors), and `stpq` (usually for texture coordinates).
 
 ```glsl
 vec4 A;
@@ -2095,7 +2095,7 @@ The tutorial assumes you have some basic understanding of git concepts - reposit
 
 #### Step 1: Setup our GLM Fork
 
-We will make our changes in our own copy of the GLM sitory. On the GLM GitHub repo and we repeat the Fork button.
+We will make our changes in our own copy of the GLM sitory. On the GLM GitHub repo and we press the Fork button.
 We need to download a copy of our fork to our local machine. In the terminal, type:
 
 ```
@@ -2174,7 +2174,7 @@ Some things to keep in mind for a pull request:
 
 We need to submit a pull request from the `bugfix` branch to GLM's master branch.
 
-On the fork github page, we can click on the *Pull Request* button. Then we can describe our pull request. Finally we repeat *Send Pull Request*.
+On the fork github page, we can click on the *Pull Request* button. Then we can describe our pull request. Finally we press *Send Pull Request*.
 
 Please be patient and give them some time to go through it.
 

@@ -1,10 +1,11 @@
 #pragma once
-#include <core/resource/Material.h>
-#include <core/resource/Mesh.h>
-#include <core/utility/Log.h>
+#include "Core.h"
+#include "core/resource/Material.h"
+#include "core/resource/Mesh.h"
+#include "core/utility/Log.h"
 #include "core/utility/ModelImporter.h"
 #include "core/serialization/Serializable.h"
-#include "Core.h"
+
 
 namespace HBE {
     class HB_API Model : public Resource {

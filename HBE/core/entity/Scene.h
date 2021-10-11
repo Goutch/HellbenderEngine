@@ -1,10 +1,10 @@
 #pragma once
-
+#include "Core.h"
 
 #include <string>
 #include "Entity.h"
 #include "unordered_set"
-#include "Core.h"
+
 namespace HBE {
     class HB_API Scene : public Serializable {
         friend class Entity;

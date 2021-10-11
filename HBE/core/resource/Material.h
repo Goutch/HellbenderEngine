@@ -1,11 +1,10 @@
 #pragma once
-
+#include "Core.h"
 #include "Texture.h"
 #include "GraphicPipeline.h"
 #include "core/graphics/Graphics.h"
 #include "unordered_map"
 #include "core/serialization/Serializable.h"
-#include "Core.h"
 #include "GLSL_TYPE.h"
 
 using namespace glm;

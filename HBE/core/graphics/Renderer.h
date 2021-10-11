@@ -1,8 +1,8 @@
 #pragma once
-
+#include "Core.h"
 #include "vector"
 #include "glm/glm.hpp"
-#include "Core.h"
+
 #include "Graphics.h"
 
 using namespace glm;

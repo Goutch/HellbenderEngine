@@ -1,9 +1,9 @@
 #pragma once
 
-struct GLFWwindow;
-
 #include "Core.h"
 #include "queue"
+struct GLFWwindow;
+
 namespace HBE {
     enum KEY {
         UNKNOWN = -1,

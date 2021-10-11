@@ -1,5 +1,5 @@
 #pragma once
-
+#include "Core.h"
 #include "Resource.h"
 
 namespace HBE {
@@ -7,7 +7,7 @@ namespace HBE {
 
     class ComputeBuffer;
 
-    class ComputePipeline : public Resource {
+    class HB_API ComputePipeline : public Resource {
         virtual void setShader(const Shader *shader) = 0;
 
         virtual void setComputeBuffer(ComputeBuffer* buffer)=0;

@@ -1,7 +1,8 @@
 #pragma once
+#include "Core.h"
 #include "glm/glm.hpp"
 #include "core/utility/Event.h"
-#include "Core.h"
+
 
 using namespace glm;
 namespace HBE {

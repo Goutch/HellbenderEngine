@@ -1,8 +1,8 @@
 #pragma once
-
-#include <string>
-#include <core/entity/Entity.h>
 #include "Core.h"
+#include <string>
+#include "core/entity/Entity.h"
+
 #include "map"
 #include "unordered_map"
 namespace HBE {

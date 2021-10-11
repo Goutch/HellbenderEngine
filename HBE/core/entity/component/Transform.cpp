@@ -1,6 +1,3 @@
-//
-// Created by User on 2020-01-02.
-//
 
 #include "Transform.h"
 #include "core/entity/Entity.h"
@@ -33,7 +30,7 @@ namespace HBE {
         return parent == nullptr ? transform_matrix : parent->getMatrix() * transform_matrix;
     }
 
-    vec3 Transform::getWorldPosition() const {
+    [[maybe_unused]] vec3 Transform::getWorldPosition() const {
         return parent == nullptr ? transform_matrix[3] : (vec3) (parent->getMatrix() * transform_matrix)[3];
     }
 
@@ -45,6 +42,7 @@ namespace HBE {
         return parent == nullptr ? glm::eulerAngles(getRotation()) : glm::eulerAngles(toQuat(transform_matrix) * parent->getWorldRotation());
     }
 
+    void translate(const vec3 &translation);
     void Transform::translate(const vec3 &translation) {
         transform_matrix = glm::translate(transform_matrix, translation);
     }
@@ -58,14 +56,6 @@ namespace HBE {
         transform_matrix = glm::rotate(transform_matrix, angle, axis);
     }
 
-    quat Transform::getRotation() const {
-        return glm::quat_cast(transform_matrix);
-    }
-
-    vec3 Transform::getEulerRotation() const {
-        return glm::eulerAngles(toQuat(transform_matrix));
-    }
-
     void Transform::setRotation(const quat &rotation) {
         vec3 p = getPosition();
         transform_matrix = mat4(1.0f);
@@ -74,11 +64,19 @@ namespace HBE {
         this->setScale(scale);
     }
 
+    quat Transform::getRotation() const {
+        return glm::quat_cast(transform_matrix);
+    }
+
+    vec3 Transform::getEulerRotation() const {
+        return glm::eulerAngles(toQuat(transform_matrix));
+    }
+
     vec3 Transform::getPosition() const {
         return transform_matrix[3];
     }
 
-    vec3 Transform::getScale() const {
+    glm::vec3 Transform::getScale() const {
         return scale;
     }
 
@@ -171,6 +169,8 @@ namespace HBE {
     std::string Transform::toString() const {
         return "Transform";
     }
+
+
 }
 
 

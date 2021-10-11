@@ -1,5 +1,5 @@
 #pragma once
-
+#include "Core.h"
 
 namespace HBE {
     class Texture;
