@@ -60,7 +60,11 @@ if (VULKAN_FOUND)
             platforms/vk/VK_Memory.h
             platforms/vk/VK_Allocator.cpp
             platforms/vk/VK_Allocator.h
-            platforms/vk/VK_CONSTANTS.h platforms/vk/VK_DescriptorPool.cpp platforms/vk/VK_DescriptorPool.h platforms/vk/VK_DescriptorSetLayout.cpp platforms/vk/VK_DescriptorSetLayout.h)
+            platforms/vk/VK_CONSTANTS.h
+            platforms/vk/VK_DescriptorPool.cpp
+            platforms/vk/VK_DescriptorPool.h
+            platforms/vk/VK_DescriptorSetLayout.cpp
+            platforms/vk/VK_DescriptorSetLayout.h)
 
     add_compile_definitions(VULKAN_RENDERER)
 
@@ -179,7 +183,6 @@ add_library(${PROJECT_NAME} SHARED
         ${VK_FILES}
         )
 target_compile_definitions(${PROJECT_NAME} PRIVATE HB_BUILD)
-target_compile_definitions(${PROJECT_NAME} PUBLIC GLM_FORCE_DEFAULT_ALIGNED_GENTYPES)
 
 target_include_directories(${PROJECT_NAME}
         PUBLIC "${${CMAKE_CURRENT_SOURCE_DIR}}"

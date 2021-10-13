@@ -12,9 +12,9 @@ layout(binding = 0) uniform UniformBufferObject {
 layout(push_constant) uniform constants
 {
     mat4 transform;
-} pc;
+} constants;
 
 void main() {
-    gl_Position = ubo.projection * ubo.view * pc.transform * vec4(inPosition, 1.0);
+    gl_Position = ubo.projection * ubo.view * constants.transform * vec4(inPosition, 1.0);
     fragColor = inColor;
 }

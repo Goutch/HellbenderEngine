@@ -8,7 +8,7 @@ namespace HBE {
 
 	VK_Buffer::VK_Buffer(VK_Device *device, VkDeviceSize size, VkBufferUsageFlags usage, AllocFlags flags) {
 		this->device = device;
-		this->size=size;
+		this->size = size;
 		VkBufferCreateInfo bufferInfo{};
 		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 		bufferInfo.size = size;
@@ -53,7 +53,6 @@ namespace HBE {
 		return *allocation;
 	}
 
-
 	void VK_Buffer::update(const void *data) {
 		if (allocation->flags & MAPPABLE) {
 			void *buffer_data;
@@ -62,7 +61,7 @@ namespace HBE {
 			vkUnmapMemory(device->getHandle(), allocation->block.memory);
 		} else {
 			VK_Buffer staging_buffer = VK_Buffer(device,
-												 allocation->size,
+												 size,
 												 VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 												 MAPPABLE);
 

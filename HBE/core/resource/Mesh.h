@@ -20,7 +20,7 @@ namespace HBE {
 		uint32_t getIndexCount() const;
 		uint32_t getInstanceCount() const;
 		bool hasIndexBuffer() const;
-		virtual void setVertices(uint32_t position, void *vertices, size_t count, const VertexLayout *layout) = 0;
+		virtual void setVertices(uint32_t position,const void *vertices, size_t count, const VertexLayout *layout) = 0;
 		virtual void setIndices(const std::vector<uint32_t> &data) = 0;
 		virtual void setBuffer(uint32_t position, const std::vector<int> &data) = 0;
 		virtual void setBuffer(uint32_t position, const std::vector<float> &data) = 0;

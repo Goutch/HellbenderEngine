@@ -21,8 +21,8 @@
 
 namespace HBE {
 	struct UniformBufferObject {
-		mat4 view;
-		mat4 projection;
+		alignas(16) mat4 view;
+		alignas(16) mat4 projection;
 	};
 
 
@@ -114,7 +114,7 @@ namespace HBE {
 				const Mesh *mesh = mesh_kv.first;
 				mesh->bind();
 				for (const Transform *transform:mesh_kv.second) {
-					pipeline->setUniform("pc", transform->getMatrix());
+					pipeline->setUniform("constants", transform->getMatrix());
 					if (mesh->hasIndexBuffer()) {
 						vkCmdDrawIndexed(command_pool->getCurrentBuffer(), mesh->getIndexCount(), 1, 0, 0, 0);
 					} else {

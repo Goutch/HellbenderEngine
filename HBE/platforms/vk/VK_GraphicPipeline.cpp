@@ -169,7 +169,7 @@ namespace HBE {
 		if (descriptor_pool) delete descriptor_pool;
 		std::vector<const VK_DescriptorSetLayout *> descriptor_set_layouts;
 		descriptor_set_layouts.resize(vertex_sets_layouts.size() + frag_sets_layouts.size());
-		for (int i = 0; i < descriptor_set_layouts.size(); ++i) {
+		for (size_t i = 0; i < descriptor_set_layouts.size(); ++i) {
 			if (i < vertex_sets_layouts.size()) {
 				descriptor_set_layouts[i] = vertex_sets_layouts[i];
 			} else {
@@ -194,7 +194,7 @@ namespace HBE {
 
 		std::vector<VkPushConstantRange> push_constant_ranges;
 		push_constant_ranges.resize(vertex_push_constants.size() + frag_push_constants.size());
-		for (int i = 0; i < push_constant_ranges.size(); ++i) {
+		for (size_t i = 0; i < push_constant_ranges.size(); ++i) {
 			if (i < vertex_push_constants.size()) {
 				push_constant_ranges[i] = vertex_push_constants[i];
 			} else {

@@ -12,19 +12,17 @@ namespace HBE {
 		this->command_pool = command_pool;
 	}
 
-	void VK_Mesh::setVertices(uint32_t position, void *vertices, size_t count, const VertexLayout *layout) {
+	void VK_Mesh::setVertices(uint32_t position,const void *vertices, size_t count, const VertexLayout *layout) {
 
 		this->vertex_count = count;
 		VkDeviceSize buffer_size = layout->getBytesPerVertex() * count;
 		if (buffers.find(position) != buffers.end()) {
 			delete buffers[position];
-			buffers.erase(position);
 		}
-
 		buffers[position] = new VK_Buffer(device,
 										  vertices,
 										  buffer_size,
-										  VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+										  VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,MAPPABLE);
 	}
 
 	VK_Mesh::~VK_Mesh() {
@@ -32,7 +30,8 @@ namespace HBE {
 			delete buffer.second;
 		}
 		buffers.clear();
-		delete indices_buffer;
+		if (has_index_buffer)
+			delete indices_buffer;
 	}
 
 	void VK_Mesh::setIndices(const std::vector<unsigned int> &indices) {
@@ -86,7 +85,8 @@ namespace HBE {
 		}
 
 		vkCmdBindVertexBuffers(command_pool->getCurrentBuffer(), 0, buffers.size(), flat_buffers, offsets);
-		vkCmdBindIndexBuffer(command_pool->getCurrentBuffer(), indices_buffer->getHandle(), 0, VK_INDEX_TYPE_UINT32);
+		if (has_index_buffer)
+			vkCmdBindIndexBuffer(command_pool->getCurrentBuffer(), indices_buffer->getHandle(), 0, VK_INDEX_TYPE_UINT32);
 
 		delete offsets;
 		delete flat_buffers;
