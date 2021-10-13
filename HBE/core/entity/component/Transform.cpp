@@ -30,7 +30,7 @@ namespace HBE {
         return parent == nullptr ? transform_matrix : parent->getMatrix() * transform_matrix;
     }
 
-    [[maybe_unused]] vec3 Transform::getWorldPosition() const {
+    vec3 Transform::getWorldPosition() const {
         return parent == nullptr ? transform_matrix[3] : (vec3) (parent->getMatrix() * transform_matrix)[3];
     }
 

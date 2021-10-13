@@ -64,7 +64,7 @@ if (VULKAN_FOUND)
             platforms/vk/VK_DescriptorPool.cpp
             platforms/vk/VK_DescriptorPool.h
             platforms/vk/VK_DescriptorSetLayout.cpp
-            platforms/vk/VK_DescriptorSetLayout.h)
+            platforms/vk/VK_DescriptorSetLayout.h platforms/vk/VK_RenderTarget.cpp platforms/vk/VK_RenderTarget.h)
 
     add_compile_definitions(VULKAN_RENDERER)
 

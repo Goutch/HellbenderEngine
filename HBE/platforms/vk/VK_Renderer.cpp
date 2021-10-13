@@ -18,6 +18,7 @@
 #include "VK_Mesh.h"
 #include "core/resource/Material.h"
 #include "VK_GraphicPipeline.h"
+#include "VK_RenderTarget.h"
 
 namespace HBE {
 	struct UniformBufferObject {
@@ -97,10 +98,28 @@ namespace HBE {
 		return factory;
 	}
 
-	void VK_Renderer::render(const HBE::RenderTarget *render_target,
+	void VK_Renderer::render(const RenderTarget *render_target,
 							 const mat4 &projection_matrix,
 							 const mat4 &view_matrix) {
 		command_pool->begin(current_frame);
+
+		int width,height;
+		Graphics::getWindow()->getSize(width,height);
+		VkViewport viewport{};
+		viewport.x = 0.0f;
+		viewport.y = (float) height;
+		viewport.width = (float) width;
+		viewport.height = (float) -height;
+		viewport.minDepth = 0.0f;
+		viewport.maxDepth = 1.0f;
+
+		VkRect2D scissor{};
+		scissor.offset = {0, 0};
+		scissor.extent = VkExtent2D{(uint32_t) width, (uint32_t) height};
+
+		//static_cast<VK_RenderTarget*>(render_target)->begin(command_pool->getCurrentBuffer());
+		vkCmdSetViewport(command_pool->getCurrentBuffer(),0,1,&viewport);
+		vkCmdSetScissor(command_pool->getCurrentBuffer(),0,1,&scissor);
 		UniformBufferObject ubo{};
 		ubo.view = view_matrix;
 		ubo.projection = projection_matrix;
@@ -114,7 +133,7 @@ namespace HBE {
 				const Mesh *mesh = mesh_kv.first;
 				mesh->bind();
 				for (const Transform *transform:mesh_kv.second) {
-					pipeline->setUniform("constants", transform->getMatrix());
+					pipeline->setUniform("constants", transform->getWorldMatrix());
 					if (mesh->hasIndexBuffer()) {
 						vkCmdDrawIndexed(command_pool->getCurrentBuffer(), mesh->getIndexCount(), 1, 0, 0, 0);
 					} else {
@@ -239,6 +258,8 @@ namespace HBE {
 	uint32_t VK_Renderer::getCurrentFrame() const {
 		return current_frame;
 	}
+
+
 
 
 }

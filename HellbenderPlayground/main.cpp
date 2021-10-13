@@ -67,16 +67,17 @@ int main() {
     material->setPipeline(pipeline);
 
 
-    auto meshRenderer = Application::scene->instantiate<MeshRenderer>();
-    meshRenderer->setMaterial(*material);
-    meshRenderer->setMesh(*mesh);
-    meshRenderer->entity->transform->translate(vec3(1, 0, 0));
+    auto mr1 = Application::scene->instantiate<MeshRenderer>();
+    mr1->setMaterial(*material);
+    mr1->setMesh(*mesh);
+
+	mr1->entity->attach<Rotator>();
 
     auto mr2 = Application::scene->instantiate<MeshRenderer>();
     mr2->setMaterial(*material);
     mr2->setMesh(*mesh);
-    mr2->entity->attach<Rotator>();
-
+	mr2->entity->transform->translate(vec3(2, 0, 0));
+	mr2->entity->transform->setParent(mr1->entity->transform);
     auto camera = Application::scene->instantiate<Camera>();
     camera->setRenderMode(RenderMode::PERSPECTIVE);
     camera->entity->transform->setPosition(vec3(0, 0, 5));

@@ -9,7 +9,7 @@ layout(binding = 0) uniform UniformBufferObject {
     mat4 view;
     mat4 projection;
 } ubo;
-layout(push_constant) uniform constants
+layout(push_constant) uniform Constants
 {
     mat4 transform;
 } constants;

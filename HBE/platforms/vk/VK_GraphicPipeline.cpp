@@ -152,15 +152,15 @@ namespace HBE {
 		colorBlending.blendConstants[2] = 0.0f; // Optional
 		colorBlending.blendConstants[3] = 0.0f; // Optional
 
-		/* VkDynamicState dynamicStates[] = {
+		 VkDynamicState dynamicStates[] = {
 				  VK_DYNAMIC_STATE_VIEWPORT,
-				  VK_DYNAMIC_STATE_LINE_WIDTH
-		  };
+				  VK_DYNAMIC_STATE_SCISSOR
+		 };
 
 		  VkPipelineDynamicStateCreateInfo dynamicState{};
 		  dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
 		  dynamicState.dynamicStateCount = 2;
-		  dynamicState.pDynamicStates = dynamicStates;*/
+		  dynamicState.pDynamicStates = dynamicStates;
 
 		const std::vector<VK_DescriptorSetLayout *> &vertex_sets_layouts = vk_vertex->getDescriptorSetsLayouts();
 		const std::vector<VK_DescriptorSetLayout *> &frag_sets_layouts = vk_frag->getDescriptorSetsLayouts();
@@ -227,7 +227,7 @@ namespace HBE {
 		pipelineInfo.pMultisampleState = &multisampling;
 		pipelineInfo.pDepthStencilState = nullptr; // Optional
 		pipelineInfo.pColorBlendState = &colorBlending;
-		pipelineInfo.pDynamicState = nullptr; // Optional
+		pipelineInfo.pDynamicState = &dynamicState; // Optional
 		pipelineInfo.pTessellationState = VK_NULL_HANDLE;
 		pipelineInfo.layout = pipeline_layout_handle;
 
