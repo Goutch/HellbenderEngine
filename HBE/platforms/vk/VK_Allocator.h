@@ -54,7 +54,8 @@ namespace HBE {
 	private:
 		void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
 		uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
-
+		std::string memoryTypeToString(const uint32_t mem_type);
+		std::string allocToString(const Allocation &alloc);
 	};
 }
 

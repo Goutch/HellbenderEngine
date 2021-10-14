@@ -13,6 +13,8 @@ namespace HBE {
         Log::status("Looking for suitable GPU:");
         pickBestPhysicalDevice();
         support_details = querySwapchainSupportDetails(handle);
+		vkGetPhysicalDeviceMemoryProperties(handle,&memory_properties);
+
     }
 
     void VK_PhysicalDevice::pickBestPhysicalDevice() {
@@ -110,6 +112,11 @@ namespace HBE {
         return indices;
     }
 
+
+    const VkPhysicalDeviceMemoryProperties& VK_PhysicalDevice::getMemoryProperties() const
+	{
+		return memory_properties;
+	}
     const VkPhysicalDevice &VK_PhysicalDevice::getHandle() const {
         return handle;
     }

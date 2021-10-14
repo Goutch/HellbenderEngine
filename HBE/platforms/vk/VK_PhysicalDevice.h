@@ -30,6 +30,7 @@ namespace HBE {
 				VK_KHR_SWAPCHAIN_EXTENSION_NAME
 		};
 
+
 		const VkInstance *vk_instance_handle;
 		VkSurfaceKHR *surface_handle;
 		VkPhysicalDevice handle = VK_NULL_HANDLE;
@@ -37,6 +38,7 @@ namespace HBE {
 		VkPhysicalDeviceFeatures features;
 		QueueFamilyIndices queue_family_indices{};
 		SwapchainSupportDetails support_details;
+		VkPhysicalDeviceMemoryProperties memory_properties;
 	public:
 		VK_PhysicalDevice(const VkInstance &vk_instance_handle, VkSurfaceKHR &surface_handle);
 
@@ -54,6 +56,7 @@ namespace HBE {
 
 		SwapchainSupportDetails querySwapchainSupportDetails(const VkPhysicalDevice &physical_device) const;
 
+		const VkPhysicalDeviceMemoryProperties &getMemoryProperties() const;
 	private:
 		void pickBestPhysicalDevice();
 
