@@ -39,21 +39,21 @@ namespace HBE {
 		const VK_Device *device;
 		const VkDeviceSize BLOCK_SIZE = 134217728; //1024*1024*128 = 128mb
 		std::unordered_map<uint32_t, std::vector<Block>> blocks;
-		VkPhysicalDeviceMemoryProperties memory_propeties;
+		const VkPhysicalDeviceMemoryProperties* memory_propeties;
 
 	public:
 
 		VK_Allocator(const VK_Device *device);
 
 		~VK_Allocator();
-		Allocation &alloc(VkMemoryRequirements memRequirements, AllocFlags flags = NONE);
+		Allocation &alloc(VkMemoryRequirements memory_requirement, AllocFlags flags = NONE);
 
 		void free(Allocation &allocation);
 		void copy(VkBuffer src, VkBuffer dest, VkDeviceSize size);
 		void copy(VkBuffer src, VkImage dest, uint32_t width = 1, uint32_t height = 1, uint32_t depth = 1);
 	private:
 		void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
-		uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+		uint32_t findMemoryType(VkMemoryRequirements memory_requirement,AllocFlags flags);
 		std::string memoryTypeToString(const uint32_t mem_type);
 		std::string allocToString(const Allocation &alloc);
 	};

@@ -20,7 +20,10 @@ namespace HBE {
 	VK_Allocator::VK_Allocator(const VK_Device *device) {
 		this->device = device;
 		this->command_pool = new VK_CommandPool(device, 1);
-		vkGetPhysicalDeviceMemoryProperties(device->getPhysicalDevice().getHandle(), &memory_propeties);
+		memory_propeties=&device->getPhysicalDevice().getMemoryProperties();
+		for (int i = 0; i < memory_propeties->memoryTypeCount; ++i) {
+			blocks.emplace(i,std::vector<Block>());
+		}
 	}
 
 	VK_Allocator::~VK_Allocator() {
@@ -32,9 +35,14 @@ namespace HBE {
 		}
 	}
 
-	uint32_t VK_Allocator::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
-		for (uint32_t i = 0; i < memory_propeties.memoryTypeCount; i++) {
-			if ((typeFilter & (1 << i)) && (memory_propeties.memoryTypes[i].propertyFlags & properties) == properties) {
+	uint32_t VK_Allocator::findMemoryType(VkMemoryRequirements memory_requirement,AllocFlags flags) {
+		//todo:handle out of memory.
+		// if all heap of a memory type are out of memory, return another memory type.
+		VkMemoryPropertyFlags properties = choseProperties(flags);
+		uint32_t type_filter=memory_requirement.memoryTypeBits;
+		for (uint32_t i = 0; i < memory_propeties->memoryTypeCount; i++) {
+			if ((type_filter & (1 << i)) &&
+			(memory_propeties->memoryTypes[i].propertyFlags & properties) == properties) {
 				return i;
 			}
 		}
@@ -44,7 +52,7 @@ namespace HBE {
 
 	std::string VK_Allocator::memoryTypeToString(const uint32_t mem_type) {
 
-		VkMemoryPropertyFlags flags=device->getPhysicalDevice().getMemoryProperties().memoryTypes[mem_type].propertyFlags;
+		VkMemoryPropertyFlags flags = device->getPhysicalDevice().getMemoryProperties().memoryTypes[mem_type].propertyFlags;
 		std::string type = "";
 		bool need_separator = false;
 		std::string separator = " & ";
@@ -80,10 +88,7 @@ namespace HBE {
 
 	//https://www.khronos.org/registry/vulkan/specs/1.2-extensions/man/html/VkMemoryPropertyFlagBits.html
 	Allocation &VK_Allocator::alloc(VkMemoryRequirements mem_requirements, AllocFlags flags) {
-		VkMemoryPropertyFlags properties = choseProperties(flags);
-		uint32_t memory_type = findMemoryType(mem_requirements.memoryTypeBits, properties);
-		if (blocks.find(memory_type) == blocks.end())
-			blocks.emplace(memory_type, std::vector<Block>());
+		uint32_t memory_type = findMemoryType(mem_requirements,flags);
 		for (auto block_it = blocks[memory_type].begin(); block_it != blocks[memory_type].end(); ++block_it) {
 			if (block_it->remaining < mem_requirements.size) {
 				continue;
@@ -281,7 +286,7 @@ namespace HBE {
 		Log::debug("Freed " + allocToString(allocation));
 		if (allocation.block.alloc_count == 0) {
 			vkFreeMemory(device->getHandle(), allocation.block.memory, nullptr);
-
+			Log::debug("Freed block " + std::to_string(allocation.block.index) + " of " + memoryTypeToString(allocation.block.memory_type));
 			auto it = blocks[memory_type].erase(blocks[memory_type].begin() + allocation.block.index);
 
 			for (; it != blocks[memory_type].end(); ++it) {
