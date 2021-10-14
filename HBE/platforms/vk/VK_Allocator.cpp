@@ -36,8 +36,8 @@ namespace HBE {
 	}
 
 	uint32_t VK_Allocator::findMemoryType(VkMemoryRequirements memory_requirement,AllocFlags flags) {
-		//todo:handle out of memory.
-		// if all heap of a memory type are out of memory, return another memory type.
+		//todo: handle out of memory.
+		//if all heap of a memory type are out of memory, return another memory type.
 		VkMemoryPropertyFlags properties = choseProperties(flags);
 		uint32_t type_filter=memory_requirement.memoryTypeBits;
 		for (uint32_t i = 0; i < memory_propeties->memoryTypeCount; i++) {
