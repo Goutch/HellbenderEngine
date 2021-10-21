@@ -72,6 +72,11 @@ int main() {
 	mr2->setMesh(*mesh);
 	mr2->entity->transform->translate(vec3(2, 0, 0));
 	mr2->entity->transform->setParent(mr1->entity->transform);
+
+	auto wall = Resources::createInRegistry<Texture>("Wall");
+	wall->load("../../res/textures/wall.png");
+	pipeline->setTexture("texSampler",wall);
+
 	auto camera = Application::scene->instantiate<Camera>();
 	camera->setRenderMode(RenderMode::PERSPECTIVE);
 	camera->entity->transform->setPosition(vec3(0, 0, 5));

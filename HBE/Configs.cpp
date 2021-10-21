@@ -4,7 +4,7 @@ namespace HBE {
     Event<std::string> Configs::onWindowTitleChange;
     std::string Configs::window_title = "CHANGE WITH Configs::setWindowTitle";
 
-    std::string Configs::icon_path = "../Hellbender_logo.png";
+    std::string Configs::icon_path = "../wall.png";
 
     bool Configs::antialiasing = true;
     Event<bool> Configs::onAntialiasingChange;

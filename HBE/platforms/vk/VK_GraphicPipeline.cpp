@@ -8,7 +8,7 @@
 #include "VK_CommandPool.h"
 #include "VK_Swapchain.h"
 #include "VK_VertexLayout.h"
-
+#include "algorithm"
 
 namespace HBE {
 	VK_GraphicPipeline::VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer) {
@@ -60,7 +60,10 @@ namespace HBE {
 		if(pipeline_layout_handle!=VK_NULL_HANDLE)vkDestroyPipelineLayout(device->getHandle(), pipeline_layout_handle, nullptr);
 		descriptor_set_layout_bindings.clear();
 		push_constants_ranges.clear();
-		descriptor_sets_write.clear();
+		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+			descriptor_sets_writes[i].clear();
+		}
+
 		inputs.clear();
 		name_input_index.clear();
 		binding_input_index.clear();
@@ -265,13 +268,18 @@ namespace HBE {
 
 	void VK_GraphicPipeline::setTexture(uint32_t binding, const Texture *texture) {
 
-		VkDescriptorImageInfo image_info;
 		VK_Texture *vk_texture = (VK_Texture *) texture;
-		image_info.imageView = vk_texture->getImageView();
-		image_info.sampler = vk_texture->getSampler();
-		image_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		descriptor_sets_write[binding].pImageInfo = &image_info;
-		vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_sets_write[binding], 0, nullptr);
+
+
+		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+			VkDescriptorImageInfo image_info;
+			image_info.imageView = vk_texture->getImageView();
+			image_info.sampler = vk_texture->getSampler();
+			image_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			descriptor_sets_writes[i][binding].pImageInfo = &image_info;
+			vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_sets_writes[i][binding], 0, nullptr);
+		}
+
 	}
 
 	void VK_GraphicPipeline::setTexture(const std::string &name, const Texture *texture) {
@@ -368,7 +376,7 @@ namespace HBE {
 			Log::error("failed to create pipeline layout!");
 		}
 	}
-
+	bool comparator (VkDescriptorSetLayoutBinding i,VkDescriptorSetLayoutBinding j) { return (i.binding<j.binding); }
 	void VK_GraphicPipeline::createDescriptorSets() {
 
 		std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, descriptor_set_layout_handle);
@@ -377,7 +385,7 @@ namespace HBE {
 		allocInfo.descriptorPool = descriptor_pool_handle;
 		allocInfo.descriptorSetCount = MAX_FRAMES_IN_FLIGHT;
 		allocInfo.pSetLayouts = layouts.data();
-
+		std::sort(descriptor_set_layout_bindings.begin(),descriptor_set_layout_bindings.end(), comparator);
 		if (vkAllocateDescriptorSets(device->getHandle(), &allocInfo, descriptor_set_handles.data()) != VK_SUCCESS) {
 			Log::error("failed to allocate descriptor sets!");
 		}
@@ -422,6 +430,7 @@ namespace HBE {
 
 				writes[j].descriptorCount = 1;//for arrays
 				writes[j].pTexelBufferView = nullptr; // Optional
+				descriptor_sets_writes[i].emplace_back(writes[j]);
 				vkUpdateDescriptorSets(device->getHandle(), 1, &writes[j], 0, nullptr);
 			}
 		}

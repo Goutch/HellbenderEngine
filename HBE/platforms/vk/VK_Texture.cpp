@@ -4,43 +4,51 @@
 #include "VK_Buffer.h"
 #include "VK_Renderer.h"
 #include "VK_CommandPool.h"
+
 namespace HBE {
 
 	void VK_Texture::setData(unsigned char *data, int width, int height, TEXTURE_FORMAT format) {
-		if(view_hanlde!=VK_NULL_HANDLE)
-		{
-			vkDestroyImageView(device->getHandle(),view_hanlde, nullptr);
+		if (view_hanlde != VK_NULL_HANDLE) {
+			vkDestroyImageView(device->getHandle(), view_hanlde, nullptr);
 		}
-		if(handle!=VK_NULL_HANDLE)
-		{
+		if (handle != VK_NULL_HANDLE) {
 			vkDestroyImage(device->getHandle(), handle, nullptr);
 			device->getAllocator().free(*allocation);
 		}
+		VkDeviceSize byte_per_pixel;
 		VkFormat vk_format;
 		switch (format) {
 			case R8:
 				vk_format = VK_FORMAT_R8_SRGB;
+				byte_per_pixel=1;
 				break;
 			case RG8:
 				vk_format = VK_FORMAT_R8G8_SRGB;
+				byte_per_pixel=2;
 				break;
 			case RGB8:
 				vk_format = VK_FORMAT_R8G8B8_SRGB;
+				byte_per_pixel=3;
 				break;
 			case RGBA8:
 				vk_format = VK_FORMAT_R8G8B8A8_SRGB;
+				byte_per_pixel=4;
 				break;
 			case R32F:
 				vk_format = VK_FORMAT_R32_SFLOAT;
+				byte_per_pixel=4;
 				break;
 			case RG32F:
 				vk_format = VK_FORMAT_R32G32_SFLOAT;
+				byte_per_pixel=4*2;
 				break;
 			case RGB32F:
 				vk_format = VK_FORMAT_R32G32B32_SFLOAT;
+				byte_per_pixel=4*3;
 				break;
 			case RGBA32F:
 				vk_format = VK_FORMAT_R32G32B32A32_SFLOAT;
+				byte_per_pixel=4*4;
 				break;
 
 		}
@@ -74,7 +82,7 @@ namespace HBE {
 
 		vkBindImageMemory(device->getHandle(), handle, allocation->block.memory, allocation->offset);
 
-		VK_Buffer staging_buffer = VK_Buffer(device, data, requirements.size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, MAPPABLE);
+		VK_Buffer staging_buffer = VK_Buffer(device, data, width*height*byte_per_pixel, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, MAPPABLE);
 
 		device->getAllocator().copy(staging_buffer.getHandle(), handle, width, height);
 
@@ -97,16 +105,15 @@ namespace HBE {
 
 	VK_Texture::VK_Texture(VK_Device *device) {
 		this->device = device;
-		//todo move to graphics pipeline if it has a texture sampler.
 		VkSamplerCreateInfo samplerInfo{};
 		samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-		samplerInfo.magFilter = VK_FILTER_LINEAR;
-		samplerInfo.minFilter = VK_FILTER_LINEAR;
-		samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-		samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-		samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+		samplerInfo.magFilter = VK_FILTER_NEAREST;
+		samplerInfo.minFilter = VK_FILTER_NEAREST;
+		samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+		samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+		samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
 
-		samplerInfo.anisotropyEnable =  device->getPhysicalDevice().getFeatures().samplerAnisotropy;
+		samplerInfo.anisotropyEnable = device->getPhysicalDevice().getFeatures().samplerAnisotropy;
 		samplerInfo.maxAnisotropy = device->getPhysicalDevice().getProperties().limits.maxSamplerAnisotropy;
 
 		samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
@@ -127,16 +134,13 @@ namespace HBE {
 	}
 
 	VK_Texture::~VK_Texture() {
-		if(sampler_handle!=VK_NULL_HANDLE)
-		{
-			vkDestroySampler(device->getHandle(),sampler_handle, nullptr);
+		if (sampler_handle != VK_NULL_HANDLE) {
+			vkDestroySampler(device->getHandle(), sampler_handle, nullptr);
 		}
-		if(view_hanlde!=VK_NULL_HANDLE)
-		{
-			vkDestroyImageView(device->getHandle(),view_hanlde, nullptr);
+		if (view_hanlde != VK_NULL_HANDLE) {
+			vkDestroyImageView(device->getHandle(), view_hanlde, nullptr);
 		}
-		if(handle!=VK_NULL_HANDLE)
-		{
+		if (handle != VK_NULL_HANDLE) {
 			vkDestroyImage(device->getHandle(), handle, nullptr);
 			device->getAllocator().free(*allocation);
 		}

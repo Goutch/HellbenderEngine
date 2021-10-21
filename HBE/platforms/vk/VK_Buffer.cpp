@@ -57,7 +57,7 @@ namespace HBE {
 		if (allocation->flags & MAPPABLE) {
 			void *buffer_data;
 			vkMapMemory(device->getHandle(), allocation->block.memory, allocation->offset, allocation->size, 0, &buffer_data);
-			memcpy(buffer_data, data, (size_t) allocation->size);
+			memcpy(buffer_data, data, (size_t) size);
 			vkUnmapMemory(device->getHandle(), allocation->block.memory);
 		} else {
 			VK_Buffer staging_buffer = VK_Buffer(device,

@@ -115,7 +115,7 @@ void main()
 		}
 	}
 
-	void Graphics::draw(const Transform &transform, const Mesh &mesh,GraphicPipeline &pipeline) {
+	void Graphics::draw(const Transform &transform, const Mesh &mesh, GraphicPipeline &pipeline) {
 		renderer->draw(transform, mesh, pipeline);
 	}
 
@@ -145,11 +145,11 @@ void main()
 	}
 
 	void Graphics::initializeDefaultVariables() {
-		Texture* default_texture=Resources::createInRegistry<Texture>("DEFAULT");
+		Texture *default_texture = Resources::createInRegistry<Texture>("DEFAULT");
 		unsigned char *texture_data = new unsigned char[16]{255, 0, 0, 255,
 															0, 255, 0, 255,
 															0, 0, 255, 255,
-															255, 255, 255, 255};
+															0, 0, 0, 255};
 		default_texture->setData(texture_data, 2, 2, TEXTURE_FORMAT::RGBA8);
 		delete texture_data;
 		//-----------------------------------DEFAULT_CUBE---------------------------------

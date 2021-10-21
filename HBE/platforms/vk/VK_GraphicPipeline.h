@@ -37,7 +37,7 @@ namespace HBE {
 		std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> descriptor_set_handles;
 		std::vector<VkDescriptorSetLayoutBinding> descriptor_set_layout_bindings;
 		std::vector<VkPushConstantRange> push_constants_ranges;
-		std::vector<VkWriteDescriptorSet> descriptor_sets_write;
+		std::array<std::vector<VkWriteDescriptorSet>, MAX_FRAMES_IN_FLIGHT> descriptor_sets_writes;
 		std::unordered_map<uint32_t, std::vector<VK_Buffer *>> uniform_buffers;
 
 		std::vector<VK_Shader::ShaderInput> inputs;
