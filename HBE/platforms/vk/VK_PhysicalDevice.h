@@ -35,10 +35,11 @@ namespace HBE {
 		VkSurfaceKHR *surface_handle;
 		VkPhysicalDevice handle = VK_NULL_HANDLE;
 		VkPhysicalDeviceProperties properties;
-		VkPhysicalDeviceFeatures features;
+		VkPhysicalDeviceFeatures supported_features;
 		QueueFamilyIndices queue_family_indices{};
 		SwapchainSupportDetails support_details;
 		VkPhysicalDeviceMemoryProperties memory_properties;
+
 	public:
 		VK_PhysicalDevice(const VkInstance &vk_instance_handle, VkSurfaceKHR &surface_handle);
 

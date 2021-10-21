@@ -9,6 +9,7 @@
 #include <core/graphics/RenderTarget.h>
 #include <core/serialization/Serializer.h>
 #include "core/utility/Log.h"
+#include "core/graphics/Window.h"
 
 namespace HBE {
     Camera *Camera::main = nullptr;
@@ -24,20 +25,23 @@ namespace HBE {
     }
 
     void Camera::setRenderTarget(RenderTarget *render_target) {
+
+    	//todo:camera render target
         if (this->render_target != nullptr) {
-            this->render_target->onSizeChange.unsubscribe(this);
+//            this->render_target->onSizeChange.unsubscribe(this);
         }
         this->render_target = render_target;
-        if (render_target != nullptr) {
+       /* if (render_target != nullptr) {
             setAspectRatio(render_target->getWidth(), render_target->getHeight());
             render_target->onSizeChange.subscribe(this, &Camera::onRenderTargetSizeChange);
-        }
+        }*/
 
     }
 
 
     Camera::~Camera() {
-        render_target->onSizeChange.unsubscribe(this);
+    	//todo:rendertarget
+        //render_target->onSizeChange.unsubscribe(this);
         if (main == this) {
             main = nullptr;
         }
@@ -50,15 +54,19 @@ namespace HBE {
     }
 
     void Camera::generateProjectionMatrix() {
+		int w,h;
+		Graphics::getWindow()->getSize(w,h);
         if (render_mode == RenderMode::PERSPECTIVE) {
-            projection_matrix = glm::perspective<float>(glm::radians(fov), aspect_ratio, 0.1f, render_distance);
+            projection_matrix = glm::perspective<float>(glm::radians(fov), static_cast<float>(w)/static_cast<float>(h), 0.1f, render_distance);
         }
         if (render_mode == RenderMode::ORTHOGRAPHIC) {
+          	//todo:renderTarget
+
             projection_matrix = glm::ortho<float>(
-                    -((static_cast<float>(render_target->getWidth()) / 2)) / orthographic_zoom,
-                    ((static_cast<float>(render_target->getWidth()) / 2)) / orthographic_zoom,
-                    -(static_cast<float>(render_target->getHeight()) / 2) / orthographic_zoom,
-                    (static_cast<float>(render_target->getHeight()) / 2) / orthographic_zoom,
+                    -((static_cast<float>(w) / 2)) / orthographic_zoom,
+                    ((static_cast<float>(w) / 2)) / orthographic_zoom,
+                    -(static_cast<float>(h) / 2) / orthographic_zoom,
+                    (static_cast<float>(h) / 2) / orthographic_zoom,
                     -render_distance, render_distance);
         }
         calculateFrustumPlanes();

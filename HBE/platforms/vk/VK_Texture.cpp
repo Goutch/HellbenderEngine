@@ -2,12 +2,17 @@
 
 #include "VK_Texture.h"
 #include "VK_Buffer.h"
-#include "VK_Allocator.h"
-#include "core/utility/Log.h"
+#include "VK_Renderer.h"
+#include "VK_CommandPool.h"
 namespace HBE {
 
 	void VK_Texture::setData(unsigned char *data, int width, int height, TEXTURE_FORMAT format) {
-		if (handle != VK_NULL_HANDLE) {
+		if(view_hanlde!=VK_NULL_HANDLE)
+		{
+			vkDestroyImageView(device->getHandle(),view_hanlde, nullptr);
+		}
+		if(handle!=VK_NULL_HANDLE)
+		{
 			vkDestroyImage(device->getHandle(), handle, nullptr);
 			device->getAllocator().free(*allocation);
 		}
@@ -73,24 +78,80 @@ namespace HBE {
 
 		device->getAllocator().copy(staging_buffer.getHandle(), handle, width, height);
 
-	}
+		//image view
+		VkImageViewCreateInfo viewInfo{};
+		viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		viewInfo.image = handle;
+		viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		viewInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
+		viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		viewInfo.subresourceRange.baseMipLevel = 0;
+		viewInfo.subresourceRange.levelCount = 1;
+		viewInfo.subresourceRange.baseArrayLayer = 0;
+		viewInfo.subresourceRange.layerCount = 1;
 
-	void VK_Texture::bind(unsigned int slot) const {
-
-	}
-
-	void VK_Texture::unbind(unsigned int slot) const {
-
+		if (vkCreateImageView(device->getHandle(), &viewInfo, nullptr, &view_hanlde) != VK_SUCCESS) {
+			Log::error("failed to create texture image view!");
+		}
 	}
 
 	VK_Texture::VK_Texture(VK_Device *device) {
 		this->device = device;
+		//todo move to graphics pipeline if it has a texture sampler.
+		VkSamplerCreateInfo samplerInfo{};
+		samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+		samplerInfo.magFilter = VK_FILTER_LINEAR;
+		samplerInfo.minFilter = VK_FILTER_LINEAR;
+		samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+		samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+		samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
+		samplerInfo.anisotropyEnable =  device->getPhysicalDevice().getFeatures().samplerAnisotropy;
+		samplerInfo.maxAnisotropy = device->getPhysicalDevice().getProperties().limits.maxSamplerAnisotropy;
+
+		samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+		samplerInfo.unnormalizedCoordinates = VK_FALSE;
+
+		samplerInfo.compareEnable = VK_FALSE;
+		samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+
+		samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+		samplerInfo.mipLodBias = 0.0f;
+		samplerInfo.minLod = 0.0f;
+		samplerInfo.maxLod = 0.0f;
+
+
+		if (vkCreateSampler(device->getHandle(), &samplerInfo, nullptr, &sampler_handle) != VK_SUCCESS) {
+			Log::error("failed to create texture sampler!");
+		}
 	}
 
 	VK_Texture::~VK_Texture() {
-		vkDestroyImage(device->getHandle(), handle, nullptr);
-		device->getAllocator().free(*allocation);
+		if(sampler_handle!=VK_NULL_HANDLE)
+		{
+			vkDestroySampler(device->getHandle(),sampler_handle, nullptr);
+		}
+		if(view_hanlde!=VK_NULL_HANDLE)
+		{
+			vkDestroyImageView(device->getHandle(),view_hanlde, nullptr);
+		}
+		if(handle!=VK_NULL_HANDLE)
+		{
+			vkDestroyImage(device->getHandle(), handle, nullptr);
+			device->getAllocator().free(*allocation);
+		}
+	}
+
+	const VkSampler &VK_Texture::getSampler() const {
+		return sampler_handle;
+	}
+
+	const VkImageView &VK_Texture::getImageView() const {
+		return view_hanlde;
+	}
+
+	const VkImage &VK_Texture::getImage() const {
+		return handle;
 	}
 
 

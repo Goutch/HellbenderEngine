@@ -4,19 +4,21 @@
 #include "core/graphics/RenderTarget.h"
 #include "core/serialization/Serializer.h"
 #include "core/entity/Entity.h"
+#include "core/graphics/Graphics.h"
+#include "core/graphics/Window.h"
 namespace HBE {
     void CameraController::onUpdate(float delta) {
-        float w, h;
-        w = camera->getRenderTarget()->getWidth();
-        h = camera->getRenderTarget()->getHeight();
+        int w, h;
+        Graphics::getWindow()->getSize(w,h);
+
         double x, y;
         Input::getMousePosition(x, y);
         Input::setCursorPosition(w / 2.0, h / 2.0f);
 
         float fov = camera->getFOV();
         vec2 change;
-        change.x = (((w / 2.0f) - x) / w) * glm::radians(fov);
-        change.y = (((h / 2.0f) - y) / h) * (glm::radians(fov) * camera->getAspectRatio());
+        change.x = ((((float)w / 2.0f) - x) / (float)w) * glm::radians(fov);
+        change.y = ((((float)h / 2.0f) - y) / (float)h) * (glm::radians(fov) * camera->getAspectRatio());
 
         //go to pitch 0
         entity->transform->rotate(quat(vec3(-current_pitch, 0, 0)));

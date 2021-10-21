@@ -4,19 +4,18 @@
 #include "core/entity/component/Component.h"
 
 namespace HBE {
-    class Material;
     class Mesh;
 
     class HB_API MeshRenderer : public Component {
         const Mesh *mesh;
-        const Material *material;
+        GraphicPipeline *pipeline;
 
     public:
         void onAttach() override;
 
         void onDraw() override;
 
-        void setMaterial(const Material &material);
+        void setMaterial( GraphicPipeline &pipeline);
 
         void setMesh(const Mesh &mesh);
 

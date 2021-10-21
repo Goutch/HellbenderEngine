@@ -26,10 +26,6 @@ namespace HBE {
         void load(std::string path);
 
         virtual void setData(unsigned char *data, int width, int height, TEXTURE_FORMAT format) = 0;
-
-        virtual void bind(unsigned int slot) const = 0;
-
-        virtual void unbind(unsigned int slot) const = 0;
     };
 
 }

@@ -5,12 +5,17 @@
 #include "vulkan/vulkan.h"
 #include "VK_Allocator.h"
 
+
 namespace HBE {
 	class VK_Buffer;
+
+	class VK_Renderer;
 
 	class VK_Texture : public Texture {
 		VK_Device *device;
 		VkImage handle = VK_NULL_HANDLE;
+		VkImageView view_hanlde=VK_NULL_HANDLE;
+		VkSampler sampler_handle=VK_NULL_HANDLE;
 		HBE::TEXTURE_FORMAT format;
 		Allocation *allocation;
 	public:
@@ -19,9 +24,9 @@ namespace HBE {
 
 		void setData(unsigned char *data, int width, int height, TEXTURE_FORMAT format) override;
 
-		void bind(unsigned int slot) const override;
-
-		void unbind(unsigned int slot) const override;
+		const VkSampler &getSampler() const;
+		const VkImageView &getImageView() const;
+		const VkImage &getImage() const;
 	};
 }
 

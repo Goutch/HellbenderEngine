@@ -10,7 +10,6 @@
 #include "core/resource/VertexLayout.h"
 #include "core/resource/ComputePipeline.h"
 #include "core/resource/Mesh.h"
-#include "core/resource/Material.h"
 #include "core/resource/Texture.h"
 #include "core/resource/Model.h"
 #include "core/resource/ResourcesRegistry.h"
@@ -49,7 +48,6 @@ namespace HBE {
             Resources::destroy<Model>();
             Resources::destroy<Shader>();
             Resources::destroy<VertexLayout>();
-            Resources::destroy<Material>();
         }
 
         template<class T>
@@ -107,11 +105,6 @@ namespace HBE {
             auto ptr = create<T>();
             ResourcesRegistry::add(unique_name, reinterpret_cast<Resource*>(ptr));
             return ptr;
-        }
-
-        template<>
-        Material *create<Material>() {
-            return new Material();
         }
 
         template<>

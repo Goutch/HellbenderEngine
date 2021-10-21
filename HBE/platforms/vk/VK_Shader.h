@@ -5,7 +5,6 @@
 #include "string"
 #include "VK_Buffer.h"
 #include "VK_CONSTANTS.h"
-#include "VK_DescriptorSetLayout.h"
 
 namespace HBE {
 	class VK_Renderer;
@@ -19,19 +18,23 @@ namespace HBE {
 		enum INPUT_TYPE {
 			UNIFORM_BUFFER,
 			PUSH_CONSTANT,
-			IMAGE_BUFFER,
+			TEXTURE_SAMPLER,
 		};
 		struct ShaderInput {
+
+			std::string name;
 			INPUT_TYPE type;
 			uint32_t binding;
-			uint32_t index;
+			VkShaderStageFlags stage;
+			VkDeviceSize size;
+			VkDeviceSize offset;
 		};
 	private:
 		const VK_Device *device;
 		VkShaderModule handle = VK_NULL_HANDLE;
-		std::vector<VK_DescriptorSetLayout *> descriptor_sets_layouts;
+		std::vector<VkDescriptorSetLayoutBinding> layout_bindings;
 		std::vector<VkPushConstantRange> push_constants_ranges;
-		std::unordered_map<std::string, ShaderInput> inputs;
+		std::vector<ShaderInput> inputs;
 		VkShaderStageFlags stage_flag;
 	public:
 
@@ -41,11 +44,12 @@ namespace HBE {
 		void setSource(const std::string &source, SHADER_STAGE stage) override;
 		const VkShaderModule &getHandle() const;
 
-		const std::vector<VK_DescriptorSetLayout *> &getDescriptorSetsLayouts() const;
 		const std::vector<VkPushConstantRange> &getPushConstantRanges() const;
 
-		const std::unordered_map<std::string, ShaderInput> & getInputs() const;
+		const std::vector<ShaderInput> & getInputs() const;
 		VkShaderStageFlags getStage() const;
+		const std::vector<VkDescriptorSetLayoutBinding> &getLayoutBindings() const;
+
 	};
 }
 

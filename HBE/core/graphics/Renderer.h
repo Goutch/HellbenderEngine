@@ -17,8 +17,6 @@ namespace HBE {
 
     class Framebuffer;
 
-    class Material;
-
     class Window;
 
     class ResourceFactory;
@@ -39,9 +37,9 @@ namespace HBE {
 
 
 
-        virtual void draw(const Transform &transform, const Mesh &mesh, const Material &material) = 0;
+        virtual void draw(const Transform &transform, const Mesh &mesh, GraphicPipeline &pipeline) = 0;
 
-        virtual void drawInstanced(const Mesh &mesh, const Material &material) = 0;
+        virtual void drawInstanced(const Mesh &mesh, GraphicPipeline &pipeline) = 0;
 
         virtual void clear() const = 0;
 

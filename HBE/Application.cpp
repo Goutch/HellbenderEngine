@@ -10,7 +10,6 @@
 #include <core/entity/component/MeshRenderer.h>
 #include <core/entity/component/ModelRenderer.h>
 #include <core/entity/component/CameraController.h>
-#include <core/entity/component/InstancesRenderer.h>
 #include <core/graphics/Window.h>
 #include <core/graphics/Renderer.h>
 #include <core/resource/Resources.h>
@@ -34,7 +33,6 @@ namespace HBE {
         ComponentRegistry::registerComponent<Camera>("Camera");
         ComponentRegistry::registerComponent<MeshRenderer>("MeshRenderer");
         ComponentRegistry::registerComponent<ModelRenderer>("ModelRenderer");
-        ComponentRegistry::registerComponent<InstancesRenderer>("InstancesRenderer");
         ComponentRegistry::registerComponent<CameraController>("CameraController");
         onRegisterComponents.invoke();
     }

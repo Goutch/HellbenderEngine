@@ -4,7 +4,6 @@
 #include "core/entity/component/Component.h"
 
 namespace HBE {
-    class Material;
     class Model;
     class HB_API ModelRenderer : public Component {
         const Model *model;

@@ -5,7 +5,9 @@
 #include <array>
 #include "vulkan/vulkan.h"
 #include "unordered_map"
-
+#include "VK_Texture.h"
+#include "VK_CONSTANTS.h"
+#include "VK_Shader.h"
 
 namespace HBE {
 	class VK_Device;
@@ -20,18 +22,39 @@ namespace HBE {
 
 	class VK_Buffer;
 
-	class VK_Shader;
+
 	class VK_GraphicPipeline : public GraphicPipeline {
 		VK_Device *device = nullptr;
 		VK_Renderer *renderer = nullptr;
-		VK_DescriptorPool *descriptor_pool = nullptr;
-		VkPipelineLayout pipeline_layout_handle{};
+
+		VkPipelineLayout pipeline_layout_handle = VK_NULL_HANDLE;
 		VkPipeline handle = VK_NULL_HANDLE;
-		std::vector<const VK_Shader*> shaders;
+		VkDescriptorSetLayout descriptor_set_layout_handle= VK_NULL_HANDLE;
+		VkDescriptorPool descriptor_pool_handle = VK_NULL_HANDLE;
+
+		std::vector<const VK_Shader *> shaders;
+
+		std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> descriptor_set_handles;
+		std::vector<VkDescriptorSetLayoutBinding> descriptor_set_layout_bindings;
+		std::vector<VkPushConstantRange> push_constants_ranges;
+		std::vector<VkWriteDescriptorSet> descriptor_sets_write;
+		std::unordered_map<uint32_t, std::vector<VK_Buffer *>> uniform_buffers;
+
+		std::vector<VK_Shader::ShaderInput> inputs;
+		std::unordered_map<std::string,uint32_t> name_input_index;
+		std::unordered_map<uint32_t ,uint32_t> binding_input_index;
+		std::unordered_map<std::string,uint32_t> name_push_constant_index;
 	public:
 		VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer);
 
 		void setDrawFlags(DRAW_FLAGS flags) override;
+		void setDynamicUniform(const std::string &name, void *data);
+		void setDynamicUniform(uint32_t binding, void *data) ;
+		void setUniform(const std::string &name, void *data);
+		void setUniform(uint32_t binding, void *data);
+		void PushConstant(const std::string &name, void *data);
+		void setTexture(uint32_t binding, const Texture *texture);
+		void setTexture(const std::string &name, const Texture *texture);
 
 		DRAW_FLAGS getDrawFlags() const override;
 
@@ -45,48 +68,7 @@ namespace HBE {
 
 		void unbind() const override;
 
-
-		void setUniform(const std::string &name, void *data) const override;
-
-		void setUniform(const std::string &name, int i) const override;
-
-		void setUniform(const std::string &name, float f) const override;
-
-		void setUniform(const std::string &name, const glm::vec2 &v) const override;
-
-		void setUniform(const std::string &name, const glm::vec3 &v) const override;
-
-		void setUniform(const std::string &name, const glm::vec4 &v) const override;
-
-		void setUniform(const std::string &name, const glm::mat3 &m) const override;
-
-		void setUniform(const std::string &name, const glm::mat4 &m) const override;
-
-		void setUniform(uint32_t binding, void *data) const override;
-
-		void setUniform(unsigned int location, int i) const override;
-
-		void setUniform(unsigned int location, float f) const override;
-
-		void setUniform(unsigned int location, const glm::vec2 &v) const override;
-
-		void setUniform(unsigned int location, const glm::vec3 &v) const override;
-
-		void setUniform(unsigned int location, const glm::vec4 &v) const override;
-
-		void setUniform(unsigned int location, const glm::mat3 &m) const override;
-
-		void setUniform(unsigned int location, const glm::mat4 &m) const override;
-
-		void setUniformIntArray(unsigned int location, int *i, unsigned int count) const override;
-
-		void setUniformFloatArray(unsigned int location, float *f, unsigned int count) const override;
-
-		void setUniformVec2Array(unsigned int location, const glm::vec2 *v, unsigned int count) const override;
-
-		void setUniformVec3Array(unsigned int location, const glm::vec3 *v, unsigned int count) const override;
-
-		void setUniformVec4Array(unsigned int location, const glm::vec4 *v, unsigned int count) const override;
-
+		void createPipelineLayout();
+		void createDescriptorSets();
 	};
 }

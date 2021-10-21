@@ -12,9 +12,10 @@ namespace HBE {
         this->surface_handle = &surface_handle;
         Log::status("Looking for suitable GPU:");
         pickBestPhysicalDevice();
+
         support_details = querySwapchainSupportDetails(handle);
 		vkGetPhysicalDeviceMemoryProperties(handle,&memory_properties);
-
+		vkGetPhysicalDeviceFeatures(handle, &supported_features);
     }
 
     void VK_PhysicalDevice::pickBestPhysicalDevice() {
@@ -39,7 +40,7 @@ namespace HBE {
         if (!suitable_devices_map.empty()) {
             handle = suitable_devices_map.rbegin()->second;
             vkGetPhysicalDeviceProperties(handle, &properties);
-            vkGetPhysicalDeviceFeatures(handle, &features);
+
             queue_family_indices = getSupportedQueueFamilies(handle);
             Log::status(std::string("\tFOUND:") + properties.deviceName);
         } else {
@@ -74,6 +75,7 @@ namespace HBE {
             swapchain_support =
                     !swapchain_support_details.present_modes.empty() && !swapchain_support_details.formats.empty();
         }
+
         return queue_families_indices.isComplete() && extension_support && swapchain_support;
     }
 
@@ -122,7 +124,7 @@ namespace HBE {
     }
 
     const VkPhysicalDeviceFeatures &VK_PhysicalDevice::getFeatures() const {
-        return features;
+        return supported_features;
     }
 
     const VkPhysicalDeviceProperties &VK_PhysicalDevice::getProperties() const {

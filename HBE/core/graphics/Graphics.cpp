@@ -17,10 +17,7 @@
 namespace HBE {
 	const Mesh *Graphics::DEFAULT_CUBE = nullptr;
 	const Mesh *Graphics::DEFAULT_QUAD = nullptr;
-	const GraphicPipeline *Graphics::DEFAULT_MESH_PIPELINE = nullptr;
-	const GraphicPipeline *Graphics::DEFAULT_SCREEN_PIPELINE = nullptr;
-	const GraphicPipeline *Graphics::DEFAULT_INSTANCED_PIPELINE = nullptr;
-	const Material *Graphics::DEFAULT_MESH_MATERIAL = nullptr;
+
 	DRAW_FLAGS Graphics::default_draw_flags;
 	Renderer *Graphics::renderer = nullptr;
 	Window *Graphics::window = nullptr;
@@ -114,16 +111,16 @@ void main()
 
 	void Graphics::onWindowSizeChange(int width, int height) {
 		if (!Configs::isPresentAutomatic() && render_target != nullptr) {
-			render_target->setSize(width, height);
+			//todo:render_target->setSize(width, height);
 		}
 	}
 
-	void Graphics::draw(const Transform &transform, const Mesh &mesh, const Material &material) {
-		renderer->draw(transform, mesh, material);
+	void Graphics::draw(const Transform &transform, const Mesh &mesh,GraphicPipeline &pipeline) {
+		renderer->draw(transform, mesh, pipeline);
 	}
 
-	void Graphics::drawInstanced(const Mesh &mesh, const Material &material) {
-		renderer->drawInstanced(mesh, material);
+	void Graphics::drawInstanced(const Mesh &mesh, GraphicPipeline &pipeline) {
+		renderer->drawInstanced(mesh, pipeline);
 	}
 
 	void Graphics::render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix) {
@@ -140,11 +137,6 @@ void main()
 	}
 
 	void Graphics::terminate() {
-
-		delete DEFAULT_MESH_PIPELINE;
-		delete DEFAULT_MESH_MATERIAL;
-		delete DEFAULT_SCREEN_PIPELINE;
-		delete DEFAULT_INSTANCED_PIPELINE;
 		delete DEFAULT_QUAD;
 		delete DEFAULT_CUBE;
 		delete render_target;
@@ -153,6 +145,13 @@ void main()
 	}
 
 	void Graphics::initializeDefaultVariables() {
+		Texture* default_texture=Resources::createInRegistry<Texture>("DEFAULT");
+		unsigned char *texture_data = new unsigned char[16]{255, 0, 0, 255,
+															0, 255, 0, 255,
+															0, 0, 255, 255,
+															255, 255, 255, 255};
+		default_texture->setData(texture_data, 2, 2, TEXTURE_FORMAT::RGBA8);
+		delete texture_data;
 		//-----------------------------------DEFAULT_CUBE---------------------------------
 		/*  Mesh *cube = new Mesh();
 		 Geometry::createCube(*cube, 1, 1, 1);
@@ -197,7 +196,7 @@ void main()
 		//------------------------------------DEFAULT_RENDER_TARGET------------------------------
 		int width, height;
 		window->getSize(width, height);
-		render_target = new RenderTarget(width, height, *DEFAULT_SCREEN_PIPELINE);
+		//todo:render_target = new RenderTarget(width, height, *DEFAULT_SCREEN_PIPELINE);
 
 		default_draw_flags = DRAW_FLAGS_NONE;
 	}

@@ -1,21 +1,20 @@
 #pragma once
 #include "Core.h"
-#include "core/resource/Material.h"
 #include "core/resource/Mesh.h"
 #include "core/utility/Log.h"
 #include "core/utility/ModelImporter.h"
 #include "core/serialization/Serializable.h"
-
+#include "core/resource/GraphicPipeline.h"
 
 namespace HBE {
     class HB_API Model : public Resource {
         std::string path;
-        std::vector<std::pair<Mesh *, Material *>> meshes;
+        std::vector<std::pair<Mesh *, GraphicPipeline *>> meshes;
 
         void clearMeshes();
 
     public:
-        void setMaterial(Material *material, int mesh_index = 0);
+        void setMaterial(GraphicPipeline *pipeline, int mesh_index = 0);
 
         Model *load(std::string path);
 
@@ -25,7 +24,7 @@ namespace HBE {
 
         void constructModel(std::vector<std::pair<MeshData, MaterialData>> *meshes_data);
 
-        const std::vector<std::pair<Mesh *, Material *>> &getMeshes() const;
+        const std::vector<std::pair<Mesh *, GraphicPipeline *>> &getMeshes() const;
 
         virtual ~Model();
 

@@ -34,9 +34,9 @@ namespace HBE {
 		struct RenderObject {
 			const Transform *transform;
 			const Mesh *mesh;
-			const Material *material;
+			GraphicPipeline *pipeline;
 		};
-		MAP_LIST(const Material*, MAP_LIST(const Mesh*, std::list<const Transform*>)) render_cache;
+		MAP_LIST(GraphicPipeline*, MAP_LIST(const Mesh*, std::list<const Transform*>)) render_cache;
 
 
 		VK_Window *window;
@@ -63,9 +63,9 @@ namespace HBE {
 
 		void endFrame() override;
 
-		void draw(const Transform &transform, const Mesh &mesh, const Material &material) override;
+		void draw(const Transform &transform, const Mesh &mesh, GraphicPipeline &pipeline) override;
 
-		void drawInstanced(const Mesh &mesh, const Material &material) override;
+		void drawInstanced(const Mesh &mesh,GraphicPipeline &pipeline) override;
 
 		void clear() const override;
 

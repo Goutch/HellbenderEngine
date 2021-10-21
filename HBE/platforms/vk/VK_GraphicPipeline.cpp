@@ -1,17 +1,14 @@
 #include <core/graphics/Graphics.h>
+#include <core/resource/Resources.h>
 #include "VK_GraphicPipeline.h"
-#include "VK_Shader.h"
 #include "core/graphics/Window.h"
 
-#include "VK_Device.h"
 #include "VK_Renderer.h"
 #include "VK_RenderPass.h"
 #include "VK_CommandPool.h"
-#include "VK_Buffer.h"
 #include "VK_Swapchain.h"
 #include "VK_VertexLayout.h"
-#include "VK_DescriptorPool.h"
-#include "VK_DescriptorSetLayout.h"
+
 
 namespace HBE {
 	VK_GraphicPipeline::VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer) {
@@ -20,9 +17,15 @@ namespace HBE {
 	}
 
 	VK_GraphicPipeline::~VK_GraphicPipeline() {
-		delete descriptor_pool;
-		vkDestroyPipeline(device->getHandle(), handle, nullptr);
-		vkDestroyPipelineLayout(device->getHandle(), pipeline_layout_handle, nullptr);
+		for (auto buffer_vector:uniform_buffers) {
+			for (size_t i = 0; i < buffer_vector.second.size(); ++i) {
+				delete buffer_vector.second[i];
+			}
+		}
+		if(descriptor_set_layout_handle!=VK_NULL_HANDLE)vkDestroyDescriptorSetLayout(device->getHandle(), descriptor_set_layout_handle, nullptr);
+		if(descriptor_pool_handle != VK_NULL_HANDLE)vkDestroyDescriptorPool(device->getHandle(), descriptor_pool_handle, nullptr);
+		if(handle!=VK_NULL_HANDLE)vkDestroyPipeline(device->getHandle(), handle, nullptr);
+		if(pipeline_layout_handle!=VK_NULL_HANDLE)vkDestroyPipelineLayout(device->getHandle(), pipeline_layout_handle, nullptr);
 	}
 
 
@@ -32,8 +35,8 @@ namespace HBE {
 								VK_PIPELINE_BIND_POINT_GRAPHICS,
 								pipeline_layout_handle,
 								0,
-								descriptor_pool->getSets(renderer->getCurrentFrame()).size(),
-								descriptor_pool->getSets(renderer->getCurrentFrame()).data(),
+								1,
+								&descriptor_set_handles[renderer->getCurrentFrame()],
 								0,
 								nullptr);
 	}
@@ -43,7 +46,7 @@ namespace HBE {
 	}
 
 	void VK_GraphicPipeline::setDrawFlags(DRAW_FLAGS flags) {
-        //todo:
+		//todo:
 	}
 
 	DRAW_FLAGS VK_GraphicPipeline::getDrawFlags() const {
@@ -51,6 +54,24 @@ namespace HBE {
 	}
 
 	void VK_GraphicPipeline::setShaders(const Shader *vertex, const Shader *fragment, const VertexLayout *layout) {
+		if(descriptor_set_layout_handle!=VK_NULL_HANDLE)vkDestroyDescriptorSetLayout(device->getHandle(), descriptor_set_layout_handle, nullptr);
+		if(descriptor_pool_handle!=VK_NULL_HANDLE)vkDestroyDescriptorPool(device->getHandle(), descriptor_pool_handle, nullptr);
+		if(handle!=VK_NULL_HANDLE)vkDestroyPipeline(device->getHandle(), handle, nullptr);
+		if(pipeline_layout_handle!=VK_NULL_HANDLE)vkDestroyPipelineLayout(device->getHandle(), pipeline_layout_handle, nullptr);
+		descriptor_set_layout_bindings.clear();
+		push_constants_ranges.clear();
+		descriptor_sets_write.clear();
+		inputs.clear();
+		name_input_index.clear();
+		binding_input_index.clear();
+		name_push_constant_index.clear();
+		for (auto buffer_vector:uniform_buffers) {
+			for (size_t i = 0; i < buffer_vector.second.size(); ++i) {
+				delete buffer_vector.second[i];
+			}
+		}
+		uniform_buffers.clear();
+
 
 		const VK_Shader *vk_vertex = (dynamic_cast<const VK_Shader *>(vertex));
 		const VK_Shader *vk_frag = (dynamic_cast<const VK_Shader *>(fragment));
@@ -152,68 +173,19 @@ namespace HBE {
 		colorBlending.blendConstants[2] = 0.0f; // Optional
 		colorBlending.blendConstants[3] = 0.0f; // Optional
 
-		 VkDynamicState dynamicStates[] = {
-				  VK_DYNAMIC_STATE_VIEWPORT,
-				  VK_DYNAMIC_STATE_SCISSOR
-		 };
+		VkDynamicState dynamicStates[] = {
+				VK_DYNAMIC_STATE_VIEWPORT,
+				VK_DYNAMIC_STATE_SCISSOR
+		};
 
-		  VkPipelineDynamicStateCreateInfo dynamicState{};
-		  dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-		  dynamicState.dynamicStateCount = 2;
-		  dynamicState.pDynamicStates = dynamicStates;
-
-		const std::vector<VK_DescriptorSetLayout *> &vertex_sets_layouts = vk_vertex->getDescriptorSetsLayouts();
-		const std::vector<VK_DescriptorSetLayout *> &frag_sets_layouts = vk_frag->getDescriptorSetsLayouts();
+		VkPipelineDynamicStateCreateInfo dynamicState{};
+		dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+		dynamicState.dynamicStateCount = 2;
+		dynamicState.pDynamicStates = dynamicStates;
 
 
-		if (descriptor_pool) delete descriptor_pool;
-		std::vector<const VK_DescriptorSetLayout *> descriptor_set_layouts;
-		descriptor_set_layouts.resize(vertex_sets_layouts.size() + frag_sets_layouts.size());
-		for (size_t i = 0; i < descriptor_set_layouts.size(); ++i) {
-			if (i < vertex_sets_layouts.size()) {
-				descriptor_set_layouts[i] = vertex_sets_layouts[i];
-			} else {
-				descriptor_set_layouts[i] = frag_sets_layouts[i - vertex_sets_layouts.size()];
-			}
-		}
-		descriptor_pool = new VK_DescriptorPool(device, descriptor_set_layouts);
-		std::vector<VkDescriptorSetLayout> descriptor_set_layouts_handles;
-		descriptor_set_layouts_handles.resize(vertex_sets_layouts.size() + frag_sets_layouts.size());
-		int count = 0;
-		for (const VK_DescriptorSetLayout *set_layout:vertex_sets_layouts) {
-			descriptor_set_layouts_handles[count] = set_layout->getHandle();
-			count++;
-		}
-		for (const VK_DescriptorSetLayout *set_layout:frag_sets_layouts) {
-			descriptor_set_layouts_handles[count] = set_layout->getHandle();
-			count++;
-		}
+		createPipelineLayout();
 
-		const std::vector<VkPushConstantRange> &vertex_push_constants = vk_vertex->getPushConstantRanges();
-		const std::vector<VkPushConstantRange> &frag_push_constants = vk_frag->getPushConstantRanges();
-
-		std::vector<VkPushConstantRange> push_constant_ranges;
-		push_constant_ranges.resize(vertex_push_constants.size() + frag_push_constants.size());
-		for (size_t i = 0; i < push_constant_ranges.size(); ++i) {
-			if (i < vertex_push_constants.size()) {
-				push_constant_ranges[i] = vertex_push_constants[i];
-			} else {
-				push_constant_ranges[i] = frag_push_constants[i - vertex_push_constants.size()];
-			}
-		}
-
-
-		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		pipelineLayoutInfo.setLayoutCount = descriptor_set_layouts_handles.size();
-		pipelineLayoutInfo.pSetLayouts = descriptor_set_layouts_handles.data();
-		pipelineLayoutInfo.pushConstantRangeCount = push_constant_ranges.size();
-		pipelineLayoutInfo.pPushConstantRanges = push_constant_ranges.data();
-
-		if (vkCreatePipelineLayout(device->getHandle(), &pipelineLayoutInfo, nullptr, &pipeline_layout_handle) !=
-			VK_SUCCESS) {
-			Log::error("failed to create pipeline layout!");
-		}
 
 		VkGraphicsPipelineCreateInfo pipelineInfo{};
 		pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -250,103 +222,208 @@ namespace HBE {
 		Log::error("Geometry shader not implemented in vulkan renderer");
 	}
 
-	void VK_GraphicPipeline::setUniform(unsigned int location, int i) const {
-
+	void VK_GraphicPipeline::setDynamicUniform(const std::string &name, void *data) {
+		//todo
 	}
 
-	void VK_GraphicPipeline::setUniform(unsigned int location, float f) const {
-
+	void VK_GraphicPipeline::setDynamicUniform(uint32_t binding, void *data) {
+		//todo
 	}
 
-	void VK_GraphicPipeline::setUniform(unsigned int location, const glm::vec2 &v) const {
+	void VK_GraphicPipeline::setUniform(const std::string &name, void *data) {
+		auto it = name_input_index.find(name);
+		if (it != name_input_index.end()) {
+			if (inputs[it->second].type == VK_Shader::UNIFORM_BUFFER) {
+				setUniform(inputs[it->second].binding, data);
 
+			} else {
+				Log::error(name + " is not a uniform buffer");
+			}
+		} else {
+			Log::error("No shader input is named:" + name);
+		}
 	}
 
-	void VK_GraphicPipeline::setUniform(unsigned int location, const glm::vec3 &v) const {
-
-	}
-
-	void VK_GraphicPipeline::setUniform(unsigned int location, const glm::vec4 &v) const {
-
-	}
-
-	void VK_GraphicPipeline::setUniform(unsigned int location, const glm::mat3 &m) const {
-
-	}
-
-	void VK_GraphicPipeline::setUniform(unsigned int location, const glm::mat4 &m) const {
-
-	}
-
-	void VK_GraphicPipeline::setUniformIntArray(unsigned int location, int *i, unsigned int count) const {
-
-	}
-
-	void VK_GraphicPipeline::setUniformFloatArray(unsigned int location, float *f, unsigned int count) const {
-
-	}
-
-	void VK_GraphicPipeline::setUniformVec2Array(unsigned int location, const glm::vec2 *v, unsigned int count) const {
-
-	}
-
-	void VK_GraphicPipeline::setUniformVec3Array(unsigned int location, const glm::vec3 *v, unsigned int count) const {
-
-	}
-
-	void VK_GraphicPipeline::setUniformVec4Array(unsigned int location, const glm::vec4 *v, unsigned int count) const {
-
-	}
-
-	void VK_GraphicPipeline::setUniform(const std::string &name, int i) const {
-
-	}
-
-	void VK_GraphicPipeline::setUniform(const std::string &name, float f) const {
-
-	}
-
-	void VK_GraphicPipeline::setUniform(const std::string &name, const vec2 &v) const {
-
-	}
-
-	void VK_GraphicPipeline::setUniform(const std::string &name, const vec3 &v) const {
-
-	}
-
-	void VK_GraphicPipeline::setUniform(const std::string &name, const vec4 &v) const {
-
-	}
-
-	void VK_GraphicPipeline::setUniform(const std::string &name, const mat3 &m) const {
-
-	}
-
-	void VK_GraphicPipeline::setUniform(const std::string &name, const mat4 &m) const {
-		setUniform(name,(void*)&m[0]);
-	}
-
-	void VK_GraphicPipeline::setUniform(uint32_t binding, void *data) const {
-		for (VK_Buffer *buffer:descriptor_pool->getBuffers(binding)) {
+	void VK_GraphicPipeline::setUniform(uint32_t binding, void *data) {
+		for (VK_Buffer *buffer:uniform_buffers[binding]) {
 			buffer->update(data);
 		}
 	}
 
-	void VK_GraphicPipeline::setUniform(const std::string &name, void *data) const {
-		for (const VK_Shader *shader:shaders) {
-			auto it = shader->getInputs().find(name);
-			if (it != shader->getInputs().end()) {
-				if (it->second.type == VK_Shader::UNIFORM_BUFFER) {
-					setUniform(it->second.binding,data);
-					return;
-				} else if (it->second.type == VK_Shader::PUSH_CONSTANT) {
-					VkPushConstantRange range = shader->getPushConstantRanges()[it->second.index];
-					vkCmdPushConstants(renderer->getCommandPool()->getCurrentBuffer(), pipeline_layout_handle, shader->getStage(), range.offset, range.size, data);
-					return;
-				}
+	void VK_GraphicPipeline::PushConstant(const std::string &name, void *data) {
+		auto it = name_input_index.find(name);
+		if (it != name_input_index.end()) {
+			if (inputs[it->second].type == VK_Shader::PUSH_CONSTANT) {
+				vkCmdPushConstants(renderer->getCommandPool()->getCurrentBuffer(), pipeline_layout_handle, inputs[it->second].stage,  inputs[it->second].offset,  inputs[it->second].size, data);
+			} else {
+				Log::error(name + " is not a push constant");
 			}
+		} else {
+			Log::error("No shader input is named:" + name);
 		}
 	}
 
+	void VK_GraphicPipeline::setTexture(uint32_t binding, const Texture *texture) {
 
+		VkDescriptorImageInfo image_info;
+		VK_Texture *vk_texture = (VK_Texture *) texture;
+		image_info.imageView = vk_texture->getImageView();
+		image_info.sampler = vk_texture->getSampler();
+		image_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		descriptor_sets_write[binding].pImageInfo = &image_info;
+		vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_sets_write[binding], 0, nullptr);
+	}
+
+	void VK_GraphicPipeline::setTexture(const std::string &name, const Texture *texture) {
+		auto it = name_input_index.find(name);
+		if (it != name_input_index.end()) {
+			if (inputs[it->second].type == VK_Shader::TEXTURE_SAMPLER) {
+				setTexture(inputs[it->second].binding, texture);
+			} else {
+				Log::error(name + " is not a texture binding");
+			}
+		} else {
+			Log::error("No shader input is named:" + name);
+		}
+	}
+
+	void VK_GraphicPipeline::createPipelineLayout() {
+		for (int i = 0; i < shaders.size(); ++i) {
+			auto shader_bindings = shaders[i]->getLayoutBindings();
+			descriptor_set_layout_bindings.insert(descriptor_set_layout_bindings.end(), shader_bindings.begin(), shader_bindings.end());
+
+			auto shader_ranges = shaders[i]->getPushConstantRanges();
+			push_constants_ranges.insert(push_constants_ranges.end(), shader_ranges.begin(), shader_ranges.end());
+
+			auto shader_inputs = shaders[i]->getInputs();
+
+			for (int j = 0; j < shader_inputs.size(); ++j) {
+				name_input_index.emplace(shader_inputs[j].name, inputs.size() + j);
+				binding_input_index.emplace(shader_inputs[j].binding, inputs.size() + j);
+			}
+			inputs.insert(inputs.end(), shader_inputs.begin(), shader_inputs.end());
+		}
+
+		VkDescriptorSetLayoutCreateInfo layoutInfo{};
+		layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+		layoutInfo.bindingCount = descriptor_set_layout_bindings.size();
+		layoutInfo.pBindings = descriptor_set_layout_bindings.data();
+
+		vkCreateDescriptorSetLayout(device->getHandle(), &layoutInfo, nullptr, &descriptor_set_layout_handle);
+
+
+		for (size_t i = 0; i < descriptor_set_layout_bindings.size(); ++i) {
+			if (descriptor_set_layout_bindings[i].descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
+				for (uint32_t j = 0; j < MAX_FRAMES_IN_FLIGHT; ++j) {
+					uniform_buffers.emplace(descriptor_set_layout_bindings[i].binding, std::vector<VK_Buffer *>());
+					auto it = binding_input_index.find(descriptor_set_layout_bindings[i].binding);
+					if (it != binding_input_index.end()) {
+						uniform_buffers[descriptor_set_layout_bindings[i].binding].emplace_back(new VK_Buffer(device, inputs[it->second].size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, AllocFlags::MAPPABLE));
+					} else {
+						Log::error("Could not find input at binding " + std::to_string(descriptor_set_layout_bindings[i].binding));
+					}
+				}
+		}
+
+		std::array<VkDescriptorPoolSize, 2> poolSizes{};
+		size_t combined_image_sampler_count = 0;
+		size_t uniform_buffer_count = 0;
+		for (auto layout_binding:descriptor_set_layout_bindings) {
+			switch (layout_binding.descriptorType) {
+				case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
+					uniform_buffer_count++;
+					break;
+				case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
+					combined_image_sampler_count++;
+					break;
+			}
+		}
+		poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		poolSizes[0].descriptorCount = uniform_buffer_count * MAX_FRAMES_IN_FLIGHT;
+		poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		poolSizes[1].descriptorCount = combined_image_sampler_count * MAX_FRAMES_IN_FLIGHT;
+
+		VkDescriptorPoolCreateInfo poolInfo{};
+		poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+		poolInfo.poolSizeCount = poolSizes.size();
+		poolInfo.pPoolSizes = poolSizes.data();
+
+		poolInfo.maxSets = MAX_FRAMES_IN_FLIGHT;
+
+		if (vkCreateDescriptorPool(device->getHandle(), &poolInfo, nullptr, &descriptor_pool_handle) != VK_SUCCESS) {
+			Log::error("failed to create descriptor pool!");
+		}
+		createDescriptorSets();
+
+
+		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
+		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+		pipelineLayoutInfo.setLayoutCount = 1;
+		pipelineLayoutInfo.pSetLayouts = &descriptor_set_layout_handle;
+		pipelineLayoutInfo.pushConstantRangeCount = push_constants_ranges.size();
+		pipelineLayoutInfo.pPushConstantRanges = push_constants_ranges.data();
+
+		if (vkCreatePipelineLayout(device->getHandle(), &pipelineLayoutInfo, nullptr, &pipeline_layout_handle) !=
+			VK_SUCCESS) {
+			Log::error("failed to create pipeline layout!");
+		}
+	}
+
+	void VK_GraphicPipeline::createDescriptorSets() {
+
+		std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, descriptor_set_layout_handle);
+		VkDescriptorSetAllocateInfo allocInfo{};
+		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		allocInfo.descriptorPool = descriptor_pool_handle;
+		allocInfo.descriptorSetCount = MAX_FRAMES_IN_FLIGHT;
+		allocInfo.pSetLayouts = layouts.data();
+
+		if (vkAllocateDescriptorSets(device->getHandle(), &allocInfo, descriptor_set_handles.data()) != VK_SUCCESS) {
+			Log::error("failed to allocate descriptor sets!");
+		}
+		for (uint32_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+
+			std::vector<VkWriteDescriptorSet> writes;
+			std::vector<VkDescriptorBufferInfo> buffers_info;
+			std::vector<VkDescriptorImageInfo> images_info;
+			for (size_t j = 0; j < descriptor_set_layout_bindings.size(); ++j) {
+				writes.emplace_back();
+				buffers_info.emplace_back();
+				images_info.emplace_back();
+				writes[j].pBufferInfo = nullptr;
+				writes[j].pImageInfo = nullptr;
+				if (descriptor_set_layout_bindings[j].descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
+					buffers_info[j].buffer = uniform_buffers[j][i]->getHandle();
+					buffers_info[j].offset = 0;
+					auto it = binding_input_index.find(descriptor_set_layout_bindings[j].binding);
+					if (it != binding_input_index.end()) {
+						buffers_info[j].range = (VkDeviceSize) inputs[it->second].size;
+						writes[j].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+						writes[j].pBufferInfo = &buffers_info[j];
+					} else {
+						Log::error("Could not find input at binding " + std::to_string(descriptor_set_layout_bindings[j].binding));
+					}
+
+				} else if (descriptor_set_layout_bindings[j].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) {
+					writes[j].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+					VK_Texture *default_texture = (VK_Texture *) Resources::get<Texture>("DEFAULT");
+					images_info[j].imageView = default_texture->getImageView();
+					images_info[j].sampler = default_texture->getSampler();
+					images_info[j].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+					writes[j].pImageInfo = &images_info[j];
+				} else {
+					Log::error("Descriptor set type not supported yet");
+				}
+
+				writes[j].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				writes[j].dstSet = descriptor_set_handles[i];
+				writes[j].dstBinding = descriptor_set_layout_bindings[j].binding;
+				writes[j].dstArrayElement = 0;
+
+				writes[j].descriptorCount = 1;//for arrays
+				writes[j].pTexelBufferView = nullptr; // Optional
+				vkUpdateDescriptorSets(device->getHandle(), 1, &writes[j], 0, nullptr);
+			}
+		}
+	}
 }

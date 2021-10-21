@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/resource/Material.h>
+
 #include <core/resource/Model.h>
 #include "core/resource/ResourceFactory.h"
 

@@ -11,8 +11,8 @@ namespace HBE {
     }
 
     void MeshRenderer::onDraw() {
-        if (mesh&&material)
-            Graphics::draw(*entity->transform, *mesh, *material);
+        if (mesh&&pipeline)
+            Graphics::draw(*entity->transform, *mesh, *pipeline);
         else
             Log::warning(entity->getName()+" does not have a material and/or a mesh assigned");
     }
@@ -25,8 +25,8 @@ namespace HBE {
         return mesh;
     }
 
-    void MeshRenderer::setMaterial(const Material &material) {
-        this->material = &material;
+    void MeshRenderer::setMaterial(GraphicPipeline &pipeline) {
+        this->pipeline = &pipeline;
     }
 
     void MeshRenderer::serialize(Serializer *serializer) const {

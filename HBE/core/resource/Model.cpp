@@ -7,7 +7,7 @@
 #include "Resources.h"
 
 namespace HBE {
-    const std::vector<std::pair<Mesh *, Material *>> &Model::getMeshes() const {
+    const std::vector<std::pair<Mesh *, GraphicPipeline *>> &Model::getMeshes() const {
         return meshes;
     }
 
@@ -24,10 +24,10 @@ namespace HBE {
         return this;
     }
 
-    void Model::setMaterial(Material *material, int mesh_index) {
+    void Model::setMaterial(GraphicPipeline *pipeline, int mesh_index) {
         if (meshes.size() <= (unsigned int) mesh_index)
             meshes.resize(mesh_index + 1);
-        meshes[mesh_index].second = material;
+        meshes[mesh_index].second = pipeline;
     }
 
     void Model::loadAsync(std::string path) {
@@ -43,7 +43,7 @@ namespace HBE {
         int vertex_count = 0;
         clearMeshes();
         for (std::size_t i = 0; i < meshes_data->size(); ++i) {
-            meshes.emplace_back(Resources::create<Mesh>(), new Material());
+            meshes.emplace_back(Resources::create<Mesh>(), Resources::create<GraphicPipeline>());
             meshes[i].first->setIndices((*meshes_data)[i].first.indices);
             vertex_count += (*meshes_data)[i].first.indices.size();
             if (!(*meshes_data)[i].first.positions.empty()) {
@@ -55,14 +55,13 @@ namespace HBE {
             if (!(*meshes_data)[i].first.normals.empty()) {
                 meshes[i].first->setBuffer(2, (*meshes_data)[i].first.normals);
             }
-
-            meshes[i].second->setPipeline(Graphics::DEFAULT_MESH_PIPELINE);
-
+			//todo set textures
+			/*
             if (!(*meshes_data)[i].second.diffuse_texture_paths.empty()) {
                 auto t = Resources::create<Texture>();
                 t->load((*meshes_data)[i].second.diffuse_texture_paths[0]);
-                meshes[i].second->setTexture(t);
-            }
+                meshes[i].second->setTexture(0,t);
+            }*/
         }
         delete meshes_data;
         Log::status(path + " loaded \n\tVertex count = " + std::to_string(vertex_count));

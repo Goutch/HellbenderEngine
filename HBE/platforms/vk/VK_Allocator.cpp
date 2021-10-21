@@ -40,6 +40,7 @@ namespace HBE {
 		//if all heap of a memory type are out of memory, return another memory type.
 		VkMemoryPropertyFlags properties = choseProperties(flags);
 		uint32_t type_filter=memory_requirement.memoryTypeBits;
+
 		for (uint32_t i = 0; i < memory_propeties->memoryTypeCount; i++) {
 			if ((type_filter & (1 << i)) &&
 			(memory_propeties->memoryTypes[i].propertyFlags & properties) == properties) {
@@ -227,7 +228,6 @@ namespace HBE {
 			Log::error("unsupported layout transition!");
 			return;
 		}
-
 		vkCmdPipelineBarrier(
 				command_pool->getCurrentBuffer(),
 				sourceStage, destinationStage,
@@ -236,6 +236,7 @@ namespace HBE {
 				0, nullptr,
 				1, &barrier
 		);
+
 	}
 
 	void VK_Allocator::copy(VkBuffer src, VkImage dest, uint32_t width, uint32_t height, uint32_t depth) {

@@ -61,10 +61,7 @@ if (VULKAN_FOUND)
             platforms/vk/VK_Allocator.cpp
             platforms/vk/VK_Allocator.h
             platforms/vk/VK_CONSTANTS.h
-            platforms/vk/VK_DescriptorPool.cpp
-            platforms/vk/VK_DescriptorPool.h
-            platforms/vk/VK_DescriptorSetLayout.cpp
-            platforms/vk/VK_DescriptorSetLayout.h platforms/vk/VK_RenderTarget.cpp platforms/vk/VK_RenderTarget.h)
+            platforms/vk/VK_RenderTarget.cpp platforms/vk/VK_RenderTarget.h)
 
     add_compile_definitions(VULKAN_RENDERER)
 
@@ -105,8 +102,6 @@ set(CORE_FILES
 
         core/resource/Texture.cpp
         core/resource/Texture.h
-        core/resource/Material.cpp
-        core/resource/Material.h
         core/resource/Model.cpp
         core/resource/Model.h
         core/resource/Mesh.cpp
@@ -151,8 +146,6 @@ set(CORE_FILES
         core/entity/component/MeshRenderer.h
         core/entity/component/CameraController.h
         core/entity/component/Component.cpp
-        core/entity/component/InstancesRenderer.cpp
-        core/entity/component/InstancesRenderer.h
         core/entity/component/ModelRenderer.h
         core/entity/component/ModelRenderer.cpp
 

@@ -3,6 +3,7 @@
 #include "Core.h"
 #include <vector>
 #include <string>
+#include <core/resource/Texture.h>
 #include "DrawFlags.h"
 #include "glm/glm.hpp"
 
@@ -19,8 +20,6 @@ namespace HBE {
 
     class Transform;
 
-    class Material;
-
     class Window;
 
     template<typename... Args>
@@ -32,13 +31,8 @@ namespace HBE {
         static Window *window;
         static RenderTarget *render_target;
     public:
-        static const GraphicPipeline *DEFAULT_SCREEN_PIPELINE;
-        static const GraphicPipeline *DEFAULT_MESH_PIPELINE;
-        static const Material *DEFAULT_MESH_MATERIAL;
-        static const GraphicPipeline *DEFAULT_INSTANCED_PIPELINE;
         static const Mesh *DEFAULT_QUAD;
         static const Mesh *DEFAULT_CUBE;
-
         /*
          * Initialize graphic context and window
          */
@@ -47,9 +41,9 @@ namespace HBE {
         static Window *getWindow();
 
         static void
-        draw(const Transform &transform, const Mesh &mesh, const Material &material);
+        draw(const Transform &transform, const Mesh &mesh, GraphicPipeline &material);
 
-        static void drawInstanced(const Mesh &mesh, const Material &material);
+        static void drawInstanced(const Mesh &mesh, GraphicPipeline &pipeline);
 
         static void render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix);
 
