@@ -100,7 +100,6 @@ set(CORE_FILES
         Core.h
         Configs.h
 
-        core/resource/Texture.cpp
         core/resource/Texture.h
         core/resource/Model.cpp
         core/resource/Model.h
@@ -167,7 +166,7 @@ set(CORE_FILES
         core/serialization/ComponentRegistry.h
 
         core/Tester.cpp
-        core/Tester.h)
+        core/Tester.h core/resource/Image.h core/resource/Image.cpp)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

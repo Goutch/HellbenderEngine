@@ -253,7 +253,7 @@ namespace HBE {
 		}
 	}
 
-	void VK_GraphicPipeline::PushConstant(const std::string &name, void *data) {
+	void VK_GraphicPipeline::pushConstant(const std::string &name, void *data) {
 		auto it = name_input_index.find(name);
 		if (it != name_input_index.end()) {
 			if (inputs[it->second].type == VK_Shader::PUSH_CONSTANT) {
@@ -267,7 +267,8 @@ namespace HBE {
 	}
 
 	void VK_GraphicPipeline::setTexture(uint32_t binding, const Texture *texture) {
-
+		//todo undefined behavior when texture data is not set;
+		//use texture event
 		VK_Texture *vk_texture = (VK_Texture *) texture;
 
 

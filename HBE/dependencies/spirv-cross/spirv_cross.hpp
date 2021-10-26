@@ -282,7 +282,7 @@ public:
 	// Returns a set of all global variables which are statically accessed
 	// by the control flow graph from the current entry point.
 	// Only variables which change the interface for a shader are returned, that is,
-	// variables with storage class of Input, Output, Uniform, UniformConstant, PushConstant and AtomicCounter
+	// variables with storage class of Input, Output, Uniform, UniformConstant, pushConstant and AtomicCounter
 	// storage classes are returned.
 	//
 	// To use the returned set as the filter for which variables are used during compilation,

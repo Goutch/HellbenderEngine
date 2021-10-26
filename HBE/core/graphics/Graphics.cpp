@@ -150,7 +150,7 @@ void main()
 															0, 255, 0, 255,
 															0, 0, 255, 255,
 															0, 0, 0, 255};
-		default_texture->setData(texture_data, 2, 2, TEXTURE_FORMAT::RGBA8);
+		default_texture->setData(texture_data, 2, 2, 1);
 		delete texture_data;
 		//-----------------------------------DEFAULT_CUBE---------------------------------
 		/*  Mesh *cube = new Mesh();

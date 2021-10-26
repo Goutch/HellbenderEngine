@@ -16,13 +16,17 @@ namespace HBE {
 		VkImage handle = VK_NULL_HANDLE;
 		VkImageView view_hanlde=VK_NULL_HANDLE;
 		VkSampler sampler_handle=VK_NULL_HANDLE;
-		HBE::TEXTURE_FORMAT format;
+		IMAGE_FORMAT format;
 		Allocation *allocation;
+		uint32_t width = 1, height = 1, depth = 1;
 	public:
 		VK_Texture(VK_Device *device);
 		~VK_Texture();
+		uint32_t getWidth() const override;
+		uint32_t getHeight() const override;
+		uint32_t getDepth() const override;
 
-		void setData(unsigned char *data, int width, int height, TEXTURE_FORMAT format) override;
+		void setData(void *data, uint32_t width = 1, uint32_t height = 1, uint32_t depth = 1, IMAGE_FORMAT format = IMAGE_RGBA8, IMAGE_FLAGS flags=IMAGE_FLAG_NONE) override;
 
 		const VkSampler &getSampler() const;
 		const VkImageView &getImageView() const;

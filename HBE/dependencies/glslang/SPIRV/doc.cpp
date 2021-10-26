@@ -224,7 +224,7 @@ const char* StorageClassString(int StorageClass)
     case 6:  return "Private";
     case 7:  return "Function";
     case 8:  return "Generic";
-    case 9:  return "PushConstant";
+    case 9:  return "pushConstant";
     case 10: return "AtomicCounter";
     case 11: return "Image";
     case 12: return "StorageBuffer";

@@ -52,7 +52,7 @@ namespace HBE {
 		void setDynamicUniform(uint32_t binding, void *data) ;
 		void setUniform(const std::string &name, void *data);
 		void setUniform(uint32_t binding, void *data);
-		void PushConstant(const std::string &name, void *data);
+		void pushConstant(const std::string &name, void *data);
 		void setTexture(uint32_t binding, const Texture *texture);
 		void setTexture(const std::string &name, const Texture *texture);
 

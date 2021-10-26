@@ -7,7 +7,11 @@
 
 namespace HBE {
 
-	void VK_Texture::setData(unsigned char *data, int width, int height, TEXTURE_FORMAT format) {
+	void VK_Texture::setData(void *data, uint32_t width, uint32_t height, uint32_t depth, IMAGE_FORMAT format, IMAGE_FLAGS flags) {
+		this->width=width;
+		this->height=height;
+		this->depth=depth;
+
 		if (view_hanlde != VK_NULL_HANDLE) {
 			vkDestroyImageView(device->getHandle(), view_hanlde, nullptr);
 		}
@@ -17,36 +21,48 @@ namespace HBE {
 		}
 		VkDeviceSize byte_per_pixel;
 		VkFormat vk_format;
+		VkImageType type;
+		VkImageViewType view_type;
+		if (height == 1 && depth == 1) {
+			type = VK_IMAGE_TYPE_1D;
+			view_type = VK_IMAGE_VIEW_TYPE_1D;
+		} else if (depth == 1) {
+			type = VK_IMAGE_TYPE_2D;
+			view_type = VK_IMAGE_VIEW_TYPE_2D;
+		} else {
+			type = VK_IMAGE_TYPE_3D;
+			view_type = VK_IMAGE_VIEW_TYPE_3D;
+		}
 		switch (format) {
-			case R8:
+			case IMAGE_R8:
 				vk_format = VK_FORMAT_R8_SRGB;
 				byte_per_pixel=1;
 				break;
-			case RG8:
+			case IMAGE_RG8:
 				vk_format = VK_FORMAT_R8G8_SRGB;
 				byte_per_pixel=2;
 				break;
-			case RGB8:
+			case IMAGE_RGB8:
 				vk_format = VK_FORMAT_R8G8B8_SRGB;
 				byte_per_pixel=3;
 				break;
-			case RGBA8:
+			case IMAGE_RGBA8:
 				vk_format = VK_FORMAT_R8G8B8A8_SRGB;
 				byte_per_pixel=4;
 				break;
-			case R32F:
+			case IMAGE_R32F:
 				vk_format = VK_FORMAT_R32_SFLOAT;
 				byte_per_pixel=4;
 				break;
-			case RG32F:
+			case IMAGE_RG32F:
 				vk_format = VK_FORMAT_R32G32_SFLOAT;
 				byte_per_pixel=4*2;
 				break;
-			case RGB32F:
+			case IMAGE_RGB32F:
 				vk_format = VK_FORMAT_R32G32B32_SFLOAT;
 				byte_per_pixel=4*3;
 				break;
-			case RGBA32F:
+			case IMAGE_RGBA32F:
 				vk_format = VK_FORMAT_R32G32B32A32_SFLOAT;
 				byte_per_pixel=4*4;
 				break;
@@ -55,10 +71,10 @@ namespace HBE {
 
 		VkImageCreateInfo imageInfo{};
 		imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-		imageInfo.imageType = VK_IMAGE_TYPE_2D;
+		imageInfo.imageType = type;
 		imageInfo.extent.width = static_cast<uint32_t>(width);
 		imageInfo.extent.height = static_cast<uint32_t>(height);
-		imageInfo.extent.depth = 1;
+		imageInfo.extent.depth = static_cast<uint32_t>(depth);;
 		imageInfo.mipLevels = 1;
 		imageInfo.arrayLayers = 1;
 
@@ -90,8 +106,8 @@ namespace HBE {
 		VkImageViewCreateInfo viewInfo{};
 		viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 		viewInfo.image = handle;
-		viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		viewInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
+		viewInfo.viewType = view_type;
+		viewInfo.format = vk_format;
 		viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 		viewInfo.subresourceRange.baseMipLevel = 0;
 		viewInfo.subresourceRange.levelCount = 1;
@@ -156,6 +172,18 @@ namespace HBE {
 
 	const VkImage &VK_Texture::getImage() const {
 		return handle;
+	}
+
+	uint32_t VK_Texture::getWidth() const {
+		return width;
+	}
+
+	uint32_t VK_Texture::getHeight() const {
+		return height;
+	}
+
+	uint32_t VK_Texture::getDepth() const {
+		return depth;
 	}
 
 

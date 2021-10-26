@@ -13,7 +13,7 @@
 #include "core/resource/Texture.h"
 #include "core/resource/Model.h"
 #include "core/resource/ResourcesRegistry.h"
-
+#include "core/resource/Image.h"
 namespace HBE {
     namespace Resources {
         template<class T>
@@ -48,6 +48,7 @@ namespace HBE {
             Resources::destroy<Model>();
             Resources::destroy<Shader>();
             Resources::destroy<VertexLayout>();
+			Resources::destroy<Image>();
         }
 
         template<class T>

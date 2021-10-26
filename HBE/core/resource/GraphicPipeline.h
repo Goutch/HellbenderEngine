@@ -5,7 +5,7 @@
 #include "vector"
 #include "glm/glm.hpp"
 #include "core/graphics/DrawFlags.h"
-
+#include "Resource.h"
 namespace HBE {
 	class Shader;
 
@@ -13,7 +13,7 @@ namespace HBE {
 
 	class VertexLayout;
 
-	class HB_API GraphicPipeline {
+	class HB_API GraphicPipeline : public Resource  {
 	public:
 		virtual ~GraphicPipeline() = default;
 
@@ -36,7 +36,7 @@ namespace HBE {
 
 		virtual void setUniform(const std::string &name, void *data) = 0;
 		virtual void setUniform(uint32_t binding, void *data) = 0;
-		virtual void PushConstant(const std::string &name, void *data) = 0;
+		virtual void pushConstant(const std::string &name, void *data) = 0;
 		virtual void setTexture(uint32_t binding, const Texture *texture) = 0;
 		virtual void setTexture(const std::string &name, const Texture *texture) = 0;
 	};
