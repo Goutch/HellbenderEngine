@@ -1,16 +1,16 @@
 
 
-#include "VK_Texture.h"
+#include "VK_Image.h"
 #include "VK_Buffer.h"
 #include "VK_Renderer.h"
 #include "VK_CommandPool.h"
 
 namespace HBE {
 
-	void VK_Texture::setData(void *data, uint32_t width, uint32_t height, uint32_t depth, IMAGE_FORMAT format, IMAGE_FLAGS flags) {
-		this->width=width;
-		this->height=height;
-		this->depth=depth;
+	void VK_Image::setData(void *data, uint32_t width, uint32_t height, uint32_t depth, IMAGE_FORMAT format, IMAGE_FLAGS flags) {
+		this->width = width;
+		this->height = height;
+		this->depth = depth;
 
 		if (view_hanlde != VK_NULL_HANDLE) {
 			vkDestroyImageView(device->getHandle(), view_hanlde, nullptr);
@@ -20,7 +20,6 @@ namespace HBE {
 			device->getAllocator().free(*allocation);
 		}
 		VkDeviceSize byte_per_pixel;
-		VkFormat vk_format;
 		VkImageType type;
 		VkImageViewType view_type;
 		if (height == 1 && depth == 1) {
@@ -36,38 +35,40 @@ namespace HBE {
 		switch (format) {
 			case IMAGE_R8:
 				vk_format = VK_FORMAT_R8_SRGB;
-				byte_per_pixel=1;
+				byte_per_pixel = 1;
 				break;
 			case IMAGE_RG8:
 				vk_format = VK_FORMAT_R8G8_SRGB;
-				byte_per_pixel=2;
+				byte_per_pixel = 2;
 				break;
 			case IMAGE_RGB8:
 				vk_format = VK_FORMAT_R8G8B8_SRGB;
-				byte_per_pixel=3;
+				byte_per_pixel = 3;
 				break;
 			case IMAGE_RGBA8:
 				vk_format = VK_FORMAT_R8G8B8A8_SRGB;
-				byte_per_pixel=4;
+				byte_per_pixel = 4;
 				break;
 			case IMAGE_R32F:
 				vk_format = VK_FORMAT_R32_SFLOAT;
-				byte_per_pixel=4;
+				byte_per_pixel = 4;
 				break;
 			case IMAGE_RG32F:
 				vk_format = VK_FORMAT_R32G32_SFLOAT;
-				byte_per_pixel=4*2;
+				byte_per_pixel = 4 * 2;
 				break;
 			case IMAGE_RGB32F:
 				vk_format = VK_FORMAT_R32G32B32_SFLOAT;
-				byte_per_pixel=4*3;
+				byte_per_pixel = 4 * 3;
 				break;
 			case IMAGE_RGBA32F:
 				vk_format = VK_FORMAT_R32G32B32A32_SFLOAT;
-				byte_per_pixel=4*4;
+				byte_per_pixel = 4 * 4;
 				break;
 
 		}
+
+		layout = VK_IMAGE_LAYOUT_UNDEFINED;
 
 		VkImageCreateInfo imageInfo{};
 		imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -98,9 +99,9 @@ namespace HBE {
 
 		vkBindImageMemory(device->getHandle(), handle, allocation->block.memory, allocation->offset);
 
-		VK_Buffer staging_buffer = VK_Buffer(device, data, width*height*byte_per_pixel, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, MAPPABLE);
+		VK_Buffer staging_buffer = VK_Buffer(device, data, width * height * byte_per_pixel, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, MAPPABLE);
 
-		device->getAllocator().copy(staging_buffer.getHandle(), handle, width, height);
+		device->getAllocator().copy(staging_buffer.getHandle(), this,VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 		//image view
 		VkImageViewCreateInfo viewInfo{};
@@ -119,7 +120,7 @@ namespace HBE {
 		}
 	}
 
-	VK_Texture::VK_Texture(VK_Device *device) {
+	VK_Image::VK_Image(VK_Device *device) {
 		this->device = device;
 		VkSamplerCreateInfo samplerInfo{};
 		samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -149,7 +150,7 @@ namespace HBE {
 		}
 	}
 
-	VK_Texture::~VK_Texture() {
+	VK_Image::~VK_Image() {
 		if (sampler_handle != VK_NULL_HANDLE) {
 			vkDestroySampler(device->getHandle(), sampler_handle, nullptr);
 		}
@@ -162,28 +163,40 @@ namespace HBE {
 		}
 	}
 
-	const VkSampler &VK_Texture::getSampler() const {
+	const VkSampler &VK_Image::getSampler() const {
 		return sampler_handle;
 	}
 
-	const VkImageView &VK_Texture::getImageView() const {
+	const VkImageView &VK_Image::getImageView() const {
 		return view_hanlde;
 	}
 
-	const VkImage &VK_Texture::getImage() const {
-		return handle;
-	}
-
-	uint32_t VK_Texture::getWidth() const {
+	uint32_t VK_Image::getWidth() const {
 		return width;
 	}
 
-	uint32_t VK_Texture::getHeight() const {
+	uint32_t VK_Image::getHeight() const {
 		return height;
 	}
 
-	uint32_t VK_Texture::getDepth() const {
+	uint32_t VK_Image::getDepth() const {
 		return depth;
+	}
+
+	const VkImageLayout VK_Image::getImageLayout() const {
+		return layout;
+	}
+
+	const VkFormat VK_Image::getVkFormat() const {
+		return vk_format;
+	}
+
+	const VkImage &VK_Image::getHandle() const {
+		return handle;
+	}
+
+	void VK_Image::setImageLayout(VkImageLayout layout) {
+		this->layout=layout;
 	}
 
 

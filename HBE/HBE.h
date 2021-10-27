@@ -8,6 +8,7 @@
 #include "core/resource/GraphicPipeline.h"
 #include "core/resource/Mesh.h"
 #include "core/resource/Texture.h"
+#include "core/resource/Image.h"
 #include "core/resource/Model.h"
 #include "core/resource/Shader.h"
 #include "core/resource/Resources.h"
@@ -41,7 +42,6 @@
 #include "core/serialization/Serializable.h"
 #include "core/serialization/ComponentRegistry.h"
 
-#include "core/Tester.h"
 #include <glm/glm.hpp>
 #include "glm/gtx/quaternion.hpp"
 

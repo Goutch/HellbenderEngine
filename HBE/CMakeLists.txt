@@ -38,8 +38,8 @@ if (VULKAN_FOUND)
             platforms/vk/VK_Shader.h
             platforms/vk/VK_ResourceFactory.cpp
             platforms/vk/VK_ResourceFactory.h
-            platforms/vk/VK_Texture.cpp
-            platforms/vk/VK_Texture.h
+            platforms/vk/VK_Image.cpp
+            platforms/vk/VK_Image.h
             platforms/vk/VK_Mesh.h
             platforms/vk/VK_Mesh.cpp
             platforms/vk/VK_RenderPass.cpp
@@ -116,6 +116,8 @@ set(CORE_FILES
         core/resource/Resources.h
         core/resource/ResourcesRegistry.cpp
         core/resource/ResourcesRegistry.h
+        core/resource/Image.cpp
+        core/resource/Image.h
 
         core/graphics/Window.h
         core/graphics/Framebuffer.h
@@ -163,10 +165,7 @@ set(CORE_FILES
         core/serialization/Deserializer.h
         core/serialization/ComponentRegistry.cpp
         core/serialization/ComponentRegistry.h
-        core/serialization/ComponentRegistry.h
-
-        core/Tester.cpp
-        core/Tester.h core/resource/Image.h core/resource/Image.cpp)
+        core/serialization/ComponentRegistry.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

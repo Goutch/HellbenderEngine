@@ -2,7 +2,7 @@
 #include "VK_GraphicPipeline.h"
 #include "VK_Renderer.h"
 #include "VK_Device.h"
-#include "VK_Texture.h"
+#include "VK_Image.h"
 #include "VK_CommandPool.h"
 #include "VK_Mesh.h"
 #include "VK_Shader.h"
@@ -18,7 +18,7 @@ namespace HBE {
     }
 
     Texture *VK_ResourceFactory::createTexture() const {
-        return new VK_Texture(renderer->getDevice());
+        return new VK_Image(renderer->getDevice());
     }
 
     Mesh *VK_ResourceFactory::createMesh() const {

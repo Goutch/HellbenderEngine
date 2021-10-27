@@ -6,7 +6,7 @@
 namespace HBE {
 
 
-	VK_Buffer::VK_Buffer(VK_Device *device, VkDeviceSize size, VkBufferUsageFlags usage, AllocFlags flags) {
+	VK_Buffer::VK_Buffer(VK_Device *device, VkDeviceSize size, VkBufferUsageFlags usage, ALLOC_FLAGS flags) {
 		this->device = device;
 		this->size = size;
 		VkBufferCreateInfo bufferInfo{};
@@ -27,7 +27,7 @@ namespace HBE {
 		vkBindBufferMemory(device->getHandle(), handle, allocation->block.memory, allocation->offset);
 	}
 
-	VK_Buffer::VK_Buffer(VK_Device *device, const void *data, VkDeviceSize size, VkBufferUsageFlags usage, AllocFlags flags) : VK_Buffer(device, size, usage, flags) {
+	VK_Buffer::VK_Buffer(VK_Device *device, const void *data, VkDeviceSize size, VkBufferUsageFlags usage, ALLOC_FLAGS flags) : VK_Buffer(device, size, usage, flags) {
 		update(data);
 	}
 

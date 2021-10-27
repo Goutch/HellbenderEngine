@@ -269,7 +269,7 @@ namespace HBE {
 	void VK_GraphicPipeline::setTexture(uint32_t binding, const Texture *texture) {
 		//todo undefined behavior when texture data is not set;
 		//use texture event
-		VK_Texture *vk_texture = (VK_Texture *) texture;
+		VK_Image *vk_texture = (VK_Image *) texture;
 
 
 		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
@@ -327,7 +327,7 @@ namespace HBE {
 					uniform_buffers.emplace(descriptor_set_layout_bindings[i].binding, std::vector<VK_Buffer *>());
 					auto it = binding_input_index.find(descriptor_set_layout_bindings[i].binding);
 					if (it != binding_input_index.end()) {
-						uniform_buffers[descriptor_set_layout_bindings[i].binding].emplace_back(new VK_Buffer(device, inputs[it->second].size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, AllocFlags::MAPPABLE));
+						uniform_buffers[descriptor_set_layout_bindings[i].binding].emplace_back(new VK_Buffer(device, inputs[it->second].size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, ALLOC_FLAGS::MAPPABLE));
 					} else {
 						Log::error("Could not find input at binding " + std::to_string(descriptor_set_layout_bindings[i].binding));
 					}
@@ -415,7 +415,7 @@ namespace HBE {
 
 				} else if (descriptor_set_layout_bindings[j].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) {
 					writes[j].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-					VK_Texture *default_texture = (VK_Texture *) Resources::get<Texture>("DEFAULT");
+					VK_Image *default_texture = (VK_Image *) Resources::get<Texture>("DEFAULT");
 					images_info[j].imageView = default_texture->getImageView();
 					images_info[j].sampler = default_texture->getSampler();
 					images_info[j].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;

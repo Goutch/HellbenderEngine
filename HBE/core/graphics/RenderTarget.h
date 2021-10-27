@@ -11,6 +11,6 @@ namespace HBE {
     class GraphicPipeline;
 
     class HB_API RenderTarget {
-
+		
     };
 }

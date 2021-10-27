@@ -11,9 +11,9 @@ namespace HBE {
 	class VK_Buffer;
 
 	class VK_Device;
-
+	class VK_Image;
 	struct Block;
-	enum AllocFlags {
+	enum ALLOC_FLAGS {
 		NONE = 0,
 		MAPPABLE = 1,
 	};
@@ -22,7 +22,7 @@ namespace HBE {
 		const VkDeviceSize offset;
 		Block &block;
 		std::list<Allocation>::iterator position_in_block;
-		AllocFlags flags;
+		ALLOC_FLAGS flags;
 	};
 	struct Block {
 		VkDeviceSize size;
@@ -46,14 +46,15 @@ namespace HBE {
 		VK_Allocator(const VK_Device *device);
 
 		~VK_Allocator();
-		Allocation &alloc(VkMemoryRequirements memory_requirement, AllocFlags flags = NONE);
+		Allocation &alloc(VkMemoryRequirements memory_requirement, ALLOC_FLAGS flags = NONE);
 
 		void free(Allocation &allocation);
 		void copy(VkBuffer src, VkBuffer dest, VkDeviceSize size);
-		void copy(VkBuffer src, VkImage dest, uint32_t width = 1, uint32_t height = 1, uint32_t depth = 1);
+		void copy(VkBuffer src, VK_Image* dest,VkImageLayout dst_end_layout);
+		void copy(VK_Image* src,VkImageLayout src_end_layout, VK_Image* dest,VkImageLayout dst_end_layout);
 	private:
-		void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
-		uint32_t findMemoryType(VkMemoryRequirements memory_requirement,AllocFlags flags);
+		void transitionImageLayout(VK_Image* image,VkImageLayout newLayout);
+		uint32_t findMemoryType(VkMemoryRequirements memory_requirement, ALLOC_FLAGS flags);
 		std::string memoryTypeToString(const uint32_t mem_type);
 		std::string allocToString(const Allocation &alloc);
 	};

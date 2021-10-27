@@ -19,9 +19,9 @@ namespace HBE {
 
 		VK_Buffer(const VK_Buffer &) = delete;
 
-		VK_Buffer(VK_Device *device, const void *data, VkDeviceSize size, VkBufferUsageFlags usage, AllocFlags flags = NONE);
+		VK_Buffer(VK_Device *device, const void *data, VkDeviceSize size, VkBufferUsageFlags usage, ALLOC_FLAGS flags = NONE);
 
-		VK_Buffer(VK_Device *device, VkDeviceSize size, VkBufferUsageFlags usage, AllocFlags flags = NONE);
+		VK_Buffer(VK_Device *device, VkDeviceSize size, VkBufferUsageFlags usage, ALLOC_FLAGS flags = NONE);
 
 		~VK_Buffer();
 
