@@ -39,7 +39,7 @@ namespace HBE {
 
         const VkQueue &getTransferQueue() const;
 
-        VK_Allocator & getAllocator();
+        VK_Allocator* getAllocator();
 
         void wait();
 

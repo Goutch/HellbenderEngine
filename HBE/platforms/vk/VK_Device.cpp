@@ -82,8 +82,8 @@ namespace HBE {
 		return transfer_queue;
 	}
 
-	VK_Allocator &VK_Device::getAllocator() {
-		return *allocator;
+	VK_Allocator *VK_Device::getAllocator() {
+		return allocator;
 	}
 
 }

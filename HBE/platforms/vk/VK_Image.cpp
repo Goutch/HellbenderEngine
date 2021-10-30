@@ -17,8 +17,8 @@ namespace HBE {
 	void VK_Image::update(const void *data) {
 
 		VK_Buffer staging_buffer = VK_Buffer(device, data, width * height * byte_per_pixel, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, ALLOC_FLAG_MAPPABLE);
-
-		device->getAllocator().copy(staging_buffer.getHandle(), this, chooseLayout());
+		VK_Allocator* allocator=device->getAllocator();
+		allocator->copy(staging_buffer.getHandle(), this, chooseLayout());
 	}
 
 	VK_Image::VK_Image(VK_Device *device, const TextureInfo &info) {
@@ -105,13 +105,13 @@ namespace HBE {
 
 		VkMemoryRequirements requirements;
 		vkGetImageMemoryRequirements(device->getHandle(), handle, &requirements);
-		this->allocation = &device->getAllocator().alloc(requirements, ALLOC_FLAG_NONE);
+		this->allocation = &device->getAllocator()->alloc(requirements, ALLOC_FLAG_NONE);
 		vkBindImageMemory(device->getHandle(), handle, allocation->block.memory, allocation->offset);
 
 		if (info.data != nullptr) {
 			update(info.data);
 		} else {
-			device->getAllocator().setImageLayout(this, chooseLayout());
+			device->getAllocator()->setImageLayout(this, chooseLayout());
 		}
 
 
@@ -170,7 +170,7 @@ namespace HBE {
 		}
 		if (handle != VK_NULL_HANDLE) {
 			vkDestroyImage(device->getHandle(), handle, nullptr);
-			device->getAllocator().free(*allocation);
+			device->getAllocator()->free(*allocation);
 		}
 	}
 

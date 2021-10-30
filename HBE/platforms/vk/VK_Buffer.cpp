@@ -23,7 +23,7 @@ namespace HBE {
 		VkMemoryRequirements requirements;
 		vkGetBufferMemoryRequirements(device->getHandle(), handle, &requirements);
 
-		this->allocation = &device->getAllocator().alloc(requirements, flags);
+		this->allocation = &device->getAllocator()->alloc(requirements, flags);
 		vkBindBufferMemory(device->getHandle(), handle, allocation->block.memory, allocation->offset);
 	}
 
@@ -38,11 +38,11 @@ namespace HBE {
 
 	VK_Buffer::~VK_Buffer() {
 		vkDestroyBuffer(device->getHandle(), handle, nullptr);
-		device->getAllocator().free(*allocation);
+		device->getAllocator()->free(*allocation);
 	}
 
 	void VK_Buffer::copy(VK_Buffer *other) {
-		device->getAllocator().copy(other->getHandle(), this->getHandle(), size);
+		device->getAllocator()->copy(other->getHandle(), this->getHandle(), size);
 	}
 
 	VkDeviceSize VK_Buffer::getSize() const {
