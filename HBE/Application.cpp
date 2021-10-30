@@ -76,11 +76,10 @@ namespace HBE {
             scene->draw();
             onDraw.invoke();
 			Graphics::beginFrame();
-            if (Camera::main)
+            /*if (Camera::main)
                 Graphics::render(Graphics::getRenderTarget(), Camera::main->getProjectionMatrix(),
-                                 Camera::main->getViewMatrix());
+                                 Camera::main->getViewMatrix());*/
             onRender.invoke();
-
             if (!Configs::isPresentAutomatic())
                 Graphics::present(Graphics::getRenderTarget());
 			Graphics::endFrame();
@@ -99,7 +98,6 @@ namespace HBE {
     }
 
     void Application::terminate() {
-        Resources::destroyAll();
         Graphics::terminate();
         ComponentRegistry::terminate();
     }

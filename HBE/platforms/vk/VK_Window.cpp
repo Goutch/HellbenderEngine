@@ -7,10 +7,12 @@
 namespace HBE {
     void VK_Window::windowSizeCallback(GLFWwindow *handle, int width, int height) {
         Window *window = (Window *) glfwGetWindowUserPointer(handle);
-        window->onWindowSizeChange.invoke(width, height);
+        window->onSizeChange.invoke(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
     }
 
-    VK_Window::VK_Window(int width, int height) {
+    VK_Window::VK_Window(uint32_t width, uint32_t height) {
+    	this->width=width;
+    	this->height=height;
         if (!glfwInit()) {
             Log::error("Failed to load glfw");
         }
@@ -41,12 +43,15 @@ namespace HBE {
         glfwSetWindowShouldClose(handle, true);
     }
 
-    void VK_Window::getSize(int &width, int &height) {
-        glfwGetWindowSize(handle, &width, &height);
-        while (width == 0 || height == 0) {
-            glfwGetFramebufferSize(handle, &width, &height);
+    void VK_Window::getSize(uint32_t &width, uint32_t &height) {
+    	int w,h;
+        glfwGetWindowSize(handle, &w, &h);
+        while (w == 0 || h == 0) {
+            glfwGetFramebufferSize(handle, &w, &h);
             glfwWaitEvents();
         }
+        width=static_cast<uint32_t>(w);
+        height=static_cast<uint32_t>(h);
     }
 
     GLFWwindow *VK_Window::getHandle() {

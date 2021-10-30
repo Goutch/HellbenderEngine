@@ -7,7 +7,8 @@ namespace HBE {
     class HB_API Window {
 
     public:
-        Event<int, int> onWindowSizeChange;
+        Event<uint32_t , uint32_t> onSizeChange;
+
         virtual bool shouldClose() = 0;
 
         virtual void swapBuffers() = 0;
@@ -16,12 +17,12 @@ namespace HBE {
 
         virtual ~Window() {};
 
-        static Window *create(int width,int height);
+        static Window *create(uint32_t width,uint32_t height);
 
         //todo: fix this hack
         virtual GLFWwindow* getHandle()=0;
 
-        virtual void getSize(int& width,int& height)=0;
+        virtual void getSize(uint32_t& width,uint32_t& height)=0;
     };
 }
 

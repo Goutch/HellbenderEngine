@@ -7,19 +7,27 @@
 
 namespace HBE {
 
-	void VK_Image::setData(void *data, uint32_t width, uint32_t height, uint32_t depth, IMAGE_FORMAT format, IMAGE_FLAGS flags) {
-		this->width = width;
-		this->height = height;
-		this->depth = depth;
+	VkImageLayout VK_Image::chooseLayout() {
+		if (flags & IMAGE_FLAG_RENDER_TARGET) {
+			return VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		}
+		return VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	}
 
-		if (view_hanlde != VK_NULL_HANDLE) {
-			vkDestroyImageView(device->getHandle(), view_hanlde, nullptr);
-		}
-		if (handle != VK_NULL_HANDLE) {
-			vkDestroyImage(device->getHandle(), handle, nullptr);
-			device->getAllocator().free(*allocation);
-		}
-		VkDeviceSize byte_per_pixel;
+	void VK_Image::update(const void *data) {
+
+		VK_Buffer staging_buffer = VK_Buffer(device, data, width * height * byte_per_pixel, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, ALLOC_FLAG_MAPPABLE);
+
+		device->getAllocator().copy(staging_buffer.getHandle(), this, chooseLayout());
+	}
+
+	VK_Image::VK_Image(VK_Device *device, const TextureInfo &info) {
+		this->device = device;
+		this->width = info.width;
+		this->height = info.height;
+		this->depth = info.depth;
+		this->format = info.format;
+		this->flags = info.flags;
 		VkImageType type;
 		VkImageViewType view_type;
 		if (height == 1 && depth == 1) {
@@ -33,35 +41,36 @@ namespace HBE {
 			view_type = VK_IMAGE_VIEW_TYPE_3D;
 		}
 		switch (format) {
-			case IMAGE_R8:
+
+			case IMAGE_FORMAT_R8:
 				vk_format = VK_FORMAT_R8_SRGB;
 				byte_per_pixel = 1;
 				break;
-			case IMAGE_RG8:
+			case IMAGE_FORMAT_RG8:
 				vk_format = VK_FORMAT_R8G8_SRGB;
 				byte_per_pixel = 2;
 				break;
-			case IMAGE_RGB8:
+			case IMAGE_FORMAT_RGB8:
 				vk_format = VK_FORMAT_R8G8B8_SRGB;
 				byte_per_pixel = 3;
 				break;
-			case IMAGE_RGBA8:
+			case IMAGE_FORMAT_RGBA8:
 				vk_format = VK_FORMAT_R8G8B8A8_SRGB;
 				byte_per_pixel = 4;
 				break;
-			case IMAGE_R32F:
+			case IMAGE_FORMAT_R32F:
 				vk_format = VK_FORMAT_R32_SFLOAT;
 				byte_per_pixel = 4;
 				break;
-			case IMAGE_RG32F:
+			case IMAGE_FORMAT_RG32F:
 				vk_format = VK_FORMAT_R32G32_SFLOAT;
 				byte_per_pixel = 4 * 2;
 				break;
-			case IMAGE_RGB32F:
+			case IMAGE_FORMAT_RGB32F:
 				vk_format = VK_FORMAT_R32G32B32_SFLOAT;
 				byte_per_pixel = 4 * 3;
 				break;
-			case IMAGE_RGBA32F:
+			case IMAGE_FORMAT_RGBA32F:
 				vk_format = VK_FORMAT_R32G32B32A32_SFLOAT;
 				byte_per_pixel = 4 * 4;
 				break;
@@ -88,20 +97,23 @@ namespace HBE {
 		imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 		imageInfo.flags = 0; // Optional
 
+		if (info.flags & IMAGE_FLAG_RENDER_TARGET)imageInfo.usage |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
 		if (vkCreateImage(device->getHandle(), &imageInfo, nullptr, &handle) != VK_SUCCESS) {
 			Log::error("failed to create image!");
 		}
 
 		VkMemoryRequirements requirements;
 		vkGetImageMemoryRequirements(device->getHandle(), handle, &requirements);
-
-		this->allocation = &device->getAllocator().alloc(requirements, NONE);
-
+		this->allocation = &device->getAllocator().alloc(requirements, ALLOC_FLAG_NONE);
 		vkBindImageMemory(device->getHandle(), handle, allocation->block.memory, allocation->offset);
 
-		VK_Buffer staging_buffer = VK_Buffer(device, data, width * height * byte_per_pixel, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, MAPPABLE);
+		if (info.data != nullptr) {
+			update(info.data);
+		} else {
+			device->getAllocator().setImageLayout(this, chooseLayout());
+		}
 
-		device->getAllocator().copy(staging_buffer.getHandle(), this,VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 		//image view
 		VkImageViewCreateInfo viewInfo{};
@@ -118,10 +130,8 @@ namespace HBE {
 		if (vkCreateImageView(device->getHandle(), &viewInfo, nullptr, &view_hanlde) != VK_SUCCESS) {
 			Log::error("failed to create texture image view!");
 		}
-	}
 
-	VK_Image::VK_Image(VK_Device *device) {
-		this->device = device;
+
 		VkSamplerCreateInfo samplerInfo{};
 		samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
 		samplerInfo.magFilter = VK_FILTER_NEAREST;
@@ -148,6 +158,7 @@ namespace HBE {
 		if (vkCreateSampler(device->getHandle(), &samplerInfo, nullptr, &sampler_handle) != VK_SUCCESS) {
 			Log::error("failed to create texture sampler!");
 		}
+
 	}
 
 	VK_Image::~VK_Image() {
@@ -196,7 +207,11 @@ namespace HBE {
 	}
 
 	void VK_Image::setImageLayout(VkImageLayout layout) {
-		this->layout=layout;
+		this->layout = layout;
+	}
+
+	vec3u VK_Image::getSize() const {
+		return vec3u(width, height, depth);
 	}
 
 

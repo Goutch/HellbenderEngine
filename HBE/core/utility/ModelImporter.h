@@ -5,7 +5,6 @@
 #include "glm/glm.hpp"
 #include "string"
 
-using namespace glm;
 namespace HBE {
     struct HB_API MeshData {
         std::vector<unsigned int> indices;

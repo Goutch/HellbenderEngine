@@ -12,34 +12,28 @@ namespace HBE {
 		vkDestroyShaderModule(device->getHandle(), handle, nullptr);
 	}
 
-	VK_Shader::VK_Shader(const VK_Device *device) {
+	VK_Shader::VK_Shader(const VK_Device *device,const ShaderInfo& info) {
 		this->device = device;
-	}
-
-
-	void VK_Shader::setSource(const std::string &source, SHADER_STAGE stage) {
-
-		switch (stage) {
-
-			case SHADER_STAGE::COMPUTE:
-				stage_flag = VK_SHADER_STAGE_COMPUTE_BIT;
+		this->stage=info.stage;
+		switch (info.stage) {
+			case SHADER_STAGE::SHADER_STAGE_COMPUTE:
+				vk_stage = VK_SHADER_STAGE_COMPUTE_BIT;
 				break;
-			case SHADER_STAGE::VERTEX:
-				stage_flag = VK_SHADER_STAGE_VERTEX_BIT;
+			case SHADER_STAGE::SHADER_STAGE_VERTEX:
+				vk_stage = VK_SHADER_STAGE_VERTEX_BIT;
 				break;
-			case SHADER_STAGE::FRAGMENT:
-				stage_flag = VK_SHADER_STAGE_FRAGMENT_BIT;
+			case SHADER_STAGE::SHADER_STAGE_FRAGMENT:
+				vk_stage = VK_SHADER_STAGE_FRAGMENT_BIT;
 				break;
-			case SHADER_STAGE::GEOMETRY:
-				stage_flag = VK_SHADER_STAGE_GEOMETRY_BIT;
+			case SHADER_STAGE::SHADER_STAGE_GEOMETRY:
+				vk_stage = VK_SHADER_STAGE_GEOMETRY_BIT;
 				break;
 		}
+		load(info.path);
 
-		this->type = stage;
+	}
 
-		std::vector<uint32_t> spirv;
-		ShaderCompiler::GLSLToSpirV(source, spirv, stage);
-
+	void VK_Shader::setSource(const std::vector<uint32_t> &spirv) {
 		VkShaderModuleCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 		createInfo.codeSize = spirv.size() * sizeof(uint32_t);
@@ -48,12 +42,39 @@ namespace HBE {
 		if (vkCreateShaderModule(device->getHandle(), &createInfo, nullptr, &handle) != VK_SUCCESS) {
 			Log::error("failed to create shader module!");
 		}
+		reflect(spirv);
+	}
 
+	const VkShaderModule &VK_Shader::getHandle() const {
+		return handle;
+	}
 
+	const std::vector<VkDescriptorSetLayoutBinding> &VK_Shader::getLayoutBindings() const {
+		return layout_bindings;
+	}
 
+	const std::vector<VK_Shader::ShaderInput> &VK_Shader::getInputs() const {
+		return inputs;
+	}
+
+	const std::vector<VkPushConstantRange> &VK_Shader::getPushConstantRanges() const {
+		return push_constants_ranges;
+	}
+
+	SHADER_STAGE VK_Shader::getStage() const {
+		return stage;
+	}
+
+	void VK_Shader::load(const std::string &path) {
+		std::vector<char> source;
+		getSource(path, source);
+		std::vector<uint32_t> spirv;
+		ShaderCompiler::GLSLToSpirV(source, spirv, stage);
+		setSource(spirv);
+	}
+
+	void VK_Shader::reflect(const std::vector<uint32_t> &spirv) {
 		//spirv cross: https://github.com/KhronosGroup/SPIRV-Cross/wiki/Reflection-API-user-guide
-
-
 		spvc_context context = nullptr;
 		spvc_context_create(&context);
 
@@ -72,7 +93,7 @@ namespace HBE {
 			VkDescriptorSetLayoutBinding layout_binding = {};
 			layout_binding.binding = spvc_compiler_get_decoration(compiler_glsl, uniform_list[i].id, SpvDecorationBinding);
 			layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			layout_binding.stageFlags = stage_flag;
+			layout_binding.stageFlags = vk_stage;
 			layout_binding.descriptorCount = 1;//this is for array
 			layout_binding.pImmutableSamplers = nullptr;
 			layout_bindings.emplace_back(layout_binding);
@@ -88,7 +109,7 @@ namespace HBE {
 			spvc_compiler_get_declared_struct_size(compiler_glsl, type, &size);
 
 
-			inputs.emplace_back(ShaderInput{name, INPUT_TYPE::UNIFORM_BUFFER, layout_binding.binding,stage_flag,size});
+			inputs.emplace_back(ShaderInput{name, INPUT_TYPE::UNIFORM_BUFFER, layout_binding.binding,vk_stage,size});
 		}
 
 		const spvc_reflected_resource *push_constant_list = nullptr;
@@ -108,11 +129,11 @@ namespace HBE {
 			VkPushConstantRange push_constant;
 			push_constant.size = size;
 			push_constant.offset = spvc_compiler_get_decoration(compiler_glsl, push_constant_list[i].id, SpvDecorationOffset);
-			push_constant.stageFlags = stage_flag;
+			push_constant.stageFlags = vk_stage;
 
 			push_constants_ranges.emplace_back(push_constant);
 
-			inputs.emplace_back(ShaderInput{name, INPUT_TYPE::PUSH_CONSTANT, binding,stage_flag,size,push_constant.offset});
+			inputs.emplace_back(ShaderInput{name, INPUT_TYPE::PUSH_CONSTANT, binding,vk_stage,size,push_constant.offset});
 		}
 		const spvc_reflected_resource *texture_sampler_list = nullptr;
 		size_t texture_sampler_count;
@@ -123,7 +144,7 @@ namespace HBE {
 			VkDescriptorSetLayoutBinding layout_binding = {};
 			layout_binding.binding = spvc_compiler_get_decoration(compiler_glsl, texture_sampler_list[i].id, SpvDecorationBinding);
 			layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-			layout_binding.stageFlags = stage_flag;
+			layout_binding.stageFlags = vk_stage;
 			layout_binding.descriptorCount = 1;//this is for array
 			layout_binding.pImmutableSamplers = nullptr;
 			layout_bindings.emplace_back(layout_binding);
@@ -134,32 +155,11 @@ namespace HBE {
 			uint32_t set = spvc_compiler_get_decoration(compiler_glsl, texture_sampler_list[i].id, SpvDecorationDescriptorSet);
 
 
-			inputs.emplace_back(ShaderInput{name, INPUT_TYPE::TEXTURE_SAMPLER, layout_binding.binding,stage_flag});
+			inputs.emplace_back(ShaderInput{name, INPUT_TYPE::TEXTURE_SAMPLER, layout_binding.binding,vk_stage});
 		}
 
 
 		spvc_context_release_allocations(context);
 		spvc_context_destroy(context);
-
-	}
-
-	const VkShaderModule &VK_Shader::getHandle() const {
-		return handle;
-	}
-
-	const std::vector<VkDescriptorSetLayoutBinding> &VK_Shader::getLayoutBindings() const {
-		return layout_bindings;
-	}
-
-	const std::vector<VK_Shader::ShaderInput> &VK_Shader::getInputs() const {
-		return inputs;
-	}
-
-	const std::vector<VkPushConstantRange> &VK_Shader::getPushConstantRanges() const {
-		return push_constants_ranges;
-	}
-
-	VkShaderStageFlags VK_Shader::getStage() const {
-		return stage_flag;
 	}
 }

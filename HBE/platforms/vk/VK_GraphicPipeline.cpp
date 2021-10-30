@@ -11,53 +11,14 @@
 #include "algorithm"
 
 namespace HBE {
-	VK_GraphicPipeline::VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer) {
+	VK_GraphicPipeline::VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const GraphicPipelineInfo &info) {
 		this->device = device;
 		this->renderer = renderer;
-	}
 
-	VK_GraphicPipeline::~VK_GraphicPipeline() {
-		for (auto buffer_vector:uniform_buffers) {
-			for (size_t i = 0; i < buffer_vector.second.size(); ++i) {
-				delete buffer_vector.second[i];
-			}
-		}
-		if(descriptor_set_layout_handle!=VK_NULL_HANDLE)vkDestroyDescriptorSetLayout(device->getHandle(), descriptor_set_layout_handle, nullptr);
-		if(descriptor_pool_handle != VK_NULL_HANDLE)vkDestroyDescriptorPool(device->getHandle(), descriptor_pool_handle, nullptr);
-		if(handle!=VK_NULL_HANDLE)vkDestroyPipeline(device->getHandle(), handle, nullptr);
-		if(pipeline_layout_handle!=VK_NULL_HANDLE)vkDestroyPipelineLayout(device->getHandle(), pipeline_layout_handle, nullptr);
-	}
-
-
-	void VK_GraphicPipeline::bind() const {
-		vkCmdBindPipeline(renderer->getCommandPool()->getCurrentBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, handle);
-		vkCmdBindDescriptorSets(renderer->getCommandPool()->getCurrentBuffer(),
-								VK_PIPELINE_BIND_POINT_GRAPHICS,
-								pipeline_layout_handle,
-								0,
-								1,
-								&descriptor_set_handles[renderer->getCurrentFrame()],
-								0,
-								nullptr);
-	}
-
-	void VK_GraphicPipeline::unbind() const {
-		vkCmdBindPipeline(renderer->getCommandPool()->getCurrentBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, handle);
-	}
-
-	void VK_GraphicPipeline::setDrawFlags(DRAW_FLAGS flags) {
-		//todo:
-	}
-
-	DRAW_FLAGS VK_GraphicPipeline::getDrawFlags() const {
-		return 0;
-	}
-
-	void VK_GraphicPipeline::setShaders(const Shader *vertex, const Shader *fragment, const VertexLayout *layout) {
-		if(descriptor_set_layout_handle!=VK_NULL_HANDLE)vkDestroyDescriptorSetLayout(device->getHandle(), descriptor_set_layout_handle, nullptr);
-		if(descriptor_pool_handle!=VK_NULL_HANDLE)vkDestroyDescriptorPool(device->getHandle(), descriptor_pool_handle, nullptr);
-		if(handle!=VK_NULL_HANDLE)vkDestroyPipeline(device->getHandle(), handle, nullptr);
-		if(pipeline_layout_handle!=VK_NULL_HANDLE)vkDestroyPipelineLayout(device->getHandle(), pipeline_layout_handle, nullptr);
+		if (descriptor_set_layout_handle != VK_NULL_HANDLE)vkDestroyDescriptorSetLayout(device->getHandle(), descriptor_set_layout_handle, nullptr);
+		if (descriptor_pool_handle != VK_NULL_HANDLE)vkDestroyDescriptorPool(device->getHandle(), descriptor_pool_handle, nullptr);
+		if (handle != VK_NULL_HANDLE)vkDestroyPipeline(device->getHandle(), handle, nullptr);
+		if (pipeline_layout_handle != VK_NULL_HANDLE)vkDestroyPipelineLayout(device->getHandle(), pipeline_layout_handle, nullptr);
 		descriptor_set_layout_bindings.clear();
 		push_constants_ranges.clear();
 		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
@@ -76,8 +37,8 @@ namespace HBE {
 		uniform_buffers.clear();
 
 
-		const VK_Shader *vk_vertex = (dynamic_cast<const VK_Shader *>(vertex));
-		const VK_Shader *vk_frag = (dynamic_cast<const VK_Shader *>(fragment));
+		const VK_Shader *vk_vertex = (dynamic_cast<const VK_Shader *>(info.vertex_shader));
+		const VK_Shader *vk_frag = (dynamic_cast<const VK_Shader *>(info.fragement_shader));
 		shaders.emplace_back(vk_vertex);
 		shaders.emplace_back(vk_frag);
 		VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
@@ -94,22 +55,29 @@ namespace HBE {
 
 		VkPipelineShaderStageCreateInfo shaderStages[2] = {vertShaderStageInfo, fragShaderStageInfo};
 		//--------------------------VertexLayout input-----------------------------------
-		const VK_VertexLayout *vk_layout = (const VK_VertexLayout *) layout;
 		VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
-		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-		vertexInputInfo.vertexBindingDescriptionCount = 1;
-		vertexInputInfo.pVertexBindingDescriptions = &vk_layout->getBindingDescription();
-		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(vk_layout->getAttributeDescriptions().size());
-		vertexInputInfo.pVertexAttributeDescriptions = vk_layout->getAttributeDescriptions().data();
 
+		if (info.vertex_layout != nullptr) {
+			const VK_VertexLayout *vk_layout = dynamic_cast<const VK_VertexLayout *>(info.vertex_layout);
+			vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+			vertexInputInfo.vertexBindingDescriptionCount = 1;
+			vertexInputInfo.pVertexBindingDescriptions = &vk_layout->getBindingDescription();
+			vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(vk_layout->getAttributeDescriptions().size());
+			vertexInputInfo.pVertexAttributeDescriptions = vk_layout->getAttributeDescriptions().data();
+		} else {
+			vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+			vertexInputInfo.vertexBindingDescriptionCount = 0;
+			vertexInputInfo.pVertexBindingDescriptions = nullptr;
+			vertexInputInfo.vertexAttributeDescriptionCount = 0;
+			vertexInputInfo.pVertexAttributeDescriptions = nullptr;
+		}
 		VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
 		inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 		inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 		inputAssembly.primitiveRestartEnable = VK_FALSE;
-
 		//-------------------Viewports and scissors--------------------
 
-		int width, height;
+		uint32_t width, height;
 		Graphics::getWindow()->getSize(width, height);
 		VkViewport viewport{};
 		viewport.x = 0.0f;
@@ -186,9 +154,7 @@ namespace HBE {
 		dynamicState.dynamicStateCount = 2;
 		dynamicState.pDynamicStates = dynamicStates;
 
-
 		createPipelineLayout();
-
 
 		VkGraphicsPipelineCreateInfo pipelineInfo{};
 		pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -206,7 +172,7 @@ namespace HBE {
 		pipelineInfo.pTessellationState = VK_NULL_HANDLE;
 		pipelineInfo.layout = pipeline_layout_handle;
 
-		pipelineInfo.renderPass = renderer->getSwapchain().getRenderPass().getHandle();
+		pipelineInfo.renderPass = renderer->getRenderPass().getHandle();
 		pipelineInfo.subpass = 0;
 
 		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
@@ -219,10 +185,41 @@ namespace HBE {
 
 	}
 
-	void VK_GraphicPipeline::setShaders(const Shader *vertex, const Shader *geometry,
-										const Shader *fragment, const VertexLayout *layout) {
-		//todo:vulkan geometry shader support
-		Log::error("Geometry shader not implemented in vulkan renderer");
+	VK_GraphicPipeline::~VK_GraphicPipeline() {
+		for (auto buffer_vector:uniform_buffers) {
+			for (size_t i = 0; i < buffer_vector.second.size(); ++i) {
+				delete buffer_vector.second[i];
+			}
+		}
+		if (descriptor_set_layout_handle != VK_NULL_HANDLE)vkDestroyDescriptorSetLayout(device->getHandle(), descriptor_set_layout_handle, nullptr);
+		if (descriptor_pool_handle != VK_NULL_HANDLE)vkDestroyDescriptorPool(device->getHandle(), descriptor_pool_handle, nullptr);
+		if (handle != VK_NULL_HANDLE)vkDestroyPipeline(device->getHandle(), handle, nullptr);
+		if (pipeline_layout_handle != VK_NULL_HANDLE)vkDestroyPipelineLayout(device->getHandle(), pipeline_layout_handle, nullptr);
+	}
+
+
+	void VK_GraphicPipeline::bind() const {
+		vkCmdBindPipeline(renderer->getCommandPool()->getCurrentBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, handle);
+		vkCmdBindDescriptorSets(renderer->getCommandPool()->getCurrentBuffer(),
+								VK_PIPELINE_BIND_POINT_GRAPHICS,
+								pipeline_layout_handle,
+								0,
+								1,
+								&descriptor_set_handles[renderer->getCurrentFrame()],
+								0,
+								nullptr);
+	}
+
+	void VK_GraphicPipeline::unbind() const {
+		vkCmdBindPipeline(renderer->getCommandPool()->getCurrentBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, handle);
+	}
+
+	void VK_GraphicPipeline::setDrawFlags(DRAW_FLAGS flags) {
+		//todo:
+	}
+
+	DRAW_FLAGS VK_GraphicPipeline::getDrawFlags() const {
+		return 0;
 	}
 
 	void VK_GraphicPipeline::setDynamicUniform(const std::string &name, void *data) {
@@ -257,7 +254,7 @@ namespace HBE {
 		auto it = name_input_index.find(name);
 		if (it != name_input_index.end()) {
 			if (inputs[it->second].type == VK_Shader::PUSH_CONSTANT) {
-				vkCmdPushConstants(renderer->getCommandPool()->getCurrentBuffer(), pipeline_layout_handle, inputs[it->second].stage,  inputs[it->second].offset,  inputs[it->second].size, data);
+				vkCmdPushConstants(renderer->getCommandPool()->getCurrentBuffer(), pipeline_layout_handle, inputs[it->second].stage, inputs[it->second].offset, inputs[it->second].size, data);
 			} else {
 				Log::error(name + " is not a push constant");
 			}
@@ -276,7 +273,7 @@ namespace HBE {
 			VkDescriptorImageInfo image_info;
 			image_info.imageView = vk_texture->getImageView();
 			image_info.sampler = vk_texture->getSampler();
-			image_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			image_info.imageLayout = vk_texture->getImageLayout();
 			descriptor_sets_writes[i][binding].pImageInfo = &image_info;
 			vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_sets_writes[i][binding], 0, nullptr);
 		}
@@ -327,14 +324,14 @@ namespace HBE {
 					uniform_buffers.emplace(descriptor_set_layout_bindings[i].binding, std::vector<VK_Buffer *>());
 					auto it = binding_input_index.find(descriptor_set_layout_bindings[i].binding);
 					if (it != binding_input_index.end()) {
-						uniform_buffers[descriptor_set_layout_bindings[i].binding].emplace_back(new VK_Buffer(device, inputs[it->second].size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, ALLOC_FLAGS::MAPPABLE));
+						uniform_buffers[descriptor_set_layout_bindings[i].binding].emplace_back(new VK_Buffer(device, inputs[it->second].size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, ALLOC_FLAGS::ALLOC_FLAG_MAPPABLE));
 					} else {
 						Log::error("Could not find input at binding " + std::to_string(descriptor_set_layout_bindings[i].binding));
 					}
 				}
 		}
 
-		std::array<VkDescriptorPoolSize, 2> poolSizes{};
+
 		size_t combined_image_sampler_count = 0;
 		size_t uniform_buffer_count = 0;
 		for (auto layout_binding:descriptor_set_layout_bindings) {
@@ -347,10 +344,18 @@ namespace HBE {
 					break;
 			}
 		}
-		poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		poolSizes[0].descriptorCount = uniform_buffer_count * MAX_FRAMES_IN_FLIGHT;
-		poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		poolSizes[1].descriptorCount = combined_image_sampler_count * MAX_FRAMES_IN_FLIGHT;
+		std::vector<VkDescriptorPoolSize> poolSizes{};
+		if (uniform_buffer_count > 0) {
+			poolSizes.emplace_back();
+			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			poolSizes[poolSizes.size() - 1].descriptorCount = uniform_buffer_count * MAX_FRAMES_IN_FLIGHT;
+		}
+		if (combined_image_sampler_count > 0) {
+			poolSizes.emplace_back();
+			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			poolSizes[poolSizes.size() - 1].descriptorCount = combined_image_sampler_count * MAX_FRAMES_IN_FLIGHT;
+		}
+
 
 		VkDescriptorPoolCreateInfo poolInfo{};
 		poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -377,7 +382,9 @@ namespace HBE {
 			Log::error("failed to create pipeline layout!");
 		}
 	}
-	bool comparator (VkDescriptorSetLayoutBinding i,VkDescriptorSetLayoutBinding j) { return (i.binding<j.binding); }
+
+	bool comparator(VkDescriptorSetLayoutBinding i, VkDescriptorSetLayoutBinding j) { return (i.binding < j.binding); }
+
 	void VK_GraphicPipeline::createDescriptorSets() {
 
 		std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, descriptor_set_layout_handle);
@@ -386,7 +393,7 @@ namespace HBE {
 		allocInfo.descriptorPool = descriptor_pool_handle;
 		allocInfo.descriptorSetCount = MAX_FRAMES_IN_FLIGHT;
 		allocInfo.pSetLayouts = layouts.data();
-		std::sort(descriptor_set_layout_bindings.begin(),descriptor_set_layout_bindings.end(), comparator);
+		std::sort(descriptor_set_layout_bindings.begin(), descriptor_set_layout_bindings.end(), comparator);
 		if (vkAllocateDescriptorSets(device->getHandle(), &allocInfo, descriptor_set_handles.data()) != VK_SUCCESS) {
 			Log::error("failed to allocate descriptor sets!");
 		}
@@ -415,7 +422,7 @@ namespace HBE {
 
 				} else if (descriptor_set_layout_bindings[j].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) {
 					writes[j].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-					VK_Image *default_texture = (VK_Image *) Resources::get<Texture>("DEFAULT");
+					VK_Image *default_texture = (VK_Image *) Resources::get<Texture>("DEFAULT_TEXTURE");
 					images_info[j].imageView = default_texture->getImageView();
 					images_info[j].sampler = default_texture->getSampler();
 					images_info[j].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -431,7 +438,7 @@ namespace HBE {
 
 				writes[j].descriptorCount = 1;//for arrays
 				writes[j].pTexelBufferView = nullptr; // Optional
-				descriptor_sets_writes[i].emplace_back(writes[j]);
+				descriptor_sets_writes[i].emplace(writes[j].dstBinding,writes[j]);
 				vkUpdateDescriptorSets(device->getHandle(), 1, &writes[j], 0, nullptr);
 			}
 		}

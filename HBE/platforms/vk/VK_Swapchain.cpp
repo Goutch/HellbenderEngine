@@ -23,11 +23,13 @@ namespace HBE {
     }
 
 	void VK_Swapchain::recreate() {
-		if(render_pass!= nullptr)delete render_pass;
-		for (auto imageView : image_views) {
-			vkDestroyImageView(device->getHandle(), imageView, nullptr);
+    	if(handle!=VK_NULL_HANDLE)
+		{
+			for (auto imageView : image_views) {
+				vkDestroyImageView(device->getHandle(), imageView, nullptr);
+			}
+			vkDestroySwapchainKHR(device->getHandle(), handle, nullptr);
 		}
-		vkDestroySwapchainKHR(device->getHandle(), handle, nullptr);
 
 		SwapchainSupportDetails details = physical_device->querySwapchainSupportDetails(physical_device->getHandle());
 		image_count = details.capabilities.minImageCount + 1;
@@ -69,7 +71,6 @@ namespace HBE {
 		create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 		create_info.presentMode = present_mode;
 		create_info.clipped = VK_TRUE;
-		//todo set to oldSwapchain when resize;
 		create_info.oldSwapchain = VK_NULL_HANDLE;
 
 		if (vkCreateSwapchainKHR(device->getHandle(), &create_info, nullptr, &handle) != VK_SUCCESS) {
@@ -84,12 +85,9 @@ namespace HBE {
 
 		Log::status(std::string("Created swapchain with extent:") + std::to_string(extent.width) + "x" +
 					std::to_string(extent.height));
-
-		render_pass = new VK_RenderPass(device, this);
 	}
 
     VK_Swapchain::~VK_Swapchain() {
-        delete render_pass;
         for (auto imageView : image_views) {
             vkDestroyImageView(device->getHandle(), imageView, nullptr);
         }
@@ -159,10 +157,6 @@ namespace HBE {
         return extent;
     }
 
-    const VK_RenderPass& VK_Swapchain::getRenderPass() const {
-        return *render_pass;
-    }
-
     VkSwapchainKHR &VK_Swapchain::getHandle() {
         return handle;
     }
@@ -174,6 +168,7 @@ namespace HBE {
     const std::vector<VkImageView> &VK_Swapchain::getImagesViews() const {
         return image_views;
     }
+
 
 
 }

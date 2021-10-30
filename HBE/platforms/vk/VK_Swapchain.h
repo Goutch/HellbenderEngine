@@ -12,6 +12,8 @@ namespace HBE {
 
     class VK_Device;
 
+    class VK_Semaphore;
+
     class VK_Swapchain {
         VkSwapchainKHR handle{};
 		const VkSurfaceKHR *surface_handle= nullptr;
@@ -24,7 +26,6 @@ namespace HBE {
         std::vector<VkImageView> image_views;
         VkExtent2D extent;
         VkFormat format;
-        VK_RenderPass* render_pass= nullptr;
     public:
         VK_Swapchain(uint32_t width,
                      uint32_t height,
@@ -49,6 +50,5 @@ namespace HBE {
 
         const std::vector<VkImageView> &getImagesViews() const;
 
-        const VK_RenderPass& getRenderPass() const;
     };
 }

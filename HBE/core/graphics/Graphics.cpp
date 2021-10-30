@@ -6,7 +6,7 @@
 #include <core/utility/Log.h>
 #include <core/utility/Event.h>
 #include <core/utility/Geometry.h>
-#include <core/graphics/RenderTarget.h>
+#include <HBE/core/resource/RenderTarget.h>
 #include "core/resource/GraphicPipeline.h"
 #include <Configs.h>
 #include <core/resource/Model.h>
@@ -21,7 +21,7 @@ namespace HBE {
 	DRAW_FLAGS Graphics::default_draw_flags;
 	Renderer *Graphics::renderer = nullptr;
 	Window *Graphics::window = nullptr;
-	RenderTarget *Graphics::render_target = nullptr;
+	RenderTarget *Graphics::main_render_target = nullptr;
 
 	const char *default_mesh_vertex_shader_code = R"(#version 330 core
 layout (location = 0) in vec3 vertex_position;
@@ -105,13 +105,15 @@ void main()
 	void Graphics::init() {
 		window = Window::create(900, 600);
 		renderer = Renderer::create();
-		window->onWindowSizeChange.subscribe(&Graphics::onWindowSizeChange);
+		Resources::init(*renderer->getResourceFactory());
+
+		window->onSizeChange.subscribe(&Graphics::onWindowSizeChange);
 		initializeDefaultVariables();
 	}
 
-	void Graphics::onWindowSizeChange(int width, int height) {
-		if (!Configs::isPresentAutomatic() && render_target != nullptr) {
-			//todo:render_target->setSize(width, height);
+	void Graphics::onWindowSizeChange(uint32_t width, uint32_t height) {
+		if (!Configs::isPresentAutomatic() && main_render_target != nullptr) {
+			main_render_target->setResolution(width, height);
 		}
 	}
 
@@ -128,7 +130,6 @@ void main()
 		renderer->clear();
 		renderer->render(render_target, projection_matrix, view_matrix);
 		//render_target->getFramebuffer().unbind();
-
 	}
 
 	void Graphics::present(const RenderTarget *render_target) {
@@ -137,21 +138,20 @@ void main()
 	}
 
 	void Graphics::terminate() {
+		Resources::destroyAll();
 		delete DEFAULT_QUAD;
 		delete DEFAULT_CUBE;
-		delete render_target;
 		delete renderer;
 		delete window;
 	}
 
 	void Graphics::initializeDefaultVariables() {
-		Texture *default_texture = Resources::createInRegistry<Texture>("DEFAULT");
-		unsigned char *texture_data = new unsigned char[16]{255, 0, 0, 255,
-															0, 255, 0, 255,
-															0, 0, 255, 255,
-															0, 0, 0, 255};
-		default_texture->setData(texture_data, 2, 2, 1);
-		delete texture_data;
+		RenderTargetInfo render_target_info{};
+		uint32_t w,h;
+		window->getSize(w,h);
+		render_target_info.width=w;
+		render_target_info.height=h;
+		main_render_target=Resources::createRenderTarget(render_target_info,"DEFAULT_RENDER_TARGET");
 		//-----------------------------------DEFAULT_CUBE---------------------------------
 		/*  Mesh *cube = new Mesh();
 		 Geometry::createCube(*cube, 1, 1, 1);
@@ -162,8 +162,8 @@ void main()
 		 DEFAULT_QUAD = quad;
 
 		 //-----------------------------------DEFAULT_MESH_MATERIAL--------------------------
-		 ShaderDB::add("default/vert_unlit", default_mesh_vertex_shader_code, SHADER_STAGE::VERTEX);
-		 ShaderDB::add("default/frag_unlit", default_mesh_fragment_shader_code, SHADER_STAGE::FRAGMENT);
+		 ShaderDB::add("default/vert_unlit", default_mesh_vertex_shader_code, SHADER_STAGE::SHADER_STAGE_VERTEX);
+		 ShaderDB::add("default/frag_unlit", default_mesh_fragment_shader_code, SHADER_STAGE::SHADER_STAGE_FRAGMENT);
 		 GraphicPipeline *default_graphic_pipeline = new GraphicPipeline();
 		 default_graphic_pipeline->setShaders(
 				 ShaderDB::get("default/vert_unlit"),
@@ -175,7 +175,7 @@ void main()
 		 DEFAULT_MESH_MATERIAL = default_mesh_material;
 
 		 //-----------------------------------DEFAULT_INSTANCED_PIPELINE----------------
-		 ShaderDB::add("default/vert_unlit_instanced", default_instanced_vertex_shader_code, SHADER_STAGE::VERTEX);
+		 ShaderDB::add("default/vert_unlit_instanced", default_instanced_vertex_shader_code, SHADER_STAGE::SHADER_STAGE_VERTEX);
 		 GraphicPipeline *default_instanced_shader_program = new GraphicPipeline();
 		 default_instanced_shader_program->setShaders(
 				 ShaderDB::get("default/vert_unlit_instanced"),
@@ -185,24 +185,20 @@ void main()
 		//------------------------------------DEFAULT_SCREEN_PIPELINE---------------------------
 		/*auto screen_vertex = Resources::createInRegistry<Shader>("default/screen_vertex");
 		auto screen_frag = Resources::createInRegistry<Shader>("default/screen_frag");
-		screen_vertex->setSource(default_screen_vertex_shader_code, SHADER_STAGE::VERTEX);
-		screen_frag->setSource(default_screen_fragment_shader_code, SHADER_STAGE::FRAGMENT);
+		screen_vertex->setSource(default_screen_vertex_shader_code, SHADER_STAGE::SHADER_STAGE_VERTEX);
+		screen_frag->setSource(default_screen_fragment_shader_code, SHADER_STAGE::SHADER_STAGE_FRAGMENT);
 		auto default_screen_pipeline = Resources::createInRegistry<GraphicPipeline>("default/screen_pipeline");
 		auto default_screen_layout = Resources::createInRegistry<VertexLayout>("default/screen_layout");
 		default_screen_layout->setLayoutTypes({GLSL_TYPE::VEC2F, GLSL_TYPE::VEC2F});
 		default_screen_pipeline->setShaders(
 				screen_vertex,
 				screen_frag, default_screen_layout);*/
-		//------------------------------------DEFAULT_RENDER_TARGET------------------------------
-		int width, height;
-		window->getSize(width, height);
-		//todo:render_target = new RenderTarget(width, height, *DEFAULT_SCREEN_PIPELINE);
 
 		default_draw_flags = DRAW_FLAGS_NONE;
 	}
 
-	RenderTarget *Graphics::getRenderTarget() {
-		return render_target;
+	const RenderTarget *Graphics::getRenderTarget() {
+		return main_render_target;
 	}
 
 	Window *Graphics::getWindow() {

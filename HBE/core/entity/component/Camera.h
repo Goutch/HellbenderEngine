@@ -8,7 +8,7 @@
 namespace HBE {
     class RenderTarget;
 
-    enum RenderMode {
+    enum RENDER_MODE {
         ORTHOGRAPHIC = 0,
         PERSPECTIVE = 1,
     };
@@ -21,9 +21,8 @@ namespace HBE {
         float orthographic_zoom = 1.0f;
         float aspect_ratio = 1;
         float render_distance = 500;
-        RenderMode render_mode = PERSPECTIVE;
-        RenderTarget *render_target = nullptr;
-        vec4 clear_color;
+        RENDER_MODE render_mode = PERSPECTIVE;
+        const RenderTarget *render_target = nullptr;
         mat4 projection_matrix = mat4(1.0f);
         std::array<Plane, 6> frustum_planes;
 
@@ -57,8 +56,8 @@ namespace HBE {
 
         float getOrthographicZoom();
 
-        void setRenderTarget(RenderTarget *render_target);
-
+        void setRenderTarget(const RenderTarget *render_target);
+        
         const RenderTarget *getRenderTarget();
 
         void calculateFrustumPlanes();
@@ -69,17 +68,15 @@ namespace HBE {
 
         bool isSphereInFrustum(const vec3 &position, float radius) const;
 
-        void setRenderMode(RenderMode mode);
+        void setRenderMode(RENDER_MODE mode);
 
-        RenderMode getRenderMode();
+        RENDER_MODE getRenderMode();
 
-        void onRenderTargetSizeChange(int width, int height);
+        void onRenderTargetSizeChange(RenderTarget* render_target);
 
         void serialize(Serializer *serializer) const override;
 
         void deserialize(Deserializer *deserializer) override;
-
-        void setClearColor(vec4 clear_color);
     private:
         void generateProjectionMatrix();
     };

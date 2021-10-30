@@ -1,12 +1,19 @@
 #pragma once
+
 #include "Core.h"
 #include <vector>
 #include "glm/glm.hpp"
 #include "Resource.h"
 
-using namespace glm;
 namespace HBE {
 	class VertexLayout;
+
+	enum MESH_FLAGS {
+		MESH_FLAG_NONE=0,
+	};
+	struct MeshInfo {
+		MESH_FLAGS flags=MESH_FLAG_NONE;
+	};
 
 	class HB_API Mesh : public Resource {
 	protected:
@@ -20,7 +27,7 @@ namespace HBE {
 		uint32_t getIndexCount() const;
 		uint32_t getInstanceCount() const;
 		bool hasIndexBuffer() const;
-		virtual void setVertices(uint32_t position,const void *vertices, size_t count, const VertexLayout *layout) = 0;
+		virtual void setVertices(uint32_t position, const void *vertices, size_t count, const VertexLayout *layout) = 0;
 		virtual void setIndices(const std::vector<uint32_t> &data) = 0;
 		virtual void setBuffer(uint32_t position, const std::vector<int> &data) = 0;
 		virtual void setBuffer(uint32_t position, const std::vector<float> &data) = 0;

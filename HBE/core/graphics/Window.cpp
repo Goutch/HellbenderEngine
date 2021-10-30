@@ -7,7 +7,7 @@
 #endif
 #endif
 namespace HBE {
-    Window *Window::create(int width,int height) {
+    Window *Window::create(uint32_t width,uint32_t height) {
 #ifdef OPENGL_RENDERER
         return new GL_Window(width,height);
 #else

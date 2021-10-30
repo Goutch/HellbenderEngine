@@ -1,15 +1,15 @@
 #include "CameraController.h"
 #include "core/input/Input.h"
 #include "Camera.h"
-#include "core/graphics/RenderTarget.h"
+#include "HBE/core/resource/RenderTarget.h"
 #include "core/serialization/Serializer.h"
 #include "core/entity/Entity.h"
 #include "core/graphics/Graphics.h"
 #include "core/graphics/Window.h"
 namespace HBE {
     void CameraController::onUpdate(float delta) {
-        int w, h;
-        Graphics::getWindow()->getSize(w,h);
+        uint32_t w, h;
+        camera->getRenderTarget()->getResolution(w,h);
 
         double x, y;
         Input::getMousePosition(x, y);
@@ -26,7 +26,7 @@ namespace HBE {
         entity->transform->rotate(quat(vec3(0, change.x, 0)));
         //go back to current pitch
         current_pitch += change.y;
-        current_pitch = clamp(current_pitch, -MAX_PITCH, MAX_PITCH);
+        current_pitch = glm::clamp(current_pitch, -MAX_PITCH, MAX_PITCH);
 
         entity->transform->rotate(current_pitch, vec3(1, 0, 0));
 
@@ -69,19 +69,9 @@ namespace HBE {
         Input::setCursorVisible(true);
     }
 
-    void CameraController::serialize(Serializer *serializer) const {
-        serializer->begin(toString());
-        serializer->addField("speed", units_per_seconds);
-        serializer->addField("current_pitch", current_pitch);
-        serializer->end();
-    }
-
     std::string CameraController::toString() const {
         return "CameraController";
     }
 
-    void CameraController::deserialize(Deserializer *deserializer) {
-
-    }
 }
 

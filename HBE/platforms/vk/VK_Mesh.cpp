@@ -7,7 +7,7 @@
 #include "VK_Allocator.h"
 
 namespace HBE {
-	VK_Mesh::VK_Mesh(VK_Device *device, const VK_CommandPool *command_pool) {
+	VK_Mesh::VK_Mesh(VK_Device *device, const VK_CommandPool *command_pool,const MeshInfo& info) {
 		this->device = device;
 		this->command_pool = command_pool;
 	}
@@ -22,7 +22,7 @@ namespace HBE {
 		buffers[position] = new VK_Buffer(device,
 										  vertices,
 										  buffer_size,
-										  VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,MAPPABLE);
+										  VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, ALLOC_FLAG_MAPPABLE);
 	}
 
 	VK_Mesh::~VK_Mesh() {
@@ -42,7 +42,7 @@ namespace HBE {
 									   reinterpret_cast<const void *>(indices.data()),
 									   buffer_size,
 									   VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-									   ALLOC_FLAGS::NONE);
+									   ALLOC_FLAGS::ALLOC_FLAG_NONE);
 	}
 
 	void VK_Mesh::setBuffer(uint32_t position, const std::vector<int> &data) {

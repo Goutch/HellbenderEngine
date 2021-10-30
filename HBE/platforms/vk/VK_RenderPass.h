@@ -1,27 +1,48 @@
 #pragma once
+
+#include <HBE/core/resource/RenderTarget.h>
 #include "vulkan/vulkan.h"
 #include "vector"
+#include "VK_Image.h"
 
-namespace HBE{
-    class VK_Device;
-    class VK_Swapchain;
-    class VK_RenderPass {
-        VkRenderPass handle;
-        const VK_Device* device;
-        const VK_Swapchain *swapchain;
-        VkExtent2D extent;
-        std::vector<VkFramebuffer> frame_buffers;
-    public:
-        ~VK_RenderPass();
-        VK_RenderPass(const VK_Device *device,const VK_Swapchain* swapchain);
-        void begin(const VkCommandBuffer& command_buffer,int i) const;
-        void end(const VkCommandBuffer& command_buffer) const;
-        const VkRenderPass& getHandle() const;
-        const std::vector<VkFramebuffer> & getFrameBuffers() const;
-    private:
-        void createFramebuffers();
+namespace HBE {
+	class VK_Device;
+
+	class VK_Swapchain;
+
+	class VK_RenderPass : public RenderTarget {
+		VkRenderPass handle = VK_NULL_HANDLE;
+		uint32_t width = 0, height = 0;
+		vec4 clear_color = vec4(0.f, 0.f, 0.f, 1.f);
+
+		VK_Renderer *renderer;
+		VK_Device *device;
+		VkExtent2D extent;
+		std::vector<VK_Image *> images;
+		std::vector<VkFramebuffer> frame_buffers;
+		VkFormat vk_format;
+		IMAGE_FORMAT format;
+		bool use_swapchain;
+
+	public:
+		~VK_RenderPass();
+		VK_RenderPass(VK_Renderer *renderer, const RenderTargetInfo &info);
+		VK_RenderPass(VK_Renderer *renderer);
+		void begin(const VkCommandBuffer &command_buffer, uint32_t i) const;
+		void end(const VkCommandBuffer &command_buffer) const;
+		void setClearColor(vec4 color) override;
+		const vec4 &getClearColor() const override;
+		const VkRenderPass &getHandle() const;
+		const std::vector<VkFramebuffer> &getFrameBuffers() const;
+		void setResolution(uint32_t width, uint32_t height) override;
+		void getResolution(uint32_t &width, uint32_t &height) const override;
+		const VK_Image *getImage(uint32_t i) const;
+
+		void recreate();
+	private:
+		void createFramebuffers();
 
 
-    };
+	};
 }
 

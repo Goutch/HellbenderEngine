@@ -8,6 +8,7 @@
 #include "VK_Image.h"
 #include "VK_CONSTANTS.h"
 #include "VK_Shader.h"
+#include "unordered_map"
 
 namespace HBE {
 	class VK_Device;
@@ -17,8 +18,6 @@ namespace HBE {
 	class VK_Renderer;
 
 	class VK_VertexLayout;
-
-	class VK_DescriptorPool;
 
 	class VK_Buffer;
 
@@ -37,7 +36,7 @@ namespace HBE {
 		std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> descriptor_set_handles;
 		std::vector<VkDescriptorSetLayoutBinding> descriptor_set_layout_bindings;
 		std::vector<VkPushConstantRange> push_constants_ranges;
-		std::array<std::vector<VkWriteDescriptorSet>, MAX_FRAMES_IN_FLIGHT> descriptor_sets_writes;
+		std::array<std::unordered_map<uint32_t ,VkWriteDescriptorSet>, MAX_FRAMES_IN_FLIGHT> descriptor_sets_writes;
 		std::unordered_map<uint32_t, std::vector<VK_Buffer *>> uniform_buffers;
 
 		std::vector<VK_Shader::ShaderInput> inputs;
@@ -45,7 +44,7 @@ namespace HBE {
 		std::unordered_map<uint32_t ,uint32_t> binding_input_index;
 		std::unordered_map<std::string,uint32_t> name_push_constant_index;
 	public:
-		VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer);
+		VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer,const GraphicPipelineInfo& info);
 
 		void setDrawFlags(DRAW_FLAGS flags) override;
 		void setDynamicUniform(const std::string &name, void *data);
@@ -57,10 +56,6 @@ namespace HBE {
 		void setTexture(const std::string &name, const Texture *texture);
 
 		DRAW_FLAGS getDrawFlags() const override;
-
-		void setShaders(const Shader *vertex, const Shader *fragment, const VertexLayout *layout);
-
-		void setShaders(const Shader *vertex, const Shader *geometry, const Shader *fragment, const VertexLayout *layout);
 
 		~VK_GraphicPipeline() override;
 

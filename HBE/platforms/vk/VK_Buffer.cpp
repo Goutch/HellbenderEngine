@@ -12,7 +12,7 @@ namespace HBE {
 		VkBufferCreateInfo bufferInfo{};
 		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 		bufferInfo.size = size;
-		bufferInfo.usage = flags & MAPPABLE ? usage : usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+		bufferInfo.usage = flags & ALLOC_FLAG_MAPPABLE ? usage : usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 		bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
 		if (vkCreateBuffer(device->getHandle(), &bufferInfo, nullptr, &handle) != VK_SUCCESS) {
@@ -54,7 +54,7 @@ namespace HBE {
 	}
 
 	void VK_Buffer::update(const void *data) {
-		if (allocation->flags & MAPPABLE) {
+		if (allocation->flags & ALLOC_FLAG_MAPPABLE) {
 			void *buffer_data;
 			vkMapMemory(device->getHandle(), allocation->block.memory, allocation->offset, allocation->size, 0, &buffer_data);
 			memcpy(buffer_data, data, (size_t) size);
@@ -63,7 +63,7 @@ namespace HBE {
 			VK_Buffer staging_buffer = VK_Buffer(device,
 												 size,
 												 VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-												 MAPPABLE);
+												 ALLOC_FLAG_MAPPABLE);
 
 			VkDeviceMemory &stagingBufferMemory = staging_buffer.getAllocation().block.memory;
 

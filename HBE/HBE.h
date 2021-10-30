@@ -2,13 +2,13 @@
 #define _USE_MATH_DEFINES
 
 #include "Core.h"
+
 #include "Configs.h"
 #include "Application.h"
 #include "Core.h"
 #include "core/resource/GraphicPipeline.h"
 #include "core/resource/Mesh.h"
 #include "core/resource/Texture.h"
-#include "core/resource/Image.h"
 #include "core/resource/Model.h"
 #include "core/resource/Shader.h"
 #include "core/resource/Resources.h"
@@ -24,7 +24,7 @@
 #include "core/entity/component/ModelRenderer.h"
 
 #include "core/graphics/Graphics.h"
-#include "core/graphics/RenderTarget.h"
+#include "HBE/core/resource/RenderTarget.h"
 
 #include "core/input/Input.h"
 #include "core/math/Plane.h"
@@ -44,5 +44,3 @@
 
 #include <glm/glm.hpp>
 #include "glm/gtx/quaternion.hpp"
-
-using namespace glm;

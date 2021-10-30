@@ -12,137 +12,145 @@
 #include "core/resource/Mesh.h"
 #include "core/resource/Texture.h"
 #include "core/resource/Model.h"
-#include "core/resource/ResourcesRegistry.h"
-#include "core/resource/Image.h"
+#include "core/resource/RenderTarget.h"
 namespace HBE {
-    namespace Resources {
-        template<class T>
-        static T *get(std::string unique_name) {
+	class HB_API Resources {
+		static std::unordered_map<std::string, Resource *> registry;
+		static const ResourceFactory* factory;
+	public:
+		static void init(const ResourceFactory& factory)
+		{
+			Resources::factory=&factory;
+		}
+		template<class T>
+		static T *get(std::string unique_name) {
 #ifdef DEBUG_MODE
-            if (!ResourcesRegistry::exist(unique_name)) {
-                Log::warning("Cant find resource:" + unique_name);
-            }
+			if (!Resources::exist(unique_name)) {
+				Log::warning("Cant find resource:" + unique_name);
+			}
 #endif
-            return (T *) ResourcesRegistry::get(unique_name);
-        }
+			return dynamic_cast<T *>(Resources::get(unique_name));
+		}
 
-        static Resource *get(std::string unique_name) {
+		static bool exist(std::string &unique_name) {
+			return Resources::registry.find(unique_name) != registry.end();
+		}
+
+		static void add(std::string &unique_name, Resource *res) {
+			Resources::registry.emplace(unique_name, res);
+		}
+
+		static Resource *get(std::string &unique_name) {
 #ifdef DEBUG_MODE
-            if (!ResourcesRegistry::exist(unique_name)) {
-                Log::warning("Cant find resource:" + unique_name);
-            }
+			if (!Resources::exist(unique_name)) {
+				Log::warning("Cant find resource:" + unique_name);
+			}
 #endif
-            return ResourcesRegistry::get(unique_name);
-        }
+			return Resources::registry.at(unique_name);
+		}
 
-        template<class T>
-        static void destroy() {
-            ResourcesRegistry::clear();
-        }
 
-        static void destroyAll() {
-            Resources::destroy<Mesh>();
-            Resources::destroy<Texture>();
-            Resources::destroy<GraphicPipeline>();
-            Resources::destroy<ComputePipeline>();
-            Resources::destroy<Model>();
-            Resources::destroy<Shader>();
-            Resources::destroy<VertexLayout>();
-			Resources::destroy<Image>();
-        }
+		static void destroyAll() {
+			for (auto &name_res:Resources::registry) {
+				delete name_res.second;
+			}
+			Resources::registry.clear();
+		}
 
-        template<class T>
-        static void destroy(std::string unique_name) {
-            return ResourcesRegistry::remove(unique_name);
-        }
+		static void destroy(std::string &unique_name) {
+			delete get(unique_name);
 
-        /**
-         * Add a shared resource to the managed resources that will be deleted at the end of the application lifetime
-         * @tparam Resource type to add to registry.
-         * @param unique_name unique identifier to retrieve and delete this resource.
-         * @param t Resource to add to the managed resources
-         */
-        template<class T>
-        static void add(std::string unique_name, T *t) {
-            return ResourcesRegistry::remove(unique_name);
-        }
+			registry.erase(unique_name);
+		}
 
-        /**
-         * Create an unmanaged resource.
-         * @tparam Resource type to create.
-         * @return Unmanaged pointer to the created resource.
-         */
-        template<class T>
-        static T *create() {
-            Log::error("Resources can't create non resource type");
-            return nullptr;
-        };
+		static void add(const std::string& unique_name, Resource *r) {
+			registry.emplace(unique_name, r);
+		}
 
-        /**
-         * Create an unmanaged shared resource
-         * @tparam Resource type to create.
-         * @return managed pointer to the created resource
-         */
-        template<class T>
-        static std::shared_ptr<T> createShared() {
-            return std::make_shared<T>(create<T>());
-        };
 
-        /**
-         * Create a managed resource that will be deleted at the end of the application lifetime.
-         * @tparam Resource type to add to registry.
-         * @param unique_name unique identifier to retrieve and delete this resource.
-         * @return managed pointer to the created resource
-         */
-        template<class T>
-        static T *createInRegistry(std::string unique_name) {
-#ifdef DEBUG_MODE
-            if (ResourcesRegistry::exist(unique_name)) {
-                delete get<T>(unique_name);
-                ResourcesRegistry::remove(unique_name);
-                Log::warning("Resource with name:\"" + unique_name + "\" already exist in registry, deleted old resource.");
-            }
-#endif
-            auto ptr = create<T>();
-            ResourcesRegistry::add(unique_name, reinterpret_cast<Resource*>(ptr));
-            return ptr;
-        }
+		static Model *createModel(const MeshInfo &info, const std::string &name) {
+			auto m = new Model();
+			add(name, m);
+			return m;
+		}
 
-        template<>
-        Model *create<Model>() {
-            return new Model();
-        }
+		static Model *createModel(const MeshInfo &info) {
 
-        template<>
-        Mesh *create<Mesh>() {
-            return Graphics::getRenderer()->getResourceFactory()->createMesh();
-        }
+			return new Model;
+		}
 
-        template<>
-        Shader *create<Shader>() {
-            return Graphics::getRenderer()->getResourceFactory()->createShader();
-        }
+		static Mesh *createMesh(const MeshInfo &info, const std::string &name) {
+			auto m = factory->createMesh(info);
+			add(name, m);
+			return m;
+		}
 
-        template<>
-        GraphicPipeline *create<GraphicPipeline>() {
-            return Graphics::getRenderer()->getResourceFactory()->createGraphicsPipeline();
-        }
+		static Mesh *createMesh(const MeshInfo &info) {
+			return factory->createMesh(info);
+		}
 
-        template<>
-        ComputePipeline *create<ComputePipeline>() {
-            return Graphics::getRenderer()->getResourceFactory()->createComputePipeline();
-        }
+		static Shader *createShader(const ShaderInfo &info, const std::string &name) {
+			auto s = factory->createShader(info);
+			add(name, s);
+			return s;
+		}
 
-        template<>
-        VertexLayout *create<VertexLayout>() {
-            return Graphics::getRenderer()->getResourceFactory()->createVertexLayout();
-        }
+		static Shader *createShader(const ShaderInfo &info) {
+			return factory->createShader(info);
+		}
 
-        template<>
-        Texture *create<Texture>() {
-            return Graphics::getRenderer()->getResourceFactory()->createTexture();
-        }
-    };
+		static GraphicPipeline *createGraphicPipeline(const GraphicPipelineInfo &info, const std::string &name) {
+			auto gp = factory->createGraphicPipeline(info);
+			add(name, gp);
+			return gp;
+
+		}
+
+		static GraphicPipeline *createGraphicPipeline(const GraphicPipelineInfo &info) {
+			return factory->createGraphicPipeline(info);
+		}
+
+		static ComputePipeline *createComputePipeline(const ComputePipelineInfo &info, const std::string &name) {
+			auto cp = factory->createComputePipeline(info);
+			add(name, cp);
+			return cp;
+		}
+
+		static ComputePipeline *createComputePipeline(const ComputePipelineInfo &info) {
+			return factory->createComputePipeline(info);
+		}
+
+		static VertexLayout *createVertexLayout(const VertexLayoutInfo& info) {
+			return factory->createVertexLayout(info);
+		}
+
+		static VertexLayout *createVertexLayout(const VertexLayoutInfo& info,const std::string &name) {
+			auto vl = factory->createVertexLayout(info);
+			add(name, vl);
+			return vl;
+		}
+
+		static Texture *createTexture(const TextureInfo &info, const std::string &name) {
+			auto t = factory->createTexture(info);
+			add(name, t);
+			return t;
+		}
+
+		static Texture *createTexture(const TextureInfo &info) {
+			return factory->createTexture(info);
+		}
+
+
+		static RenderTarget *createRenderTarget(const RenderTargetInfo &info) {
+			return factory->createRenderTarget(info);
+		}
+
+		static RenderTarget *createRenderTarget(const RenderTargetInfo &info, const std::string &name) {
+			auto rt = factory->createRenderTarget(info);
+			add(name, rt);
+			return rt;
+		}
+	};
 
 
 }

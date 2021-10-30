@@ -4,7 +4,6 @@
 
 #include "Core.h"
 
-using namespace glm;
 namespace HBE {
     class HB_API Deserializer {
 

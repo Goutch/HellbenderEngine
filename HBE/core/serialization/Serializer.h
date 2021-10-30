@@ -6,7 +6,6 @@
 #include "Core.h"
 #include "string"
 
-using namespace glm;
 namespace HBE {
     class HB_API Serializer {
     public:

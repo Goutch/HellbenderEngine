@@ -18,10 +18,10 @@ namespace HBE {
 		mutable std::unordered_map<unsigned int, VK_Buffer *> buffers;
 
 	public:
-		VK_Mesh(VK_Device *device, const VK_CommandPool *command_pool);
+		VK_Mesh(VK_Device *device, const VK_CommandPool *command_pool, const MeshInfo &info);
 		~VK_Mesh() override;
 		void setIndices(const std::vector<uint32_t> &data) override;
-		void setVertices(uint32_t position,const void *vertices, size_t count, const VertexLayout *layout) override;
+		void setVertices(uint32_t position, const void *vertices, size_t count, const VertexLayout *layout) override;
 		void setBuffer(uint32_t position, const std::vector<int> &data) override;
 		void setBuffer(uint32_t position, const std::vector<float> &data) override;
 		void setBuffer(uint32_t position, const std::vector<vec2> &data) override;

@@ -114,19 +114,19 @@ namespace HBE {
 									   /* .generalConstantMatrixVectorIndexing = */ 1,
 							   }};
 
-	void ShaderCompiler::GLSLToSpirV(const std::string &source, std::vector<uint32_t> &buffer, SHADER_STAGE type) {
+	void ShaderCompiler::GLSLToSpirV(const std::vector<char>& source, std::vector<uint32_t> &buffer, SHADER_STAGE type) {
 		glslang_stage_t stage = GLSLANG_STAGE_VERTEX;;
 		switch (type) {
-			case SHADER_STAGE::COMPUTE:
+			case SHADER_STAGE::SHADER_STAGE_COMPUTE:
 				stage = GLSLANG_STAGE_COMPUTE;
 				break;
-			case SHADER_STAGE::VERTEX:
+			case SHADER_STAGE::SHADER_STAGE_VERTEX:
 				stage = GLSLANG_STAGE_VERTEX;
 				break;
-			case SHADER_STAGE::FRAGMENT:
+			case SHADER_STAGE::SHADER_STAGE_FRAGMENT:
 				stage = GLSLANG_STAGE_FRAGMENT;
 				break;
-			case SHADER_STAGE::GEOMETRY:
+			case SHADER_STAGE::SHADER_STAGE_GEOMETRY:
 				stage = GLSLANG_STAGE_GEOMETRY;
 				break;
 		}
@@ -139,7 +139,7 @@ namespace HBE {
 						.client_version = GLSLANG_TARGET_VULKAN_1_2,
 						.target_language = GLSLANG_TARGET_SPV,
 						.target_language_version = GLSLANG_TARGET_SPV_1_0,
-						.code = source.c_str(),
+						.code = source.data(),
 						.default_version = 100,
 						.default_profile = GLSLANG_NO_PROFILE,
 						.force_default_version_and_profile = false,

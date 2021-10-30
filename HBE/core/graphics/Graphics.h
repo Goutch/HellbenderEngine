@@ -3,11 +3,9 @@
 #include "Core.h"
 #include <vector>
 #include <string>
-#include <core/resource/Texture.h>
 #include "DrawFlags.h"
 #include "glm/glm.hpp"
 
-using namespace glm;
 
 namespace HBE {
     class Renderer;
@@ -29,13 +27,11 @@ namespace HBE {
         static DRAW_FLAGS default_draw_flags;
         static Renderer *renderer;
         static Window *window;
-        static RenderTarget *render_target;
+        static RenderTarget *main_render_target;
     public:
         static const Mesh *DEFAULT_QUAD;
         static const Mesh *DEFAULT_CUBE;
-        /*
-         * Initialize graphic context and window
-         */
+
         static void init();
 
         static Window *getWindow();
@@ -51,12 +47,14 @@ namespace HBE {
 
         static void clear();
 
-        static RenderTarget *getRenderTarget();
+        static const RenderTarget *getRenderTarget();
 
         static void terminate();
 
-        static void onWindowSizeChange(int width,int height);
+        static void onWindowSizeChange(uint32_t width,uint32_t height);
+
 		static void beginFrame();
+
         static void endFrame();
 
         static void setDefaultDrawFlags(DRAW_FLAGS drawFlags);

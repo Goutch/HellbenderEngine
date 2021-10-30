@@ -8,7 +8,7 @@
 namespace HBE {
 	VkMemoryPropertyFlags choseProperties(ALLOC_FLAGS flags) {
 		VkMemoryPropertyFlags properties = 0;
-		if (flags & MAPPABLE) {
+		if (flags & ALLOC_FLAG_MAPPABLE) {
 			properties |= VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
 		} else {
 			properties |= VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
@@ -188,10 +188,10 @@ namespace HBE {
 		//todo use transfer queue
 		vkQueueSubmit(device->getGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
 		vkQueueWaitIdle(device->getGraphicsQueue());
+		//command_pool->reset(0);
 	}
 
 	void VK_Allocator::transitionImageLayout(VK_Image *image, VkImageLayout new_layout) {
-
 		VkImageLayout old_layout = image->getImageLayout();
 		VkImageMemoryBarrier barrier{};
 		barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -220,7 +220,14 @@ namespace HBE {
 
 			sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 			destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-		} else if (old_layout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && new_layout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+		} else if(old_layout == VK_IMAGE_LAYOUT_UNDEFINED && new_layout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL){
+			barrier.srcAccessMask = 0;
+			barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+			sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+			destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		}
+		else if (old_layout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && new_layout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
 			barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 			barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 
@@ -234,17 +241,18 @@ namespace HBE {
 				command_pool->getCurrentBuffer(),
 				sourceStage, destinationStage,
 				0,
-				0, nullptr,
-				0, nullptr,
-				1, &barrier
+				0,
+				nullptr,
+				0,
+				nullptr,
+				1,
+				&barrier
 		);
 
 		image->setImageLayout(new_layout);
-
 	}
 
 	void VK_Allocator::copy(VkBuffer src, VK_Image *dest, VkImageLayout dst_end_layout) {
-
 		command_pool->begin(0);
 		transitionImageLayout(dest, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 		VkBufferImageCopy region{};
@@ -272,7 +280,6 @@ namespace HBE {
 				&region
 		);
 
-
 		transitionImageLayout(dest, dst_end_layout);
 		command_pool->end(0);
 
@@ -284,12 +291,17 @@ namespace HBE {
 		//todo use transfer queue
 		vkQueueSubmit(device->getGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
 		vkQueueWaitIdle(device->getGraphicsQueue());
+		//command_pool->reset(0);
+
+
 	}
 
 	void VK_Allocator::copy(VK_Image *src, VkImageLayout src_end_layout, VK_Image *dest, VkImageLayout dst_end_layout) {
-		command_pool->begin(0);
+
 		VkImageAspectFlagBits src_aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT;//todo change for depth if image is depth or stensil
 		VkImageAspectFlagBits dst_aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT;
+
+		command_pool->begin(0);
 		transitionImageLayout(dest, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 		transitionImageLayout(src, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 		VkImageCopy region{};
@@ -325,6 +337,7 @@ namespace HBE {
 		//todo use transfer queue
 		vkQueueSubmit(device->getGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
 		vkQueueWaitIdle(device->getGraphicsQueue());
+		//command_pool->reset(0);
 	}
 
 	void VK_Allocator::free(Allocation &allocation) {
@@ -347,4 +360,19 @@ namespace HBE {
 	}
 
 
+	void VK_Allocator::setImageLayout(VK_Image *image, VkImageLayout newLayout) {
+		command_pool->begin(0);
+		transitionImageLayout(image,newLayout);
+		command_pool->end(0);
+
+		VkSubmitInfo submitInfo{};
+		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &command_pool->getCurrentBuffer();
+
+		//todo use transfer queue
+		vkQueueSubmit(device->getGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+		vkQueueWaitIdle(device->getGraphicsQueue());
+		//command_pool->reset(0);
+	}
 }

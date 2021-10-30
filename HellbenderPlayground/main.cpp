@@ -33,31 +33,42 @@ struct Vertex {
 	vec2 uv;
 };
 
-int main() {
-	Application::init();
-	//-----------------------SETUP--------------------
-	Configs::setWindowTitle("Hellbender");
-	auto frag = Resources::createInRegistry<Shader>("frag");
-	auto vert = Resources::createInRegistry<Shader>("vert");
-	auto pipeline = Resources::createInRegistry<GraphicPipeline>("pipeline");
-	auto layout = Resources::createInRegistry<VertexLayout>("layout");
-	auto mesh = Resources::createInRegistry<Mesh>("mesh");
+void init()
+{
+	ShaderInfo frag_info{SHADER_STAGE_FRAGMENT, "../../res/shaders/VK.frag"};
+	ShaderInfo vert_info{SHADER_STAGE_VERTEX, "../../res/shaders/VK.vert"};
 
-	vert->load("../../res/shaders/VK.vert", SHADER_STAGE::VERTEX);
-	frag->load("../../res/shaders/VK.frag", SHADER_STAGE::FRAGMENT);
-	layout->setLayoutTypes({GLSL_TYPE::VEC3F, GLSL_TYPE::VEC3F, GLSL_TYPE::VEC2F});
-	pipeline->setShaders(vert, frag, layout);
 
+	auto frag = Resources::createShader(frag_info, "frag");
+	auto vert = Resources::createShader(vert_info, "vert");
+
+
+	VertexLayoutInfo layout_info{ std::vector<GLSL_TYPE>({GLSL_TYPE::VEC3F, GLSL_TYPE::VEC3F, GLSL_TYPE::VEC2F})};
+	auto layout = Resources::createVertexLayout(layout_info, "layout");
+
+	GraphicPipelineInfo pipeline_info{};
+	pipeline_info.fragement_shader=frag;
+	pipeline_info.vertex_shader=vert;
+	pipeline_info.vertex_layout=layout;
+	pipeline_info.flags=GRAPHIC_PIPELINE_FLAG_NONE;
+	auto pipeline = Resources::createGraphicPipeline(pipeline_info,"pipeline");
+
+
+	RenderTargetInfo render_target_info{500,500};
+	RenderTarget* render_target=Resources::createRenderTarget(render_target_info,"render_target");
+
+
+	auto mesh = Resources::createMesh(MeshInfo{},"mesh");
 	const std::vector<Vertex> vertices = {
-			{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-			{{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-			{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-			{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
+			{{-0.5f, -0.5f, 0.0f},  {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
+			{{0.5f,  -0.5f, 0.0f},  {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
+			{{0.5f,  0.5f,  0.0f},  {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
+			{{-0.5f, 0.5f,  0.0f},  {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
 
 			{{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-			{{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-			{{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-			{{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}
+			{{0.5f,  -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
+			{{0.5f,  0.5f,  -0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
+			{{-0.5f, 0.5f,  -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}
 	};
 	const std::vector<uint32_t> indices = {
 			0, 1, 2, 2, 3, 0,
@@ -79,13 +90,28 @@ int main() {
 	mr2->entity->transform->translate(vec3(2, 0, 0));
 	mr2->entity->transform->setParent(mr1->entity->transform);
 
-	auto wall = Resources::createInRegistry<Texture>("Wall");
-	wall->load("../../res/textures/wall.png");
-	pipeline->setTexture("texSampler",wall);
+	auto wall = Texture::load("../../res/textures/wall.png");
+	Resources::add("Wall",wall);
+
+	pipeline->setTexture("texSampler", wall);
 
 	auto camera = Application::scene->instantiate<Camera>();
-	camera->setRenderMode(RenderMode::PERSPECTIVE);
+	camera->setRenderMode(RENDER_MODE::PERSPECTIVE);
 	camera->entity->transform->setPosition(vec3(0, 0, 5));
+
+	/*Graphics::beginFrame();
+	Graphics::draw(*mr1->entity->transform,*mesh,*pipeline);
+	Graphics::render(render_target,camera->getProjectionMatrix(),camera->getViewMatrix());
+	Graphics::endFrame();*/
+}
+int main() {
+	Application::init();
+	//-----------------------SETUP--------------------
+	Configs::setWindowTitle("Hellbender");
+
+
+	init();
+
 	//-----------------------EVENTS------------------
 	Application::onUpdate.subscribe(&onUpdate);
 

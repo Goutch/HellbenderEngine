@@ -43,7 +43,8 @@ namespace HBE {
         int vertex_count = 0;
         clearMeshes();
         for (std::size_t i = 0; i < meshes_data->size(); ++i) {
-            meshes.emplace_back(Resources::create<Mesh>(), Resources::create<GraphicPipeline>());
+        	MeshInfo mesh_info{};
+            meshes.emplace_back(Resources::createMesh(mesh_info), nullptr);
             meshes[i].first->setIndices((*meshes_data)[i].first.indices);
             vertex_count += (*meshes_data)[i].first.indices.size();
             if (!(*meshes_data)[i].first.positions.empty()) {

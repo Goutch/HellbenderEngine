@@ -20,9 +20,6 @@ namespace HBE {
 
         std::string toString() const override;
 
-        void serialize(Serializer *serializer) const override;
-
-        void deserialize(Deserializer *deserializer) override;
     };
 
 }

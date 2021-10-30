@@ -1,5 +1,7 @@
+#include <core/resource/Resources.h>
 #include "VK_Renderer.h"
-
+#include "VK_Semaphore.h"
+#include "VK_Fence.h"
 #define GLFW_INCLUDE_VULKAN
 
 #include "Configs.h"
@@ -19,6 +21,7 @@
 
 #include "VK_GraphicPipeline.h"
 #include "VK_RenderTarget.h"
+#include "core/graphics/Graphics.h"
 
 namespace HBE {
 	struct UniformBufferObject {
@@ -30,7 +33,7 @@ namespace HBE {
 	VK_Renderer::VK_Renderer() {
 		window = dynamic_cast<VK_Window *>(Graphics::getWindow());
 
-		int width, height;
+		uint32_t width, height;
 		window->getSize(width, height);
 
 		instance = new VK_Instance();
@@ -41,31 +44,40 @@ namespace HBE {
 		command_pool = new VK_CommandPool(device, MAX_FRAMES_IN_FLIGHT);
 
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-			image_available_semaphores.push_back(new VK_Semaphore(*device));
-			render_finished_semaphores.push_back(new VK_Semaphore(*device));
-			frames_in_flight_fences.push_back(new VK_Fence(*device));
+
+			frames[i].image_available_semaphore=new VK_Semaphore(*device);
+			frames[i].finished_semaphore=new VK_Semaphore(*device);
+			frames[i].in_flight_fence=new VK_Fence(*device);
 		}
-		images_in_flight_fences.resize(swapchain->getRenderPass().getFrameBuffers().size(), nullptr);
+
 
 		factory = new VK_ResourceFactory(this);
 
+		swapchain_render_pass = new VK_RenderPass(this);
+
+		images_in_flight_fences.resize(swapchain_render_pass->getFrameBuffers().size(), nullptr);
+
+		createDefaultResources();
+
 		Application::onWindowClosed.subscribe(this, &VK_Renderer::onWindowClosed);
 		Configs::onVerticalSyncChange.subscribe(this, &VK_Renderer::reCreateSwapchain);
-		window->onWindowSizeChange.subscribe(this, &VK_Renderer::onWindowSizeChange);
+		window->onSizeChange.subscribe(this, &VK_Renderer::onWindowSizeChange);
 	}
 
-	void VK_Renderer::onWindowSizeChange(int width, int height) {
+	void VK_Renderer::onWindowSizeChange(uint32_t width, uint32_t height) {
 		windowResized = true;
 	}
 
 	void VK_Renderer::reCreateSwapchain() {
-		int width, height;
+		uint32_t width, height;
 		window->getSize(width, height);
 		device->wait();
 
 		command_pool->clear();
 
 		swapchain->recreate();
+
+		swapchain_render_pass->recreate();
 
 		command_pool->createCommandBuffers(MAX_FRAMES_IN_FLIGHT);
 	}
@@ -75,18 +87,18 @@ namespace HBE {
 	}
 
 	VK_Renderer::~VK_Renderer() {
-		window->onWindowSizeChange.unsubscribe(this);
+		window->onSizeChange.unsubscribe(this);
 		Application::onWindowClosed.unsubscribe(this);
 		Configs::onVerticalSyncChange.unsubscribe(this);
 		device->wait();
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-			delete image_available_semaphores[i];
-			delete render_finished_semaphores[i];
-			delete frames_in_flight_fences[i];
+			delete frames[i].image_available_semaphore;
+			delete frames[i].finished_semaphore;
+			delete frames[i].in_flight_fence;
 		}
-		delete command_pool;
-
 		delete factory;
+		delete swapchain_render_pass;
+		delete command_pool;
 		delete swapchain;
 		delete device;
 		delete physical_device;
@@ -103,13 +115,13 @@ namespace HBE {
 							 const mat4 &view_matrix) {
 		command_pool->begin(current_frame);
 
-		int width, height;
-		Graphics::getWindow()->getSize(width, height);
+		uint32_t width, height;
+		render_target->getResolution(width, height);
 		VkViewport viewport{};
 		viewport.x = 0.0f;
-		viewport.y = (float) height;
-		viewport.width = (float) width;
-		viewport.height = (float) -height;
+		viewport.y = static_cast<float>(height);
+		viewport.width = static_cast<float>(width);
+		viewport.height = -static_cast<float>(height);
 		viewport.minDepth = 0.0f;
 		viewport.maxDepth = 1.0f;
 
@@ -123,7 +135,7 @@ namespace HBE {
 		UniformBufferObject ubo{};
 		ubo.view = view_matrix;
 		ubo.projection = projection_matrix;
-		swapchain->getRenderPass().begin(command_pool->getCurrentBuffer(), current_image);
+		swapchain_render_pass->begin(command_pool->getCurrentBuffer(), current_image);
 		for (const auto &pipeline_kv:render_cache) {
 			GraphicPipeline *pipeline = pipeline_kv.first;
 			VK_GraphicPipeline *vk_pipeline = (VK_GraphicPipeline *) pipeline;
@@ -144,18 +156,34 @@ namespace HBE {
 			}
 			vk_pipeline->unbind();
 		}
-		swapchain->getRenderPass().end(command_pool->getCurrentBuffer());
+		swapchain_render_pass->end(command_pool->getCurrentBuffer());
 		command_pool->end(current_frame);
+
+		VkSubmitInfo submitInfo{};
+		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		submitInfo.commandBufferCount=1;
+		submitInfo.pCommandBuffers=&command_pool->getBuffers()[current_frame];
+
+		frames[current_frame].in_flight_fence->reset();
+		if (vkQueueSubmit(device->getGraphicsQueue(), 1, &submitInfo,
+						  frames[current_frame].in_flight_fence->getHandle()) != VK_SUCCESS) {
+			Log::error("failed to submit draw command buffer!");
+		}
 	}
 
 	void VK_Renderer::beginFrame() {
 		//wait for last frame i to finish
-		frames_in_flight_fences[current_frame]->wait();
+
+
+	}
+
+	void VK_Renderer::present(const HBE::RenderTarget *render_target) {
+		frames[current_frame].in_flight_fence->wait();
 
 		VkResult result = vkAcquireNextImageKHR(device->getHandle(),
 												swapchain->getHandle(),
 												UINT64_MAX,
-												image_available_semaphores[current_frame]->getHandle(),
+												frames[current_frame].image_available_semaphore->getHandle(),
 												VK_NULL_HANDLE,
 												&current_image);
 		if (result == VK_ERROR_OUT_OF_DATE_KHR) {
@@ -170,16 +198,47 @@ namespace HBE {
 			images_in_flight_fences[current_image]->wait();
 		}
 
-		images_in_flight_fences[current_image] = frames_in_flight_fences[current_frame];
+		images_in_flight_fences[current_image] = frames[current_frame].in_flight_fence;
+
+		VK_RenderPass* current_render_pass=(VK_RenderPass*) render_target;
+
+		screen_pipeline->setTexture("texture0",current_render_pass->getImage(current_frame));
+
+		command_pool->begin(current_frame);
+
+		uint32_t width, height;
+		render_target->getResolution(width, height);
+		VkViewport viewport{};
+		viewport.x = 0.0f;
+		viewport.y = static_cast<float>(height);
+		viewport.width = static_cast<float>(width);
+		viewport.height = -static_cast<float>(height);
+		viewport.minDepth = 0.0f;
+		viewport.maxDepth = 1.0f;
+
+		VkRect2D scissor{};
+		scissor.offset = {0, 0};
+		scissor.extent = VkExtent2D{(uint32_t) width, (uint32_t) height};
 
 
-	}
+		//static_cast<VK_RenderTarget*>(render_target)->begin(command_pool->getCurrentBuffer());
+		vkCmdSetViewport(command_pool->getCurrentBuffer(), 0, 1, &viewport);
+		vkCmdSetScissor(command_pool->getCurrentBuffer(), 0, 1, &scissor);
 
-	void VK_Renderer::present(const HBE::RenderTarget *render_target) {
+		swapchain_render_pass->begin(command_pool->getCurrentBuffer(), current_image);
+
+		screen_pipeline->bind();
+		vkCmdDraw(command_pool->getCurrentBuffer(), 3, 1, 0, 0);
+		screen_pipeline->unbind();
+
+		swapchain_render_pass->end(command_pool->getCurrentBuffer());
+		command_pool->end(current_frame);
+
+
 		VkSubmitInfo submitInfo{};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-		VkSemaphore waitSemaphores[] = {image_available_semaphores[current_frame]->getHandle()};
+		VkSemaphore waitSemaphores[] = {frames[current_frame].image_available_semaphore->getHandle()};
 		VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
 		submitInfo.waitSemaphoreCount = 1;
 		submitInfo.pWaitSemaphores = waitSemaphores;
@@ -188,14 +247,13 @@ namespace HBE {
 		submitInfo.commandBufferCount = 1;
 		submitInfo.pCommandBuffers = &command_pool->getBuffers()[current_frame];
 
-		VkSemaphore signalSemaphores[] = {render_finished_semaphores[current_frame]->getHandle()};
+		VkSemaphore signalSemaphores[] = {frames[current_frame].finished_semaphore->getHandle()};
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = signalSemaphores;
 
-		frames_in_flight_fences[current_frame]->reset();
+		frames[current_frame].in_flight_fence->reset();
 		if (vkQueueSubmit(device->getGraphicsQueue(), 1, &submitInfo,
-						  frames_in_flight_fences[current_frame]->getHandle()) !=
-			VK_SUCCESS) {
+						  frames[current_frame].in_flight_fence->getHandle()) != VK_SUCCESS) {
 			Log::error("failed to submit draw command buffer!");
 		}
 
@@ -211,7 +269,7 @@ namespace HBE {
 		presentInfo.pImageIndices = &current_image;
 		presentInfo.pResults = nullptr; // Optional
 
-		VkResult result = vkQueuePresentKHR(device->getPresentQueue(), &presentInfo);
+		result = vkQueuePresentKHR(device->getPresentQueue(), &presentInfo);
 
 		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || windowResized) {
 			windowResized = false;
@@ -223,7 +281,6 @@ namespace HBE {
 	}
 
 	void VK_Renderer::endFrame() {
-
 		current_frame = (current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
 		render_cache.clear();
 	}
@@ -257,6 +314,46 @@ namespace HBE {
 
 	uint32_t VK_Renderer::getCurrentFrame() const {
 		return current_frame;
+	}
+
+	const VK_RenderPass &VK_Renderer::getRenderPass() const {
+		return *swapchain_render_pass;
+	}
+
+	RenderTarget *VK_Renderer::getMainRenderTarget() {
+		return swapchain_render_pass;
+	}
+
+	void VK_Renderer::createDefaultResources() {
+		uint8_t *texture_data=new uint8_t[16]{255, 0, 0, 255,
+											  0, 255, 0, 255,
+											  0, 0, 255, 255,
+											  0, 0, 0, 255};
+		TextureInfo texture_info{};
+		texture_info.data = texture_data;
+		texture_info.width = 2;
+		texture_info.height = 2;
+		texture_info.format = IMAGE_FORMAT_RGBA8;
+		texture_info.flags = IMAGE_FLAG_NONE;
+		Resources::add("DEFAULT_TEXTURE",factory->createTexture(texture_info));
+		delete texture_data;
+
+		ShaderInfo shader_info{};
+		shader_info.stage = SHADER_STAGE_VERTEX;
+		shader_info.path = "../../res/shaders/VK_Screen.vert";
+		Shader *vert = new VK_Shader(device, shader_info);
+		Resources::add("DEFAULT_SCREEN_VERT_SHADER",vert);
+
+		shader_info.stage = SHADER_STAGE_FRAGMENT;
+		shader_info.path = "../../res/shaders/VK_Screen.frag";
+		Shader *frag = new VK_Shader(device, shader_info);
+		Resources::add("DEFAULT_SCREEN_FRAG_SHADER",frag);
+
+		GraphicPipelineInfo pipeline_info{};
+		pipeline_info.vertex_shader =vert;
+		pipeline_info.fragement_shader =frag;
+		screen_pipeline = new VK_GraphicPipeline(device,this,pipeline_info);
+		Resources::add("DEFAULT_SCREEN_PIPELINE",screen_pipeline);
 	}
 
 

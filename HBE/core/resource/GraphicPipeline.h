@@ -6,6 +6,7 @@
 #include "glm/glm.hpp"
 #include "core/graphics/DrawFlags.h"
 #include "Resource.h"
+
 namespace HBE {
 	class Shader;
 
@@ -13,7 +14,20 @@ namespace HBE {
 
 	class VertexLayout;
 
-	class HB_API GraphicPipeline : public Resource  {
+	enum GRAPHIC_PIPELINE_FLAGS {
+		GRAPHIC_PIPELINE_FLAG_NONE = 0,
+		GRAPHIC_PIPELINE_FLAG_DEPTH_TEST = 1
+	};
+
+	struct GraphicPipelineInfo {
+		const VertexLayout *vertex_layout = nullptr;
+		const Shader *vertex_shader = nullptr;
+		const Shader *fragement_shader = nullptr;
+		const Shader *geometry_shader = nullptr;
+		GRAPHIC_PIPELINE_FLAGS flags = GRAPHIC_PIPELINE_FLAG_NONE;
+	};
+
+	class HB_API GraphicPipeline : public Resource {
 	public:
 		virtual ~GraphicPipeline() = default;
 
@@ -24,11 +38,6 @@ namespace HBE {
 		virtual void setDrawFlags(DRAW_FLAGS flags) = 0;
 
 		virtual DRAW_FLAGS getDrawFlags() const = 0;
-
-		virtual void setShaders(const Shader *vertex, const Shader *fragment, const VertexLayout *layout) = 0;
-
-		virtual void setShaders(const Shader *vertex, const Shader *geometry, const Shader *fragment,
-								const VertexLayout *layout) = 0;
 
 
 		virtual void setDynamicUniform(const std::string &name, void *data) = 0;

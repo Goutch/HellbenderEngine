@@ -35,21 +35,26 @@ namespace HBE {
 		std::vector<VkDescriptorSetLayoutBinding> layout_bindings;
 		std::vector<VkPushConstantRange> push_constants_ranges;
 		std::vector<ShaderInput> inputs;
-		VkShaderStageFlags stage_flag;
+		SHADER_STAGE stage;
+		VkShaderStageFlags vk_stage;
+
 	public:
 
-		VK_Shader(const VK_Device *device);
+		VK_Shader(const VK_Device *device,const ShaderInfo& info);
 		~VK_Shader();
 
-		void setSource(const std::string &source, SHADER_STAGE stage) override;
 		const VkShaderModule &getHandle() const;
 
 		const std::vector<VkPushConstantRange> &getPushConstantRanges() const;
 
-		const std::vector<ShaderInput> & getInputs() const;
-		VkShaderStageFlags getStage() const;
+		const std::vector<ShaderInput> &getInputs() const;
+		SHADER_STAGE getStage() const override;
 		const std::vector<VkDescriptorSetLayoutBinding> &getLayoutBindings() const;
 
+	private:
+		void load(const std::string &path);
+		void setSource(const std::vector<uint32_t> &spirv);
+		void reflect(const std::vector<uint32_t> &spirv);
 	};
 }
 

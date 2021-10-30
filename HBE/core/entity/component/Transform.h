@@ -6,7 +6,6 @@
 #include "Component.h"
 #include "vector"
 
-using namespace glm;
 namespace HBE {
     class HB_API Transform : public Component {
         glm::mat4 transform_matrix = glm::mat4(1.0f);

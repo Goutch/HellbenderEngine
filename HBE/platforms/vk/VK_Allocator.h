@@ -14,8 +14,8 @@ namespace HBE {
 	class VK_Image;
 	struct Block;
 	enum ALLOC_FLAGS {
-		NONE = 0,
-		MAPPABLE = 1,
+		ALLOC_FLAG_NONE = 0,
+		ALLOC_FLAG_MAPPABLE = 1,
 	};
 	struct Allocation {
 		const VkDeviceSize size;
@@ -46,14 +46,16 @@ namespace HBE {
 		VK_Allocator(const VK_Device *device);
 
 		~VK_Allocator();
-		Allocation &alloc(VkMemoryRequirements memory_requirement, ALLOC_FLAGS flags = NONE);
+		Allocation &alloc(VkMemoryRequirements memory_requirement, ALLOC_FLAGS flags = ALLOC_FLAG_NONE);
 
 		void free(Allocation &allocation);
 		void copy(VkBuffer src, VkBuffer dest, VkDeviceSize size);
 		void copy(VkBuffer src, VK_Image* dest,VkImageLayout dst_end_layout);
 		void copy(VK_Image* src,VkImageLayout src_end_layout, VK_Image* dest,VkImageLayout dst_end_layout);
+		void setImageLayout(VK_Image* image,VkImageLayout newLayout);
 	private:
 		void transitionImageLayout(VK_Image* image,VkImageLayout newLayout);
+
 		uint32_t findMemoryType(VkMemoryRequirements memory_requirement, ALLOC_FLAGS flags);
 		std::string memoryTypeToString(const uint32_t mem_type);
 		std::string allocToString(const Allocation &alloc);

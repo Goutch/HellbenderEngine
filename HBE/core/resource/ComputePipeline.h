@@ -7,6 +7,9 @@ namespace HBE {
 
     class ComputeBuffer;
 
+    struct ComputePipelineInfo{
+    	Shader* shader;
+    };
     class HB_API ComputePipeline : public Resource {
         virtual void setShader(const Shader *shader) = 0;
 

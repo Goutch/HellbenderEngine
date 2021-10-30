@@ -61,7 +61,8 @@ if (VULKAN_FOUND)
             platforms/vk/VK_Allocator.cpp
             platforms/vk/VK_Allocator.h
             platforms/vk/VK_CONSTANTS.h
-            platforms/vk/VK_RenderTarget.cpp platforms/vk/VK_RenderTarget.h)
+            platforms/vk/VK_RenderTarget.cpp
+            platforms/vk/VK_RenderTarget.h)
 
     add_compile_definitions(VULKAN_RENDERER)
 
@@ -99,6 +100,7 @@ set(CORE_FILES
         Configs.cpp
         Core.h
         Configs.h
+        HBETypes.h
 
         core/resource/Texture.h
         core/resource/Model.cpp
@@ -114,10 +116,8 @@ set(CORE_FILES
         core/resource/ComputePipeline.h
         core/resource/GLSL_TYPE.h
         core/resource/Resources.h
-        core/resource/ResourcesRegistry.cpp
-        core/resource/ResourcesRegistry.h
-        core/resource/Image.cpp
-        core/resource/Image.h
+        core/resource/Resources.cpp
+        core/resource/Texture.cpp
 
         core/graphics/Window.h
         core/graphics/Framebuffer.h
@@ -125,8 +125,7 @@ set(CORE_FILES
         core/graphics/Renderer.h
         core/graphics/Graphics.cpp
         core/graphics/Graphics.h
-        core/graphics/RenderTarget.cpp
-        core/graphics/RenderTarget.h
+        core/resource/RenderTarget.h
         core/graphics/Renderer.cpp
         core/graphics/Window.cpp
         core/graphics/DrawFlags.h
@@ -165,7 +164,9 @@ set(CORE_FILES
         core/serialization/Deserializer.h
         core/serialization/ComponentRegistry.cpp
         core/serialization/ComponentRegistry.h
-        core/serialization/ComponentRegistry.h)
+        core/serialization/ComponentRegistry.h
+
+)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

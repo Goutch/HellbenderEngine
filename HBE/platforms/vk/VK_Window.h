@@ -6,8 +6,9 @@ struct GLFWwindow;
 namespace HBE {
     class VK_Window : public Window {
         GLFWwindow *handle;
+        uint32_t width,height;
     public:
-        VK_Window(int width, int height);
+        VK_Window(uint32_t width, uint32_t height);
 
         ~VK_Window();
 
@@ -15,7 +16,7 @@ namespace HBE {
 
         void swapBuffers() override;
 
-        void getSize(int &width, int &height) override;
+        void getSize(uint32_t &width, uint32_t &height) override;
 
         GLFWwindow *getHandle() override;
 

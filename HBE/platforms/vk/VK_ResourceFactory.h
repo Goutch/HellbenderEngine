@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include <core/resource/Model.h>
+
 #include "core/resource/ResourceFactory.h"
 
 namespace HBE {
@@ -12,18 +12,14 @@ namespace HBE {
         VK_Renderer* renderer;
     public:
         VK_ResourceFactory(VK_Renderer *renderer);
+		GraphicPipeline *createGraphicPipeline(const GraphicPipelineInfo &info) const override;
+		Shader *createShader(const ShaderInfo &info) const override;
+		Texture *createTexture(const TextureInfo &info) const override;
+		Mesh *createMesh(const MeshInfo &info) const override;
+		ComputePipeline *createComputePipeline(const ComputePipelineInfo &info) const override;
+		RenderTarget *createRenderTarget(const RenderTargetInfo &info) const override;
+        VertexLayout *createVertexLayout(const VertexLayoutInfo& info) const override;
 
-        GraphicPipeline *createGraphicsPipeline() const override;
-
-        Texture *createTexture() const override;
-
-        Mesh *createMesh() const override;
-
-        Shader *createShader() const override;
-
-        ComputePipeline *createComputePipeline() const override;
-
-        VertexLayout *createVertexLayout() const;
-    };
+	};
 }
 

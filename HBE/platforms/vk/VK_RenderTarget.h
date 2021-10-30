@@ -1,7 +1,7 @@
 #pragma once
 
 #include "vulkan/vulkan.h"
-#include "core/graphics/RenderTarget.h"
+#include "HBE/core/resource/RenderTarget.h"
 
 namespace HBE {
 	class VK_RenderTarget : public RenderTarget {
