@@ -62,7 +62,7 @@ if (VULKAN_FOUND)
             platforms/vk/VK_Allocator.h
             platforms/vk/VK_CONSTANTS.h
             platforms/vk/VK_RenderTarget.cpp
-            platforms/vk/VK_RenderTarget.h)
+            platforms/vk/VK_RenderTarget.h platforms/vk/VK_Queue.cpp platforms/vk/VK_Queue.h)
 
     add_compile_definitions(VULKAN_RENDERER)
 
@@ -166,7 +166,7 @@ set(CORE_FILES
         core/serialization/ComponentRegistry.h
         core/serialization/ComponentRegistry.h
 
-)
+        core/resource/VertexLayout.cpp)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

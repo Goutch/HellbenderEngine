@@ -24,6 +24,8 @@ namespace HBE {
         uint32_t height;
         std::vector<VkImage> images;
         std::vector<VkImageView> image_views;
+        std::vector<VkFramebuffer> frame_buffers;
+        VkRenderPass render_pass;
         VkExtent2D extent;
         VkFormat format;
     public:
@@ -49,6 +51,13 @@ namespace HBE {
         const VkFormat &getFormat() const;
 
         const std::vector<VkImageView> &getImagesViews() const;
+
+        void beginRenderPass(uint32_t i,const VkCommandBuffer& command_buffer);
+        void endRenderPass(const VkCommandBuffer& command_buffer);
+
+    private:
+        void createRenderPass();
+        void createFramebuffers();
 
     };
 }

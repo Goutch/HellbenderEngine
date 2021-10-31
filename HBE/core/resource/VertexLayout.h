@@ -6,14 +6,18 @@
 #include "Resource.h"
 
 namespace HBE {
-	struct VertexLayoutInfo
-	{
-		const std::vector<GLSL_TYPE>& layout_types;
-	};
+    struct VertexLayoutInfo {
+        const GLSL_TYPE *layout_types = nullptr;
+        uint32_t layout_types_count = 0;
+    };
+
     class HB_API VertexLayout : public Resource {
+    protected:
+        std::vector<GLSL_TYPE> layout;
     public:
         virtual ~VertexLayout() = default;
 
-        virtual int getBytesPerVertex() const=0;
+        uint32_t getBytesPerVertex() const;
     };
+
 }

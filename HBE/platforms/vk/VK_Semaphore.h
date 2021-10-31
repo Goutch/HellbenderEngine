@@ -10,6 +10,6 @@ namespace HBE{
         VK_Semaphore(const VK_Device& device);
         ~VK_Semaphore();
 
-        const VkSemaphore& getHandle();
+        const VkSemaphore & getHandle() const;
     };
 }

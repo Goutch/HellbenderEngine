@@ -3,6 +3,8 @@
 #include <vulkan/vulkan.h>
 #include "GLFW/glfw3.h"
 #include "VK_PhysicalDevice.h"
+#include "unordered_map"
+#include "VK_Queue.h"
 
 namespace HBE {
     class VK_RenderPass;
@@ -15,15 +17,19 @@ namespace HBE {
 
     class VK_Allocator;
 
+    class VK_Queue;
+
     class VK_Device {
         VkDevice handle;
 
-        VkQueue graphics_queue;
-        VkQueue present_queue;
-        VkQueue compute_queue;
-        VkQueue transfer_queue;
+
+        std::unordered_map<QUEUE_FAMILY, VK_Queue *> queues;
+        /* VkQueue graphics_queue;
+         VkQueue present_queue;
+         VkQueue compute_queue;
+         VkQueue transfer_queue;*/
         VK_PhysicalDevice *physical_device;
-        VK_Allocator* allocator;
+        VK_Allocator *allocator;
     public:
         VK_Device(VK_PhysicalDevice &physical_device);
 
@@ -31,15 +37,16 @@ namespace HBE {
 
         const VK_PhysicalDevice &getPhysicalDevice() const;
 
-        const VkQueue &getGraphicsQueue() const;
+      /*  const VkQueue &getGraphicsQueue() const;
 
         const VkQueue &getPresentQueue() const;
 
         const VkQueue &getComputeQueue() const;
 
-        const VkQueue &getTransferQueue() const;
+        const VkQueue &getTransferQueue() const;*/
 
-        VK_Allocator* getAllocator();
+        const VK_Queue* getQueue(QUEUE_FAMILY family);
+        VK_Allocator *getAllocator();
 
         void wait();
 

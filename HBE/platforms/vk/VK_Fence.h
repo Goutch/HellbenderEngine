@@ -9,9 +9,9 @@ namespace HBE {
         VK_Fence(const VK_Device& device);
 
         ~VK_Fence();
-        void wait();
-        void reset();
-        const VkFence& getHandle();
+        void wait() const;
+        void reset() const;
+        const VkFence & getHandle() const;
     };
 
 }

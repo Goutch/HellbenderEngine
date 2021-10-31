@@ -5,44 +5,66 @@
 #include "vector"
 #include "VK_Image.h"
 
+
 namespace HBE {
-	class VK_Device;
+    class VK_Device;
 
-	class VK_Swapchain;
+    class VK_Swapchain;
 
-	class VK_RenderPass : public RenderTarget {
-		VkRenderPass handle = VK_NULL_HANDLE;
-		uint32_t width = 0, height = 0;
-		vec4 clear_color = vec4(0.f, 0.f, 0.f, 1.f);
+    class VK_Semaphore;
 
-		VK_Renderer *renderer;
-		VK_Device *device;
-		VkExtent2D extent;
-		std::vector<VK_Image *> images;
-		std::vector<VkFramebuffer> frame_buffers;
-		VkFormat vk_format;
-		IMAGE_FORMAT format;
-		bool use_swapchain;
+    class VK_Fence;
 
-	public:
-		~VK_RenderPass();
-		VK_RenderPass(VK_Renderer *renderer, const RenderTargetInfo &info);
-		VK_RenderPass(VK_Renderer *renderer);
-		void begin(const VkCommandBuffer &command_buffer, uint32_t i) const;
-		void end(const VkCommandBuffer &command_buffer) const;
-		void setClearColor(vec4 color) override;
-		const vec4 &getClearColor() const override;
-		const VkRenderPass &getHandle() const;
-		const std::vector<VkFramebuffer> &getFrameBuffers() const;
-		void setResolution(uint32_t width, uint32_t height) override;
-		void getResolution(uint32_t &width, uint32_t &height) const override;
-		const VK_Image *getImage(uint32_t i) const;
+    class VK_RenderPass : public RenderTarget {
+        VkRenderPass handle = VK_NULL_HANDLE;
+        uint32_t width = 0, height = 0;
+        vec4 clear_color = vec4(0.f, 0.f, 0.f, 1.f);
+        VK_CommandPool *command_pool;
+        VK_Renderer *renderer;
+        VK_Device *device;
+        VkExtent2D extent;
+        std::vector<VK_Image *> images;
+        std::vector<VkFramebuffer> frame_buffers;
+        std::vector<VK_Semaphore> render_finished_semaphores;
+        uint32_t current_frame=0;
+        VkFormat vk_format;
+        IMAGE_FORMAT format;
 
-		void recreate();
-	private:
-		void createFramebuffers();
+    public:
+        ~VK_RenderPass();
+
+        VK_RenderPass(VK_Renderer *renderer, const RenderTargetInfo &info);
+
+        void begin(uint32_t i) const;
+
+        void end(uint32_t i) const;
+
+        void wait(uint32_t i) const;
+
+        const VK_Semaphore &getSemaphore(uint32_t) const;
+
+        void setClearColor(vec4 color) override;
+
+        const vec4 &getClearColor() const override;
+
+        const VkRenderPass &getHandle() const;
+
+        const std::vector<VkFramebuffer> &getFrameBuffers() const;
+
+        void setResolution(uint32_t width, uint32_t height) override;
+
+        void getResolution(uint32_t &width, uint32_t &height) const override;
+
+        const VK_Image *getImage(uint32_t i) const;
+
+        const VkCommandBuffer& getCommandBuffer(uint32_t i)const;
+
+        void recreate();
+
+    protected:
+        virtual void createFramebuffers();
 
 
-	};
+    };
 }
 

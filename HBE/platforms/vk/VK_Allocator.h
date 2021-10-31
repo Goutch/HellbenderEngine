@@ -9,7 +9,7 @@ namespace HBE {
 	class VK_CommandPool;
 
 	class VK_Buffer;
-
+    class VK_Fence;
 	class VK_Device;
 	class VK_Image;
 	struct Block;

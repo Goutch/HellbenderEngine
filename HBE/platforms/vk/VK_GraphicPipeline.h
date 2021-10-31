@@ -22,7 +22,8 @@ namespace HBE {
 	class VK_Buffer;
 
 
-	class VK_GraphicPipeline : public GraphicPipeline {
+
+    class VK_GraphicPipeline : public GraphicPipeline {
 		VK_Device *device = nullptr;
 		VK_Renderer *renderer = nullptr;
 
@@ -65,5 +66,9 @@ namespace HBE {
 
 		void createPipelineLayout();
 		void createDescriptorSets();
-	};
+
+        void setTexture(uint32_t binding, const RenderTarget *render_target) override;
+
+        void setTexture(const std::string &name, const RenderTarget *render_target) override;
+    };
 }

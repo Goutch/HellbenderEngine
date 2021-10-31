@@ -18,15 +18,15 @@ namespace HBE {
         vkDestroyFence(device->getHandle(), handle, nullptr);
     }
 
-    const VkFence &VK_Fence::getHandle() {
+    const VkFence & VK_Fence::getHandle() const {
         return handle;
     }
 
-    void VK_Fence::wait() {
+    void VK_Fence::wait() const {
         vkWaitForFences(device->getHandle(), 1, &handle, VK_TRUE, UINT64_MAX);
     }
 
-    void VK_Fence::reset() {
+    void VK_Fence::reset() const {
         vkResetFences(device->getHandle(), 1, &handle);
     }
 }

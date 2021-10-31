@@ -22,7 +22,7 @@ namespace HBE{
         vkDestroySemaphore(device->getHandle(), handle, nullptr);
     }
 
-    const VkSemaphore &VK_Semaphore::getHandle() {
+    const VkSemaphore & VK_Semaphore::getHandle() const {
         return handle;
     }
 }
