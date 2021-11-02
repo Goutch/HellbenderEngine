@@ -20,21 +20,16 @@ namespace HBE {
 			Camera::main = this;
 		}
 		setRenderTarget(Graphics::getDefaultRenderTarget());
-
-		generateProjectionMatrix();
 	}
 
 	void Camera::setRenderTarget(const RenderTarget *render_target) {
-
-
 		if (this->render_target != nullptr) {
 			this->render_target->onResolutionChange.unsubscribe(this);
 		}
+
 		this->render_target = render_target;
 		if (render_target != nullptr) {
-			uint32_t w,h;
-			render_target->getResolution(w,h);
-			setAspectRatio(w, h);
+			generateProjectionMatrix();
 			render_target->onResolutionChange.subscribe(this, &Camera::onRenderTargetSizeChange);
 		}
 		else
@@ -54,20 +49,18 @@ namespace HBE {
 	}
 
 	void Camera::onRenderTargetSizeChange(RenderTarget* renderTarget) {
-		uint32_t w,h;
-		renderTarget->getResolution(w,h);
-		setAspectRatio(w, h);
+		generateProjectionMatrix();
 	}
 
 	void Camera::generateProjectionMatrix() {
+
 		uint32_t w, h;
-		Graphics::getWindow()->getSize(w, h);
+		render_target->getResolution(w, h);
+		aspect_ratio = static_cast<float>(w) / static_cast<float>(h);
 		if (render_mode == RENDER_MODE::PERSPECTIVE) {
-			projection_matrix = glm::perspective<float>(glm::radians(fov), static_cast<float>(w) / static_cast<float>(h), 0.1f, render_distance);
+			projection_matrix = glm::perspective<float>(glm::radians(fov), aspect_ratio, 0.1f, render_distance);
 		}
 		if (render_mode == RENDER_MODE::ORTHOGRAPHIC) {
-			//todo:renderTarget
-
 			projection_matrix = glm::ortho<float>(
 					-((static_cast<float>(w) / 2)) / orthographic_zoom,
 					((static_cast<float>(w) / 2)) / orthographic_zoom,
@@ -93,16 +86,6 @@ namespace HBE {
 
 	const mat4 &Camera::getProjectionMatrix() const {
 		return projection_matrix;
-	}
-
-	void Camera::setAspectRatio(float width, float height) {
-		aspect_ratio = width / height;
-		generateProjectionMatrix();
-	}
-
-	void Camera::setAspectRatio(float aspect_ratio) {
-		this->aspect_ratio = aspect_ratio;
-		generateProjectionMatrix();
 	}
 
 	mat4 Camera::getViewMatrix() const {

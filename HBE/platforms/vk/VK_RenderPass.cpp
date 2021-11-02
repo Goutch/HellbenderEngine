@@ -196,6 +196,7 @@ namespace HBE {
         this->width = width;
         this->height = height;
         recreate();
+        onResolutionChange.invoke(this);
     }
 
     void VK_RenderPass::getResolution(uint32_t &width, uint32_t &height) const {

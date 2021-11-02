@@ -306,7 +306,7 @@ namespace HBE {
 		RenderTargetInfo render_target_info{};
 		render_target_info.width = swapchain->getExtent().width;
 		render_target_info.height = swapchain->getExtent().height;
-		render_target_info.clear_color = vec4(1.f, 0.f, 0.f, 1.f);
+		render_target_info.clear_color = vec4(0.f, 0.f, 0.f, 1.f);
 		render_target_info.format = IMAGE_FORMAT_RGBA32F;
 		default_render_target = Resources::createRenderTarget(render_target_info, "DEFAULT_RENDER_TARGET");
 

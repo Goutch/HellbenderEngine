@@ -34,10 +34,6 @@ namespace HBE {
 
         ~Camera() override;
 
-        void setAspectRatio(float width, float height);
-
-        void setAspectRatio(float aspect_ratio);
-
         float getAspectRatio();
 
         void setRenderDistance(float render_distance);

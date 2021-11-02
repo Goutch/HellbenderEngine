@@ -26,7 +26,6 @@ namespace HBE {
 		uint32_t width = 1, height = 1, depth = 1;
 		uint32_t byte_per_pixel;
 		IMAGE_FLAGS flags;
-        std::array<VK_Semaphore*,MAX_TRANSFER_OPP_IN_FLIGHT> semaphores;
 		uint32_t id=0;
 		static uint32_t current_id;
 	public:

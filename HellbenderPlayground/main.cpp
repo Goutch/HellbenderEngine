@@ -34,16 +34,15 @@ struct Vertex {
 };
 
 void init() {
+	//-------------------RESOURCES CREATION--------------------------------------
     ShaderInfo frag_info{SHADER_STAGE_FRAGMENT, "../../res/shaders/VK.frag"};
     ShaderInfo vert_info{SHADER_STAGE_VERTEX, "../../res/shaders/VK.vert"};
-
 
     auto frag = Resources::createShader(frag_info, "frag");
     auto vert = Resources::createShader(vert_info, "vert");
 
-    std::vector<GLSL_TYPE> vertex_description = std::vector<GLSL_TYPE>{GLSL_TYPE::VEC3F,
-                                                                       GLSL_TYPE::VEC3F,
-                                                                       GLSL_TYPE::VEC2F};
+    std::vector<GLSL_TYPE> vertex_description = std::vector<GLSL_TYPE>{GLSL_TYPE::VEC3F,GLSL_TYPE::VEC2F};
+
     VertexLayoutInfo layout_info{};
     layout_info.layout_types = vertex_description.data();
     layout_info.layout_types_count = vertex_description.size();
@@ -56,27 +55,15 @@ void init() {
     pipeline_info.flags = GRAPHIC_PIPELINE_FLAG_NONE;
     auto pipeline = Resources::createGraphicPipeline(pipeline_info, "pipeline");
 
+	auto wall = Texture::load("../../res/textures/wall.png");
+	Resources::add("Wall", wall);
+	pipeline->setTexture("texSampler", wall);
 
-    auto mesh = Resources::createMesh(MeshInfo{}, "mesh");
-    const std::vector<Vertex> vertices = {
-            {{-0.5f, -0.5f, 0.0f},  {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-            {{0.5f,  -0.5f, 0.0f},  {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-            {{0.5f,  0.5f,  0.0f},  {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-            {{-0.5f, 0.5f,  0.0f},  {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
-
-            {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-            {{0.5f,  -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-            {{0.5f,  0.5f,  -0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-            {{-0.5f, 0.5f,  -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}
-    };
-    const std::vector<uint32_t> indices = {
-            0, 1, 2, 2, 3, 0,
-            4, 5, 6, 6, 7, 4
-    };
-    mesh->setVertices(0, (void *) vertices.data(), vertices.size(), layout);
-    mesh->setIndices(indices);
+    auto mesh = Resources::createMesh(MeshInfo{layout}, "mesh");
+	Geometry::createCube(*mesh,1,1,1,VERTEX_FLAG_UV);
 
 
+	//-------------------SCENE CREATION--------------------------------------
     auto mr1 = Application::scene->instantiate<MeshRenderer>();
     mr1->setMaterial(*pipeline);
     mr1->setMesh(*mesh);
@@ -89,19 +76,11 @@ void init() {
     mr2->entity->transform->translate(vec3(2, 0, 0));
     mr2->entity->transform->setParent(mr1->entity->transform);
 
-    auto wall = Texture::load("../../res/textures/wall.png");
-    Resources::add("Wall", wall);
 
-    pipeline->setTexture("texSampler", wall);
 
     auto camera = Application::scene->instantiate<Camera>();
     camera->setRenderMode(RENDER_MODE::PERSPECTIVE);
     camera->entity->transform->setPosition(vec3(0, 0, 5));
-
-    /*Graphics::beginFrame();
-    Graphics::draw(*mr1->entity->transform,*mesh,*pipeline);
-    Graphics::render(render_target,camera->getProjectionMatrix(),camera->getViewMatrix());
-    Graphics::endFrame();*/
 }
 
 int main() {

@@ -10,9 +10,10 @@ namespace HBE {
 	VK_Mesh::VK_Mesh(VK_Device *device, const VK_CommandPool *command_pool,const MeshInfo& info) {
 		this->device = device;
 		this->command_pool = command_pool;
+		this->layout=info.layout;
 	}
 
-	void VK_Mesh::setVertices(uint32_t position,const void *vertices, size_t count, const VertexLayout *layout) {
+	void VK_Mesh::setVertices(uint32_t position,const void *vertices, size_t count) {
 
 		this->vertex_count = count;
 		VkDeviceSize buffer_size = layout->getBytesPerVertex() * count;
