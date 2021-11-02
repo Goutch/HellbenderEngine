@@ -7,6 +7,7 @@
 #include "VK_CONSTANTS.h"
 #include "list"
 #include "array"
+
 namespace HBE {
 	class VK_Window;
 
@@ -36,10 +37,10 @@ namespace HBE {
 			const Mesh *mesh;
 			GraphicPipeline *pipeline;
 		};
-		struct FrameState{
-			VK_Fence* in_flight_fence;
-			VK_Semaphore* finished_semaphore;
-			VK_Semaphore* image_available_semaphore;
+		struct FrameState {
+			VK_Fence *in_flight_fence;
+			VK_Semaphore *finished_semaphore;
+			VK_Semaphore *image_available_semaphore;
 		};
 
 		MAP_LIST(GraphicPipeline*, MAP_LIST(const Mesh*, std::list<const Transform*>)) render_cache;
@@ -53,27 +54,28 @@ namespace HBE {
 		VK_ResourceFactory *factory;
 		VK_Swapchain *swapchain;
 		VK_CommandPool *command_pool;
-		VK_RenderPass *swapchain_render_pass;
+		VK_RenderPass *current_render_pass = nullptr;
+		RenderTarget *default_render_target = nullptr;
 		uint32_t current_frame = 0;
 		uint32_t current_image = 0;
-		std::array<FrameState,MAX_FRAMES_IN_FLIGHT> frames;
-		std::vector<VK_Fence*> images_in_flight_fences;
+		std::array<FrameState, MAX_FRAMES_IN_FLIGHT> frames;
+		std::vector<VK_Fence *> images_in_flight_fences;
 		GraphicPipeline *screen_pipeline = nullptr;
 		bool windowResized = false;
 	public:
 		void render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix) override;
 
-		void present(const RenderTarget *render_target) override;
+		void setCurrentRenderTarget(RenderTarget *render_target) override;
+
+		RenderTarget* getDefaultRenderTarget() override;
 
 		void beginFrame() override;
 
-		void endFrame() override;
+		void endFrame(bool present) override;
 
 		void draw(const Transform &transform, const Mesh &mesh, GraphicPipeline &pipeline) override;
 
 		void drawInstanced(const Mesh &mesh, GraphicPipeline &pipeline) override;
-
-		void clear() const override;
 
 		VK_Renderer();
 
@@ -92,11 +94,12 @@ namespace HBE {
 		void reCreateSwapchain();
 
 		const VK_Swapchain &getSwapchain() const;
-		RenderTarget *getMainRenderTarget() override;
-		const VK_RenderPass &getRenderPass() const;
+
 		uint32_t getCurrentFrame() const;
 
-		void createDefaultResources();
+		void createDefaultResources() override;
+
+
 	};
 }
 

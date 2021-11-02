@@ -3,69 +3,60 @@
 #include "Core.h"
 #include <vector>
 #include <string>
-#include "DrawFlags.h"
 #include "glm/glm.hpp"
 
 
 namespace HBE {
-    class Renderer;
+	class Renderer;
 
-    class RenderTarget;
+	class RenderTarget;
 
-    class GraphicPipeline;
+	class GraphicPipeline;
 
-    class Mesh;
+	class Mesh;
 
-    class Transform;
+	class Transform;
 
-    class Window;
+	class Window;
 
-    template<typename... Args>
-    class Event;
+	template<typename... Args>
+	class Event;
 
-    class HB_API Graphics {
-        static DRAW_FLAGS default_draw_flags;
-        static Renderer *renderer;
-        static Window *window;
-        static RenderTarget *main_render_target;
-    public:
-        static const Mesh *DEFAULT_QUAD;
-        static const Mesh *DEFAULT_CUBE;
+	class HB_API Graphics {
+		static Renderer *renderer;
+		static Window *window;
+	public:
+		static const Mesh *DEFAULT_QUAD;
+		static const Mesh *DEFAULT_CUBE;
 
-        static void init();
+		static void init();
 
-        static Window *getWindow();
+		static Window *getWindow();
 
-        static void
-        draw(const Transform &transform, const Mesh &mesh, GraphicPipeline &material);
+		static void
+		draw(const Transform &transform, const Mesh &mesh, GraphicPipeline &material);
 
-        static void drawInstanced(const Mesh &mesh, GraphicPipeline &pipeline);
+		static void drawInstanced(const Mesh &mesh, GraphicPipeline &pipeline);
 
-        static void render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix);
+		static void render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix);
 
-        static void present(const RenderTarget *render_target);
+		static void setRenderTarget(RenderTarget *render_target);
 
-        static void clear();
+		static const RenderTarget *getDefaultRenderTarget();
 
-        static const RenderTarget *getRenderTarget();
+		static void terminate();
 
-        static void terminate();
-
-        static void onWindowSizeChange(uint32_t width,uint32_t height);
+		static void onWindowSizeChange(uint32_t width, uint32_t height);
 
 		static void beginFrame();
 
-        static void endFrame();
+		static void endFrame(bool present = true);
 
-        static void setDefaultDrawFlags(DRAW_FLAGS drawFlags);
+		static Renderer *getRenderer();
 
-        static DRAW_FLAGS getDefaultDrawFlags();
+	private:
+		static void initializeDefaultVariables();
 
-        static Renderer *getRenderer();
-
-    private:
-        static void initializeDefaultVariables();
-
-    };
+	};
 
 }

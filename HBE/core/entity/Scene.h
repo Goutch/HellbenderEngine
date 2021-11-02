@@ -4,13 +4,17 @@
 #include <string>
 #include "Entity.h"
 #include "unordered_set"
-
+#include "core/utility/Event.h"
 namespace HBE {
-    class HB_API Scene : public Serializable {
+	class HB_API Scene : public Serializable {
         friend class Entity;
 
         std::vector<Entity *> scene_tree;
-
+		Event<Scene*> on_init;
+		Event<Scene*> on_draw;
+		Event<Scene*> on_render;
+		Event<Scene*,float> on_update;
+		Event<Scene*> on_terminate;
         std::unordered_set<Component *> update_listeners;
         std::unordered_set<Component *> draw_listeners;
     public:
@@ -26,6 +30,8 @@ namespace HBE {
         void update(float delta);
 
         void draw();
+
+        void render();
 
         void terminate();
 

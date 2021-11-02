@@ -22,12 +22,13 @@ namespace HBE {
 		VkImageLayout layout;
 		IMAGE_FORMAT format;
 		VkFormat vk_format;
-		Allocation *allocation = nullptr;
+		Allocation allocation;
 		uint32_t width = 1, height = 1, depth = 1;
 		uint32_t byte_per_pixel;
 		IMAGE_FLAGS flags;
         std::array<VK_Semaphore*,MAX_TRANSFER_OPP_IN_FLIGHT> semaphores;
-
+		uint32_t id=0;
+		static uint32_t current_id;
 	public:
 		VK_Image(VK_Device *device, const TextureInfo &info);
 		~VK_Image();
@@ -43,8 +44,6 @@ namespace HBE {
 		void setImageLayout(VkImageLayout layout);
 		const VkImageLayout getImageLayout() const;
 		const VkFormat getVkFormat() const;
-
-        const VK_Semaphore& getSemaphore(uint32_t i) const;
 
     private:
 		VkImageLayout chooseLayout();

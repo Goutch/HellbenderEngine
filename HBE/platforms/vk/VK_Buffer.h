@@ -12,7 +12,7 @@ namespace HBE {
 	private:
 		VK_Device *device;
 		VkBuffer handle;
-		Allocation *allocation;
+		Allocation allocation;
 		VkDeviceSize size;
 	public:
 		VK_Buffer &operator=(const VK_Buffer &) = delete;
@@ -31,7 +31,7 @@ namespace HBE {
 
 		void copy(VK_Buffer *other);
 
-		Allocation &getAllocation();
+		const Allocation &getAllocation();
 
 		VkDeviceSize getSize() const;
 	};

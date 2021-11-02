@@ -49,7 +49,6 @@ namespace HBE {
         return scene;
     }
 
-
     void Application::init() {
         Graphics::init();
         window = Graphics::getWindow();
@@ -76,14 +75,11 @@ namespace HBE {
             scene->draw();
             onDraw.invoke();
 			Graphics::beginFrame();
-            /*if (Camera::main)
-                Graphics::render(Graphics::getRenderTarget(), Camera::main->getProjectionMatrix(),
-                                 Camera::main->getViewMatrix());*/
-            onRender.invoke();
-            if (!Configs::isPresentAutomatic())
-                Graphics::present(Graphics::getRenderTarget());
+            if (Camera::main)
+                Graphics::render(Graphics::getDefaultRenderTarget(), Camera::main->getProjectionMatrix(),
+								 Camera::main->getViewMatrix());
+            scene->render();
 			Graphics::endFrame();
-
 
             delta_t = update_clock.ns() / SECONDS_TO_NANOSECOND;
             update_clock.reset();

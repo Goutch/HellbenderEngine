@@ -46,8 +46,7 @@ namespace HBE {
 		std::unordered_map<std::string,uint32_t> name_push_constant_index;
 	public:
 		VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer,const GraphicPipelineInfo& info);
-
-		void setDrawFlags(DRAW_FLAGS flags) override;
+		VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer,const GraphicPipelineInfo& info,VkRenderPass& render_pass);
 		void setDynamicUniform(const std::string &name, void *data);
 		void setDynamicUniform(uint32_t binding, void *data) ;
 		void setUniform(const std::string &name, void *data);
@@ -55,8 +54,6 @@ namespace HBE {
 		void pushConstant(const std::string &name, void *data);
 		void setTexture(uint32_t binding, const Texture *texture);
 		void setTexture(const std::string &name, const Texture *texture);
-
-		DRAW_FLAGS getDrawFlags() const override;
 
 		~VK_GraphicPipeline() override;
 

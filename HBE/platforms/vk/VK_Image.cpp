@@ -8,7 +8,7 @@
 #include "VK_Semaphore.h"
 
 namespace HBE {
-
+	uint32_t VK_Image::current_id=0;
     VkImageLayout VK_Image::chooseLayout() {
         if (flags & IMAGE_FLAG_RENDER_TARGET) {
             return VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -31,8 +31,8 @@ namespace HBE {
         this->depth = info.depth;
         this->format = info.format;
         this->flags = info.flags;
-        this->fence = new VK_Fence(*device);
-        this->semaphore = new VK_Semaphore(*device);
+        this->id=current_id++;
+        Log::debug("Create image#"+std::to_string(id));
         VkImageType type;
         VkImageViewType view_type;
         if (height == 1 && depth == 1) {
@@ -110,8 +110,8 @@ namespace HBE {
 
         VkMemoryRequirements requirements;
         vkGetImageMemoryRequirements(device->getHandle(), handle, &requirements);
-        this->allocation = &device->getAllocator()->alloc(requirements, ALLOC_FLAG_NONE);
-        vkBindImageMemory(device->getHandle(), handle, allocation->block.memory, allocation->offset);
+        this->allocation = device->getAllocator()->alloc(requirements, ALLOC_FLAG_NONE);
+        vkBindImageMemory(device->getHandle(), handle, allocation.block->memory, allocation.offset);
 
         if (info.data != nullptr) {
             update(info.data);
@@ -167,7 +167,7 @@ namespace HBE {
     }
 
     VK_Image::~VK_Image() {
-        fence->wait();
+    	Log::debug("Delete image#"+std::to_string(id));
         if (sampler_handle != VK_NULL_HANDLE) {
             vkDestroySampler(device->getHandle(), sampler_handle, nullptr);
         }
@@ -176,8 +176,8 @@ namespace HBE {
         }
         if (handle != VK_NULL_HANDLE) {
             vkDestroyImage(device->getHandle(), handle, nullptr);
-            device->getAllocator()->free(*allocation);
         }
+		device->getAllocator()->free(allocation);
     }
 
     const VkSampler &VK_Image::getSampler() const {
@@ -218,10 +218,6 @@ namespace HBE {
 
     vec3u VK_Image::getSize() const {
         return vec3u(width, height, depth);
-    }
-
-    const VK_Semaphore VK_Image::getSemaphore() {
-        return *semaphore;
     }
 
 

@@ -40,10 +40,10 @@ namespace HBE {
 		if (vkCreateDevice(physical_device.getHandle(), &device_create_info, nullptr, &handle) != VK_SUCCESS) {
 			Log::error("Failed to create logical device");
 		}
-        queues.emplace(QUEUE_FAMILY_GRAPHICS,new VK_Queue(this,indices.graphics_family.value(),MAX_FRAMES_IN_FLIGHT));
-        queues.emplace(QUEUE_FAMILY_PRESENT,new VK_Queue(this,indices.present_family.value(),3));
-        queues.emplace(QUEUE_FAMILY_COMPUTE,new VK_Queue(this,indices.compute_family.value(),3));
-        queues.emplace(QUEUE_FAMILY_TRANSFER,new VK_Queue(this,indices.transfer_family.value(),3));
+        queues.emplace(QUEUE_FAMILY_GRAPHICS,new VK_Queue(this,indices.graphics_family.value()));
+        queues.emplace(QUEUE_FAMILY_PRESENT,new VK_Queue(this,indices.present_family.value()));
+        queues.emplace(QUEUE_FAMILY_COMPUTE,new VK_Queue(this,indices.compute_family.value()));
+        queues.emplace(QUEUE_FAMILY_TRANSFER,new VK_Queue(this,indices.transfer_family.value()));
 		/*vkGetDeviceQueue(handle, indices.graphics_family.value(), 0, &graphics_queue);
 		vkGetDeviceQueue(handle, indices.present_family.value(), 0, &present_queue);
 		vkGetDeviceQueue(handle, indices.compute_family.value(), 0, &compute_queue);

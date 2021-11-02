@@ -20,12 +20,10 @@ namespace HBE {
         const VK_PhysicalDevice *physical_device = nullptr;
         const VK_Device *device = nullptr;
         uint32_t image_count;
-        uint32_t width;
-        uint32_t height;
         std::vector<VkImage> images;
         std::vector<VkImageView> image_views;
         std::vector<VkFramebuffer> frame_buffers;
-        VkRenderPass render_pass;
+        VkRenderPass render_pass = VK_NULL_HANDLE;
         VkExtent2D extent;
         VkFormat format;
     public:
@@ -35,12 +33,12 @@ namespace HBE {
                      const VK_Device &device);
 
         ~VK_Swapchain();
-		void recreate();
+		void recreate(uint32_t width, uint32_t height);
         VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &available_formats);
 
         VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &available_present_modes);
 
-        VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities);
+        void chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities);
 
         void createImageViews();
 
@@ -54,7 +52,8 @@ namespace HBE {
 
         void beginRenderPass(uint32_t i,const VkCommandBuffer& command_buffer);
         void endRenderPass(const VkCommandBuffer& command_buffer);
-
+		uint32_t getImagesCount() const;
+		VkRenderPass& getRenderPass();
     private:
         void createRenderPass();
         void createFramebuffers();

@@ -4,7 +4,6 @@
 #include "string"
 #include "vector"
 #include "glm/glm.hpp"
-#include "core/graphics/DrawFlags.h"
 #include "Resource.h"
 
 namespace HBE {
@@ -36,11 +35,6 @@ namespace HBE {
 		virtual void bind() const = 0;
 
 		virtual void unbind() const = 0;
-
-		virtual void setDrawFlags(DRAW_FLAGS flags) = 0;
-
-		virtual DRAW_FLAGS getDrawFlags() const = 0;
-
 
 		virtual void setDynamicUniform(const std::string &name, void *data) = 0;
 		virtual void setDynamicUniform(uint32_t binding, void *data) = 0;

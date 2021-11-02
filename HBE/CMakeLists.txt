@@ -62,7 +62,11 @@ if (VULKAN_FOUND)
             platforms/vk/VK_Allocator.h
             platforms/vk/VK_CONSTANTS.h
             platforms/vk/VK_RenderTarget.cpp
-            platforms/vk/VK_RenderTarget.h platforms/vk/VK_Queue.cpp platforms/vk/VK_Queue.h)
+            platforms/vk/VK_RenderTarget.h
+            platforms/vk/VK_Queue.cpp
+            platforms/vk/VK_Queue.h
+            platforms/vk/VK_Scheduler.cpp
+            platforms/vk/VK_Scheduler.h)
 
     add_compile_definitions(VULKAN_RENDERER)
 
@@ -128,7 +132,6 @@ set(CORE_FILES
         core/resource/RenderTarget.h
         core/graphics/Renderer.cpp
         core/graphics/Window.cpp
-        core/graphics/DrawFlags.h
 
         core/input/Input.h
         core/input/Input.cpp

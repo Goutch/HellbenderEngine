@@ -18,10 +18,8 @@ namespace HBE {
 	const Mesh *Graphics::DEFAULT_CUBE = nullptr;
 	const Mesh *Graphics::DEFAULT_QUAD = nullptr;
 
-	DRAW_FLAGS Graphics::default_draw_flags;
 	Renderer *Graphics::renderer = nullptr;
 	Window *Graphics::window = nullptr;
-	RenderTarget *Graphics::main_render_target = nullptr;
 
 	const char *default_mesh_vertex_shader_code = R"(#version 330 core
 layout (location = 0) in vec3 vertex_position;
@@ -106,15 +104,7 @@ void main()
 		window = Window::create(900, 600);
 		renderer = Renderer::create();
 		Resources::init(*renderer->getResourceFactory());
-
-		window->onSizeChange.subscribe(&Graphics::onWindowSizeChange);
-		initializeDefaultVariables();
-	}
-
-	void Graphics::onWindowSizeChange(uint32_t width, uint32_t height) {
-		if (!Configs::isPresentAutomatic() && main_render_target != nullptr) {
-			main_render_target->setResolution(width, height);
-		}
+		renderer->createDefaultResources();
 	}
 
 	void Graphics::draw(const Transform &transform, const Mesh &mesh, GraphicPipeline &pipeline) {
@@ -126,15 +116,7 @@ void main()
 	}
 
 	void Graphics::render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix) {
-		//render_target->getFramebuffer().bind();
-		renderer->clear();
 		renderer->render(render_target, projection_matrix, view_matrix);
-		//render_target->getFramebuffer().unbind();
-	}
-
-	void Graphics::present(const RenderTarget *render_target) {
-		renderer->clear();
-		renderer->present(render_target);
 	}
 
 	void Graphics::terminate() {
@@ -146,12 +128,6 @@ void main()
 	}
 
 	void Graphics::initializeDefaultVariables() {
-		RenderTargetInfo render_target_info{};
-		uint32_t w,h;
-		window->getSize(w,h);
-		render_target_info.width=w;
-		render_target_info.height=h;
-		main_render_target=Resources::createRenderTarget(render_target_info,"DEFAULT_RENDER_TARGET");
 		//-----------------------------------DEFAULT_CUBE---------------------------------
 		/*  Mesh *cube = new Mesh();
 		 Geometry::createCube(*cube, 1, 1, 1);
@@ -193,40 +169,30 @@ void main()
 		default_screen_pipeline->setShaders(
 				screen_vertex,
 				screen_frag, default_screen_layout);*/
-
-		default_draw_flags = DRAW_FLAGS_NONE;
 	}
 
-	const RenderTarget *Graphics::getRenderTarget() {
-		return main_render_target;
+	const RenderTarget *Graphics::getDefaultRenderTarget() {
+		return renderer->getDefaultRenderTarget();
 	}
 
 	Window *Graphics::getWindow() {
 		return window;
 	}
 
-	void Graphics::clear() {
-		renderer->clear();
-	}
-
-	void Graphics::endFrame() {
-		renderer->endFrame();
-	}
-
-	void Graphics::setDefaultDrawFlags(DRAW_FLAGS draw_flags) {
-		default_draw_flags = draw_flags;
+	void Graphics::endFrame(bool present) {
+		renderer->endFrame(present);
 	}
 
 	Renderer *Graphics::getRenderer() {
 		return renderer;
 	}
 
-	DRAW_FLAGS Graphics::getDefaultDrawFlags() {
-		return default_draw_flags;
-	}
-
 	void Graphics::beginFrame() {
 		renderer->beginFrame();
+	}
+
+	void Graphics::setRenderTarget(RenderTarget *render_target) {
+		renderer->setCurrentRenderTarget(render_target);
 	}
 
 }

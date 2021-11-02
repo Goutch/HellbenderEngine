@@ -30,20 +30,20 @@ namespace HBE {
 		virtual void render(const RenderTarget *render_target, const mat4 &projection_matrix,
 							const mat4 &view_matrix) = 0;
 
-		virtual void present(const RenderTarget *render_target) = 0;
-
 		virtual void beginFrame() = 0;
-		virtual void endFrame() = 0;
 
+		virtual void endFrame(bool present) = 0;
 
-		virtual RenderTarget *getMainRenderTarget() = 0;
+		virtual void setCurrentRenderTarget(RenderTarget *renderTarget) = 0;
 
 		virtual void draw(const Transform &transform, const Mesh &mesh, GraphicPipeline &pipeline) = 0;
 
 		virtual void drawInstanced(const Mesh &mesh, GraphicPipeline &pipeline) = 0;
 
-		virtual void clear() const = 0;
+		virtual RenderTarget *getDefaultRenderTarget() = 0;
 
 		virtual const ResourceFactory *getResourceFactory() const = 0;
+
+		virtual void createDefaultResources() =0;
 	};
 }

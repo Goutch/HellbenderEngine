@@ -1,18 +1,9 @@
-//
-// Created by user on 4/22/2021.
-//
 
 #include "VK_RenderPass.h"
-#include "vulkan/vulkan.h"
-#include "VK_Device.h"
-#include "core/utility/Log.h"
 #include "VK_Swapchain.h"
-#include "VK_CONSTANTS.h"
 #include "VK_Renderer.h"
-#include "VK_Image.h"
 #include "VK_CommandPool.h"
 #include "VK_Fence.h"
-#include "VK_Semaphore.h"
 namespace HBE {
 
     VkFormat getVkFormat(IMAGE_FORMAT format) {
@@ -54,20 +45,22 @@ namespace HBE {
         this->clear_color = info.clear_color;
         this->vk_format = getVkFormat(info.format);
         this->format = info.format;
-        command_pool=new VK_CommandPool(device,MAX_FRAMES_IN_FLIGHT);
-        for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-            render_finished_semaphores.emplace_back(*device);
-        }
         recreate();
     }
 
     void VK_RenderPass::recreate() {
         if (handle != VK_NULL_HANDLE) {
 
+			vkDestroyRenderPass(device->getHandle(), handle, nullptr);
             for (auto framebuffer: frame_buffers) {
                 vkDestroyFramebuffer(device->getHandle(), framebuffer, nullptr);
             }
-            vkDestroyRenderPass(device->getHandle(), handle, nullptr);
+			for (size_t i = 0; i < images.size(); ++i) {
+				delete images[i];
+			}
+			images.clear();
+            frame_buffers.clear();
+
         }
 
         VkAttachmentDescription colorAttachment{};
@@ -78,7 +71,7 @@ namespace HBE {
         colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
         colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        colorAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
         VkAttachmentReference color_attachment_ref{};
         color_attachment_ref.attachment = 0;
@@ -124,7 +117,7 @@ namespace HBE {
     }
 
     VK_RenderPass::~VK_RenderPass() {
-        delete command_pool;
+
         for (int i = 0; i < images.size(); ++i) {
             delete images[i];
         }
@@ -134,8 +127,7 @@ namespace HBE {
         vkDestroyRenderPass(device->getHandle(), handle, nullptr);
     }
 
-    void VK_RenderPass::begin(uint32_t i) const {
-        command_pool->begin(i);
+    void VK_RenderPass::begin(const VkCommandBuffer& command_buffer,uint32_t i) const {
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
         renderPassInfo.renderPass = handle;
@@ -148,26 +140,20 @@ namespace HBE {
         renderPassInfo.clearValueCount = 1;
         renderPassInfo.pClearValues = &clearColor;
 
-        vkCmdBeginRenderPass(command_pool->getCurrentBuffer(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+        vkCmdBeginRenderPass(command_buffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     }
 
     const VkRenderPass &VK_RenderPass::getHandle() const {
         return handle;
     }
 
-    void VK_RenderPass::end(uint32_t i) const {
-        vkCmdEndRenderPass(command_pool->getCurrentBuffer());
+    void VK_RenderPass::end(const VkCommandBuffer& command_buffer) const {
+        vkCmdEndRenderPass(command_buffer);
     }
 
     void VK_RenderPass::createFramebuffers() {
-        for (int i = 0; i < images.size(); ++i) {
-            delete images[i];
-        }
-        images.clear();
 
         std::vector<VkImageView> image_views;
-
-
         images.resize(MAX_FRAMES_IN_FLIGHT);
         image_views.resize(MAX_FRAMES_IN_FLIGHT);
         for (size_t i = 0; i < images.size(); ++i) {
@@ -221,9 +207,7 @@ namespace HBE {
         return images[i];
     }
 
-    const VK_Semaphore &VK_RenderPass::getSemaphore(uint32_t i) const {
-        return render_finished_semaphores[i];
-    }
+
 
 
 }

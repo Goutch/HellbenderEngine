@@ -19,7 +19,7 @@ namespace HBE {
 		if (Camera::main == nullptr) {
 			Camera::main = this;
 		}
-		setRenderTarget(Graphics::getRenderTarget());
+		setRenderTarget(Graphics::getDefaultRenderTarget());
 
 		generateProjectionMatrix();
 	}
