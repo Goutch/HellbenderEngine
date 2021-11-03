@@ -13,11 +13,13 @@ namespace HBE {
 
 	class VertexLayout;
 
-    class RenderTarget;
+	class RenderTarget;
 
 	enum GRAPHIC_PIPELINE_FLAGS {
 		GRAPHIC_PIPELINE_FLAG_NONE = 0,
-		GRAPHIC_PIPELINE_FLAG_DEPTH_TEST = 1
+		GRAPHIC_PIPELINE_CULL_BACK = 1,
+		GRAPHIC_PIPELINE_CULL_FRONT = 2,
+		GRAPHIC_PIPELINE_FLAG_DEPTH_TEST = 3
 	};
 
 	struct GraphicPipelineInfo {
@@ -43,9 +45,9 @@ namespace HBE {
 		virtual void setUniform(uint32_t binding, void *data) = 0;
 		virtual void pushConstant(const std::string &name, void *data) = 0;
 		virtual void setTexture(uint32_t binding, const Texture *texture) = 0;
-        virtual void setTexture(uint32_t binding, const RenderTarget *render_target) = 0;
+		virtual void setTexture(uint32_t binding, const RenderTarget *render_target) = 0;
 		virtual void setTexture(const std::string &name, const Texture *texture) = 0;
-        virtual void setTexture(const std::string &name, const RenderTarget *render_target) = 0;
+		virtual void setTexture(const std::string &name, const RenderTarget *render_target) = 0;
 	};
 
 

@@ -52,7 +52,7 @@ void init() {
     pipeline_info.fragement_shader = frag;
     pipeline_info.vertex_shader = vert;
     pipeline_info.vertex_layout = layout;
-    pipeline_info.flags = GRAPHIC_PIPELINE_FLAG_NONE;
+    pipeline_info.flags = GRAPHIC_PIPELINE_CULL_BACK;
     auto pipeline = Resources::createGraphicPipeline(pipeline_info, "pipeline");
 
 	auto wall = Texture::load("../../res/textures/wall.png");
@@ -75,8 +75,6 @@ void init() {
     mr2->setMesh(*mesh);
     mr2->entity->transform->translate(vec3(2, 0, 0));
     mr2->entity->transform->setParent(mr1->entity->transform);
-
-
 
     auto camera = Application::scene->instantiate<Camera>();
     camera->setRenderMode(RENDER_MODE::PERSPECTIVE);

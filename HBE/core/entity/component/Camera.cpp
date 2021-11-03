@@ -53,7 +53,6 @@ namespace HBE {
 	}
 
 	void Camera::generateProjectionMatrix() {
-
 		uint32_t w, h;
 		render_target->getResolution(w, h);
 		aspect_ratio = static_cast<float>(w) / static_cast<float>(h);
