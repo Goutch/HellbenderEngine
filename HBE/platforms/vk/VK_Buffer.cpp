@@ -2,7 +2,7 @@
 #include "VK_Buffer.h"
 #include "VK_Device.h"
 
-
+#include "cstring"
 namespace HBE {
 
 

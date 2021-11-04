@@ -2,8 +2,8 @@
 #include "VK_Shader.h"
 #include "VK_Device.h"
 #include "ShaderCompiler.h"
-#include "spirv_cross/spirv_cross_c.h"
-#include "spirv_cross/spirv_cross.hpp"
+#include "spirv_cross.hpp"
+#include "spirv_cross_c.h"
 #include "VK_CommandPool.h"
 #include "spirv_cross.hpp"
 

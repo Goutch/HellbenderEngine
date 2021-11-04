@@ -10,11 +10,8 @@ namespace HBE {
 
     class VK_Instance {
         VkInstance handle;
-        VK_ValidationLayers *validation_layers = nullptr;
 #ifdef DEBUG_MODE
-        const bool ENABLE_VALIDATION_LAYERS = true;
-#else
-        const bool ENABLE_VALIDATION_LAYERS = false;
+        VK_ValidationLayers *validation_layers = nullptr;
 #endif
     public:
         VK_Instance();

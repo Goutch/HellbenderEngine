@@ -5,6 +5,7 @@
 #include "list"
 #include "unordered_map"
 #include "set"
+#include "string"
 
 namespace HBE {
 	class VK_CommandPool;
