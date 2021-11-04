@@ -10,12 +10,16 @@ namespace HBE {
 
 	class GraphicPipeline;
 
+	enum RENDER_TARGET_FLAGS {
+		RENDER_TARGET_FLAG_NONE=0,
+		RENDER_TARGET_FLAG_DONT_CLEAR=1
+	};
 	struct RenderTargetInfo {
 		uint32_t width = 0;
 		uint32_t height = 0;
 		IMAGE_FORMAT format = IMAGE_FORMAT_RGBA8;
 		vec4 clear_color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-
+		RENDER_TARGET_FLAGS flags = RENDER_TARGET_FLAG_NONE;
 	};
 
 	class HB_API RenderTarget : public Resource {

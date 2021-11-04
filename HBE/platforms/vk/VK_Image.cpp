@@ -102,7 +102,7 @@ namespace HBE {
         imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
         imageInfo.flags = 0; // Optional
 
-        if (info.flags & IMAGE_FLAG_RENDER_TARGET)imageInfo.usage |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+       imageInfo.usage |= info.flags&IMAGE_FLAG_RENDER_TARGET? VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT:0;
 
         if (vkCreateImage(device->getHandle(), &imageInfo, nullptr, &handle) != VK_SUCCESS) {
             Log::error("failed to create image!");

@@ -32,7 +32,7 @@ namespace HBE {
 		}
 
 		SwapchainSupportDetails details = physical_device->querySwapchainSupportDetails(physical_device->getHandle());
-		image_count = details.capabilities.minImageCount + 1;
+		image_count = details.capabilities.minImageCount + 2;
 		if (details.capabilities.maxImageCount > 0 && image_count > details.capabilities.maxImageCount)
 			image_count = details.capabilities.maxImageCount;
 		VkSurfaceFormatKHR surface_format = chooseSwapSurfaceFormat(details.formats);

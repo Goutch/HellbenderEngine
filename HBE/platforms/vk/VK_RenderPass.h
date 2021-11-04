@@ -27,7 +27,7 @@ namespace HBE {
 		uint32_t current_frame = 0;
 		VkFormat vk_format;
 		IMAGE_FORMAT format;
-
+		RENDER_TARGET_FLAGS flags;
 	public:
 		~VK_RenderPass();
 

@@ -169,7 +169,8 @@ set(CORE_FILES
         core/serialization/ComponentRegistry.h
         core/serialization/ComponentRegistry.h
 
-        core/resource/VertexLayout.cpp)
+        core/resource/VertexLayout.cpp
+        core/ecs/ECSScene.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}
