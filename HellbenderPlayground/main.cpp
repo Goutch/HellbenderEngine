@@ -52,20 +52,10 @@ void init() {
 
 	//-------------------SCENE CREATION--------------------------------------
 
-	Scene scene;
-	Entity e = scene.createEntity();
-	e.attach<Camera>();
-	e.attach<Transform>();
-	if (e.has<Transform>()) {
-		Transform &t = e.get<Transform>();
-	}
+	//
 
-	EntityGroup<Transform, Camera> group = scene.group<Transform, Camera>();
-	for (EntityHandle entity_handle:group) {
-		group.get<Transform>(entity_handle);
-		group.get<Camera>(entity_handle);
-	}
-	/*
+
+/*
 	auto mr1 = Application::scene->instantiate<MeshRenderer>();
 	mr1->setMaterial(*pipeline);
 	mr1->setMesh(*mesh);
@@ -83,14 +73,18 @@ void init() {
 	camera->entity->transform->setPosition(vec3(0, 0, 5));*/
 }
 
-struct comp {
-	vec3 pos = vec3(0);
-	vec4 color = vec4(1.0f);
-};
-
-
 int main() {
+    Scene scene;
+    Entity entity=scene.createEntity();
+    entity.attach<Transform>();
+    entity.attach<Camera>();
+    auto group = scene.group<Transform, Camera>();
+    for (EntityHandle entity_handle:group) {
+        group.get<Transform>(entity_handle);
+        group.get<Camera>(entity_handle);
+    }
 
+    /*
 	Application::init();
 	//-----------------------SETUP--------------------
 	Configs::setWindowTitle("Hellbender");
@@ -108,6 +102,6 @@ int main() {
 	//delete texture_data;
 	//-----------------------TERMINATE------------------
 
-	Application::terminate();
+	Application::terminate();*/
 
 }
