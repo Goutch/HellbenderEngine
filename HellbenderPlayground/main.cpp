@@ -1,21 +1,7 @@
 #include "HBE.h"
-#include "core/ecs/ECSScene.h"
 
 using namespace HBE;
 
-
-class Rotator : public Component {
-public:
-	void onAttach() override {
-		//Note: there is no need to unsubscribe in the onDetach function this is handled in the component class.
-		subscribeUpdate();
-	}
-
-	void onUpdate(float delta) override {
-		entity->transform->rotate(delta, vec3(0, 1, 0));
-
-	}
-};
 
 void onUpdate(float delta) {
 	//Shut down app if escape key is pressed
@@ -36,50 +22,65 @@ struct Vertex {
 
 void init() {
 	//-------------------RESOURCES CREATION--------------------------------------
-	/* ShaderInfo frag_info{SHADER_STAGE_FRAGMENT, "../../res/shaders/VK.frag"};
-	 ShaderInfo vert_info{SHADER_STAGE_VERTEX, "../../res/shaders/VK.vert"};
+	ShaderInfo frag_info{SHADER_STAGE_FRAGMENT, "../../res/shaders/VK.frag"};
+	ShaderInfo vert_info{SHADER_STAGE_VERTEX, "../../res/shaders/VK.vert"};
 
-	 auto frag = Resources::createShader(frag_info, "frag");
-	 auto vert = Resources::createShader(vert_info, "vert");
+	auto frag = Resources::createShader(frag_info, "frag");
+	auto vert = Resources::createShader(vert_info, "vert");
 
-	 std::vector<GLSL_TYPE> vertex_description = std::vector<GLSL_TYPE>{GLSL_TYPE::VEC3F,GLSL_TYPE::VEC2F};
+	std::vector<GLSL_TYPE> vertex_description = std::vector<GLSL_TYPE>{GLSL_TYPE::VEC3F, GLSL_TYPE::VEC2F};
 
-	 VertexLayoutInfo layout_info{};
-	 layout_info.layout_types = vertex_description.data();
-	 layout_info.layout_types_count = vertex_description.size();
-	 auto layout = Resources::createVertexLayout(layout_info, "layout");
+	VertexLayoutInfo layout_info{};
+	layout_info.layout_types = vertex_description.data();
+	layout_info.layout_types_count = vertex_description.size();
+	auto layout = Resources::createVertexLayout(layout_info, "layout");
 
-	 GraphicPipelineInfo pipeline_info{};
-	 pipeline_info.fragement_shader = frag;
-	 pipeline_info.vertex_shader = vert;
-	 pipeline_info.vertex_layout = layout;
-	 pipeline_info.flags = GRAPHIC_PIPELINE_CULL_BACK;
-	 auto pipeline = Resources::createGraphicPipeline(pipeline_info, "pipeline");
+	GraphicPipelineInfo pipeline_info{};
+	pipeline_info.fragement_shader = frag;
+	pipeline_info.vertex_shader = vert;
+	pipeline_info.vertex_layout = layout;
+	pipeline_info.flags = GRAPHIC_PIPELINE_CULL_BACK;
+	auto pipeline = Resources::createGraphicPipeline(pipeline_info, "pipeline");
 
-	 auto wall = Texture::load("../../res/textures/wall.png");
-	 Resources::add("Wall", wall);
-	 pipeline->setTexture("texSampler", wall);
+	auto wall = Texture::load("../../res/textures/wall.png");
+	Resources::add("Wall", wall);
+	pipeline->setTexture("texSampler", wall);
 
-	 auto mesh = Resources::createMesh(MeshInfo{layout}, "mesh");
-	 Geometry::createCube(*mesh,1,1,1,VERTEX_FLAG_UV);
+	auto mesh = Resources::createMesh(MeshInfo{layout}, "mesh");
+	Geometry::createCube(*mesh, 1, 1, 1, VERTEX_FLAG_UV);
 
 
-	 //-------------------SCENE CREATION--------------------------------------
-	 auto mr1 = Application::scene->instantiate<MeshRenderer>();
-	 mr1->setMaterial(*pipeline);
-	 mr1->setMesh(*mesh);
+	//-------------------SCENE CREATION--------------------------------------
 
-	 mr1->entity->attach<Rotator>();
+	Scene scene;
+	Entity e = scene.createEntity();
+	e.attach<Camera>();
+	e.attach<Transform>();
+	if (e.has<Transform>()) {
+		Transform &t = e.get<Transform>();
+	}
 
-	 auto mr2 = Application::scene->instantiate<MeshRenderer>();
-	 mr2->setMaterial(*pipeline);
-	 mr2->setMesh(*mesh);
-	 mr2->entity->transform->translate(vec3(2, 0, 0));
-	 mr2->entity->transform->setParent(mr1->entity->transform);
+	EntityGroup<Transform, Camera> group = scene.group<Transform, Camera>();
+	for (EntityHandle entity_handle:group) {
+		group.get<Transform>(entity_handle);
+		group.get<Camera>(entity_handle);
+	}
+	/*
+	auto mr1 = Application::scene->instantiate<MeshRenderer>();
+	mr1->setMaterial(*pipeline);
+	mr1->setMesh(*mesh);
 
-	 auto camera = Application::scene->instantiate<Camera>();
-	 camera->setRenderMode(RENDER_MODE::PERSPECTIVE);
-	 camera->entity->transform->setPosition(vec3(0, 0, 5));*/
+	mr1->entity->attach<Rotator>();
+
+	auto mr2 = Application::scene->instantiate<MeshRenderer>();
+	mr2->setMaterial(*pipeline);
+	mr2->setMesh(*mesh);
+	mr2->entity->transform->translate(vec3(2, 0, 0));
+	mr2->entity->transform->setParent(mr1->entity->transform);
+
+	auto camera = Application::scene->instantiate<Camera>();
+	camera->setRenderMode(RENDER_MODE::PERSPECTIVE);
+	camera->entity->transform->setPosition(vec3(0, 0, 5));*/
 }
 
 struct comp {
@@ -89,16 +90,8 @@ struct comp {
 
 
 int main() {
-	ECSScene scene;
-	std::vector<uint32_t> entities;
 
-	for (int i = 0; i < 10; ++i) {
-		entities.emplace_back(scene.create());
-		comp c{};
-		scene.attach(entities[i],c);
-	}
-
-	/*Application::init();
+	Application::init();
 	//-----------------------SETUP--------------------
 	Configs::setWindowTitle("Hellbender");
 
@@ -115,6 +108,6 @@ int main() {
 	//delete texture_data;
 	//-----------------------TERMINATE------------------
 
-	Application::terminate();*/
+	Application::terminate();
 
 }

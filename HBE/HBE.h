@@ -14,6 +14,10 @@
 #include "core/resource/Resources.h"
 #include "core/resource/VertexLayout.h"
 
+#include "core/scene/Components.h"
+#include "core/scene/Scene.h"
+#include "core/scene/Entity.h"
+/*
 #include "core/entity/Entity.h"
 #include "core/entity/Scene.h"
 #include "core/entity/component/Transform.h"
@@ -22,6 +26,8 @@
 #include "core/entity/component/Camera.h"
 #include "core/entity/component/CameraController.h"
 #include "core/entity/component/ModelRenderer.h"
+ */
+
 
 #include "core/graphics/Graphics.h"
 #include "HBE/core/resource/RenderTarget.h"
@@ -36,11 +42,6 @@
 #include "core/utility/Log.h"
 #include "core/utility/Geometry.h"
 #include "core/utility/Random.h"
-
-#include "core/serialization/Serializer.h"
-#include "core/serialization/Deserializer.h"
-#include "core/serialization/Serializable.h"
-#include "core/serialization/ComponentRegistry.h"
 
 #include <glm/glm.hpp>
 #include "glm/gtx/quaternion.hpp"

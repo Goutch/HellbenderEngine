@@ -3,7 +3,6 @@
 #include "core/resource/Mesh.h"
 #include "core/utility/Log.h"
 #include "core/utility/ModelImporter.h"
-#include "core/serialization/Serializable.h"
 #include "core/resource/GraphicPipeline.h"
 
 namespace HBE {

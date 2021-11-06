@@ -11,7 +11,7 @@ namespace HBE {
 
     class GraphicPipeline;
 
-    class Transform;
+    struct Transform;
 
     class GL_ResourceFactory;
 

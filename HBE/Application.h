@@ -2,7 +2,7 @@
 #pragma once
 #include "Core.h"
 #include "core/utility/Event.h"
-#include "core/entity/Scene.h"
+#include "core/scene/Scene.h"
 
 namespace HBE {
     class Window;

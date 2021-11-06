@@ -20,15 +20,15 @@ namespace HBE {
 		this->device = device;
 		this->command_pool = new VK_CommandPool(device, 1);
 		memory_propeties = &device->getPhysicalDevice().getMemoryProperties();
-		for (int i = 0; i < memory_propeties->memoryTypeCount; ++i) {
-			blocks.emplace(i, std::vector<Block*>());
+		for (size_t i = 0; i < memory_propeties->memoryTypeCount; ++i) {
+			blocks.emplace(i, std::vector<Block *>());
 		}
 	}
 
 	VK_Allocator::~VK_Allocator() {
 		delete command_pool;
 		for (auto it = blocks.begin(); it != blocks.end(); ++it) {
-			for (Block* block: it->second) {
+			for (Block *block: it->second) {
 				vkFreeMemory(device->getHandle(), block->memory, nullptr);
 			}
 		}
@@ -91,20 +91,20 @@ namespace HBE {
 	Allocation VK_Allocator::alloc(VkMemoryRequirements mem_requirements, ALLOC_FLAGS flags) {
 		uint32_t memory_type = findMemoryType(mem_requirements, flags);
 
-		for (Block* block:blocks[memory_type]) {
+		for (Block *block:blocks[memory_type]) {
 			if (block->remaining < mem_requirements.size) {
 				continue;
 			}
 			VkDeviceSize position = 0;
 
-			for(const Allocation& current_alloc:block->allocations){
+			for (const Allocation &current_alloc:block->allocations) {
 				VkDeviceSize end_of_alloc = current_alloc.offset - (current_alloc.offset % mem_requirements.alignment);
 				VkDeviceSize available = (end_of_alloc - position);
 
 				if (available >= mem_requirements.size) {
 					block->alloc_count++;
 					block->remaining -= mem_requirements.size;
-					const Allocation& new_alloc =*block->allocations.emplace(
+					const Allocation &new_alloc = *block->allocations.emplace(
 							mem_requirements.size,
 							position,
 							block,
@@ -127,7 +127,7 @@ namespace HBE {
 				block->alloc_count++;
 
 				block->remaining -= mem_requirements.size;
-				const Allocation& new_alloc =*block->allocations.emplace(
+				const Allocation &new_alloc = *block->allocations.emplace(
 						mem_requirements.size,
 						position,
 						block,
@@ -141,13 +141,13 @@ namespace HBE {
 		//new block needed
 
 		uint32_t index = blocks[memory_type].size();
-		Block* block = blocks[memory_type].emplace_back(new Block{
+		Block *block = blocks[memory_type].emplace_back(new Block{
 				.size= mem_requirements.size > BLOCK_SIZE ? mem_requirements.size : BLOCK_SIZE,
 				.memory=VK_NULL_HANDLE,
 				.memory_type=memory_type,
 				.index=index,
 				.alloc_count=0,
-				.remaining=(mem_requirements.size > BLOCK_SIZE ? mem_requirements.size : BLOCK_SIZE) -mem_requirements.size});
+				.remaining=(mem_requirements.size > BLOCK_SIZE ? mem_requirements.size : BLOCK_SIZE) - mem_requirements.size});
 
 
 		VkMemoryAllocateInfo allocInfo{};
@@ -159,7 +159,7 @@ namespace HBE {
 			Log::error("failed to allocate buffer memory!");
 		}
 		block->alloc_count++;
-		const Allocation& new_alloc =*block->allocations.emplace(
+		const Allocation &new_alloc = *block->allocations.emplace(
 				mem_requirements.size,
 				VkDeviceSize(0),
 				block,
@@ -182,10 +182,6 @@ namespace HBE {
 
 		command_pool->end(0);
 
-		VkSubmitInfo submitInfo{};
-		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &command_pool->getCurrentBuffer();
 
 		//todo use transfer queue
 		device->getQueue(QUEUE_FAMILY_GRAPHICS)->submit(command_pool->getCurrentBuffer());
@@ -287,10 +283,6 @@ namespace HBE {
 		transitionImageLayout(dest, dst_end_layout);
 		command_pool->end(0);
 
-		VkSubmitInfo submitInfo{};
-		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &command_pool->getCurrentBuffer();
 
 		device->getQueue(QUEUE_FAMILY_GRAPHICS)->submit(command_pool->getCurrentBuffer());
 		device->getQueue(QUEUE_FAMILY_GRAPHICS)->wait();
@@ -331,11 +323,6 @@ namespace HBE {
 		transitionImageLayout(src, src_end_layout);
 		command_pool->end(0);
 
-		VkSubmitInfo submitInfo{};
-		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &command_pool->getCurrentBuffer();
-
 		device->getQueue(QUEUE_FAMILY_GRAPHICS)->submit(command_pool->getCurrentBuffer());
 		device->getQueue(QUEUE_FAMILY_GRAPHICS)->wait();
 	}
@@ -343,7 +330,7 @@ namespace HBE {
 	void VK_Allocator::free(const Allocation &allocation) {
 		Log::debug("Freeing Alloc#" + std::to_string(allocation.id));
 
-		Block* block=allocation.block;
+		Block *block = allocation.block;
 		block->alloc_count--;
 		uint32_t memory_type = allocation.block->memory_type;
 		Log::debug("Freed " + allocToString(allocation));
@@ -366,11 +353,6 @@ namespace HBE {
 		command_pool->begin(0);
 		transitionImageLayout(image, newLayout);
 		command_pool->end(0);
-
-		VkSubmitInfo submitInfo{};
-		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &command_pool->getCurrentBuffer();
 
 		device->getQueue(QUEUE_FAMILY_GRAPHICS)->submit(command_pool->getCurrentBuffer());
 		device->getQueue(QUEUE_FAMILY_GRAPHICS)->wait();

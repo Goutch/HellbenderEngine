@@ -1,13 +1,9 @@
 
 #include "Graphics.h"
-
-#include "Framebuffer.h"
-#include <core/entity/component/Transform.h>
+#include <core/scene/Components.h>
 #include <core/utility/Log.h>
 #include <core/utility/Event.h>
-#include <core/utility/Geometry.h>
 #include <HBE/core/resource/RenderTarget.h>
-#include "core/resource/GraphicPipeline.h"
 #include <Configs.h>
 #include <core/resource/Model.h>
 #include "Renderer.h"

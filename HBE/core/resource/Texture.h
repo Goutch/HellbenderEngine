@@ -2,7 +2,6 @@
 
 #include "Core.h"
 #include <string>
-#include "core/serialization/Serializable.h"
 #include "Resource.h"
 
 namespace HBE {

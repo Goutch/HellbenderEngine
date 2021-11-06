@@ -15,7 +15,7 @@ namespace HBE {
 
 	class Mesh;
 
-	class Transform;
+	struct Transform;
 
 	class Window;
 

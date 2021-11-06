@@ -9,7 +9,7 @@ namespace HBE {
 
 	class RenderTarget;
 
-	class Transform;
+	struct Transform;
 
 	class Mesh;
 

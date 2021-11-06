@@ -143,7 +143,7 @@ namespace HBE {
 				const Mesh *mesh = mesh_kv.first;
 				mesh->bind();
 				for (const Transform *transform: mesh_kv.second) {
-					pipeline->pushConstant("constants", static_cast<void *>(&transform->getWorldMatrix()[0]));
+					pipeline->pushConstant("constants", static_cast<void *>(&transform));
 					if (mesh->hasIndexBuffer()) {
 						vkCmdDrawIndexed(command_pool->getCurrentBuffer(), mesh->getIndexCount(), 1, 0, 0, 0);
 					} else {

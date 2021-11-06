@@ -122,10 +122,9 @@ set(CORE_FILES
         core/resource/Resources.h
         core/resource/Resources.cpp
         core/resource/Texture.cpp
+        core/resource/VertexLayout.cpp
 
         core/graphics/Window.h
-        core/graphics/Framebuffer.h
-        core/graphics/Framebuffer.cpp
         core/graphics/Renderer.h
         core/graphics/Graphics.cpp
         core/graphics/Graphics.h
@@ -136,21 +135,21 @@ set(CORE_FILES
         core/input/Input.h
         core/input/Input.cpp
 
-        core/entity/Scene.cpp
-        core/entity/Scene.h
-        core/entity/Entity.cpp
-        core/entity/Entity.h
-        core/entity/component/Transform.cpp
-        core/entity/component/Transform.h
-        core/entity/component/Camera.cpp
-        core/entity/component/Component.h
-        core/entity/component/CameraController.cpp
-        core/entity/component/MeshRenderer.cpp
-        core/entity/component/MeshRenderer.h
-        core/entity/component/CameraController.h
-        core/entity/component/Component.cpp
-        core/entity/component/ModelRenderer.h
-        core/entity/component/ModelRenderer.cpp
+        #core/entity/Scene.cpp
+        #core/entity/Scene.h
+        #core/entity/Entity.cpp
+        #core/entity/Entity.h
+        #core/entity/component/Transform.cpp
+        #core/entity/component/Transform.h
+        #core/entity/component/Camera.cpp
+        #core/entity/component/Component.h
+        #core/entity/component/CameraController.cpp
+        #core/entity/component/MeshRenderer.cpp
+        #core/entity/component/MeshRenderer.h
+        #core/entity/component/CameraController.h
+        #core/entity/component/Component.cpp
+        #core/entity/component/ModelRenderer.h
+        #core/entity/component/ModelRenderer.cpp
 
         core/utility/Log.cpp
         core/utility/Geometry.cpp
@@ -158,19 +157,23 @@ set(CORE_FILES
         core/utility/Clock.cpp
         core/utility/ModelImporter.cpp
         core/utility/ModelImporter.h
-        core/threading/JobManager.cpp
-        core/threading/JobManager.h
         core/utility/Random.cpp
         core/utility/Random.h
+        core/utility/CArray.h
 
-        core/serialization/Serializer.h
-        core/serialization/Deserializer.h
-        core/serialization/ComponentRegistry.cpp
-        core/serialization/ComponentRegistry.h
-        core/serialization/ComponentRegistry.h
+        core/threading/JobManager.cpp
+        core/threading/JobManager.h
 
-        core/resource/VertexLayout.cpp
-        core/ecs/ECSScene.h)
+        core/scene/System.h
+        core/scene/Scene.cpp
+        core/scene/Scene.h
+        core/scene/Entity.cpp
+        core/scene/Entity.h
+        core/scene/Components.h
+        core/scene/systems/CameraSystem.cpp
+        core/scene/systems/CameraSystem.h
+        core/scene/systems/TransformSystem.cpp
+        core/scene/systems/TransformSystem.h core/scene/EntityGroup.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}
@@ -184,6 +187,7 @@ target_include_directories(${PROJECT_NAME}
         PUBLIC "${${CMAKE_CURRENT_SOURCE_DIR}}"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/contrib/zlib/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm/"
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/entt/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/include/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/include"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/include/"
