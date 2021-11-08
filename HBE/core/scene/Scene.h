@@ -30,6 +30,7 @@ namespace HBE {
 
 		std::vector<System *> systems;
 		Entity main_camera_entity;
+
 		std::unordered_map<size_t, Event<Entity>> attach_events;
 		std::unordered_map<size_t, Event<Entity>> detach_events;
 

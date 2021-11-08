@@ -47,11 +47,11 @@ namespace HBE {
 	public:
 		VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer,const GraphicPipelineInfo& info);
 		VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer,const GraphicPipelineInfo& info,VkRenderPass& render_pass);
-		void setDynamicUniform(const std::string &name, void *data);
-		void setDynamicUniform(uint32_t binding, void *data) ;
-		void setUniform(const std::string &name, void *data);
-		void setUniform(uint32_t binding, void *data);
-		void pushConstant(const std::string &name, void *data);
+		void setDynamicUniform(const std::string &name,const void *data);
+		void setDynamicUniform(uint32_t binding,const  void *data) ;
+		void setUniform(const std::string &name,const  void *data);
+		void setUniform(uint32_t binding,const  void *data);
+		void pushConstant(const std::string &name,const  void *data);
 		void setTexture(uint32_t binding, const Texture *texture);
 		void setTexture(const std::string &name, const Texture *texture);
 

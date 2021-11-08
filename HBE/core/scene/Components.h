@@ -16,33 +16,33 @@ namespace HBE {
 	struct HB_API Transform {
 		mat4 local = mat4(1.0f);
 		Transform *parent = nullptr;
-		mat4 world();
+		mat4 world() const;
 		void translate(vec3 translation);
-		vec3 position();
+		vec3 position() const;
 
 		void setPosition(vec3 pos);
-		quat rotation();
+		quat rotation() const;
 		void rotate(quat rot);
 		void rotate(vec3 rot);
 		void setRotation(quat rot);
 		void setRotation(vec3 rot);
 		void setScale(vec3 s);
-		vec3 scale();
-		vec3 eulerRotation();
-		quat worldRotation();
-		vec3 worldEulerRotation();
-		vec3 worldDown();
-		vec3 worldUp();
-		vec3 worldLeft();
-		vec3 worldRight();
-		vec3 worldBackward();
-		vec3 worldForward();
-		vec3 down();
-		vec3 up();
-		vec3 back();
-		vec3 right();
-		vec3 front();
-		vec3 left();
+		vec3 scale() const;
+		vec3 eulerRotation() const;
+		quat worldRotation() const;
+		vec3 worldEulerRotation() const;
+		vec3 worldDown() const;
+		vec3 worldUp() const;
+		vec3 worldLeft() const;
+		vec3 worldRight() const;
+		vec3 worldBackward() const;
+		vec3 worldForward() const;
+		vec3 down() const;
+		vec3 up() const;
+		vec3 back() const;
+		vec3 right() const;
+		vec3 front() const;
+		vec3 left() const;
 	};
 
 	struct HB_API Camera {

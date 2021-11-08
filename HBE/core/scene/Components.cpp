@@ -7,55 +7,55 @@ namespace HBE {
 		local = glm::translate(local, translation);
 	}
 
-	vec3 Transform::position() {
+	vec3 Transform::position() const {
 		return local[3];
 	}
 
-	vec3 Transform::front() {
+	vec3 Transform::front() const {
 		return glm::normalize(world()[2]);
 	}
 
-	vec3 Transform::back() {
+	vec3 Transform::back() const {
 		return -glm::normalize(world()[2]);
 	}
 
-	vec3 Transform::right() {
+	vec3 Transform::right() const {
 		return glm::normalize(world()[0]);
 	}
 
-	vec3 Transform::left() {
+	vec3 Transform::left() const {
 		return -glm::normalize(world()[0]);
 	}
 
-	vec3 Transform::up() {
+	vec3 Transform::up() const {
 		return glm::normalize(world()[1]);
 	}
 
-	vec3 Transform::down() {
+	vec3 Transform::down() const {
 		return -glm::normalize(world()[1]);
 	}
 
-	vec3 Transform::worldForward() {
+	vec3 Transform::worldForward() const {
 		return glm::normalize(world()[2]);
 	}
 
-	vec3 Transform::worldBackward() {
+	vec3 Transform::worldBackward() const {
 		return -glm::normalize(world()[2]);
 	}
 
-	vec3 Transform::worldRight() {
+	vec3 Transform::worldRight() const {
 		return glm::normalize(world()[0]);
 	}
 
-	vec3 Transform::worldLeft() {
+	vec3 Transform::worldLeft() const {
 		return -glm::normalize(world()[0]);
 	}
 
-	vec3 Transform::worldUp() {
+	vec3 Transform::worldUp() const {
 		return glm::normalize(world()[1]);
 	}
 
-	vec3 Transform::worldDown() {
+	vec3 Transform::worldDown() const {
 		return -glm::normalize(world()[1]);
 
 	}
@@ -83,9 +83,9 @@ namespace HBE {
 	}
 
 	void Transform::rotate(vec3 rot) {
-		local=glm::rotate(local, rot.x, vec3(1.f, 0.f, 0.f));
-		local=glm::rotate(local, rot.y, vec3(0.f, 1.f, 0.f));
-		local=glm::rotate(local, rot.z, vec3(0.f, 0.f, 1.f));
+		local = glm::rotate(local, rot.x, vec3(1.f, 0.f, 0.f));
+		local = glm::rotate(local, rot.y, vec3(0.f, 1.f, 0.f));
+		local = glm::rotate(local, rot.z, vec3(0.f, 0.f, 1.f));
 
 	}
 
@@ -95,23 +95,23 @@ namespace HBE {
 		local[3].z = pos.z;
 	}
 
-	mat4 Transform::world() {
+	mat4 Transform::world() const {
 		return parent == nullptr ? local : parent->world() * local;
 	}
 
-	quat Transform::rotation() {
+	quat Transform::rotation() const {
 		return glm::quat_cast(local);
 	}
 
-	quat Transform::worldRotation() {
+	quat Transform::worldRotation() const {
 		return parent == nullptr ? rotation() : rotation() * parent->worldRotation();
 	}
 
-	vec3 Transform::eulerRotation() {
+	vec3 Transform::eulerRotation() const {
 		return glm::eulerAngles(rotation());
 	}
 
-	vec3 Transform::worldEulerRotation() {
+	vec3 Transform::worldEulerRotation() const {
 		return parent == nullptr ? glm::eulerAngles(rotation()) : glm::eulerAngles(glm::quat_cast(local) * parent->worldRotation());
 	}
 
@@ -124,7 +124,7 @@ namespace HBE {
 		setRotation(rot);
 	}
 
-	vec3 Transform::scale() {
+	vec3 Transform::scale() const {
 
 		return vec3(glm::length(local[0]),
 					glm::length(local[1]),

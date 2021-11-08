@@ -38,12 +38,12 @@ namespace HBE {
 
 		virtual void unbind() const = 0;
 
-		virtual void setDynamicUniform(const std::string &name, void *data) = 0;
-		virtual void setDynamicUniform(uint32_t binding, void *data) = 0;
+		virtual void setDynamicUniform(const std::string &name,const void *data) = 0;
+		virtual void setDynamicUniform(uint32_t binding,const void *data) = 0;
 
-		virtual void setUniform(const std::string &name, void *data) = 0;
-		virtual void setUniform(uint32_t binding, void *data) = 0;
-		virtual void pushConstant(const std::string &name, void *data) = 0;
+		virtual void setUniform(const std::string &name,const void *data) = 0;
+		virtual void setUniform(uint32_t binding,const void *data) = 0;
+		virtual void pushConstant(const std::string &name,const void *data) = 0;
 		virtual void setTexture(uint32_t binding, const Texture *texture) = 0;
 		virtual void setTexture(uint32_t binding, const RenderTarget *render_target) = 0;
 		virtual void setTexture(const std::string &name, const Texture *texture) = 0;

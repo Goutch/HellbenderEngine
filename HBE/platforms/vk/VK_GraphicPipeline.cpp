@@ -221,15 +221,15 @@ namespace HBE {
 		vkCmdBindPipeline(renderer->getCommandPool()->getCurrentBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, handle);
 	}
 
-	void VK_GraphicPipeline::setDynamicUniform(const std::string &name, void *data) {
+	void VK_GraphicPipeline::setDynamicUniform(const std::string &name,const void *data) {
 		//todo
 	}
 
-	void VK_GraphicPipeline::setDynamicUniform(uint32_t binding, void *data) {
+	void VK_GraphicPipeline::setDynamicUniform(uint32_t binding,const void *data) {
 		//todo
 	}
 
-	void VK_GraphicPipeline::setUniform(const std::string &name, void *data) {
+	void VK_GraphicPipeline::setUniform(const std::string &name,const void *data) {
 		auto it = name_input_index.find(name);
 		if (it != name_input_index.end()) {
 			if (inputs[it->second].type == VK_Shader::UNIFORM_BUFFER) {
@@ -243,13 +243,13 @@ namespace HBE {
 		}
 	}
 
-	void VK_GraphicPipeline::setUniform(uint32_t binding, void *data) {
+	void VK_GraphicPipeline::setUniform(uint32_t binding,const void *data) {
 		for (VK_Buffer *buffer: uniform_buffers[binding]) {
 			buffer->update(data);
 		}
 	}
 
-	void VK_GraphicPipeline::pushConstant(const std::string &name, void *data) {
+	void VK_GraphicPipeline::pushConstant(const std::string &name,const void *data) {
 		auto it = name_input_index.find(name);
 		if (it != name_input_index.end()) {
 			if (inputs[it->second].type == VK_Shader::PUSH_CONSTANT) {
