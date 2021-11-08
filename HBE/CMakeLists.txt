@@ -172,8 +172,7 @@ set(CORE_FILES
         core/scene/Components.h
         core/scene/systems/CameraSystem.cpp
         core/scene/systems/CameraSystem.h
-        core/scene/systems/TransformSystem.cpp
-        core/scene/systems/TransformSystem.h core/scene/EntityGroup.h)
+        core/scene/EntityGroup.h core/scene/systems/MeshRendererSystem.cpp core/scene/systems/MeshRendererSystem.h core/scene/Components.cpp core/scene/systems/CameraControllerSystem.cpp core/scene/systems/CameraControllerSystem.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

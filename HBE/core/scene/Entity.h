@@ -3,12 +3,10 @@
 #include "Core.h"
 #include <cstdint>
 #include "HBETypes.h"
+
 namespace HBE {
 	class HB_API Entity {
 		friend class Scene;
-
-		template<typename ... Components>
-		friend class EntityGroup;
 
 		EntityHandle handle = entt::null;
 		entt::registry *registry = nullptr;
@@ -17,16 +15,21 @@ namespace HBE {
 		Entity() = default;
 		Entity(EntityHandle handle, entt::registry *registry);
 
-		Entity(Entity &other);
+		Entity(const Entity &other);
 
 		template<typename Component, typename ... Args>
-		Component &attach(Component &c) {
+		Component &attach() {
 			return registry->emplace_or_replace<Component>(handle);
 		}
 
 		template<typename Component, typename ... Args>
 		Component &attach(Args &&... args) {
 			return registry->emplace_or_replace<Component>(handle, std::forward<Args>(args)...);
+		}
+
+		template<typename Component>
+		Component &attach(Component &component) {
+			return registry->emplace_or_replace<Component>(handle, component);
 		}
 
 		template<typename Component>
@@ -48,8 +51,7 @@ namespace HBE {
 			return registry->valid(handle);
 		}
 
-		EntityHandle getHandle()
-		{
+		EntityHandle getHandle() {
 			return handle;
 		}
 

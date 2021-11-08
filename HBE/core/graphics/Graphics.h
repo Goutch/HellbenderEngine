@@ -42,11 +42,9 @@ namespace HBE {
 
 		static void setRenderTarget(RenderTarget *render_target);
 
-		static const RenderTarget *getDefaultRenderTarget();
+		static RenderTarget *getDefaultRenderTarget();
 
 		static void terminate();
-
-		static void onWindowSizeChange(uint32_t width, uint32_t height);
 
 		static void beginFrame();
 

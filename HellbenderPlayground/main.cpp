@@ -3,13 +3,12 @@
 using namespace HBE;
 
 
-void onUpdate(float delta) {
+void onAppUpdate(float delta) {
 	//Shut down app if escape key is pressed
 	if (Input::getKeyDown(KEY::ESCAPE)) {
 		Application::quit();
 	}
 	if (Input::getKeyDown(KEY::V)) {
-		Log::debug("setVsync");
 		Configs::setVerticalSync(!Configs::getVerticalSync());
 	}
 }
@@ -39,7 +38,7 @@ void init() {
 	pipeline_info.fragement_shader = frag;
 	pipeline_info.vertex_shader = vert;
 	pipeline_info.vertex_layout = layout;
-	pipeline_info.flags = GRAPHIC_PIPELINE_CULL_BACK;
+	pipeline_info.flags = GRAPHIC_PIPELINE_FLAG_NONE;
 	auto pipeline = Resources::createGraphicPipeline(pipeline_info, "pipeline");
 
 	auto wall = Texture::load("../../res/textures/wall.png");
@@ -49,59 +48,36 @@ void init() {
 	auto mesh = Resources::createMesh(MeshInfo{layout}, "mesh");
 	Geometry::createCube(*mesh, 1, 1, 1, VERTEX_FLAG_UV);
 
-
 	//-------------------SCENE CREATION--------------------------------------
+	Scene &scene = *Application::getScene();
 
-	//
+	Entity camera_entity = scene.createEntity();
+	camera_entity.attach<Camera>();
+	camera_entity.get<Transform>().setPosition(vec3(0, 0, 5));
+	camera_entity.attach<CameraController>();
+	scene.setCameraEntity(camera_entity);
 
-
-/*
-	auto mr1 = Application::scene->instantiate<MeshRenderer>();
-	mr1->setMaterial(*pipeline);
-	mr1->setMesh(*mesh);
-
-	mr1->entity->attach<Rotator>();
-
-	auto mr2 = Application::scene->instantiate<MeshRenderer>();
-	mr2->setMaterial(*pipeline);
-	mr2->setMesh(*mesh);
-	mr2->entity->transform->translate(vec3(2, 0, 0));
-	mr2->entity->transform->setParent(mr1->entity->transform);
-
-	auto camera = Application::scene->instantiate<Camera>();
-	camera->setRenderMode(RENDER_MODE::PERSPECTIVE);
-	camera->entity->transform->setPosition(vec3(0, 0, 5));*/
+	MeshRenderer &cube = scene.createEntity().attach<MeshRenderer>();
+	cube.pipeline = pipeline;
+	cube.mesh = mesh;
 }
 
 int main() {
-    Scene scene;
-    Entity entity=scene.createEntity();
-    entity.attach<Transform>();
-    entity.attach<Camera>();
-    auto group = scene.group<Transform, Camera>();
-    for (EntityHandle entity_handle:group) {
-        group.get<Transform>(entity_handle);
-        group.get<Camera>(entity_handle);
-    }
-
-    /*
 	Application::init();
 	//-----------------------SETUP--------------------
 	Configs::setWindowTitle("Hellbender");
 
-
 	init();
 
 	//-----------------------EVENTS------------------
-	Application::onUpdate.subscribe(&onUpdate);
-
+	Application::onUpdate.subscribe(&onAppUpdate);
 	//-----------------------LOOP--------------------
 	Application::run();
 	//-----------------------CLEANUP------------------
-	Application::onUpdate.unsubscribe(&onUpdate);
+	Application::onUpdate.unsubscribe(&onAppUpdate);
 	//delete texture_data;
 	//-----------------------TERMINATE------------------
 
-	Application::terminate();*/
+	Application::terminate();
 
 }

@@ -6,29 +6,25 @@
 
 namespace HBE {
 
-	template<typename ... Components>
-	class HB_API EntityGroup {
+	/*template<typename ... Components>
+	class EntityGroup: public entt::view<Components...>{
         friend class Scene;
-        entt::view<entt::exclude_t<>,Components...> view;
+		//entt::basic_view<EntityHandle , entt::exclude_t<>, Components...> entity_view;
 
-		EntityGroup(entt::registry &registry):view(registry.view<Components...>()){
-
-		}
-
-	public:
-        EntityGroup(EntityGroup<Components...>& other)=default;
+		public:
+        EntityGroup(EntityGroup<Components...>& other):entity_view(other.view){};
 		template<typename T>
 		T &get(EntityHandle entity_handle) {
-			return view.template get<T>(entity_handle);
+			return entity_view.template get<T>(entity_handle);
 		}
 
         auto begin() {
-			return view.begin();
+			return entity_view.begin();
 		}
 
         auto end() {
-			return view.end();
+			return entity_view.end();
 		}
 
-	};
+	};*/
 }

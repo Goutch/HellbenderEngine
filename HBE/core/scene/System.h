@@ -1,19 +1,16 @@
-#include "ECSScene.h"
+#pragma once
+
+#include "Core.h"
 
 namespace HBE {
+	class Scene;
 
-	struct test {
-		bool isTrue;
-	};
+	class HB_API System {
+	protected:
+		Scene *scene;
+	public:
+		virtual ~System() = default;
 
-	template<typename ... Ts>
-	class System {
-		virtual void init(Scene* scene) = 0;
-
-		virtual void update() = 0;
-
-		virtual void draw() = 0;
-
-		virtual void render() = 0;
+		System(Scene *scene) { this->scene = scene; }
 	};
 }

@@ -167,7 +167,7 @@ void main()
 				screen_frag, default_screen_layout);*/
 	}
 
-	const RenderTarget *Graphics::getDefaultRenderTarget() {
+	 RenderTarget *Graphics::getDefaultRenderTarget() {
 		return renderer->getDefaultRenderTarget();
 	}
 

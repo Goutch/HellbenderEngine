@@ -10,41 +10,42 @@
 #include <core/resource/Resources.h>
 
 namespace HBE {
-	Scene *Application::scene = nullptr;
+	Scene *Application::current_scene = nullptr;
 	Window *Application::window = nullptr;
 	Clock *Application::time = nullptr;
 	int Application::fps_counter = 0;
 	float Application::fps_timer = 0;
 	Event<> Application::onInit = Event<>();
-	Event<float> Application::onUpdate = Event<float>();
-	Event<> Application::onDraw = Event<>();
 	Event<Scene *> Application::onSceneChange = Event<Scene *>();
-	Event<> Application::onRender = Event<>();
-	Event<> Application::onRegisterComponents = Event<>();
 	Event<> Application::onWindowClosed = Event<>();
 	Event<> Application::onQuit = Event<>();
 
-	void Application::registerComponents() {
-		onRegisterComponents.invoke();
+	Event<float> Application::onUpdate;
+	Event<> Application::onDraw;
+	Event<> Application::onRender;
+
+	void Application::setScene(Scene *scene, bool delete_previous_scene) {
+		if (delete_previous_scene && scene != nullptr) {
+			delete current_scene;
+			current_scene = nullptr;
+		}
+		Application::current_scene = scene;
+		if (scene != nullptr) {
+			onSceneChange.invoke(scene);
+		}
+
 	}
 
-	Scene *Application::setScene(std::string path) {
-		//todo:scene loading
-		if (scene != nullptr) {
-			delete scene;
-		}
-		scene = new Scene();
-		onSceneChange.invoke(scene);
-		return scene;
+	Scene *Application::getScene() {
+		return current_scene;
 	}
 
 	void Application::init() {
 		Graphics::init();
 		window = Graphics::getWindow();
-		registerComponents();
 		Input::init();
-		if (!scene)
-			setScene("");
+		if (!current_scene)
+			setScene(new Scene());
 		onInit.invoke();
 	}
 
@@ -54,27 +55,29 @@ namespace HBE {
 		Clock update_clock = Clock();
 		float delta_t = 0.0f;
 
-		while (!window->shouldClose() && scene != nullptr) {
+		while (!window->shouldClose() && current_scene != nullptr) {
 			window->swapBuffers();
 			Input::pollEvents();
 
 			JobManager::updateJobsStatus();
 			onUpdate.invoke(delta_t);
+			current_scene->update(delta_t);
 
-			Entity camera_entity = scene->getCameraEntity();
+			Entity camera_entity = current_scene->getCameraEntity();
 
 			if (camera_entity.valid()) {
 				Camera &camera = camera_entity.get<Camera>();
-				Transform transform = camera_entity.get<Transform>();
-				onDraw.invoke();
-				Graphics::beginFrame();
-				Graphics::render(camera.render_target,
-								 camera.projection,
-								 glm::inverse(transform.matrix));
-				Graphics::endFrame();
+				if (camera.active) {
+					onDraw.invoke();
+					current_scene->draw();
+					Graphics::beginFrame();
+					onRender.invoke();
+					current_scene->render();
+					Graphics::endFrame();
+				}
+			} else {
+				Log::warning("No camera in current scene");
 			}
-
-
 			delta_t = update_clock.ns() / SECONDS_TO_NANOSECOND;
 			update_clock.reset();
 #ifdef DEBUG_MODE
@@ -84,7 +87,7 @@ namespace HBE {
 		onWindowClosed.invoke();
 		onQuit.invoke();
 		delete time;
-		delete scene;
+		delete current_scene;
 	}
 
 	void Application::terminate() {
