@@ -9,35 +9,18 @@ namespace HBE {
 		systems.push_back(new CameraControllerSystem(this));
 	}
 
-	Entity Scene::createEntity(const std::string &name) {
-		Entity e(registry.create(), &registry);
-		e.attach<Identity>(name);
-		e.attach<Transform>();
-		return e;
-	}
-
-
-	Entity Scene::createEntity() {
-		Entity e(registry.create(), &registry);
-		e.attach<Transform>();
-		return e;
-	}
 
 	Entity Scene::getCameraEntity() {
 		return main_camera_entity;
 	}
 
 	void Scene::destroyEntity(Entity entity) {
-		registry.destroy(entity.handle);
+		registry.destroy(entity.getHandle());
 
 	}
 
 	void Scene::setCameraEntity(Entity camera) {
 		main_camera_entity = camera;
-	}
-
-	Entity Scene::get(const std::string &entity_name) {
-		return entities[entity_name];
 	}
 
 	void Scene::update(float delta_t) {
@@ -58,5 +41,58 @@ namespace HBE {
 		}
 	}
 
+	void Scene::addSystem(System *system) {
+		systems.emplace_back(system);
+	}
+
+	bool Scene::valid(entity_handle handle) {
+
+#ifdef USE_ENTT
+		return registry.valid(handle);
+#else
+		return registry.valid(handle);
+#endif
+	}
+
+	bool Entity::valid() {
+		return scene->valid(handle);
+	}
+
+	entity_handle Entity::getHandle() {
+		return handle;
+	}
+
+	Entity::Entity(const Entity &other) {
+		this->handle = other.handle;
+		this->scene = other.scene;
+	}
+
+	Entity::Entity(entity_handle handle, Scene *scene) {
+		this->handle = handle;
+		this->scene = scene;
+	}
+
+	Entity Scene::createEntity(const std::string &name) {
+#ifdef USE_ENTT
+		Entity e(registry.create(), this);
+#else
+		Entity e(registry.create(), this);
+#endif
+		auto identity = e.attach<Identity>();
+		identity.name = name;
+		e.attach<Transform>();
+		return e;
+	}
+
+
+	Entity Scene::createEntity() {
+#ifdef USE_ENTT
+		Entity e(registry.create(), this);
+#else
+		Entity e(registry.create(), this);
+#endif
+		e.attach<Transform>();
+		return e;
+	}
 
 }

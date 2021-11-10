@@ -5,7 +5,7 @@
 namespace HBE {
 	VK_Scheduler::VK_Scheduler(VK_Device *device, uint32_t concurrent_operations_count) {
 		this->device = device;
-		for (int i = 0; i < concurrent_operations_count; ++i) {
+		for (size_t i = 0; i < concurrent_operations_count; ++i) {
 			fences.emplace_back(*device);
 		}
 	}

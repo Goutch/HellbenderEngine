@@ -50,73 +50,75 @@ namespace HBE {
 		std::vector<float> vertices;
 		switch (flags) {
 			case 0x0://VERTEX_FLAG_NONE
-				vertices = {
-						size.x, -size.y, size.z,
-						size.x, size.y, size.z,
-						-size.x, size.y, size.z,
-						-size.x, -size.y, size.z,
+				vertices.assign({
+										size.x, -size.y, size.z,
+										size.x, size.y, size.z,
+										-size.x, size.y, size.z,
+										-size.x, -size.y, size.z,
 
-						size.x, -size.y, -size.z,
-						size.x, size.y, -size.z,
-						size.x, size.y, size.z,
-						size.x, -size.y, size.z,
+										size.x, -size.y, -size.z,
+										size.x, size.y, -size.z,
+										size.x, size.y, size.z,
+										size.x, -size.y, size.z,
 
-						-size.x, -size.y, -size.z,
-						-size.x, size.y, -size.z,
-						size.x, size.y, -size.z,
-						size.x, -size.y, -size.z,
+										-size.x, -size.y, -size.z,
+										-size.x, size.y, -size.z,
+										size.x, size.y, -size.z,
+										size.x, -size.y, -size.z,
 
-						-size.x, -size.y, size.z,
-						-size.x, size.y, size.z,
-						-size.x, size.y, -size.z,
-						-size.x, -size.y, -size.z,
+										-size.x, -size.y, size.z,
+										-size.x, size.y, size.z,
+										-size.x, size.y, -size.z,
+										-size.x, -size.y, -size.z,
 
-						-size.x, size.y, -size.z,
-						-size.x, size.y, size.z,
-						size.x, size.y, size.z,
-						size.x, size.y, -size.z,
+										-size.x, size.y, -size.z,
+										-size.x, size.y, size.z,
+										size.x, size.y, size.z,
+										size.x, size.y, -size.z,
 
-						size.x, -size.y, size.z,
-						-size.x, -size.y, size.z,
-						-size.x, -size.y, -size.z,
-						size.x, -size.y, -size.z,
-				};
+										size.x, -size.y, size.z,
+										-size.x, -size.y, size.z,
+										-size.x, -size.y, -size.z,
+										size.x, -size.y, -size.z,
+								});
 
-
+				mesh.setVertices(0, vertices.data(), vertices.size() / 3);
 				break;
 
 			case 0x1://VERTEX_FLAG_UV
-				vertices = {
-						size.x, -size.y, size.z, 0.0f, 0.0f,
-						size.x, size.y, size.z, 0.0f, 1.0f,
-						-size.x, size.y, size.z, 1.0f, 1.0f,
-						-size.x, -size.y, size.z, 1.0f, 0.0f,
+				vertices.assign({
+										size.x, -size.y, size.z, 0.0f, 0.0f,
+										size.x, size.y, size.z, 0.0f, 1.0f,
+										-size.x, size.y, size.z, 1.0f, 1.0f,
+										-size.x, -size.y, size.z, 1.0f, 0.0f,
 
-						size.x, -size.y, -size.z, 0.0f, 0.0f,
-						size.x, size.y, -size.z, 0.0f, 1.0f,
-						size.x, size.y, size.z, 1.0f, 1.0f,
-						size.x, -size.y, size.z, 1.0f, 0.0f,
+										size.x, -size.y, -size.z, 0.0f, 0.0f,
+										size.x, size.y, -size.z, 0.0f, 1.0f,
+										size.x, size.y, size.z, 1.0f, 1.0f,
+										size.x, -size.y, size.z, 1.0f, 0.0f,
 
-						-size.x, -size.y, -size.z, 0.0f, 0.0f,
-						-size.x, size.y, -size.z, 0.0f, 1.0f,
-						size.x, size.y, -size.z, 1.0f, 1.0f,
-						size.x, -size.y, -size.z, 1.0f, 0.0f,
+										-size.x, -size.y, -size.z, 0.0f, 0.0f,
+										-size.x, size.y, -size.z, 0.0f, 1.0f,
+										size.x, size.y, -size.z, 1.0f, 1.0f,
+										size.x, -size.y, -size.z, 1.0f, 0.0f,
 
-						-size.x, -size.y, size.z, 0.0f, 0.0f,
-						-size.x, size.y, size.z, 0.0f, 1.0f,
-						-size.x, size.y, -size.z, 1.0f, 1.0f,
-						-size.x, -size.y, -size.z, 1.0f, 0.0f,
+										-size.x, -size.y, size.z, 0.0f, 0.0f,
+										-size.x, size.y, size.z, 0.0f, 1.0f,
+										-size.x, size.y, -size.z, 1.0f, 1.0f,
+										-size.x, -size.y, -size.z, 1.0f, 0.0f,
 
-						-size.x, size.y, -size.z, 0.0f, 0.0f,
-						-size.x, size.y, size.z, 0.0f, 1.0f,
-						size.x, size.y, size.z, 1.0f, 1.0f,
-						size.x, size.y, -size.z, 1.0f, 0.0f,
+										-size.x, size.y, -size.z, 0.0f, 0.0f,
+										-size.x, size.y, size.z, 0.0f, 1.0f,
+										size.x, size.y, size.z, 1.0f, 1.0f,
+										size.x, size.y, -size.z, 1.0f, 0.0f,
 
-						size.x, -size.y, size.z, 0.0f, 0.0f,
-						-size.x, -size.y, size.z, 0.0f, 1.0f,
-						-size.x, -size.y, -size.z, 1.0f, 1.0f,
-						size.x, -size.y, -size.z, 1.0f, 0.0f,
-				};
+										size.x, -size.y, size.z, 0.0f, 0.0f,
+										-size.x, -size.y, size.z, 0.0f, 1.0f,
+										-size.x, -size.y, -size.z, 1.0f, 1.0f,
+										size.x, -size.y, -size.z, 1.0f, 0.0f,
+
+								});
+				mesh.setVertices(0, vertices.data(), vertices.size() / 5);
 				break;
 
 			case 0x10://VERTEX_FLAG_NORMAL
@@ -124,7 +126,7 @@ namespace HBE {
 			case 0x11://VERTEX_FLAG_NORMAL&VERTEX_FLAG_UV
 				break;
 		}
-		mesh.setVertices(0, vertices.data(),vertices.size());
+
 		std::vector<uint32_t> indices = {
 				0, 1, 2,
 				2, 3, 0,

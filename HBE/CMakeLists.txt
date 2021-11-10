@@ -159,7 +159,7 @@ set(CORE_FILES
         core/utility/ModelImporter.h
         core/utility/Random.cpp
         core/utility/Random.h
-        core/utility/CArray.h
+        core/utility/RawVector.h
 
         core/threading/JobManager.cpp
         core/threading/JobManager.h
@@ -167,12 +167,10 @@ set(CORE_FILES
         core/scene/System.h
         core/scene/Scene.cpp
         core/scene/Scene.h
-        core/scene/Entity.cpp
-        core/scene/Entity.h
         core/scene/Components.h
         core/scene/systems/CameraSystem.cpp
         core/scene/systems/CameraSystem.h
-        core/scene/EntityGroup.h core/scene/systems/MeshRendererSystem.cpp core/scene/systems/MeshRendererSystem.h core/scene/Components.cpp core/scene/systems/CameraControllerSystem.cpp core/scene/systems/CameraControllerSystem.h)
+        core/scene/EntityGroup.h core/scene/systems/MeshRendererSystem.cpp core/scene/systems/MeshRendererSystem.h core/scene/Components.cpp core/scene/systems/CameraControllerSystem.cpp core/scene/systems/CameraControllerSystem.h core/scene/systems/RotatorSystem.cpp core/scene/systems/RotatorSystem.h core/scene/ecs/Registry.h core/utility/Profiler.cpp core/utility/Profiler.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

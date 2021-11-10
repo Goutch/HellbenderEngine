@@ -3,6 +3,7 @@
 #include "CameraControllerSystem.h"
 #include "core/scene/Scene.h"
 #include "core/input/Input.h"
+#include "core/utility/Profiler.h"
 
 namespace HBE {
 	CameraControllerSystem::CameraControllerSystem(Scene *scene) : System(scene) {
@@ -10,12 +11,24 @@ namespace HBE {
 	}
 
 	void CameraControllerSystem::update(float delta_t) {
+		Profiler::begin("CameraControllerUpdate");
+		Profiler::begin("CameraControllerUpdateGroup");
 		auto group = scene->group<Transform, Camera, CameraController>();
-		for (EntityHandle entity_handle:group) {
-			Camera &camera = group.get<Camera>(entity_handle);
-			Transform &transform = group.get<Transform>(entity_handle);
-			CameraController &controller = group.get<CameraController>(entity_handle);
-
+		Profiler::end();
+#ifdef USE_ENTT
+		for (entity_handle handle:group) {
+			Camera &camera = group.get<Camera>(handle);
+			Transform &transform = group.get<Transform>(handle);
+			CameraController &controller = group.get<CameraController>(handle);
+#else
+		Camera *cameras = scene->get<Camera>();
+		Transform *transforms = scene->get<Transform>();
+		CameraController *constrollers = scene->get<CameraController>();
+		for (size_t i = 0; i < group.size(); ++i) {
+			Camera &camera = cameras[i];
+			Transform &transform = transforms[i];
+			CameraController &controller = constrollers[i];
+#endif
 
 			float max_pitch_radian = glm::radians(controller.max_pitch);
 			uint32_t w, h;
@@ -40,7 +53,7 @@ namespace HBE {
 
 			transform.rotate(vec3(controller.current_pitch, 0, 0));
 
-
+			float boost = 1.0f;
 			vec3 translation = vec3(0);
 			if (Input::getKey(KEY::S)) {
 				translation.z += 1;
@@ -60,10 +73,13 @@ namespace HBE {
 			if (Input::getKey(KEY::LEFT_CONTROL)) {
 				translation.y = -1;
 			}
+			if (Input::getKey(KEY::LEFT_SHIFT)) {
+				boost = 10.0f;
+			}
 
-			transform.translate(translation * delta_t * controller.speed);
+			transform.translate(translation * delta_t * controller.speed * boost);
 		}
-
+		Profiler::end();
 
 	}
 

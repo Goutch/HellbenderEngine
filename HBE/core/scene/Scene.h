@@ -1,9 +1,10 @@
 #pragma once
+//#define USE_ENTT
 
 #include "Core.h"
-#include "entt.hpp"
+
 #include "Components.h"
-#include "Entity.h"
+
 
 #include "System.h"
 #include "unordered_map"
@@ -11,11 +12,52 @@
 #include "core/scene/systems/MeshRendererSystem.h"
 #include "typeinfo"
 
-namespace HBE {
-	class Entity;
 
-	template<typename ... Components>
-	using EntityGroup = entt::basic_view<EntityHandle, entt::exclude_t<>, Components...>;
+#ifdef USE_ENTT
+
+#include "entt.hpp"
+
+#else
+
+#include "core/scene/ecs/Registry.h"
+
+#endif
+
+
+namespace HBE {
+#ifdef USE_ENTT
+	typedef entt::entity entity_handle;
+#endif
+
+	class Scene;
+
+	class HB_API Entity {
+		entity_handle handle;
+		Scene *scene = nullptr;
+	public:
+
+		Entity() = default;
+		Entity(entity_handle handle, Scene *scene);
+
+		Entity(const Entity &other);
+
+		template<typename Component>
+		Component &attach();
+
+		template<typename Component>
+		Component &attach(Component &component);
+		template<typename Component>
+		Component &get();
+
+		template<typename Component>
+		void detach();
+		template<typename Component>
+		bool has();
+
+		bool valid();
+
+		entity_handle getHandle();
+	};
 
 	class HB_API Scene {
 	public:
@@ -23,10 +65,16 @@ namespace HBE {
 		Event<> onDraw;
 		Event<float> onUpdate;
 	private:
-		friend class entt::basic_registry<EntityHandle>;
+#ifdef USE_ENTT
+
+		friend class entt::basic_registry<entity_handle>;
 
 		entt::registry registry;
-		std::unordered_map<std::string, Entity> entities;
+#else
+		Registry registry;
+#endif
+		Scene(const Scene &scene) = delete;
+		Scene(Scene &scene) = delete;
 
 		std::vector<System *> systems;
 		Entity main_camera_entity;
@@ -40,59 +88,170 @@ namespace HBE {
 		void update(float deltaTime);
 		void draw();
 		void render();
-		Entity get(const std::string &entity_name);
 		Entity createEntity(const std::string &name);
 		Entity createEntity();
 		void destroyEntity(Entity entity);
 		Entity getCameraEntity();
 		void setCameraEntity(Entity camera);
+		void addSystem(System *system);
 
 		template<typename ... Components>
-		EntityGroup<Components...> group() {
-			auto view = registry.view<Components...>();
-			return view;
-		}
+		auto group();
+		template<typename Component>
+		Component* get();
+		template<typename Component>
+		Component &get(entity_handle handle);
 
 		template<typename Component>
-		Entity get(Component &component) {
-			return Entity(entt::to_entity(registry, component), registry);
-		}
+		Component &attach(entity_handle handle);
 
 		template<typename Component>
-		Event<Entity> &onAttach() {
-			size_t hash = typeid(Component).hash_code();
-			if (attach_events.find(hash)==attach_events.end()) {
-				attach_events.emplace(hash, Event<Entity>());
-				registry.on_construct<Component>().template connect<&Scene::onComponentAttached<Component>>(this);
-			}
-			return attach_events[hash];
-		};
+		Component &attach(entity_handle handle, Component &component);
+
 
 		template<typename Component>
-		Event<Entity> &onDetach() {
-			size_t hash = typeid(Component).hash_code();
-			if (detach_events.find(hash)==detach_events.end()) {
-				detach_events.emplace(hash, Event<Entity>());
-				registry.on_destroy<Component>().template connect<&Scene::onComponentAttached<Component>>(this);
-			}
-			return detach_events[hash];
-		};
-
-	private:
-		template<typename Component>
-		void onComponentAttached(entt::registry &registry, EntityHandle entity_handle) {
-			size_t hash = typeid(Component).hash_code();
-			attach_events[hash].invoke(Entity(entity_handle, &registry));
-		}
+		bool has(entity_handle handle);
 
 		template<typename Component>
-		void onComponentDetached(entt::registry &registry, EntityHandle entity_handle) {
-			size_t hash = typeid(Component).hash_code();
-			detach_events[hash].invoke(Entity(entity_handle, &registry));
-		}
+		Component &detach(entity_handle handle);
+
+		bool valid(entity_handle handle);
+
+		template<typename Component>
+		Event<Entity> &onAttach();
+		template<typename Component>
+		Event<Entity> &onDetach();
+
 	};
 
 
+
+
+	template<typename Component>
+	Component &Entity::attach(Component &component) {
+		return scene->attach<Component>(handle, component);
+	}
+	template<typename Component>
+	Component &Entity::attach() {
+		return scene->attach<Component>(handle);
+	}
+	template<typename Component>
+	Component &Entity::get() {
+		return scene->get<Component>(handle);
+	}
+
+	template<typename Component>
+	void Entity::detach() {
+		scene->detach<Component>(handle);
+	}
+
+	template<typename Component>
+	bool Entity::has() {
+		return scene->has<Component>(handle);
+	}
+
+
+	template<typename ... Components>
+	auto Scene::group() {
+#ifdef USE_ENTT
+		return registry.view<Components...>();
+#else
+		return registry.group<Components...>();
+#endif
+	}
+
+
+	template<typename Component>
+	Component &Scene::get(entity_handle handle) {
+#ifdef USE_ENTT
+		return *registry.template try_get<Component>(handle);
+#else
+		return registry.get<Component>(handle);
+#endif
+	}
+	template<typename Component>
+	Component* Scene::get()
+	{
+#ifdef USE_ENTT
+		return nullptr;
+#else
+		return registry.get<Component>();
+#endif
+	}
+	template<typename Component>
+	Component &Scene::attach(entity_handle handle) {
+		size_t hash = typeid(Component).hash_code();;
+#ifdef USE_ENTT
+		Component &component = registry.template emplace_or_replace<Component>(handle);
+#else
+		Component &component = registry.attach<Component>(handle);
+#endif
+		Entity e = Entity(handle, this);
+		if (attach_events.find(hash) != attach_events.end())
+			attach_events[hash].invoke(e);
+		return component;
+	};
+
+
+	template<typename Component>
+	Component &Scene::attach(entity_handle handle, Component &component) {
+		size_t hash = typeid(Component).hash_code();
+#ifdef USE_ENTT
+		Component &component2 =registry.template emplace<Component>(handle, component);
+#else
+		Component &component2 = registry.attach<Component>(handle, component);
+#endif
+		if (attach_events.find(hash) != attach_events.end())
+			attach_events[hash].invoke(Entity(handle, this));
+		return component;
+	};
+
+	template<typename Component>
+	bool Scene::has(entity_handle handle) {
+#ifdef USE_ENTT
+		Component *c = registry.template try_get<Component>(handle);
+		if (c == nullptr) {
+			Log::error("Component does not exist");
+		}
+		return c != nullptr;
+#else
+		return registry.has<Component>(handle);
+#endif
+	}
+
+	template<typename Component>
+	Component &Scene::detach(entity_handle handle) {
+		size_t hash = typeid(Component).hash_code();
+		Component *component;
+#ifdef USE_ENTT
+		component = &registry.template erase<Component>(handle, Component{});
+#else
+		component = &registry.attach<Component>(handle, Component{});
+#endif
+		if (detach_events.find(hash) != detach_events.end())
+			detach_events[hash].invoke(Entity(handle, this));
+		return *component;
+	};
+
+	template<typename Component>
+	Event<Entity> &Scene::onAttach() {
+		size_t hash = typeid(Component).hash_code();
+		if (attach_events.find(hash) == attach_events.end()) {
+			attach_events.emplace(hash, Event<Entity>());
+		}
+		return attach_events[hash];
+	};
+
+	template<typename Component>
+	Event<Entity> &Scene::onDetach() {
+
+		size_t hash = typeid(Component).hash_code();
+		if (detach_events.find(hash) == detach_events.end()) {
+			detach_events.emplace(hash, Event<Entity>());
+		}
+		return detach_events[hash];
+
+	}
 }
 
 

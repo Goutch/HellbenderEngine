@@ -1,7 +1,6 @@
 #pragma once
 
 #include "glm/glm.hpp"
-#include "entt.hpp"
 namespace HBE {
 	typedef glm::mat2 mat2;
 	typedef glm::mat3 mat3;
@@ -20,6 +19,4 @@ namespace HBE {
 	typedef glm::vec<4,uint32_t> vec4u;
 
 	typedef glm::quat quat;
-
-	typedef entt::entity EntityHandle;
 }

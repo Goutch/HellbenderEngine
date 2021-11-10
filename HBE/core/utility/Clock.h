@@ -1,28 +1,31 @@
 
 #pragma once
+
 #include "Core.h"
 #include <chrono>
 
-#define SECONDS_TO_NANOSECOND 1000000000
-
-#define SECOND_TO_MILISECOND 1000
-
+#define SECONDS_TO_NANOSECONDS 1000000000.0
+#define MILISECONDS_TO_NANOSECONDS 1000000.0
+#define SECONDS_TO_MILISECONDS 1000.0
+#define NANOSECONDS_TO_SECONDS 1.0/1000000000.0
+#define NANOSECONDS_TO_MILISECONDS 1.0/1000000.0
+#define MILISECONDS_TO_SECONDS 1.0/1000.0
 namespace HBE {
-    class HB_API Clock {
-        std::chrono::high_resolution_clock::time_point start_time;
+	class HB_API Clock {
+		std::chrono::high_resolution_clock::time_point start_time;
 
-    public:
-        Clock();
+	public:
+		Clock();
 
-        void reset();
+		void reset();
 
-        void start();
+		void start();
 
-        void stop();
+		void stop();
 
-        float ms() const;
+		float ms() const;
 
-        float ns() const;
-    };
+		float ns() const;
+	};
 
 }

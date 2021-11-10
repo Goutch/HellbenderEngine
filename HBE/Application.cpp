@@ -8,6 +8,7 @@
 #include <core/graphics/Window.h>
 #include <core/graphics/Renderer.h>
 #include <core/resource/Resources.h>
+#include "core/utility/Profiler.h"
 
 namespace HBE {
 	Scene *Application::current_scene = nullptr;
@@ -58,31 +59,35 @@ namespace HBE {
 		while (!window->shouldClose() && current_scene != nullptr) {
 			window->swapBuffers();
 			Input::pollEvents();
-
+			Profiler::begin("TOTAL_FRAME");
 			JobManager::updateJobsStatus();
+			Profiler::begin("UPDATE");
 			onUpdate.invoke(delta_t);
 			current_scene->update(delta_t);
-
+			Profiler::end();
 			Entity camera_entity = current_scene->getCameraEntity();
 
 			if (camera_entity.valid()) {
 				Camera &camera = camera_entity.get<Camera>();
 				if (camera.active) {
+					Profiler::begin("DRAW");
 					onDraw.invoke();
 					current_scene->draw();
+					Profiler::end();
+					Profiler::begin("RENDER");
 					Graphics::beginFrame();
 					onRender.invoke();
 					current_scene->render();
 					Graphics::endFrame();
+					Profiler::end();
 				}
 			} else {
 				Log::warning("No camera in current scene");
 			}
-			delta_t = update_clock.ns() / SECONDS_TO_NANOSECOND;
+			Profiler::end();
+			delta_t = update_clock.ns() * NANOSECONDS_TO_SECONDS;
 			update_clock.reset();
-#ifdef DEBUG_MODE
 			printFPS(delta_t);
-#endif
 		}
 		onWindowClosed.invoke();
 		onQuit.invoke();
@@ -100,7 +105,7 @@ namespace HBE {
 
 	float Application::getTime() {
 		if (time) {
-			return time->ms() / SECOND_TO_MILISECOND;
+			return time->ms() * MILISECONDS_TO_SECONDS;
 		}
 		return 0;
 	}

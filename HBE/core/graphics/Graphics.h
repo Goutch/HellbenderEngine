@@ -34,7 +34,7 @@ namespace HBE {
 		static Window *getWindow();
 
 		static void
-		draw(const Transform &transform, const Mesh &mesh, GraphicPipeline &material);
+		draw(mat4 transform_matrix, const Mesh &mesh, GraphicPipeline &material);
 
 		static void drawInstanced(const Mesh &mesh, GraphicPipeline &pipeline);
 

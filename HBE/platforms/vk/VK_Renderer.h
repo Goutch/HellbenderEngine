@@ -30,7 +30,7 @@ namespace HBE {
 	class VK_Fence;
 
 	class VK_Renderer : public Renderer {
-#define MAP_LIST(T1, T2) std::unordered_map<T1,T2>
+#define MAP(T1, T2) std::unordered_map<T1,T2>
 	private:
 		struct RenderObject {
 			const Transform *transform;
@@ -43,7 +43,7 @@ namespace HBE {
 			VK_Semaphore *image_available_semaphore;
 		};
 
-		MAP_LIST(GraphicPipeline*, MAP_LIST(const Mesh*, std::list<const Transform*>)) render_cache;
+		MAP(GraphicPipeline*, MAP(const Mesh*, std::vector<mat4>)) render_cache;
 
 
 		VK_Window *window;
@@ -73,7 +73,7 @@ namespace HBE {
 
 		void endFrame(bool present) override;
 
-		void draw(const Transform &transform, const Mesh &mesh, GraphicPipeline &pipeline) override;
+		void draw(mat4 transform_matrix, const Mesh &mesh, GraphicPipeline &pipeline) override;
 
 		void drawInstanced(const Mesh &mesh, GraphicPipeline &pipeline) override;
 

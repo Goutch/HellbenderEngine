@@ -1,3 +1,4 @@
+#include <core/scene/systems/RotatorSystem.h>
 #include "HBE.h"
 
 using namespace HBE;
@@ -51,19 +52,38 @@ void init() {
 	//-------------------SCENE CREATION--------------------------------------
 	Scene &scene = *Application::getScene();
 
+	scene.addSystem(new RotatorSystem(&scene));
+
 	Entity camera_entity = scene.createEntity();
-	camera_entity.attach<Camera>();
-	camera_entity.get<Transform>().setPosition(vec3(0, 0, 5));
+	Camera &camera = camera_entity.attach<Camera>();
+	camera.render_target = Graphics::getDefaultRenderTarget();
+	camera.calculateProjection();
 	camera_entity.attach<CameraController>();
 	scene.setCameraEntity(camera_entity);
 
-	MeshRenderer &cube = scene.createEntity().attach<MeshRenderer>();
-	cube.pipeline = pipeline;
-	cube.mesh = mesh;
+	Random random;
+	for (int i = -5; i < 5; ++i) {
+		for (int j = -5; j < 5; ++j) {
+			for (int k = -5; k < 5; ++k) {
+				Entity cube_entity = scene.createEntity();
+				MeshRenderer &cube = cube_entity.attach<MeshRenderer>();
+				cube.pipeline = pipeline;
+				cube.mesh = mesh;
+				cube_entity.get<Transform>().translate(vec3(i, j, k) * 5.0f);
+				Rotator &rotator = cube_entity.attach<Rotator>();
+				rotator.rotate_speed = random.floatRange(M_PI, 5.0f);
+				rotator.angle = vec3(random.floatRange(-M_PI, M_PI),
+									 random.floatRange(-M_PI, M_PI),
+									 random.floatRange(-M_PI, M_PI));
+			}
+		}
+	}
+
 }
 
 int main() {
 	Application::init();
+	Log::setFlags(Log::getFlags());
 	//-----------------------SETUP--------------------
 	Configs::setWindowTitle("Hellbender");
 

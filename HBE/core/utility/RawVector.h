@@ -1,24 +1,27 @@
 #pragma once
+
 #include <cstdint>
-struct CArray {
+#include <cstdlib>
+#include "string"
+struct RawVector {
 private:
 	const size_t element_size;
 	uint8_t *data = nullptr;
-	void *temp = nullptr;
+	uint8_t *temp = nullptr;
 	size_t count;
 	size_t capacity;
 
 public:
-	CArray(const CArray &) = delete;
+	RawVector(const RawVector &) = delete;
 
-	CArray(size_t element_size) : element_size(element_size) {
+	RawVector(size_t element_size) : element_size(element_size) {
 		count = 0;
 		capacity = 2;
 		data = (uint8_t *) malloc(element_size * capacity);
-		temp = malloc(element_size);
+		temp = (uint8_t *)malloc(element_size);
 	}
 
-	~CArray() {
+	~RawVector() {
 		if (data != nullptr)
 			delete[] data;
 		if (temp != nullptr)
@@ -26,7 +29,7 @@ public:
 	}
 
 
-	void add(void *element) {
+	void add(uint8_t *element) {
 		int index = element_size * count;
 		if (capacity == count) {
 			capacity *= 2;
@@ -46,8 +49,8 @@ public:
 
 		memcpy(temp, data + byte_i, element_size);
 
-		memcpy(data + byte_i, data + byte_j, element_size);
-		memcpy(data + byte_j, temp, element_size);
+		memmove(data + byte_i, data + byte_j, element_size);
+		memmove(data + byte_j, temp, element_size);
 	}
 
 
@@ -61,11 +64,11 @@ public:
 		count--;
 	}
 
-	size_t size() {
+	size_t size() const {
 		return count;
 	}
 
-	uint8_t *operator[](size_t i) {
-		return (data + (i * element_size));
+	uint8_t &operator[](size_t i) {
+		return data[i * element_size];
 	}
 };

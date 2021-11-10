@@ -62,7 +62,7 @@ namespace HBE {
 		bool active = true;
 	};
 
-	struct CameraController {
+	struct HB_API CameraController {
 		float speed = 1.0f;
 		float sensibility = 1.0f;
 		float current_pitch = 0.0f;

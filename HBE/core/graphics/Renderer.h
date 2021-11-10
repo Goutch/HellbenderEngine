@@ -36,7 +36,7 @@ namespace HBE {
 
 		virtual void setCurrentRenderTarget(RenderTarget *renderTarget) = 0;
 
-		virtual void draw(const Transform &transform, const Mesh &mesh, GraphicPipeline &pipeline) = 0;
+		virtual void draw(mat4 transform_matrix, const Mesh &mesh, GraphicPipeline &pipeline) = 0;
 
 		virtual void drawInstanced(const Mesh &mesh, GraphicPipeline &pipeline) = 0;
 

@@ -3,6 +3,7 @@
 #include "VK_Device.h"
 
 #include "cstring"
+
 namespace HBE {
 
 
@@ -57,7 +58,8 @@ namespace HBE {
 		if (allocation.flags & ALLOC_FLAG_MAPPABLE) {
 			void *buffer_data;
 			vkMapMemory(device->getHandle(), allocation.block->memory, allocation.offset, allocation.size, 0, &buffer_data);
-			memcpy(buffer_data, data, (size_t) size);
+			size_t copy_size = (size_t) size;
+			memcpy(buffer_data, data, copy_size);
 			vkUnmapMemory(device->getHandle(), allocation.block->memory);
 		} else {
 			VK_Buffer staging_buffer = VK_Buffer(device,
