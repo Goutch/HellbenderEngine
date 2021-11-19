@@ -9,7 +9,7 @@
 #include <core/graphics/Renderer.h>
 #include <core/resource/Resources.h>
 #include "core/utility/Profiler.h"
-
+#include "core/scene/Scene.h"
 namespace HBE {
 	Scene *Application::current_scene = nullptr;
 	Window *Application::window = nullptr;
@@ -89,14 +89,17 @@ namespace HBE {
 			update_clock.reset();
 			printFPS(delta_t);
 		}
+
 		onWindowClosed.invoke();
 		onQuit.invoke();
 		delete time;
 		delete current_scene;
+
 	}
 
 	void Application::terminate() {
 		Graphics::terminate();
+		Profiler::printAverange();
 	}
 
 	void Application::quit() {
@@ -105,7 +108,7 @@ namespace HBE {
 
 	float Application::getTime() {
 		if (time) {
-			return time->ms() * MILISECONDS_TO_SECONDS;
+			return time->ns() * NANOSECONDS_TO_SECONDS;
 		}
 		return 0;
 	}

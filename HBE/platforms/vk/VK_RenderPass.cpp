@@ -120,7 +120,7 @@ namespace HBE {
 
 	VK_RenderPass::~VK_RenderPass() {
 
-		for (int i = 0; i < images.size(); ++i) {
+		for (size_t i = 0; i < images.size(); ++i) {
 			delete images[i];
 		}
 		for (auto framebuffer: frame_buffers) {

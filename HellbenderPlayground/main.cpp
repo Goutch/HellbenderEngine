@@ -50,25 +50,57 @@ void init() {
 	Geometry::createCube(*mesh, 1, 1, 1, VERTEX_FLAG_UV);
 
 	//-------------------SCENE CREATION--------------------------------------
-	Scene &scene = *Application::getScene();
+	Scene &scene = *(new Scene());
+	Application::setScene(&scene, true);
 
 	scene.addSystem(new RotatorSystem(&scene));
 
-	Entity camera_entity = scene.createEntity();
+	Entity camera_entity = scene.createEntity("camera");
+	if(!scene.has<Identity>(camera_entity.getHandle()))
+	{
+		Log::error("no identity");
+	}
 	Camera &camera = camera_entity.attach<Camera>();
 	camera.render_target = Graphics::getDefaultRenderTarget();
 	camera.calculateProjection();
 	camera_entity.attach<CameraController>();
+	if (!scene.has<Transform>(camera_entity.getHandle())) {
+		Log::error("no Transform");
+	}
+	camera_entity.get<Transform>().setPosition(vec3(0, 0, 0));
 	scene.setCameraEntity(camera_entity);
 
+	Entity cube_entity = scene.createEntity();
+	cube_entity.attach<Transform>();
+	MeshRenderer &cube = cube_entity.attach<MeshRenderer>();
+	cube.pipeline = pipeline;
+	cube.mesh = mesh;
+	if (!cube_entity.valid()) {
+		Log::error("invalid");
+	}
+	if (!cube_entity.has<Transform>()) {
+		Log::error("no Transform");
+	}
+	cube_entity.get<Transform>().translate(vec3(0, 0, 1) * 5.0f);
+
+	/*
 	Random random;
 	for (int i = -5; i < 5; ++i) {
 		for (int j = -5; j < 5; ++j) {
 			for (int k = -5; k < 5; ++k) {
 				Entity cube_entity = scene.createEntity();
+				cube_entity.attach<Transform>();
 				MeshRenderer &cube = cube_entity.attach<MeshRenderer>();
 				cube.pipeline = pipeline;
 				cube.mesh = mesh;
+				if(!cube_entity.valid())
+				{
+					Log::error("invalid");
+				}
+				if(!cube_entity.has<Transform>())
+				{
+					Log::error("no Transform");
+				}
 				cube_entity.get<Transform>().translate(vec3(i, j, k) * 5.0f);
 				Rotator &rotator = cube_entity.attach<Rotator>();
 				rotator.rotate_speed = random.floatRange(M_PI, 5.0f);
@@ -77,7 +109,7 @@ void init() {
 									 random.floatRange(-M_PI, M_PI));
 			}
 		}
-	}
+	}*/
 
 }
 

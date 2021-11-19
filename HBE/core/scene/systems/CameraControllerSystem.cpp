@@ -15,16 +15,13 @@ namespace HBE {
 		Profiler::begin("CameraControllerUpdateGroup");
 		auto group = scene->group<Transform, Camera, CameraController>();
 		Profiler::end();
-#ifdef USE_ENTT
-		for (entity_handle handle:group) {
-			Camera &camera = group.get<Camera>(handle);
-			Transform &transform = group.get<Transform>(handle);
-			CameraController &controller = group.get<CameraController>(handle);
+#if  defined(USE_ENTT) || defined(PERSISTENT)
+		for (auto [handle,transform,camera,controller]:group) {
 #else
 		Camera *cameras = scene->get<Camera>();
 		Transform *transforms = scene->get<Transform>();
 		CameraController *constrollers = scene->get<CameraController>();
-		for (size_t i = 0; i < group.size(); ++i) {
+		for (size_t i = 0; i < group.count(); ++i) {
 			Camera &camera = cameras[i];
 			Transform &transform = transforms[i];
 			CameraController &controller = constrollers[i];

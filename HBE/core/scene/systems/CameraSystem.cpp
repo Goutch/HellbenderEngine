@@ -1,4 +1,3 @@
-
 #include <core/graphics/Graphics.h>
 #include "CameraSystem.h"
 #include "core/scene/Scene.h"
@@ -29,18 +28,16 @@ namespace HBE {
 		Profiler::begin("CameraRenderGroup");
 		auto group = scene->group<Transform, Camera>();
 		Profiler::end();
-#ifdef USE_ENTT
-		for (entity_handle handle:group) {
-			Camera &camera = group.get<Camera>(handle);
+#if  defined(USE_ENTT) || defined(PERSISTENT)
+		for (auto [handle,transform,camera]:group) {
 			if (camera.active) {
-				Transform &transform = group.get<Transform>(handle);
 				Graphics::render(camera.render_target, camera.projection, glm::inverse(transform.world()));
 			}
 		}
 #else
-		Transform *transforms = scene->get<Transform>();
-		Camera *cameras = scene->get<Camera>();
-		for (size_t i = 0; i < group.size(); ++i) {
+		Transform *transforms = scene->getAll<Transform>();
+		Camera *cameras = scene->getAll<Camera>();
+		for (size_t i = 0; i < group.count(); ++i) {
 
 			if (cameras[i].active) {
 

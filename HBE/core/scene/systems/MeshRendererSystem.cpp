@@ -14,13 +14,11 @@ namespace HBE {
 		Profiler::begin("MeshRendererUpdateGroup");
 		auto group = scene->group<Transform, MeshRenderer>();
 		Profiler::end();
-#ifdef USE_ENTT
-		for (entity_handle entity:group) {
-			MeshRenderer &mesh_renderer = group.get<MeshRenderer>(entity);
+#if  defined(USE_ENTT) || defined(PERSISTENT)
+		for (auto [handle,transform,mesh_renderer]:group) {
 			if (mesh_renderer.active) {
-				Transform &transform = group.get<Transform>(entity);
 				if (mesh_renderer.mesh && mesh_renderer.pipeline)
-					Graphics::draw(transform, *mesh_renderer.mesh, *mesh_renderer.pipeline);
+					Graphics::draw(transform.world(), *mesh_renderer.mesh, *mesh_renderer.pipeline);
 				else
 					Log::warning("Mesh renderer does not have a material and/or a mesh assigned");
 			}
@@ -28,9 +26,11 @@ namespace HBE {
 		}
 #else
 
-		Transform *transforms = scene->get<Transform>();
-		MeshRenderer *renderers = scene->get<MeshRenderer>();
-		for (size_t i = 0; i < group.size(); ++i) {
+		Transform *transforms = scene->getAll<Transform>();
+		MeshRenderer *renderers = scene->getAll<MeshRenderer>();
+		for (size_t i = 0; i < group.count(); ++i) {
+
+			auto [handle, transform, meshRenderer]=group.get((uint32_t)i);
 			if (renderers[i].active) {
 				if (renderers[i].mesh && renderers[i].pipeline)
 					Graphics::draw(transforms[i].world(), *renderers[i].mesh, *renderers[i].pipeline);

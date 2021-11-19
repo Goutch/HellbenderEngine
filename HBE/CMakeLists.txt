@@ -164,13 +164,22 @@ set(CORE_FILES
         core/threading/JobManager.cpp
         core/threading/JobManager.h
 
-        core/scene/System.h
         core/scene/Scene.cpp
-        core/scene/Scene.h
+        core/scene/System.h
         core/scene/Components.h
         core/scene/systems/CameraSystem.cpp
         core/scene/systems/CameraSystem.h
-        core/scene/EntityGroup.h core/scene/systems/MeshRendererSystem.cpp core/scene/systems/MeshRendererSystem.h core/scene/Components.cpp core/scene/systems/CameraControllerSystem.cpp core/scene/systems/CameraControllerSystem.h core/scene/systems/RotatorSystem.cpp core/scene/systems/RotatorSystem.h core/scene/ecs/Registry.h core/utility/Profiler.cpp core/utility/Profiler.h)
+        core/scene/systems/MeshRendererSystem.cpp
+        core/scene/systems/MeshRendererSystem.h
+        core/scene/Components.cpp
+        core/scene/systems/CameraControllerSystem.cpp
+        core/scene/systems/CameraControllerSystem.h
+        core/scene/systems/RotatorSystem.cpp
+        core/scene/systems/RotatorSystem.h
+        core/scene/ecs/Registry.h
+        core/utility/Profiler.cpp
+        core/utility/Profiler.h
+        core/scene/ecs/PersistentRegistry/Registry.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

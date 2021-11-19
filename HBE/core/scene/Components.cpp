@@ -83,10 +83,7 @@ namespace HBE {
 	}
 
 	void Transform::rotate(vec3 rot) {
-		local = glm::rotate(local, rot.x, vec3(1.f, 0.f, 0.f));
-		local = glm::rotate(local, rot.y, vec3(0.f, 1.f, 0.f));
-		local = glm::rotate(local, rot.z, vec3(0.f, 0.f, 1.f));
-
+		rotate(quat(rot));
 	}
 
 	void Transform::setPosition(vec3 pos) {

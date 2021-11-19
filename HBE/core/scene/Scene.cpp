@@ -1,8 +1,24 @@
 #include "Scene.h"
-#include "core/graphics/Graphics.h"
-#include "core/scene/systems/CameraControllerSystem.h"
-
 namespace HBE {
+
+	bool Entity::valid() {
+		return scene->valid(handle);
+	}
+
+	entity_handle Entity::getHandle() {
+		return handle;
+	}
+
+	Entity::Entity(const Entity &other) {
+		this->handle = other.handle;
+		this->scene = other.scene;
+	}
+
+	Entity::Entity(entity_handle handle, Scene *scene) {
+		this->handle = handle;
+		this->scene = scene;
+	}
+
 	Scene::Scene() {
 		systems.push_back(new MeshRendererSystem(this));
 		systems.push_back(new CameraSystem(this));
@@ -54,33 +70,10 @@ namespace HBE {
 #endif
 	}
 
-	bool Entity::valid() {
-		return scene->valid(handle);
-	}
-
-	entity_handle Entity::getHandle() {
-		return handle;
-	}
-
-	Entity::Entity(const Entity &other) {
-		this->handle = other.handle;
-		this->scene = other.scene;
-	}
-
-	Entity::Entity(entity_handle handle, Scene *scene) {
-		this->handle = handle;
-		this->scene = scene;
-	}
 
 	Entity Scene::createEntity(const std::string &name) {
-#ifdef USE_ENTT
-		Entity e(registry.create(), this);
-#else
-		Entity e(registry.create(), this);
-#endif
-		auto identity = e.attach<Identity>();
-		identity.name = name;
-		e.attach<Transform>();
+		Entity e = createEntity();
+		e.attach<Identity>().name=name;
 		return e;
 	}
 
@@ -91,8 +84,7 @@ namespace HBE {
 #else
 		Entity e(registry.create(), this);
 #endif
-		e.attach<Transform>();
+		attach<Transform>(e.getHandle());
 		return e;
 	}
-
 }

@@ -2,11 +2,11 @@
 #pragma once
 #include "Core.h"
 #include "core/utility/Event.h"
-#include "core/scene/Scene.h"
 
 namespace HBE {
     class Window;
     class Clock;
+	class Scene;
     class HB_API Application {
         static Window *window;
         static Clock *time;

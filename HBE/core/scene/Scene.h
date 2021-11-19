@@ -1,29 +1,30 @@
 #pragma once
-//#define USE_ENTT
 
 #include "Core.h"
 
-#include "Components.h"
-
-
-#include "System.h"
-#include "unordered_map"
-#include "core/scene/systems/CameraSystem.h"
-#include "core/scene/systems/MeshRendererSystem.h"
-#include "typeinfo"
-
+#define PERSISTENT
 
 #ifdef USE_ENTT
 
 #include "entt.hpp"
 
 #else
+#ifdef PERSISTENT
 
-#include "core/scene/ecs/Registry.h"
+#include "core/scene/ecs/PersistentRegistry/Registry.h"
 
+#else
+#include "Components.h"
 #endif
 
+#include "System.h"
+#include "unordered_map"
+#include "core/scene/systems/CameraSystem.h"
+#include "core/scene/systems/MeshRendererSystem.h"
+#include "core/scene/systems/CameraControllerSystem.h"
+#include "typeinfo"
 
+#endif
 namespace HBE {
 #ifdef USE_ENTT
 	typedef entt::entity entity_handle;
@@ -32,7 +33,11 @@ namespace HBE {
 	class Scene;
 
 	class HB_API Entity {
+#ifdef USE_ENTT
+		entity_handle handle = entt::null;
+#else
 		entity_handle handle;
+#endif
 		Scene *scene = nullptr;
 	public:
 
@@ -66,10 +71,9 @@ namespace HBE {
 		Event<float> onUpdate;
 	private:
 #ifdef USE_ENTT
-
-		friend class entt::basic_registry<entity_handle>;
-
-		entt::registry registry;
+		public:
+			entt::registry registry;
+		private:
 #else
 		Registry registry;
 #endif
@@ -98,8 +102,6 @@ namespace HBE {
 		template<typename ... Components>
 		auto group();
 		template<typename Component>
-		Component* get();
-		template<typename Component>
 		Component &get(entity_handle handle);
 
 		template<typename Component>
@@ -121,20 +123,20 @@ namespace HBE {
 		Event<Entity> &onAttach();
 		template<typename Component>
 		Event<Entity> &onDetach();
-
+		template<typename Component>
+		Component *getAll();
 	};
-
-
-
 
 	template<typename Component>
 	Component &Entity::attach(Component &component) {
 		return scene->attach<Component>(handle, component);
 	}
+
 	template<typename Component>
 	Component &Entity::attach() {
 		return scene->attach<Component>(handle);
 	}
+
 	template<typename Component>
 	Component &Entity::get() {
 		return scene->get<Component>(handle);
@@ -154,7 +156,7 @@ namespace HBE {
 	template<typename ... Components>
 	auto Scene::group() {
 #ifdef USE_ENTT
-		return registry.view<Components...>();
+		return registry.group<Components...>();
 #else
 		return registry.group<Components...>();
 #endif
@@ -164,25 +166,31 @@ namespace HBE {
 	template<typename Component>
 	Component &Scene::get(entity_handle handle) {
 #ifdef USE_ENTT
-		return *registry.template try_get<Component>(handle);
+		return registry.get<Component>(handle);
 #else
 		return registry.get<Component>(handle);
 #endif
 	}
+
 	template<typename Component>
-	Component* Scene::get()
-	{
+	Component *Scene::getAll() {
 #ifdef USE_ENTT
+		return nullptr;
+#else
+#ifdef PERSISTENT
 		return nullptr;
 #else
 		return registry.get<Component>();
 #endif
+
+#endif
 	}
+
 	template<typename Component>
 	Component &Scene::attach(entity_handle handle) {
 		size_t hash = typeid(Component).hash_code();;
 #ifdef USE_ENTT
-		Component &component = registry.template emplace_or_replace<Component>(handle);
+		Component &component = registry.emplace<Component>(handle, Component{});
 #else
 		Component &component = registry.attach<Component>(handle);
 #endif
@@ -197,7 +205,7 @@ namespace HBE {
 	Component &Scene::attach(entity_handle handle, Component &component) {
 		size_t hash = typeid(Component).hash_code();
 #ifdef USE_ENTT
-		Component &component2 =registry.template emplace<Component>(handle, component);
+		Component &component2 = registry.template emplace<Component>(handle, component);
 #else
 		Component &component2 = registry.attach<Component>(handle, component);
 #endif
@@ -209,10 +217,7 @@ namespace HBE {
 	template<typename Component>
 	bool Scene::has(entity_handle handle) {
 #ifdef USE_ENTT
-		Component *c = registry.template try_get<Component>(handle);
-		if (c == nullptr) {
-			Log::error("Component does not exist");
-		}
+		Component *c = registry.try_get<Component>(handle);
 		return c != nullptr;
 #else
 		return registry.has<Component>(handle);
@@ -252,6 +257,7 @@ namespace HBE {
 		return detach_events[hash];
 
 	}
+
 }
 
 

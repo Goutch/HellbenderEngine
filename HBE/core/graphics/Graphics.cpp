@@ -1,6 +1,5 @@
 
 #include "Graphics.h"
-#include <core/scene/Components.h>
 #include <core/utility/Log.h>
 #include <core/utility/Event.h>
 #include <HBE/core/resource/RenderTarget.h>

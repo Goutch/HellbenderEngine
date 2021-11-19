@@ -53,7 +53,7 @@ namespace HBE {
 
 	void Log::profile(const std::string &s) {
 		if (Log::log_flags & PROFILE) {
-			std::clog << "[PROFILE]" << s << std::endl;
+			std::cout << "[PROFILE]" << s << std::endl;
 		}
 	}
 

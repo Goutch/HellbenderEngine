@@ -9,12 +9,20 @@
 #include "bitset"
 #include "unordered_set"
 
+
 typedef uint32_t entity_handle;
 
 namespace HBE {
 #ifndef MAX_COMPONENT_TYPES
 #define MAX_COMPONENT_TYPES 128
 #endif
+
+	template<typename T>
+	void swapData(T &t1, T &t2) {
+		T temp = t1;
+		t1 = t2;
+		t2 = temp;
+	}
 
 	class ComponentPool {
 		RawVector data;
@@ -45,21 +53,18 @@ namespace HBE {
 			return &data[index_of_entity[handle]];
 		}
 
-		void reorder(std::vector<entity_handle> &entities_order) {
-			for (size_t i = 0; i < entities_order.size(); ++i) {
+		void reorder(entity_handle *entities_order, size_t count) {
+			for (size_t i = 0; i < count; ++i) {
 				size_t current_entity_index = index_of_entity[entities_order[i]];
 				size_t moved_entity_index = i;
 				if (moved_entity_index != current_entity_index) {
 					data.swap(moved_entity_index, current_entity_index);
+
 					entity_handle moved_entity = entity_of_index[i];
 					entity_handle current_entity = entities_order[i];
 
-
-					index_of_entity[current_entity] = moved_entity_index;
-					index_of_entity[moved_entity] = current_entity_index;
-					entity_of_index[current_entity_index] = moved_entity;
-					entity_of_index[moved_entity_index] = current_entity;
-
+					swapData(index_of_entity[current_entity], index_of_entity[moved_entity]);
+					swapData(entity_of_index[current_entity_index], entity_of_index[moved_entity_index]);
 				}
 			}
 		}
@@ -88,6 +93,86 @@ namespace HBE {
 		}
 
 
+	};
+
+	template<typename ... Components>
+	class ComponentGroup {
+		size_t entity_count;
+		entity_handle *entities;
+		std::tuple<Components *...> components;
+	public:
+		ComponentGroup(uint32_t count, entity_handle *entities, Components *... args) {
+			this->entity_count = count;
+			this->components = std::forward_as_tuple(args...);
+			this->entities = entities;
+		}
+
+		ComponentGroup() {
+			this->entity_count = 0;
+			this->entities = nullptr;
+		}
+
+		template<size_t ... seq>
+		std::tuple<entity_handle, Components &...> create_tuple(size_t index) {
+			return std::make_tuple(entities[index],std::get<seq>(components)[index]...);
+		}
+
+		std::tuple<entity_handle, Components &...> get(uint32_t index) {
+			return create_tuple<std::index_sequence_for<Components...>()>(index);
+		}
+
+		struct iterator {
+			size_t entity_count;
+			entity_handle *entities;
+			std::tuple<Components *...> components;
+			uint32_t i = 0;
+
+			iterator(entity_handle *entities, std::tuple<Components *...> components, size_t count, uint32_t i) {
+				this->i = i;
+				this->entities = entities;
+				this->components = components;
+				this->count = count;
+			}
+
+			std::tuple<entity_handle, Components &...> operator*() const {
+				return std::make_tuple(entities[i],std::get<std::index_sequence_for<Components...>()>(components)[i]);
+			}
+
+			bool operator==(const iterator &other) const {
+				return other.entities == entities &&
+					   other.count == entity_count &&
+					   other.i == i &&
+					   other.components == components;
+			}
+
+			bool operator!=(const iterator &other) const {
+				return other.entities != entities ||
+					   other.count != entity_count ||
+					   other.i != i ||
+					   other.components != components;
+			}
+
+			iterator &operator++() {
+				i++;
+			}
+		};
+
+
+		size_t count() {
+			return entity_count;
+		}
+
+		iterator begin() const {
+			return iterator(entities, components, entity_count, 0);
+		}
+
+		iterator end() const {
+			return iterator(entities, components, entity_count, entity_count);
+		}
+
+		iterator operator[](size_t i) {
+			return iterator(entities, components, entity_count, i);;
+		}
 	};
 
 	class Registry {
@@ -135,9 +220,7 @@ namespace HBE {
 
 		void destroy(entity_handle handle) {
 			inactive.emplace(handle);
-			size_t entity_index = index_of_entity[handle];
-			entities[entity_index] = entities[entities.size() - 1];
-			index_of_entity[entities[entity_index]] = entity_index;
+			swapData(index_of_entity[handle], entities.back());
 			entities.pop_back();
 
 
@@ -154,7 +237,7 @@ namespace HBE {
 
 		template<typename Component>
 		Component &attach(entity_handle handle, Component &component) {
-			size_t hash = typeid(Component).hash_code();
+			const size_t hash = typeid(Component).hash_code();
 			if (components.find(hash) == components.end()) {
 				bit_of_hash.emplace(hash, current_bit);
 				components.emplace(hash, new ComponentPool(sizeof(Component)));
@@ -175,7 +258,7 @@ namespace HBE {
 
 		template<typename Component>
 		void detach(entity_handle handle) {
-			size_t hash = typeid(Component).hash_code();
+			const size_t hash = typeid(Component).hash_code();
 			components[hash]->detach(handle);
 			component_flags_of_entity[handle].set(bit_of_hash[hash], false);
 			component_hash_codes_of_entity[handle].erase(component_hash_codes_of_entity[handle].find(hash));
@@ -183,7 +266,7 @@ namespace HBE {
 
 		template<typename Component>
 		bool has() {
-			size_t hash = typeid(Component).hash_code();
+			const size_t hash = typeid(Component).hash_code();
 			return component_flags_of_entity[hash].test(bit_of_hash[hash]);
 		}
 
@@ -191,22 +274,23 @@ namespace HBE {
 			return index_of_entity.find(handle) == index_of_entity.end();
 		}
 
+
 		//get all entities in component with lesser size
 		//filter out rest of entities for each components with bitfield
 		//sort xyz component array replicate the entity array indicies in the count range
 		//create group with entity[] and x[] y[] z[]
 		template<typename ... Components>
-		std::vector<entity_handle> group() {
-			std::vector<std::size_t> hashes = {typeid(Components).hash_code()...};
+		ComponentGroup<Components...> group() {
+			constexpr std::size_t component_count = sizeof...(Components);
+			const size_t hashes[component_count] = {typeid(Components).hash_code()...};
 
 			std::bitset<MAX_COMPONENT_TYPES> flags;
 
-
 			size_t min_size_index = 0;
 
-			for (size_t i = 0; i < hashes.size(); ++i) {
+			for (size_t i = 0; i < component_count; ++i) {
 				if (components.find(hashes[i]) == components.end())
-					return std::vector<entity_handle>();
+					return ComponentGroup<Components...>();
 
 				if (i != 0 && components[hashes[i]]->size() < components[hashes[min_size_index]]->size())
 					min_size_index = i;
@@ -214,33 +298,31 @@ namespace HBE {
 			}
 
 			std::vector<entity_handle> entity_handle_group(components[hashes[min_size_index]]->getEntities().begin(), components[hashes[min_size_index]]->getEntities().end());
-			size_t size = entity_handle_group.size();
-			for (size_t i = 0; i < size; ++i) {
-				while ((component_flags_of_entity[entity_handle_group[i]] & flags) != flags && i < size) {
-					size--;
-					entity_handle temp = entity_handle_group[i];
-					entity_handle_group[i] = entity_handle_group[size];
-					entity_handle_group[size] = temp;
+			size_t entity_count = entity_handle_group.size();
+			for (size_t i = 0; i < entity_count; ++i) {
+				while ((component_flags_of_entity[entity_handle_group[i]] & flags) != flags && i < entity_count) {
+					entity_count--;
+					swapData(entity_handle_group[i], entity_handle_group[entity_count]);
 				}
 			}
-			entity_handle_group.resize(size);
-
-			for (size_t i = 0; i < hashes.size(); ++i) {
-				components[hashes[i]]->reorder(entity_handle_group);
+			entity_handle_group.resize(entity_count);
+			for (size_t i = 0; i < component_count; ++i) {
+				components[hashes[i]]->reorder(entity_handle_group.data(), entity_count);
 			}
 
-			return entity_handle_group;
+			return ComponentGroup<Components...>(entity_count, entity_handle_group.data(), get<Components>()...);
 		}
 
 		template<class Component>
 		Component *get() {
-			size_t hash = typeid(Component).hash_code();
+			const size_t hash = typeid(Component).hash_code();
 			return components.find(hash) == components.end() ? nullptr : (Component *) components[hash]->raw();
 		};
 
 		template<class Component>
 		Component &get(entity_handle handle) {
-			return *((Component *) components[typeid(Component).hash_code()]->getComponent(handle));
+			const size_t hash = typeid(Component).hash_code();
+			return *((Component *) components[hash]->getComponent(handle));
 		};
 
 	};
