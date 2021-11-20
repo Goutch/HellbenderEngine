@@ -4,7 +4,7 @@
 
 #include "Configs.h"
 #include "core/scene/Components.h"
-#include "core/scene/SceneImpl.h"
+#include "core/scene/Scene.h"
 #include "Application.h"
 #include "Core.h"
 

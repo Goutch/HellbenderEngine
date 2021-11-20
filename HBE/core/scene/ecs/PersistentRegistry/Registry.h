@@ -95,15 +95,16 @@ namespace HBE {
     struct ComponentPage {
         Component *components = nullptr;
         size_t offset = 0;
-        std::vector<entity_handle> &handles;
+        entity_handle *handles = nullptr;
+        std::size_t count = 0;
 
-        ComponentPage()
-        {
+        ComponentPage() {
 
         };
 
-        ComponentPage(RawComponentPage &page) : handles(page.handles) {
-            components = reinterpret_cast<Component>(page.data);
+        ComponentPage(RawComponentPage &page) : handles(page.handles.data()) {
+            components = reinterpret_cast<Component*>(page.data);
+            count = page.handles.size();
             offset = page.offset;
         }
 
@@ -200,23 +201,58 @@ namespace HBE {
     class Group {
 
         std::vector<RegistryPage *> &pages;
+        ComponentTypeInfo types[sizeof...(Components)];
     public:
-        Group(std::vector<RegistryPage *> &pages) : pages(pages) {
+        Group(std::vector<RegistryPage *> &pages, ComponentTypeInfo types[sizeof...(Components)]) : pages(pages) {
             this->pages = pages;
+            for (size_t i = 0; i < sizeof...(Components); i++) {
+                this->types[i] = types[i];
+            }
         }
 
         class iterator {
             std::vector<RegistryPage *> &pages;
             std::vector<entity_handle> entities;
             std::tuple<ComponentPage<Components>...> current_pages;
+            ComponentTypeInfo types[sizeof...(Components)];
             size_t current_entity = 0;
             size_t current_page = 0;
             bool finish = false;
+        private:
+
+            template<std::size_t index, typename Component>
+            void replacePage() {
+                std::get<index>(current_pages) = ComponentPage<Component>(*pages[current_page]->component_pages[types[index].hash]);
+            }
+
+            template<typename... Parms>
+            void func(Parms ...p) {}
+
+            template<std::size_t... indices>
+            void fillPages(std::index_sequence<indices...>) {
+                //template black magic
+                //https://stackoverflow.com/questions/6941176/variadic-template-parameter-pack-expanding-for-function-calls
+                func((replacePage<indices, Components>(), 0)...);
+            }
+
+            template<std::size_t... indices>
+            std::tuple<entity_handle, Components &...> createTuple(entity_handle handle, std::index_sequence<indices...>) {
+                return std::forward_as_tuple(handle, std::get<indices>(current_pages)[current_entity]...);
+            }
+
+
         public:
-            iterator(std::vector<RegistryPage *> &pages, bool end) : pages(pages),current_pages(std::tuple<ComponentPage<Components>...>(ComponentPage<Components>()...)) {
+            iterator(std::vector<RegistryPage *> &pages, ComponentTypeInfo types[sizeof...(Components)], bool end) : pages(pages),
+                                                                                                                     current_pages(
+                                                                                                                             std::tuple<ComponentPage<Components>...>(
+                                                                                                                                     ComponentPage<Components>()...)) {
                 this->current_entity = 0;
                 finish = end;
+                for (size_t i = 0; i < sizeof...(Components); i++) {
+                    this->types[i] = types[i];
+                }
                 updatePages();
+
             }
 
             iterator(iterator &&other) : pages(other.pages) {
@@ -237,14 +273,6 @@ namespace HBE {
                 this->pages = other.pages;
             }
 
-            template<std::size_t... indices>
-            inline std::tuple<entity_handle, Components &...> createTuple(entity_handle handle, std::index_sequence<indices...>) {
-                return std::move(std::make_tuple(handle, std::get<indices>(current_pages)[current_entity]...));
-            }
-
-            std::tuple<entity_handle, Components &...> operator*() {
-                return std::move(createTuple(entities[current_entity], std::index_sequence<sizeof...(Components)>{}));
-            }
 
             bool operator==(const iterator &other) const {
                 return current_entity == other.current_entity &&
@@ -254,6 +282,10 @@ namespace HBE {
             bool operator!=(const iterator &other) const {
                 return current_entity != other.current_entity ||
                        finish != other.finish;
+            }
+
+            std::tuple<entity_handle, Components &...> operator*() {
+                return std::move(createTuple(entities[current_entity], std::index_sequence_for<Components...>{}));
             }
 
             void updatePages() {
@@ -267,8 +299,9 @@ namespace HBE {
                     finish = true;
                 } else if (page_changed) {
                     current_entity = 0;
-                    RawComponentPage* raw_pages[] = {pages[current_page]->component_pages[typeid(Components).hash_code()]...};
-                    current_pages = std::move(std::tuple(pages[current_page]->getPage<Components>()...));
+
+                    RawComponentPage *raw_pages[] = {pages[current_page]->component_pages[typeid(Components).hash_code()]...};
+                    fillPages(std::index_sequence_for<Components...>());
                     size_t min_size_index = 0;
                     for (size_t i = 1; i < sizeof...(Components); ++i) {
                         if (raw_pages[min_size_index]->handles.size() > raw_pages[i]->handles.size()) {
@@ -281,7 +314,7 @@ namespace HBE {
                             continue;
                         size_t entity_count = entities.size();
                         for (size_t j = 0; j < entity_count; ++j) {
-                            while (!std::get<i>(current_pages)->valid(entities[j])) {
+                            while (!raw_pages[i]->valid[j]) {
                                 entity_count--;
                                 std::swap(entities[j], entities.back());
                                 if (j < entity_count) break;
@@ -302,11 +335,11 @@ namespace HBE {
 
     public:
         iterator begin() {
-            return iterator(pages, false);
+            return iterator(pages, types, false);
         };
 
         iterator end() {
-            return iterator(pages, true);
+            return iterator(pages, types, true);
         }
     };
 
@@ -350,7 +383,9 @@ namespace HBE {
 
         template<typename ... Components>
         Group<Components...> group() {
-            return Group<Components...>(pages);
+
+            ComponentTypeInfo ts[sizeof...(Components)] = {types[typeid(Components).hash_code()]...};
+            return Group<Components...>(pages, ts);
         };
 
         template<typename Component>
