@@ -28,7 +28,7 @@ namespace HBE {
 		Profiler::begin("CameraRenderGroup");
 		auto group = scene->group<Transform, Camera>();
 		Profiler::end();
-#if  defined(USE_ENTT) || defined(PERSISTENT)
+#if  defined(USE_ENTT) || defined(OTHER_REGISTRY)
 		for (auto [handle,transform,camera]:group) {
 			if (camera.active) {
 				Graphics::render(camera.render_target, camera.projection, glm::inverse(transform.world()));

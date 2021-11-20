@@ -15,7 +15,7 @@ namespace HBE {
 		Profiler::begin("CameraControllerUpdateGroup");
 		auto group = scene->group<Transform, Camera, CameraController>();
 		Profiler::end();
-#if  defined(USE_ENTT) || defined(PERSISTENT)
+#if  defined(USE_ENTT) || defined(OTHER_REGISTRY)
 		for (auto [handle,transform,camera,controller]:group) {
 #else
 		Camera *cameras = scene->get<Camera>();

@@ -14,7 +14,7 @@ namespace HBE {
 		Profiler::begin("MeshRendererUpdateGroup");
 		auto group = scene->group<Transform, MeshRenderer>();
 		Profiler::end();
-#if  defined(USE_ENTT) || defined(PERSISTENT)
+#if  defined(USE_ENTT) || defined(OTHER_REGISTRY)
 		for (auto [handle,transform,mesh_renderer]:group) {
 			if (mesh_renderer.active) {
 				if (mesh_renderer.mesh && mesh_renderer.pipeline)

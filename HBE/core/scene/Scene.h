@@ -2,21 +2,22 @@
 
 #include "Core.h"
 
-#define PERSISTENT
+#define OTHER_REGISTRY
 
 #ifdef USE_ENTT
 
 #include "entt.hpp"
 
 #else
-#ifdef PERSISTENT
+#ifdef OTHER_REGISTRY
 
 #include "core/scene/ecs/PersistentRegistry/Registry.h"
 
 #else
-#include "Components.h"
+#include "core/scene/ecs/Registry.h"
 #endif
-
+#endif
+#include "Components.h"
 #include "System.h"
 #include "unordered_map"
 #include "core/scene/systems/CameraSystem.h"
@@ -24,7 +25,7 @@
 #include "core/scene/systems/CameraControllerSystem.h"
 #include "typeinfo"
 
-#endif
+
 namespace HBE {
 #ifdef USE_ENTT
 	typedef entt::entity entity_handle;
@@ -177,7 +178,7 @@ namespace HBE {
 #ifdef USE_ENTT
 		return nullptr;
 #else
-#ifdef PERSISTENT
+#ifdef OTHER_REGISTRY
 		return nullptr;
 #else
 		return registry.get<Component>();

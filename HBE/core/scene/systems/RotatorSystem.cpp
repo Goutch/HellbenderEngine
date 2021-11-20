@@ -27,7 +27,7 @@ namespace HBE {
 		auto group = scene->group<Transform, Rotator>();
 
 		Profiler::end();
-#if  defined(USE_ENTT) || defined(PERSISTENT)
+#if  defined(USE_ENTT) || defined(OTHER_REGISTRY)
 		for (auto [handle,transform,rotator]:group) {
 			transform.rotate(rotator.rotate_speed * delta_t * rotator.angle);
 		}
