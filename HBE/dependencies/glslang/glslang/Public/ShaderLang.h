@@ -811,15 +811,15 @@ public:
     virtual void notifyInOut(EShLanguage stage, TVarEntryInfo& ent) = 0;
     // Called by mapIO when it starts its notify pass for the given stage
     virtual void beginNotifications(EShLanguage stage) = 0;
-    // Called by mapIO when it has finished the notify pass
+    // Called by mapIO when it has isEnd the notify pass
     virtual void endNotifications(EShLanguage stage) = 0;
     // Called by mipIO when it starts its resolve pass for the given stage
     virtual void beginResolve(EShLanguage stage) = 0;
-    // Called by mapIO when it has finished the resolve pass
+    // Called by mapIO when it has isEnd the resolve pass
     virtual void endResolve(EShLanguage stage) = 0;
     // Called by mapIO when it starts its symbol collect for teh given stage
     virtual void beginCollect(EShLanguage stage) = 0;
-    // Called by mapIO when it has finished the symbol collect
+    // Called by mapIO when it has isEnd the symbol collect
     virtual void endCollect(EShLanguage stage) = 0;
     // Called by TSlotCollector to resolve storage locations or bindings
     virtual void reserverStorageSlot(TVarEntryInfo& ent, TInfoSink& infoSink) = 0;

@@ -179,7 +179,7 @@ set(CORE_FILES
         core/scene/ecs/Registry.h
         core/utility/Profiler.cpp
         core/utility/Profiler.h
-        core/scene/ecs/PersistentRegistry/Registry.h)
+        core/scene/ecs/SparseRegistry/Registry.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

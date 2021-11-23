@@ -11285,7 +11285,7 @@ yyexhaustedlab:
 
 
 /*-------------------------------------------------------.
-| yyreturn -- parsing is finished, clean up and return.  |
+| yyreturn -- parsing is isEnd, clean up and return.  |
 `-------------------------------------------------------*/
 yyreturn:
   if (yychar != YYEMPTY)

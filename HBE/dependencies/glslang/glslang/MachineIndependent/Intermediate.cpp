@@ -3460,7 +3460,7 @@ bool TIntermediate::promoteBinary(TIntermBinary& node)
         break;
     }
 
-    // Compare left and right, and finish with the cases where the operand types must match
+    // Compare left and right, and isEnd with the cases where the operand types must match
     switch (op) {
     case EOpLessThan:
     case EOpGreaterThan:

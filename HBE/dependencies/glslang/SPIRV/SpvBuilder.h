@@ -355,7 +355,7 @@ public:
     // code.  In the case of an implicit return, no post-return block is inserted.
     void makeReturn(bool implicit, Id retVal = 0);
 
-    // Generate all the code needed to finish up a function.
+    // Generate all the code needed to isEnd up a function.
     void leaveFunction();
 
     // Create block terminator instruction for certain statements like

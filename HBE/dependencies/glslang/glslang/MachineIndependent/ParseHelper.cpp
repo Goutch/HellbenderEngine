@@ -1620,7 +1620,7 @@ void TParseContext::checkLocation(const TSourceLoc& loc, TOperator op)
 }
 
 // Finish processing object.length(). This started earlier in handleDotDereference(), where
-// the ".length" part was recognized and semantically checked, and finished here where the
+// the ".length" part was recognized and semantically checked, and isEnd here where the
 // function syntax "()" is recognized.
 //
 // Return resulting tree node.

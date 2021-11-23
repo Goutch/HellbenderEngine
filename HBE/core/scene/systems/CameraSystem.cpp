@@ -28,23 +28,11 @@ namespace HBE {
 		Profiler::begin("CameraRenderGroup");
 		auto group = scene->group<Transform, Camera>();
 		Profiler::end();
-#if  defined(USE_ENTT) || defined(OTHER_REGISTRY)
 		for (auto [handle,transform,camera]:group) {
 			if (camera.active) {
 				Graphics::render(camera.render_target, camera.projection, glm::inverse(transform.world()));
 			}
 		}
-#else
-		Transform *transforms = scene->getAll<Transform>();
-		Camera *cameras = scene->getAll<Camera>();
-		for (size_t i = 0; i < group.count(); ++i) {
-
-			if (cameras[i].active) {
-
-				Graphics::render(cameras[i].render_target, cameras[i].projection, glm::inverse(transforms[i].world()));
-			}
-		}
-#endif
 		Profiler::end();
 	}
 

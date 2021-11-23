@@ -15,18 +15,7 @@ namespace HBE {
 		Profiler::begin("CameraControllerUpdateGroup");
 		auto group = scene->group<Transform, Camera, CameraController>();
 		Profiler::end();
-#if  defined(USE_ENTT) || defined(OTHER_REGISTRY)
 		for (auto [handle,transform,camera,controller]:group) {
-#else
-		Camera *cameras = scene->get<Camera>();
-		Transform *transforms = scene->get<Transform>();
-		CameraController *constrollers = scene->get<CameraController>();
-		for (size_t i = 0; i < group.count(); ++i) {
-			Camera &camera = cameras[i];
-			Transform &transform = transforms[i];
-			CameraController &controller = constrollers[i];
-#endif
-
 			float max_pitch_radian = glm::radians(controller.max_pitch);
 			uint32_t w, h;
 			camera.render_target->getResolution(w, h);

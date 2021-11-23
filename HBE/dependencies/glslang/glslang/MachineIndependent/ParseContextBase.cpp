@@ -266,7 +266,7 @@ void TParseContextBase::rValueErrorCheck(const TSourceLoc& loc, const char* op, 
 }
 
 // Add 'symbol' to the list of deferred linkage symbols, which
-// are later processed in finish(), at which point the symbol
+// are later processed in isEnd(), at which point the symbol
 // must still be valid.
 // It is okay if the symbol's type will be subsequently edited;
 // the modifications will be tracked.

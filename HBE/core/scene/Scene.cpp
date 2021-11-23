@@ -62,12 +62,7 @@ namespace HBE {
 	}
 
 	bool Scene::valid(entity_handle handle) {
-
-#ifdef USE_ENTT
 		return registry.valid(handle);
-#else
-		return registry.valid(handle);
-#endif
 	}
 
 
@@ -79,11 +74,7 @@ namespace HBE {
 
 
 	Entity Scene::createEntity() {
-#ifdef USE_ENTT
 		Entity e(registry.create(), this);
-#else
-		Entity e(registry.create(), this);
-#endif
 		attach<Transform>(e.getHandle());
 		return e;
 	}

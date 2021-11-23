@@ -27,34 +27,9 @@ namespace HBE {
 		auto group = scene->group<Transform, Rotator>();
 
 		Profiler::end();
-#if  defined(USE_ENTT) || defined(OTHER_REGISTRY)
 		for (auto [handle,transform,rotator]:group) {
 			transform.rotate(rotator.rotate_speed * delta_t * rotator.angle);
 		}
-#else
-		Rotator *rotators = scene->getAll<Rotator>();
-		Transform *transforms = scene->getAll<Transform>();
-
-		if (paralelize) {
-			std::vector<std::thread> threads;
-			uint32_t nb_thread = 6;
-			uint32_t thread_offset = (group.count() - (group.count() % nb_thread)) / nb_thread;
-			for (uint32_t i = 0; i < nb_thread; ++i) {
-				uint32_t position = i * thread_offset;
-				threads.emplace_back(process,
-									 delta_t,
-									 position,
-									 i == nb_thread-1 ? group.count() : position + thread_offset,
-									 transforms,
-									 rotators);
-			}
-			for (size_t i = 0; i < nb_thread; ++i) {
-				threads[i].join();
-			}
-		} else {
-			process(delta_t, 0, group.count(), transforms, rotators);
-		}
-#endif
 		Profiler::end();
 	}
 }

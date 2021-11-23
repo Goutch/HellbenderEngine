@@ -1739,7 +1739,7 @@ void TGlslangToSpvTraverser::finishSpv()
         builder.leaveFunction();
     }
 
-    // finish off the entry-point SPV instruction by adding the Input/Output <id>
+    // isEnd off the entry-point SPV instruction by adding the Input/Output <id>
     for (auto it = iOSet.cbegin(); it != iOSet.cend(); ++it)
         entryPoint->addIdOperand(*it);
 
@@ -2781,7 +2781,7 @@ bool TGlslangToSpvTraverser::visitAggregate(glslang::TVisit visit, glslang::TInt
     case glslang::EOpSubgroupMemoryBarrierImage:
     case glslang::EOpSubgroupMemoryBarrierShared:
         noReturnValue = true;
-        // These all have 0 operands and will naturally finish up in the code below for 0 operands
+        // These all have 0 operands and will naturally isEnd up in the code below for 0 operands
         break;
 
     case glslang::EOpAtomicAdd:
@@ -3343,7 +3343,7 @@ bool TGlslangToSpvTraverser::visitSelection(glslang::TVisit /* visit */, glslang
             // emit the "else" statement
             builder.createStore(falseValue, result);
 
-            // finish off the control flow
+            // isEnd off the control flow
             ifBuilder.makeEndIf();
 
             builder.clearAccessChain();
@@ -3380,7 +3380,7 @@ bool TGlslangToSpvTraverser::visitSelection(glslang::TVisit /* visit */, glslang
                 builder.createStore(accessChainLoad(node->getFalseBlock()->getAsTyped()->getType()), result);
         }
 
-        // finish off the control flow
+        // isEnd off the control flow
         ifBuilder.makeEndIf();
 
         if (result != spv::NoResult) {
@@ -8844,7 +8844,7 @@ spv::Id TGlslangToSpvTraverser::createShortCircuit(glslang::TOperator op, glslan
     phiOperands.push_back(rightId);
     phiOperands.push_back(builder.getBuildPoint()->getId());
 
-    // finish the "if"
+    // isEnd the "if"
     ifBuilder.makeEndIf();
 
     // phi together the two results

@@ -162,7 +162,7 @@ namespace HBE {
 
 	void VK_Renderer::beginFrame() {
 		frames[current_frame].in_flight_fence->wait();
-		//wait for last frame i to finish
+		//wait for last frame i to isEnd
 		command_pool->begin(current_frame);
 	}
 

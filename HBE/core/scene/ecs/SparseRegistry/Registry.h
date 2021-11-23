@@ -29,7 +29,7 @@ namespace HBE {
 
 	struct ComponentTypeInfo {
 		size_t hash;
-		uint32_t bit_number;
+		uint32_t signature_bit;
 		size_t size;
 
 		bool operator==(const size_t hash) const {
@@ -41,7 +41,7 @@ namespace HBE {
 		}
 	};
 
-	class RawComponentPage {
+	class RawComponentPool {
 	public:
 		ComponentTypeInfo info;
 		char *data;
@@ -49,14 +49,14 @@ namespace HBE {
 		std::vector<entity_handle> handles;
 		size_t offset;
 
-		RawComponentPage(RawComponentPage &&other) {
+		RawComponentPool(RawComponentPool &&other) {
 			data = other.data;
 			memcpy(valid, other.valid, REGISTRY_PAGE_SIZE * sizeof(bool));
 			info = other.info;
 			offset = other.offset;
 		}
 
-		RawComponentPage(ComponentTypeInfo info, size_t offset) : info(info) {
+		RawComponentPool(ComponentTypeInfo info, size_t offset) : info(info) {
 			data = static_cast<char *>(malloc(info.size * REGISTRY_PAGE_SIZE));
 
 			memset(data, 0, info.size * REGISTRY_PAGE_SIZE);
@@ -65,7 +65,7 @@ namespace HBE {
 			this->offset = offset;
 		}
 
-		~RawComponentPage() {
+		~RawComponentPool() {
 			delete[] data;
 		}
 
@@ -77,12 +77,13 @@ namespace HBE {
 				std::sort(handles.begin(), handles.end());
 			}
 			memcpy(data + (i * info.size), component, info.size);
-			return &data[i];
+			return &data[i * info.size];
 		}
 
 		template<typename Component>
 		Component &getAs(entity_handle handle) {
-			return reinterpret_cast<Component *>(data)[handle - offset];
+			size_t i = handle - offset;
+			return *reinterpret_cast<Component *>(&data[i*info.size]);
 		}
 
 		void detach(entity_handle handle) {
@@ -101,18 +102,18 @@ namespace HBE {
 	};
 
 	template<typename Component>
-	struct ComponentPage {
+	struct ComponentPool {
 		Component *components = nullptr;
 		size_t offset = 0;
 		entity_handle *handles = nullptr;
 		std::size_t count = 0;
 
-		ComponentPage() {
+		ComponentPool() {
 
 		};
 
-		ComponentPage(RawComponentPage &page) : handles(page.handles.data()) {
-			components = reinterpret_cast<Component *>(page.data);
+		ComponentPool(RawComponentPool &page) : handles(page.handles.data()) {
+			components = reinterpret_cast<Component *>(&page.data[0]);
 			count = page.handles.size();
 			offset = page.offset;
 		}
@@ -129,8 +130,8 @@ namespace HBE {
 
 		bool valid_entities[REGISTRY_PAGE_SIZE];
 		std::bitset<REGISTRY_MAX_COMPONENT_TYPES> components_of_entity[REGISTRY_PAGE_SIZE];
-		std::unordered_map<size_t, RawComponentPage *> component_pages;
-		std::bitset<REGISTRY_MAX_COMPONENT_TYPES> components_flags = 0;
+		std::unordered_map<size_t, RawComponentPool *> component_pages;
+		std::bitset<REGISTRY_MAX_COMPONENT_TYPES> components_signature = 0;
 
 		RegistryPage(size_t page_index) : offset(page_index * REGISTRY_PAGE_SIZE) {
 			for (int i = 0; i < REGISTRY_PAGE_SIZE; ++i) {
@@ -139,56 +140,65 @@ namespace HBE {
 			}
 		};
 
+		size_t handleToIndex(entity_handle handle) {
+			return handle - offset;
+		}
+
+		RawComponentPool *getRawPool(size_t hash) {
+			auto it = component_pages.find(hash);
+			return it == component_pages.end() ? nullptr : it->second;
+		}
+
 		template<typename Component>
-		ComponentPage<Component> getPage() {
-			return ComponentPage<Component>(component_pages[typeid(Component).hash_code()]);
+		ComponentPool<Component> getPool() {
+			return ComponentPool<Component>(component_pages[typeid(Component).hash_code()]);
 		}
 
 		template<typename Component>
 		Component &attach(entity_handle handle, ComponentTypeInfo &type) {
-			size_t i = handle - offset;
+			size_t i = handleToIndex(handle);
 			if (!valid_entities[i]) Log::error("Enitty#" + std::to_string(handle) + "is not valid");
 
 
-			components_of_entity[i] |= 1 << type.bit_number;
+			components_of_entity[i] |= 1 << type.signature_bit;
 			auto component_page_it = component_pages.find(type.hash);
 			if (component_page_it == component_pages.end()) {
-				component_pages.emplace(type.hash, new RawComponentPage(type, offset));
-				components_flags.set(type.bit_number, true);
+				component_pages.emplace(type.hash, new RawComponentPool(type, offset));
+				components_signature.set(type.signature_bit, true);
 			}
 			Component component{};
-			char *raw_ptr = component_pages[type.hash]->attach(handle, (char *) (&component));
+			char *raw_ptr = component_pages[type.hash]->attach(handle, reinterpret_cast<char *>(&component));
 			return *reinterpret_cast<Component *>(raw_ptr);
 		};
 
 		void detach(entity_handle handle, ComponentTypeInfo &type) {
-			size_t i = handle - offset;
+			size_t i = handleToIndex(handle);
 
-			components_of_entity[i] |= 1 << type.bit_number;
+			components_of_entity[i] |= 1 << type.signature_bit;
 			if (valid_entities[i]) {
 				auto component_page_it = component_pages.find(type.hash);
 				if (component_page_it == component_pages.end()) {
 					return;
 				}
-				RawComponentPage &component_page = *component_page_it->second;
+				RawComponentPool &component_page = *component_page_it->second;
 				component_page.detach(handle);
 				if (component_page.handles.size() == 0) {
-					components_flags.set(component_page.info.bit_number, false);
+					components_signature.set(component_page.info.signature_bit, false);
 					component_pages.erase(component_page_it->first);
 				}
 			}
 		};
 
 		void setValid(entity_handle handle) {
-			valid_entities[handle - offset] = true;
+			valid_entities[handleToIndex(handle)] = true;
 		}
 
 		void setInvalid(entity_handle handle) {
-			size_t i = handle - offset;
+			size_t i = handleToIndex(handle);
 			valid_entities[i] = false;
 			std::list<size_t> obsolete_types_hash;
 			for (auto component_page_it: component_pages) {
-				RawComponentPage &component_page = *component_page_it.second;
+				RawComponentPool &component_page = *component_page_it.second;
 				component_page.detach(i);
 				if (component_page.handles.size() == 0) {
 					obsolete_types_hash.emplace_back(component_page_it.first);
@@ -207,7 +217,6 @@ namespace HBE {
 
 	template<typename ... Components>
 	class Group {
-
 		std::vector<RegistryPage *> &pages;
 		ComponentTypeInfo types[sizeof...(Components)];
 	public:
@@ -221,17 +230,17 @@ namespace HBE {
 		class iterator {
 			std::vector<RegistryPage *> &pages;
 			std::vector<entity_handle> entities;
-			std::tuple<ComponentPage<Components>...> current_pages;
+			std::tuple<ComponentPool<Components>...> current_pages;
 			ComponentTypeInfo types[sizeof...(Components)];
 			std::bitset<REGISTRY_MAX_COMPONENT_TYPES> signature;
 			size_t current_entity = 0;
 			size_t current_page = 0;
-			bool finish = false;
+			bool isEnd = false;
 		private:
 
 			template<std::size_t index, typename Component>
 			void replacePage() {
-				std::get<index>(current_pages) = ComponentPage<Component>(*pages[current_page]->component_pages[types[index].hash]);
+				std::get<index>(current_pages) = ComponentPool<Component>(*pages[current_page]->component_pages[types[index].hash]);
 			}
 
 			template<typename... Parms>
@@ -249,27 +258,27 @@ namespace HBE {
 				return std::forward_as_tuple(handle, std::get<indices>(current_pages)[current_entity]...);
 			}
 
+			bool currentPageHasSignature() {
+				return (pages[current_page]->components_signature & signature) == signature;
+			};
 
 		public:
-			iterator(std::vector<RegistryPage *> &pages, ComponentTypeInfo types[sizeof...(Components)], bool end) : pages(pages),
-																													 current_pages(
-																															 std::tuple<ComponentPage<Components>...>(
-																																	 ComponentPage<Components>()...)) {
+			iterator(std::vector<RegistryPage *> &pages, ComponentTypeInfo types[sizeof...(Components)], bool end) :
+					pages(pages),
+					current_pages(
+							std::tuple<ComponentPool<Components>...>(ComponentPool<Components>()...)) {
 				this->current_entity = 0;
-				finish = end;
+				isEnd = end;
 
 				for (size_t i = 0; i < sizeof...(Components); i++) {
 					this->types[i] = types[i];
-					signature.set(types[i].bit_number);
+					signature.set(types[i].signature_bit);
 				}
-				if (!finish) {
-					if ((pages[current_page]->components_flags & signature) != signature) {
-						nextPage();
-					}
 
-					getPageEntities();
-				} else {
-					current_page = pages.size();
+				if (isEnd)current_page = pages.size();
+				else {
+					getCurrentPageEntities();
+					updatePage();
 				}
 
 			}
@@ -277,7 +286,7 @@ namespace HBE {
 			iterator(iterator &&other) : pages(other.pages) {
 				this->current_entity = other.current_entity;
 				this->current_page = other.current_page;
-				this->components_flags = other.components_flags;
+				this->components_signature = other.components_signature;
 				this->current_pages = other.current_pages;
 				this->entities = other.entities;
 				this->pages = other.pages;
@@ -286,7 +295,7 @@ namespace HBE {
 			iterator(iterator &other) : pages(other.pages) {
 				this->current_entity = other.current_entity;
 				this->current_page = other.current_page;
-				this->components_flags = other.components_flags;
+				this->components_signature = other.components_signature;
 				this->current_pages = other.current_pages;
 				this->entities = other.entities;
 				this->pages = other.pages;
@@ -296,14 +305,14 @@ namespace HBE {
 			bool operator==(const iterator &other) const {
 				return current_entity == other.current_entity &&
 					   current_page == other.current_page &&
-					   finish == other.finish &&
+					   isEnd == other.isEnd &&
 					   other.signature == signature;
 			}
 
 			bool operator!=(const iterator &other) const {
 				return current_entity != other.current_entity ||
 					   current_page != other.current_page ||
-					   finish != other.finish ||
+					   isEnd != other.isEnd ||
 					   other.signature != signature;
 			}
 
@@ -311,12 +320,19 @@ namespace HBE {
 				return std::move(createTuple(entities[current_entity], std::index_sequence_for<Components...>{}));
 			}
 
-			void getPageEntities() {
 
-				RawComponentPage *raw_pages[] = {pages[current_page]->component_pages[typeid(Components).hash_code()]...};
-				fillPages(std::index_sequence_for<Components...>());
+			void getCurrentPageEntities() {
+
+				RawComponentPool *raw_pages[] = {pages[current_page]->getRawPool(typeid(Components).hash_code())...};
+				for (int i = 0; i < sizeof...(Components); ++i) {
+					if (raw_pages[i] == nullptr) {
+						entities.clear();
+						return;
+					}
+				}
 				size_t min_size_index = 0;
 				for (size_t i = 1; i < sizeof...(Components); ++i) {
+
 					if (raw_pages[min_size_index]->handles.size() > raw_pages[i]->handles.size()) {
 						min_size_index = i;
 					}
@@ -335,35 +351,33 @@ namespace HBE {
 					}
 					entities.resize(entity_count);
 				}
-				std::sort(entities.begin(), entities.end());
+				if (entities.size() != 0) {
+					fillPages(std::index_sequence_for<Components...>());
+					std::sort(entities.begin(), entities.end());
+				}
 			}
 
-			bool nextPage() {
-				bool page_changed = false;
-				while (current_page != pages.size() &&
-					   (pages[current_page] == nullptr ||
-						(pages[current_page]->components_flags & signature) != signature ||
-						entities.size() == 0 ||
-						current_entity >= entities.size())) {
+			void updatePage() {
+				while (!isEnd && current_entity >= entities.size()) {
+					nextPage();
+					if (!isEnd)
+						getCurrentPageEntities();
+				}
+			}
+
+			void nextPage() {
+				do {
 					current_page++;
-					page_changed = true;
-				}
+				} while (current_page != pages.size() && (pages[current_page] == nullptr || !currentPageHasSignature()));
+				current_entity = 0;
 				if (current_page == pages.size()) {
-					finish = true;
-					current_entity = 0;
-				} else if (page_changed) {
-					current_entity = 0;
+					isEnd = true;
 				}
-				return page_changed;
 			}
 
 			iterator &operator++() {
 				current_entity++;
-				if (current_entity >= entities.size()) {
-					nextPage();
-					if (!finish)
-						getPageEntities();
-				}
+				updatePage();
 
 				return *this;
 			}

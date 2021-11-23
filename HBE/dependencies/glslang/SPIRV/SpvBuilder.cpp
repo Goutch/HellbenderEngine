@@ -1916,7 +1916,7 @@ Id Builder::createLvalueSwizzle(Id typeId, Id target, Id source, const std::vect
     for (int i = 0; i < (int)channels.size(); ++i)
         components[channels[i]] = numTargetComponents + i;
 
-    // finish the instruction with these components selectors
+    // isEnd the instruction with these components selectors
     for (int i = 0; i < numTargetComponents; ++i)
         swizzle->addImmediateOperand(components[i]);
     buildPoint->addInstruction(std::unique_ptr<Instruction>(swizzle));
