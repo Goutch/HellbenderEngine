@@ -14,39 +14,39 @@ void onAppUpdate(float delta) {
 	}
 }
 
-struct Vertex {
-	vec3 position;
-	vec3 color;
-	vec2 uv;
-};
-
 void init() {
 	//-------------------RESOURCES CREATION--------------------------------------
 	ShaderInfo frag_info{SHADER_STAGE_FRAGMENT, "../../res/shaders/VK.frag"};
 	ShaderInfo vert_info{SHADER_STAGE_VERTEX, "../../res/shaders/VK.vert"};
-
+	ShaderInfo instanced_vert_info{SHADER_STAGE_VERTEX, "../../res/shaders/VK_instanced.vert"};
 	auto frag = Resources::createShader(frag_info, "frag");
 	auto vert = Resources::createShader(vert_info, "vert");
+	auto instanced_vert = Resources::createShader(instanced_vert_info, "instance_vert");
 
-	std::vector<GLSL_TYPE> vertex_description = std::vector<GLSL_TYPE>{GLSL_TYPE::VEC3F, GLSL_TYPE::VEC2F};
-
-	VertexLayoutInfo layout_info{};
-	layout_info.layout_types = vertex_description.data();
-	layout_info.layout_types_count = vertex_description.size();
-	auto layout = Resources::createVertexLayout(layout_info, "layout");
+	std::vector<VertexBindingInfo> binding_infos = {{0, sizeof(vec3) + sizeof(vec2)}};
+	std::vector<VertexBindingInfo> binding_infos_instanced = {{0, sizeof(vec3) + sizeof(vec2)},
+															  {1, sizeof(mat4),
+																	  VERTEX_BINDING_FLAG_PER_INSTANCE
+																	  | VERTEX_BINDING_FLAG_FAST_WRITE
+																	  | VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS}};
 
 	GraphicPipelineInfo pipeline_info{};
 	pipeline_info.fragement_shader = frag;
 	pipeline_info.vertex_shader = vert;
-	pipeline_info.vertex_layout = layout;
+	pipeline_info.binding_info_count = binding_infos.size();
+	pipeline_info.binding_infos = binding_infos.data();
 	pipeline_info.flags = GRAPHIC_PIPELINE_FLAG_NONE;
 	auto pipeline = Resources::createGraphicPipeline(pipeline_info, "pipeline");
 
-	auto wall = Texture::load("../../res/textures/wall.png");
-	Resources::add("Wall", wall);
-	pipeline->setTexture("texSampler", wall);
+	GraphicPipelineInfo pipeline_info_instanced{};
+	pipeline_info_instanced.fragement_shader = frag;
+	pipeline_info_instanced.vertex_shader = instanced_vert;
+	pipeline_info_instanced.binding_info_count = binding_infos_instanced.size();
+	pipeline_info_instanced.binding_infos = binding_infos_instanced.data();
+	pipeline_info_instanced.flags = GRAPHIC_PIPELINE_FLAG_NONE;
+	auto pipeline_instanced = Resources::createGraphicPipeline(pipeline_info_instanced, "pipeline_instanced");
 
-	auto mesh = Resources::createMesh(MeshInfo{layout}, "mesh");
+	auto mesh = Resources::createMesh(MeshInfo{binding_infos_instanced.data(), binding_infos_instanced.size()}, "mesh");
 	Geometry::createCube(*mesh, 1, 1, 1, VERTEX_FLAG_UV);
 
 	//-------------------SCENE CREATION--------------------------------------
@@ -56,8 +56,7 @@ void init() {
 	scene.addSystem(new RotatorSystem(&scene));
 
 	Entity camera_entity = scene.createEntity("camera");
-	if(!scene.has<Identity>(camera_entity.getHandle()))
-	{
+	if (!scene.has<Identity>(camera_entity.getHandle())) {
 		Log::error("no identity");
 	}
 	Camera &camera = camera_entity.attach<Camera>();
@@ -81,11 +80,10 @@ void init() {
 			for (int k = -5; k < 5; ++k) {
 				Entity cube_entity = scene.createEntity();
 				cube_entity.attach<Transform>();
-				MeshRenderer &cube = cube_entity.attach<MeshRenderer>();
-				cube.pipeline = pipeline;
-				cube.mesh = mesh;
+				auto &renderer = cube_entity.attach<InstancedRenderer>();
+				renderer.pipeline = pipeline_instanced;
+				renderer.mesh = mesh;
 
-				MeshRenderer& renderer=cube_entity.get<MeshRenderer>();
 				cube_entity.get<Transform>().translate(vec3(i, j, k) * 5.0f);
 				Rotator &rotator = cube_entity.attach<Rotator>();
 				rotator.rotate_speed = random.floatRange(M_PI, 5.0f);

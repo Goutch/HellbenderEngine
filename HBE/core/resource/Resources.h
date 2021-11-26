@@ -7,21 +7,22 @@
 #include "core/graphics/Graphics.h"
 #include "core/resource/Shader.h"
 #include "core/resource/GraphicPipeline.h"
-#include "core/resource/VertexLayout.h"
+#include "core/resource/MeshLayout.h"
 #include "core/resource/ComputePipeline.h"
 #include "core/resource/Mesh.h"
 #include "core/resource/Texture.h"
 #include "core/resource/Model.h"
 #include "core/resource/RenderTarget.h"
+
 namespace HBE {
 	class HB_API Resources {
 		static std::unordered_map<std::string, Resource *> registry;
-		static const ResourceFactory* factory;
+		static const ResourceFactory *factory;
 	public:
-		static void init(const ResourceFactory& factory)
-		{
-			Resources::factory=&factory;
+		static void init(const ResourceFactory &factory) {
+			Resources::factory = &factory;
 		}
+
 		template<class T>
 		static T *get(std::string unique_name) {
 #ifdef DEBUG_MODE
@@ -63,7 +64,7 @@ namespace HBE {
 			registry.erase(unique_name);
 		}
 
-		static void add(const std::string& unique_name, Resource *r) {
+		static void add(const std::string &unique_name, Resource *r) {
 			registry.emplace(unique_name, r);
 		}
 
@@ -118,16 +119,6 @@ namespace HBE {
 
 		static ComputePipeline *createComputePipeline(const ComputePipelineInfo &info) {
 			return factory->createComputePipeline(info);
-		}
-
-		static VertexLayout *createVertexLayout(const VertexLayoutInfo& info) {
-			return factory->createVertexLayout(info);
-		}
-
-		static VertexLayout *createVertexLayout(const VertexLayoutInfo& info,const std::string &name) {
-			auto vl = factory->createVertexLayout(info);
-			add(name, vl);
-			return vl;
 		}
 
 		static Texture *createTexture(const TextureInfo &info, const std::string &name) {

@@ -19,8 +19,8 @@ namespace HBE {
     class ComputePipeline;
 	struct ComputePipelineInfo;
 
-    class VertexLayout;
-	struct VertexLayoutInfo;
+    class MeshLayout;
+	struct MeshLayoutInfo;
 
     class RenderTarget;
     struct RenderTargetInfo;
@@ -38,8 +38,6 @@ namespace HBE {
         virtual Mesh *createMesh(const MeshInfo& info) const = 0;
 
         virtual ComputePipeline *createComputePipeline(const ComputePipelineInfo& info) const = 0;
-
-        virtual VertexLayout *createVertexLayout(const VertexLayoutInfo& info) const = 0;
 
 		virtual RenderTarget *createRenderTarget(const RenderTargetInfo& info) const = 0;
     };

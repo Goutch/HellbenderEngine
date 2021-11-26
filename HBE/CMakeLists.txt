@@ -113,7 +113,7 @@ set(CORE_FILES
         core/resource/Mesh.h
         core/resource/Shader.cpp
         core/resource/Shader.h
-        core/resource/VertexLayout.h
+        core/resource/MeshLayout.h
         core/resource/ResourceFactory.h
         core/resource/Resource.h
         core/resource/GraphicPipeline.h
@@ -122,7 +122,7 @@ set(CORE_FILES
         core/resource/Resources.h
         core/resource/Resources.cpp
         core/resource/Texture.cpp
-        core/resource/VertexLayout.cpp
+        core/resource/MeshLayout.cpp
 
         core/graphics/Window.h
         core/graphics/Renderer.h
@@ -179,7 +179,7 @@ set(CORE_FILES
         core/scene/ecs/Registry.h
         core/utility/Profiler.cpp
         core/utility/Profiler.h
-        core/scene/ecs/SparseRegistry/Registry.h)
+        core/scene/ecs/SparseRegistry/Registry.h core/scene/systems/InstancedRendererSystem.cpp core/scene/systems/InstancedRendererSystem.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

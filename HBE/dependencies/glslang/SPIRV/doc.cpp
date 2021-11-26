@@ -88,7 +88,7 @@ const char* SourceString(int source)
 const char* ExecutionModelString(int model)
 {
     switch (model) {
-    case 0:  return "VertexLayout";
+    case 0:  return "MeshLayout";
     case 1:  return "TessellationControl";
     case 2:  return "TessellationEvaluation";
     case 3:  return "Geometry";
@@ -1551,7 +1551,7 @@ void Parameterize()
     ExecutionModeOperands[ExecutionModeLocalSizeHint].push(OperandLiteralNumber, "'y size'");
     ExecutionModeOperands[ExecutionModeLocalSizeHint].push(OperandLiteralNumber, "'z size'");
 
-    ExecutionModeOperands[ExecutionModeOutputVertices].push(OperandLiteralNumber, "'VertexLayout count'");
+    ExecutionModeOperands[ExecutionModeOutputVertices].push(OperandLiteralNumber, "'MeshLayout count'");
     ExecutionModeOperands[ExecutionModeVecTypeHint].push(OperandLiteralNumber, "'Vector type'");
 
     DecorationOperands[DecorationStream].push(OperandLiteralNumber, "'Stream Number'");

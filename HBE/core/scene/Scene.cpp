@@ -23,6 +23,7 @@ namespace HBE {
 		systems.push_back(new MeshRendererSystem(this));
 		systems.push_back(new CameraSystem(this));
 		systems.push_back(new CameraControllerSystem(this));
+		systems.push_back(new InstancedRendererSystem(this));
 	}
 
 

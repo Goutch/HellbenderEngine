@@ -32,11 +32,7 @@ namespace HBE {
 	class VK_Renderer : public Renderer {
 #define MAP(T1, T2) std::unordered_map<T1,T2>
 	private:
-		struct RenderObject {
-			const Transform *transform;
-			const Mesh *mesh;
-			GraphicPipeline *pipeline;
-		};
+
 		struct FrameState {
 			VK_Fence *in_flight_fence;
 			VK_Semaphore *finished_semaphore;
@@ -44,7 +40,7 @@ namespace HBE {
 		};
 
 		MAP(GraphicPipeline*, MAP(const Mesh*, std::vector<mat4>)) render_cache;
-
+		MAP(GraphicPipeline*, const Mesh*) instanced_cache;
 
 		VK_Window *window;
 		VK_Instance *instance;
@@ -67,6 +63,8 @@ namespace HBE {
 
 		void setCurrentRenderTarget(RenderTarget *render_target) override;
 
+
+		void waitCurrentFrame();
 		RenderTarget* getDefaultRenderTarget() override;
 
 		void beginFrame() override;

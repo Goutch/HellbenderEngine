@@ -14,7 +14,7 @@
 #include "core/resource/Model.h"
 #include "core/resource/Shader.h"
 #include "core/resource/Resources.h"
-#include "core/resource/VertexLayout.h"
+#include "core/resource/MeshLayout.h"
 
 #include "core/graphics/Graphics.h"
 #include "HBE/core/resource/RenderTarget.h"

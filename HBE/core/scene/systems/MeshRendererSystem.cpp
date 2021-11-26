@@ -17,7 +17,7 @@ namespace HBE {
 		for (auto [handle,transform,mesh_renderer]:group) {
 			if (mesh_renderer.active) {
 				if (mesh_renderer.mesh && mesh_renderer.pipeline)
-					Graphics::draw(transform.world(), *mesh_renderer.mesh, *mesh_renderer.pipeline);
+					Graphics::draw(std::move(transform.world()), *mesh_renderer.mesh, *mesh_renderer.pipeline);
 				else
 					Log::warning("Mesh renderer does not have a material and/or a mesh assigned");
 			}

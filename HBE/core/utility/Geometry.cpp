@@ -8,37 +8,58 @@
 namespace HBE {
 	void Geometry::createQuad(Mesh &mesh, float size_x, float size_y, VERTEX_FLAGS flags) {
 		if (true) {
-			std::vector<vec3> vertex_positions = {
-					vec3(0.5f * size_x, -0.5f * size_y, .0f),
-					vec3(0.5f * size_x, 0.5f * size_y, .0f),
-					vec3(-0.5f * size_x, 0.5f * size_y, .0f),
-					vec3(-0.5f * size_x, -0.5f * size_y, .0f)
+			switch (flags) {
+				case 0://VERTEX_FLAG_NONE
+				{
+					std::vector<float> vertex_positions = {
+							0.5f * size_x, -0.5f * size_y, .0f, 1.0f, 0.0f, 0, 0, -1.0f,
+							0.5f * size_x, 0.5f * size_y, .0f, 1.0f, 1.0f, 0, 0, -1.0f,
+							-0.5f * size_x, 0.5f * size_y, .0f, 0.0f, 1.0f, 0, 0, -1.0f,
+							-0.5f * size_x, -0.5f * size_y, .0f, 0.0f, 0.0f, 0, 0, -1.0
+					};
+					mesh.setBuffer(0, vertex_positions.data(), vertex_positions.size());
+					break;
+				}
+				case 1://VERTEX_FLAG_UV
+				{
+					std::vector<float> vertex_positions = {
+							0.5f * size_x, -0.5f * size_y, .0f, 1.0f,
+							0.5f * size_x, 0.5f * size_y, .0f, 1.0f,
+							-0.5f * size_x, 0.5f * size_y, .0f, 0.0f,
+							-0.5f * size_x, -0.5f * size_y, .0f, 0.0f,
+					};
+					mesh.setBuffer(0, vertex_positions.data(), vertex_positions.size());
+					break;
+				}
+				case 2://VERTEX_FLAG_NORMAL
+				{
+					std::vector<float> vertex_positions = {
+							0.5f * size_x, -0.5f * size_y, 0.0f, 0, 0, -1.0f,
+							0.5f * size_x, 0.5f * size_y, 1.0f, 0, 0, -1.0f,
+							-0.5f * size_x, 0.5f * size_y, 1.0f, 0, 0, -1.0f,
+							-0.5f * size_x, -0.5f * size_y, 0.0f, 0, 0, -1.0
+					};
+					mesh.setBuffer(0, vertex_positions.data(), vertex_positions.size());
+					break;
+				}
+				case 3://VERTEX_FLAG_NORMAL&VERTEX_FLAG_UV
+				{
+					std::vector<float> vertex_positions = {
+							0.5f * size_x, -0.5f * size_y, .0f, 1.0f, 0.0f, 0, 0, -1.0f,
+							0.5f * size_x, 0.5f * size_y, .0f, 1.0f, 1.0f, 0, 0, -1.0f,
+							-0.5f * size_x, 0.5f * size_y, .0f, 0.0f, 1.0f, 0, 0, -1.0f,
+							-0.5f * size_x, -0.5f * size_y, .0f, 0.0f, 0.0f, 0, 0, -1.0
+					};
+					mesh.setBuffer(0, vertex_positions.data(), vertex_positions.size());
+					break;
+				}
+			}
+			std::vector<unsigned int> indices = {
+					0, 1, 2,
+					2, 3, 0,
 			};
-			mesh.setBuffer(0, vertex_positions);
+			mesh.setVertexIndices(indices);
 		}
-		if (true) {
-			std::vector<vec2> vertex_uvs = {
-					vec2(1.0f, 0.0f),
-					vec2(1.0f, 1.0f),
-					vec2(0.0f, 1.0f),
-					vec2(0.0f, 0.0f),
-			};
-			mesh.setBuffer(1, vertex_uvs);
-		}
-		if (true) {
-			std::vector<vec3> vertex_normals = {
-					vec3(0, 0, -1.0f),
-					vec3(0, 0, -1.0f),
-					vec3(0, 0, -1.0f),
-					vec3(0, 0, -1.0f),
-			};
-			mesh.setBuffer(2, vertex_normals);
-		}
-		std::vector<unsigned int> indices = {
-				0, 1, 2,
-				2, 3, 0,
-		};
-		mesh.setIndices(indices);
 	}
 
 	void Geometry::createCube(Mesh &mesh, float size_x, float size_y, float size_z, VERTEX_FLAGS flags) {
@@ -82,7 +103,7 @@ namespace HBE {
 										size.x, -size.y, -size.z,
 								});
 
-				mesh.setVertices(0, vertices.data(), vertices.size() / 3);
+				mesh.setBuffer(0, vertices.data(), vertices.size() / 3);
 				break;
 
 			case 0x1://VERTEX_FLAG_UV
@@ -118,7 +139,7 @@ namespace HBE {
 										size.x, -size.y, -size.z, 1.0f, 0.0f,
 
 								});
-				mesh.setVertices(0, vertices.data(), vertices.size() / 5);
+				mesh.setBuffer(0, vertices.data(), vertices.size() / 5);
 				break;
 
 			case 0x10://VERTEX_FLAG_NORMAL
@@ -141,7 +162,7 @@ namespace HBE {
 				0 + 20, 1 + 20, 2 + 20,
 				2 + 20, 3 + 20, 0 + 20,
 		};
-		mesh.setIndices(indices);
+		mesh.setVertexIndices(indices);
 	}
 
 }

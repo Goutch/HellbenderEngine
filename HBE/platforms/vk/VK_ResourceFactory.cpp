@@ -8,29 +8,26 @@
 #include "VK_Shader.h"
 #include "VK_VertexLayout.h"
 #include "VK_RenderPass.h"
-namespace HBE {
-    VK_ResourceFactory::VK_ResourceFactory(VK_Renderer *renderer) {
-        this->renderer = renderer;
-    }
 
-    VertexLayout *VK_ResourceFactory::createVertexLayout(const VertexLayoutInfo& info ) const {
-        return new VK_VertexLayout(info);
-    }
+namespace HBE {
+	VK_ResourceFactory::VK_ResourceFactory(VK_Renderer *renderer) {
+		this->renderer = renderer;
+	}
 
 	GraphicPipeline *VK_ResourceFactory::createGraphicPipeline(const GraphicPipelineInfo &info) const {
-		return new VK_GraphicPipeline(renderer->getDevice(), renderer,info);
+		return new VK_GraphicPipeline(renderer->getDevice(), renderer, info);
 	}
 
 	Shader *VK_ResourceFactory::createShader(const ShaderInfo &info) const {
-		return new VK_Shader(renderer->getDevice(),info);
+		return new VK_Shader(renderer->getDevice(), info);
 	}
 
 	Texture *VK_ResourceFactory::createTexture(const TextureInfo &info) const {
-		return new VK_Image(renderer->getDevice(),info);
+		return new VK_Image(renderer->getDevice(), info);
 	}
 
 	Mesh *VK_ResourceFactory::createMesh(const MeshInfo &info) const {
-		return new VK_Mesh(renderer->getDevice(), renderer->getCommandPool(),info);
+		return new VK_Mesh(renderer, renderer->getCommandPool(), info);
 	}
 
 	ComputePipeline *VK_ResourceFactory::createComputePipeline(const ComputePipelineInfo &info) const {
@@ -38,9 +35,9 @@ namespace HBE {
 		return nullptr;
 	}
 
-	RenderTarget* VK_ResourceFactory::createRenderTarget(const RenderTargetInfo &info) const {
-		return new VK_RenderPass(renderer,info);
-    }
+	RenderTarget *VK_ResourceFactory::createRenderTarget(const RenderTargetInfo &info) const {
+		return new VK_RenderPass(renderer, info);
+	}
 
 }
 

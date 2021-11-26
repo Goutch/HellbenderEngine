@@ -15,7 +15,7 @@ namespace HBE {
 		Profiler::begin("CameraControllerUpdateGroup");
 		auto group = scene->group<Transform, Camera, CameraController>();
 		Profiler::end();
-		for (auto [handle,transform,camera,controller]:group) {
+		for (auto[handle, transform, camera, controller]:group) {
 			float max_pitch_radian = glm::radians(controller.max_pitch);
 			uint32_t w, h;
 			camera.render_target->getResolution(w, h);
@@ -34,7 +34,7 @@ namespace HBE {
 			//rotate on y axis
 			transform.rotate(vec3(0, change.x, 0));
 			//go back to current pitch
-			controller.current_pitch -= change.y;
+			controller.current_pitch += change.y;
 			controller.current_pitch = glm::clamp(controller.current_pitch, -max_pitch_radian, max_pitch_radian);
 
 			transform.rotate(vec3(controller.current_pitch, 0, 0));

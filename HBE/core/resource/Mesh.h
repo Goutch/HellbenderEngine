@@ -4,15 +4,19 @@
 #include <vector>
 #include "glm/glm.hpp"
 #include "Resource.h"
+#include "GraphicPipeline.h"
 
 namespace HBE {
-	class VertexLayout;
+	class MeshLayout;
 
-	enum MESH_FLAGS {
+	typedef uint32_t MESH_FLAGS;
+	enum MESH_FLAG {
 		MESH_FLAG_NONE = 0,
 	};
+
 	struct MeshInfo {
-		VertexLayout *layout = nullptr;
+		const VertexBindingInfo *binding_infos = nullptr;
+		uint32_t binding_info_count = 0;
 		MESH_FLAGS flags = MESH_FLAG_NONE;
 	};
 
@@ -22,22 +26,16 @@ namespace HBE {
 		uint32_t index_count = 0;
 		bool has_index_buffer = false;
 		uint32_t instance_count = 1;
-		VertexLayout *layout;
+		std::unordered_map<uint32_t, VertexBindingInfo> bindings;
 	public:
 		virtual ~Mesh() = default;
 		uint32_t getVertexCount() const;
 		uint32_t getIndexCount() const;
 		uint32_t getInstanceCount() const;
 		bool hasIndexBuffer() const;
-		virtual void setVertices(uint32_t position, const void *vertices, size_t count) = 0;
-		virtual void setIndices(const std::vector<uint32_t> &data) = 0;
-		virtual void setBuffer(uint32_t position, const std::vector<int> &data) = 0;
-		virtual void setBuffer(uint32_t position, const std::vector<float> &data) = 0;
-		virtual void setBuffer(uint32_t position, const std::vector<vec2> &data) = 0;
-		virtual void setBuffer(uint32_t position, const std::vector<vec3> &data) = 0;
-		virtual void setBuffer(uint32_t position, const std::vector<vec4> &data) = 0;
-		virtual void setBuffer(uint32_t position, const std::vector<uint32_t> &data) = 0;
-		virtual void setInstancedBuffer(uint32_t position, const std::vector<mat4> &data) = 0;
+		virtual void setVertexIndices(const std::vector<uint32_t> &data) = 0;
+		virtual void setBuffer(uint32_t binding, const void *vertices, size_t count) = 0;
+		virtual void setInstanceBuffer(uint32_t binding, const void *data, size_t count) = 0;
 		virtual void bind() const = 0;
 		virtual void unbind() const = 0;
 

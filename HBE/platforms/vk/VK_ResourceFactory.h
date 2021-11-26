@@ -18,7 +18,6 @@ namespace HBE {
 		Mesh *createMesh(const MeshInfo &info) const override;
 		ComputePipeline *createComputePipeline(const ComputePipelineInfo &info) const override;
 		RenderTarget *createRenderTarget(const RenderTargetInfo &info) const override;
-        VertexLayout *createVertexLayout(const VertexLayoutInfo& info) const override;
 
 	};
 }

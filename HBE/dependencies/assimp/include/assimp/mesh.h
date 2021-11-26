@@ -229,7 +229,7 @@ struct aiVertexWeight {
 
     //! Initialization from a given index and vertex weight factor
     //! \param pID ID
-    //! \param pWeight VertexLayout weight factor
+    //! \param pWeight MeshLayout weight factor
     aiVertexWeight( unsigned int pID, float pWeight )
     : mVertexId( pID )
     , mWeight( pWeight ) {
@@ -554,7 +554,7 @@ enum aiMorphingMethod
 *
 * It usually consists of a number of vertices and a series of primitives/faces
 * referencing the vertices. In addition there might be a series of bones, each
-* of them addressing a number of vertices with a certain weight. VertexLayout data
+* of them addressing a number of vertices with a certain weight. MeshLayout data
 * is presented in channels with each channel containing a single per-vertex
 * information such as a set of texture coords or a normal vector.
 * If a data pointer is non-null, the corresponding data stream is present.
@@ -589,13 +589,13 @@ struct aiMesh
     */
     unsigned int mNumFaces;
 
-    /** VertexLayout positions.
+    /** MeshLayout positions.
     * This array is always present in a mesh. The array is
     * mNumVertices in size.
     */
     C_STRUCT aiVector3D* mVertices;
 
-    /** VertexLayout normals.
+    /** MeshLayout normals.
     * The array contains normalized vectors, NULL if not present.
     * The array is mNumVertices in size. Normals are undefined for
     * point and line primitives. A mesh consisting of points and
@@ -617,7 +617,7 @@ struct aiMesh
     */
     C_STRUCT aiVector3D* mNormals;
 
-    /** VertexLayout tangents.
+    /** MeshLayout tangents.
     * The tangent of a vertex points in the direction of the positive
     * X texture axis. The array contains normalized vectors, NULL if
     * not present. The array is mNumVertices in size. A mesh consisting
@@ -631,7 +631,7 @@ struct aiMesh
     */
     C_STRUCT aiVector3D* mTangents;
 
-    /** VertexLayout bitangents.
+    /** MeshLayout bitangents.
     * The bitangent of a vertex points in the direction of the positive
     * Y texture axis. The array contains normalized vectors, NULL if not
     * present. The array is mNumVertices in size.
@@ -640,14 +640,14 @@ struct aiMesh
     */
     C_STRUCT aiVector3D* mBitangents;
 
-    /** VertexLayout color sets.
+    /** MeshLayout color sets.
     * A mesh may contain 0 to #AI_MAX_NUMBER_OF_COLOR_SETS vertex
     * colors per vertex. NULL if not present. Each array is
     * mNumVertices in size if present.
     */
     C_STRUCT aiColor4D* mColors[AI_MAX_NUMBER_OF_COLOR_SETS];
 
-    /** VertexLayout texture coords, also known as UV channels.
+    /** MeshLayout texture coords, also known as UV channels.
     * A mesh may contain 0 to AI_MAX_NUMBER_OF_TEXTURECOORDS per
     * vertex. NULL if not present. The array is mNumVertices in size.
     */
@@ -697,7 +697,7 @@ struct aiMesh
      *      the same (dummy) name to each of the result meshes
      *      aids the caller at recovering the original mesh
      *      partitioning.
-     *   - VertexLayout animations refer to meshes by their names.
+     *   - MeshLayout animations refer to meshes by their names.
      **/
     C_STRUCT aiString mName;
 

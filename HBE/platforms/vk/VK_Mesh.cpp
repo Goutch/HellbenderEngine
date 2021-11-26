@@ -2,76 +2,123 @@
 #include <array>
 #include "VK_Mesh.h"
 #include "VK_Device.h"
-#include "VK_VertexLayout.h"
+
 #include "VK_Buffer.h"
 #include "VK_Allocator.h"
+#include "VK_CONSTANTS.h"
+#include "VK_Renderer.h"
 
 namespace HBE {
-	VK_Mesh::VK_Mesh(VK_Device *device, const VK_CommandPool *command_pool,const MeshInfo& info) {
-		this->device = device;
+	VK_Mesh::VK_Mesh(VK_Renderer *renderer, const VK_CommandPool *command_pool, const MeshInfo &info) {
+		this->renderer = renderer;
+		this->device = renderer->getDevice();
 		this->command_pool = command_pool;
-		this->layout=info.layout;
+
+		for (int i = 0; i < info.binding_info_count; ++i) {
+			buffers.emplace(info.binding_infos[i].binding, std::vector<VK_Buffer *>(
+					(info.binding_infos[i].flags & VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS) == VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS ?
+					MAX_FRAMES_IN_FLIGHT : 1, nullptr));
+			bindings.emplace(info.binding_infos[i].binding, info.binding_infos[i]);
+		}
 	}
 
-	void VK_Mesh::setVertices(uint32_t position,const void *vertices, size_t count) {
+	void VK_Mesh::setBuffer(uint32_t binding, const void *vertices, size_t count) {
 
 		this->vertex_count = count;
-		VkDeviceSize buffer_size = layout->getBytesPerVertex() * count;
-		if (buffers.find(position) != buffers.end()) {
-			delete buffers[position];
+		VertexBindingInfo &binding_info = bindings[binding];
+		VkDeviceSize buffer_size = binding_info.size * count;
+
+		if ((binding_info.flags & VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS) == VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS) {
+			renderer->waitCurrentFrame();
+			if (buffers[binding][renderer->getCurrentFrame()]) {
+				delete buffers[binding][renderer->getCurrentFrame()];
+			}
+			buffers[binding][renderer->getCurrentFrame()] = new VK_Buffer(device,
+																		  vertices,
+																		  buffer_size,
+																		  VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+																		  ((binding_info.flags & VERTEX_BINDING_FLAG_FAST_WRITE) == VERTEX_BINDING_FLAG_FAST_WRITE) ?
+																		  ALLOC_FLAG_MAPPABLE :
+																		  ALLOC_FLAG_NONE);
+
+		} else {
+			device->getQueue(QUEUE_FAMILY_GRAPHICS)->wait();
+			if (buffers[binding][0]) {
+				delete buffers[binding][0];
+			}
+			buffers[binding][0] = new VK_Buffer(device,
+												vertices,
+												buffer_size,
+												VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+												((binding_info.flags & VERTEX_BINDING_FLAG_FAST_WRITE) == VERTEX_BINDING_FLAG_FAST_WRITE) ?
+												ALLOC_FLAG_MAPPABLE :
+												ALLOC_FLAG_NONE);
 		}
-		buffers[position] = new VK_Buffer(device,
-										  vertices,
-										  buffer_size,
-										  VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, ALLOC_FLAG_MAPPABLE);
+	}
+
+	void VK_Mesh::setInstanceBuffer(uint32_t binding, const void *data, size_t count) {
+		this->instance_count = count;
+		VertexBindingInfo &binding_info = bindings[binding];
+		VkDeviceSize buffer_size = binding_info.size * count;
+
+		if ((binding_info.flags & VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS) == VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS) {
+			renderer->waitCurrentFrame();
+			if (buffers[binding][renderer->getCurrentFrame()]) {
+				delete buffers[binding][renderer->getCurrentFrame()];
+			}
+			buffers[binding][renderer->getCurrentFrame()] = new VK_Buffer(device,
+																		  data,
+																		  buffer_size,
+																		  VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+																		  ((binding_info.flags & VERTEX_BINDING_FLAG_FAST_WRITE) == VERTEX_BINDING_FLAG_FAST_WRITE) ?
+																		  ALLOC_FLAG_MAPPABLE :
+																		  ALLOC_FLAG_NONE);
+
+		} else {
+			device->getQueue(QUEUE_FAMILY_GRAPHICS)->wait();
+			if (buffers[binding][0]) {
+				delete buffers[binding][0];
+			}
+
+			buffers[binding][0] = new VK_Buffer(device,
+												data,
+												buffer_size,
+												VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+												((binding_info.flags & VERTEX_BINDING_FLAG_FAST_WRITE) == VERTEX_BINDING_FLAG_FAST_WRITE) ?
+												ALLOC_FLAG_MAPPABLE :
+												ALLOC_FLAG_NONE);
+		}
+
 	}
 
 	VK_Mesh::~VK_Mesh() {
-		for (auto buffer: buffers) {
-			delete buffer.second;
+		;
+		for (int i = 0; i < bindings.size(); ++i) {
+			for (int j = 0; j < buffers[i].size(); ++j) {
+				if (buffers[i][j])
+					delete buffers[i][j];
+			}
 		}
 		buffers.clear();
 		if (has_index_buffer)
 			delete indices_buffer;
 	}
 
-	void VK_Mesh::setIndices(const std::vector<unsigned int> &indices) {
+	void VK_Mesh::setVertexIndices(const std::vector<uint32_t> &data) {
+		device->getQueue(QUEUE_FAMILY_GRAPHICS)->wait();
+		if (has_index_buffer) {
+			delete indices_buffer;
+		}
 		this->has_index_buffer = true;
-		this->index_count = indices.size();
-		VkDeviceSize buffer_size = sizeof(indices[0]) * indices.size();
+		this->index_count = data.size();
+		VkDeviceSize buffer_size = sizeof(data[0]) * data.size();
+
+
 		indices_buffer = new VK_Buffer(device,
-									   reinterpret_cast<const void *>(indices.data()),
+									   reinterpret_cast<const void *>(data.data()),
 									   buffer_size,
 									   VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
 									   ALLOC_FLAGS::ALLOC_FLAG_NONE);
-	}
-
-	void VK_Mesh::setBuffer(uint32_t position, const std::vector<int> &data) {
-
-	}
-
-	void VK_Mesh::setBuffer(uint32_t position, const std::vector<float> &data) {
-
-	}
-
-	void VK_Mesh::setBuffer(uint32_t position, const std::vector<vec2> &data) {
-
-	}
-
-	void VK_Mesh::setBuffer(uint32_t position, const std::vector<vec3> &data) {
-
-	}
-
-	void VK_Mesh::setBuffer(uint32_t position, const std::vector<vec4> &data) {
-
-	}
-
-	void VK_Mesh::setBuffer(uint32_t position, const std::vector<uint32_t> &data) {
-
-	}
-
-	void VK_Mesh::setInstancedBuffer(uint32_t position, const std::vector<mat4> &data) {
-
 	}
 
 	void VK_Mesh::bind() const {
@@ -80,7 +127,13 @@ namespace HBE {
 		VkDeviceSize *offsets = new VkDeviceSize[buffers.size()];
 		int i = 0;
 		for (auto buffer: buffers) {
-			flat_buffers[i] = buffer.second->getHandle();
+			if ((bindings.at(buffer.first).flags & VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS) == VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS) {
+				flat_buffers[i] = buffer.second[renderer->getCurrentFrame()]->getHandle();
+			} else {
+				flat_buffers[i] = buffer.second[0]->getHandle();
+			}
+
+
 			offsets[i] = 0;
 			i++;
 		}

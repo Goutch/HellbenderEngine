@@ -13,7 +13,7 @@ namespace HBE {
         void clearMeshes();
 
     public:
-        void setMaterial(GraphicPipeline *pipeline, int mesh_index = 0);
+        void setPipeline(GraphicPipeline *pipeline, int mesh_index = 0);
 
         Model *load(std::string path);
 

@@ -103,7 +103,7 @@ void main()
 	}
 
 	void Graphics::draw(mat4 transform_matrix, const Mesh &mesh, GraphicPipeline &pipeline) {
-		renderer->draw(transform_matrix, mesh, pipeline);
+		renderer->draw(std::move(transform_matrix), mesh, pipeline);
 	}
 
 	void Graphics::drawInstanced(const Mesh &mesh, GraphicPipeline &pipeline) {
@@ -159,7 +159,7 @@ void main()
 		screen_vertex->setSource(default_screen_vertex_shader_code, SHADER_STAGE::SHADER_STAGE_VERTEX);
 		screen_frag->setSource(default_screen_fragment_shader_code, SHADER_STAGE::SHADER_STAGE_FRAGMENT);
 		auto default_screen_pipeline = Resources::createInRegistry<GraphicPipeline>("default/screen_pipeline");
-		auto default_screen_layout = Resources::createInRegistry<VertexLayout>("default/screen_layout");
+		auto default_screen_layout = Resources::createInRegistry<MeshLayout>("default/screen_layout");
 		default_screen_layout->setLayoutTypes({GLSL_TYPE::VEC2F, GLSL_TYPE::VEC2F});
 		default_screen_pipeline->setShaders(
 				screen_vertex,

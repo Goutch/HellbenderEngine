@@ -12,7 +12,10 @@
 #include "VK_Fence.h"
 
 namespace HBE {
-	VK_GraphicPipeline::VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const GraphicPipelineInfo &info) {
+	VK_GraphicPipeline::VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const GraphicPipelineInfo &info) :
+			VK_GraphicPipeline(device, renderer, info, dynamic_cast<VK_RenderPass *>(renderer->getDefaultRenderTarget())->getHandle()) {}
+
+	VK_GraphicPipeline::VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const GraphicPipelineInfo &info, const VkRenderPass &render_pass) {
 		this->device = device;
 		this->renderer = renderer;
 
@@ -58,23 +61,50 @@ namespace HBE {
 		fragShaderStageInfo.pName = "main";
 
 		VkPipelineShaderStageCreateInfo shaderStages[2] = {vertShaderStageInfo, fragShaderStageInfo};
-		//--------------------------VertexLayout input-----------------------------------
-		VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+		//--------------------------MeshLayout input-----------------------------------
 
-		if (info.vertex_layout != nullptr) {
-			const VK_VertexLayout *vk_layout = dynamic_cast<const VK_VertexLayout *>(info.vertex_layout);
-			vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-			vertexInputInfo.vertexBindingDescriptionCount = 1;
-			vertexInputInfo.pVertexBindingDescriptions = &vk_layout->getBindingDescription();
-			vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(vk_layout->getAttributeDescriptions().size());
-			vertexInputInfo.pVertexAttributeDescriptions = vk_layout->getAttributeDescriptions().data();
-		} else {
-			vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-			vertexInputInfo.vertexBindingDescriptionCount = 0;
-			vertexInputInfo.pVertexBindingDescriptions = nullptr;
-			vertexInputInfo.vertexAttributeDescriptionCount = 0;
-			vertexInputInfo.pVertexAttributeDescriptions = nullptr;
+
+		VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+
+		std::vector<VkVertexInputBindingDescription> binding_descriptions;
+		binding_descriptions.resize(info.binding_info_count);
+		for (int i = 0; i < info.binding_info_count; ++i) {
+			binding_descriptions[i].binding = info.binding_infos[i].binding;
+			binding_descriptions[i].inputRate = (info.binding_infos[i].flags & VERTEX_BINDING_FLAG_PER_INSTANCE) == VERTEX_BINDING_FLAG_PER_INSTANCE ?
+												VK_VERTEX_INPUT_RATE_INSTANCE :
+												VK_VERTEX_INPUT_RATE_VERTEX;
+			binding_descriptions[i].stride = info.binding_infos[i].size;
 		}
+		vertexInputInfo.vertexBindingDescriptionCount = binding_descriptions.size();
+		vertexInputInfo.pVertexBindingDescriptions = binding_descriptions.data();
+
+		std::vector<VkVertexInputAttributeDescription> attribute_descriptions;
+		auto reflected_attributes = vk_vertex->getAttributeDescriptions();
+		attribute_descriptions.resize(reflected_attributes.size());
+		uint32_t offset = 0;
+		uint32_t binding = 0;
+		if (binding_descriptions.size() != 0) {
+			for (int i = 0; i < reflected_attributes.size(); ++i) {
+				for (int j = 0; j < binding_descriptions.size() - 1; ++j) {
+					if (binding == binding_descriptions[j].binding && offset == binding_descriptions[j].stride) {
+						offset = 0;
+						binding = binding_descriptions[j + 1].binding;
+						break;
+					}
+				}
+				attribute_descriptions[i].location = reflected_attributes[i].location;
+				attribute_descriptions[i].format = reflected_attributes[i].format;
+				attribute_descriptions[i].offset = offset;
+				attribute_descriptions[i].binding = binding;
+				offset += reflected_attributes[i].size;
+
+			}
+			vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attribute_descriptions.size());
+			vertexInputInfo.pVertexAttributeDescriptions = attribute_descriptions.data();
+		}
+
+
 		VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
 		inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 		inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
@@ -109,8 +139,10 @@ namespace HBE {
 		rasterizer.rasterizerDiscardEnable = VK_FALSE;
 		rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
 		rasterizer.lineWidth = 1.0f;
-		rasterizer.cullMode = VK_CULL_MODE_NONE;
 		rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+		rasterizer.cullMode = VK_CULL_MODE_NONE;
+		rasterizer.cullMode |= (info.flags & GRAPHIC_PIPELINE_CULL_BACK) == GRAPHIC_PIPELINE_CULL_BACK ? VK_CULL_MODE_BACK_BIT : VK_CULL_MODE_NONE;
+		rasterizer.cullMode |= (info.flags & GRAPHIC_PIPELINE_CULL_FRONT) == GRAPHIC_PIPELINE_CULL_FRONT ? VK_CULL_MODE_FRONT_BIT : VK_CULL_MODE_NONE;
 		rasterizer.depthBiasEnable = VK_FALSE;
 		rasterizer.depthBiasConstantFactor = 0.0f; // Optional
 		rasterizer.depthBiasClamp = 0.0f; // Optional
@@ -150,7 +182,7 @@ namespace HBE {
 
 		VkDynamicState dynamicStates[] = {
 				VK_DYNAMIC_STATE_VIEWPORT,
-				VK_DYNAMIC_STATE_SCISSOR
+				VK_DYNAMIC_STATE_SCISSOR,
 		};
 
 		VkPipelineDynamicStateCreateInfo dynamicState{};
@@ -176,7 +208,7 @@ namespace HBE {
 		pipelineInfo.pTessellationState = VK_NULL_HANDLE;
 		pipelineInfo.layout = pipeline_layout_handle;
 
-		pipelineInfo.renderPass = dynamic_cast<VK_RenderPass *>(renderer->getDefaultRenderTarget())->getHandle();
+		pipelineInfo.renderPass = render_pass;
 		pipelineInfo.subpass = 0;
 
 		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
@@ -186,7 +218,6 @@ namespace HBE {
 			VK_SUCCESS) {
 			Log::error("failed to create graphics pipeline!");
 		}
-
 	}
 
 	VK_GraphicPipeline::~VK_GraphicPipeline() {
@@ -221,18 +252,18 @@ namespace HBE {
 		vkCmdBindPipeline(renderer->getCommandPool()->getCurrentBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, handle);
 	}
 
-	void VK_GraphicPipeline::setDynamicUniform(const std::string &name,const void *data) {
+	void VK_GraphicPipeline::setDynamicUniform(const std::string &name, const void *data) {
 		//todo
 	}
 
-	void VK_GraphicPipeline::setDynamicUniform(uint32_t binding,const void *data) {
+	void VK_GraphicPipeline::setDynamicUniform(uint32_t binding, const void *data) {
 		//todo
 	}
 
-	void VK_GraphicPipeline::setUniform(const std::string &name,const void *data) {
+	void VK_GraphicPipeline::setUniform(const std::string &name, const void *data) {
 		auto it = name_input_index.find(name);
 		if (it != name_input_index.end()) {
-			if (inputs[it->second].type == VK_Shader::UNIFORM_BUFFER) {
+			if (inputs[it->second].type == UNIFORM_INPUT_TYPE_BUFFER) {
 				setUniform(inputs[it->second].binding, data);
 
 			} else {
@@ -243,16 +274,16 @@ namespace HBE {
 		}
 	}
 
-	void VK_GraphicPipeline::setUniform(uint32_t binding,const void *data) {
+	void VK_GraphicPipeline::setUniform(uint32_t binding, const void *data) {
 		for (VK_Buffer *buffer: uniform_buffers[binding]) {
 			buffer->update(data);
 		}
 	}
 
-	void VK_GraphicPipeline::pushConstant(const std::string &name,const void *data) {
+	void VK_GraphicPipeline::pushConstant(const std::string &name, const void *data) {
 		auto it = name_input_index.find(name);
 		if (it != name_input_index.end()) {
-			if (inputs[it->second].type == VK_Shader::PUSH_CONSTANT) {
+			if (inputs[it->second].type == UNIFORM_INPUT_TYPE_PUSH_CONSTANT) {
 				vkCmdPushConstants(renderer->getCommandPool()->getCurrentBuffer(), pipeline_layout_handle,
 								   inputs[it->second].stage, inputs[it->second].offset, inputs[it->second].size, data);
 			} else {
@@ -281,7 +312,7 @@ namespace HBE {
 	void VK_GraphicPipeline::setTexture(const std::string &name, const Texture *texture) {
 		auto it = name_input_index.find(name);
 		if (it != name_input_index.end()) {
-			if (inputs[it->second].type == VK_Shader::TEXTURE_SAMPLER) {
+			if (inputs[it->second].type == UNIFORM_INPUT_TYPE_TEXTURE_SAMPLER) {
 				setTexture(inputs[it->second].binding, texture);
 			} else {
 				Log::error(name + " is not a texture binding");
@@ -308,7 +339,7 @@ namespace HBE {
 	void VK_GraphicPipeline::setTexture(const std::string &name, const RenderTarget *render_target) {
 		auto it = name_input_index.find(name);
 		if (it != name_input_index.end()) {
-			if (inputs[it->second].type == VK_Shader::TEXTURE_SAMPLER) {
+			if (inputs[it->second].type == UNIFORM_INPUT_TYPE_TEXTURE_SAMPLER) {
 				setTexture(inputs[it->second].binding, render_target);
 			} else {
 				Log::error(name + " is not a texture binding");
@@ -475,180 +506,4 @@ namespace HBE {
 		}
 	}
 
-	VK_GraphicPipeline::VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const GraphicPipelineInfo &info, VkRenderPass &render_pass) {
-		this->device = device;
-		this->renderer = renderer;
-
-		if (descriptor_set_layout_handle != VK_NULL_HANDLE)
-			vkDestroyDescriptorSetLayout(device->getHandle(), descriptor_set_layout_handle, nullptr);
-		if (descriptor_pool_handle != VK_NULL_HANDLE)
-			vkDestroyDescriptorPool(device->getHandle(), descriptor_pool_handle, nullptr);
-		if (handle != VK_NULL_HANDLE)vkDestroyPipeline(device->getHandle(), handle, nullptr);
-		if (pipeline_layout_handle != VK_NULL_HANDLE)
-			vkDestroyPipelineLayout(device->getHandle(), pipeline_layout_handle, nullptr);
-		descriptor_set_layout_bindings.clear();
-		push_constants_ranges.clear();
-		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-			descriptor_sets_writes[i].clear();
-		}
-
-		inputs.clear();
-		name_input_index.clear();
-		binding_input_index.clear();
-		name_push_constant_index.clear();
-		for (auto buffer_vector: uniform_buffers) {
-			for (size_t i = 0; i < buffer_vector.second.size(); ++i) {
-				delete buffer_vector.second[i];
-			}
-		}
-		uniform_buffers.clear();
-
-
-		const VK_Shader *vk_vertex = (dynamic_cast<const VK_Shader *>(info.vertex_shader));
-		const VK_Shader *vk_frag = (dynamic_cast<const VK_Shader *>(info.fragement_shader));
-		shaders.emplace_back(vk_vertex);
-		shaders.emplace_back(vk_frag);
-		VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
-		vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-		vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-		vertShaderStageInfo.module = vk_vertex->getHandle();
-		vertShaderStageInfo.pName = "main";
-
-		VkPipelineShaderStageCreateInfo fragShaderStageInfo{};
-		fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-		fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-		fragShaderStageInfo.module = vk_frag->getHandle();
-		fragShaderStageInfo.pName = "main";
-
-		VkPipelineShaderStageCreateInfo shaderStages[2] = {vertShaderStageInfo, fragShaderStageInfo};
-		//--------------------------VertexLayout input-----------------------------------
-		VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
-
-		if (info.vertex_layout != nullptr) {
-			const VK_VertexLayout *vk_layout = dynamic_cast<const VK_VertexLayout *>(info.vertex_layout);
-			vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-			vertexInputInfo.vertexBindingDescriptionCount = 1;
-			vertexInputInfo.pVertexBindingDescriptions = &vk_layout->getBindingDescription();
-			vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(vk_layout->getAttributeDescriptions().size());
-			vertexInputInfo.pVertexAttributeDescriptions = vk_layout->getAttributeDescriptions().data();
-		} else {
-			vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-			vertexInputInfo.vertexBindingDescriptionCount = 0;
-			vertexInputInfo.pVertexBindingDescriptions = nullptr;
-			vertexInputInfo.vertexAttributeDescriptionCount = 0;
-			vertexInputInfo.pVertexAttributeDescriptions = nullptr;
-		}
-		VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
-		inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-		inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-		inputAssembly.primitiveRestartEnable = VK_FALSE;
-		//-------------------Viewports and scissors--------------------
-
-		uint32_t width, height;
-		Graphics::getWindow()->getSize(width, height);
-		VkViewport viewport{};
-		viewport.x = 0.0f;
-		viewport.y = (float) height;
-		viewport.width = (float) width;
-		viewport.height = (float) -height;
-		viewport.minDepth = 0.0f;
-		viewport.maxDepth = 1.0f;
-
-		VkRect2D scissor{};
-		scissor.offset = {0, 0};
-		scissor.extent = VkExtent2D{(uint32_t) width, (uint32_t) height};
-
-		VkPipelineViewportStateCreateInfo viewportState{};
-		viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-		viewportState.viewportCount = 1;
-		viewportState.pViewports = &viewport;
-		viewportState.scissorCount = 1;
-		viewportState.pScissors = &scissor;
-
-		//---------------------------Rasterizer------------------------
-		VkPipelineRasterizationStateCreateInfo rasterizer{};
-		rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-		rasterizer.depthClampEnable = VK_FALSE;
-		rasterizer.rasterizerDiscardEnable = VK_FALSE;
-		rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
-		rasterizer.lineWidth = 1.0f;
-		rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
-		rasterizer.depthBiasEnable = VK_FALSE;
-		rasterizer.depthBiasConstantFactor = 0.0f; // Optional
-		rasterizer.depthBiasClamp = 0.0f; // Optional
-		rasterizer.depthBiasSlopeFactor = 0.0f; // Optional
-		rasterizer.cullMode |= info.flags & GRAPHIC_PIPELINE_CULL_BACK ? VK_CULL_MODE_BACK_BIT : VK_CULL_MODE_NONE;
-		rasterizer.cullMode |= info.flags & GRAPHIC_PIPELINE_CULL_FRONT ? VK_CULL_MODE_FRONT_BIT : VK_CULL_MODE_NONE;
-
-		VkPipelineMultisampleStateCreateInfo multisampling{};
-		multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-		multisampling.sampleShadingEnable = VK_FALSE;
-		multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
-		multisampling.minSampleShading = 1.0f; // Optional
-		multisampling.pSampleMask = nullptr; // Optional
-		multisampling.alphaToCoverageEnable = VK_FALSE; // Optional
-		multisampling.alphaToOneEnable = VK_FALSE; // Optional
-
-		VkPipelineColorBlendAttachmentState colorBlendAttachment{};
-		colorBlendAttachment.colorWriteMask =
-				VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
-				VK_COLOR_COMPONENT_A_BIT;
-		colorBlendAttachment.blendEnable = VK_TRUE;
-		colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-		colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-		colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;
-		colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-		colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-		colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;
-
-		VkPipelineColorBlendStateCreateInfo colorBlending{};
-		colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-		colorBlending.logicOpEnable = VK_FALSE;
-		colorBlending.logicOp = VK_LOGIC_OP_COPY; // Optional
-		colorBlending.attachmentCount = 1;
-		colorBlending.pAttachments = &colorBlendAttachment;
-		colorBlending.blendConstants[0] = 0.0f; // Optional
-		colorBlending.blendConstants[1] = 0.0f; // Optional
-		colorBlending.blendConstants[2] = 0.0f; // Optional
-		colorBlending.blendConstants[3] = 0.0f; // Optional
-
-		VkDynamicState dynamicStates[] = {
-				VK_DYNAMIC_STATE_VIEWPORT,
-				VK_DYNAMIC_STATE_SCISSOR
-		};
-
-		VkPipelineDynamicStateCreateInfo dynamicState{};
-		dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-		dynamicState.dynamicStateCount = 2;
-		dynamicState.pDynamicStates = dynamicStates;
-
-		createPipelineLayout();
-
-		VkGraphicsPipelineCreateInfo pipelineInfo{};
-		pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-		pipelineInfo.stageCount = 2;
-		pipelineInfo.pStages = shaderStages;
-
-		pipelineInfo.pVertexInputState = &vertexInputInfo;
-		pipelineInfo.pInputAssemblyState = &inputAssembly;
-		pipelineInfo.pViewportState = &viewportState;
-		pipelineInfo.pRasterizationState = &rasterizer;
-		pipelineInfo.pMultisampleState = &multisampling;
-		pipelineInfo.pDepthStencilState = nullptr; // Optional
-		pipelineInfo.pColorBlendState = &colorBlending;
-		pipelineInfo.pDynamicState = &dynamicState; // Optional
-		pipelineInfo.pTessellationState = VK_NULL_HANDLE;
-		pipelineInfo.layout = pipeline_layout_handle;
-
-		pipelineInfo.renderPass = render_pass;
-		pipelineInfo.subpass = 0;
-
-		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
-		pipelineInfo.basePipelineIndex = -1; // Optional
-
-		if (vkCreateGraphicsPipelines(device->getHandle(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &handle) !=
-			VK_SUCCESS) {
-			Log::error("failed to create graphics pipeline!");
-		}
-	}
 }

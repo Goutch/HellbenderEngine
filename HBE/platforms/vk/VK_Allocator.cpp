@@ -110,7 +110,7 @@ namespace HBE {
 							block,
 							flags,
 							current_id++).first;
-					Log::debug("Allocated " + allocToString(new_alloc));
+					//Log::debug("Allocated " + allocToString(new_alloc));
 					return new_alloc;
 
 				} else {
@@ -134,7 +134,7 @@ namespace HBE {
 						flags,
 						current_id++).first;
 
-				Log::debug("Allocated " + allocToString(new_alloc));
+				//Log::debug("Allocated " + allocToString(new_alloc));
 				return new_alloc;
 			}
 		}
@@ -165,10 +165,10 @@ namespace HBE {
 				block,
 				flags,
 				current_id++).first;
-		Log::debug(
+		/*Log::debug(
 				"Created block " + std::to_string(block->index) + " of type " + memoryTypeToString(block->memory_type) +
 				" with " + std::to_string(block->size / 1048576.0f) + "mb");
-		Log::debug("Allocated " + allocToString(new_alloc));
+		Log::debug("Allocated " + allocToString(new_alloc));*/
 		return new_alloc;
 	}
 
@@ -328,16 +328,16 @@ namespace HBE {
 	}
 
 	void VK_Allocator::free(const Allocation &allocation) {
-		Log::debug("Freeing Alloc#" + std::to_string(allocation.id));
+		//Log::debug("Freeing Alloc#" + std::to_string(allocation.id));
 
 		Block *block = allocation.block;
 		block->alloc_count--;
 		uint32_t memory_type = allocation.block->memory_type;
-		Log::debug("Freed " + allocToString(allocation));
+		//Log::debug("Freed " + allocToString(allocation));
 		if (allocation.block->alloc_count == 0) {
 			vkFreeMemory(device->getHandle(), allocation.block->memory, nullptr);
-			Log::debug("Freed block " + std::to_string(allocation.block->index) + " of " +
-					   memoryTypeToString(allocation.block->memory_type));
+			/*Log::debug("Freed block " + std::to_string(allocation.block->index) + " of " +
+					   memoryTypeToString(allocation.block->memory_type));*/
 			auto it = blocks[memory_type].erase(blocks[memory_type].begin() + allocation.block->index);
 			delete block;
 			for (; it != blocks[memory_type].end(); ++it) {

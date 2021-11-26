@@ -93,7 +93,7 @@ namespace HBE {
 	}
 
 	mat4 Transform::world() const {
-		return parent == nullptr ? local : parent->world() * local;
+		return std::move(parent == nullptr ? local : parent->world() * local);
 	}
 
 	quat Transform::rotation() const {
@@ -132,6 +132,7 @@ namespace HBE {
 //---------------------------------------CAMERA---------------------------------------
 	void Camera::calculateProjection() {
 		projection = glm::perspective<float>(glm::radians(fov), aspectRatio(), near, render_distance);
+		projection[1] = -projection[1];
 	}
 
 	float Camera::aspectRatio() {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <core/resource/GraphicPipeline.h>
-#include <core/resource/VertexLayout.h>
+#include <core/resource/MeshLayout.h>
 #include <array>
 #include "vulkan/vulkan.h"
 #include "unordered_map"
@@ -16,8 +16,6 @@ namespace HBE {
 	class VK_RenderPass;
 
 	class VK_Renderer;
-
-	class VK_VertexLayout;
 
 	class VK_Buffer;
 
@@ -40,13 +38,13 @@ namespace HBE {
 		std::array<std::unordered_map<uint32_t ,VkWriteDescriptorSet>, MAX_FRAMES_IN_FLIGHT> descriptor_sets_writes;
 		std::unordered_map<uint32_t, std::vector<VK_Buffer *>> uniform_buffers;
 
-		std::vector<VK_Shader::ShaderInput> inputs;
+		std::vector<UniformInput> inputs;
 		std::unordered_map<std::string,uint32_t> name_input_index;
 		std::unordered_map<uint32_t ,uint32_t> binding_input_index;
 		std::unordered_map<std::string,uint32_t> name_push_constant_index;
 	public:
 		VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer,const GraphicPipelineInfo& info);
-		VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer,const GraphicPipelineInfo& info,VkRenderPass& render_pass);
+		VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer,const GraphicPipelineInfo& info,const VkRenderPass& render_pass);
 		void setDynamicUniform(const std::string &name,const void *data);
 		void setDynamicUniform(uint32_t binding,const  void *data) ;
 		void setUniform(const std::string &name,const  void *data);

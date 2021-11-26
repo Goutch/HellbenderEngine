@@ -7,7 +7,7 @@
 
 namespace HBE {
     struct HB_API MeshData {
-        std::vector<unsigned int> indices;
+        std::vector<uint32_t> indices;
         std::vector<vec3> positions;
         std::vector<vec2> uvs;
         std::vector<vec3> normals;

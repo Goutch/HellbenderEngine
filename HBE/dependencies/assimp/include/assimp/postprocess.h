@@ -131,7 +131,7 @@ enum aiPostProcessSteps
      *
      * The  components to be removed are specified in a separate
      * importer property, <tt>#AI_CONFIG_PP_RVC_FLAGS</tt>. This is quite useful
-     * if you don't need all parts of the output structure. VertexLayout colors
+     * if you don't need all parts of the output structure. MeshLayout colors
      * are rarely used today for example... Calling this step to remove unneeded
      * data from the pipeline as early as possible results in increased
      * performance and a more optimized output data structure.
@@ -142,7 +142,7 @@ enum aiPostProcessSteps
      *
      * This flag is a poor one, mainly because its purpose is usually
      * misunderstood. Consider the following case: a 3D model has been exported
-     * from a CAD app, and it has per-face vertex colors. VertexLayout positions can't be
+     * from a CAD app, and it has per-face vertex colors. MeshLayout positions can't be
      * shared, thus the #aiProcess_JoinIdenticalVertices step fails to
      * optimize the data because of these nasty little vertex colors.
      * Most apps don't even process them, so it's all for nothing. By using

@@ -7,6 +7,7 @@
 #include "core/resource/GraphicPipeline.h"
 #include "core/resource/RenderTarget.h"
 #include <glm/detail/type_quat.hpp>
+#include <core/resource/Model.h>
 
 namespace HBE {
 	struct HB_API Identity {
@@ -57,6 +58,12 @@ namespace HBE {
 	};
 
 	struct HB_API MeshRenderer {
+		Mesh *mesh = nullptr;
+		GraphicPipeline *pipeline = nullptr;
+		bool active = true;
+	};
+
+	struct HB_API InstancedRenderer {
 		Mesh *mesh = nullptr;
 		GraphicPipeline *pipeline = nullptr;
 		bool active = true;

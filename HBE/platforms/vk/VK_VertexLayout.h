@@ -1,19 +1,20 @@
 #pragma once
 
-#include "core/resource/VertexLayout.h"
+#include "core/resource/MeshLayout.h"
 #include "vulkan/vulkan.h"
 
 namespace HBE {
-    class VK_VertexLayout : public VertexLayout {
+   /* class VK_VertexLayout : public MeshLayout {
     private:
-        VkVertexInputBindingDescription binding_description{};
-        std::vector<VkVertexInputAttributeDescription> attribute_descriptions;
+
+        std::vector<VkVertexInputAttributeDescription> vertex_attribute_descriptions;
+		std::vector<VkVertexInputAttributeDescription> instance_attribute_descriptions;
     public:
-    	VK_VertexLayout(const VertexLayoutInfo& info);
+    	VK_VertexLayout(const MeshLayoutInfo& info);
         const VkVertexInputBindingDescription &getBindingDescription() const;
 
         const std::vector<VkVertexInputAttributeDescription> &getAttributeDescriptions() const;
-    };
+    };*/
 }
 
 

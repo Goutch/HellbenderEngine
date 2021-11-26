@@ -138,23 +138,37 @@ namespace HBE {
 		render_pass->begin(command_pool->getCurrentBuffer(), current_frame);
 		for (const auto &pipeline_kv: render_cache) {
 			GraphicPipeline *pipeline = pipeline_kv.first;
-			VK_GraphicPipeline *vk_pipeline = (VK_GraphicPipeline *) pipeline;
-			vk_pipeline->bind();
+			pipeline->bind();
 			pipeline->setUniform("ubo", &ubo);
 			for (const auto &mesh_kv: pipeline_kv.second) {
 				const Mesh *mesh = mesh_kv.first;
 				mesh->bind();
-				for (const mat4& transform_matrix: mesh_kv.second) {
+				for (const mat4 &transform_matrix: mesh_kv.second) {
 					pipeline->pushConstant("constants", static_cast<const void *>(&transform_matrix[0]));
 					if (mesh->hasIndexBuffer()) {
-						vkCmdDrawIndexed(command_pool->getCurrentBuffer(), mesh->getIndexCount(), 1, 0, 0, 0);
+						vkCmdDrawIndexed(command_pool->getCurrentBuffer(), mesh->getIndexCount(), mesh->getInstanceCount(), 0, 0, 0);
 					} else {
-						vkCmdDraw(command_pool->getCurrentBuffer(), mesh->getVertexCount(), 1, 0, 0);
+						vkCmdDraw(command_pool->getCurrentBuffer(), mesh->getVertexCount(), mesh->getInstanceCount(), 0, 0);
 					}
+
 				}
 				mesh->unbind();
 			}
-			vk_pipeline->unbind();
+			pipeline->unbind();
+		}
+		for (const auto &pipeline_kv: instanced_cache) {
+			auto pipeline = pipeline_kv.first;
+			auto mesh = pipeline_kv.second;
+			pipeline->bind();
+			pipeline->setUniform("ubo", &ubo);
+			mesh->bind();
+			if (mesh->hasIndexBuffer()) {
+				vkCmdDrawIndexed(command_pool->getCurrentBuffer(), mesh->getIndexCount(), mesh->getInstanceCount(), 0, 0, 0);
+			} else {
+				vkCmdDraw(command_pool->getCurrentBuffer(), mesh->getVertexCount(), mesh->getInstanceCount(), 0, 0);
+			}
+			mesh->unbind();
+			pipeline->unbind();
 		}
 		render_pass->end(command_pool->getCurrentBuffer());
 		Profiler::end();
@@ -264,12 +278,13 @@ namespace HBE {
 	void VK_Renderer::draw(mat4 transform_matrix, const Mesh &mesh, GraphicPipeline &pipeline) {
 		auto it_material = render_cache.try_emplace(&pipeline).first;
 		auto it_mesh = it_material->second.try_emplace(&mesh).first;
-		it_mesh->second.emplace_back(transform_matrix);
+		it_mesh->second.emplace_back(std::move(transform_matrix));
 	}
 
 	void VK_Renderer::drawInstanced(const HBE::Mesh &mesh,
 									GraphicPipeline &pipeline) {
-
+		auto it_material = instanced_cache.try_emplace(&pipeline).first;
+		auto it_mesh = it_material->second = &mesh;
 	}
 
 	const VK_Swapchain &VK_Renderer::getSwapchain() const {
@@ -336,6 +351,10 @@ namespace HBE {
 	void VK_Renderer::setCurrentRenderTarget(RenderTarget *render_target) {
 		current_render_pass = dynamic_cast<VK_RenderPass *>(render_target);
 		screen_pipeline->setTexture("texture0", render_target);
+	}
+
+	void VK_Renderer::waitCurrentFrame() {
+		frames[current_frame].in_flight_fence->wait();
 	}
 }
 

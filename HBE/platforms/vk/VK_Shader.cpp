@@ -12,9 +12,9 @@ namespace HBE {
 		vkDestroyShaderModule(device->getHandle(), handle, nullptr);
 	}
 
-	VK_Shader::VK_Shader(const VK_Device *device,const ShaderInfo& info) {
+	VK_Shader::VK_Shader(const VK_Device *device, const ShaderInfo &info) {
 		this->device = device;
-		this->stage=info.stage;
+		this->stage = info.stage;
 		switch (info.stage) {
 			case SHADER_STAGE::SHADER_STAGE_COMPUTE:
 				vk_stage = VK_SHADER_STAGE_COMPUTE_BIT;
@@ -53,7 +53,7 @@ namespace HBE {
 		return layout_bindings;
 	}
 
-	const std::vector<VK_Shader::ShaderInput> &VK_Shader::getInputs() const {
+	const std::vector<UniformInput> &VK_Shader::getInputs() const {
 		return inputs;
 	}
 
@@ -88,6 +88,7 @@ namespace HBE {
 		const spvc_reflected_resource *uniform_list = nullptr;
 		size_t uniform_count;
 		spvc_compiler_create_shader_resources(compiler_glsl, &resources);
+
 		spvc_resources_get_resource_list_for_type(resources, SPVC_RESOURCE_TYPE_UNIFORM_BUFFER, &uniform_list, &uniform_count);
 		for (uint32_t i = 0; i < uniform_count; ++i) {
 			VkDescriptorSetLayoutBinding layout_binding = {};
@@ -109,7 +110,7 @@ namespace HBE {
 			spvc_compiler_get_declared_struct_size(compiler_glsl, type, &size);
 
 
-			inputs.emplace_back(ShaderInput{name, INPUT_TYPE::UNIFORM_BUFFER, layout_binding.binding,vk_stage,size});
+			inputs.emplace_back(UniformInput{name, UNIFORM_INPUT_TYPE_BUFFER, layout_binding.binding, vk_stage, size});
 		}
 
 		const spvc_reflected_resource *push_constant_list = nullptr;
@@ -133,7 +134,7 @@ namespace HBE {
 
 			push_constants_ranges.emplace_back(push_constant);
 
-			inputs.emplace_back(ShaderInput{name, INPUT_TYPE::PUSH_CONSTANT, binding,vk_stage,size,push_constant.offset});
+			inputs.emplace_back(UniformInput{name, UNIFORM_INPUT_TYPE_PUSH_CONSTANT, binding, vk_stage, size, push_constant.offset});
 		}
 		const spvc_reflected_resource *texture_sampler_list = nullptr;
 		size_t texture_sampler_count;
@@ -154,12 +155,70 @@ namespace HBE {
 
 			uint32_t set = spvc_compiler_get_decoration(compiler_glsl, texture_sampler_list[i].id, SpvDecorationDescriptorSet);
 
-
-			inputs.emplace_back(ShaderInput{name, INPUT_TYPE::TEXTURE_SAMPLER, layout_binding.binding,vk_stage});
+			inputs.emplace_back(UniformInput{name, UNIFORM_INPUT_TYPE_TEXTURE_SAMPLER, layout_binding.binding, vk_stage});
 		}
+
+		const spvc_reflected_resource *vertex_inputs = nullptr;
+		size_t vertex_inputs_count;
+		spvc_resources_get_resource_list_for_type(resources, SPVC_RESOURCE_TYPE_STAGE_INPUT, &vertex_inputs, &vertex_inputs_count);
+
+		for (int i = 0; i < vertex_inputs_count; ++i) {
+
+			spvc_type type = spvc_compiler_get_type_handle(compiler_glsl, vertex_inputs[i].type_id);
+			spvc_basetype basetype = spvc_type_get_basetype(type);
+			size_t size;
+			size = spvc_type_get_vector_size(type);
+			size_t num_col = spvc_type_get_columns(type);
+			uint32_t location = spvc_compiler_get_decoration(compiler_glsl, vertex_inputs[i].id, SpvDecorationLocation);
+			for (int j = 0; j < num_col; ++j) {
+				VertexInput attribute_description{};
+				attribute_description.location = location;
+				attribute_description.size = size * 4;
+				switch (size) {
+					case 1:
+						if (basetype == spvc_basetype::SPVC_BASETYPE_FP32)
+							attribute_description.format = VK_FORMAT_R32_SFLOAT;
+						else if (basetype == spvc_basetype::SPVC_BASETYPE_UINT32)
+							attribute_description.format = VK_FORMAT_R32_UINT;
+						break;
+					case 2:
+						if (basetype == spvc_basetype::SPVC_BASETYPE_FP32)
+							attribute_description.format = VK_FORMAT_R32G32_SFLOAT;
+						else if (basetype == spvc_basetype::SPVC_BASETYPE_UINT32)
+							attribute_description.format = VK_FORMAT_R32G32_UINT;
+						break;
+					case 3:
+						if (basetype == spvc_basetype::SPVC_BASETYPE_FP32)
+							attribute_description.format = VK_FORMAT_R32G32B32_SFLOAT;
+						else if (basetype == spvc_basetype::SPVC_BASETYPE_UINT32)
+							attribute_description.format = VK_FORMAT_R32G32B32_UINT;
+						break;
+					case 4:
+						if (basetype == spvc_basetype::SPVC_BASETYPE_FP32)
+							attribute_description.format = VK_FORMAT_R32G32B32A32_SFLOAT;
+						else if (basetype == spvc_basetype::SPVC_BASETYPE_UINT32)
+							attribute_description.format = VK_FORMAT_R32G32B32A32_UINT;
+						break;
+				}
+				vertex_attribute_descriptions.emplace_back(attribute_description);
+				Log::message(std::string(vertex_inputs[i].name) +
+							 " location:" + std::to_string(location) +
+							 " size:" + std::to_string(size * 4));
+				location++;
+			}
+
+		}
+		std::sort(vertex_attribute_descriptions.begin(), vertex_attribute_descriptions.end(),
+				  [](const VertexInput &a, const VertexInput &b) -> bool {
+					  return a.location < b.location;
+				  });
 
 
 		spvc_context_release_allocations(context);
 		spvc_context_destroy(context);
+	}
+
+	const std::vector<VertexInput> &VK_Shader::getAttributeDescriptions() const {
+		return vertex_attribute_descriptions;
 	}
 }
