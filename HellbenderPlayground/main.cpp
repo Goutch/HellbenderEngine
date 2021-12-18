@@ -43,7 +43,7 @@ void init() {
 	pipeline_info_instanced.vertex_shader = instanced_vert;
 	pipeline_info_instanced.binding_info_count = binding_infos_instanced.size();
 	pipeline_info_instanced.binding_infos = binding_infos_instanced.data();
-	pipeline_info_instanced.flags = GRAPHIC_PIPELINE_CULL_BACK;
+	pipeline_info_instanced.flags = GRAPHIC_PIPELINE_FLAG_NONE;
 	auto pipeline_instanced = Resources::createGraphicPipeline(pipeline_info_instanced, "pipeline_instanced");
 
 	auto mesh = Resources::createMesh(MeshInfo{binding_infos.data(), binding_infos.size()}, "mesh");
@@ -76,23 +76,23 @@ void init() {
 	auto &renderer = cube_entity.attach<MeshRenderer>();
 	renderer.pipeline = pipeline;
 	renderer.mesh = mesh;
-	transform.setPosition(vec3(0, 0, 5));
+	transform.setPosition(vec3(-1, 0, -5));
 
 	Entity cube_entity2 = scene.createEntity();
 	Transform &transform2 = cube_entity2.get<Transform>();
 	auto &renderer2 = cube_entity2.attach<InstancedRenderer>();
 	renderer2.pipeline = pipeline_instanced;
 	renderer2.mesh = instanced_mesh;
-	transform2.translate(vec3(0, 0, -5));
-	Random random;
-	/*for (int i = -5; i < 5; ++i) {
+	transform2.translate(vec3(1, 0, -5));
+	/*Random random;
+	for (int i = -5; i < 5; ++i) {
 		for (int j = -5; j < 5; ++j) {
 			for (int k = -5; k < 5; ++k) {
 				Entity cube_entity = scene.createEntity();
-				cube_entity.attach<Transform>();
+				cube_entity.get<Transform>();
 				auto &renderer = cube_entity.attach<InstancedRenderer>();
 				renderer.pipeline = pipeline_instanced;
-				renderer.mesh = mesh;
+				renderer.mesh = instanced_mesh;
 
 				cube_entity.get<Transform>().translate(vec3(i, j, k) * 5.0f);
 				Rotator &rotator = cube_entity.attach<Rotator>();
