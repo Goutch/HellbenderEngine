@@ -28,6 +28,8 @@ namespace HBE {
 			case SHADER_STAGE::SHADER_STAGE_GEOMETRY:
 				vk_stage = VK_SHADER_STAGE_GEOMETRY_BIT;
 				break;
+			case SHADER_STAGE_NONE:
+				break;
 		}
 		load(info.path);
 
@@ -101,10 +103,6 @@ namespace HBE {
 
 
 			std::string name = spvc_compiler_get_name(compiler_glsl, uniform_list[i].id);
-
-
-			uint32_t set = spvc_compiler_get_decoration(compiler_glsl, uniform_list[i].id, SpvDecorationDescriptorSet);
-
 			size_t size;
 			spvc_type type = spvc_compiler_get_type_handle(compiler_glsl, uniform_list[i].type_id);
 			spvc_compiler_get_declared_struct_size(compiler_glsl, type, &size);
@@ -152,9 +150,6 @@ namespace HBE {
 
 
 			std::string name = spvc_compiler_get_name(compiler_glsl, texture_sampler_list[i].id);
-
-			uint32_t set = spvc_compiler_get_decoration(compiler_glsl, texture_sampler_list[i].id, SpvDecorationDescriptorSet);
-
 			inputs.emplace_back(UniformInput{name, UNIFORM_INPUT_TYPE_TEXTURE_SAMPLER, layout_binding.binding, vk_stage});
 		}
 
@@ -162,7 +157,7 @@ namespace HBE {
 		size_t vertex_inputs_count;
 		spvc_resources_get_resource_list_for_type(resources, SPVC_RESOURCE_TYPE_STAGE_INPUT, &vertex_inputs, &vertex_inputs_count);
 
-		for (int i = 0; i < vertex_inputs_count; ++i) {
+		for (size_t i = 0; i < vertex_inputs_count; ++i) {
 
 			spvc_type type = spvc_compiler_get_type_handle(compiler_glsl, vertex_inputs[i].type_id);
 			spvc_basetype basetype = spvc_type_get_basetype(type);
@@ -170,7 +165,7 @@ namespace HBE {
 			size = spvc_type_get_vector_size(type);
 			size_t num_col = spvc_type_get_columns(type);
 			uint32_t location = spvc_compiler_get_decoration(compiler_glsl, vertex_inputs[i].id, SpvDecorationLocation);
-			for (int j = 0; j < num_col; ++j) {
+			for (size_t j = 0; j < num_col; ++j) {
 				VertexInput attribute_description{};
 				attribute_description.location = location;
 				attribute_description.size = size * 4;

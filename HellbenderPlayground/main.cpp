@@ -43,11 +43,18 @@ void init() {
 	pipeline_info_instanced.vertex_shader = instanced_vert;
 	pipeline_info_instanced.binding_info_count = binding_infos_instanced.size();
 	pipeline_info_instanced.binding_infos = binding_infos_instanced.data();
-	pipeline_info_instanced.flags = GRAPHIC_PIPELINE_FLAG_NONE;
+	pipeline_info_instanced.flags = GRAPHIC_PIPELINE_CULL_BACK;
 	auto pipeline_instanced = Resources::createGraphicPipeline(pipeline_info_instanced, "pipeline_instanced");
 
-	auto mesh = Resources::createMesh(MeshInfo{binding_infos_instanced.data(), binding_infos_instanced.size()}, "mesh");
+	auto mesh = Resources::createMesh(MeshInfo{binding_infos.data(), binding_infos.size()}, "mesh");
+	auto instanced_mesh = Resources::createMesh(MeshInfo{binding_infos_instanced.data(), binding_infos_instanced.size()}, "mesh_instanced");
+
+
 	Geometry::createCube(*mesh, 1, 1, 1, VERTEX_FLAG_UV);
+	Geometry::createCube(*instanced_mesh, 1, 1, 1, VERTEX_FLAG_UV);
+
+
+
 
 	//-------------------SCENE CREATION--------------------------------------
 	Scene &scene = *(new Scene());
@@ -56,9 +63,6 @@ void init() {
 	scene.addSystem(new RotatorSystem(&scene));
 
 	Entity camera_entity = scene.createEntity("camera");
-	if (!scene.has<Identity>(camera_entity.getHandle())) {
-		Log::error("no identity");
-	}
 	Camera &camera = camera_entity.attach<Camera>();
 	camera.render_target = Graphics::getDefaultRenderTarget();
 	camera.calculateProjection();
@@ -66,16 +70,22 @@ void init() {
 	camera_entity.get<Transform>().setPosition(vec3(0, 0, 0));
 	scene.setCameraEntity(camera_entity);
 
-	/*Entity cube_entity = scene.createEntity();
-	cube_entity.attach<Transform>();
-	MeshRenderer &cube = cube_entity.attach<MeshRenderer>();
-	cube.pipeline = pipeline;
-	cube.mesh = mesh;
-	cube_entity.get<Transform>().translate(vec3(0, 0, 1) * 5.0f);
 
-	*/
+	Entity cube_entity = scene.createEntity();
+	Transform &transform = cube_entity.get<Transform>();
+	auto &renderer = cube_entity.attach<MeshRenderer>();
+	renderer.pipeline = pipeline;
+	renderer.mesh = mesh;
+	transform.setPosition(vec3(0, 0, 5));
+
+	Entity cube_entity2 = scene.createEntity();
+	Transform &transform2 = cube_entity2.get<Transform>();
+	auto &renderer2 = cube_entity2.attach<InstancedRenderer>();
+	renderer2.pipeline = pipeline_instanced;
+	renderer2.mesh = instanced_mesh;
+	transform2.translate(vec3(0, 0, -5));
 	Random random;
-	for (int i = -5; i < 5; ++i) {
+	/*for (int i = -5; i < 5; ++i) {
 		for (int j = -5; j < 5; ++j) {
 			for (int k = -5; k < 5; ++k) {
 				Entity cube_entity = scene.createEntity();
@@ -92,7 +102,7 @@ void init() {
 									 random.floatRange(-M_PI, M_PI));
 			}
 		}
-	}
+	}*/
 
 }
 

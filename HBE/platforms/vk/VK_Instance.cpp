@@ -96,9 +96,8 @@ namespace HBE {
 	}
 
 	VK_Instance::~VK_Instance() {
-#ifdef DEBUG_MODE
-		delete validation_layers;
-#endif
+		if (ENABLE_VALIDATION_LAYERS)
+			delete validation_layers;
 		vkDestroyInstance(handle, nullptr);
 	}
 

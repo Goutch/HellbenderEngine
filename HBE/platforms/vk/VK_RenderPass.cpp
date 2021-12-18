@@ -35,7 +35,14 @@ namespace HBE {
 				return VK_FORMAT_R32G32B32A32_SFLOAT;
 				break;
 
+			case IMAGE_FORMAT_DEPTH32F:
+				break;
+			case IMAGE_FORMAT_DEPTH32f_STENCIL8U:
+				break;
+			case IMAGE_FORMAT_DEPTH24f_STENCIL8U:
+				break;
 		}
+		return VK_FORMAT_R32_SFLOAT;
 	}
 
 	VK_RenderPass::VK_RenderPass(VK_Renderer *renderer, const RenderTargetInfo &info) {

@@ -83,7 +83,7 @@ namespace HBE {
 		template<typename Component>
 		Component &getAs(entity_handle handle) {
 			size_t i = handle - offset;
-			return *reinterpret_cast<Component *>(&data[i*info.size]);
+			return *reinterpret_cast<Component *>(&data[i * info.size]);
 		}
 
 		void detach(entity_handle handle) {
@@ -118,8 +118,8 @@ namespace HBE {
 			offset = page.offset;
 		}
 
-		Component &operator[](size_t i) {
-			return components[i];
+		Component &operator[](size_t handle) {
+			return components[handle - offset];
 		}
 	};
 
@@ -230,7 +230,7 @@ namespace HBE {
 		class iterator {
 			std::vector<RegistryPage *> &pages;
 			std::vector<entity_handle> entities;
-			std::tuple<ComponentPool<Components>...> current_pages;
+			std::tuple<ComponentPool<Components>...> current_pools;
 			ComponentTypeInfo types[sizeof...(Components)];
 			std::bitset<REGISTRY_MAX_COMPONENT_TYPES> signature;
 			size_t current_entity = 0;
@@ -239,8 +239,8 @@ namespace HBE {
 		private:
 
 			template<std::size_t index, typename Component>
-			void replacePage() {
-				std::get<index>(current_pages) = ComponentPool<Component>(*pages[current_page]->component_pages[types[index].hash]);
+			void replacePools() {
+				std::get<index>(current_pools) = ComponentPool<Component>(*pages[current_page]->component_pages[types[index].hash]);
 			}
 
 			template<typename... Parms>
@@ -250,12 +250,12 @@ namespace HBE {
 			void fillPages(std::index_sequence<indices...>) {
 				//template black magic
 				//https://stackoverflow.com/questions/6941176/variadic-template-parameter-pack-expanding-for-function-calls
-				func((replacePage<indices, Components>(), 0)...);
+				func((replacePools<indices, Components>(), 0)...);
 			}
 
 			template<std::size_t... indices>
 			std::tuple<entity_handle, Components &...> createTuple(entity_handle handle, std::index_sequence<indices...>) {
-				return std::forward_as_tuple(handle, std::get<indices>(current_pages)[current_entity]...);
+				return std::forward_as_tuple(handle, std::get<indices>(current_pools)[entities[current_entity]]...);
 			}
 
 			bool currentPageHasSignature() {
@@ -265,7 +265,7 @@ namespace HBE {
 		public:
 			iterator(std::vector<RegistryPage *> &pages, ComponentTypeInfo types[sizeof...(Components)], bool end) :
 					pages(pages),
-					current_pages(
+					current_pools(
 							std::tuple<ComponentPool<Components>...>(ComponentPool<Components>()...)) {
 				this->current_entity = 0;
 				isEnd = end;
@@ -287,7 +287,7 @@ namespace HBE {
 				this->current_entity = other.current_entity;
 				this->current_page = other.current_page;
 				this->components_signature = other.components_signature;
-				this->current_pages = other.current_pages;
+				this->current_pools = other.current_pools;
 				this->entities = other.entities;
 				this->pages = other.pages;
 			}
@@ -296,7 +296,7 @@ namespace HBE {
 				this->current_entity = other.current_entity;
 				this->current_page = other.current_page;
 				this->components_signature = other.components_signature;
-				this->current_pages = other.current_pages;
+				this->current_pools = other.current_pools;
 				this->entities = other.entities;
 				this->pages = other.pages;
 			}
@@ -324,7 +324,7 @@ namespace HBE {
 			void getCurrentPageEntities() {
 
 				RawComponentPool *raw_pages[] = {pages[current_page]->getRawPool(typeid(Components).hash_code())...};
-				for (int i = 0; i < sizeof...(Components); ++i) {
+				for (size_t i = 0; i < sizeof...(Components); ++i) {
 					if (raw_pages[i] == nullptr) {
 						entities.clear();
 						return;

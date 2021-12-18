@@ -129,6 +129,8 @@ namespace HBE {
 			case SHADER_STAGE::SHADER_STAGE_GEOMETRY:
 				stage = GLSLANG_STAGE_GEOMETRY;
 				break;
+			case SHADER_STAGE_NONE:
+				break;
 		}
 
 		const glslang_input_t input =

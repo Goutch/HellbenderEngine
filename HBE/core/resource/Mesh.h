@@ -16,7 +16,7 @@ namespace HBE {
 
 	struct MeshInfo {
 		const VertexBindingInfo *binding_infos = nullptr;
-		uint32_t binding_info_count = 0;
+		size_t binding_info_count = 0;
 		MESH_FLAGS flags = MESH_FLAG_NONE;
 	};
 

@@ -28,7 +28,7 @@ namespace HBE {
 			vkDestroyPipelineLayout(device->getHandle(), pipeline_layout_handle, nullptr);
 		descriptor_set_layout_bindings.clear();
 		push_constants_ranges.clear();
-		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
 			descriptor_sets_writes[i].clear();
 		}
 
@@ -69,7 +69,7 @@ namespace HBE {
 
 		std::vector<VkVertexInputBindingDescription> binding_descriptions;
 		binding_descriptions.resize(info.binding_info_count);
-		for (int i = 0; i < info.binding_info_count; ++i) {
+		for (size_t i = 0; i < info.binding_info_count; ++i) {
 			binding_descriptions[i].binding = info.binding_infos[i].binding;
 			binding_descriptions[i].inputRate = (info.binding_infos[i].flags & VERTEX_BINDING_FLAG_PER_INSTANCE) == VERTEX_BINDING_FLAG_PER_INSTANCE ?
 												VK_VERTEX_INPUT_RATE_INSTANCE :
@@ -85,8 +85,8 @@ namespace HBE {
 		uint32_t offset = 0;
 		uint32_t binding = 0;
 		if (binding_descriptions.size() != 0) {
-			for (int i = 0; i < reflected_attributes.size(); ++i) {
-				for (int j = 0; j < binding_descriptions.size() - 1; ++j) {
+			for (size_t i = 0; i < reflected_attributes.size(); ++i) {
+				for (size_t j = 0; j < binding_descriptions.size() - 1; ++j) {
 					if (binding == binding_descriptions[j].binding && offset == binding_descriptions[j].stride) {
 						offset = 0;
 						binding = binding_descriptions[j + 1].binding;
@@ -298,7 +298,7 @@ namespace HBE {
 		//todo undefined behavior when texture data is not set;
 		//use texture event
 		VK_Image *vk_texture = (VK_Image *) texture;
-		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
 			VkDescriptorImageInfo image_info;
 			image_info.imageView = vk_texture->getImageView();
 			image_info.sampler = vk_texture->getSampler();
@@ -325,7 +325,7 @@ namespace HBE {
 	void VK_GraphicPipeline::setTexture(uint32_t binding, const RenderTarget *render_target) {
 
 		VK_RenderPass *render_pass = (VK_RenderPass *) render_target;
-		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
 			const VK_Image *vk_image = render_pass->getImage(i);
 			VkDescriptorImageInfo image_info;
 			image_info.imageView = vk_image->getImageView();
@@ -350,7 +350,7 @@ namespace HBE {
 	}
 
 	void VK_GraphicPipeline::createPipelineLayout() {
-		for (int i = 0; i < shaders.size(); ++i) {
+		for (size_t i = 0; i < shaders.size(); ++i) {
 			auto shader_bindings = shaders[i]->getLayoutBindings();
 			descriptor_set_layout_bindings.insert(descriptor_set_layout_bindings.end(), shader_bindings.begin(),
 												  shader_bindings.end());
@@ -360,7 +360,7 @@ namespace HBE {
 
 			auto shader_inputs = shaders[i]->getInputs();
 
-			for (int j = 0; j < shader_inputs.size(); ++j) {
+			for (size_t j = 0; j < shader_inputs.size(); ++j) {
 				name_input_index.emplace(shader_inputs[j].name, inputs.size() + j);
 				binding_input_index.emplace(shader_inputs[j].binding, inputs.size() + j);
 			}
@@ -401,6 +401,32 @@ namespace HBE {
 					break;
 				case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
 					combined_image_sampler_count++;
+					break;
+				case VK_DESCRIPTOR_TYPE_SAMPLER:
+					break;
+				case VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE:
+					break;
+				case VK_DESCRIPTOR_TYPE_STORAGE_IMAGE:
+					break;
+				case VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
+					break;
+				case VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
+					break;
+				case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
+					break;
+				case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC:
+					break;
+				case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC:
+					break;
+				case VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT:
+					break;
+				case VK_DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK_EXT:
+					break;
+				case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR:
+					break;
+				case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_NV:
+					break;
+				case VK_DESCRIPTOR_TYPE_MAX_ENUM:
 					break;
 			}
 		}

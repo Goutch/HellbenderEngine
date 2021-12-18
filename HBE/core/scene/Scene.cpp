@@ -69,7 +69,8 @@ namespace HBE {
 
 	Entity Scene::createEntity(const std::string &name) {
 		Entity e = createEntity();
-		e.attach<Identity>().name=name;
+		Identity& identity=e.attach<Identity>();
+		identity.name=name;
 		return e;
 	}
 

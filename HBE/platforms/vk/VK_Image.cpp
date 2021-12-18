@@ -80,7 +80,13 @@ namespace HBE {
                 byte_per_pixel = 4 * 4;
                 break;
 
-        }
+			case IMAGE_FORMAT_DEPTH32F:
+				break;
+			case IMAGE_FORMAT_DEPTH32f_STENCIL8U:
+				break;
+			case IMAGE_FORMAT_DEPTH24f_STENCIL8U:
+				break;
+		}
 
         layout = VK_IMAGE_LAYOUT_UNDEFINED;
 

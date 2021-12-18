@@ -10,8 +10,9 @@
 #include <core/resource/Model.h>
 
 namespace HBE {
+
 	struct HB_API Identity {
-		std::string name = "";
+		std::string name="Default";
 	};
 
 	struct HB_API Transform {

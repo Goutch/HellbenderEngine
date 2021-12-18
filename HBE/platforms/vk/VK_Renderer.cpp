@@ -284,7 +284,7 @@ namespace HBE {
 	void VK_Renderer::drawInstanced(const HBE::Mesh &mesh,
 									GraphicPipeline &pipeline) {
 		auto it_material = instanced_cache.try_emplace(&pipeline).first;
-		auto it_mesh = it_material->second = &mesh;
+		it_material->second = &mesh;
 	}
 
 	const VK_Swapchain &VK_Renderer::getSwapchain() const {

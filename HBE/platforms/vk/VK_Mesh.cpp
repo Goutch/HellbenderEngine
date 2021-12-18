@@ -14,7 +14,7 @@ namespace HBE {
 		this->device = renderer->getDevice();
 		this->command_pool = command_pool;
 
-		for (int i = 0; i < info.binding_info_count; ++i) {
+		for (size_t i = 0; i < info.binding_info_count; ++i) {
 			buffers.emplace(info.binding_infos[i].binding, std::vector<VK_Buffer *>(
 					(info.binding_infos[i].flags & VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS) == VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS ?
 					MAX_FRAMES_IN_FLIGHT : 1, nullptr));
@@ -93,8 +93,8 @@ namespace HBE {
 
 	VK_Mesh::~VK_Mesh() {
 		;
-		for (int i = 0; i < bindings.size(); ++i) {
-			for (int j = 0; j < buffers[i].size(); ++j) {
+		for (size_t i = 0; i < bindings.size(); ++i) {
+			for (size_t j = 0; j < buffers[i].size(); ++j) {
 				if (buffers[i][j])
 					delete buffers[i][j];
 			}
