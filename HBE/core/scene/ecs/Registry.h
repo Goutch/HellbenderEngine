@@ -1,329 +1,491 @@
-#pragma once
 
-#include <vector>
-#include "core/utility/RawVector.h"
-#include "unordered_map"
+/*
+ * ideas
+ * When grouping check registry if type exist then create an empty group if not
+ *
+ *
+ */
+#include "Core.h"
 #include "queue"
-#include "typeinfo"
+#include "list"
+#include "unordered_map"
+#include "unordered_set"
 #include "map"
 #include "bitset"
-#include "unordered_set"
+#include "typeinfo"
+#include "set"
+#include "core/utility/Log.h"
+#include <cstring>
+#include "algorithm"
 
-
-typedef uint32_t entity_handle;
-
-namespace HBE {
-#ifndef MAX_COMPONENT_TYPES
-#define MAX_COMPONENT_TYPES 128
+#ifndef REGISTRY_PAGE_SIZE
+#define REGISTRY_PAGE_SIZE 128
 #endif
+#ifndef REGISTRY_MAX_COMPONENT_TYPES
+#define REGISTRY_MAX_COMPONENT_TYPES 128
+#endif
+namespace HBE {
+	typedef uint32_t entity_handle;
 
-	template<typename T>
-	void swapData(T &t1, T &t2) {
-		T temp = t1;
-		t1 = t2;
-		t2 = temp;
-	}
+	struct ComponentTypeInfo {
+		size_t hash;
+		uint32_t signature_bit;
+		size_t size;
 
-	class ComponentPool {
-		RawVector data;
-		std::unordered_map<entity_handle, uint32_t> index_of_entity;
-		std::vector<entity_handle> entity_of_index;
+		bool operator==(const size_t hash) const {
+			return this->hash == hash;
+		}
 
+		bool operator==(const ComponentTypeInfo &other) const {
+			return hash == other.hash;
+		}
+	};
+
+	class RawComponentPool {
 	public:
-		ComponentPool(size_t element_size) : data(RawVector(element_size)) {
+		ComponentTypeInfo info;
+		char *data;
+		bool valid[REGISTRY_PAGE_SIZE];
+		std::vector<entity_handle> handles;
+		size_t offset;
 
+		RawComponentPool(RawComponentPool &&other) {
+			data = other.data;
+			memcpy(valid, other.valid, REGISTRY_PAGE_SIZE * sizeof(bool));
+			info = other.info;
+			offset = other.offset;
 		}
 
-		uint8_t *attach(uint32_t entity, uint8_t *component) {
-			index_of_entity.emplace(entity, data.size());
-			entity_of_index.emplace_back(entity);
-			data.add(component);
-			return &data[data.size() - 1];
+		RawComponentPool(ComponentTypeInfo info, size_t offset) : info(info) {
+			data = static_cast<char *>(malloc(info.size * REGISTRY_PAGE_SIZE));
+
+			memset(data, 0, info.size * REGISTRY_PAGE_SIZE);
+			memset(&valid, 0, sizeof(bool) * REGISTRY_PAGE_SIZE);
+
+			this->offset = offset;
 		}
 
-		size_t size() const {
-			return data.size();
+		~RawComponentPool() {
+			delete[] data;
 		}
 
-		std::vector<entity_handle> &getEntities() {
-			return entity_of_index;
+		char *attach(entity_handle handle, char *component) {
+			size_t i = handle - offset;
+			if (!valid[i]) {
+				handles.emplace_back(handle);
+				valid[i] = true;
+				std::sort(handles.begin(), handles.end());
+			}
+			memcpy(data + (i * info.size), component, info.size);
+			return &data[i * info.size];
 		}
 
-		uint8_t *getComponent(entity_handle handle) {
-			return &data[index_of_entity[handle]];
+		template<typename Component>
+		Component &getAs(entity_handle handle) {
+			size_t i = handle - offset;
+			return *reinterpret_cast<Component *>(&data[i * info.size]);
 		}
 
-		void reorder(entity_handle *entities_order, size_t count) {
-			for (size_t i = 0; i < count; ++i) {
-				size_t current_entity_index = index_of_entity[entities_order[i]];
-				size_t moved_entity_index = i;
-				if (moved_entity_index != current_entity_index) {
-					data.swap(moved_entity_index, current_entity_index);
-
-					entity_handle moved_entity = entity_of_index[i];
-					entity_handle current_entity = entities_order[i];
-
-					swapData(index_of_entity[current_entity], index_of_entity[moved_entity]);
-					swapData(entity_of_index[current_entity_index], entity_of_index[moved_entity_index]);
-				}
+		void detach(entity_handle handle) {
+			size_t i = handle - offset;
+			if (valid[i]) {
+				memset(data + (i * info.size), 0, info.size);
+				valid[i] = false;
+				handles.erase(std::find(handles.begin(), handles.end(), handle));
+				std::sort(handles.begin(), handles.end());
 			}
 		}
 
-		bool hasComponent(uint32_t entity) {
-			return index_of_entity.find(entity) == index_of_entity.end();
+		bool has(entity_handle handle) {
+			return valid[handle - offset];
+		}
+	};
+
+	template<typename Component>
+	struct ComponentPool {
+		Component *components = nullptr;
+		size_t offset = 0;
+		entity_handle *handles = nullptr;
+		std::size_t count = 0;
+
+		ComponentPool() {
+
+		};
+
+		ComponentPool(RawComponentPool &page) : handles(page.handles.data()) {
+			components = reinterpret_cast<Component *>(&page.data[0]);
+			count = page.handles.size();
+			offset = page.offset;
 		}
 
-		void detach(uint32_t entity) {
-			uint32_t entity_index = index_of_entity[entity];
-			uint32_t last_entity = entity_of_index[data.size() - 1];
+		Component &operator[](size_t handle) {
+			return components[handle - offset];
+		}
+	};
 
-			data.swap(entity_index, data.size() - 1);
+	class RegistryPage {
+	public:
+		size_t offset;
+		uint32_t count = 0;
 
-			entity_of_index[entity_index] = last_entity;
-			index_of_entity[last_entity] = entity_index;
+		bool valid_entities[REGISTRY_PAGE_SIZE];
+		std::bitset<REGISTRY_MAX_COMPONENT_TYPES> components_of_entity[REGISTRY_PAGE_SIZE];
+		std::unordered_map<size_t, RawComponentPool *> component_pages;
+		std::bitset<REGISTRY_MAX_COMPONENT_TYPES> components_signature = 0;
 
-			entity_of_index[entity_index] = last_entity;
-			entity_of_index.pop_back();
-			index_of_entity.erase(entity);
-			data.remove(data.size() - 1);
+		RegistryPage(size_t page_index) : offset(page_index * REGISTRY_PAGE_SIZE) {
+			for (int i = 0; i < REGISTRY_PAGE_SIZE; ++i) {
+				valid_entities[i] = false;
+				components_of_entity[i] = 0;
+			}
+		};
+
+		size_t handleToIndex(entity_handle handle) {
+			return handle - offset;
 		}
 
-		uint8_t *raw() {
-			return &data[0];
+		RawComponentPool *getRawPool(size_t hash) {
+			auto it = component_pages.find(hash);
+			return it == component_pages.end() ? nullptr : it->second;
 		}
 
+		template<typename Component>
+		ComponentPool<Component> getPool() {
+			return ComponentPool<Component>(component_pages[typeid(Component).hash_code()]);
+		}
+
+		template<typename Component>
+		Component &attach(entity_handle handle, ComponentTypeInfo &type) {
+			size_t i = handleToIndex(handle);
+			if (!valid_entities[i]) Log::error("Enitty#" + std::to_string(handle) + "is not valid");
+
+
+			components_of_entity[i] |= 1 << type.signature_bit;
+			auto component_page_it = component_pages.find(type.hash);
+			if (component_page_it == component_pages.end()) {
+				component_pages.emplace(type.hash, new RawComponentPool(type, offset));
+				components_signature.set(type.signature_bit, true);
+			}
+			Component component{};
+			char *raw_ptr = component_pages[type.hash]->attach(handle, reinterpret_cast<char *>(&component));
+			return *reinterpret_cast<Component *>(raw_ptr);
+		};
+
+		void detach(entity_handle handle, ComponentTypeInfo &type) {
+			size_t i = handleToIndex(handle);
+
+			components_of_entity[i] |= 1 << type.signature_bit;
+			if (valid_entities[i]) {
+				auto component_page_it = component_pages.find(type.hash);
+				if (component_page_it == component_pages.end()) {
+					return;
+				}
+				RawComponentPool &component_page = *component_page_it->second;
+				component_page.detach(handle);
+				if (component_page.handles.size() == 0) {
+					components_signature.set(component_page.info.signature_bit, false);
+					component_pages.erase(component_page_it->first);
+				}
+			}
+		};
+
+		void setValid(entity_handle handle) {
+			valid_entities[handleToIndex(handle)] = true;
+		}
+
+		void setInvalid(entity_handle handle) {
+			size_t i = handleToIndex(handle);
+			valid_entities[i] = false;
+			std::list<size_t> obsolete_types_hash;
+			for (auto component_page_it: component_pages) {
+				RawComponentPool &component_page = *component_page_it.second;
+				component_page.detach(i);
+				if (component_page.handles.size() == 0) {
+					obsolete_types_hash.emplace_back(component_page_it.first);
+				}
+			}
+			for (size_t hash: obsolete_types_hash) {
+				component_pages.erase(hash);
+			}
+		}
+
+		bool valid(entity_handle handle) {
+			return valid_entities[handle - offset];
+		}
 
 	};
 
 	template<typename ... Components>
-	class ComponentGroup {
-		size_t entity_count;
-		entity_handle *entities;
-		std::tuple<Components *...> components;
+	class Group {
+		std::vector<RegistryPage *> &pages;
+		ComponentTypeInfo types[sizeof...(Components)];
 	public:
-		ComponentGroup(uint32_t count, entity_handle *entities, Components *... args) {
-			this->entity_count = count;
-			this->components = std::forward_as_tuple(args...);
-			this->entities = entities;
+		Group(std::vector<RegistryPage *> &pages, ComponentTypeInfo types[sizeof...(Components)]) : pages(pages) {
+			this->pages = pages;
+			for (size_t i = 0; i < sizeof...(Components); i++) {
+				this->types[i] = types[i];
+			}
 		}
 
-		ComponentGroup() {
-			this->entity_count = 0;
-			this->entities = nullptr;
-		}
+		class iterator {
+			std::vector<RegistryPage *> &pages;
+			std::vector<entity_handle> entities;
+			std::tuple<ComponentPool<Components>...> current_pools;
+			ComponentTypeInfo types[sizeof...(Components)];
+			std::bitset<REGISTRY_MAX_COMPONENT_TYPES> signature;
+			size_t current_entity = 0;
+			size_t current_page = 0;
+			bool isEnd = false;
+		private:
 
-		template<size_t ... seq>
-		std::tuple<entity_handle, Components &...> create_tuple(size_t index) {
-			return std::make_tuple(entities[index],std::get<seq>(components)[index]...);
-		}
-
-		std::tuple<entity_handle, Components &...> get(uint32_t index) {
-			return create_tuple<std::index_sequence_for<Components...>()>(index);
-		}
-
-		struct iterator {
-			size_t entity_count;
-			entity_handle *entities;
-			std::tuple<Components *...> components;
-			uint32_t i = 0;
-
-			iterator(entity_handle *entities, std::tuple<Components *...> components, size_t count, uint32_t i) {
-				this->i = i;
-				this->entities = entities;
-				this->components = components;
-				this->count = count;
+			template<std::size_t index, typename Component>
+			void replacePools() {
+				std::get<index>(current_pools) = ComponentPool<Component>(*pages[current_page]->component_pages[types[index].hash]);
 			}
 
-			std::tuple<entity_handle, Components &...> operator*() const {
-				return std::make_tuple(entities[i],std::get<std::index_sequence_for<Components...>()>(components)[i]);
+			template<typename... Parms>
+			void func(Parms ...p) {}
+
+			template<std::size_t... indices>
+			void fillPages(std::index_sequence<indices...>) {
+				//template black magic
+				//https://stackoverflow.com/questions/6941176/variadic-template-parameter-pack-expanding-for-function-calls
+				func((replacePools<indices, Components>(), 0)...);
 			}
+
+			template<std::size_t... indices>
+			std::tuple<entity_handle, Components &...> createTuple(entity_handle handle, std::index_sequence<indices...>) {
+				return std::forward_as_tuple(handle, std::get<indices>(current_pools)[entities[current_entity]]...);
+			}
+
+			bool currentPageHasSignature() {
+				return (pages[current_page]->components_signature & signature) == signature;
+			};
+
+		public:
+			iterator(std::vector<RegistryPage *> &pages, ComponentTypeInfo types[sizeof...(Components)], bool end) :
+					pages(pages),
+					current_pools(
+							std::tuple<ComponentPool<Components>...>(ComponentPool<Components>()...)) {
+				this->current_entity = 0;
+				isEnd = end;
+
+				for (size_t i = 0; i < sizeof...(Components); i++) {
+					this->types[i] = types[i];
+					signature.set(types[i].signature_bit);
+				}
+
+				if (isEnd)current_page = pages.size();
+				else {
+					getCurrentPageEntities();
+					updatePage();
+				}
+
+			}
+
+			iterator(iterator &&other) : pages(other.pages) {
+				this->current_entity = other.current_entity;
+				this->current_page = other.current_page;
+				this->components_signature = other.components_signature;
+				this->current_pools = other.current_pools;
+				this->entities = other.entities;
+				this->pages = other.pages;
+			}
+
+			iterator(iterator &other) : pages(other.pages) {
+				this->current_entity = other.current_entity;
+				this->current_page = other.current_page;
+				this->components_signature = other.components_signature;
+				this->current_pools = other.current_pools;
+				this->entities = other.entities;
+				this->pages = other.pages;
+			}
+
 
 			bool operator==(const iterator &other) const {
-				return other.entities == entities &&
-					   other.count == entity_count &&
-					   other.i == i &&
-					   other.components == components;
+				return current_entity == other.current_entity &&
+					   current_page == other.current_page &&
+					   isEnd == other.isEnd &&
+					   other.signature == signature;
 			}
 
 			bool operator!=(const iterator &other) const {
-				return other.entities != entities ||
-					   other.count != entity_count ||
-					   other.i != i ||
-					   other.components != components;
+				return current_entity != other.current_entity ||
+					   current_page != other.current_page ||
+					   isEnd != other.isEnd ||
+					   other.signature != signature;
+			}
+
+			std::tuple<entity_handle, Components &...> operator*() {
+				return std::move(createTuple(entities[current_entity], std::index_sequence_for<Components...>{}));
+			}
+
+
+			void getCurrentPageEntities() {
+
+				RawComponentPool *raw_pages[] = {pages[current_page]->getRawPool(typeid(Components).hash_code())...};
+				for (size_t i = 0; i < sizeof...(Components); ++i) {
+					if (raw_pages[i] == nullptr) {
+						entities.clear();
+						return;
+					}
+				}
+				size_t min_size_index = 0;
+				for (size_t i = 1; i < sizeof...(Components); ++i) {
+
+					if (raw_pages[min_size_index]->handles.size() > raw_pages[i]->handles.size()) {
+						min_size_index = i;
+					}
+				}
+				entities = raw_pages[min_size_index]->handles;
+				for (size_t i = 0; i < sizeof...(Components); ++i) {
+					if (i == min_size_index)
+						continue;
+					size_t entity_count = entities.size();
+					for (size_t j = 0; j < entity_count; ++j) {
+						while (!raw_pages[i]->valid[j]) {
+							entity_count--;
+							std::swap(entities[j], entities.back());
+							if (j < entity_count) break;
+						}
+					}
+					entities.resize(entity_count);
+				}
+				if (entities.size() != 0) {
+					fillPages(std::index_sequence_for<Components...>());
+					std::sort(entities.begin(), entities.end());
+				}
+			}
+
+			void updatePage() {
+				while (!isEnd && current_entity >= entities.size()) {
+					nextPage();
+					if (!isEnd)
+						getCurrentPageEntities();
+				}
+			}
+
+			void nextPage() {
+				do {
+					current_page++;
+				} while (current_page != pages.size() && (pages[current_page] == nullptr || !currentPageHasSignature()));
+				current_entity = 0;
+				if (current_page == pages.size()) {
+					isEnd = true;
+				}
 			}
 
 			iterator &operator++() {
-				i++;
+				current_entity++;
+				updatePage();
+
+				return *this;
 			}
+
 		};
 
+	public:
+		iterator begin() {
+			return iterator(pages, types, false);
+		};
 
-		size_t count() {
-			return entity_count;
-		}
-
-		iterator begin() const {
-			return iterator(entities, components, entity_count, 0);
-		}
-
-		iterator end() const {
-			return iterator(entities, components, entity_count, entity_count);
-		}
-
-		iterator operator[](size_t i) {
-			return iterator(entities, components, entity_count, i);;
+		iterator end() {
+			return iterator(pages, types, true);
 		}
 	};
 
 	class Registry {
-		//Entity
-		std::vector<entity_handle> entities;
+		uint32_t current_handle = 0;
 		std::queue<entity_handle> inactive;
-		std::unordered_map<entity_handle, size_t> index_of_entity;
-
-		std::unordered_map<size_t, ComponentPool *> components;
-
-		//Maps
-		std::vector<std::bitset<MAX_COMPONENT_TYPES>> component_flags_of_entity;
-		std::vector<std::unordered_set<size_t>> component_hash_codes_of_entity;
-		std::unordered_map<std::size_t, uint32_t> bit_of_hash;
-
+		std::vector<RegistryPage *> pages = std::vector<RegistryPage *>();
+		std::unordered_map<size_t, ComponentTypeInfo> types;
 		uint32_t current_bit = 0;
-		//todo cached groups
+
+		size_t getPage(entity_handle handle) {
+			return (handle - (handle % REGISTRY_PAGE_SIZE)) / REGISTRY_PAGE_SIZE;
+		}
 
 	public:
+		Registry() {
+
+		}
+
 		~Registry() {
-			for (auto kv:components) {
-				delete kv.second;
+			for (auto page: pages) {
+				delete page;
 			}
 		}
 
 		entity_handle create() {
-
 			entity_handle handle;
-			if (!inactive.empty()) {
+			if (inactive.empty()) {
+				handle = current_handle;
+				current_handle++;
+			} else {
 				handle = inactive.front();
 				inactive.pop();
-
-				component_flags_of_entity[handle] = 0;
-				component_hash_codes_of_entity[handle].clear();
-			} else {
-				handle = entities.size();
-				component_flags_of_entity.emplace_back(0);
-				component_hash_codes_of_entity.emplace_back();
 			}
-			entities.emplace_back(handle);
-			component_flags_of_entity[handle] = 0;
-
+			size_t page = getPage(handle);
+			if (pages.size() <= page) {
+				pages.resize(page + 1);
+			}
+			if (pages[page] == nullptr) {
+				pages[page] = new RegistryPage(page);
+			}
+			pages[page]->setValid(handle);
 			return handle;
 		}
 
-		void destroy(entity_handle handle) {
-			inactive.emplace(handle);
-			swapData(index_of_entity[handle], entities.back());
-			entities.pop_back();
+		template<typename ... Components>
+		Group<Components...> group() {
 
-
-			auto hash_codes = component_hash_codes_of_entity[handle];
-			for (size_t hash:hash_codes) {
-				components[hash]->detach(handle);
-			}
-
-			component_flags_of_entity[handle] = component_flags_of_entity[component_flags_of_entity.size() - 1];
-			component_flags_of_entity.pop_back();
-			component_hash_codes_of_entity[handle] = component_hash_codes_of_entity[component_flags_of_entity.size() - 1];
-		}
-
+			ComponentTypeInfo ts[sizeof...(Components)] = {types[typeid(Components).hash_code()]...};
+			return Group<Components...>(pages, ts);
+		};
 
 		template<typename Component>
-		Component &attach(entity_handle handle, Component &component) {
-			const size_t hash = typeid(Component).hash_code();
-			if (components.find(hash) == components.end()) {
-				bit_of_hash.emplace(hash, current_bit);
-				components.emplace(hash, new ComponentPool(sizeof(Component)));
-				current_bit++;
-			}
+		Component &get(entity_handle handle) {
+			return pages[getPage(handle)]->component_pages[typeid(Component).hash_code()]->getAs<Component>(handle);
+		}
 
-			Component &result = *(reinterpret_cast<Component *>(components[hash]->attach(handle, reinterpret_cast<uint8_t *>(&component))));
-			component_flags_of_entity[handle].set(bit_of_hash[hash], true);
-			component_hash_codes_of_entity[handle].emplace(hash);
-			return result;
+		template<typename Component>
+		bool has(entity_handle handle) {
+			return pages[getPage(handle)]->valid(handle);
+		}
+
+		void destroy(entity_handle handle) {
+			inactive.push(handle);
+			pages[getPage(handle)]->setInvalid(handle);
+		}
+
+		bool valid(entity_handle handle) {
+			size_t page = getPage(handle);
+			if (pages[page] != nullptr) {
+				return pages[page]->valid(handle);
+			}
+			return false;
 		}
 
 		template<typename Component>
 		Component &attach(entity_handle handle) {
-			Component component{};
-			return attach < Component > (handle, component);
+
+			const size_t hash = typeid(Component).hash_code();
+			auto type_it = types.find(hash);
+			if (type_it == types.end()) {
+				types.emplace(hash, ComponentTypeInfo{hash, current_bit, sizeof(Component)});
+				current_bit++;
+			}
+			size_t page = getPage(handle);
+			return pages[page]->attach<Component>(handle, types[hash]);
 		}
 
 		template<typename Component>
 		void detach(entity_handle handle) {
 			const size_t hash = typeid(Component).hash_code();
-			components[hash]->detach(handle);
-			component_flags_of_entity[handle].set(bit_of_hash[hash], false);
-			component_hash_codes_of_entity[handle].erase(component_hash_codes_of_entity[handle].find(hash));
+			ComponentTypeInfo &type = types[hash];
+			size_t page = getPage(handle);
+
 		}
-
-		template<typename Component>
-		bool has() {
-			const size_t hash = typeid(Component).hash_code();
-			return component_flags_of_entity[hash].test(bit_of_hash[hash]);
-		}
-
-		bool valid(entity_handle handle) {
-			return index_of_entity.find(handle) == index_of_entity.end();
-		}
-
-
-		//get all entities in component with lesser size
-		//filter out rest of entities for each components with bitfield
-		//sort xyz component array replicate the entity array indicies in the count range
-		//create group with entity[] and x[] y[] z[]
-		template<typename ... Components>
-		ComponentGroup<Components...> group() {
-			constexpr std::size_t component_count = sizeof...(Components);
-			const size_t hashes[component_count] = {typeid(Components).hash_code()...};
-
-			std::bitset<MAX_COMPONENT_TYPES> flags;
-
-			size_t min_size_index = 0;
-
-			for (size_t i = 0; i < component_count; ++i) {
-				if (components.find(hashes[i]) == components.end())
-					return ComponentGroup<Components...>();
-
-				if (i != 0 && components[hashes[i]]->size() < components[hashes[min_size_index]]->size())
-					min_size_index = i;
-				flags |= 1 << bit_of_hash[hashes[i]];
-			}
-
-			std::vector<entity_handle> entity_handle_group(components[hashes[min_size_index]]->getEntities().begin(), components[hashes[min_size_index]]->getEntities().end());
-			size_t entity_count = entity_handle_group.size();
-			for (size_t i = 0; i < entity_count; ++i) {
-				while ((component_flags_of_entity[entity_handle_group[i]] & flags) != flags && i < entity_count) {
-					entity_count--;
-					swapData(entity_handle_group[i], entity_handle_group[entity_count]);
-				}
-			}
-			entity_handle_group.resize(entity_count);
-			for (size_t i = 0; i < component_count; ++i) {
-				components[hashes[i]]->reorder(entity_handle_group.data(), entity_count);
-			}
-
-			return ComponentGroup<Components...>(entity_count, entity_handle_group.data(), get<Components>()...);
-		}
-
-		template<class Component>
-		Component *get() {
-			const size_t hash = typeid(Component).hash_code();
-			return components.find(hash) == components.end() ? nullptr : (Component *) components[hash]->raw();
-		};
-
-		template<class Component>
-		Component &get(entity_handle handle) {
-			const size_t hash = typeid(Component).hash_code();
-			return *((Component *) components[hash]->getComponent(handle));
-		};
 
 	};
 }
