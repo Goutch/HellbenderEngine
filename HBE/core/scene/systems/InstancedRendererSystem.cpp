@@ -10,10 +10,10 @@ namespace HBE {
 	}
 
 	void HBE::InstancedRendererSystem::draw() {
-		Profiler::begin("MeshRendererUpdate");
-		Profiler::begin("MeshRendererUpdateGroup");
+		//TODO:OPTIMIZE, METHOD IS VERY SLOW (MAYBE EVEN SLOWER THAN REGULAR DRAW)
+		Profiler::begin("InstancedRendererUpdate");
+		Profiler::begin("InstancedRendererUpdateGroup");
 		auto group = scene->group<Transform, InstancedRenderer>();
-
 
 		Profiler::end();
 		transform_batches.clear();
@@ -24,7 +24,7 @@ namespace HBE {
 					transform_batches[instance_renderer.pipeline].try_emplace(instance_renderer.mesh, std::vector<mat4>());
 					transform_batches[instance_renderer.pipeline][instance_renderer.mesh].emplace_back(transform.world());
 				} else
-					Log::warning("Mesh renderer does not have a material and/or a mesh assigned");
+					Log::warning("Instance renderer does not have a material and/or a mesh assigned");
 			}
 
 		}

@@ -3,7 +3,7 @@
 #include "Core.h"
 
 
-#include "core/scene/ecs/SparseRegistry/Registry.h"
+#include "core/scene/ecs/Registry.h"
 
 
 #include "Components.h"
