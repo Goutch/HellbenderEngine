@@ -66,7 +66,7 @@ namespace HBE {
 	class VK_Allocator {
 		VK_CommandPool *command_pool;
 		VK_Device *device;
-		const VkDeviceSize BLOCK_SIZE = 134217728; //1024*1024*128 = 128mb
+		const VkDeviceSize BLOCK_SIZE = 1024 * 1024 * 128; //1024*1024*128 = 128mb
 		std::unordered_map<uint32_t, std::vector<Block*>> blocks;
 		const VkPhysicalDeviceMemoryProperties *memory_propeties;
 		uint32_t current_id = 0;

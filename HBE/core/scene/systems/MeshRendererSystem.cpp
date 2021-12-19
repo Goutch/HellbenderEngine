@@ -12,9 +12,8 @@ namespace HBE {
 	void HBE::MeshRendererSystem::draw() {
 		Profiler::begin("MeshRendererUpdate");
 		Profiler::begin("MeshRendererUpdateGroup");
-		MeshRenderer& renderer=scene->get<MeshRenderer>(1);
 		auto group = scene->group<Transform, MeshRenderer>();
-		MeshRenderer& renderer2=scene->get<MeshRenderer>(1);
+
 		Profiler::end();
 		for (auto[handle, transform, mesh_renderer]:group) {
 			if (mesh_renderer.active) {

@@ -68,8 +68,12 @@ namespace HBE {
 			}
 			for (size_t i = 0; i < images.size(); ++i) {
 				delete images[i];
+				if (flags & RENDER_TARGET_FLAG_DEPTH_TEST)
+					delete depth_images[i];
 			}
 			images.clear();
+			if (flags & RENDER_TARGET_FLAG_DEPTH_TEST)
+				depth_images.clear();
 			frame_buffers.clear();
 
 		}
