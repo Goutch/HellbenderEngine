@@ -23,6 +23,7 @@ namespace HBE {
         void requestClose() override;
 
         static void windowSizeCallback(GLFWwindow *handle, int width, int height);
-    };
+		void onTitleChange(std::string title);
+	};
 }
 
