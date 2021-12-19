@@ -326,6 +326,7 @@ namespace HBE {
 		render_target_info.height = swapchain->getExtent().height;
 		render_target_info.clear_color = vec4(0.f, 0.f, 0.f, 1.f);
 		render_target_info.format = IMAGE_FORMAT_RGBA32F;
+		render_target_info.flags = RENDER_TARGET_FLAG_DEPTH_TEST;
 		default_render_target = Resources::createRenderTarget(render_target_info, "DEFAULT_RENDER_TARGET");
 
 		ShaderInfo shader_info{};

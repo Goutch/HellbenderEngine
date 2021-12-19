@@ -22,6 +22,8 @@ namespace HBE {
 		VK_Renderer *renderer;
 		VK_Device *device;
 		VkExtent2D extent;
+
+		std::vector<VK_Image *> depth_images;
 		std::vector<VK_Image *> images;
 		std::vector<VkFramebuffer> frame_buffers;
 		uint32_t current_frame = 0;

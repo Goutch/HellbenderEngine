@@ -10,8 +10,10 @@ namespace HBE {
 
 	class GraphicPipeline;
 
-	enum RENDER_TARGET_FLAGS {
-		RENDER_TARGET_FLAG_NONE=0,
+	typedef uint32_t RENDER_TARGET_FLAGS;
+	enum RENDER_TARGET_FLAG {
+		RENDER_TARGET_FLAG_NONE = 0,
+		RENDER_TARGET_FLAG_DEPTH_TEST = 1,
 	};
 	struct RenderTargetInfo {
 		uint32_t width = 0;

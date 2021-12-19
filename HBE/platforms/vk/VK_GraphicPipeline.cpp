@@ -141,8 +141,8 @@ namespace HBE {
 		rasterizer.lineWidth = 1.0f;
 		rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
 		rasterizer.cullMode = VK_CULL_MODE_NONE;
-		rasterizer.cullMode |= (info.flags & GRAPHIC_PIPELINE_CULL_BACK) == GRAPHIC_PIPELINE_CULL_BACK ? VK_CULL_MODE_BACK_BIT : VK_CULL_MODE_NONE;
-		rasterizer.cullMode |= (info.flags & GRAPHIC_PIPELINE_CULL_FRONT) == GRAPHIC_PIPELINE_CULL_FRONT ? VK_CULL_MODE_FRONT_BIT : VK_CULL_MODE_NONE;
+		rasterizer.cullMode |= (info.flags & GRAPHIC_PIPELINE_FLAG_CULL_BACK) == GRAPHIC_PIPELINE_FLAG_CULL_BACK ? VK_CULL_MODE_BACK_BIT : VK_CULL_MODE_NONE;
+		rasterizer.cullMode |= (info.flags & GRAPHIC_PIPELINE_FLAG_CULL_FRONT) == GRAPHIC_PIPELINE_FLAG_CULL_FRONT ? VK_CULL_MODE_FRONT_BIT : VK_CULL_MODE_NONE;
 		rasterizer.depthBiasEnable = VK_FALSE;
 		rasterizer.depthBiasConstantFactor = 0.0f; // Optional
 		rasterizer.depthBiasClamp = 0.0f; // Optional
@@ -190,6 +190,19 @@ namespace HBE {
 		dynamicState.dynamicStateCount = 2;
 		dynamicState.pDynamicStates = dynamicStates;
 
+		VkPipelineDepthStencilStateCreateInfo depthStencil{};
+		depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+		depthStencil.depthTestEnable = VK_TRUE;
+		depthStencil.depthWriteEnable = VK_TRUE;
+		depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
+		depthStencil.depthBoundsTestEnable = VK_FALSE;
+		depthStencil.minDepthBounds = 0.0f; // Optional
+		depthStencil.maxDepthBounds = 1.0f; // Optional
+		depthStencil.stencilTestEnable = VK_FALSE;
+		depthStencil.front = {}; // Optional
+		depthStencil.back = {}; // Optional
+
+
 		createPipelineLayout();
 
 		VkGraphicsPipelineCreateInfo pipelineInfo{};
@@ -202,11 +215,15 @@ namespace HBE {
 		pipelineInfo.pViewportState = &viewportState;
 		pipelineInfo.pRasterizationState = &rasterizer;
 		pipelineInfo.pMultisampleState = &multisampling;
-		pipelineInfo.pDepthStencilState = nullptr; // Optional
+
 		pipelineInfo.pColorBlendState = &colorBlending;
 		pipelineInfo.pDynamicState = &dynamicState; // Optional
 		pipelineInfo.pTessellationState = VK_NULL_HANDLE;
 		pipelineInfo.layout = pipeline_layout_handle;
+		if (!(info.flags & GRAPHIC_PIPELINE_FLAG_NO_DEPTH_TEST))
+			pipelineInfo.pDepthStencilState = &depthStencil;
+		else
+			pipelineInfo.pDepthStencilState = nullptr;
 
 		pipelineInfo.renderPass = render_pass;
 		pipelineInfo.subpass = 0;

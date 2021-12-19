@@ -122,50 +122,6 @@ void main()
 		delete window;
 	}
 
-	void Graphics::initializeDefaultVariables() {
-		//-----------------------------------DEFAULT_CUBE---------------------------------
-		/*  Mesh *cube = new Mesh();
-		 Geometry::createCube(*cube, 1, 1, 1);
-		 DEFAULT_CUBE = cube;
-		 //-----------------------------------DEFAULT_QUAD---------------------------------
-		 Mesh *quad = new Mesh();
-		 Geometry::createQuad(*quad, 1, 1);
-		 DEFAULT_QUAD = quad;
-
-		 //-----------------------------------DEFAULT_MESH_MATERIAL--------------------------
-		 ShaderDB::add("default/vert_unlit", default_mesh_vertex_shader_code, SHADER_STAGE::SHADER_STAGE_VERTEX);
-		 ShaderDB::add("default/frag_unlit", default_mesh_fragment_shader_code, SHADER_STAGE::SHADER_STAGE_FRAGMENT);
-		 GraphicPipeline *default_graphic_pipeline = new GraphicPipeline();
-		 default_graphic_pipeline->setShaders(
-				 ShaderDB::get("default/vert_unlit"),
-				 ShaderDB::get("default/frag_unlit"));
-
-		 DEFAULT_MESH_PIPELINE = default_graphic_pipeline;
-		 Material *default_mesh_material = new Material();
-		 default_mesh_material->setPipeline(DEFAULT_MESH_PIPELINE);
-		 DEFAULT_MESH_MATERIAL = default_mesh_material;
-
-		 //-----------------------------------DEFAULT_INSTANCED_PIPELINE----------------
-		 ShaderDB::add("default/vert_unlit_instanced", default_instanced_vertex_shader_code, SHADER_STAGE::SHADER_STAGE_VERTEX);
-		 GraphicPipeline *default_instanced_shader_program = new GraphicPipeline();
-		 default_instanced_shader_program->setShaders(
-				 ShaderDB::get("default/vert_unlit_instanced"),
-				 ShaderDB::get("default/frag_unlit"));
-		 DEFAULT_INSTANCED_PIPELINE = default_instanced_shader_program;
-*/
-		//------------------------------------DEFAULT_SCREEN_PIPELINE---------------------------
-		/*auto screen_vertex = Resources::createInRegistry<Shader>("default/screen_vertex");
-		auto screen_frag = Resources::createInRegistry<Shader>("default/screen_frag");
-		screen_vertex->setSource(default_screen_vertex_shader_code, SHADER_STAGE::SHADER_STAGE_VERTEX);
-		screen_frag->setSource(default_screen_fragment_shader_code, SHADER_STAGE::SHADER_STAGE_FRAGMENT);
-		auto default_screen_pipeline = Resources::createInRegistry<GraphicPipeline>("default/screen_pipeline");
-		auto default_screen_layout = Resources::createInRegistry<MeshLayout>("default/screen_layout");
-		default_screen_layout->setLayoutTypes({GLSL_TYPE::VEC2F, GLSL_TYPE::VEC2F});
-		default_screen_pipeline->setShaders(
-				screen_vertex,
-				screen_frag, default_screen_layout);*/
-	}
-
 	 RenderTarget *Graphics::getDefaultRenderTarget() {
 		return renderer->getDefaultRenderTarget();
 	}

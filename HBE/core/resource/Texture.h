@@ -19,11 +19,12 @@ namespace HBE {
 		IMAGE_FORMAT_DEPTH32f_STENCIL8U = 9,
 		IMAGE_FORMAT_DEPTH24f_STENCIL8U = 10,
 	};
-
-	enum IMAGE_FLAGS {
+	typedef uint32_t IMAGE_FLAGS;
+	enum IMAGE_FLAG {
 		IMAGE_FLAG_NONE = 0,
-		IMAGE_FLAG_SHADER_WRITE = 1,
-		IMAGE_FLAG_RENDER_TARGET = 2,
+		IMAGE_FLAG_SHADER_WRITE = 1 << 0,
+		IMAGE_FLAG_RENDER_TARGET = 1 << 1,
+		IMAGE_FLAG_DEPTH = 1<< 2,
 	};
 	/**
 	 * @param data can be nullptr and updated later
