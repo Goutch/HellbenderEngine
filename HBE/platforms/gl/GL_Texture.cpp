@@ -10,7 +10,7 @@ namespace HBE {
         glGenTextures(1, &texture_id);
     }
 
-    void GL_Texture::setData(unsigned char *data, int width, int height, TEXTURE_FORMAT texture_type) {
+    void GL_Texture::setData(void *data, uint32_t width, uint32_t height, uint32_t depth, IMAGE_FORMAT format, IMAGE_DIMENSION dimension) {
         bind();
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);

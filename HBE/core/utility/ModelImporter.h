@@ -1,13 +1,13 @@
 #pragma once
+#include "Core.h"
 #include "vector"
 
 #include "glm/glm.hpp"
 #include "string"
-#include "Core.h"
-using namespace glm;
+
 namespace HBE {
     struct HB_API MeshData {
-        std::vector<unsigned int> indices;
+        std::vector<uint32_t> indices;
         std::vector<vec3> positions;
         std::vector<vec2> uvs;
         std::vector<vec3> normals;

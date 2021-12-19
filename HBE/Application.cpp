@@ -1,120 +1,127 @@
 #include "Application.h"
 #include "core/graphics/Graphics.h"
 #include "core/input/Input.h"
-#include "core/entity/component/Camera.h"
 #include "GLFW/glfw3.h"
 #include "core/utility/Clock.h"
 #include "Configs.h"
 #include "core/threading/JobManager.h"
-#include <core/serialization/ComponentRegistry.h>
-#include <core/entity/component/MeshRenderer.h>
-#include <core/entity/component/ModelRenderer.h>
-#include <core/entity/component/CameraController.h>
-#include <core/entity/component/InstancesRenderer.h>
 #include <core/graphics/Window.h>
-
+#include <core/graphics/Renderer.h>
+#include <core/resource/Resources.h>
+#include "core/utility/Profiler.h"
+#include "core/scene/Scene.h"
 namespace HBE {
-    Scene *Application::scene = nullptr;
-    Window *Application::window = nullptr;
-    Clock *Application::time = nullptr;
-    int Application::fps_counter = 0;
-    float Application::fps_timer = 0;
-    Event<> Application::onInit;
-    Event<float> Application::onUpdate;
-    Event<Scene *> Application::onSceneChange;
-    Event<> Application::onRender;
-    Event<> Application::onRegisterComponents;
+	Scene *Application::current_scene = nullptr;
+	Window *Application::window = nullptr;
+	Clock *Application::time = nullptr;
+	int Application::fps_counter = 0;
+	float Application::fps_timer = 0;
+	Event<> Application::onInit = Event<>();
+	Event<Scene *> Application::onSceneChange = Event<Scene *>();
+	Event<> Application::onWindowClosed = Event<>();
+	Event<> Application::onQuit = Event<>();
 
-    void Application::registerComponents() {
-        ComponentRegistry::registerComponent<Camera>("Camera");
-        ComponentRegistry::registerComponent<MeshRenderer>("MeshRenderer");
-        ComponentRegistry::registerComponent<ModelRenderer>("ModelRenderer");
-        ComponentRegistry::registerComponent<InstancesRenderer>("InstancesRenderer");
-        ComponentRegistry::registerComponent<CameraController>("CameraController");
-        onRegisterComponents.invoke();
-    }
+	Event<float> Application::onUpdate;
+	Event<> Application::onDraw;
+	Event<> Application::onRender;
 
-    Scene *Application::setScene(std::string path) {
-        //todo:scene loading
-        if (scene != nullptr) {
-            scene->terminate();
-            delete scene;
-        }
-        scene = new Scene();
-        scene->init();
-        onSceneChange.invoke(scene);
-        return scene;
-    }
+	void Application::setScene(Scene *scene, bool delete_previous_scene) {
+		if (delete_previous_scene && scene != nullptr) {
+			delete current_scene;
+			current_scene = nullptr;
+		}
+		Application::current_scene = scene;
+		if (scene != nullptr) {
+			onSceneChange.invoke(scene);
+		}
 
+	}
 
+	Scene *Application::getScene() {
+		return current_scene;
+	}
 
-    void Application::init() {
-        Graphics::init();
-        window = Graphics::getWindow();
-        registerComponents();
-        Input::init();
-        if (!scene)
-            setScene("");
-        onInit.invoke();
-    }
+	void Application::init() {
+		Graphics::init();
+		window = Graphics::getWindow();
+		Input::init();
+		if (!current_scene)
+			setScene(new Scene());
+		onInit.invoke();
+	}
 
-    void Application::run() {
+	void Application::run() {
 
-        time = new Clock();
-        Clock update_clock = Clock();
-        float delta_t = 0.0f;
+		time = new Clock();
+		Clock update_clock = Clock();
+		float delta_t = 0.0f;
 
-        while (!window->shouldClose() && scene != nullptr) {
-            window->swapBuffers();
-            Input::pollEvents();
+		while (!window->shouldClose() && current_scene != nullptr) {
+			window->swapBuffers();
+			Input::pollEvents();
+			Profiler::begin("TOTAL_FRAME");
+			JobManager::updateJobsStatus();
+			Profiler::begin("UPDATE");
+			onUpdate.invoke(delta_t);
+			current_scene->update(delta_t);
+			Profiler::end();
+			Entity camera_entity = current_scene->getCameraEntity();
 
-            JobManager::updateJobsStatus();
-            scene->update(delta_t);
-            onUpdate.invoke(delta_t);
-            scene->draw();
-            if (Camera::main)
-                Graphics::render(Graphics::getRenderTarget(), Camera::main->getProjectionMatrix(),
-                                 Camera::main->getViewMatrix());
-            if (!Configs::isPresentAutomatic())
-                Graphics::present(Graphics::getRenderTarget());
-            onRender.invoke();
-            Graphics::clearDrawCache();
+			if (camera_entity.valid()) {
+				Camera &camera = camera_entity.get<Camera>();
+				if (camera.active) {
+					Profiler::begin("DRAW");
+					onDraw.invoke();
+					current_scene->draw();
+					Profiler::end();
+					Profiler::begin("RENDER");
+					Graphics::beginFrame();
+					onRender.invoke();
+					current_scene->render();
+					Graphics::endFrame();
+					Profiler::end();
+				}
+			} else {
+				Log::warning("No camera in current scene");
+			}
+			Profiler::end();
+			delta_t = update_clock.ns() * NANOSECONDS_TO_SECONDS;
+			update_clock.reset();
+			printFPS(delta_t);
+		}
 
-            delta_t = update_clock.ns() / SECONDS_TO_NANOSECOND;
-            update_clock.reset();
-#ifdef DEBUG_MODE
-            printFPS(delta_t);
-#endif
-        }
-        delete time;
-        delete scene;
-    }
+		onWindowClosed.invoke();
+		onQuit.invoke();
+		delete time;
+		delete current_scene;
 
-    void Application::terminate() {
-        Graphics::terminate();
-        ComponentRegistry::terminate();
-    }
+	}
 
-    void Application::quit() {
-        window->requestClose();
-    }
+	void Application::terminate() {
+		Graphics::terminate();
+		Profiler::printAverange();
+	}
 
-    float Application::getTime() {
-        if (time) {
-            return time->ms() / SECOND_TO_MILISECOND;
-        }
-        return 0;
-    }
+	void Application::quit() {
+		window->requestClose();
+	}
 
-    void Application::printFPS(float delta) {
-        fps_counter++;
-        fps_timer += delta;
-        if (fps_timer >= 1.0) {
-            Log::debug("fps:" + std::to_string(fps_counter));
-            fps_counter = 0;
-            fps_timer = 0;
-        }
-    }
+	float Application::getTime() {
+		if (time) {
+			return time->ns() * NANOSECONDS_TO_SECONDS;
+		}
+		return 0;
+	}
+
+	void Application::printFPS(float delta) {
+		fps_counter++;
+		fps_timer += delta;
+		if (fps_timer >= 1.0) {
+			Log::debug("fps:" + std::to_string(fps_counter));
+			fps_counter = 0;
+			fps_timer = 0;
+		}
+	}
 }
 
 

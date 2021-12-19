@@ -4,29 +4,29 @@
 #include "string"
 #include "Resource.h"
 #include "map"
-#include "IShader.h"
 #include "memory"
+#include "vector"
+#include "GLSL_TYPE.h"
 
 namespace HBE {
-    class HB_API Shader : public Resource {
-        IShader *instance;
-        SHADER_TYPE type;
-    public:
-        Shader(const std::string &source, SHADER_TYPE type);
+	enum SHADER_STAGE {
+		SHADER_STAGE_NONE, SHADER_STAGE_COMPUTE, SHADER_STAGE_VERTEX, SHADER_STAGE_FRAGMENT, SHADER_STAGE_GEOMETRY
+	};
 
-        Shader();
+	struct ShaderInfo {
+		SHADER_STAGE stage = SHADER_STAGE_NONE;
+		std::string path="";
+	};
 
-        void load(const std::string &path, SHADER_TYPE type);
+	class HB_API Shader : public Resource {
+	public:
+		virtual SHADER_STAGE getStage() const = 0;
 
-        void setSource(const std::string &source, SHADER_TYPE type);
-        const void* getHandle() const;
-        SHADER_TYPE getType();
+		virtual ~Shader() = default;
 
-        ~Shader();
+	protected:
+		void getSource(const std::string &path, std::vector<char> &buffer);
 
-    private:
-        void getSource(const std::string &path, std::string &buffer);
-
-    };
+	};
 }
 

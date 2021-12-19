@@ -1,55 +1,44 @@
-
 #pragma once
 
+#include "Core.h"
 #include <vector>
 #include "glm/glm.hpp"
-#include "Core.h"
+#include "Resource.h"
+#include "GraphicPipeline.h"
 
-
-using namespace glm;
 namespace HBE {
-    class IMesh;
+	class MeshLayout;
 
-    class HB_API Mesh final {
-        IMesh *instance;
+	typedef uint32_t MESH_FLAGS;
+	enum MESH_FLAG {
+		MESH_FLAG_NONE = 0,
+	};
 
-        unsigned int vertex_count = 0;
-        unsigned int index_count = 0;
-        bool has_index_buffer = false;
-        unsigned int instance_count = 1;
-    public:
-        Mesh();
+	struct MeshInfo {
+		const VertexBindingInfo *binding_infos = nullptr;
+		size_t binding_info_count = 0;
+		MESH_FLAGS flags = MESH_FLAG_NONE;
+	};
 
-        virtual ~Mesh();
+	class HB_API Mesh : public Resource {
+	protected:
+		uint32_t vertex_count = 0;
+		uint32_t index_count = 0;
+		bool has_index_buffer = false;
+		uint32_t instance_count = 1;
+		std::unordered_map<uint32_t, VertexBindingInfo> bindings;
+	public:
+		virtual ~Mesh() = default;
+		uint32_t getVertexCount() const;
+		uint32_t getIndexCount() const;
+		uint32_t getInstanceCount() const;
+		bool hasIndexBuffer() const;
+		virtual void setVertexIndices(const std::vector<uint32_t> &data) = 0;
+		virtual void setBuffer(uint32_t binding, const void *vertices, size_t count) = 0;
+		virtual void setInstanceBuffer(uint32_t binding, const void *data, size_t count) = 0;
+		virtual void bind() const = 0;
+		virtual void unbind() const = 0;
 
-        void setIndices(const std::vector<unsigned int> &data);
-
-        void setBuffer(unsigned int position, const std::vector<int> &data);
-
-        void setBuffer(unsigned int position, const std::vector<float> &data);
-
-        void setBuffer(unsigned int position, const std::vector<vec2> &data);
-
-        void setBuffer(unsigned int position, const std::vector<vec3> &data);
-
-        void setBuffer(unsigned int position, const std::vector<vec4> &data);
-
-        void setBuffer(unsigned int position, const std::vector<unsigned int> &data);
-
-        void setInstancedBuffer(unsigned int position, const std::vector<mat4> &data);
-
-        unsigned int getVertexCount() const;
-
-        unsigned int getIndexCount() const;
-
-        unsigned int getInstanceCount() const;
-
-        bool hasIndexBuffer() const;
-
-        virtual void bind() const;
-
-        virtual void unbind() const;
-
-    };
+	};
 }
 

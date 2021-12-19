@@ -2,6 +2,7 @@
 
 #include "core/utility/Event.h"
 #include "Core.h"
+#include <string>
 namespace HBE {
     class HB_API Configs {
     public:
@@ -30,7 +31,7 @@ namespace HBE {
 
         static bool getAntialiasing();
 
-        static Event<bool> onVerticalSyncChange;
+        static Event<> onVerticalSyncChange;
 
         static void setVerticalSync(bool v_sync);
 

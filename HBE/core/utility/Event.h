@@ -1,13 +1,14 @@
 #pragma once
-
+#include "Core.h"
 #include "unordered_set"
 #include "functional"
 #include "Function.h"
-#include "Core.h"
+#include "unordered_map"
+
 namespace HBE {
     template<typename... Args>
 
-    class HB_API Event {
+    class Event {
         std::unordered_set<void (*)(Args...)> static_callbacks;
         std::unordered_map<void *, std::function<void(Args...)>> instances_callbacks;
     public:

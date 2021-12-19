@@ -4,7 +4,7 @@
 #include "glm/glm.hpp"
 #include <unordered_map>
 #include <vector>
-#include <core/resource/IGraphicPipeline.h>
+#include <core/resource/GraphicPipeline.h>
 
 using namespace glm;
 namespace HBE {

@@ -1,6 +1,7 @@
 #pragma once
-#include "glm/glm.hpp"
 #include "Core.h"
+#include "glm/glm.hpp"
+
 namespace HBE {
     struct HB_API Plane {
         glm::vec3 normal;

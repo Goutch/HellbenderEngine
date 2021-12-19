@@ -1,17 +1,20 @@
 cmake_minimum_required(VERSION 3.15)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 project(HBE CXX)
-
+add_compile_definitions(HB_BUILD)
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --std=c++17 -O3 -fPIC")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3 -fPIC")
 endif ()
-
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
 
-#find_package(Vulkan)
+find_package(Vulkan)
 if (VULKAN_FOUND)
+    message("Found vulkan at ${Vulkan_INCLUDE_DIRS}!")
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/)
     include_directories(${Vulkan_INCLUDE_DIRS})
     set(VK_FILES
             platforms/vk/VK_Renderer.cpp
@@ -35,11 +38,41 @@ if (VULKAN_FOUND)
             platforms/vk/VK_Shader.h
             platforms/vk/VK_ResourceFactory.cpp
             platforms/vk/VK_ResourceFactory.h
-            platforms/vk/VK_Texture.cpp
-            platforms/vk/VK_Texture.h
+            platforms/vk/VK_Image.cpp
+            platforms/vk/VK_Image.h
+            platforms/vk/VK_Mesh.h
             platforms/vk/VK_Mesh.cpp
-            platforms/vk/VK_Mesh.h platforms/vk/VK_RenderPass.cpp platforms/vk/VK_RenderPass.h)
+            platforms/vk/VK_RenderPass.cpp
+            platforms/vk/VK_RenderPass.h
+            platforms/vk/ShaderCompiler.cpp
+            platforms/vk/ShaderCompiler.h
+            platforms/vk/VK_Semaphore.cpp
+            platforms/vk/VK_Semaphore.h
+            platforms/vk/VK_Fence.cpp
+            platforms/vk/VK_Fence.h
+            platforms/vk/VK_VertexLayout.cpp
+            platforms/vk/VK_VertexLayout.h
+            platforms/vk/VK_CommandPool.cpp
+            platforms/vk/VK_CommandPool.h
+            platforms/vk/VK_Buffer.cpp
+            platforms/vk/VK_Buffer.h
+            platforms/vk/VK_Memory.cpp
+            platforms/vk/VK_Memory.h
+            platforms/vk/VK_Allocator.cpp
+            platforms/vk/VK_Allocator.h
+            platforms/vk/VK_CONSTANTS.h
+            platforms/vk/VK_RenderTarget.cpp
+            platforms/vk/VK_RenderTarget.h
+            platforms/vk/VK_Queue.cpp
+            platforms/vk/VK_Queue.h
+            platforms/vk/VK_Scheduler.cpp
+            platforms/vk/VK_Scheduler.h)
+
     add_compile_definitions(VULKAN_RENDERER)
+
+
+    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/")
+    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/")
 else ()
     add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/")
     add_compile_definitions(OPENGL_RENDERER)
@@ -71,44 +104,52 @@ set(CORE_FILES
         Configs.cpp
         Core.h
         Configs.h
+        HBETypes.h
 
         core/resource/Texture.h
-        core/resource/Texture.cpp
-        core/resource/Material.cpp
-        core/resource/Material.h
         core/resource/Model.cpp
-        core/resource/GraphicPipeline.cpp
-        core/resource/GraphicPipeline.h
+        core/resource/Model.h
+        core/resource/Mesh.cpp
+        core/resource/Mesh.h
         core/resource/Shader.cpp
+        core/resource/Shader.h
+        core/resource/MeshLayout.h
+        core/resource/ResourceFactory.h
+        core/resource/Resource.h
+        core/resource/GraphicPipeline.h
+        core/resource/ComputePipeline.h
+        core/resource/GLSL_TYPE.h
+        core/resource/Resources.h
+        core/resource/Resources.cpp
+        core/resource/Texture.cpp
+        core/resource/MeshLayout.cpp
 
         core/graphics/Window.h
-        core/graphics/Framebuffer.h
-        core/graphics/Framebuffer.cpp
         core/graphics/Renderer.h
         core/graphics/Graphics.cpp
         core/graphics/Graphics.h
-        core/graphics/RenderTarget.cpp
-        core/graphics/RenderTarget.h
+        core/resource/RenderTarget.h
         core/graphics/Renderer.cpp
+        core/graphics/Window.cpp
 
         core/input/Input.h
         core/input/Input.cpp
 
-        core/entity/Scene.cpp
-        core/entity/Scene.h
-        core/entity/Entity.cpp
-        core/entity/component/Transform.cpp
-        core/entity/component/Camera.cpp
-        core/entity/component/Component.h
-        core/entity/component/CameraController.cpp
-        core/entity/component/MeshRenderer.cpp
-        core/entity/component/MeshRenderer.h
-        core/entity/component/CameraController.h
-        core/entity/component/Component.cpp
-        core/entity/component/InstancesRenderer.cpp
-        core/entity/component/InstancesRenderer.h
-        core/entity/component/ModelRenderer.h
-        core/entity/component/ModelRenderer.cpp
+        #core/entity/Scene.cpp
+        #core/entity/Scene.h
+        #core/entity/Entity.cpp
+        #core/entity/Entity.h
+        #core/entity/component/Transform.cpp
+        #core/entity/component/Transform.h
+        #core/entity/component/Camera.cpp
+        #core/entity/component/Component.h
+        #core/entity/component/CameraController.cpp
+        #core/entity/component/MeshRenderer.cpp
+        #core/entity/component/MeshRenderer.h
+        #core/entity/component/CameraController.h
+        #core/entity/component/Component.cpp
+        #core/entity/component/ModelRenderer.h
+        #core/entity/component/ModelRenderer.cpp
 
         core/utility/Log.cpp
         core/utility/Geometry.cpp
@@ -116,28 +157,29 @@ set(CORE_FILES
         core/utility/Clock.cpp
         core/utility/ModelImporter.cpp
         core/utility/ModelImporter.h
-        core/threading/JobManager.cpp
-        core/threading/JobManager.h
         core/utility/Random.cpp
         core/utility/Random.h
+        core/utility/RawVector.h
 
-        core/serialization/Serializer.h
-        core/serialization/Deserializer.h
-        core/serialization/ComponentRegistry.cpp
-        core/serialization/ComponentRegistry.h
-        core/graphics/Window.cpp
-        core/serialization/ComponentRegistry.h
-        core/resource/IResourceFactory.h
-        core/resource/IMesh.h
-        core/resource/Mesh.cpp
-        core/resource/Resource.h
-        core/resource/ITexture.h
-        core/resource/IGraphicPipeline.h
-        core/resource/IShader.h
-        core/resource/ShaderDB.cpp
-        core/resource/ShaderDB.h
-        core/graphics/DrawFlags.h
-        core/resource/IComputePipeline.h)
+        core/threading/JobManager.cpp
+        core/threading/JobManager.h
+
+        core/scene/Scene.cpp
+        core/scene/System.h
+        core/scene/Components.h
+        core/scene/systems/CameraSystem.cpp
+        core/scene/systems/CameraSystem.h
+        core/scene/systems/MeshRendererSystem.cpp
+        core/scene/systems/MeshRendererSystem.h
+        core/scene/Components.cpp
+        core/scene/systems/CameraControllerSystem.cpp
+        core/scene/systems/CameraControllerSystem.h
+        core/scene/systems/RotatorSystem.cpp
+        core/scene/systems/RotatorSystem.h
+        core/scene/ecs/Registry.h
+        core/utility/Profiler.cpp
+        core/utility/Profiler.h
+        core/scene/ecs/SparseRegistry/Registry.h core/scene/systems/InstancedRendererSystem.cpp core/scene/systems/InstancedRendererSystem.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}
@@ -145,34 +187,39 @@ add_library(${PROJECT_NAME} SHARED
         ${GL_FILES}
         ${VK_FILES}
         )
+target_compile_definitions(${PROJECT_NAME} PRIVATE HB_BUILD)
 
 target_include_directories(${PROJECT_NAME}
+        PUBLIC "${${CMAKE_CURRENT_SOURCE_DIR}}"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/contrib/zlib/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm/"
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/entt/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/include/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/include"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/include/"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb/")
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb/"
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/"
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/")
+
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    message("Using Clang")
+    message("Using Clang not supported")
 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-
     if (WIN32)
         message("Using mingw compiler")
         target_link_libraries(${PROJECT_NAME}
-                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/mingw/libassimp.a"
-                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/mingw/libzlibstatic.a"
-                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/mingw/libIrrXML.a"
-                PUBLIC glfw)
+                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/mingw/libassimp.a"
+                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/mingw/libzlibstatic.a"
+                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/mingw/libIrrXML.a"
+
+                )
     else ()
         message("Using GCC Compiler")
         target_link_libraries(${PROJECT_NAME}
-                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/gcc/libassimp.a"
-                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/gcc/libzlibstatic.a"
-                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/gcc/libIrrXML.a"
-                PUBLIC glfw)
+                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/gcc/libassimp.a"
+                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/gcc/libzlibstatic.a"
+                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/gcc/libIrrXML.a")
     endif ()
 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
@@ -182,25 +229,37 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     # using Visual Studio C++
     message("Using visual studio compiler")
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        MESSAGE("debug mode ")
+        MESSAGE("debug mode")
         target_link_libraries(${PROJECT_NAME}
-                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/debug/assimp-vc142-mt.lib"
-                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/debug/zlibstatic.lib"
-                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/debug/IrrXML.lib"
-                PUBLIC glfw)
+                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/debug/assimp-vc142-mt.lib"
+                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/debug/zlibstatic.lib"
+                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/debug/IrrXML.lib")
     else ()
         MESSAGE("release mode")
         target_link_libraries(${PROJECT_NAME}
-                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/release/assimp-vc142-mt.lib"
-                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/release/zlibstatic.lib"
-                PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/release/IrrXML.lib"
-                PUBLIC glfw)
+                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/release/assimp-vc142-mt.lib"
+                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/release/zlibstatic.lib"
+                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/release/IrrXML.lib")
     endif ()
 endif ()
 if (VULKAN_FOUND)
+    set(GLSLANG_LIBS
+            OSDependent
+            OGLCompiler
+            SPIRV
+            glslang
+            )
     target_link_libraries(${PROJECT_NAME} PUBLIC ${Vulkan_LIBRARY})
+    target_link_libraries(${PROJECT_NAME}
+            PUBLIC spirv-cross-glsl
+            PUBLIC spirv-cross-cpp
+            PUBLIC spirv-cross-c-shared
+            PUBLIC spirv-cross-reflect
+            PUBLIC spirv-cross-msl
+            PUBLIC spirv-cross-util
+            PUBLIC spirv-cross-core)
+
 else ()
     target_link_libraries(${PROJECT_NAME} PUBLIC glad)
 endif ()
-
-target_compile_definitions(${PROJECT_NAME} PRIVATE HB_BUILD)
+target_link_libraries(${PROJECT_NAME} PUBLIC glfw ${GLSLANG_LIBS} )

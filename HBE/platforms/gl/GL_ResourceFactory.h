@@ -2,7 +2,7 @@
 
 #include <core/resource/GraphicPipeline.h>
 #include <core/resource/Texture.h>
-#include "core/resource/IResourceFactory.h"
+#include "core/resource/ResourceFactory.h"
 
 namespace HBE {
     class GL_ResourceFactory : public IResourceFactory {

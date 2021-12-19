@@ -1,8 +1,10 @@
-class IJob;
+
 #include "Core.h"
 #include "Job.h"
+#include <future>
 #include "list"
 namespace HBE {
+
     class HB_API JobManager {
     private:
         static std::list<IJob *> running_jobs;

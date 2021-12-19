@@ -2117,7 +2117,7 @@ the following:
   1. On each shard, set the `GTEST_TOTAL_SHARDS` environment variable to the total number of shards.  It must be the same for all shards.
   1. On each shard, set the `GTEST_SHARD_INDEX` environment variable to the index of the shard.  Different shards must be assigned different indices, which must be in the range `[0, GTEST_TOTAL_SHARDS - 1]`.
   1. Run the same test program on all shards.  When Google Test sees the above two environment variables, it will select a subset of the test functions to run.  Across all shards, each test function in the program will be run exactly once.
-  1. Wait for all shards to finish, then collect and report the results.
+  1. Wait for all shards to isEnd, then collect and report the results.
 
 Your project may have tests that were written without Google Test and
 thus don't understand this protocol.  In order for your test runner to

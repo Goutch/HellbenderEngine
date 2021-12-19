@@ -86,7 +86,7 @@ To generate user documentation and run tests please proceed with the steps below
 
 On successful build you will find compiled test and example binaries in `bin`
 directory. The generated documentation will be available in `doc/html`
-directory of the build tree. To run tests after finished build please run `make
+directory of the build tree. To run tests after isEnd build please run `make
 test` or `ctest` from your build tree. You can get detailed output using `ctest
 -V` command.
 
