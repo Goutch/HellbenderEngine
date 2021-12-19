@@ -30,3 +30,4 @@
 #define DEBUG_MODE
 #endif
 
+#include "HBETypes.h"

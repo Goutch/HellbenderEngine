@@ -538,7 +538,7 @@ Some platforms (Dreamcast) doesn't support double precision floating point value
 
 ### <a name="section2_14"></a> 2.14. GLM\_FORCE\_SWIZZLE: Enable swizzle operators
 
-GraphicPipeline languages like GLSL often feature so-called swizzle expressions, which may be used to freely select and arrange a vector's components. For example, `variable.x`, `variable.xzy` and `variable.zxyy` respectively form a scalar, a 3D vector and a 4D vector.  The result of a swizzle expression in GLSL can be either an R-value or an L-value. Swizzle expressions can be written with characters from exactly one of `xyzw` (usually for positions), `rgba` (usually for colors), and `stpq` (usually for texture coordinates).
+Shader languages like GLSL often feature so-called swizzle expressions, which may be used to freely select and arrange a vector's components. For example, `variable.x`, `variable.xzy` and `variable.zxyy` respectively form a scalar, a 3D vector and a 4D vector.  The result of a swizzle expression in GLSL can be either an R-value or an L-value. Swizzle expressions can be written with characters from exactly one of `xyzw` (usually for positions), `rgba` (usually for colors), and `stpq` (usually for texture coordinates).
 
 ```glsl
 vec4 A;
@@ -2155,7 +2155,7 @@ Once the code changes for the fix is done, we need to commit the changes:
 >>> git commit -m "Resolve the issue that caused problem with a specific fix #432"
 ```
 
-The commit message should be as specific as possible and finished by the bug number in the [GLM GitHub issue page](https://github.com/g-truc/glm/issues)
+The commit message should be as specific as possible and isEnd by the bug number in the [GLM GitHub issue page](https://github.com/g-truc/glm/issues)
 
 Finally, we need to push our changes in our branch to our GitHub fork using:
 ```

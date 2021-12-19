@@ -42,10 +42,4 @@ namespace HBE{
             delete[] message;
         }
     }
-
-    const void *GL_Shader::getHandle() const{
-        return &handle;
-    }
-
-
 }

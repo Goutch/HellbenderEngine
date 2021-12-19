@@ -1,76 +1,70 @@
 #pragma once
 
-#include "core/serialization/Serializable.h"
-
-#include "glm/glm.hpp"
+#include "Core.h"
 #include "string"
 #include "vector"
-#include "Core.h"
-#include "map"
-
+#include "glm/glm.hpp"
 #include "Resource.h"
-#include "core/graphics/DrawFlags.h"
+
 namespace HBE {
+	class Shader;
 
-    class Shader;
+	class Texture;
 
-    class IGraphicPipeline;
+	class MeshLayout;
 
-    class HB_API GraphicPipeline final : public Resource {
-        IGraphicPipeline *instance;
-    public:
-        GraphicPipeline();
+	class RenderTarget;
 
-        ~GraphicPipeline();
+	typedef uint32_t GRAPHIC_PIPELINE_FLAGS;
+	enum GRAPHIC_PIPELINE_FLAG {
+		GRAPHIC_PIPELINE_FLAG_NONE = 0,
+		GRAPHIC_PIPELINE_FLAG_CULL_BACK = 1 << 0,
+		GRAPHIC_PIPELINE_FLAG_CULL_FRONT = 1 << 1,
+		GRAPHIC_PIPELINE_FLAG_NO_DEPTH_TEST = 1 << 2,
+	};
 
-        void setShaders(const Shader *vertex, const Shader *geometry,const Shader *fragment);
+	typedef uint32_t VERTEX_BINDING_FLAGS;
+	enum VERTEX_BINDING_FLAG {
+		VERTEX_BINDING_FLAG_NONE = 0,
+		VERTEX_BINDING_FLAG_PER_INSTANCE = 1 << 0,
+		/// Disable device local memory and skip staging buffer. May result in slower read in shader.
+		VERTEX_BINDING_FLAG_FAST_WRITE = 1 << 1,
+		///Recommended for buffer changing every frame, dont wait for rendering to finish but double or triple memory usage.
+		VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS = 1 << 2,
+	};
+	struct VertexBindingInfo {
+		uint32_t binding = 0;
+		uint32_t size = 0;
+		VERTEX_BINDING_FLAGS flags = VERTEX_BINDING_FLAG_NONE;
+	};
+	struct GraphicPipelineInfo {
+		const Shader *vertex_shader = nullptr;
+		const Shader *fragement_shader = nullptr;
+		const Shader *geometry_shader = nullptr;
+		const VertexBindingInfo *binding_infos = nullptr;
+		uint32_t binding_info_count = 0;
+		GRAPHIC_PIPELINE_FLAGS flags = GRAPHIC_PIPELINE_FLAG_NONE;
+	};
 
-        void setShaders(const Shader *vertex, const Shader *fragment);
+	class HB_API GraphicPipeline : public Resource {
+	public:
+		virtual ~GraphicPipeline() = default;
 
-        void bind() const;
+		virtual void bind() const = 0;
 
-        void unbind() const;
+		virtual void unbind() const = 0;
 
-        void setDrawFlags(DRAW_FLAGS flags);
+		virtual void setDynamicUniform(const std::string &name, const void *data) = 0;
+		virtual void setDynamicUniform(uint32_t binding, const void *data) = 0;
 
-        DRAW_FLAGS getDrawFlags() const;
+		virtual void setUniform(const std::string &name, const void *data) = 0;
+		virtual void setUniform(uint32_t binding, const void *data) = 0;
+		virtual void pushConstant(const std::string &name, const void *data) = 0;
+		virtual void setTexture(uint32_t binding, const Texture *texture) = 0;
+		virtual void setTexture(uint32_t binding, const RenderTarget *render_target) = 0;
+		virtual void setTexture(const std::string &name, const Texture *texture) = 0;
+		virtual void setTexture(const std::string &name, const RenderTarget *render_target) = 0;
+	};
 
-        void setUniform(const std::string &name, int i) const;
 
-        void setUniform(const std::string &name, float f) const;
-
-        void setUniform(const std::string &name, const glm::vec2 &v) const;
-
-        void setUniform(const std::string &name, const glm::vec3 &v) const;
-
-        void setUniform(const std::string &name, const glm::vec4 &v) const;
-
-        void setUniform(const std::string &name, const glm::mat3 &m) const;
-
-        void setUniform(const std::string &name, const glm::mat4 &m) const;
-
-        void setUniform(unsigned int location, int i) const;
-
-        void setUniform(unsigned int location, float f) const;
-
-        void setUniform(unsigned int location, const glm::vec2 &v) const;
-
-        void setUniform(unsigned int location, const glm::vec3 &v) const;
-
-        void setUniform(unsigned int location, const glm::vec4 &v) const;
-
-        void setUniform(unsigned int location, const glm::mat3 &m) const;
-
-        void setUniform(unsigned int location, const glm::mat4 &m) const;
-
-        void setUniformIntArray(unsigned int location, int *i, unsigned int count) const;
-
-        void setUniformFloatArray(unsigned int location, float *f, unsigned int count) const;
-
-        void setUniformVec2Array(unsigned int location, const glm::vec2 *v, unsigned int count) const;
-
-        void setUniformVec3Array(unsigned int location, const glm::vec3 *v, unsigned int count) const;
-
-        void setUniformVec4Array(unsigned int location, const glm::vec4 *v, unsigned int count) const;
-    };
 }

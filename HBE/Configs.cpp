@@ -1,15 +1,16 @@
 #include "Configs.h"
+
 namespace HBE {
     Event<std::string> Configs::onWindowTitleChange;
     std::string Configs::window_title = "CHANGE WITH Configs::setWindowTitle";
 
-    std::string Configs::icon_path = "../Hellbender_logo.png";
+    std::string Configs::icon_path = "../wall.png";
 
     bool Configs::antialiasing = true;
     Event<bool> Configs::onAntialiasingChange;
 
     bool Configs::vertical_sync = true;
-    Event<bool> Configs::onVerticalSyncChange;
+    Event<> Configs::onVerticalSyncChange;
 
     Configs::CAMERA_MODE Configs::default_camera_mode = Configs::CAMERA_MODE::PERSPECTIVE;
     Event<Configs::CAMERA_MODE> Configs::onDefaultCameraModeChange;
@@ -30,8 +31,8 @@ namespace HBE {
     }
 
     void Configs::setVerticalSync(bool v_sync) {
-        onVerticalSyncChange.invoke(v_sync);
-        vertical_sync = v_sync;
+		vertical_sync = v_sync;
+        onVerticalSyncChange.invoke();
     }
 
     Configs::CAMERA_MODE Configs::getDefaultCameraMode() {

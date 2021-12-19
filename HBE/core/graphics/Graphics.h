@@ -3,77 +3,58 @@
 #include "Core.h"
 #include <vector>
 #include <string>
-#include "DrawFlags.h"
 #include "glm/glm.hpp"
 
-using namespace glm;
 
 namespace HBE {
-    class Renderer;
+	class Renderer;
 
-    class RenderTarget;
+	class RenderTarget;
 
-    class GraphicPipeline;
+	class GraphicPipeline;
 
-    class Mesh;
+	class Mesh;
 
-    class Transform;
+	struct Transform;
 
-    class Material;
+	class Window;
 
-    class Window;
+	template<typename... Args>
+	class Event;
 
-    template<typename... Args>
-    class Event;
+	class HB_API Graphics {
+		static Renderer *renderer;
+		static Window *window;
+	public:
+		static const Mesh *DEFAULT_QUAD;
+		static const Mesh *DEFAULT_CUBE;
 
-    class HB_API Graphics {
-        static DRAW_FLAGS default_draw_flags;
-        static Renderer *renderer;
-        static Window *window;
-        static RenderTarget *render_target;
-    public:
-        static const GraphicPipeline *DEFAULT_SCREEN_PIPELINE;
-        static const GraphicPipeline *DEFAULT_MESH_PIPELINE;
-        static const Material *DEFAULT_MESH_MATERIAL;
-        static const GraphicPipeline *DEFAULT_INSTANCED_PIPELINE;
-        static const Mesh *DEFAULT_QUAD;
-        static const Mesh *DEFAULT_CUBE;
+		static void init();
 
-        /*
-         * Initialize graphic context and window
-         */
-        static void init();
+		static Window *getWindow();
 
-        static Window *getWindow();
+		static void
+		draw(mat4 transform_matrix, const Mesh &mesh, GraphicPipeline &material);
 
-        static void
-        draw(const Transform &transform, const Mesh &mesh, const Material &material);
+		static void drawInstanced(const Mesh &mesh, GraphicPipeline &pipeline);
 
-        static void drawInstanced(const Mesh &mesh, const Material &material);
+		static void render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix);
 
-        static void render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix);
+		static void setRenderTarget(RenderTarget *render_target);
 
-        static void present(const RenderTarget *render_target);
+		static RenderTarget *getDefaultRenderTarget();
 
-        static void clear();
+		static void terminate();
 
-        static RenderTarget *getRenderTarget();
+		static void beginFrame();
 
-        static void terminate();
+		static void endFrame(bool present = true);
 
-        static void onWindowSizeChange(int width,int height);
+		static Renderer *getRenderer();
 
-        static void clearDrawCache();
+	private:
+		static void initializeDefaultVariables();
 
-        static void setDefaultDrawFlags(DRAW_FLAGS drawFlags);
-
-        static DRAW_FLAGS getDefaultDrawFlags();
-
-        static Renderer *getRenderer();
-
-    private:
-        static void initializeDefaultVariables();
-
-    };
+	};
 
 }

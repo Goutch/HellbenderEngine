@@ -8,7 +8,7 @@
 #include <Configs.h>
 #include "GLFW/glfw3.h"
 #include "core/graphics/Framebuffer.h"
-#include "core/graphics/RenderTarget.h"
+#include "HBE/core/resource/RenderTarget.h"
 #include "core/utility/Log.h"
 #include "GL_ResourceFactory.h"
 

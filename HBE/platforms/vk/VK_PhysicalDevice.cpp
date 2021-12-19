@@ -12,6 +12,10 @@ namespace HBE {
         this->surface_handle = &surface_handle;
         Log::status("Looking for suitable GPU:");
         pickBestPhysicalDevice();
+
+        support_details = querySwapchainSupportDetails(handle);
+		vkGetPhysicalDeviceMemoryProperties(handle,&memory_properties);
+		vkGetPhysicalDeviceFeatures(handle, &supported_features);
     }
 
     void VK_PhysicalDevice::pickBestPhysicalDevice() {
@@ -36,7 +40,7 @@ namespace HBE {
         if (!suitable_devices_map.empty()) {
             handle = suitable_devices_map.rbegin()->second;
             vkGetPhysicalDeviceProperties(handle, &properties);
-            vkGetPhysicalDeviceFeatures(handle, &features);
+
             queue_family_indices = getSupportedQueueFamilies(handle);
             Log::status(std::string("\tFOUND:") + properties.deviceName);
         } else {
@@ -71,6 +75,7 @@ namespace HBE {
             swapchain_support =
                     !swapchain_support_details.present_modes.empty() && !swapchain_support_details.formats.empty();
         }
+
         return queue_families_indices.isComplete() && extension_support && swapchain_support;
     }
 
@@ -83,14 +88,25 @@ namespace HBE {
 
 
         for (uint32_t i = 0; i < queue_family_count; ++i) {
+
+            //present
+            VkBool32 present_supported = false;
+            vkGetPhysicalDeviceSurfaceSupportKHR(physical_device, i, *surface_handle, &present_supported);
+            if (present_supported) {
+                indices.present_family = i;
+            }
             //graphics
             if (supported_queue_families.at(i).queueFlags & VK_QUEUE_GRAPHICS_BIT) {
                 indices.graphics_family = i;
             }
-            //present
-            VkBool32 present_supported = false;
-            vkGetPhysicalDeviceSurfaceSupportKHR(physical_device, i, *surface_handle, &present_supported);
-            if (present_supported)indices.present_family = i;
+                //compute
+            else if (supported_queue_families.at(i).queueFlags & VK_QUEUE_COMPUTE_BIT) {
+                indices.compute_family = i;
+            }
+                //tranfer
+            else if ((supported_queue_families.at(i).queueFlags & VK_QUEUE_TRANSFER_BIT)) {
+                indices.transfer_family = i;
+            }
             //complete?
             if (indices.isComplete())break;
         }
@@ -98,12 +114,17 @@ namespace HBE {
         return indices;
     }
 
+
+    const VkPhysicalDeviceMemoryProperties& VK_PhysicalDevice::getMemoryProperties() const
+	{
+		return memory_properties;
+	}
     const VkPhysicalDevice &VK_PhysicalDevice::getHandle() const {
         return handle;
     }
 
     const VkPhysicalDeviceFeatures &VK_PhysicalDevice::getFeatures() const {
-        return features;
+        return supported_features;
     }
 
     const VkPhysicalDeviceProperties &VK_PhysicalDevice::getProperties() const {
@@ -140,7 +161,7 @@ namespace HBE {
         return device_required_extensions;
     }
 
-    SwapchainSupportDetails VK_PhysicalDevice::querySwapchainSupportDetails(VkPhysicalDevice const &physical_device) {
+    SwapchainSupportDetails VK_PhysicalDevice::querySwapchainSupportDetails(VkPhysicalDevice const &physical_device) const {
         SwapchainSupportDetails details;
 
         vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device, *surface_handle, &details.capabilities);
@@ -176,8 +197,8 @@ namespace HBE {
         return details;
     }
 
-    SwapchainSupportDetails VK_PhysicalDevice::getSwapchainSupportDetails() {
-        return querySwapchainSupportDetails(handle);
+    const SwapchainSupportDetails &VK_PhysicalDevice::getSwapchainSupportDetails() const {
+        return support_details;
     }
 
 }

@@ -11,7 +11,7 @@ namespace HBE {
 
     class GraphicPipeline;
 
-    class Transform;
+    struct Transform;
 
     class GL_ResourceFactory;
 
@@ -23,7 +23,6 @@ namespace HBE {
             const Transform *transform;
             const Mesh *mesh;
             const Material *material;
-            const DRAW_FLAGS draw_flags;
         };
         MAP_LIST(const Material*,MAP_LIST(const Mesh*, std::list<const Transform*>)) render_cache;
     private:
