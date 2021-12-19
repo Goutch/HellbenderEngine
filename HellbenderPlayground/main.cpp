@@ -66,7 +66,7 @@ void init() {
 	Camera &camera = camera_entity.attach<Camera>();
 	camera.render_target = Graphics::getDefaultRenderTarget();
 	camera.calculateProjection();
-	camera_entity.attach<CameraController>();
+	//camera_entity.attach<CameraController>();
 	camera_entity.get<Transform>().setPosition(vec3(0, 0, 0));
 	scene.setCameraEntity(camera_entity);
 

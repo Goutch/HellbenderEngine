@@ -1,4 +1,6 @@
 #include "Scene.h"
+#include "core/graphics/Graphics.h"
+
 namespace HBE {
 
 	bool Entity::valid() {
@@ -24,6 +26,7 @@ namespace HBE {
 		systems.push_back(new CameraSystem(this));
 		systems.push_back(new CameraControllerSystem(this));
 		systems.push_back(new InstancedRendererSystem(this));
+		Graphics::getDefaultRenderTarget()->onResolutionChange.subscribe(this, &Scene::calculateCameraProjection);
 	}
 
 
@@ -36,8 +39,14 @@ namespace HBE {
 
 	}
 
+	void Scene::calculateCameraProjection(RenderTarget *renderTarget) {
+
+		main_camera_entity.get<Camera>().calculateProjection();
+	}
+
 	void Scene::setCameraEntity(Entity camera) {
 		main_camera_entity = camera;
+		calculateCameraProjection(Graphics::getDefaultRenderTarget());
 	}
 
 	void Scene::update(float delta_t) {
@@ -53,6 +62,7 @@ namespace HBE {
 	}
 
 	Scene::~Scene() {
+		Graphics::getDefaultRenderTarget()->onResolutionChange.unsubscribe(this);
 		for (System *system:systems) {
 			delete system;
 		}
@@ -69,8 +79,8 @@ namespace HBE {
 
 	Entity Scene::createEntity(const std::string &name) {
 		Entity e = createEntity();
-		Identity& identity=e.attach<Identity>();
-		identity.name=name;
+		Identity &identity = e.attach<Identity>();
+		identity.name = name;
 		return e;
 	}
 
