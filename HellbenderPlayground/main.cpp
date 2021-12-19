@@ -48,13 +48,9 @@ void init() {
 
 	auto mesh = Resources::createMesh(MeshInfo{binding_infos.data(), binding_infos.size()}, "mesh");
 	auto instanced_mesh = Resources::createMesh(MeshInfo{binding_infos_instanced.data(), binding_infos_instanced.size()}, "mesh_instanced");
-
-
+	
 	Geometry::createCube(*mesh, 1, 1, 1, VERTEX_FLAG_UV);
 	Geometry::createCube(*instanced_mesh, 1, 1, 1, VERTEX_FLAG_UV);
-
-
-
 
 	//-------------------SCENE CREATION--------------------------------------
 	Scene &scene = *(new Scene());
