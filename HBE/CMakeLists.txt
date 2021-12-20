@@ -135,21 +135,21 @@ set(CORE_FILES
         core/input/Input.h
         core/input/Input.cpp
 
-        #core/entity/Scene.cpp
-        #core/entity/Scene.h
-        #core/entity/Entity.cpp
-        #core/entity/Entity.h
-        #core/entity/component/Transform.cpp
-        #core/entity/component/Transform.h
-        #core/entity/component/Camera.cpp
-        #core/entity/component/Component.h
-        #core/entity/component/CameraController.cpp
-        #core/entity/component/MeshRenderer.cpp
-        #core/entity/component/MeshRenderer.h
-        #core/entity/component/CameraController.h
-        #core/entity/component/Component.cpp
-        #core/entity/component/ModelRenderer.h
-        #core/entity/component/ModelRenderer.cpp
+        core/scene/ecs/Registry.h
+        core/scene/Scene.cpp
+        core/scene/System.h
+        core/scene/Components.h
+        core/scene/Components.cpp
+        core/scene/systems/CameraSystem.cpp
+        core/scene/systems/CameraSystem.h
+        core/scene/systems/MeshRendererSystem.cpp
+        core/scene/systems/MeshRendererSystem.h
+        core/scene/systems/CameraControllerSystem.cpp
+        core/scene/systems/CameraControllerSystem.h
+        core/scene/systems/RotatorSystem.cpp
+        core/scene/systems/RotatorSystem.h
+        core/scene/systems/InstancedRendererSystem.cpp
+        core/scene/systems/InstancedRendererSystem.h
 
         core/utility/Log.cpp
         core/utility/Geometry.cpp
@@ -160,26 +160,11 @@ set(CORE_FILES
         core/utility/Random.cpp
         core/utility/Random.h
         core/utility/RawVector.h
-
-        core/threading/JobManager.cpp
-        core/threading/JobManager.h
-
-        core/scene/Scene.cpp
-        core/scene/System.h
-        core/scene/Components.h
-        core/scene/systems/CameraSystem.cpp
-        core/scene/systems/CameraSystem.h
-        core/scene/systems/MeshRendererSystem.cpp
-        core/scene/systems/MeshRendererSystem.h
-        core/scene/Components.cpp
-        core/scene/systems/CameraControllerSystem.cpp
-        core/scene/systems/CameraControllerSystem.h
-        core/scene/systems/RotatorSystem.cpp
-        core/scene/systems/RotatorSystem.h
-        core/scene/ecs/Registry.h
         core/utility/Profiler.cpp
         core/utility/Profiler.h
-        core/scene/ecs/SparseRegistry/Registry.h core/scene/systems/InstancedRendererSystem.cpp core/scene/systems/InstancedRendererSystem.h)
+
+        core/threading/JobManager.cpp
+        core/threading/JobManager.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

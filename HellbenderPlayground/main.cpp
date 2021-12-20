@@ -16,12 +16,16 @@ void onAppUpdate(float delta) {
 void init() {
 	//-------------------RESOURCES CREATION--------------------------------------
 	ShaderInfo frag_info{SHADER_STAGE_FRAGMENT, "../../res/shaders/VK.frag"};
-	ShaderInfo vert_info{SHADER_STAGE_VERTEX, "../../res/shaders/VK.vert"};
+	ShaderInfo vert_info{SHADER_STAGE_VERTEX, "../../res/shaders/VK_instanced.vert"};
 	auto frag = Resources::createShader(frag_info, "frag");
 	auto vert = Resources::createShader(vert_info, "vert");
 
 
-	std::vector<VertexBindingInfo> binding_infos = {{0, sizeof(vec3) + sizeof(vec2)}};
+	std::vector<VertexBindingInfo> binding_infos = {{0, sizeof(vec3) + sizeof(vec2)},    //vertex binding
+													{1, sizeof(mat4),                    //instance binding
+															VERTEX_BINDING_FLAG_PER_INSTANCE
+															| VERTEX_BINDING_FLAG_FAST_WRITE
+															| VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS}};
 	GraphicPipelineInfo pipeline_info{};
 	pipeline_info.binding_infos = binding_infos.data();
 	pipeline_info.binding_info_count = binding_infos.size();
@@ -34,9 +38,9 @@ void init() {
 	mesh_info.binding_infos = binding_infos.data();
 	mesh_info.binding_info_count = binding_infos.size();
 	mesh_info.flags = MESH_FLAG_NONE;
-	auto cube_mesh = Resources::createMesh(mesh_info, "mesh");
+	auto mesh = Resources::createMesh(mesh_info, "mesh");
 
-	Geometry::createCube(*cube_mesh, 1, 1, 1, VERTEX_FLAG_UV);
+	Geometry::createCube(*mesh, 1, 1, 1, VERTEX_FLAG_UV);
 
 	//-------------------SCENE CREATION--------------------------------------
 	Scene &scene = *(new Scene());
@@ -45,14 +49,24 @@ void init() {
 	Entity camera_entity = scene.createEntity("camera");
 	Camera &camera = camera_entity.attach<Camera>();
 	camera.render_target = Graphics::getDefaultRenderTarget();
+	camera_entity.attach<CameraController>();
 
 	scene.setCameraEntity(camera_entity);
 
-	Entity cube_entity = scene.createEntity();
-	MeshRenderer& cube = cube_entity.attach<MeshRenderer>();
-	cube.pipeline = pipeline;
-	cube.mesh = cube_mesh;
-	cube_entity.get<Transform>().translate(vec3(0, 0, -5.0f));
+	int32_t range = 5; //10*10*10 = 1000 cubes
+	for (int i = -range; i < range; ++i) {
+		for (int j = -range; j < range; ++j) {
+			for (int k = -range; k < range; ++k) {
+				Entity cube_entity = scene.createEntity();
+				auto &renderer = cube_entity.attach<InstancedRenderer>();
+				renderer.pipeline = pipeline;
+				renderer.mesh = mesh;
+
+				cube_entity.get<Transform>().translate(vec3(i, j, k) * 2.0f);
+			}
+		}
+	}
+
 }
 
 int main() {
