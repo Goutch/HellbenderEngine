@@ -1,20 +1,28 @@
 #pragma once
+
 #include "Core.h"
 #include "Resource.h"
 
 namespace HBE {
-    class Shader;
+	class Shader;
 
-    class ComputeBuffer;
+	class ComputeBuffer;
 
-    struct ComputePipelineInfo{
-    	Shader* shader;
-    };
-    class HB_API ComputePipeline : public Resource {
-        virtual void setShader(const Shader *shader) = 0;
+	typedef uint32_t COMPUTE_PIPELINE_FLAG;
+	enum COMPUTE_PIPELINE_FLAGS {
+		COMPUTE_PIPELINE_FLAG_NONE = 0,
+	};
+	struct ComputePipelineInfo {
+		Shader *compute_shader;
+		COMPUTE_PIPELINE_FLAG flags = COMPUTE_PIPELINE_FLAG_NONE;
+	};
 
-        virtual void setComputeBuffer(ComputeBuffer* buffer)=0;
+	class HB_API ComputePipeline : public Resource {
 
-        virtual void dispatch(int x, int y, int z) = 0;
-    };
+		virtual void updateBuffer(ComputeBuffer *buffer) = 0;
+
+		virtual void dispatch(int x, int y, int z) = 0;
+
+		virtual void wait() = 0;
+	};
 }

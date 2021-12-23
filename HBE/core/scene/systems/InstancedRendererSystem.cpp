@@ -20,8 +20,14 @@ namespace HBE {
 		for (auto[handle, transform, instance_renderer]:group) {
 			if (instance_renderer.active) {
 				if (instance_renderer.mesh && instance_renderer.pipeline) {
-					transform_batches.try_emplace(instance_renderer.pipeline, std::unordered_map<Mesh *, std::vector<mat4>>());
-					transform_batches[instance_renderer.pipeline].try_emplace(instance_renderer.mesh, std::vector<mat4>());
+					if(transform_batches.find(instance_renderer.pipeline)==transform_batches.end())
+					{
+						transform_batches.emplace(std::make_pair(instance_renderer.pipeline, std::unordered_map<Mesh *, std::vector<mat4>>()));
+					}
+					if(transform_batches[instance_renderer.pipeline].find(instance_renderer.mesh)==transform_batches[instance_renderer.pipeline].end())
+					{
+						transform_batches[instance_renderer.pipeline].emplace(std::make_pair(instance_renderer.mesh, std::vector<mat4>()));
+					}
 					transform_batches[instance_renderer.pipeline][instance_renderer.mesh].emplace_back(transform.world());
 				} else
 					Log::warning("Instance renderer does not have a material and/or a mesh assigned");

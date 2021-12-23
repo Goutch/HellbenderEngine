@@ -6,7 +6,6 @@
 #include "VK_CommandPool.h"
 #include "VK_Mesh.h"
 #include "VK_Shader.h"
-#include "VK_VertexLayout.h"
 #include "VK_RenderPass.h"
 
 namespace HBE {

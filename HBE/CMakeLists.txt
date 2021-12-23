@@ -50,8 +50,6 @@ if (VULKAN_FOUND)
             platforms/vk/VK_Semaphore.h
             platforms/vk/VK_Fence.cpp
             platforms/vk/VK_Fence.h
-            platforms/vk/VK_VertexLayout.cpp
-            platforms/vk/VK_VertexLayout.h
             platforms/vk/VK_CommandPool.cpp
             platforms/vk/VK_CommandPool.h
             platforms/vk/VK_Buffer.cpp
@@ -113,7 +111,6 @@ set(CORE_FILES
         core/resource/Mesh.h
         core/resource/Shader.cpp
         core/resource/Shader.h
-        core/resource/MeshLayout.h
         core/resource/ResourceFactory.h
         core/resource/Resource.h
         core/resource/GraphicPipeline.h
@@ -122,7 +119,6 @@ set(CORE_FILES
         core/resource/Resources.h
         core/resource/Resources.cpp
         core/resource/Texture.cpp
-        core/resource/MeshLayout.cpp
 
         core/graphics/Window.h
         core/graphics/Renderer.h
@@ -164,7 +160,7 @@ set(CORE_FILES
         core/utility/Profiler.h
 
         core/threading/JobManager.cpp
-        core/threading/JobManager.h)
+        core/threading/JobManager.h platforms/vk/VK_ComputePipeline.cpp platforms/vk/VK_ComputePipeline.h platforms/vk/VK_PipelineLayout.cpp platforms/vk/VK_PipelineLayout.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

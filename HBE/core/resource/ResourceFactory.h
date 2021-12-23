@@ -19,9 +19,6 @@ namespace HBE {
     class ComputePipeline;
 	struct ComputePipelineInfo;
 
-    class MeshLayout;
-	struct MeshLayoutInfo;
-
     class RenderTarget;
     struct RenderTargetInfo;
 

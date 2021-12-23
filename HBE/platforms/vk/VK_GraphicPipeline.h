@@ -1,7 +1,6 @@
 #pragma once
 
 #include <core/resource/GraphicPipeline.h>
-#include <core/resource/MeshLayout.h>
 #include <array>
 #include "vulkan/vulkan.h"
 #include "unordered_map"
@@ -19,8 +18,6 @@ namespace HBE {
 
 	class VK_Buffer;
 
-
-
     class VK_GraphicPipeline : public GraphicPipeline {
 		VK_Device *device = nullptr;
 		VK_Renderer *renderer = nullptr;
@@ -36,6 +33,7 @@ namespace HBE {
 		std::vector<VkDescriptorSetLayoutBinding> descriptor_set_layout_bindings;
 		std::vector<VkPushConstantRange> push_constants_ranges;
 		std::array<std::unordered_map<uint32_t ,VkWriteDescriptorSet>, MAX_FRAMES_IN_FLIGHT> descriptor_sets_writes;
+
 		std::unordered_map<uint32_t, std::vector<VK_Buffer *>> uniform_buffers;
 
 		std::vector<UniformInput> inputs;

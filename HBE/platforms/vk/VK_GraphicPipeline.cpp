@@ -7,7 +7,6 @@
 #include "VK_RenderPass.h"
 #include "VK_CommandPool.h"
 #include "VK_Swapchain.h"
-#include "VK_VertexLayout.h"
 #include "algorithm"
 #include "VK_Fence.h"
 
@@ -192,7 +191,7 @@ namespace HBE {
 
 		VkPipelineDepthStencilStateCreateInfo depthStencil{};
 		depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-		depthStencil.depthTestEnable = VK_TRUE;
+		depthStencil.depthTestEnable = (info.flags & GRAPHIC_PIPELINE_FLAG_CULL_BACK) == GRAPHIC_PIPELINE_FLAG_CULL_BACK ? VK_TRUE : VK_FALSE;
 		depthStencil.depthWriteEnable = VK_TRUE;
 		depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
 		depthStencil.depthBoundsTestEnable = VK_FALSE;
@@ -220,10 +219,8 @@ namespace HBE {
 		pipelineInfo.pDynamicState = &dynamicState; // Optional
 		pipelineInfo.pTessellationState = VK_NULL_HANDLE;
 		pipelineInfo.layout = pipeline_layout_handle;
-		if (!(info.flags & GRAPHIC_PIPELINE_FLAG_NO_DEPTH_TEST))
-			pipelineInfo.pDepthStencilState = &depthStencil;
-		else
-			pipelineInfo.pDepthStencilState = nullptr;
+
+		pipelineInfo.pDepthStencilState = &depthStencil;
 
 		pipelineInfo.renderPass = render_pass;
 		pipelineInfo.subpass = 0;
