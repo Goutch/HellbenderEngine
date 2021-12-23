@@ -40,3 +40,6 @@ These are 2 tested compilers :
 ## Qestions and Answers
 Q: Why should I use this engine instead of unity/unreal?  
 A: You shouldn't this is a toy engine for me.  
+
+### Notes:
+Opengl is deprecated as of now I am not sure if I will support it in the future. Checkout the opengl branch if you want a working opengl version.
