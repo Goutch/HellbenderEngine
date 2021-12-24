@@ -7,7 +7,6 @@
 #include "GraphicPipeline.h"
 
 namespace HBE {
-	class MeshLayout;
 
 	typedef uint32_t MESH_FLAGS;
 	enum MESH_FLAG {

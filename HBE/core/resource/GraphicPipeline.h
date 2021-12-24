@@ -10,9 +10,6 @@ namespace HBE {
 	class Shader;
 
 	class Texture;
-
-	class MeshLayout;
-
 	class RenderTarget;
 
 	typedef uint32_t GRAPHIC_PIPELINE_FLAGS;
