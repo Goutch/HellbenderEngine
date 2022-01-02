@@ -24,10 +24,6 @@ namespace HBE {
 
 
         std::unordered_map<QUEUE_FAMILY, VK_Queue *> queues;
-        /* VkQueue graphics_queue;
-         VkQueue present_queue;
-         VkQueue compute_queue;
-         VkQueue transfer_queue;*/
         VK_PhysicalDevice *physical_device;
         VK_Allocator *allocator;
     public:
@@ -37,15 +33,9 @@ namespace HBE {
 
         const VK_PhysicalDevice &getPhysicalDevice() const;
 
-      /*  const VkQueue &getGraphicsQueue() const;
 
-        const VkQueue &getPresentQueue() const;
+        VK_Queue *getQueue(QUEUE_FAMILY family);
 
-        const VkQueue &getComputeQueue() const;
-
-        const VkQueue &getTransferQueue() const;*/
-
-        const VK_Queue* getQueue(QUEUE_FAMILY family);
         VK_Allocator *getAllocator();
 
         void wait();

@@ -90,7 +90,7 @@ namespace HBE {
 		return allocator;
 	}
 
-    const VK_Queue *VK_Device::getQueue(QUEUE_FAMILY family) {
+    VK_Queue *VK_Device::getQueue(QUEUE_FAMILY family) {
         return queues[family];
     }
 

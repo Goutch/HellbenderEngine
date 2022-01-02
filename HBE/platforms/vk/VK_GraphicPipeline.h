@@ -10,58 +10,58 @@
 #include "unordered_map"
 
 namespace HBE {
-	class VK_Device;
+    class VK_Device;
 
-	class VK_RenderPass;
+    class VK_RenderPass;
 
-	class VK_Renderer;
+    class VK_Renderer;
 
-	class VK_Buffer;
+    class VK_Buffer;
+
+    class VK_PipelineLayout;
 
     class VK_GraphicPipeline : public GraphicPipeline {
-		VK_Device *device = nullptr;
-		VK_Renderer *renderer = nullptr;
+        VkPipeline handle = VK_NULL_HANDLE;
+        VK_PipelineLayout *layout = nullptr;
 
-		VkPipelineLayout pipeline_layout_handle = VK_NULL_HANDLE;
-		VkPipeline handle = VK_NULL_HANDLE;
-		VkDescriptorSetLayout descriptor_set_layout_handle= VK_NULL_HANDLE;
-		VkDescriptorPool descriptor_pool_handle = VK_NULL_HANDLE;
+        VK_Device *device = nullptr;
+        VK_Renderer *renderer = nullptr;
 
-		std::vector<const VK_Shader *> shaders;
+        std::vector<const VK_Shader *> shaders;
+    public:
+        VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const GraphicPipelineInfo &info);
 
-		std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> descriptor_set_handles;
-		std::vector<VkDescriptorSetLayoutBinding> descriptor_set_layout_bindings;
-		std::vector<VkPushConstantRange> push_constants_ranges;
-		std::array<std::unordered_map<uint32_t ,VkWriteDescriptorSet>, MAX_FRAMES_IN_FLIGHT> descriptor_sets_writes;
+        VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const GraphicPipelineInfo &info,
+                           const VkRenderPass &render_pass);
 
-		std::unordered_map<uint32_t, std::vector<VK_Buffer *>> uniform_buffers;
+        void setDynamicUniform(const std::string &name, const void *data) override;
 
-		std::vector<UniformInput> inputs;
-		std::unordered_map<std::string,uint32_t> name_input_index;
-		std::unordered_map<uint32_t ,uint32_t> binding_input_index;
-		std::unordered_map<std::string,uint32_t> name_push_constant_index;
-	public:
-		VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer,const GraphicPipelineInfo& info);
-		VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer,const GraphicPipelineInfo& info,const VkRenderPass& render_pass);
-		void setDynamicUniform(const std::string &name,const void *data);
-		void setDynamicUniform(uint32_t binding,const  void *data) ;
-		void setUniform(const std::string &name,const  void *data);
-		void setUniform(uint32_t binding,const  void *data);
-		void pushConstant(const std::string &name,const  void *data);
-		void setTexture(uint32_t binding, const Texture *texture);
-		void setTexture(const std::string &name, const Texture *texture);
+        void setDynamicUniform(uint32_t binding, const void *data) override;
 
-		~VK_GraphicPipeline() override;
+        void setUniform(const std::string &name, const void *data) override;
 
-		void bind() const override;
+        void setUniform(uint32_t binding, const void *data) override;
 
-		void unbind() const override;
+        void pushConstant(const std::string &name, const void *data) override;
 
-		void createPipelineLayout();
-		void createDescriptorSets();
+        void setTexture(uint32_t binding, const Texture *texture) override;
+
+        void setTexture(const std::string &name, const Texture *texture) override;
 
         void setTexture(uint32_t binding, const RenderTarget *render_target) override;
 
         void setTexture(const std::string &name, const RenderTarget *render_target) override;
+
+        ~VK_GraphicPipeline() override;
+
+        void bind() const override;
+
+        void unbind() const override;
+
+        void createPipelineLayout();
+
+        void createDescriptorSets();
+
+
     };
 }
