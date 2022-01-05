@@ -53,9 +53,9 @@ namespace HBE {
 		for (auto queue:queues) {
 			delete queue.second;
 		}
+		queues.clear();
 		delete allocator;
 		vkDestroyDevice(handle, nullptr);
-
 	}
 
 	const VkDevice &VK_Device::getHandle() const {

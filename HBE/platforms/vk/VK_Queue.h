@@ -22,7 +22,7 @@ namespace HBE {
     class VK_Queue {
     private:
         VkQueue handle;
-        VK_Device *device;
+        VkDevice device_handle;
         VK_CommandPool *command_pool = nullptr;
         VK_Fence *fence;
     public:

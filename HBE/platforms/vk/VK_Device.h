@@ -7,41 +7,41 @@
 #include "VK_Queue.h"
 
 namespace HBE {
-    class VK_RenderPass;
+	class VK_RenderPass;
 
-    class VK_Swapchain;
+	class VK_Swapchain;
 
-    class VK_GraphicPipeline;
+	class VK_GraphicPipeline;
 
-    class VK_CommandPool;
+	class VK_CommandPool;
 
-    class VK_Allocator;
+	class VK_Allocator;
 
-    class VK_Queue;
+	class VK_Queue;
 
-    class VK_Device {
-        VkDevice handle;
-
-
-        std::unordered_map<QUEUE_FAMILY, VK_Queue *> queues;
-        VK_PhysicalDevice *physical_device;
-        VK_Allocator *allocator;
-    public:
-        VK_Device(VK_PhysicalDevice &physical_device);
-
-        const VkDevice &getHandle() const;
-
-        const VK_PhysicalDevice &getPhysicalDevice() const;
+	class VK_Device {
+		VkDevice handle;
 
 
-        VK_Queue *getQueue(QUEUE_FAMILY family);
+		std::unordered_map<QUEUE_FAMILY, VK_Queue*> queues;
+		VK_PhysicalDevice *physical_device;
+		VK_Allocator *allocator;
+	public:
+		VK_Device(VK_PhysicalDevice &physical_device);
 
-        VK_Allocator *getAllocator();
+		const VkDevice &getHandle() const;
 
-        void wait();
+		const VK_PhysicalDevice &getPhysicalDevice() const;
 
-        ~VK_Device();
-    };
+
+		VK_Queue *getQueue(QUEUE_FAMILY family);
+
+		VK_Allocator *getAllocator();
+
+		void wait();
+
+		~VK_Device();
+	};
 
 }
 
