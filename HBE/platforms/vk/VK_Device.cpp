@@ -5,6 +5,7 @@
 #include "set"
 #include "VK_Allocator.h"
 #include "VK_CONSTANTS.h"
+
 namespace HBE {
 	VK_Device::VK_Device(VK_PhysicalDevice &physical_device) {
 		this->physical_device = &physical_device;
@@ -40,19 +41,18 @@ namespace HBE {
 		if (vkCreateDevice(physical_device.getHandle(), &device_create_info, nullptr, &handle) != VK_SUCCESS) {
 			Log::error("Failed to create logical device");
 		}
-        queues.emplace(QUEUE_FAMILY_GRAPHICS,new VK_Queue(this,indices.graphics_family.value()));
-        queues.emplace(QUEUE_FAMILY_PRESENT,new VK_Queue(this,indices.present_family.value()));
-        queues.emplace(QUEUE_FAMILY_COMPUTE,new VK_Queue(this,indices.compute_family.value()));
-        queues.emplace(QUEUE_FAMILY_TRANSFER,new VK_Queue(this,indices.transfer_family.value()));
-		/*vkGetDeviceQueue(handle, indices.graphics_family.value(), 0, &graphics_queue);
-		vkGetDeviceQueue(handle, indices.present_family.value(), 0, &present_queue);
-		vkGetDeviceQueue(handle, indices.compute_family.value(), 0, &compute_queue);
-		vkGetDeviceQueue(handle, indices.transfer_family.value(), 0, &transfer_queue);*/
+		queues.emplace(QUEUE_FAMILY_GRAPHICS, new VK_Queue(this, indices.graphics_family.value()));
+		queues.emplace(QUEUE_FAMILY_PRESENT, new VK_Queue(this, indices.present_family.value()));
+		queues.emplace(QUEUE_FAMILY_COMPUTE, new VK_Queue(this, indices.compute_family.value()));
+		queues.emplace(QUEUE_FAMILY_TRANSFER, new VK_Queue(this, indices.transfer_family.value()));
 
 		allocator = new VK_Allocator(this);
 	}
 
 	VK_Device::~VK_Device() {
+		for (auto queue:queues) {
+			delete queue.second;
+		}
 		delete allocator;
 		vkDestroyDevice(handle, nullptr);
 
@@ -63,24 +63,24 @@ namespace HBE {
 	}
 
 
-
 	const VK_PhysicalDevice &VK_Device::getPhysicalDevice() const {
 		return *physical_device;
 	}
-   /* const VkQueue &VK_Device::getGraphicsQueue() const {
-        return graphics_queue;
-    }
-	const VkQueue &VK_Device::getPresentQueue() const {
-		return present_queue;
-	}
 
-    const VkQueue &VK_Device::getComputeQueue() const {
-        return compute_queue;
-    }
+	/* const VkQueue &VK_Device::getGraphicsQueue() const {
+		 return graphics_queue;
+	 }
+	 const VkQueue &VK_Device::getPresentQueue() const {
+		 return present_queue;
+	 }
 
-    const VkQueue &VK_Device::getTransferQueue() const {
-        return transfer_queue;
-    }*/
+	 const VkQueue &VK_Device::getComputeQueue() const {
+		 return compute_queue;
+	 }
+
+	 const VkQueue &VK_Device::getTransferQueue() const {
+		 return transfer_queue;
+	 }*/
 	void VK_Device::wait() {
 		vkDeviceWaitIdle(handle);
 	}
@@ -90,8 +90,8 @@ namespace HBE {
 		return allocator;
 	}
 
-    VK_Queue *VK_Device::getQueue(QUEUE_FAMILY family) {
-        return queues[family];
-    }
+	VK_Queue *VK_Device::getQueue(QUEUE_FAMILY family) {
+		return queues[family];
+	}
 
 }

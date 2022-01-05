@@ -27,7 +27,7 @@ namespace HBE {
         VK_Fence *fence;
     public:
         VK_Queue(VK_Device *device, uint32_t family_index);
-
+		~VK_Queue();
         const VkQueue &getHandle() const;
 
         void wait() const;
