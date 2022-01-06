@@ -28,6 +28,7 @@ namespace HBE {
 		create_info.enabledExtensionCount = static_cast<uint32_t>(required_extensions.size());
 		create_info.ppEnabledExtensionNames = required_extensions.data();
 
+
 		if (!checkExtensionsSupported(required_extensions))
 			Log::error("Missing extensions to create vulkan instance");
 

@@ -16,7 +16,8 @@ namespace HBE {
 		vkGetDeviceQueue(device_handle, family_index, 0, &handle);
 
 		command_pool = new VK_CommandPool(device, 1);
-		fence=new VK_Fence(*device);
+		fence = new VK_Fence(*device);
+		this->family_index = family_index;
 	}
 
 
@@ -75,6 +76,10 @@ namespace HBE {
 		delete fence;
 		delete command_pool;
 
+	}
+
+	uint32_t VK_Queue::getFamilyIndex() {
+		return family_index;
 	}
 
 

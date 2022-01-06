@@ -117,7 +117,12 @@ namespace HBE {
 		imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 
-		imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		std::array<uint32_t, 3> queues = {device->getQueue(QUEUE_FAMILY_GRAPHICS)->getFamilyIndex(),
+										  device->getQueue(QUEUE_FAMILY_TRANSFER)->getFamilyIndex(),
+										  device->getQueue(QUEUE_FAMILY_COMPUTE)->getFamilyIndex()};
+		imageInfo.sharingMode = VK_SHARING_MODE_CONCURRENT;
+		imageInfo.pQueueFamilyIndices = queues.data();
+		imageInfo.queueFamilyIndexCount = queues.size();
 		imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 		imageInfo.flags = 0; // Optional
 

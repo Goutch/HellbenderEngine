@@ -15,8 +15,8 @@ void onAppUpdate(float delta) {
 
 void init() {
     //-------------------RESOURCES CREATION--------------------------------------
-    ShaderInfo frag_info{SHADER_STAGE_FRAGMENT, "../../res/shaders/VK.frag"};
-    ShaderInfo vert_info{SHADER_STAGE_VERTEX, "../../res/shaders/VK_instanced.vert"};
+    ShaderInfo frag_info{SHADER_STAGE_FRAGMENT, "../../res/shaders/defaults/VK.frag"};
+    ShaderInfo vert_info{SHADER_STAGE_VERTEX, "../../res/shaders/defaults/VK_instanced.vert"};
     auto frag = Resources::createShader(frag_info, "frag");
     auto vert = Resources::createShader(vert_info, "vert");
 
