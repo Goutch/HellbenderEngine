@@ -1,7 +1,3 @@
-//
-// Created by user on 11/10/2021.
-//
-
 #include "Profiler.h"
 
 namespace HBE {

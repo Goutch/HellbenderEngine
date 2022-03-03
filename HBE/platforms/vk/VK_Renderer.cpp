@@ -276,9 +276,13 @@ namespace HBE {
 	}
 
 	void VK_Renderer::draw(mat4 transform_matrix, const Mesh &mesh, GraphicPipeline &pipeline) {
-		auto it_material = render_cache.try_emplace(&pipeline).first;
-		auto it_mesh = it_material->second.try_emplace(&mesh).first;
-		it_mesh->second.emplace_back(transform_matrix);
+		auto pipeline_it = render_cache.find(&pipeline);
+		if (pipeline_it == render_cache.end()) render_cache.emplace(&pipeline, MAP(const Mesh*, std::vector<mat4>)());
+
+		auto mesh_it = pipeline_it->second.find(&mesh);
+		if (mesh_it == pipeline_it->second.end())pipeline_it->second.emplace(&mesh, std::vector<mat4>());
+
+		mesh_it->second.emplace_back(transform_matrix);
 	}
 
 	void VK_Renderer::drawInstanced(const HBE::Mesh &mesh,
@@ -309,9 +313,9 @@ namespace HBE {
 
 	void VK_Renderer::createDefaultResources() {
 		uint8_t texture_data[16] = {255, 0, 0, 255,
-								  0, 255, 0, 255,
-								  0, 0, 255, 255,
-								  0, 0, 0, 255};
+									0, 255, 0, 255,
+									0, 0, 255, 255,
+									0, 0, 0, 255};
 		float image_data[16]{1, 0, 0, 1,
 							 0, 1, 0, 1,
 							 0, 0, 1, 1,
@@ -369,5 +373,7 @@ namespace HBE {
 	void VK_Renderer::waitCurrentFrame() {
 		frames[current_frame].in_flight_fence->wait();
 	}
+
+
 }
 

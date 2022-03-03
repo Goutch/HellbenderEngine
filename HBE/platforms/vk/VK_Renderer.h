@@ -39,7 +39,9 @@ namespace HBE {
 			VK_Semaphore *image_available_semaphore;
 		};
 
+
 		MAP(GraphicPipeline*, MAP(const Mesh*, std::vector<mat4>)) render_cache;
+		MAP(GraphicPipeline*, MAP(const Mesh*, std::vector<mat3>)) render_cache_2D;
 		MAP(GraphicPipeline*, const Mesh*) instanced_cache;
 
 		VK_Window *window;

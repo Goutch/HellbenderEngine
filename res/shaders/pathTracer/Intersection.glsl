@@ -19,39 +19,44 @@ struct Sphere{
     float radius;
 };
 
-const float FLOAT_MAX=10000000.0f;
-Intersection[2] intersectCube(Ray ray, Cube cube)
+struct Plane{
+    vec3 normal;
+    float distance;
+};
+
+Intersection intersectCube(Ray ray, Cube cube)
 {
-    vec3 ts0=vec3((cube.min-ray.origin)/ray.direction);
-    vec3 ts1=vec3((cube.max-ray.origin)/ray.direction);
+    vec3 min_ts=vec3((cube.min-ray.origin)/ray.direction);
+    vec3 max_ts=vec3((cube.max-ray.origin)/ray.direction);
 
-    if (ts0.x<0.)ts0.x=FLOAT_MAX;
-    if (ts0.y<0.)ts0.y=FLOAT_MAX;
-    if (ts0.z<0.)ts0.z=FLOAT_MAX;
-    if (ts1.x<0.)ts0.x=FLOAT_MAX;
-    if (ts1.y<0.)ts0.y=FLOAT_MAX;
-    if (ts1.z<0.)ts0.z=FLOAT_MAX;
+    vec3 ts0=min(min_ts, max_ts);
 
-    uint t0_index=ts0.x<ts0.y?(ts0.x<ts0.z?0:2):(ts0.y<ts0.z?1:2);
-    uint t1_index=ts1.x<ts1.y?(ts1.x<ts1.z?0:2):(ts1.y<ts1.z?1:2);
-    vec3 normal0=vec3(0., 0., 0.);
-    vec3 normal1=vec3(0., 0., 0.);
+    vec3 ts1=max(min_ts, max_ts);
+
+    uint t0_index=ts0.x>ts0.y?
+    (ts0.x>ts0.z?0:2):
+    (ts0.y>ts0.z?1:2);
+
+    uint t1_index=ts1.x<ts1.y?
+    (ts1.x<ts1.z?0:2):
+    (ts1.y<ts1.z?1:2);
+
+    vec3 t0_normal=vec3(0., 0., 0.);
+    vec3 t1_normal=vec3(0., 0., 0.);
+
     float t0=ts0[t0_index];
     float t1=ts1[t1_index];
 
-    normal0[t0_index]=1.;
-    normal1[t1_index]=1.;
-    Intersection intersections[2];
+    t0_normal[t0_index]=(-ray.direction[t0_index]);
+    t0_normal=normalize(t0_normal);
 
-    if (t0>t1)
-    {
-        intersections[0]=Intersection(t0, normal0);
-        intersections[1]=Intersection(t1, normal1);
-    }
-    else
-    {
-        intersections[1]=Intersection(t0, normal0);
-        intersections[0]=Intersection(t1, normal1);
-    }
-    return intersections;
+    t1_normal[t1_index]=(ray.direction[t1_index]);
+    t1_normal=normalize(t1_normal);
+
+    Intersection intersection;
+
+    intersection.t = t0;
+    intersection.normal = t0_normal;
+
+    return intersection;
 }

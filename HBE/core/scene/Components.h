@@ -12,7 +12,23 @@
 namespace HBE {
 
 	struct HB_API Identity {
-		std::string name="Default";
+		std::string name = "Default";
+	};
+
+	struct HB_API Transform2D {
+		mat3 local = mat3(1.0f);
+		Transform2D *parent;
+		mat3 world() const;
+		vec2 worldPosition() const;
+		void translate(vec2 translation);
+		vec2 position();
+		void setPosition(vec2 pos);
+		float rotation() const;
+		void rotate(float rotation);
+		void setRotaton(float rotation);
+		float worldRotation() const;
+		void setScale(vec2 s);
+		vec2 scale() const;
 	};
 
 	struct HB_API Transform {
@@ -21,7 +37,7 @@ namespace HBE {
 		mat4 world() const;
 		void translate(vec3 translation);
 		vec3 position() const;
-
+		vec3 worldPosition() const;
 		void setPosition(vec3 pos);
 		quat rotation() const;
 		void rotate(quat rot);
@@ -47,10 +63,19 @@ namespace HBE {
 		vec3 left() const;
 	};
 
+	struct HB_API Camera2D {
+		bool active = true;
+		mat4 projection = mat3(1.0f);
+		float zoom_ratio=10;
+		RenderTarget *render_target = nullptr;
+		void calculateProjection();
+		float aspectRatio();
+	};
+
 	struct HB_API Camera {
 		mat4 projection = mat4(1.0f);
 		float fov = 90.0f;
-		float render_distance = 500.0f;
+		float render_distance = 100.0f;
 		float near = 0.1f;
 		bool active = true;
 		RenderTarget *render_target = nullptr;

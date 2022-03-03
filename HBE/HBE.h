@@ -16,6 +16,7 @@
 #include "core/resource/Resources.h"
 
 #include "core/graphics/Graphics.h"
+#include "core/graphics/Window.h"
 #include "HBE/core/resource/RenderTarget.h"
 
 #include "core/input/Input.h"
@@ -28,6 +29,9 @@
 #include "core/utility/Log.h"
 #include "core/utility/Geometry.h"
 #include "core/utility/Random.h"
+#include "core/utility/Profiler.h"
 
 #include <glm/glm.hpp>
 #include "glm/gtx/quaternion.hpp"
+
+#include "core/math/fixed.h"

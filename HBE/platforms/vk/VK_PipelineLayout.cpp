@@ -11,22 +11,53 @@ namespace HBE {
 										 size_t count) {
 
 		this->device = device;
+
+		std::unordered_map<uint32_t, std::string> binding_names;
+		std::unordered_map<uint32_t, VkShaderStageFlags> binding_stages;
 		for (size_t i = 0; i < count; ++i) {
-			auto shader_bindings = shaders[i]->getLayoutBindings();
-			descriptor_set_layout_bindings.insert(descriptor_set_layout_bindings.end(), shader_bindings.begin(),
-												  shader_bindings.end());
+			auto shader_inputs = shaders[i]->getInputs();
+			for (size_t j = 0; j < shader_inputs.size(); ++j) {
+				auto it = binding_names.find(shader_inputs[j].binding);
+				//binding already exist
+				if (it != binding_names.end()) {
+					//if has the same name then add the shader stage bit
+					if (it->second == shader_inputs[j].name) {
+						binding_stages.at(shader_inputs[j].binding) |= shaders[i]->getVkStage();
+					} else {
+						Log::error("Binding#" + std::to_string(shader_inputs[j].binding) + " has multiple name definitions");
+					}
+				} else {
+					binding_stages.emplace(shader_inputs[j].binding, shaders[i]->getVkStage());
+				}
+
+				name_input_index.emplace(shader_inputs[j].name, inputs.size() + j);
+				binding_input_index.emplace(shader_inputs[j].binding, inputs.size() + j);
+				binding_names.emplace(shader_inputs[j].binding, shader_inputs[j].name);
+			}
+			inputs.insert(inputs.end(), shader_inputs.begin(), shader_inputs.end());
+
 
 			auto shader_ranges = shaders[i]->getPushConstantRanges();
 			push_constants_ranges.insert(push_constants_ranges.end(), shader_ranges.begin(), shader_ranges.end());
 
-			auto shader_inputs = shaders[i]->getInputs();
+			auto shader_bindings = shaders[i]->getLayoutBindings();
 
-			for (size_t j = 0; j < shader_inputs.size(); ++j) {
-				name_input_index.emplace(shader_inputs[j].name, inputs.size() + j);
-				binding_input_index.emplace(shader_inputs[j].binding, inputs.size() + j);
-			}
-			inputs.insert(inputs.end(), shader_inputs.begin(), shader_inputs.end());
+			for (size_t j = 0; j < shader_bindings.size(); ++j) {
+				bool updated = false;
+				for (size_t k = 0; k < descriptor_set_layout_bindings.size(); ++k) {
+					if (descriptor_set_layout_bindings[k].binding == shader_bindings[j].binding) {
+						updated = true;
+						descriptor_set_layout_bindings[j].stageFlags = binding_stages[shader_bindings[j].binding];
+					}
+
+				}
+				if (!updated)
+					descriptor_set_layout_bindings.emplace_back(shader_bindings[j]);
+			};
+
+
 		}
+
 
 		VkDescriptorSetLayoutCreateInfo layoutInfo{};
 		layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;

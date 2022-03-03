@@ -1,7 +1,3 @@
-//
-// Created by User on 03-Jun.-2020.
-//
-
 #include "Geometry.h"
 #include <algorithm>
 
@@ -12,10 +8,10 @@ namespace HBE {
 				case 0://VERTEX_FLAG_NONE
 				{
 					std::vector<float> vertex_positions = {
-							0.5f * size_x, -0.5f * size_y, .0f, 1.0f, 0.0f, 0, 0, -1.0f,
-							0.5f * size_x, 0.5f * size_y, .0f, 1.0f, 1.0f, 0, 0, -1.0f,
-							-0.5f * size_x, 0.5f * size_y, .0f, 0.0f, 1.0f, 0, 0, -1.0f,
-							-0.5f * size_x, -0.5f * size_y, .0f, 0.0f, 0.0f, 0, 0, -1.0
+							0.5f * size_x, -0.5f * size_y,
+							0.5f * size_x, 0.5f * size_y,
+							-0.5f * size_x, 0.5f * size_y,
+							-0.5f * size_x, -0.5f * size_y
 					};
 					mesh.setBuffer(0, vertex_positions.data(), vertex_positions.size());
 					break;
@@ -23,9 +19,9 @@ namespace HBE {
 				case 1://VERTEX_FLAG_UV
 				{
 					std::vector<float> vertex_positions = {
-							0.5f * size_x, -0.5f * size_y, .0f, 1.0f,
-							0.5f * size_x, 0.5f * size_y, .0f, 1.0f,
-							-0.5f * size_x, 0.5f * size_y, .0f, 0.0f,
+							0.5f * size_x, -0.5f * size_y, 1.0f, 0.0f,
+							0.5f * size_x, 0.5f * size_y,1.0f, 1.0f,
+							-0.5f * size_x, 0.5f * size_y, 0.0f, 1.0f,
 							-0.5f * size_x, -0.5f * size_y, .0f, 0.0f,
 					};
 					mesh.setBuffer(0, vertex_positions.data(), vertex_positions.size());

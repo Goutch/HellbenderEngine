@@ -174,7 +174,7 @@ namespace HBE {
         VkPipelineDepthStencilStateCreateInfo depthStencil{};
         depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
         depthStencil.depthTestEnable =
-                (info.flags & GRAPHIC_PIPELINE_FLAG_CULL_BACK) == GRAPHIC_PIPELINE_FLAG_CULL_BACK ? VK_TRUE : VK_FALSE;
+                (info.flags & GRAPHIC_PIPELINE_FLAG_IGNORE_DEPTH_TEST) == GRAPHIC_PIPELINE_FLAG_IGNORE_DEPTH_TEST ? VK_FALSE : VK_TRUE;
         depthStencil.depthWriteEnable = VK_TRUE;
         depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
         depthStencil.depthBoundsTestEnable = VK_FALSE;

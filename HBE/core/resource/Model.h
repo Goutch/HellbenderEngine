@@ -4,12 +4,13 @@
 #include "core/utility/Log.h"
 #include "core/utility/ModelImporter.h"
 #include "core/resource/GraphicPipeline.h"
-
+#include "mutex"
 namespace HBE {
     class HB_API Model : public Resource {
         std::string path;
         std::vector<std::pair<Mesh *, GraphicPipeline *>> meshes;
-
+        std::vector<std::pair<MeshData, MaterialData >> meshes_data;
+        std::mutex data_mutex;
         void clearMeshes();
 
     public:
@@ -27,6 +28,7 @@ namespace HBE {
 
         virtual ~Model();
 
+        void constructModel();
     };
 
 }

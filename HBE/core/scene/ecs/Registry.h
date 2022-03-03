@@ -343,13 +343,14 @@ namespace HBE {
 						continue;
 					size_t entity_count = entities.size();
 					for (size_t j = 0; j < entity_count; ++j) {
-						while (!raw_pages[i]->valid[j]) {
+						while (!raw_pages[i]->has(entities[j])) {
 							entity_count--;
 							std::swap(entities[j], entities.back());
+							entities.resize(entity_count);
 							if (j < entity_count) break;
 						}
 					}
-					entities.resize(entity_count);
+
 				}
 				if (entities.size() != 0) {
 					fillPages(std::index_sequence_for<Components...>());
@@ -450,7 +451,14 @@ namespace HBE {
 
 		template<typename Component>
 		bool has(entity_handle handle) {
-			return pages[getPage(handle)]->valid(handle);
+			const size_t hash = typeid(Component).hash_code();
+			auto page= pages[getPage(handle)];
+			auto comp_page_it= page->component_pages.find(hash);
+
+			if(comp_page_it!=page->component_pages.end())
+				return comp_page_it->second->has(handle);
+			else
+				return false;
 		}
 
 		void destroy(entity_handle handle) {

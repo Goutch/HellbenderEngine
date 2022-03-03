@@ -1,12 +1,13 @@
 #pragma once
 
+#include "Core.h"
 #include "Log.h"
 #include "Clock.h"
 #include "stack"
 #include "unordered_map"
 
 namespace HBE {
-	class Profiler {
+	class HB_API Profiler {
 		struct Profile {
 			std::string message;
 			Clock clock;

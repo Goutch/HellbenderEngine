@@ -10,11 +10,6 @@ namespace HBE {
 		VERTEX_FLAG_UV = 1,
 		VERTEX_FLAG_NORMAL = 2,
 	};
-	struct HB_API UsedBuffers {
-		bool vertex_position = true;
-		bool vertex_uv = true;
-		bool vertex_normal = true;
-	};
 
 	class HB_API Geometry {
 

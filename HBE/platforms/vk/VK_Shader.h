@@ -63,6 +63,8 @@ namespace HBE {
 
         const std::vector<VertexInput> &getAttributeDescriptions() const;
 
+        VkShaderStageFlags getVkStage() const;
+
     private:
         void load(const std::string &path);
 

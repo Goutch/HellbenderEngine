@@ -17,9 +17,6 @@
 
 
 namespace HBE {
-#ifdef USE_ENTT
-	typedef entt::entity entity_handle;
-#endif
 
 	class Scene;
 
@@ -76,7 +73,7 @@ namespace HBE {
 		Entity createEntity(const std::string &name);
 		Entity createEntity();
 		void destroyEntity(Entity entity);
-		Entity getCameraEntity();
+		Entity* getCameraEntity();
 		void setCameraEntity(Entity camera);
 		void addSystem(System *system);
 

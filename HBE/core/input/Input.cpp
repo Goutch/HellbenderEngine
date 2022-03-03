@@ -39,6 +39,7 @@ namespace HBE {
 		Input::window = static_cast<GLFWwindow *>(Graphics::getWindow()->getHandle());
 		glfwSetScrollCallback(window, scrollCallback);
 		glfwSetKeyCallback(window, keyCallback);
+		glfwSetMouseButtonCallback(window, mouseButtonCallback);
 		for (int i = 0; i < 348; ++i) {
 			down[i] = false;
 			released[i] = false;
@@ -83,6 +84,26 @@ namespace HBE {
 			reset_queue.emplace(key);
 		}
 	}
+	void Input::mouseButtonCallback(GLFWwindow* window, int key, int action, int mods)
+	{
+		released[key] = false;
+		down[key] = false;
+		repeat[key] = false;
+		if (action == GLFW_PRESS) {
+			down[key] = true;
+			pressed[key] = true;
+			reset_queue.emplace(key);
+		}
+		if (action == GLFW_REPEAT) {
+			repeat[key] = true;
+		}
+		if (action == GLFW_RELEASE) {
+			repeat[key] = false;
+			pressed[key] = false;
+			released[key] = true;
+			reset_queue.emplace(key);
+		}
+	}
 
 	void Input::pollEvents() {
 		while (!reset_queue.empty()) {
@@ -90,8 +111,10 @@ namespace HBE {
 			down[reset_queue.front()] = false;
 			reset_queue.pop();
 		}
+		wheel_offset = 0;
 		glfwPollEvents();
 	}
+
 
 
 }

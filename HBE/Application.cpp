@@ -65,11 +65,11 @@ namespace HBE {
 			onUpdate.invoke(delta_t);
 			current_scene->update(delta_t);
 			Profiler::end();
-			Entity camera_entity = current_scene->getCameraEntity();
+			Entity camera_entity = *current_scene->getCameraEntity();
 
 			if (camera_entity.valid()) {
-				Camera &camera = camera_entity.get<Camera>();
-				if (camera.active) {
+				if(camera_entity.has<Camera>()||
+				   camera_entity.has<Camera2D>()){
 					Profiler::begin("DRAW");
 					onDraw.invoke();
 					current_scene->draw();

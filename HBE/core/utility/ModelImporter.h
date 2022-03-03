@@ -22,7 +22,7 @@ namespace HBE {
     class HB_API ModelImporter {
 
     public:
-        static std::vector<std::pair<MeshData, MaterialData>> *load(std::string path);
-    };
+		static void load(std::string path, std::vector<std::pair<MeshData, MaterialData>> &meshes);
+	};
 
 }

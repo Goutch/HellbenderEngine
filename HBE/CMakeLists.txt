@@ -62,9 +62,7 @@ if (VULKAN_FOUND)
             platforms/vk/VK_RenderTarget.cpp
             platforms/vk/VK_RenderTarget.h
             platforms/vk/VK_Queue.cpp
-            platforms/vk/VK_Queue.h
-            platforms/vk/VK_Scheduler.cpp
-            platforms/vk/VK_Scheduler.h)
+            platforms/vk/VK_Queue.h)
 
     add_compile_definitions(VULKAN_RENDERER)
 
@@ -160,7 +158,11 @@ set(CORE_FILES
         core/utility/Profiler.h
 
         core/threading/JobManager.cpp
-        core/threading/JobManager.h platforms/vk/VK_ComputePipeline.cpp platforms/vk/VK_ComputePipeline.h platforms/vk/VK_PipelineLayout.cpp platforms/vk/VK_PipelineLayout.h)
+        core/threading/JobManager.h
+        platforms/vk/VK_ComputePipeline.cpp
+        platforms/vk/VK_ComputePipeline.h
+        platforms/vk/VK_PipelineLayout.cpp
+        platforms/vk/VK_PipelineLayout.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}
@@ -180,7 +182,8 @@ target_include_directories(${PROJECT_NAME}
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/include/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/")
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/"
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/fpm/include/")
 
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -189,18 +192,8 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     if (WIN32)
         message("Using mingw compiler")
-        target_link_libraries(${PROJECT_NAME}
-                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/mingw/libassimp.a"
-                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/mingw/libzlibstatic.a"
-                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/mingw/libIrrXML.a"
-
-                )
     else ()
         message("Using GCC Compiler")
-        target_link_libraries(${PROJECT_NAME}
-                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/gcc/libassimp.a"
-                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/gcc/libzlibstatic.a"
-                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/gcc/libIrrXML.a")
     endif ()
 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
@@ -211,16 +204,8 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     message("Using visual studio compiler")
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         MESSAGE("debug mode")
-        target_link_libraries(${PROJECT_NAME}
-                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/debug/assimp-vc142-mt.lib"
-                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/debug/zlibstatic.lib"
-                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/debug/IrrXML.lib")
     else ()
         MESSAGE("release mode")
-        target_link_libraries(${PROJECT_NAME}
-                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/release/assimp-vc142-mt.lib"
-                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/release/zlibstatic.lib"
-                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/vc/release/IrrXML.lib")
     endif ()
 endif ()
 if (VULKAN_FOUND)

@@ -30,8 +30,8 @@ namespace HBE {
 	}
 
 
-	Entity Scene::getCameraEntity() {
-		return main_camera_entity;
+	Entity* Scene::getCameraEntity() {
+		return &main_camera_entity;
 	}
 
 	void Scene::destroyEntity(Entity entity) {
@@ -41,7 +41,14 @@ namespace HBE {
 
 	void Scene::calculateCameraProjection(RenderTarget *renderTarget) {
 
-		main_camera_entity.get<Camera>().calculateProjection();
+		if(main_camera_entity.has<Camera>())
+		{
+			main_camera_entity.get<Camera>().calculateProjection();
+		}
+		else if(main_camera_entity.has<Camera2D>())
+		{
+			main_camera_entity.get<Camera2D>().calculateProjection();
+		}
 	}
 
 	void Scene::setCameraEntity(Entity camera) {

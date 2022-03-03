@@ -17,8 +17,10 @@ namespace HBE {
 	Model *Model::load(std::string path) {
 		this->path = path;
 		Log::status("Loading:" + path);
-		auto meshes_data = ModelImporter::load(path);
-		constructModel(meshes_data);
+		data_mutex.lock();
+		ModelImporter::load(path, meshes_data);
+		data_mutex.unlock();
+		constructModel();
 		return this;
 	}
 
@@ -31,24 +33,28 @@ namespace HBE {
 	void Model::loadAsync(std::string path) {
 		this->path = path;
 		Log::status("Loading async:" + path);
-		auto job = JobManager::create<std::vector<std::pair<MeshData, MaterialData>> *, std::string>();
+		Log::warning("Not implemented: Loading async");
+
+		/*auto job = JobManager::create<void,std::vector<std::pair<MeshData, MaterialData>>&, std::string>();
 		job->setCallback<Model>(this, &Model::constructModel);
-		job->run(&ModelImporter::load, path);
+
+		job->run(&ModelImporter::load, path, meshes_data);		*/
 	}
 
-	void Model::constructModel(std::vector<std::pair<MeshData, MaterialData>> *meshes_data) {
+	void Model::constructModel() {
 		uint32_t vertex_count = 0;
 		clearMeshes();
-		for (std::size_t i = 0; i < meshes_data->size(); ++i) {
+		data_mutex.lock();
+		for (std::size_t i = 0; i < meshes_data.size(); ++i) {
 			//todo:info bindings
 			MeshInfo mesh_info{};
 			std::vector<VertexBindingInfo> binding_infos = {{0, sizeof(float) * 7, VERTEX_BINDING_FLAG_NONE}};
 			meshes.emplace_back(Resources::createMesh(mesh_info), nullptr);
-			meshes[i].first->setVertexIndices((*meshes_data)[i].first.indices);
-			vertex_count += (*meshes_data)[i].first.indices.size();
+			meshes[i].first->setVertexIndices(meshes_data[i].first.indices);
+			vertex_count += meshes_data[i].first.indices.size();
 
-			MeshData &mesh_data = (*meshes_data)[i].first;
-			MaterialData &material_data = (*meshes_data)[i].second;
+			const MeshData &mesh_data = meshes_data[i].first;
+			const MaterialData &material_data = meshes_data[i].second;
 			if (!mesh_data.positions.empty()) {
 				meshes[i].first->setBuffer(0, mesh_data.positions.data(), mesh_data.positions.size());
 			}
@@ -63,13 +69,14 @@ namespace HBE {
 				meshes[i].second->setTexture(0, t);
 			}
 		}
-		delete meshes_data;
+		meshes_data.clear();
+		data_mutex.unlock();
 		Log::status(path + " loaded \n\tVertex count = " + std::to_string(vertex_count));
 
 	}
 
 	void Model::clearMeshes() {
-		for (std::size_t i = 0; i < meshes.size(); ++i) {
+		for (std::size_t i = 0; i < meshes_data.size(); ++i) {
 			if (meshes[i].first)
 				delete meshes[i].first;
 			if (meshes[i].second)
