@@ -3,6 +3,7 @@
 #include "HBE.h"
 
 #include "AgentSystem.h"
+#include "PlayerInputSystem.h"
 
 class Pathfinder {
 private:
@@ -21,8 +22,11 @@ public:
 		Application::setScene(new Scene(), true);
 
 		Scene &scene = *Application::getScene();
+		scene.addSystem(new PlayerInputSystem(&scene));
 		scene.addSystem(new AgentSystem(&scene));
 		scene.addSystem(new SimTransformSystem(&scene));
+
+
 		Entity e = scene.createEntity();
 		Agent agent = e.attach<Agent>();
 		e.attach<SimTransform>();
