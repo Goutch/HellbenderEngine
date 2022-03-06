@@ -4,6 +4,7 @@
 
 #include "AgentSystem.h"
 #include "PlayerInputSystem.h"
+#include "SimTransform.h"
 
 class Pathfinder {
 private:
@@ -15,7 +16,6 @@ public:
 		Camera2D &cam = camera.get<Camera2D>();
 		cam.zoom_ratio -= cam.zoom_ratio * wheel * delta * 100;
 		cam.calculateProjection();
-
 	}
 
 	Pathfinder() {

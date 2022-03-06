@@ -6,7 +6,7 @@
 using namespace HBE;
 
 struct Agent {
-	f32 speed = f32(100);
+	f32 speed = f32(10);
 	f32 size = f32(1);
 	fixed3<f32> target_position;
 };

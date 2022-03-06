@@ -19,8 +19,6 @@ void onAppUpdate(float delta) {
 
 
 int main() {
-
-
 	Application::init();
 
 	//-----------------------SETUP--------------------

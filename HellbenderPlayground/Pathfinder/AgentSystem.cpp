@@ -21,6 +21,8 @@ void AgentSystem::onUpdate(float delta) {
 					simTransform.position.y += direction.y * agent.speed * f32(delta);
 				}
 
+                simTransform.rotation=f32::atan2(direction.y,direction.x)-f32 ::HALF_PI;
+
 			}
 		}
 	}
