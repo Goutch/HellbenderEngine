@@ -118,6 +118,7 @@ namespace HBE {
 
 	template<typename Component>
 	Component &Entity::get() {
+
 		return scene->get<Component>(handle);
 	}
 

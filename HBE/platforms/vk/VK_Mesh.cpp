@@ -23,8 +23,11 @@ namespace HBE {
 	}
 
 	void VK_Mesh::setBuffer(uint32_t binding, const void *vertices, size_t count) {
-
 		this->vertex_count = count;
+		if (count == 0) {
+			Log::warning("Trying to set a mesh buffer with vertex count = 0");
+			return;
+		}
 		VertexBindingInfo &binding_info = bindings[binding];
 		VkDeviceSize buffer_size = binding_info.size * count;
 

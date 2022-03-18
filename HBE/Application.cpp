@@ -10,6 +10,7 @@
 #include <core/resource/Resources.h>
 #include "core/utility/Profiler.h"
 #include "core/scene/Scene.h"
+
 namespace HBE {
 	Scene *Application::current_scene = nullptr;
 	Window *Application::window = nullptr;
@@ -68,8 +69,8 @@ namespace HBE {
 			Entity camera_entity = *current_scene->getCameraEntity();
 
 			if (camera_entity.valid()) {
-				if(camera_entity.has<Camera>()||
-				   camera_entity.has<Camera2D>()){
+				if (camera_entity.has<Camera>() ||
+					camera_entity.has<Camera2D>()) {
 					Profiler::begin("DRAW");
 					onDraw.invoke();
 					current_scene->draw();
@@ -93,11 +94,10 @@ namespace HBE {
 		onWindowClosed.invoke();
 		onQuit.invoke();
 		delete time;
-		delete current_scene;
-
 	}
 
 	void Application::terminate() {
+		delete current_scene;
 		Graphics::terminate();
 		Profiler::printAverange();
 	}

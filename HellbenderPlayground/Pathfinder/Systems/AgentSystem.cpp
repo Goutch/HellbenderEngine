@@ -1,6 +1,6 @@
 
 #include "AgentSystem.h"
-#include "SimTransform.h"
+#include "SimTransformSystem.h"
 
 void AgentSystem::onUpdate(float delta) {
 	auto group = scene->group<SimTransform, Agent>();
@@ -21,7 +21,7 @@ void AgentSystem::onUpdate(float delta) {
 					simTransform.position.y += direction.y * agent.speed * f32(delta);
 				}
 
-                simTransform.rotation=f32::atan2(direction.y,direction.x)-f32 ::HALF_PI;
+				simTransform.rotation = f32::atan2(direction.y, direction.x) - f32::HALF_PI;
 
 			}
 		}

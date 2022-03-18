@@ -17,6 +17,7 @@ namespace HBE {
 		const VertexBindingInfo *binding_infos = nullptr;
 		size_t binding_info_count = 0;
 		MESH_FLAGS flags = MESH_FLAG_NONE;
+
 	};
 
 	class HB_API Mesh : public Resource {

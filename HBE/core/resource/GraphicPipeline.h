@@ -32,6 +32,10 @@ namespace HBE {
 		///Recommended for buffer changing every frame, dont wait for rendering to finish but double or triple memory usage.
 		VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS = 1 << 2,
 	};
+	enum VERTEX_TOPOLOGY {
+		VERTEX_TOPOLOGY_TRIANGLE,
+		VERTEX_TOPOLOGY_LINE,
+	};
 	struct VertexBindingInfo {
 		uint32_t binding = 0;
 		uint32_t size = 0;
@@ -43,6 +47,7 @@ namespace HBE {
 		const Shader *geometry_shader = nullptr;
 		const VertexBindingInfo *binding_infos = nullptr;
 		uint32_t binding_info_count = 0;
+		VERTEX_TOPOLOGY topology = VERTEX_TOPOLOGY_TRIANGLE;
 		GRAPHIC_PIPELINE_FLAGS flags = GRAPHIC_PIPELINE_FLAG_NONE;
 	};
 

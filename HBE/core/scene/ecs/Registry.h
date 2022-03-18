@@ -445,21 +445,26 @@ namespace HBE {
 		};
 
 		template<typename Component>
-		Component &get(entity_handle handle) {
-			return pages[getPage(handle)]->component_pages[typeid(Component).hash_code()]->getAs<Component>(handle);
-		}
-
-		template<typename Component>
 		bool has(entity_handle handle) {
 			const size_t hash = typeid(Component).hash_code();
-			auto page= pages[getPage(handle)];
-			auto comp_page_it= page->component_pages.find(hash);
+			auto page = pages[getPage(handle)];
+			auto comp_page_it = page->component_pages.find(hash);
 
-			if(comp_page_it!=page->component_pages.end())
+			if (comp_page_it != page->component_pages.end())
 				return comp_page_it->second->has(handle);
 			else
 				return false;
 		}
+
+		template<typename Component>
+		Component &get(entity_handle handle) {
+#ifndef NDEBUG
+			if (!has<Component>(handle))
+				Log::error(std::string("tried to get ") + typeid(Component).name() + " in entity#" + std::to_string(handle) + std::string(" but has<") + typeid(Component).name() + ">(" + std::to_string(handle) + ") = false");
+#endif
+			return pages[getPage(handle)]->component_pages[typeid(Component).hash_code()]->getAs<Component>(handle);
+		}
+
 
 		void destroy(entity_handle handle) {
 			inactive.push(handle);

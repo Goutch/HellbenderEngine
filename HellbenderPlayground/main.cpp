@@ -23,7 +23,7 @@ int main() {
 
 	//-----------------------SETUP--------------------
 	Configs::setWindowTitle("Hellbender");
-	Pathfinder pathfinder;
+	Pathfinder *pathfinder = new Pathfinder();
 	//Raytracer::init();
 	//Pong::init();
 	//Instancing::init();
@@ -34,6 +34,6 @@ int main() {
 	//-----------------------CLEANUP------------------
 	Application::onUpdate.unsubscribe(&onAppUpdate);
 	//-----------------------TERMINATE------------------
-
+	delete pathfinder;
 	Application::terminate();
 }
