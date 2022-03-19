@@ -5,16 +5,18 @@ void Navmesh::draw() {
 	if (!vertices.empty()) {
 		std::vector<vec2> mesh_vertices;
 		std::vector<uint32_t> mesh_indices;
-		for (const auto& v:vertices) {
+
+		for (const auto &v:vertices) {
 			mesh_vertices.emplace_back(v.position.x.toFloat(), v.position.y.toFloat());
 		}
-		for (const auto& s:segments) {
+		for (const auto &s:segments) {
 			mesh_indices.emplace_back(s.v1);
 			mesh_indices.emplace_back(s.v2);
 		}
-		mesh->setBuffer(0, mesh_vertices.data(), mesh_vertices.size());
-		mesh->setVertexIndices(mesh_indices);
-
+		if (mesh->getIndexCount() != mesh_indices.size() || mesh_indices.size() != mesh->getVertexCount()) {
+			mesh->setBuffer(0, mesh_vertices.data(), mesh_vertices.size());
+			mesh->setVertexIndices(mesh_indices);
+		}
 	}
 
 	if (mesh->getVertexCount() > 0) {
@@ -39,7 +41,7 @@ Navmesh::Navmesh(const bool *map, uint32_t size_x, uint32_t size_y, f32 cell_siz
 	VertexBindingInfo binding_info{};
 	binding_info.size = sizeof(vec2);
 	binding_info.binding = 0;
-	binding_info.flags = VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS | VERTEX_BINDING_FLAG_FAST_WRITE;
+	binding_info.flags = VERTEX_BINDING_FLAG_FAST_WRITE | VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS;
 	MeshInfo mesh_info{};
 	mesh_info.binding_info_count = 1;
 	mesh_info.binding_infos = &binding_info;

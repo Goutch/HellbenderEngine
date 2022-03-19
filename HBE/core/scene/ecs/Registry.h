@@ -157,8 +157,7 @@ namespace HBE {
 		template<typename Component>
 		Component &attach(entity_handle handle, ComponentTypeInfo &type) {
 			size_t i = handleToIndex(handle);
-			if (!valid_entities[i]) Log::error("Enitty#" + std::to_string(handle) + "is not valid");
-
+			HB_ASSERT(valid_entities[i],"Enitty#" + std::to_string(handle) + "is not valid");
 
 			components_of_entity[i] |= 1 << type.signature_bit;
 			auto component_page_it = component_pages.find(type.hash);

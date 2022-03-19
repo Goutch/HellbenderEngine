@@ -38,6 +38,7 @@ namespace HBE {
 	}
 
 	VK_Buffer::~VK_Buffer() {
+		device->getAllocator()->wait();
 		vkDestroyBuffer(device->getHandle(), handle, nullptr);
 		device->getAllocator()->free(allocation);
 	}

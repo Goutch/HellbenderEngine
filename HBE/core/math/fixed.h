@@ -407,12 +407,12 @@ namespace HBE {
 		}
 
 		fixed2 operator/(const fixed2 &other) const {
-			fixed2(x / other.x,
+			return fixed2(x / other.x,
 				   y / other.y);
 		}
 
 		fixed2 operator/(const T &other) const {
-			fixed2(x / other,
+			return fixed2(x / other,
 				   y / other);
 		}
 
@@ -432,7 +432,7 @@ namespace HBE {
 		}
 
 		fixed2 operator+(const T &other) const {
-			fixed2(x + other,
+			return fixed2(x + other,
 				   y + other);
 		}
 
@@ -452,7 +452,7 @@ namespace HBE {
 		}
 
 		fixed2 operator-(const T &other) const {
-			fixed2(x - other,
+			return fixed2(x - other,
 				   y - other);
 		}
 

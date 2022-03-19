@@ -3,7 +3,24 @@
 #include "VK_CommandPool.h"
 #include "VK_Image.h"
 #include "VK_Semaphore.h"
+#include "VK_Fence.h"
 
+
+/*
+ *
+todo: use somne kind of ring buffer for staging and wait and free only when ring buffer is full
+
+You wait for the fence for the previous upload after you have already written the data to the staging buffer. That's too late; the fence is there to prevent you from writing data to memory that's being read.
+
+But really, your problem is that your design is wrong. Your design is such that sequential updates all use the same memory. They shouldn't. Instead, sequential updates should use different regions of the same memory, so that they cannot overlap. That way, you can perform the transfers and not have to wait on fences at all (or at least, not until next frame).
+
+Basically, you should treat your staging buffer like a ring buffer. Every operation that wants to do some staged transfer work should "allocate" X bytes of memory from the staging ring buffer. The staging buffer system allocates memory sequentially, wrapping around if there is insufficient space. But it also remembers where the last memory region is that it synchronized with. If you try to stage too much work, then it has to synchronize.
+
+Also, one of the purposes behind mapping memory is that you can write directly to that memory, rather than writing to some other CPU memory and copying it in. So instead of passing in a VULKAN_BUFFER (whatever that is), the process that generated that data should have fetched a pointer to a region of the active staging buffer and written its data into that.
+
+Oh, and one more thing: never, ever create a command buffer and immediately submit it. Just don't do it. There's a reason why vkQueueSubmit can take multiple command buffers, and multiple batches of command buffers. For any one queue, you should never be submitting more than once (or maybe twice) per frame.
+
+ */
 namespace HBE {
 	VkMemoryPropertyFlags choseProperties(ALLOC_FLAGS flags) {
 		VkMemoryPropertyFlags properties = 0;
@@ -19,6 +36,7 @@ namespace HBE {
 	VK_Allocator::VK_Allocator(VK_Device *device) {
 		this->device = device;
 		this->command_pool = new VK_CommandPool(device, 1);
+		fence = new VK_Fence(*device);
 		memory_propeties = &device->getPhysicalDevice().getMemoryProperties();
 		for (size_t i = 0; i < memory_propeties->memoryTypeCount; ++i) {
 			blocks.emplace(i, std::vector<Block *>());
@@ -26,6 +44,7 @@ namespace HBE {
 	}
 
 	VK_Allocator::~VK_Allocator() {
+		delete fence;
 		delete command_pool;
 		for (auto it = blocks.begin(); it != blocks.end(); ++it) {
 			for (Block *block: it->second) {
@@ -173,19 +192,58 @@ namespace HBE {
 	}
 
 	void VK_Allocator::copy(VkBuffer src, VkBuffer dest, VkDeviceSize size) {
+		fence->reset();
 		command_pool->begin(0);
+		VkBufferMemoryBarrier barriers[2];
+		barriers[0] = {};
+		barriers[0].sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+		barriers[0].buffer = dest;
+		barriers[0].size = size;
+		barriers[0].offset = 0;
+		barriers[0].srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+		barriers[0].dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT | VK_ACCESS_MEMORY_WRITE_BIT;
+		barriers[0].dstQueueFamilyIndex = device->getQueue(QUEUE_FAMILY_GRAPHICS)->getFamilyIndex();
+		barriers[0].srcQueueFamilyIndex = device->getQueue(QUEUE_FAMILY_GRAPHICS)->getFamilyIndex();
+		barriers[0].pNext = nullptr;
+		barriers[1] = {};
+		barriers[1].sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+		barriers[1].buffer = src;
+		barriers[1].size = size;
+		barriers[1].offset = 0;
+		barriers[1].srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+		barriers[1].dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT | VK_ACCESS_MEMORY_WRITE_BIT;
+		barriers[1].dstQueueFamilyIndex = device->getQueue(QUEUE_FAMILY_GRAPHICS)->getFamilyIndex();
+		barriers[1].srcQueueFamilyIndex = device->getQueue(QUEUE_FAMILY_GRAPHICS)->getFamilyIndex();
+		barriers[1].pNext = nullptr;
+		vkCmdPipelineBarrier(command_pool->getCurrentBuffer(),
+							 VK_PIPELINE_STAGE_TRANSFER_BIT,
+							 VK_PIPELINE_STAGE_VERTEX_INPUT_BIT | VK_PIPELINE_STAGE_TRANSFER_BIT,
+							 0,
+							 0,
+							 nullptr,
+							 2,
+							 barriers,
+							 0,
+							 nullptr);
+
+
 		VkBufferCopy copyRegion{};
 		copyRegion.srcOffset = 0; // buffer offset not memory
 		copyRegion.dstOffset = 0; // buffer offset not memory
 		copyRegion.size = size;
+
+
 		vkCmdCopyBuffer(command_pool->getCurrentBuffer(), src, dest, 1, &copyRegion);
 
 		command_pool->end(0);
 
 
 		//todo use transfer queue
-		device->getQueue(QUEUE_FAMILY_GRAPHICS)->submit(command_pool->getCurrentBuffer());
-		device->getQueue(QUEUE_FAMILY_GRAPHICS)->wait();
+		device->getQueue(QUEUE_FAMILY_GRAPHICS)->submit(command_pool->getCurrentBuffer(), fence->getHandle());
+		//device->getQueue(QUEUE_FAMILY_GRAPHICS)->wait();
+		//device->getQueue(QUEUE_FAMILY_GRAPHICS)->wait();
+
+
 		//command_pool->reset(0);
 	}
 
@@ -365,24 +423,25 @@ namespace HBE {
 	}
 
 	void VK_Allocator::free(const Allocation &allocation) {
+		fence->wait();
 		//Log::debug("Freeing Alloc#" + std::to_string(allocation.id));
-
 		Block *block = allocation.block;
 		block->alloc_count--;
 		uint32_t memory_type = allocation.block->memory_type;
 		//Log::debug("Freed " + allocToString(allocation));
-		if (allocation.block->alloc_count == 0) {
-			vkFreeMemory(device->getHandle(), allocation.block->memory, nullptr);
-			//Log::debug("Freed block " + std::to_string(allocation.block->index) + " of " +
-			// memoryTypeToString(allocation.block->memory_type));
-			auto it = blocks[memory_type].erase(blocks[memory_type].begin() + allocation.block->index);
-			delete block;
-			for (; it != blocks[memory_type].end(); ++it) {
-				(*it)->index--;
+		if (allocation.block->memory_type)
+			if (allocation.block->alloc_count == 0) {
+				vkFreeMemory(device->getHandle(), allocation.block->memory, nullptr);
+				//Log::debug("Freed block " + std::to_string(allocation.block->index) + " of " +
+				// memoryTypeToString(allocation.block->memory_type));
+				auto it = blocks[memory_type].erase(blocks[memory_type].begin() + allocation.block->index);
+				delete block;
+				for (; it != blocks[memory_type].end(); ++it) {
+					(*it)->index--;
+				}
+			} else {
+				allocation.block->allocations.erase(allocation);
 			}
-		} else {
-			allocation.block->allocations.erase(allocation);
-		}
 	}
 
 
@@ -393,6 +452,10 @@ namespace HBE {
 
 		device->getQueue(QUEUE_FAMILY_GRAPHICS)->submit(command_pool->getCurrentBuffer());
 		device->getQueue(QUEUE_FAMILY_GRAPHICS)->wait();
+	}
+
+	void VK_Allocator::wait() {
+		fence->wait();
 	}
 }
 

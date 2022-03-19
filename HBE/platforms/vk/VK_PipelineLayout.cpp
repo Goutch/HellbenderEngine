@@ -287,15 +287,10 @@ namespace HBE {
 
 	void VK_PipelineLayout::setTexture(const std::string &name, const RenderTarget *render_target) {
 		auto it = name_input_index.find(name);
-		if (it != name_input_index.end()) {
-			if (inputs[it->second].type == UNIFORM_INPUT_TYPE_TEXTURE_SAMPLER) {
-				setTexture(inputs[it->second].binding, render_target);
-			} else {
-				Log::error(name + " is not a texture binding");
-			}
-		} else {
-			Log::error("No shader input is named:" + name);
-		}
+		HB_ASSERT(it != name_input_index.end(), "No shader input is named:" + name);
+		HB_ASSERT(inputs[it->second].type == UNIFORM_INPUT_TYPE_TEXTURE_SAMPLER, name + " is not a texture binding");
+
+		setTexture(inputs[it->second].binding, render_target);
 	}
 
 	void VK_PipelineLayout::setTexture(const std::string &name, const Texture *texture) {

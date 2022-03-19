@@ -69,6 +69,7 @@ namespace HBE {
 		const VkDeviceSize BLOCK_SIZE = 1024 * 1024 * 128; //1024*1024*128 = 128mb
 		std::unordered_map<uint32_t, std::vector<Block*>> blocks;
 		const VkPhysicalDeviceMemoryProperties *memory_propeties;
+		VK_Fence* fence;
 		uint32_t current_id = 0;
 	public:
 
@@ -76,6 +77,7 @@ namespace HBE {
 
 		~VK_Allocator();
 		Allocation alloc(VkMemoryRequirements memory_requirement, ALLOC_FLAGS flags = ALLOC_FLAG_NONE);
+		void wait();
 		void free(const Allocation &allocation);
 		void copy(VkBuffer src, VkBuffer dest, VkDeviceSize size);
 		void copy(VkBuffer src, VK_Image *dest, VkImageLayout dst_end_layout);
