@@ -202,6 +202,7 @@ namespace HBE {
 
 	void VK_RenderPass::end(const VkCommandBuffer &command_buffer) const {
 		vkCmdEndRenderPass(command_buffer);
+		vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_DEPENDENCY_BY_REGION_BIT, 0, nullptr, 0, nullptr, 0, nullptr);
 	}
 
 	void VK_RenderPass::createFramebuffers() {

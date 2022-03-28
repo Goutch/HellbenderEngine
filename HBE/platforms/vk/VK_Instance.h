@@ -22,11 +22,10 @@ namespace HBE {
 
         ~VK_Instance();
 
-        const VkInstance &getHandle();
-
-    private:
+        VkInstance getHandle() const;
+	private:
         void getRequiredExtensions(std::vector<const char *> &required_extensions);
 
         bool checkExtensionsSupported(std::vector<const char *> &required_extensions);
-    };
+	};
 }

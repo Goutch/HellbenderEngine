@@ -7,11 +7,9 @@
 using namespace HBE;
 
 void onAppUpdate(float delta) {
-	//Shut down app if escape key is pressed
 	if (Input::getKeyDown(KEY::ESCAPE)) {
 		Application::quit();
 	}
-	//change vertical sync if V key is pressed
 	if (Input::getKeyDown(KEY::V)) {
 		Configs::setVerticalSync(!Configs::getVerticalSync());
 	}
@@ -23,8 +21,8 @@ int main() {
 
 	//-----------------------SETUP--------------------
 	Configs::setWindowTitle("Hellbender");
-	Pathfinder *pathfinder = new Pathfinder();
-	//Raytracer::init();
+	//Pathfinder *pathfinder = new Pathfinder();
+	Raytracer::init();
 	//Pong::init();
 	//Instancing::init();
 	//-----------------------EVENTS------------------
@@ -34,6 +32,6 @@ int main() {
 	//-----------------------CLEANUP------------------
 	Application::onUpdate.unsubscribe(&onAppUpdate);
 	//-----------------------TERMINATE------------------
-	delete pathfinder;
+	//delete pathfinder;
 	Application::terminate();
 }

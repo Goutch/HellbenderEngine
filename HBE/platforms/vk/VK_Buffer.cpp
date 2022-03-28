@@ -38,7 +38,6 @@ namespace HBE {
 	}
 
 	VK_Buffer::~VK_Buffer() {
-		device->getAllocator()->wait();
 		vkDestroyBuffer(device->getHandle(), handle, nullptr);
 		device->getAllocator()->free(allocation);
 	}
@@ -51,18 +50,20 @@ namespace HBE {
 		return size;
 	}
 
-	const Allocation &VK_Buffer::getAllocation() {
+	const Allocation &VK_Buffer::getAllocation() const {
 		return allocation;
 	}
 
 	void VK_Buffer::update(const void *data) {
-		if (allocation.flags & ALLOC_FLAG_MAPPABLE) {
+		device->getAllocator()->update(*this, data, size);
+		/*if (allocation.flags & ALLOC_FLAG_MAPPABLE) {
 			void *buffer_data;
 			vkMapMemory(device->getHandle(), allocation.block->memory, allocation.offset, allocation.size, 0, &buffer_data);
 			size_t copy_size = (size_t) size;
 			memcpy(buffer_data, data, copy_size);
 			vkUnmapMemory(device->getHandle(), allocation.block->memory);
 		} else {
+
 			VK_Buffer staging_buffer = VK_Buffer(device,
 												 size,
 												 VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -76,7 +77,7 @@ namespace HBE {
 			vkUnmapMemory(device->getHandle(), stagingBufferMemory);
 			copy(&staging_buffer);
 
-		}
+		}*/
 
 	}
 }

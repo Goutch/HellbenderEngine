@@ -7,14 +7,18 @@
 #include "VK_Allocator.h"
 #include "array"
 #include "VK_CONSTANTS.h"
+
 namespace HBE {
 	class VK_Buffer;
 
-    class VK_Fence;
+	class VK_Fence;
 
 	class VK_Renderer;
-    class VK_Semaphore;
+
+	class VK_Semaphore;
+
 	class VK_Image : public Texture {
+		VkImageLayout desired_layout;
 		VK_Device *device;
 		VkImage handle = VK_NULL_HANDLE;
 		VkImageView view_hanlde = VK_NULL_HANDLE;
@@ -26,7 +30,7 @@ namespace HBE {
 		uint32_t width = 1, height = 1, depth = 1;
 		uint32_t byte_per_pixel;
 		IMAGE_FLAGS flags;
-		uint32_t id=0;
+		uint32_t id = 0;
 		static uint32_t current_id;
 	public:
 		VK_Image(VK_Device *device, const TextureInfo &info);
@@ -43,8 +47,9 @@ namespace HBE {
 		void setImageLayout(VkImageLayout layout);
 		const VkImageLayout getImageLayout() const;
 		const VkFormat getVkFormat() const;
-
-    private:
+		const uint32_t bytePerPixel() const;
+		const VkImageLayout getDesiredLayout() const;
+	private:
 		VkImageLayout chooseLayout();
 	};
 }

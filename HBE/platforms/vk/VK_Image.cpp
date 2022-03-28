@@ -22,11 +22,7 @@ namespace HBE {
 	}
 
 	void VK_Image::update(const void *data) {
-
-		VK_Buffer staging_buffer = VK_Buffer(device, data, width * height * byte_per_pixel,
-											 VK_BUFFER_USAGE_TRANSFER_SRC_BIT, ALLOC_FLAG_MAPPABLE);
-		VK_Allocator *allocator = device->getAllocator();
-		allocator->copy(staging_buffer.getHandle(), this, chooseLayout());
+		device->getAllocator()->update(*this, data, width, height);
 	}
 
 	VK_Image::VK_Image(VK_Device *device, const TextureInfo &info) {
@@ -37,6 +33,7 @@ namespace HBE {
 		this->format = info.format;
 		this->flags = info.flags;
 		this->id = current_id++;
+		desired_layout = chooseLayout();
 		Log::debug("Create image#" + std::to_string(id));
 		VkImageType type;
 		VkImageViewType view_type;
@@ -142,7 +139,7 @@ namespace HBE {
 		if (info.data != nullptr) {
 			update(info.data);
 		} else {
-			device->getAllocator()->setImageLayout(this, chooseLayout());
+			device->getAllocator()->setImageLayout(this, desired_layout);
 		}
 
 
@@ -244,6 +241,14 @@ namespace HBE {
 
 	vec3u VK_Image::getSize() const {
 		return vec3u(width, height, depth);
+	}
+
+	const uint32_t VK_Image::bytePerPixel() const {
+		return byte_per_pixel;
+	}
+
+	const VkImageLayout VK_Image::getDesiredLayout() const {
+		return desired_layout;
 	}
 
 

@@ -103,7 +103,7 @@ void main()
 	}
 
 	void Graphics::draw(mat4 transform_matrix, const Mesh &mesh, GraphicPipeline &pipeline) {
-		renderer->draw(std::move(transform_matrix), mesh, pipeline);
+		renderer->draw(transform_matrix, mesh, pipeline);
 	}
 
 	void Graphics::drawInstanced(const Mesh &mesh, GraphicPipeline &pipeline) {

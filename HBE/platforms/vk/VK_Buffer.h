@@ -3,6 +3,7 @@
 #include "vulkan/vulkan.h"
 #include "core/utility/Log.h"
 #include "VK_Allocator.h"
+
 namespace HBE {
 	class VK_Device;
 
@@ -31,7 +32,7 @@ namespace HBE {
 
 		void copy(VK_Buffer *other);
 
-		const Allocation &getAllocation();
+		const Allocation &getAllocation() const;
 
 		VkDeviceSize getSize() const;
 	};

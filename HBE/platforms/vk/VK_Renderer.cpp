@@ -42,13 +42,12 @@ namespace HBE {
 		physical_device = new VK_PhysicalDevice(instance->getHandle(), surface->getHandle());
 		device = new VK_Device(*physical_device);
 		swapchain = new VK_Swapchain(width, height, surface->getHandle(), *device);
-		command_pool = new VK_CommandPool(device, MAX_FRAMES_IN_FLIGHT);
+		command_pool = new VK_CommandPool(*device, MAX_FRAMES_IN_FLIGHT);
 
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
 
 			frames[i].image_available_semaphore = new VK_Semaphore(*device);
 			frames[i].finished_semaphore = new VK_Semaphore(*device);
-			frames[i].in_flight_fence = new VK_Fence(*device);
 		}
 
 
@@ -70,6 +69,10 @@ namespace HBE {
 		window->getSize(width, height);
 
 		device->wait();
+
+		for (size_t i = 0; i < swapchain->getImagesCount(); ++i) {
+			images_in_flight_fences[i] = nullptr;
+		}
 
 		command_pool->clear();
 
@@ -94,7 +97,6 @@ namespace HBE {
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 			delete frames[i].image_available_semaphore;
 			delete frames[i].finished_semaphore;
-			delete frames[i].in_flight_fence;
 		}
 		delete factory;
 		delete command_pool;
@@ -175,14 +177,15 @@ namespace HBE {
 	}
 
 	void VK_Renderer::beginFrame() {
-		frames[current_frame].in_flight_fence->wait();
+		//frames[current_frame].in_flight_fence->wait();
 		//wait for last frame i to isEnd
-		command_pool->begin(current_frame);
+		command_pool->begin();
 	}
 
 	void VK_Renderer::endFrame(bool present) {
 		Profiler::begin("endFrame");
 		if (present) {
+			Profiler::begin("AquireImage");
 			VkResult result = vkAcquireNextImageKHR(device->getHandle(),
 													swapchain->getHandle(),
 													UINT64_MAX,
@@ -195,13 +198,15 @@ namespace HBE {
 			} else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
 				Log::error("failed to acquire swap chain image!");
 			}
-
+			Profiler::end();
+			Profiler::begin("WaitImageInflight");
 			if (images_in_flight_fences[current_image] != nullptr) {
 				images_in_flight_fences[current_image]->wait();
 			}
-
-			images_in_flight_fences[current_image] = frames[current_frame].in_flight_fence;
-			frames[current_frame].in_flight_fence->reset();
+			Profiler::end();
+			images_in_flight_fences[current_image] = &command_pool->getCurrentFence();
+			command_pool->getCurrentFence().reset();
+			//reset here idk why
 			uint32_t width, height;
 			current_render_pass->getResolution(width, height);
 			VkViewport viewport{};
@@ -228,18 +233,17 @@ namespace HBE {
 
 			swapchain->endRenderPass(command_pool->getCurrentBuffer());
 
-			command_pool->end(current_frame);
+			command_pool->end();
 			VkSemaphore wait_semaphores[] = {frames[current_frame].image_available_semaphore->getHandle()};
 			VkPipelineStageFlags stages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
 			VkSemaphore signal_semaphores[] = {frames[current_frame].finished_semaphore->getHandle()};
 
-			device->getQueue(QUEUE_FAMILY_GRAPHICS)->submit(command_pool->getCurrentBuffer(),
-															frames[current_frame].in_flight_fence->getHandle(),
-															wait_semaphores,
-															stages,
-															1,
-															signal_semaphores,
-															1);
+			command_pool->submit(QUEUE_FAMILY_GRAPHICS,
+								 wait_semaphores,
+								 stages,
+								 1,
+								 signal_semaphores,
+								 1);
 
 
 			VkPresentInfoKHR presentInfo{};
@@ -254,8 +258,9 @@ namespace HBE {
 			presentInfo.pImageIndices = &current_image;
 			presentInfo.pResults = nullptr; // Optional
 
+			Profiler::begin("Present");
 			result = vkQueuePresentKHR(device->getQueue(QUEUE_FAMILY_PRESENT)->getHandle(), &presentInfo);
-
+			Profiler::end();
 			if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || windowResized) {
 				windowResized = false;
 				reCreateSwapchain();
@@ -264,11 +269,9 @@ namespace HBE {
 				Log::error("failed to present swap chain image!");
 			}
 		} else {
-			command_pool->end(current_frame);
-			frames[current_frame].in_flight_fence->reset();
-
-			device->getQueue(QUEUE_FAMILY_GRAPHICS)->submit(command_pool->getCurrentBuffer(),
-															frames[current_frame].in_flight_fence->getHandle());
+			command_pool->getCurrentFence().reset();
+			command_pool->end();
+			command_pool->submit(QUEUE_FAMILY_GRAPHICS);
 		}
 		current_frame = (current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
 		render_cache.clear();
@@ -371,9 +374,7 @@ namespace HBE {
 	}
 
 	void VK_Renderer::waitCurrentFrame() {
-		frames[current_frame].in_flight_fence->wait();
+		command_pool->getCurrentFence().wait();
 	}
-
-
 }
 

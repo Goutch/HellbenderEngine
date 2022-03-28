@@ -1,11 +1,8 @@
 
 #include "VK_Allocator.h"
-#include "VK_CommandPool.h"
-#include "VK_Image.h"
-#include "VK_Semaphore.h"
-#include "VK_Fence.h"
-
-
+#include "platforms/vk/VK_CommandPool.h"
+#include "platforms/vk/VK_Image.h"
+#include "platforms/vk/VK_Buffer.h"
 /*
  *
 todo: use somne kind of ring buffer for staging and wait and free only when ring buffer is full
@@ -35,8 +32,7 @@ namespace HBE {
 
 	VK_Allocator::VK_Allocator(VK_Device *device) {
 		this->device = device;
-		this->command_pool = new VK_CommandPool(device, 1);
-		fence = new VK_Fence(*device);
+		this->command_pool = new VK_CommandPool(*device, 16);
 		memory_propeties = &device->getPhysicalDevice().getMemoryProperties();
 		for (size_t i = 0; i < memory_propeties->memoryTypeCount; ++i) {
 			blocks.emplace(i, std::vector<Block *>());
@@ -44,16 +40,22 @@ namespace HBE {
 	}
 
 	VK_Allocator::~VK_Allocator() {
-		delete fence;
+		freeStagingBuffers();
 		delete command_pool;
 		for (auto it = blocks.begin(); it != blocks.end(); ++it) {
 			for (Block *block: it->second) {
 				vkFreeMemory(device->getHandle(), block->memory, nullptr);
+				delete block;
 			}
+		}
+		for (auto pooled_block: block_pool) {
+
+			vkFreeMemory(device->getHandle(), pooled_block.second->memory, nullptr);
+			delete pooled_block.second;
 		}
 	}
 
-	uint32_t VK_Allocator::findMemoryType(VkMemoryRequirements memory_requirement, ALLOC_FLAGS flags) {
+	uint32_t VK_Allocator::findMemoryTypeIndex(VkMemoryRequirements memory_requirement, ALLOC_FLAGS flags) {
 		//todo: handle out of memory.
 		//if all heap of a memory type are out of memory, return another memory type.
 		VkMemoryPropertyFlags properties = choseProperties(flags);
@@ -69,9 +71,8 @@ namespace HBE {
 		return 0;
 	}
 
-	std::string VK_Allocator::memoryTypeToString(const uint32_t mem_type) {
-
-		VkMemoryPropertyFlags flags = device->getPhysicalDevice().getMemoryProperties().memoryTypes[mem_type].propertyFlags;
+	std::string VK_Allocator::memoryTypeToString(const uint32_t mem_type_index) {
+		VkMemoryPropertyFlags flags = device->getPhysicalDevice().getMemoryProperties().memoryTypes[mem_type_index].propertyFlags;
 		std::string type = "";
 		bool need_separator = false;
 		std::string separator = " & ";
@@ -97,18 +98,71 @@ namespace HBE {
 			type += "\"Host coherent\"";
 		}
 		return type;
+
 	}
 
 	std::string VK_Allocator::allocToString(const Allocation &alloc) {
 
-		return "Alloc#" + std::to_string(alloc.id) + " " + std::to_string(alloc.size) + " bytes of " + memoryTypeToString(alloc.block->memory_type) +
+		return "Alloc#" + std::to_string(alloc.id) + " " + std::to_string(alloc.size) + " bytes of " + memoryTypeToString(alloc.block->memory_type_index) +
 			   " at position " + std::to_string(alloc.offset) + " in block " + std::to_string(alloc.block->index);
 
 	}
 
+	StagingBuffer VK_Allocator::createTempStagingBuffer(const void *data, size_t size) {
+		VkBufferCreateInfo staging_buffer_info{};
+		staging_buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		staging_buffer_info.size = size;
+		staging_buffer_info.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+		staging_buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+		VkBuffer buffer;
+		if (vkCreateBuffer(device->getHandle(), &staging_buffer_info, nullptr, &buffer) != VK_SUCCESS) {
+			Log::error("failed to create buffer!");
+		}
+
+		VkMemoryRequirements requirements;
+		vkGetBufferMemoryRequirements(device->getHandle(), buffer, &requirements);
+
+		Allocation staging_alloc = device->getAllocator()->alloc(requirements, ALLOC_FLAG_MAPPABLE);
+
+		VkDeviceMemory &stagingBufferMemory = staging_alloc.block->memory;
+
+		vkBindBufferMemory(device->getHandle(), buffer, staging_alloc.block->memory, staging_alloc.offset);
+		StagingBuffer staging_buffer = StagingBuffer{staging_alloc, buffer};
+		void *staging_buffer_data;
+		vkMapMemory(device->getHandle(), staging_buffer.allocation.block->memory, staging_buffer.allocation.offset, staging_buffer.allocation.size, 0, &staging_buffer_data);
+		memcpy(staging_buffer_data, data, (size_t) size);
+		vkUnmapMemory(device->getHandle(), staging_buffer.allocation.block->memory);
+		return staging_buffer;
+	}
+
+	void VK_Allocator::update(const VK_Buffer &buffer, const void *data, size_t size) {
+		const Allocation &alloc = buffer.getAllocation();
+		if (alloc.flags & ALLOC_FLAG_MAPPABLE) {
+			void *buffer_data;
+			vkMapMemory(device->getHandle(), alloc.block->memory, alloc.offset, alloc.size, 0, &buffer_data);
+			size_t copy_size = (size_t) size;
+			memcpy(buffer_data, data, copy_size);
+			vkUnmapMemory(device->getHandle(), alloc.block->memory);
+		} else {
+			StagingBuffer staging_buffer = createTempStagingBuffer(data, size);
+
+			copy(staging_buffer.buffer, buffer.getHandle(), size);
+			staging_buffer.fence = &command_pool->getCurrentFence();
+			staging_buffers_queue.emplace(staging_buffer);
+		}
+	}
+
+	void VK_Allocator::update(VK_Image &image, const void *data, size_t width, size_t height) {
+		StagingBuffer staging_buffer = createTempStagingBuffer(data, width * height * image.bytePerPixel());
+		copy(staging_buffer.buffer, &image, image.getDesiredLayout());
+		staging_buffer.fence = &command_pool->getCurrentFence();
+		staging_buffers_queue.emplace(staging_buffer);
+	}
+
 	//https://www.khronos.org/registry/vulkan/specs/1.2-extensions/man/html/VkMemoryPropertyFlagBits.html
 	Allocation VK_Allocator::alloc(VkMemoryRequirements mem_requirements, ALLOC_FLAGS flags) {
-		uint32_t memory_type = findMemoryType(mem_requirements, flags);
+		uint32_t memory_type = findMemoryTypeIndex(mem_requirements, flags);
 
 		for (Block *block:blocks[memory_type]) {
 			if (block->remaining < mem_requirements.size) {
@@ -158,24 +212,35 @@ namespace HBE {
 			}
 		}
 		//new block needed
+		Block *block;
+		auto block_it = block_pool.find(memory_type);
+		if (block_it == block_pool.end()) {
+			uint32_t index = blocks[memory_type].size();
+			block = blocks[memory_type].emplace_back(new Block{
+					.size= mem_requirements.size > BLOCK_SIZE ? mem_requirements.size : BLOCK_SIZE,
+					.memory=VK_NULL_HANDLE,
+					.memory_type_index=memory_type,
+					.index=index,
+					.alloc_count=0,
+					.remaining=(mem_requirements.size > BLOCK_SIZE ? mem_requirements.size : BLOCK_SIZE) - mem_requirements.size});
+			VkMemoryAllocateInfo allocInfo{};
+			allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+			allocInfo.allocationSize = block->size;
+			allocInfo.memoryTypeIndex = memory_type;
 
-		uint32_t index = blocks[memory_type].size();
-		Block *block = blocks[memory_type].emplace_back(new Block{
-				.size= mem_requirements.size > BLOCK_SIZE ? mem_requirements.size : BLOCK_SIZE,
-				.memory=VK_NULL_HANDLE,
-				.memory_type=memory_type,
-				.index=index,
-				.alloc_count=0,
-				.remaining=(mem_requirements.size > BLOCK_SIZE ? mem_requirements.size : BLOCK_SIZE) - mem_requirements.size});
+			if (vkAllocateMemory(device->getHandle(), &allocInfo, nullptr, &block->memory) != VK_SUCCESS) {
+				Log::error("failed to allocate buffer memory!");
+			}
 
+		} else {
 
-		VkMemoryAllocateInfo allocInfo{};
-		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-		allocInfo.allocationSize = block->size;
-		allocInfo.memoryTypeIndex = memory_type;
-
-		if (vkAllocateMemory(device->getHandle(), &allocInfo, nullptr, &block->memory) != VK_SUCCESS) {
-			Log::error("failed to allocate buffer memory!");
+			block = block_it->second;
+			block->index = blocks[memory_type].size();
+			block->remaining = block->size;
+			block->alloc_count = 0;
+			block->allocations.clear();
+			block_pool.erase(memory_type);
+			blocks[memory_type].emplace_back(block);
 		}
 		block->alloc_count++;
 		const Allocation &new_alloc = *block->allocations.emplace(
@@ -191,9 +256,17 @@ namespace HBE {
 		return new_alloc;
 	}
 
+	void VK_Allocator::freeStagingBuffers() {
+		while (!staging_buffers_queue.empty() && vkGetFenceStatus(device->getHandle(), staging_buffers_queue.front().fence->getHandle()) == VK_SUCCESS) {
+			vkDestroyBuffer(device->getHandle(), staging_buffers_queue.front().buffer, nullptr);
+			free(staging_buffers_queue.front().allocation);
+			staging_buffers_queue.pop();
+		}
+	}
+
 	void VK_Allocator::copy(VkBuffer src, VkBuffer dest, VkDeviceSize size) {
-		fence->reset();
-		command_pool->begin(0);
+		freeStagingBuffers();
+		command_pool->begin();
 		VkBufferMemoryBarrier barriers[2];
 		barriers[0] = {};
 		barriers[0].sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
@@ -235,19 +308,13 @@ namespace HBE {
 
 		vkCmdCopyBuffer(command_pool->getCurrentBuffer(), src, dest, 1, &copyRegion);
 
-		command_pool->end(0);
-
+		command_pool->end();
 
 		//todo use transfer queue
-		device->getQueue(QUEUE_FAMILY_GRAPHICS)->submit(command_pool->getCurrentBuffer(), fence->getHandle());
-		//device->getQueue(QUEUE_FAMILY_GRAPHICS)->wait();
-		//device->getQueue(QUEUE_FAMILY_GRAPHICS)->wait();
-
-
-		//command_pool->reset(0);
+		command_pool->submit(QUEUE_FAMILY_GRAPHICS);
 	}
 
-	void VK_Allocator::transitionImageLayout(VK_Image *image, VkImageLayout new_layout) {
+	void VK_Allocator::barrierTransitionImageLayout(VK_Image *image, VkImageLayout new_layout) {
 		VkImageLayout old_layout = image->getImageLayout();
 
 		//block dstStage until srcStage is finished
@@ -316,7 +383,7 @@ namespace HBE {
 			switch (new_layout) {
 				case VK_IMAGE_LAYOUT_GENERAL:
 					barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
-					destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+					destinationStage = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT;
 					break;
 				case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
 					barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
@@ -347,9 +414,9 @@ namespace HBE {
 	}
 
 	void VK_Allocator::copy(VkBuffer src, VK_Image *dest, VkImageLayout dst_end_layout) {
-		device->getQueue(QUEUE_FAMILY_GRAPHICS)->wait();
-		command_pool->begin(0);
-		transitionImageLayout(dest, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+		freeStagingBuffers();
+		command_pool->begin();
+		barrierTransitionImageLayout(dest, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 		VkBufferImageCopy region{};
 		region.bufferOffset = 0;
 		region.bufferRowLength = 0;
@@ -375,24 +442,18 @@ namespace HBE {
 				&region
 		);
 
-		transitionImageLayout(dest, dst_end_layout);
-		command_pool->end(0);
-
-
-		device->getQueue(QUEUE_FAMILY_GRAPHICS)->submit(command_pool->getCurrentBuffer());
-		device->getQueue(QUEUE_FAMILY_GRAPHICS)->wait();
-		//command_pool->reset(0);
+		barrierTransitionImageLayout(dest, dst_end_layout);
+		command_pool->end();
+		command_pool->submit(QUEUE_FAMILY_GRAPHICS);
 	}
 
 	void VK_Allocator::copy(VK_Image *src, VkImageLayout src_end_layout, VK_Image *dest, VkImageLayout dst_end_layout) {
-
-
-		VkImageAspectFlagBits src_aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT;//todo change for depth if image is depth or stensil
+		VkImageAspectFlagBits src_aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT;//todo change for depth if image is depth or stencil
 		VkImageAspectFlagBits dst_aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT;
-
-		command_pool->begin(0);
-		transitionImageLayout(dest, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-		transitionImageLayout(src, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+		freeStagingBuffers();
+		command_pool->begin();
+		barrierTransitionImageLayout(dest, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+		barrierTransitionImageLayout(src, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 		VkImageCopy region{};
 		region.dstOffset = {0, 0, 0};
 		region.extent = {src->getWidth(), src->getHeight(), src->getDepth()};
@@ -414,48 +475,47 @@ namespace HBE {
 				1,
 				&region
 		);
-		transitionImageLayout(dest, dst_end_layout);
-		transitionImageLayout(src, src_end_layout);
-		command_pool->end(0);
-
-		device->getQueue(QUEUE_FAMILY_GRAPHICS)->submit(command_pool->getCurrentBuffer());
-		device->getQueue(QUEUE_FAMILY_GRAPHICS)->wait();
+		barrierTransitionImageLayout(dest, dst_end_layout);
+		barrierTransitionImageLayout(src, src_end_layout);
+		command_pool->end();
+		command_pool->submit(QUEUE_FAMILY_GRAPHICS);
 	}
 
 	void VK_Allocator::free(const Allocation &allocation) {
-		fence->wait();
 		//Log::debug("Freeing Alloc#" + std::to_string(allocation.id));
 		Block *block = allocation.block;
-		block->alloc_count--;
-		uint32_t memory_type = allocation.block->memory_type;
+
+		uint32_t memory_type_index = allocation.block->memory_type_index;
 		//Log::debug("Freed " + allocToString(allocation));
-		if (allocation.block->memory_type)
-			if (allocation.block->alloc_count == 0) {
-				vkFreeMemory(device->getHandle(), allocation.block->memory, nullptr);
-				//Log::debug("Freed block " + std::to_string(allocation.block->index) + " of " +
-				// memoryTypeToString(allocation.block->memory_type));
-				auto it = blocks[memory_type].erase(blocks[memory_type].begin() + allocation.block->index);
-				delete block;
-				for (; it != blocks[memory_type].end(); ++it) {
+		if (allocation.block->memory_type_index)
+			if (allocation.block->alloc_count == 1) {
+				auto it = blocks[memory_type_index].erase(blocks[memory_type_index].begin() + allocation.block->index);
+				auto block_pool_it = block_pool.find(allocation.block->memory_type_index);
+				if (block_pool_it == block_pool.end()) {
+					block_pool.emplace(block->memory_type_index, block);
+				} else {
+					vkFreeMemory(device->getHandle(), allocation.block->memory, nullptr);
+					delete block;
+				}
+				for (; it != blocks[memory_type_index].end(); ++it) {
 					(*it)->index--;
 				}
+
 			} else {
+				block->alloc_count--;
 				allocation.block->allocations.erase(allocation);
 			}
 	}
 
 
 	void VK_Allocator::setImageLayout(VK_Image *image, VkImageLayout newLayout) {
-		command_pool->begin(0);
-		transitionImageLayout(image, newLayout);
-		command_pool->end(0);
-
-		device->getQueue(QUEUE_FAMILY_GRAPHICS)->submit(command_pool->getCurrentBuffer());
-		device->getQueue(QUEUE_FAMILY_GRAPHICS)->wait();
+		freeStagingBuffers();
+		command_pool->begin();
+		barrierTransitionImageLayout(image, newLayout);
+		command_pool->end();
+		command_pool->submit(QUEUE_FAMILY_GRAPHICS);
 	}
 
-	void VK_Allocator::wait() {
-		fence->wait();
-	}
+
 }
 

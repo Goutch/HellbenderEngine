@@ -41,7 +41,7 @@ namespace HBE {
         layout->bindDescriptors(renderer->getCommandPool()->getCurrentBuffer(), renderer->getCurrentFrame());
         vkCmdDispatch(queue->getCommandPool()->getCurrentBuffer(), group_count_x, group_count_y, group_count_z);
         queue->endCommand();
-        queue->submit();
+        queue->submitCommand();
     }
 
     void VK_ComputePipeline::wait() {

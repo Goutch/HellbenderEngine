@@ -102,8 +102,9 @@ namespace HBE {
 		vkDestroyInstance(handle, nullptr);
 	}
 
-	const VkInstance &VK_Instance::getHandle() {
+	VkInstance VK_Instance::getHandle() const {
 		return handle;
 	}
+
 }
 

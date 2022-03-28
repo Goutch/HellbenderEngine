@@ -34,7 +34,6 @@ namespace HBE {
 	private:
 
 		struct FrameState {
-			VK_Fence *in_flight_fence;
 			VK_Semaphore *finished_semaphore;
 			VK_Semaphore *image_available_semaphore;
 		};
@@ -99,7 +98,8 @@ namespace HBE {
 
 		void createDefaultResources() override;
 
-
+		const VK_Instance* getInstance() const;
+		void waitAll();
 	};
 }
 

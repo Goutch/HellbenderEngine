@@ -62,7 +62,11 @@ if (VULKAN_FOUND)
             platforms/vk/VK_RenderTarget.cpp
             platforms/vk/VK_RenderTarget.h
             platforms/vk/VK_Queue.cpp
-            platforms/vk/VK_Queue.h)
+            platforms/vk/VK_Queue.h
+            platforms/vk/VK_ComputePipeline.cpp
+            platforms/vk/VK_ComputePipeline.h
+            platforms/vk/VK_PipelineLayout.cpp
+            platforms/vk/VK_PipelineLayout.h)
 
     add_compile_definitions(VULKAN_RENDERER)
 
@@ -159,10 +163,7 @@ set(CORE_FILES
 
         core/threading/JobManager.cpp
         core/threading/JobManager.h
-        platforms/vk/VK_ComputePipeline.cpp
-        platforms/vk/VK_ComputePipeline.h
-        platforms/vk/VK_PipelineLayout.cpp
-        platforms/vk/VK_PipelineLayout.h)
+    )
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

@@ -15,8 +15,7 @@ namespace HBE {
 		this->device_handle = device->getHandle();
 		vkGetDeviceQueue(device_handle, family_index, 0, &handle);
 
-		command_pool = new VK_CommandPool(device, 1);
-		fence = new VK_Fence(*device);
+		command_pool = new VK_CommandPool(*		device, 1);
 		this->family_index = family_index;
 	}
 
@@ -55,17 +54,15 @@ namespace HBE {
 	}
 
 	void VK_Queue::beginCommand() {
-		fence->wait();
-		fence->reset();
-		command_pool->begin(0);
+		command_pool->begin();
 	}
 
 	void VK_Queue::endCommand() {
-		command_pool->end(0);
+		command_pool->end();
 	}
 
-	void VK_Queue::submit() {
-		submit(command_pool->getCurrentBuffer(), fence->getHandle());
+	void VK_Queue::submitCommand() {
+		submit(command_pool->getCurrentBuffer());
 	}
 
 	VK_CommandPool *VK_Queue::getCommandPool() {
@@ -73,7 +70,6 @@ namespace HBE {
 	}
 
 	VK_Queue::~VK_Queue() {
-		delete fence;
 		delete command_pool;
 
 	}
