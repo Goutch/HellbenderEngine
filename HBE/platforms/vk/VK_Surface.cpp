@@ -7,8 +7,8 @@
 #include "GLFW/glfw3.h"
 namespace HBE
 {
-    VK_Surface::VK_Surface(const VkInstance &instance_handle,GLFWwindow* window_handle) {
-        this->instance_handle=&instance_handle;
+    VK_Surface::VK_Surface(VkInstance instance_handle,GLFWwindow* window_handle) {
+    	this->instance_handle=instance_handle;
         if (glfwCreateWindowSurface(instance_handle, window_handle, nullptr, &handle) != VK_SUCCESS) {
             Log::error("Failed to create window surface");
         }
@@ -19,7 +19,7 @@ namespace HBE
     }
 
     VK_Surface::~VK_Surface() {
-        vkDestroySurfaceKHR(*instance_handle,handle, nullptr);
+        vkDestroySurfaceKHR(instance_handle,handle, nullptr);
     }
 }
 

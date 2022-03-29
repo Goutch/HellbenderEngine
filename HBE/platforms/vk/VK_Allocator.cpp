@@ -32,7 +32,7 @@ namespace HBE {
 
 	VK_Allocator::VK_Allocator(VK_Device *device) {
 		this->device = device;
-		this->command_pool = new VK_CommandPool(*device, 16);
+		this->command_pool = new VK_CommandPool(*device, 1);
 		memory_propeties = &device->getPhysicalDevice().getMemoryProperties();
 		for (size_t i = 0; i < memory_propeties->memoryTypeCount; ++i) {
 			blocks.emplace(i, std::vector<Block *>());
@@ -45,11 +45,9 @@ namespace HBE {
 		for (auto it = blocks.begin(); it != blocks.end(); ++it) {
 			for (Block *block: it->second) {
 				vkFreeMemory(device->getHandle(), block->memory, nullptr);
-				delete block;
 			}
 		}
-		for (auto pooled_block: block_pool) {
-
+		for (auto pooled_block: block_cache) {
 			vkFreeMemory(device->getHandle(), pooled_block.second->memory, nullptr);
 			delete pooled_block.second;
 		}
@@ -146,17 +144,17 @@ namespace HBE {
 			vkUnmapMemory(device->getHandle(), alloc.block->memory);
 		} else {
 			StagingBuffer staging_buffer = createTempStagingBuffer(data, size);
-
-			copy(staging_buffer.buffer, buffer.getHandle(), size);
 			staging_buffer.fence = &command_pool->getCurrentFence();
+			copy(staging_buffer.buffer, buffer.getHandle(), size);
 			staging_buffers_queue.emplace(staging_buffer);
 		}
 	}
 
 	void VK_Allocator::update(VK_Image &image, const void *data, size_t width, size_t height) {
 		StagingBuffer staging_buffer = createTempStagingBuffer(data, width * height * image.bytePerPixel());
-		copy(staging_buffer.buffer, &image, image.getDesiredLayout());
 		staging_buffer.fence = &command_pool->getCurrentFence();
+		copy(staging_buffer.buffer, &image, image.getDesiredLayout());
+
 		staging_buffers_queue.emplace(staging_buffer);
 	}
 
@@ -213,8 +211,8 @@ namespace HBE {
 		}
 		//new block needed
 		Block *block;
-		auto block_it = block_pool.find(memory_type);
-		if (block_it == block_pool.end()) {
+		auto block_it = block_cache.find(memory_type);
+		if (block_it == block_cache.end()) {
 			uint32_t index = blocks[memory_type].size();
 			block = blocks[memory_type].emplace_back(new Block{
 					.size= mem_requirements.size > BLOCK_SIZE ? mem_requirements.size : BLOCK_SIZE,
@@ -231,15 +229,10 @@ namespace HBE {
 			if (vkAllocateMemory(device->getHandle(), &allocInfo, nullptr, &block->memory) != VK_SUCCESS) {
 				Log::error("failed to allocate buffer memory!");
 			}
-
 		} else {
-
 			block = block_it->second;
 			block->index = blocks[memory_type].size();
-			block->remaining = block->size;
-			block->alloc_count = 0;
-			block->allocations.clear();
-			block_pool.erase(memory_type);
+			block_cache.erase(memory_type);
 			blocks[memory_type].emplace_back(block);
 		}
 		block->alloc_count++;
@@ -490,10 +483,14 @@ namespace HBE {
 		if (allocation.block->memory_type_index)
 			if (allocation.block->alloc_count == 1) {
 				auto it = blocks[memory_type_index].erase(blocks[memory_type_index].begin() + allocation.block->index);
-				auto block_pool_it = block_pool.find(allocation.block->memory_type_index);
-				if (block_pool_it == block_pool.end()) {
-					block_pool.emplace(block->memory_type_index, block);
+				auto block_pool_it = block_cache.find(allocation.block->memory_type_index);
+				if (block_pool_it == block_cache.end()) {
+					block->remaining = block->size;
+					block->alloc_count = 0;
+					block->allocations.clear();
+					block_cache.emplace(block->memory_type_index, block);
 				} else {
+
 					vkFreeMemory(device->getHandle(), allocation.block->memory, nullptr);
 					delete block;
 				}

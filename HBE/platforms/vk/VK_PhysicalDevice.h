@@ -31,8 +31,8 @@ namespace HBE {
 		};
 
 
-		const VkInstance *vk_instance_handle;
-		VkSurfaceKHR *surface_handle;
+		VkInstance vk_instance_handle;
+		VkSurfaceKHR surface_handle;
 		VkPhysicalDevice handle = VK_NULL_HANDLE;
 		VkPhysicalDeviceProperties properties;
 		VkPhysicalDeviceFeatures supported_features;
@@ -41,7 +41,7 @@ namespace HBE {
 		VkPhysicalDeviceMemoryProperties memory_properties;
 
 	public:
-		VK_PhysicalDevice(const VkInstance &vk_instance_handle, VkSurfaceKHR &surface_handle);
+		VK_PhysicalDevice(VkInstance vk_instance_handle, VkSurfaceKHR surface_handle);
 
 		const QueueFamilyIndices &getQueueFamilyIndices() const;
 

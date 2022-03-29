@@ -6,10 +6,9 @@
 #include <cstring>
 
 namespace HBE {
-
-    VK_PhysicalDevice::VK_PhysicalDevice(const VkInstance &vk_instance_handle, VkSurfaceKHR &surface_handle) {
-        this->vk_instance_handle = &vk_instance_handle;
-        this->surface_handle = &surface_handle;
+	VK_PhysicalDevice::VK_PhysicalDevice(VkInstance vk_instance_handle, VkSurfaceKHR surface_handle) {
+        this->vk_instance_handle = vk_instance_handle;
+        this->surface_handle = surface_handle;
         Log::status("Looking for suitable GPU:");
         pickBestPhysicalDevice();
 
@@ -20,12 +19,12 @@ namespace HBE {
 
     void VK_PhysicalDevice::pickBestPhysicalDevice() {
         uint32_t device_count = 0;
-        vkEnumeratePhysicalDevices(*vk_instance_handle, &device_count, nullptr);
+        vkEnumeratePhysicalDevices(vk_instance_handle, &device_count, nullptr);
         if (device_count == 0) {
             Log::error("No available GPU!");
         }
         std::vector<VkPhysicalDevice> available_physical_devices = std::vector<VkPhysicalDevice>(device_count);
-        vkEnumeratePhysicalDevices(*vk_instance_handle, &device_count, available_physical_devices.data());
+        vkEnumeratePhysicalDevices(vk_instance_handle, &device_count, available_physical_devices.data());
 
         std::multimap<int, VkPhysicalDevice> suitable_devices_map;
         for (const VkPhysicalDevice &physical_device:available_physical_devices) {
@@ -91,7 +90,7 @@ namespace HBE {
 
             //present
             VkBool32 present_supported = false;
-            vkGetPhysicalDeviceSurfaceSupportKHR(physical_device, i, *surface_handle, &present_supported);
+            vkGetPhysicalDeviceSurfaceSupportKHR(physical_device, i, surface_handle, &present_supported);
             if (present_supported) {
                 indices.present_family = i;
             }
@@ -164,32 +163,32 @@ namespace HBE {
     SwapchainSupportDetails VK_PhysicalDevice::querySwapchainSupportDetails(VkPhysicalDevice const &physical_device) const {
         SwapchainSupportDetails details;
 
-        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device, *surface_handle, &details.capabilities);
+        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device, surface_handle, &details.capabilities);
 
         uint32_t format_count;
         vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device,
-                                             *surface_handle,
+                                             surface_handle,
                                              &format_count,
                                              nullptr);
 
         if (format_count != 0) {
             details.formats.resize(format_count);
             vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device,
-                                                 *surface_handle,
+                                                 surface_handle,
                                                  &format_count,
                                                  details.formats.data());
         }
 
         uint32_t present_mode_count;
         vkGetPhysicalDeviceSurfacePresentModesKHR(physical_device,
-                                                  *surface_handle,
+                                                  surface_handle,
                                                   &present_mode_count,
                                                   nullptr);
 
         if (present_mode_count != 0) {
             details.present_modes.resize(present_mode_count);
             vkGetPhysicalDeviceSurfacePresentModesKHR(physical_device,
-                                                      *surface_handle,
+                                                      surface_handle,
                                                       &present_mode_count,
                                                       details.present_modes.data());
         }
@@ -200,6 +199,8 @@ namespace HBE {
     const SwapchainSupportDetails &VK_PhysicalDevice::getSwapchainSupportDetails() const {
         return support_details;
     }
+
+
 
 }
 

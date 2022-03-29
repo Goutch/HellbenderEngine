@@ -94,6 +94,7 @@ namespace HBE {
 		Application::onWindowClosed.unsubscribe(this);
 		Configs::onVerticalSyncChange.unsubscribe(this);
 		device->wait();
+		Resources::destroyAll();
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 			delete frames[i].image_available_semaphore;
 			delete frames[i].finished_semaphore;
@@ -269,7 +270,6 @@ namespace HBE {
 				Log::error("failed to present swap chain image!");
 			}
 		} else {
-			command_pool->getCurrentFence().reset();
 			command_pool->end();
 			command_pool->submit(QUEUE_FAMILY_GRAPHICS);
 		}

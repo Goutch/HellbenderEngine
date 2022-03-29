@@ -163,7 +163,7 @@ set(CORE_FILES
 
         core/threading/JobManager.cpp
         core/threading/JobManager.h
-    )
+        )
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

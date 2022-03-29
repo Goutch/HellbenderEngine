@@ -14,6 +14,7 @@ namespace HBE {
     public:
        const std::vector<const char *> validation_layer_names={
                "VK_LAYER_KHRONOS_validation"
+			   ""
        };
     private:
 

@@ -115,7 +115,8 @@ void main()
 	}
 
 	void Graphics::terminate() {
-		Resources::destroyAll();
+
+
 		delete DEFAULT_QUAD;
 		delete DEFAULT_CUBE;
 		delete renderer;

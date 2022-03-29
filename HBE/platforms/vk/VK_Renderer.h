@@ -78,7 +78,7 @@ namespace HBE {
 
 		VK_Renderer();
 
-		~VK_Renderer();
+		~VK_Renderer() override;
 
 		const ResourceFactory *getResourceFactory() const override;
 

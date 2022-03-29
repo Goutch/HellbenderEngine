@@ -25,7 +25,6 @@ namespace HBE {
 	enum ALLOC_FLAGS {
 		ALLOC_FLAG_NONE = 0,
 		ALLOC_FLAG_MAPPABLE = 1,
-		ALLOC_FLAG_TEMP = 2,//
 	};
 
 	struct Allocation {
@@ -83,7 +82,7 @@ namespace HBE {
 		VK_Device *device;
 
 		std::unordered_map<uint32_t, std::vector<Block *>> blocks;
-		std::unordered_map<uint32_t, Block *> block_pool;
+		std::unordered_map<uint32_t, Block *> block_cache;
 		const VkPhysicalDeviceMemoryProperties *memory_propeties;
 		uint32_t current_id = 0;
 
