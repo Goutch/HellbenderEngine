@@ -22,7 +22,6 @@
 - Instancing
 - keyboard and mouse input handling
 - Resource loading
-	 - Model
 	 - Texture
 	 - Shaders
 - Job System
@@ -39,7 +38,7 @@ These are 2 tested compilers :
 - [Home](https://github.com/Goutch/HellbenderEngine/wiki) 
 ## Qestions and Answers
 Q: Why should I use this engine instead of unity/unreal?  
-A: You shouldn't this is a toy engine for me.  
+A: You shouldn't this is a toy engine made for me.  
 
 ### Notes:
 Opengl is deprecated as of now I am not sure if I will support it in the future. Checkout the opengl branch if you want a working opengl version.
