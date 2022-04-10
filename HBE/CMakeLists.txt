@@ -8,7 +8,6 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3 -fPIC")
 endif ()
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
 
 find_package(Vulkan REQUIRED)
 if (VULKAN_FOUND)
@@ -95,6 +94,8 @@ else ()
             platforms/gl/GL_ResourceFactory.h)
 endif ()
 
+
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
 
 include_directories(.)
 set(CORE_FILES
@@ -183,8 +184,7 @@ target_include_directories(${PROJECT_NAME}
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/include/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/fpm/include/")
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/")
 
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")

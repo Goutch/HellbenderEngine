@@ -28,7 +28,7 @@ namespace HBE {
 
 		void update(const void *data);
 
-		const VkBuffer &getHandle() const;
+		VkBuffer getHandle() const;
 
 		void copy(VK_Buffer *other);
 

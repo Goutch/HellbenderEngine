@@ -150,8 +150,8 @@ namespace HBE {
 		}
 	}
 
-	void VK_Allocator::update(VK_Image &image, const void *data, size_t width, size_t height) {
-		StagingBuffer staging_buffer = createTempStagingBuffer(data, width * height * image.bytePerPixel());
+	void VK_Allocator::update(VK_Image &image, const void *data, size_t width, size_t height, size_t depth) {
+		StagingBuffer staging_buffer = createTempStagingBuffer(data, width * height * depth * image.bytePerPixel());
 		staging_buffer.fence = &command_pool->getCurrentFence();
 		copy(staging_buffer.buffer, &image, image.getDesiredLayout());
 

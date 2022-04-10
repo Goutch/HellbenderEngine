@@ -33,7 +33,7 @@ namespace HBE {
 	}
 
 
-	const VkBuffer &VK_Buffer::getHandle() const {
+	VkBuffer VK_Buffer::getHandle() const {
 		return handle;
 	}
 

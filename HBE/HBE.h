@@ -1,7 +1,6 @@
 #pragma once
 #define _USE_MATH_DEFINES
 #include "Core.h"
-
 #include "Configs.h"
 #include "core/scene/Components.h"
 #include "core/scene/Scene.h"

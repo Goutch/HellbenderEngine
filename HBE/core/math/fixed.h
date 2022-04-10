@@ -2,8 +2,6 @@
 
 #include <string>
 #include "glm/glm.hpp"
-#include "fpm/fixed.hpp"
-#include "fpm/math.hpp"
 #include "core/utility/Log.h"
 //https://github.com/MikeLankamp/fpm/blob/master/docs/index.md
 //https://en.wikipedia.org/wiki/Fixed-point_arithmetic

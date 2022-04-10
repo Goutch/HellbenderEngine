@@ -1,14 +1,20 @@
 #include "HBE.h"
-#include "Raytracer/Raytracer.h"
+#include "VoxelModule/Raytracer.h"
 #include "Pong/Pong.h"
 #include "Examples/Instancing.h"
 #include "Pathfinder/Pathfinder.h"
 
 using namespace HBE;
+bool fullscreen = false;
 
 void onAppUpdate(float delta) {
 	if (Input::getKeyDown(KEY::ESCAPE)) {
 		Application::quit();
+	}
+	if (Input::getKeyDown(KEY::F11)) {
+		fullscreen = !fullscreen;
+		Graphics::getWindow()->setFullscreen(fullscreen);
+
 	}
 	if (Input::getKeyDown(KEY::V)) {
 		Configs::setVerticalSync(!Configs::getVerticalSync());
@@ -18,7 +24,6 @@ void onAppUpdate(float delta) {
 
 int main() {
 	Application::init();
-
 	//-----------------------SETUP--------------------
 	Configs::setWindowTitle("Hellbender");
 	//Pathfinder *pathfinder = new Pathfinder();

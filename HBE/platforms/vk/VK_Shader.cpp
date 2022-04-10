@@ -209,6 +209,7 @@ namespace HBE {
 				VertexInput attribute_description{};
 				attribute_description.location = location;
 				attribute_description.size = size * 4;
+
 				switch (size) {
 					case 1:
 						if (basetype == spvc_basetype::SPVC_BASETYPE_FP32)

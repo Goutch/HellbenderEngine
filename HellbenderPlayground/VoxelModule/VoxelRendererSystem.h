@@ -7,14 +7,14 @@ struct CubeRenderer {
 
 };
 
-class TracedRendererSystem : public System {
+class VoxelRendererSystem : public System {
 	Mesh *mesh;
 	Shader *fragment_shader;
 	Shader *vertex_shader;
 	GraphicPipeline *pipeline;
 	std::vector<mat4> transforms;
-	~TracedRendererSystem();
+	~VoxelRendererSystem();
 public:
 	void draw();
-	TracedRendererSystem(Scene *scene);
+	VoxelRendererSystem(Scene *scene);
 };

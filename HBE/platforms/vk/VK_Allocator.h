@@ -100,7 +100,7 @@ namespace HBE {
 		void copy(VK_Image *src, VkImageLayout src_end_layout, VK_Image *dest, VkImageLayout dst_end_layout);
 		void setImageLayout(VK_Image *image, VkImageLayout newLayout);
 		void update(const VK_Buffer &buffer, const void *data, size_t size);
-		void update(VK_Image &image, const void *data, size_t width, size_t height);
+		void update(VK_Image &image, const void *data, size_t width, size_t height = 1, size_t depth = 1);
 	private:
 		void barrierTransitionImageLayout(VK_Image *image, VkImageLayout new_layout);
 
@@ -110,6 +110,7 @@ namespace HBE {
 
 		void freeStagingBuffers();
 		StagingBuffer createTempStagingBuffer(const void *data, size_t size);
+
 	};
 }
 

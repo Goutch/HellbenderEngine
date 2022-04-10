@@ -3,6 +3,8 @@
 #include "GLFW/glfw3.h"
 #include "core/utility/Log.h"
 #include "Configs.h"
+#include "core/graphics/Graphics.h"
+#include "VK_RenderPass.h"
 
 namespace HBE {
 	void VK_Window::windowSizeCallback(GLFWwindow *handle, int width, int height) {
@@ -19,7 +21,7 @@ namespace HBE {
 		this->height = height;
 		if (!glfwInit()) {
 			Log::error("Failed to load glfw");
-		} 
+		}
 		if (!glfwVulkanSupported()) {
 			Log::error("Vulkan is not supported");
 		}
@@ -62,6 +64,26 @@ namespace HBE {
 
 	GLFWwindow *VK_Window::getHandle() {
 		return handle;
+	}
+
+	void VK_Window::setFullscreen(bool fullscreen) {
+		if (fullscreen) {
+			// backup window position and window size
+			//glfwGetWindowPos( handle, &_wndPos[0], &_wndPos[1] );
+			//glfwGetWindowSize( _wnd, &_wndSize[0], &_wndSize[1] );
+
+			// get resolution of monitor
+			const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+			// switch to full screen
+			glfwSetWindowMonitor(handle, glfwGetPrimaryMonitor(), 0, 0, mode->width, mode->height, 0);
+		} else {
+			// restore last window size and position
+			uint32_t w, h;
+			Graphics::getDefaultRenderTarget()->getResolution(w, h);
+			glfwSetWindowMonitor(handle, nullptr, 0, 0, w, h, 0);
+		}
+
 	}
 
 }

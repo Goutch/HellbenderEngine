@@ -4,26 +4,28 @@
 #include "core/utility/Event.h"
 struct GLFWwindow;
 namespace HBE {
-    class HB_API Window {
+	class HB_API Window {
 
-    public:
-        Event<uint32_t , uint32_t> onSizeChange;
+	public:
+		Event <uint32_t, uint32_t> onSizeChange;
 
-        virtual bool shouldClose() = 0;
+		virtual bool shouldClose() = 0;
 
-        virtual void swapBuffers() = 0;
+		virtual void swapBuffers() = 0;
 
-        virtual void requestClose() = 0;
+		virtual void requestClose() = 0;
 
-        virtual ~Window() {};
+		virtual ~Window() {};
 
-        static Window *create(uint32_t width,uint32_t height);
+		static Window *create(uint32_t width, uint32_t height);
 
-        //todo: fix this hack
-        virtual GLFWwindow* getHandle()=0;
+		//todo: fix this hack
+		virtual GLFWwindow *getHandle() = 0;
 
-        virtual void getSize(uint32_t& width,uint32_t& height)=0;
-    };
+		virtual void getSize(uint32_t &width, uint32_t &height) = 0;
+
+		virtual void setFullscreen(bool fullscreen) = 0;
+	};
 }
 
 

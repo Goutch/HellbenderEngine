@@ -336,7 +336,7 @@ namespace HBE {
 		image_info.width = 2;
 		image_info.height = 2;
 		image_info.format = IMAGE_FORMAT_RGBA32F;
-		image_info.flags = IMAGE_FLAG_RAW;
+		image_info.flags = IMAGE_FLAG_NO_SAMPLER;
 		Resources::add("DEFAULT_IMAGE", factory->createTexture(image_info));
 
 

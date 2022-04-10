@@ -11,6 +11,14 @@ namespace HBE {
 	typedef glm::vec3 vec3;
 	typedef glm::vec4 vec4;
 
+	typedef glm::ivec2 ivec2;
+	typedef glm::ivec3 ivec3;
+	typedef glm::ivec4 ivec4;
+
+	typedef glm::uvec2 uvec2;
+	typedef glm::uvec3 uvec3;
+	typedef glm::uvec4 uvec4;
+
 	typedef glm::vec<2,int32_t> vec2i;
 	typedef glm::vec<3,int32_t> vec3i;
 	typedef glm::vec<4,int32_t> vec4i;

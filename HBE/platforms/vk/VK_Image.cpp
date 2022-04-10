@@ -15,14 +15,14 @@ namespace HBE {
 			return VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 		} else if (flags & IMAGE_FLAG_RENDER_TARGET) {
 			return VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		} else if (flags & IMAGE_FLAG_RAW) {
+		} else if (flags & IMAGE_FLAG_SHADER_WRITE || flags & IMAGE_FLAG_NO_SAMPLER) {
 			return VK_IMAGE_LAYOUT_GENERAL;
 		}
 		return VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 	}
 
 	void VK_Image::update(const void *data) {
-		device->getAllocator()->update(*this, data, width, height);
+		device->getAllocator()->update(*this, data, width, height, depth);
 	}
 
 	VK_Image::VK_Image(VK_Device *device, const TextureInfo &info) {
@@ -50,7 +50,7 @@ namespace HBE {
 		switch (format) {
 
 			case IMAGE_FORMAT_R8:
-				vk_format = VK_FORMAT_R8_SRGB;
+				vk_format = VK_FORMAT_R8_UINT;
 				byte_per_pixel = 1;
 				break;
 			case IMAGE_FORMAT_RG8:
@@ -112,7 +112,6 @@ namespace HBE {
 
 		imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 		imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 
 		std::array<uint32_t, 3> queues = {device->getQueue(QUEUE_FAMILY_GRAPHICS)->getFamilyIndex(),
 										  device->getQueue(QUEUE_FAMILY_TRANSFER)->getFamilyIndex(),
@@ -122,11 +121,11 @@ namespace HBE {
 		imageInfo.queueFamilyIndexCount = queues.size();
 		imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 		imageInfo.flags = 0; // Optional
-
-		imageInfo.usage |= (info.flags & IMAGE_FLAG_DEPTH) != IMAGE_FLAG_DEPTH ? VK_IMAGE_USAGE_SAMPLED_BIT : 0;
+		imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+		imageInfo.usage |= ((info.flags & IMAGE_FLAG_DEPTH) != IMAGE_FLAG_DEPTH && (info.flags & IMAGE_FLAG_NO_SAMPLER) != IMAGE_FLAG_NO_SAMPLER )? VK_IMAGE_USAGE_SAMPLED_BIT : 0;
 		imageInfo.usage |= (info.flags & IMAGE_FLAG_RENDER_TARGET) ? VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT : 0;
 		imageInfo.usage |= (info.flags & IMAGE_FLAG_DEPTH) ? VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT : 0;
-		imageInfo.usage |= (info.flags & IMAGE_FLAG_RAW) ? VK_IMAGE_USAGE_STORAGE_BIT : 0;
+		imageInfo.usage |= (info.flags & IMAGE_FLAG_SHADER_WRITE || info.flags & IMAGE_FLAG_NO_SAMPLER) ? VK_IMAGE_USAGE_STORAGE_BIT : 0;
 		if (vkCreateImage(device->getHandle(), &imageInfo, nullptr, &handle) != VK_SUCCESS) {
 			Log::error("failed to create image!");
 		}
@@ -138,7 +137,7 @@ namespace HBE {
 
 		if (info.data != nullptr) {
 			update(info.data);
-		} else {
+		} else if (flags & IMAGE_FLAG_RENDER_TARGET) {
 			device->getAllocator()->setImageLayout(this, desired_layout);
 		}
 
@@ -159,34 +158,34 @@ namespace HBE {
 			Log::error("failed to create texture image view!");
 		}
 
+		if ((flags & IMAGE_FLAG_NO_SAMPLER) != IMAGE_FLAG_NO_SAMPLER) {
+			VkSamplerCreateInfo samplerInfo{};
+			samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+			samplerInfo.magFilter = VK_FILTER_NEAREST;
+			samplerInfo.minFilter = VK_FILTER_NEAREST;
+			samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+			samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+			samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
 
-		VkSamplerCreateInfo samplerInfo{};
-		samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-		samplerInfo.magFilter = VK_FILTER_NEAREST;
-		samplerInfo.minFilter = VK_FILTER_NEAREST;
-		samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-		samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-		samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+			samplerInfo.anisotropyEnable = device->getPhysicalDevice().getFeatures().samplerAnisotropy;
+			samplerInfo.maxAnisotropy = device->getPhysicalDevice().getProperties().limits.maxSamplerAnisotropy;
 
-		samplerInfo.anisotropyEnable = device->getPhysicalDevice().getFeatures().samplerAnisotropy;
-		samplerInfo.maxAnisotropy = device->getPhysicalDevice().getProperties().limits.maxSamplerAnisotropy;
+			samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+			samplerInfo.unnormalizedCoordinates = VK_FALSE;
 
-		samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
-		samplerInfo.unnormalizedCoordinates = VK_FALSE;
+			samplerInfo.compareEnable = VK_FALSE;
+			samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
 
-		samplerInfo.compareEnable = VK_FALSE;
-		samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
-
-		samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-		samplerInfo.mipLodBias = 0.0f;
-		samplerInfo.minLod = 0.0f;
-		samplerInfo.maxLod = 0.0f;
+			samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+			samplerInfo.mipLodBias = 0.0f;
+			samplerInfo.minLod = 0.0f;
+			samplerInfo.maxLod = 0.0f;
 
 
-		if (vkCreateSampler(device->getHandle(), &samplerInfo, nullptr, &sampler_handle) != VK_SUCCESS) {
-			Log::error("failed to create texture sampler!");
+			if (vkCreateSampler(device->getHandle(), &samplerInfo, nullptr, &sampler_handle) != VK_SUCCESS) {
+				Log::error("failed to create texture sampler!");
+			}
 		}
-
 	}
 
 	VK_Image::~VK_Image() {

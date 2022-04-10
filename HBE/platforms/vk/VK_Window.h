@@ -13,8 +13,8 @@ namespace HBE {
         ~VK_Window();
 
         bool shouldClose() override;
-
-        void swapBuffers() override;
+		void setFullscreen(bool fullscreen) override;
+		void swapBuffers() override;
 
         void getSize(uint32_t &width, uint32_t &height) override;
 

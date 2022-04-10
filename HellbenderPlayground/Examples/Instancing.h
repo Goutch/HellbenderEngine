@@ -37,6 +37,8 @@ public:
 
 		auto pipeline = Resources::createGraphicPipeline(pipeline_info, "pipeline");
 
+		vec4 color = vec4(1, 0, 0, 1);
+		pipeline->setUniform("material", &color);
 		MeshInfo mesh_info{};
 		mesh_info.binding_infos = binding_infos.data();
 		mesh_info.binding_info_count = binding_infos.size();
