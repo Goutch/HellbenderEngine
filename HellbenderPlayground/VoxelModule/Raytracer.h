@@ -16,8 +16,7 @@ public :
 		Entity camera_entity = scene.createEntity("camera");
 		Camera &camera = camera_entity.attach<Camera>();
 		camera.render_target = Graphics::getDefaultRenderTarget();
-		camera_entity.attach<CameraController>();
-
+		camera_entity.get<Transform>().translate(vec3(0,0,30));
 		scene.setCameraEntity(camera_entity);
 	}
 };

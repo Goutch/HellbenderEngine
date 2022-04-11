@@ -17,7 +17,7 @@ set(PATHFINDER_FILES
         Pathfinder/Systems/SimCamera2DSystem.h)
 
 set(VOXEL_MODULE
-        VoxelModule/VoxelRendererSystem.cpp)
+        VoxelModule/VoxelRendererSystem.cpp VoxelModule/Octree.cpp VoxelModule/Octree.h VoxelModule/Server.cpp VoxelModule/Server.h VoxelModule/VoxelChunk.cpp VoxelModule/VoxelChunk.h)
 
 add_executable(${PROJECT_NAME}
         main.cpp

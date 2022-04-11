@@ -8,7 +8,7 @@
 
 namespace HBE {
 	Texture *Texture::load(std::string path) {
-		std::ifstream file(path.c_str());
+		std::ifstream file((RESOURCE_PATH+path).c_str());
 		if (file.good()) {
 			TextureInfo info{};
 			Texture *texture;

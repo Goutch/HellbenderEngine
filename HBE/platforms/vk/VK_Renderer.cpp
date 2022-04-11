@@ -180,7 +180,9 @@ namespace HBE {
 	void VK_Renderer::beginFrame() {
 		//frames[current_frame].in_flight_fence->wait();
 		//wait for last frame i to isEnd
+		Profiler::begin("CommandPoolWait");
 		command_pool->begin();
+		Profiler::end();
 	}
 
 	void VK_Renderer::endFrame(bool present) {
@@ -350,12 +352,12 @@ namespace HBE {
 
 		ShaderInfo shader_info{};
 		shader_info.stage = SHADER_STAGE_VERTEX;
-		shader_info.path = "../../res/shaders/defaults/VK_Screen.vert";
+		shader_info.path = "shaders/defaults/VK_Screen.vert";
 		Shader *vert = new VK_Shader(device, shader_info);
 		Resources::add("DEFAULT_SCREEN_VERT_SHADER", vert);
 
 		shader_info.stage = SHADER_STAGE_FRAGMENT;
-		shader_info.path = "../../res/shaders/defaults/VK_Screen.frag";
+		shader_info.path = "shaders/defaults/VK_Screen.frag";
 		Shader *frag = new VK_Shader(device, shader_info);
 		Resources::add("DEFAULT_SCREEN_FRAG_SHADER", frag);
 

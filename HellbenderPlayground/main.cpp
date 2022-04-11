@@ -6,6 +6,7 @@
 
 using namespace HBE;
 bool fullscreen = false;
+bool controller = false;
 
 void onAppUpdate(float delta) {
 	if (Input::getKeyDown(KEY::ESCAPE)) {
@@ -19,6 +20,17 @@ void onAppUpdate(float delta) {
 	if (Input::getKeyDown(KEY::V)) {
 		Configs::setVerticalSync(!Configs::getVerticalSync());
 	}
+
+	if (Input::getKeyDown(KEY::C)) {
+		if (controller) {
+			controller = false;
+			Application::getScene()->getCameraEntity()->detach<CameraController>();
+		} else {
+			controller = true;
+			Application::getScene()->getCameraEntity()->attach<CameraController>();
+		}
+
+	}
 }
 
 
@@ -28,6 +40,7 @@ int main() {
 	Configs::setWindowTitle("Hellbender");
 	//Pathfinder *pathfinder = new Pathfinder();
 	Raytracer::init();
+	Application::getScene()->getCameraEntity()->attach<CameraController>();
 	//Pong::init();
 	//Instancing::init();
 	//-----------------------EVENTS------------------

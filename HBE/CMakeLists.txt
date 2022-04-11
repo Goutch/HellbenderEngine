@@ -225,8 +225,8 @@ if (VULKAN_FOUND)
             PUBLIC spirv-cross-msl
             PUBLIC spirv-cross-util
             PUBLIC spirv-cross-core)
-
 else ()
     target_link_libraries(${PROJECT_NAME} PUBLIC glad)
 endif ()
 target_link_libraries(${PROJECT_NAME} PUBLIC glfw ${GLSLANG_LIBS})
+

@@ -17,81 +17,63 @@ layout(binding = 0, set=0) uniform UniformBufferObject {
 layout(binding = 1, set=0, r8ui) uniform readonly uimage3D voxels;
 
 layout(set =0, binding = 2) uniform VoxelDataUBO {
-    uvec4 dimensions;
+    uvec3 resolution;
+    vec3 bounding_box_size;
 } VoxelData;
 
-
-
-ivec3 voxel_pos;
-float t=0.0f;
-
-bool march(Ray ray)
-{
-
-    return true;
-}
-
 void main() {
+    vec3 half_size=(VoxelData.bounding_box_size/2.0f);
+    vec3 voxel_size=VoxelData.bounding_box_size/vec3(VoxelData.resolution);
     vec3 camera_position=inverse(ubo.view)[3].xyz;
     vec3 cube_position=fragInstanceTransform[3].xyz;
     Ray ray=Ray(camera_position, normalize(worldPosition-camera_position));
-    Cube cube=Cube(cube_position-vec3(0.5, 0.5, 0.5), cube_position + vec3(0.5, 0.5, 0.5));
+    ivec3 step = ivec3(ray.direction.x < 0 ? -1 : 1, ray.direction.y < 0 ? -1 : 1, ray.direction.z < 0 ? -1 : 1);
+    Cube cube=Cube(cube_position-half_size, cube_position + half_size);
+
     Intersection intersection = intersectCube(ray, cube);
+    float t=intersection.t;
 
     vec3 position = (ray.origin+(ray.direction*intersection.t));
-    vec3 fdimensions= vec3(VoxelData.dimensions.xyz);
-    voxel_pos=clamp(ivec3(floor((position-cube_position+vec3(0.5, 0.5, 0.5))*fdimensions)), ivec3(0, 0, 0), ivec3(VoxelData.dimensions.xyz)-ivec3(1, 1, 1));
+    ivec3 voxel_pos=clamp(ivec3(floor((((position-cube_position)+half_size)/VoxelData.bounding_box_size)*vec3(VoxelData.resolution))), ivec3(0, 0, 0), ivec3(VoxelData.resolution)-ivec3(1, 1, 1));
 
-    t=intersection.t;
+    vec3 planes =cube.min+ vec3(
+    (voxel_pos.x+int(step.x > 0)) * voxel_size.x,
+    (voxel_pos.y+int(step.y > 0)) * voxel_size.y,
+    (voxel_pos.z+int(step.z > 0)) * voxel_size.z);
 
+    bool sucess = true;
+    int step_index = 0;
 
-
-    ivec3 step = ivec3(ray.direction.x < 0 ? -1 : 1, ray.direction.y < 0 ? -1 : 1, ray.direction.z < 0 ? -1 : 1);
-    float voxel_size=1/fdimensions.x;
-    /* vec3 planes = (position-(mod(position, voxel_size)))+vec3(
-     (int(step.x > 0?1:0)) * voxel_size,
-     (int(step.y > 0?1:0)) * voxel_size,
-     (int(step.z > 0?1:0)) * voxel_size);*/
-
-    vec3 planes = vec3(
-    step.x > 0 ? ceil(voxel_pos.x + 0.5) * voxel_size : floor(voxel_pos.x + 0.5) * voxel_size,
-    step.y > 0 ? ceil(voxel_pos.y + 0.5) * voxel_size : floor(voxel_pos.y + 0.5) * voxel_size,
-    step.z > 0 ? ceil(voxel_pos.z + 0.5) * voxel_size : floor(voxel_pos.z + 0.5) * voxel_size)+cube_position-vec3(0.5, 0.5, 0.5);
-    uint v=imageLoad(voxels, voxel_pos).r;
-
-    bool sucess =true;
-    while (v==0)
+    uint v = imageLoad(voxels, voxel_pos).r;
+    while (v == 0)
     {
 
         vec3 ts = (planes - ray.origin) / ray.direction;
-        int step_index=0;
-        t = ts.x;
+        step_index=0;
 
-        if (ts.y < t)
-        {
-            t = ts.y;
-            step_index = 1;
-        }
-        if (ts.z < t)
-        {
-            t=ts.z;
-            step_index = 2;
-        }
-        voxel_pos[step_index]+=step[step_index];
+        int x_lesser_than_y=int(ts.x < ts.y);
+        int y_lesser_than_x=int(ts.y < ts.x);
+        int xy_lesser_than_z = int(ts[y_lesser_than_x]< ts.z);
+        int z_lesser_than_xy = int(ts.z<ts[y_lesser_than_x]);
 
-        if (voxel_pos[step_index]<0||voxel_pos[step_index]>=VoxelData.dimensions[step_index])
+        step_index=y_lesser_than_x+z_lesser_than_xy+(x_lesser_than_y *z_lesser_than_xy);
+        t=ts[step_index];
+
+        voxel_pos[step_index] += step[step_index];
+
+        if (voxel_pos[step_index]<0 || voxel_pos[step_index] >= VoxelData.resolution[step_index])
         {
             sucess=false;
             break;
         }
-        planes[step_index]+=step[step_index]*voxel_size;
+        planes[step_index] += step[step_index]*voxel_size[step_index];
         v=imageLoad(voxels, voxel_pos).r;
     }
 
     if (sucess)
     {
         float depth=t/100;
-        vec3 color= vec3(voxel_pos)/vec3(fdimensions);
+        vec3 color= vec3(voxel_pos)/vec3(VoxelData.resolution);
         gl_FragDepth=depth;
         outColor=vec4((1-depth), (1-depth), (1-depth), 1.)*vec4(color, 1.0f);
     }

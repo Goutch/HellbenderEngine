@@ -13,6 +13,7 @@
 #include "core/resource/Model.h"
 #include "core/resource/RenderTarget.h"
 
+
 namespace HBE {
 	class HB_API Resources {
 		static std::unordered_map<std::string, Resource *> registry;
