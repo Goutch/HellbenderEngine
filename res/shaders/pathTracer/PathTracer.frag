@@ -56,7 +56,7 @@ void main() {
         int xy_lesser_than_z = int(ts[y_lesser_than_x]< ts.z);
         int z_lesser_than_xy = int(ts.z<ts[y_lesser_than_x]);
 
-        step_index=y_lesser_than_x+z_lesser_than_xy+(x_lesser_than_y *z_lesser_than_xy);
+        step_index=y_lesser_than_x + z_lesser_than_xy+(x_lesser_than_y * z_lesser_than_xy);
         t=ts[step_index];
 
         voxel_pos[step_index] += step[step_index];

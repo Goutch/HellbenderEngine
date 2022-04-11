@@ -13,7 +13,7 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 	binding_infos[0].binding = 0;
 	binding_infos[0].size = sizeof(vec3);
 	binding_infos[1].binding = 1;
-	binding_infos[1].flags = VERTEX_BINDING_FLAG_PER_INSTANCE | VERTEX_BINDING_FLAG_FAST_WRITE;
+	binding_infos[1].flags = VERTEX_BINDING_FLAG_PER_INSTANCE;
 	binding_infos[1].size = sizeof(mat4);
 	MeshInfo mesh_info{};
 	mesh_info.flags = MESH_FLAG_NONE;

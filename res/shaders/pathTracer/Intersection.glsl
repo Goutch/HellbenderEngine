@@ -26,6 +26,19 @@ struct Plane{
 
 Intersection intersectCube(Ray ray, Cube cube)
 {
+    if (ray.origin.x>cube.min.x &&
+    ray.origin.y>cube.min.y&&
+    ray.origin.z>cube.min.z&&
+    ray.origin.x<cube.max.x &&
+    ray.origin.y<cube.max.y&&
+    ray.origin.z<cube.max.z)
+    {
+        Intersection intersection;
+        intersection.t = 0;
+        intersection.normal = -ray.direction;
+
+        return intersection;
+    }
     vec3 min_ts=vec3((cube.min-ray.origin)/ray.direction);
     vec3 max_ts=vec3((cube.max-ray.origin)/ray.direction);
 
@@ -48,7 +61,7 @@ Intersection intersectCube(Ray ray, Cube cube)
     float t1=ts1[t1_index];
 
     t0_normal[t0_index]=(-ray.direction[t0_index]);
-   // t0_normal=normalize(t0_normal);
+    // t0_normal=normalize(t0_normal);
 
     t1_normal[t1_index]=(ray.direction[t1_index]);
     //t1_normal=normalize(t1_normal);

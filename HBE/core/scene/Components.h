@@ -76,7 +76,7 @@ namespace HBE {
 		mat4 projection = mat4(1.0f);
 		float fov = 90.0f;
 		float render_distance = 100.0f;
-		float near = 0.1f;
+		float near = 0.001f;
 		bool active = true;
 		RenderTarget *render_target = nullptr;
 		void calculateProjection();
