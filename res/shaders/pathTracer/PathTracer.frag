@@ -21,6 +21,10 @@ layout(set =0, binding = 2) uniform VoxelDataUBO {
     vec3 bounding_box_size;
 } VoxelData;
 
+vec3 Atmosphere(float t)
+{
+    return exp(-0.005*t*vec3(4, 2, 1));
+}
 void main() {
     vec3 half_size=(VoxelData.bounding_box_size/2.0f);
     vec3 voxel_size=VoxelData.bounding_box_size/vec3(VoxelData.resolution);
@@ -74,8 +78,10 @@ void main() {
     {
         float depth=t/100;
         vec3 color= vec3(voxel_pos)/vec3(VoxelData.resolution);
+        vec3 atmosphere =Atmosphere(t);
+        color=(atmosphere*color) + ((vec3(1)-atmosphere)*vec3(0.5,0.5,0.5));
         gl_FragDepth=depth;
-        outColor=vec4((1-depth), (1-depth), (1-depth), 1.)*vec4(color, 1.0f);
+        outColor=vec4(color, 1.0f);
     }
     else
     {

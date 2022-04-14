@@ -14,11 +14,15 @@ namespace HBE {
 		for (size_t i = 0; i < count; ++i) {
 			auto shader_bindings = shaders[i]->getLayoutBindings();
 			auto shader_inputs = shaders[i]->getInputs();
+			int binding_count = 0;
 			for (size_t j = 0; j < shader_inputs.size(); ++j) {
 				uint32_t binding = shader_inputs[j].binding;
-				auto it = binding_input_index.find(binding);
+				auto it = name_input_index.find(shader_inputs[j].name);
 				//binding already exist
-				if (it != binding_input_index.end()) {
+				if (it != name_input_index.end()) {
+					if (shader_inputs[j].type == UNIFORM_INPUT_TYPE_PUSH_CONSTANT)
+						Log::warning("Trying to use multiple push constant declaration but it is not supported at the moment");
+					HB_ASSERT(inputs[it->second].binding == shader_inputs[j].binding, "Binding#" + std::to_string(shader_inputs[j].binding) + " has multiple definitions");
 					HB_ASSERT(inputs[it->second].name == shader_inputs[j].name, "Binding#" + std::to_string(shader_inputs[j].binding) + " has multiple name definitions");
 					HB_ASSERT(inputs[it->second].size == shader_inputs[j].size, "Binding#" + std::to_string(shader_inputs[j].binding) + " has different sizes");
 					//if has the same name then add the shader stage bit
@@ -26,9 +30,12 @@ namespace HBE {
 					descriptor_set_layout_bindings[binding_input_index[binding]].stageFlags |= shaders[i]->getVkStage();
 				} else {
 					name_input_index.emplace(shader_inputs[j].name, inputs.size());
-					binding_input_index.emplace(shader_inputs[j].binding, inputs.size());
 					inputs.emplace_back(shader_inputs[j]);
-					descriptor_set_layout_bindings.emplace_back(shader_bindings[j]);
+					if (shader_inputs[j].type != UNIFORM_INPUT_TYPE_PUSH_CONSTANT) {
+						binding_input_index.emplace(shader_inputs[j].binding, inputs.size());
+						descriptor_set_layout_bindings.emplace_back(shader_bindings[binding_count]);
+						binding_count++;
+					}
 				}
 			}
 

@@ -43,8 +43,8 @@ void AgentSystem::onDraw() {
 
 AgentSystem::AgentSystem(Scene *scene) : System(scene) {
 	camera_entity = scene->getCameraEntity();
-	ShaderInfo frag_info{SHADER_STAGE_FRAGMENT, "../../res/shaders/defaults/VK.frag"};
-	ShaderInfo vert_info{SHADER_STAGE_VERTEX, "../../res/shaders/defaults/VK_instanced.vert"};
+	ShaderInfo frag_info{SHADER_STAGE_FRAGMENT, "/shaders/defaults/VK.frag"};
+	ShaderInfo vert_info{SHADER_STAGE_VERTEX, "/shaders/defaults/VK_instanced.vert"};
 	auto frag = Resources::createShader(frag_info, "frag");
 	auto vert = Resources::createShader(vert_info, "vert");
 

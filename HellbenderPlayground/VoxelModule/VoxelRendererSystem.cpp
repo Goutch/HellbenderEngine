@@ -40,7 +40,7 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 
 	Geometry::createCube(*mesh, 1, 1, 1, 0);
 
-	int32_t range = 20; //10*10*10 = 1000 cubes
+	int32_t range = 2; //10*10*10 = 1000 cubes
 	uint32_t count = 0;
 	for (int i = -range; i < range; ++i) {
 		for (int j = -range; j < range; ++j) {
@@ -56,9 +56,9 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 
 
 	TextureInfo texture_info{};
-	texture_info.width = 8;
-	texture_info.height = 8;
-	texture_info.depth = 8;
+	texture_info.width = 128;
+	texture_info.height = 128;
+	texture_info.depth = 128;
 	texture_info.flags = IMAGE_FLAG_NO_SAMPLER;
 	texture_info.format = IMAGE_FORMAT_R8;
 	auto raw_voxels = Resources::createTexture(texture_info, "voxels");

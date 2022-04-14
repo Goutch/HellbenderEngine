@@ -33,6 +33,8 @@ namespace HBE {
 		this->format = info.format;
 		this->flags = info.flags;
 		this->id = current_id++;
+		this->mip_levels = info.generate_mip_maps ? static_cast<uint32_t>(std::floor(std::log2(std::max(std::max(info.width, info.height), info.depth)))) + 1 : 1;
+
 		desired_layout = chooseLayout();
 		Log::debug("Create image#" + std::to_string(id));
 		VkImageType type;
@@ -104,8 +106,8 @@ namespace HBE {
 		imageInfo.imageType = type;
 		imageInfo.extent.width = static_cast<uint32_t>(width);
 		imageInfo.extent.height = static_cast<uint32_t>(height);
-		imageInfo.extent.depth = static_cast<uint32_t>(depth);;
-		imageInfo.mipLevels = 1;
+		imageInfo.extent.depth = static_cast<uint32_t>(depth);
+		imageInfo.mipLevels = mip_levels;
 		imageInfo.arrayLayers = 1;
 
 		imageInfo.format = vk_format;
@@ -122,10 +124,11 @@ namespace HBE {
 		imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 		imageInfo.flags = 0; // Optional
 		imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT;
-		imageInfo.usage |= ((info.flags & IMAGE_FLAG_DEPTH) != IMAGE_FLAG_DEPTH && (info.flags & IMAGE_FLAG_NO_SAMPLER) != IMAGE_FLAG_NO_SAMPLER )? VK_IMAGE_USAGE_SAMPLED_BIT : 0;
+		imageInfo.usage |= ((info.flags & IMAGE_FLAG_DEPTH) != IMAGE_FLAG_DEPTH && (info.flags & IMAGE_FLAG_NO_SAMPLER) != IMAGE_FLAG_NO_SAMPLER) ? VK_IMAGE_USAGE_SAMPLED_BIT : 0;
 		imageInfo.usage |= (info.flags & IMAGE_FLAG_RENDER_TARGET) ? VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT : 0;
 		imageInfo.usage |= (info.flags & IMAGE_FLAG_DEPTH) ? VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT : 0;
 		imageInfo.usage |= (info.flags & IMAGE_FLAG_SHADER_WRITE || info.flags & IMAGE_FLAG_NO_SAMPLER) ? VK_IMAGE_USAGE_STORAGE_BIT : 0;
+		imageInfo.usage |= (info.generate_mip_maps ? VK_IMAGE_USAGE_TRANSFER_SRC_BIT : 0);
 		if (vkCreateImage(device->getHandle(), &imageInfo, nullptr, &handle) != VK_SUCCESS) {
 			Log::error("failed to create image!");
 		}
@@ -150,7 +153,7 @@ namespace HBE {
 		viewInfo.format = vk_format;
 		viewInfo.subresourceRange.aspectMask |= info.flags & IMAGE_FLAG_DEPTH ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
 		viewInfo.subresourceRange.baseMipLevel = 0;
-		viewInfo.subresourceRange.levelCount = 1;
+		viewInfo.subresourceRange.levelCount = mip_levels;
 		viewInfo.subresourceRange.baseArrayLayer = 0;
 		viewInfo.subresourceRange.layerCount = 1;
 
@@ -250,6 +253,9 @@ namespace HBE {
 		return desired_layout;
 	}
 
+	uint32_t VK_Image::getMipLevelCount() const {
+		return mip_levels;
+	}
 
 }
 

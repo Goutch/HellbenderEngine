@@ -16,13 +16,26 @@ set(PATHFINDER_FILES
         Pathfinder/Systems/SimCamera2DSystem.cpp
         Pathfinder/Systems/SimCamera2DSystem.h)
 
-set(VOXEL_MODULE
-        VoxelModule/VoxelRendererSystem.cpp VoxelModule/Octree.cpp VoxelModule/Octree.h VoxelModule/Server.cpp VoxelModule/Server.h VoxelModule/VoxelChunk.cpp VoxelModule/VoxelChunk.h)
+set(VOXEL_MODULE_FILES
+        VoxelModule/VoxelRendererSystem.cpp
+        VoxelModule/Octree.cpp
+        VoxelModule/Octree.h
+        VoxelModule/Server.cpp
+        VoxelModule/Server.h
+        VoxelModule/VoxelChunk.cpp
+        VoxelModule/VoxelChunk.h
+        )
+
+
+set(EXEMPLES_FILES
+        Raytracing/RaytracingExemple.cpp
+        Raytracing/RaytracingExemple.h)
 
 add_executable(${PROJECT_NAME}
         main.cpp
+        ${EXEMPLES_FILES}
         ${PATHFINDER_FILES}
-        ${VOXEL_MODULE})
+        ${VOXEL_MODULE_FILES})
 
 target_link_libraries(${PROJECT_NAME} PUBLIC HBE)
 target_include_directories(${PROJECT_NAME}

@@ -5,7 +5,7 @@
 
 using namespace HBE;
 
-class Raytracer {
+class VoxelModule {
 public :
 	static void init() {
 		//-------------------SCENE CREATION--------------------------------------

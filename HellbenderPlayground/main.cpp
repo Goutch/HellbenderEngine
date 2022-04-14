@@ -1,9 +1,9 @@
 #include "HBE.h"
-#include "VoxelModule/Raytracer.h"
+#include "VoxelModule/VoxelModule.h"
 #include "Pong/Pong.h"
 #include "Examples/Instancing.h"
 #include "Pathfinder/Pathfinder.h"
-
+#include "Raytracing/RaytracingExemple.h"
 using namespace HBE;
 bool fullscreen = false;
 bool controller = false;
@@ -39,17 +39,21 @@ int main() {
 	//-----------------------SETUP--------------------
 	Configs::setWindowTitle("Hellbender");
 	//Pathfinder *pathfinder = new Pathfinder();
-	Raytracer::init();
-	Application::getScene()->getCameraEntity()->attach<CameraController>();
-	//Pong::init();
-	//Instancing::init();
-	//-----------------------EVENTS------------------
-	Application::onUpdate.subscribe(&onAppUpdate);
-	//-----------------------LOOP--------------------
-	Application::run();
-	//-----------------------CLEANUP------------------
-	Application::onUpdate.unsubscribe(&onAppUpdate);
-	//-----------------------TERMINATE------------------
+
+	{
+		RaytracingExemple raytracer;
+
+		//VoxelModule::init();
+		//Pong::init();
+		//Instancing::init();
+		//-----------------------EVENTS------------------
+		Application::onUpdate.subscribe(&onAppUpdate);
+		//-----------------------LOOP--------------------
+		Application::run();
+		//-----------------------CLEANUP------------------
+		Application::onUpdate.unsubscribe(&onAppUpdate);
+		//-----------------------TERMINATE------------------
+	}
 	//delete pathfinder;
 	Application::terminate();
 }

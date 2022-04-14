@@ -282,10 +282,11 @@ namespace HBE {
 
 	void VK_Renderer::draw(mat4 transform_matrix, const Mesh &mesh, GraphicPipeline &pipeline) {
 		auto pipeline_it = render_cache.find(&pipeline);
-		if (pipeline_it == render_cache.end()) render_cache.emplace(&pipeline, MAP(const Mesh*, std::vector<mat4>)());
-
+		if (pipeline_it == render_cache.end())
+			pipeline_it = render_cache.emplace(&pipeline, MAP(const Mesh*, std::vector<mat4>)()).first;
 		auto mesh_it = pipeline_it->second.find(&mesh);
-		if (mesh_it == pipeline_it->second.end())pipeline_it->second.emplace(&mesh, std::vector<mat4>());
+		if (mesh_it == pipeline_it->second.end())
+			mesh_it = pipeline_it->second.emplace(&mesh, std::vector<mat4>()).first;
 
 		mesh_it->second.emplace_back(transform_matrix);
 	}

@@ -31,6 +31,7 @@ namespace HBE {
 		uint32_t byte_per_pixel;
 		IMAGE_FLAGS flags;
 		uint32_t id = 0;
+		uint32_t mip_levels;
 		static uint32_t current_id;
 	public:
 		VK_Image(VK_Device *device, const TextureInfo &info);
@@ -49,8 +50,10 @@ namespace HBE {
 		const VkFormat getVkFormat() const;
 		const uint32_t bytePerPixel() const;
 		const VkImageLayout getDesiredLayout() const;
+		uint32_t getMipLevelCount() const;
 	private:
 		VkImageLayout chooseLayout();
+
 	};
 }
 

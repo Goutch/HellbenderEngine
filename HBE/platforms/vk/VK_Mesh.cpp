@@ -126,6 +126,7 @@ namespace HBE {
 
 	void VK_Mesh::bind() const {
 
+		//todo: cleanup this
 		VkBuffer *flat_buffers = new VkBuffer[buffers.size()];
 		VkDeviceSize *offsets = new VkDeviceSize[buffers.size()];
 		int i = 0;

@@ -49,11 +49,11 @@ Navmesh::Navmesh(const bool *map, uint32_t size_x, uint32_t size_y, f32 cell_siz
 
 
 	ShaderInfo vertex_shader_info{};
-	vertex_shader_info.path = "../../res/shaders/defaults/Line.vert";
+	vertex_shader_info.path = "/shaders/defaults/Line.vert";
 	vertex_shader_info.stage = SHADER_STAGE_VERTEX;
 
 	ShaderInfo fragment_shader_info{};
-	fragment_shader_info.path = "../../res/shaders/defaults/Line.frag";
+	fragment_shader_info.path = "/shaders/defaults/Line.frag";
 	fragment_shader_info.stage = SHADER_STAGE_FRAGMENT;
 
 	Shader *vertex_shader;
