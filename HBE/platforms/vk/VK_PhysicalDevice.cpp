@@ -39,7 +39,6 @@ namespace HBE {
         if (!suitable_devices_map.empty()) {
             handle = suitable_devices_map.rbegin()->second;
             vkGetPhysicalDeviceProperties(handle, &properties);
-
             queue_family_indices = getSupportedQueueFamilies(handle);
             Log::status(std::string("\tFOUND:") + properties.deviceName);
         } else {
@@ -200,6 +199,13 @@ namespace HBE {
         return support_details;
     }
 
+	const VkPhysicalDeviceAccelerationStructureFeaturesKHR VK_PhysicalDevice::getAccelerationStructureFeatures() {
+		return acceleration_structure_features;
+	}
+
+	const VkPhysicalDeviceRayTracingPipelineFeaturesKHR VK_PhysicalDevice::getRayTracingPipelineFeatures() {
+		return ray_tracing_pipeline_features;
+	}
 
 
 }

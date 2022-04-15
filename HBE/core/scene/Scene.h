@@ -73,7 +73,7 @@ namespace HBE {
 		Entity createEntity(const std::string &name);
 		Entity createEntity();
 		void destroyEntity(Entity entity);
-		Entity* getCameraEntity();
+		Entity *getCameraEntity();
 		void setCameraEntity(Entity camera);
 		void addSystem(System *system);
 
@@ -146,7 +146,7 @@ namespace HBE {
 
 	template<typename Component>
 	Component &Scene::attach(entity_handle handle) {
-		size_t hash = typeid(Component).hash_code();;
+		size_t hash = typeHash<Component>();
 		Component &component = registry.attach<Component>(handle);
 		Entity e = Entity(handle, this);
 		if (attach_events.find(hash) != attach_events.end())
@@ -157,7 +157,7 @@ namespace HBE {
 
 	template<typename Component>
 	Component &Scene::attach(entity_handle handle, Component &component) {
-		size_t hash = typeid(Component).hash_code();
+		size_t hash = typeHash<Component>();
 		Component &component_ref = registry.attach<Component>(handle, component);
 
 		if (attach_events.find(hash) != attach_events.end())
@@ -172,7 +172,7 @@ namespace HBE {
 
 	template<typename Component>
 	void Scene::detach(entity_handle handle) {
-		size_t hash = typeid(Component).hash_code();
+		size_t hash = typeHash<Component>();
 
 		if (detach_events.find(hash) != detach_events.end())
 			detach_events[hash].invoke(Entity(handle, this));
@@ -181,7 +181,7 @@ namespace HBE {
 
 	template<typename Component>
 	Event<Entity> &Scene::onAttach() {
-		size_t hash = typeid(Component).hash_code();
+		size_t hash = typeHash<Component>();
 		if (attach_events.find(hash) == attach_events.end()) {
 			attach_events.emplace(hash, Event<Entity>());
 		}
@@ -191,7 +191,7 @@ namespace HBE {
 	template<typename Component>
 	Event<Entity> &Scene::onDetach() {
 
-		size_t hash = typeid(Component).hash_code();
+		size_t hash = typeHash<Component>();
 		if (detach_events.find(hash) == detach_events.end()) {
 			detach_events.emplace(hash, Event<Entity>());
 		}

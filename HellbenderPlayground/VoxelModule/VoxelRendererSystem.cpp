@@ -61,6 +61,7 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 	texture_info.depth = 128;
 	texture_info.flags = IMAGE_FLAG_NO_SAMPLER;
 	texture_info.format = IMAGE_FORMAT_R8;
+	texture_info.generate_mip_maps=true;
 	auto raw_voxels = Resources::createTexture(texture_info, "voxels");
 	std::vector<uint8_t> data;
 	vec3 resoluton = vec3(raw_voxels->getWidth(), raw_voxels->getHeight(), raw_voxels->getDepth());

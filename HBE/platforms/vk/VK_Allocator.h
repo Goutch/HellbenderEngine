@@ -111,6 +111,7 @@ namespace HBE {
 		void freeStagingBuffers();
 		StagingBuffer createTempStagingBuffer(const void *data, size_t size);
 
+		void generateMipmaps(VK_Image& image);
 	};
 }
 

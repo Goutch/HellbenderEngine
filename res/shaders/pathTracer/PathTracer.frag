@@ -26,8 +26,18 @@ vec3 Atmosphere(float t)
     return exp(-0.005*t*vec3(4, 2, 1));
 }
 void main() {
+    int lod=0;
+    ivec3 resolution = ivec3(VoxelData.resolution);
+
     vec3 half_size=(VoxelData.bounding_box_size/2.0f);
-    vec3 voxel_size=VoxelData.bounding_box_size/vec3(VoxelData.resolution);
+    vec3 voxel_size=VoxelData.bounding_box_size/vec3(resolution);
+
+    for (int i =0;i<=lod;i++)
+    {
+        resolution/=2;
+        voxel_size*=2;
+    }
+
     vec3 camera_position=inverse(ubo.view)[3].xyz;
     vec3 cube_position=fragInstanceTransform[3].xyz;
     Ray ray=Ray(camera_position, normalize(worldPosition-camera_position));
@@ -38,7 +48,7 @@ void main() {
     float t=intersection.t;
 
     vec3 position = (ray.origin+(ray.direction*intersection.t));
-    ivec3 voxel_pos=clamp(ivec3(floor((((position-cube_position)+half_size)/VoxelData.bounding_box_size)*vec3(VoxelData.resolution))), ivec3(0, 0, 0), ivec3(VoxelData.resolution)-ivec3(1, 1, 1));
+    ivec3 voxel_pos=clamp(ivec3(floor((((position-cube_position)+half_size)/VoxelData.bounding_box_size)*vec3(resolution))), ivec3(0, 0, 0), resolution-ivec3(1, 1, 1));
 
     vec3 planes =cube.min+ vec3(
     (voxel_pos.x+int(step.x > 0)) * voxel_size.x,
@@ -65,7 +75,7 @@ void main() {
 
         voxel_pos[step_index] += step[step_index];
 
-        if (voxel_pos[step_index]<0 || voxel_pos[step_index] >= VoxelData.resolution[step_index])
+        if (voxel_pos[step_index]<0 || voxel_pos[step_index] >= resolution[step_index])
         {
             sucess=false;
             break;
@@ -77,9 +87,9 @@ void main() {
     if (sucess)
     {
         float depth=t/100;
-        vec3 color= vec3(voxel_pos)/vec3(VoxelData.resolution);
+        vec3 color= vec3(voxel_pos)/vec3(resolution);
         vec3 atmosphere =Atmosphere(t);
-        color=(atmosphere*color) + ((vec3(1)-atmosphere)*vec3(0.5,0.5,0.5));
+        color=(atmosphere*color) + ((vec3(1)-atmosphere)*vec3(0.5, 0.5, 0.5));
         gl_FragDepth=depth;
         outColor=vec4(color, 1.0f);
     }

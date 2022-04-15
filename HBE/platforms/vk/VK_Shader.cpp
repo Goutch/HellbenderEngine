@@ -51,18 +51,6 @@ namespace HBE {
 		return handle;
 	}
 
-	const std::vector<VkDescriptorSetLayoutBinding> &VK_Shader::getLayoutBindings() const {
-		return layout_bindings;
-	}
-
-	const std::vector<UniformInput> &VK_Shader::getInputs() const {
-		return inputs;
-	}
-
-	const std::vector<VkPushConstantRange> &VK_Shader::getPushConstantRanges() const {
-		return push_constants_ranges;
-	}
-
 	SHADER_STAGE VK_Shader::getStage() const {
 		return stage;
 	}
@@ -91,25 +79,6 @@ namespace HBE {
 		size_t uniform_count;
 		spvc_compiler_create_shader_resources(compiler_glsl, &resources);
 
-		//-------------------------------------------------UNIFORM_BUFFERS-----------------------------
-		spvc_resources_get_resource_list_for_type(resources, SPVC_RESOURCE_TYPE_UNIFORM_BUFFER, &uniform_list, &uniform_count);
-		for (uint32_t i = 0; i < uniform_count; ++i) {
-			VkDescriptorSetLayoutBinding layout_binding = {};
-			layout_binding.binding = spvc_compiler_get_decoration(compiler_glsl, uniform_list[i].id, SpvDecorationBinding);
-			layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			layout_binding.stageFlags = vk_stage;
-			layout_binding.descriptorCount = 1;//this is for array
-			layout_binding.pImmutableSamplers = nullptr;
-			layout_bindings.emplace_back(layout_binding);
-
-			std::string name = spvc_compiler_get_name(compiler_glsl, uniform_list[i].id);
-			size_t size;
-			spvc_type type = spvc_compiler_get_type_handle(compiler_glsl, uniform_list[i].type_id);
-			spvc_compiler_get_declared_struct_size(compiler_glsl, type, &size);
-
-			inputs.emplace_back(UniformInput{name, UNIFORM_INPUT_TYPE_BUFFER, layout_binding.binding, vk_stage, size});
-		}
-
 		//----------------------------------------------PUSH CONSTANTS------------------------------------------------
 		const spvc_reflected_resource *push_constant_list = nullptr;
 		size_t push_constants_count;
@@ -119,18 +88,50 @@ namespace HBE {
 			spvc_type type = spvc_compiler_get_type_handle(compiler_glsl, push_constant_list[i].type_id);
 			spvc_compiler_get_declared_struct_size(compiler_glsl, type, &size);
 
-			uint32_t binding = spvc_compiler_get_decoration(compiler_glsl, push_constant_list[i].id, SpvDecorationBinding);
+			//uint32_t binding = spvc_compiler_get_decoration(compiler_glsl, push_constant_list[i].id, SpvDecorationBinding);
 			std::string name = spvc_compiler_get_name(compiler_glsl, push_constant_list[i].id);
 
+			PushConstantInfo push_constant_info{};
+			push_constant_info.name = name;
 
-			VkPushConstantRange push_constant;
-			push_constant.size = size;
-			push_constant.offset = spvc_compiler_get_decoration(compiler_glsl, push_constant_list[i].id, SpvDecorationOffset);
-			push_constant.stageFlags = vk_stage;
+			VkPushConstantRange push_constant_range{};
+			push_constant_range.size = size;
+			push_constant_range.offset = spvc_compiler_get_decoration(compiler_glsl, push_constant_list[i].id, SpvDecorationOffset);
+			push_constant_range.stageFlags = vk_stage;
 
-			push_constants_ranges.emplace_back(push_constant);
+			push_constant_info.push_constant_range = push_constant_range;
+			push_constants.emplace_back(push_constant_info);
+		}
 
-			inputs.emplace_back(UniformInput{name, UNIFORM_INPUT_TYPE_PUSH_CONSTANT, binding, vk_stage, size, push_constant.offset});
+		std::sort(push_constants.begin(), push_constants.end(),
+				  [](const PushConstantInfo &a, const PushConstantInfo &b) -> bool {
+					  return a.push_constant_range.offset < b.push_constant_range.offset;
+				  });
+
+		//-------------------------------------------------UNIFORM_BUFFERS-----------------------------
+		spvc_resources_get_resource_list_for_type(resources, SPVC_RESOURCE_TYPE_UNIFORM_BUFFER, &uniform_list, &uniform_count);
+		for (uint32_t i = 0; i < uniform_count; ++i) {
+
+			std::string name = spvc_compiler_get_name(compiler_glsl, uniform_list[i].id);
+			size_t size;
+			spvc_type type = spvc_compiler_get_type_handle(compiler_glsl, uniform_list[i].type_id);
+			spvc_compiler_get_declared_struct_size(compiler_glsl, type, &size);
+
+			UniformInfo uniform_info{};
+
+			VkDescriptorSetLayoutBinding layout_binding = {};
+			layout_binding.binding = spvc_compiler_get_decoration(compiler_glsl, uniform_list[i].id, SpvDecorationBinding);
+			layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			layout_binding.stageFlags = vk_stage;
+			layout_binding.descriptorCount = 1;//this is for array
+			layout_binding.pImmutableSamplers = nullptr;
+
+			uniform_info.layout_binding = layout_binding;
+			uniform_info.name = name;
+			uniform_info.size = size;
+
+
+			uniforms.emplace_back(uniform_info);
 		}
 
 
@@ -141,17 +142,22 @@ namespace HBE {
 		spvc_resources_get_resource_list_for_type(resources, SPVC_RESOURCE_TYPE_SAMPLED_IMAGE, &texture_sampler_list, &texture_sampler_count);
 
 		for (uint32_t i = 0; i < texture_sampler_count; ++i) {
+			std::string name = spvc_compiler_get_name(compiler_glsl, texture_sampler_list[i].id);
+
+			UniformInfo uniform_info{};
+
 			VkDescriptorSetLayoutBinding layout_binding = {};
 			layout_binding.binding = spvc_compiler_get_decoration(compiler_glsl, texture_sampler_list[i].id, SpvDecorationBinding);
 			layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 			layout_binding.stageFlags = vk_stage;
 			layout_binding.descriptorCount = 1;//this is for array
 			layout_binding.pImmutableSamplers = nullptr;
-			layout_bindings.emplace_back(layout_binding);
 
+			uniform_info.layout_binding = layout_binding;
+			uniform_info.name = name;
+			uniform_info.size = 0;
 
-			std::string name = spvc_compiler_get_name(compiler_glsl, texture_sampler_list[i].id);
-			inputs.emplace_back(UniformInput{name, UNIFORM_INPUT_TYPE_TEXTURE_SAMPLER, layout_binding.binding, vk_stage});
+			uniforms.emplace_back(uniform_info);
 		}
 
 		//--------------------------------------------------------IMAGE----------------------------------------
@@ -161,17 +167,23 @@ namespace HBE {
 
 		spvc_resources_get_resource_list_for_type(resources, SPVC_RESOURCE_TYPE_SEPARATE_IMAGE, &separate_image_list, &separate_image_count);
 		for (uint32_t i = 0; i < separate_image_count; ++i) {
+			std::string name = spvc_compiler_get_name(compiler_glsl, separate_image_list[i].id);
+
+			UniformInfo uniform_info{};
+
 			VkDescriptorSetLayoutBinding layout_binding = {};
 			layout_binding.binding = spvc_compiler_get_decoration(compiler_glsl, separate_image_list[i].id, SpvDecorationBinding);
 			layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
 			layout_binding.stageFlags = vk_stage;
 			layout_binding.descriptorCount = 1;//this is for array
 			layout_binding.pImmutableSamplers = nullptr;
-			layout_bindings.emplace_back(layout_binding);
 
 
-			std::string name = spvc_compiler_get_name(compiler_glsl, separate_image_list[i].id);
-			inputs.emplace_back(UniformInput{name, UNIFORM_INPUT_TYPE_IMAGE, layout_binding.binding, vk_stage});
+			uniform_info.layout_binding = layout_binding;
+			uniform_info.name = name;
+			uniform_info.size = 0;
+
+			uniforms.emplace_back(uniform_info);
 		}
 		//--------------------------------------------------------STORAGE_IMAGES----------------------------------------
 
@@ -180,33 +192,47 @@ namespace HBE {
 
 		spvc_resources_get_resource_list_for_type(resources, SPVC_RESOURCE_TYPE_STORAGE_IMAGE, &storage_image_list, &storage_image_count);
 		for (uint32_t i = 0; i < storage_image_count; ++i) {
+
+			std::string name = spvc_compiler_get_name(compiler_glsl, storage_image_list[i].id);
+
+			UniformInfo uniform_info{};
+
+			uint32_t array_stride = spvc_compiler_get_decoration(compiler_glsl, uniform_list[i].id, SpvDecorationArrayStride);
+
 			VkDescriptorSetLayoutBinding layout_binding = {};
 			layout_binding.binding = spvc_compiler_get_decoration(compiler_glsl, storage_image_list[i].id, SpvDecorationBinding);
 			layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
 			layout_binding.stageFlags = vk_stage;
 			layout_binding.descriptorCount = 1;//this is for array
 			layout_binding.pImmutableSamplers = nullptr;
-			layout_bindings.emplace_back(layout_binding);
 
+			uniform_info.layout_binding=layout_binding;
+			uniform_info.name = name;
+			uniform_info.size = 0;
 
-			std::string name = spvc_compiler_get_name(compiler_glsl, storage_image_list[i].id);
-			inputs.emplace_back(UniformInput{name, UNIFORM_INPUT_TYPE_IMAGE, layout_binding.binding, vk_stage});
+			uniforms.emplace_back(uniform_info);
 		}
+
+		std::sort(uniforms.begin(), uniforms.end(),
+				  [](const UniformInfo &a, const UniformInfo &b) -> bool {
+					  return a.layout_binding.binding < b.layout_binding.binding;
+				  });
+
 		//----------------------------------------------------------VERTEX INPUTS-----------------------------
-		const spvc_reflected_resource *vertex_inputs = nullptr;
+		const spvc_reflected_resource *vertex_input_list = nullptr;
 		size_t vertex_inputs_count;
-		spvc_resources_get_resource_list_for_type(resources, SPVC_RESOURCE_TYPE_STAGE_INPUT, &vertex_inputs, &vertex_inputs_count);
+		spvc_resources_get_resource_list_for_type(resources, SPVC_RESOURCE_TYPE_STAGE_INPUT, &vertex_input_list, &vertex_inputs_count);
 
 		for (size_t i = 0; i < vertex_inputs_count; ++i) {
 
-			spvc_type type = spvc_compiler_get_type_handle(compiler_glsl, vertex_inputs[i].type_id);
+			spvc_type type = spvc_compiler_get_type_handle(compiler_glsl, vertex_input_list[i].type_id);
 			spvc_basetype basetype = spvc_type_get_basetype(type);
 			size_t size;
 			size = spvc_type_get_vector_size(type);
 			size_t num_col = spvc_type_get_columns(type);
-			uint32_t location = spvc_compiler_get_decoration(compiler_glsl, vertex_inputs[i].id, SpvDecorationLocation);
+			uint32_t location = spvc_compiler_get_decoration(compiler_glsl, vertex_input_list[i].id, SpvDecorationLocation);
 			for (size_t j = 0; j < num_col; ++j) {
-				VertexInput attribute_description{};
+				VertexInputInfo attribute_description{};
 				attribute_description.location = location;
 				attribute_description.size = size * 4;
 
@@ -236,16 +262,17 @@ namespace HBE {
 							attribute_description.format = VK_FORMAT_R32G32B32A32_UINT;
 						break;
 				}
-				vertex_attribute_descriptions.emplace_back(attribute_description);
-				Log::message(std::string(vertex_inputs[i].name) +
+				vertex_inputs.emplace_back(attribute_description);
+				Log::message(std::string(vertex_input_list[i].name) +
 							 " location:" + std::to_string(location) +
 							 " size:" + std::to_string(size * 4));
 				location++;
 			}
 
 		}
-		std::sort(vertex_attribute_descriptions.begin(), vertex_attribute_descriptions.end(),
-				  [](const VertexInput &a, const VertexInput &b) -> bool {
+
+		std::sort(vertex_inputs.begin(), vertex_inputs.end(),
+				  [](const VertexInputInfo &a, const VertexInputInfo &b) -> bool {
 					  return a.location < b.location;
 				  });
 
@@ -254,11 +281,20 @@ namespace HBE {
 		spvc_context_destroy(context);
 	}
 
-	const std::vector<VertexInput> &VK_Shader::getAttributeDescriptions() const {
-		return vertex_attribute_descriptions;
+
+	VkShaderStageFlags VK_Shader::getVkStage() const {
+		return vk_stage;
 	}
 
-	VkShaderStageFlags VK_Shader::getVkStage() const{
-		return vk_stage;
+	const std::vector<PushConstantInfo> &VK_Shader::getPushConstants() const {
+		return push_constants;
+	}
+
+	const std::vector<UniformInfo> &VK_Shader::getUniforms() const {
+		return uniforms;
+	}
+
+	const std::vector<VertexInputInfo> &VK_Shader::getVertexInputs() const {
+		return vertex_inputs;
 	}
 }

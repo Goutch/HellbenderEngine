@@ -39,7 +39,9 @@ namespace HBE {
 		QueueFamilyIndices queue_family_indices{};
 		SwapchainSupportDetails support_details;
 		VkPhysicalDeviceMemoryProperties memory_properties;
-
+		VkFormatProperties format_properties;
+		VkPhysicalDeviceAccelerationStructureFeaturesKHR acceleration_structure_features;
+		VkPhysicalDeviceRayTracingPipelineFeaturesKHR ray_tracing_pipeline_features;
 	public:
 		VK_PhysicalDevice(VkInstance vk_instance_handle, VkSurfaceKHR surface_handle);
 
@@ -56,6 +58,11 @@ namespace HBE {
 		const SwapchainSupportDetails &getSwapchainSupportDetails() const;
 
 		SwapchainSupportDetails querySwapchainSupportDetails(const VkPhysicalDevice &physical_device) const;
+
+		const VkFormatProperties& getFormatProperties() const;
+
+		const VkPhysicalDeviceAccelerationStructureFeaturesKHR getAccelerationStructureFeatures();
+		const VkPhysicalDeviceRayTracingPipelineFeaturesKHR getRayTracingPipelineFeatures();
 
 		const VkPhysicalDeviceMemoryProperties &getMemoryProperties() const;
 	private:

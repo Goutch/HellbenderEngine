@@ -20,15 +20,19 @@ namespace HBE {
         VK_Device *device = nullptr;
         VkDescriptorSetLayout descriptor_set_layout_handle = VK_NULL_HANDLE;
         VkDescriptorPool descriptor_pool_handle = VK_NULL_HANDLE;
+
         std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> descriptor_set_handles;
-        std::vector<VkDescriptorSetLayoutBinding> descriptor_set_layout_bindings;
+
+        std::vector<VkDescriptorSetLayoutBinding> uniform_descriptor_set_layout_bindings;
+        std::vector<VkDeviceSize> uniform_sizes;
+        std::map<std::string,size_t > uniform_names_to_index;
+        std::map<uint32_t,size_t> uniform_binding_to_index;
+		std::unordered_map<uint32_t, std::vector<VK_Buffer *>> uniform_buffers;
+
         std::vector<VkPushConstantRange> push_constants_ranges;
+        std::map<std::string,size_t> push_constant_name_to_index;
+
         std::array<std::unordered_map<uint32_t, VkWriteDescriptorSet>, MAX_FRAMES_IN_FLIGHT> descriptor_sets_writes;
-        std::unordered_map<uint32_t, std::vector<VK_Buffer *>> uniform_buffers;
-        std::vector<UniformInput> inputs;
-        std::unordered_map<std::string, uint32_t> name_input_index;
-        std::unordered_map<uint32_t, uint32_t> binding_input_index;
-        std::unordered_map<std::string, uint32_t> name_push_constant_index;
 
         void createDescriptorSets();
 

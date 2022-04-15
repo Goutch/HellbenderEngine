@@ -28,10 +28,11 @@ namespace HBE {
 		IMAGE_FLAG_NO_SAMPLER = 1 << 3,// image2D in glsl aecessed with imageLoad and imageStore.
 	};
 	/**
-	 * @param data can be nullptr and updated later
+	 * @param data can be nullptr
 	 * @param width must be greater than 0
 	 * @param height must be greater than 0
 	 * @param depth must be greater than 0
+	 * @param min_lod must be greater than 0
 	 */
 	struct TextureInfo {
 		void *data = nullptr;
@@ -39,6 +40,7 @@ namespace HBE {
 		uint32_t height = 1;
 		uint32_t depth = 1;
 		bool generate_mip_maps = false;
+		float min_lod = 0.0f;
 		IMAGE_FORMAT format = IMAGE_FORMAT_RGBA8;
 		IMAGE_FLAGS flags = IMAGE_FLAG_NONE;
 

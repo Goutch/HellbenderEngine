@@ -27,10 +27,52 @@
 namespace HBE {
 	typedef uint32_t entity_handle;
 
+
+	//https://stackoverflow.com/questions/922442/unique-class-type-id-that-is-safe-and-holds-across-library-boundaries
+#if __SIZEOF_POINTER__ == 8
+	inline uint64_t hashCStr(const char *data, uint64_t len) {
+	uint64_t result = 14695981039346656037ul;
+	for (uint64_t index = 0; index < len; ++index)
+	{
+		result ^= (uint64_t)data[index];
+		result *= 1099511628211ul;
+	}
+	return result;
+}
+#else
+
+	inline uint32_t hashCStr(const char *data, uint32_t len) {
+		uint32_t result = 2166136261u;
+		for (uint32_t index = 0; index < len; ++index) {
+			result ^= (uint32_t) data[index];
+			result *= 16777619u;
+		}
+		return result;
+	}
+
+#endif
+
+	inline size_t hashStr(const std::string &str) { return hashCStr(str.c_str(), str.length()); }
+
+
+	template<typename T>
+	static const std::string &typeName() {
+		static const std::string type_name = typeid(T).name();
+		return type_name;
+	}
+
+	template<typename T>
+	static size_t typeHash() {
+		static const size_t hashed_type = hashStr(typeName<T>());
+		return hashed_type;
+	}
+
+
 	struct ComponentTypeInfo {
 		size_t hash;
 		uint32_t signature_bit;
 		size_t size;
+		std::string name;
 
 		bool operator==(const size_t hash) const {
 			return this->hash == hash;
@@ -151,13 +193,13 @@ namespace HBE {
 
 		template<typename Component>
 		ComponentPool<Component> getPool() {
-			return ComponentPool<Component>(component_pages[typeid(Component).hash_code()]);
+			return ComponentPool<Component>(component_pages[typeHash<Component>()]);
 		}
 
 		template<typename Component>
 		Component &attach(entity_handle handle, ComponentTypeInfo &type) {
 			size_t i = handleToIndex(handle);
-			HB_ASSERT(valid_entities[i],"Enitty#" + std::to_string(handle) + "is not valid");
+			HB_ASSERT(valid_entities[i], "Enitty#" + std::to_string(handle) + "is not valid");
 
 			components_of_entity[i] |= 1 << type.signature_bit;
 			auto component_page_it = component_pages.find(type.hash);
@@ -218,9 +260,13 @@ namespace HBE {
 	class Group {
 		std::vector<RegistryPage *> &pages;
 		ComponentTypeInfo types[sizeof...(Components)];
+		bool empty = false;
 	public:
+		Group(std::vector<RegistryPage *> &pages) : pages(pages) {
+			empty = true;
+		}
+
 		Group(std::vector<RegistryPage *> &pages, ComponentTypeInfo types[sizeof...(Components)]) : pages(pages) {
-			this->pages = pages;
 			for (size_t i = 0; i < sizeof...(Components); i++) {
 				this->types[i] = types[i];
 			}
@@ -262,6 +308,14 @@ namespace HBE {
 			};
 
 		public:
+			iterator(std::vector<RegistryPage *> &pages) :
+					pages(pages),
+					current_pools(std::tuple<ComponentPool<Components>...>(ComponentPool<Components>()...)) {
+				this->current_entity = 0;
+				isEnd = true;
+				current_page = pages.size();
+			}
+
 			iterator(std::vector<RegistryPage *> &pages, ComponentTypeInfo types[sizeof...(Components)], bool end) :
 					pages(pages),
 					current_pools(
@@ -322,7 +376,7 @@ namespace HBE {
 
 			void getCurrentPageEntities() {
 
-				RawComponentPool *raw_pages[] = {pages[current_page]->getRawPool(typeid(Components).hash_code())...};
+				RawComponentPool *raw_pages[] = {pages[current_page]->getRawPool(typeHash<Components>())...};
 				for (size_t i = 0; i < sizeof...(Components); ++i) {
 					if (raw_pages[i] == nullptr) {
 						entities.clear();
@@ -386,11 +440,13 @@ namespace HBE {
 
 	public:
 		iterator begin() {
-			return iterator(pages, types, false);
+			if (empty)return iterator(pages);
+			else return iterator(pages, types, false);
 		};
 
 		iterator end() {
-			return iterator(pages, types, true);
+			if (empty)return iterator(pages);
+			else return iterator(pages, types, true);
 		}
 	};
 
@@ -406,6 +462,7 @@ namespace HBE {
 		}
 
 	public:
+
 		Registry() {
 
 		}
@@ -438,14 +495,20 @@ namespace HBE {
 
 		template<typename ... Components>
 		Group<Components...> group() {
-
-			ComponentTypeInfo ts[sizeof...(Components)] = {types[typeid(Components).hash_code()]...};
+			constexpr size_t size = sizeof...(Components);
+			bool availableType[size] = {types.find(typeHash<Components>())!=types.end()...};
+			for (int i = 0; i < size; ++i) {
+				if (!availableType[i]) {
+					return Group<Components...>(pages);
+				}
+			}
+			ComponentTypeInfo ts[size] = {types[typeHash<Components>()]...};
 			return Group<Components...>(pages, ts);
 		};
 
 		template<typename Component>
 		bool has(entity_handle handle) {
-			const size_t hash = typeid(Component).hash_code();
+			const size_t hash = typeHash<Component>();
 			auto page = pages[getPage(handle)];
 			auto comp_page_it = page->component_pages.find(hash);
 
@@ -457,11 +520,11 @@ namespace HBE {
 
 		template<typename Component>
 		Component &get(entity_handle handle) {
-#ifndef NDEBUG
-			if (!has<Component>(handle))
-				Log::error(std::string("tried to get ") + typeid(Component).name() + " in entity#" + std::to_string(handle) + std::string(" but has<") + typeid(Component).name() + ">(" + std::to_string(handle) + ") = false");
-#endif
-			return pages[getPage(handle)]->component_pages[typeid(Component).hash_code()]->getAs<Component>(handle);
+
+			HB_ASSERT(has<Component>(handle),
+					  std::string("tried to get ") + typeName<Component>() + " in entity#" + std::to_string(handle) + std::string(" but has<") + typeName<Component>() + ">(" + std::to_string(handle) + ") = false");
+
+			return pages[getPage(handle)]->component_pages[typeHash<Component>()]->getAs<Component>(handle);
 		}
 
 
@@ -481,10 +544,10 @@ namespace HBE {
 		template<typename Component>
 		Component &attach(entity_handle handle) {
 
-			const size_t hash = typeid(Component).hash_code();
+			const size_t hash = typeHash<Component>();
 			auto type_it = types.find(hash);
 			if (type_it == types.end()) {
-				types.emplace(hash, ComponentTypeInfo{hash, current_bit, sizeof(Component)});
+				types.emplace(hash, ComponentTypeInfo{hash, current_bit, sizeof(Component), typeName<Component>()});
 				current_bit++;
 			}
 			size_t page = getPage(handle);
@@ -493,11 +556,10 @@ namespace HBE {
 
 		template<typename Component>
 		void detach(entity_handle handle) {
-			const size_t hash = typeid(Component).hash_code();
+			const size_t hash = typeHash<Component>();
 			ComponentTypeInfo &type = types[hash];
 			size_t page = getPage(handle);
-
+			pages[page]->detach(handle,types[hash]);
 		}
-
 	};
 }

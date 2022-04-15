@@ -36,6 +36,7 @@ namespace HBE {
 		this->mip_levels = info.generate_mip_maps ? static_cast<uint32_t>(std::floor(std::log2(std::max(std::max(info.width, info.height), info.depth)))) + 1 : 1;
 
 		desired_layout = chooseLayout();
+
 		Log::debug("Create image#" + std::to_string(id));
 		VkImageType type;
 		VkImageViewType view_type;
@@ -138,6 +139,7 @@ namespace HBE {
 		this->allocation = device->getAllocator()->alloc(requirements, ALLOC_FLAG_NONE);
 		vkBindImageMemory(device->getHandle(), handle, allocation.block->memory, allocation.offset);
 
+
 		if (info.data != nullptr) {
 			update(info.data);
 		} else if (flags & IMAGE_FLAG_RENDER_TARGET) {
@@ -164,8 +166,8 @@ namespace HBE {
 		if ((flags & IMAGE_FLAG_NO_SAMPLER) != IMAGE_FLAG_NO_SAMPLER) {
 			VkSamplerCreateInfo samplerInfo{};
 			samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-			samplerInfo.magFilter = VK_FILTER_NEAREST;
-			samplerInfo.minFilter = VK_FILTER_NEAREST;
+			samplerInfo.magFilter = VK_FILTER_NEAREST;//If the object is close to the camera,
+			samplerInfo.minFilter = VK_FILTER_NEAREST;//If the object is further from the camera
 			samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
 			samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
 			samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
@@ -180,10 +182,9 @@ namespace HBE {
 			samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
 
 			samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-			samplerInfo.mipLodBias = 0.0f;
-			samplerInfo.minLod = 0.0f;
-			samplerInfo.maxLod = 0.0f;
-
+			samplerInfo.minLod = 0.0f; // 0 when close the camera.
+			samplerInfo.maxLod = static_cast<float>(mip_levels);
+			samplerInfo.mipLodBias = 0.0f; // Optional
 
 			if (vkCreateSampler(device->getHandle(), &samplerInfo, nullptr, &sampler_handle) != VK_SUCCESS) {
 				Log::error("failed to create texture sampler!");

@@ -59,12 +59,12 @@ namespace HBE {
 		vertexInputInfo.pVertexBindingDescriptions = binding_descriptions.data();
 
 		std::vector<VkVertexInputAttributeDescription> attribute_descriptions;
-		auto reflected_attributes = vk_vertex->getAttributeDescriptions();
-		attribute_descriptions.resize(reflected_attributes.size());
+		std::vector<VertexInputInfo> vertex_inputs = vk_vertex->getVertexInputs();
+		attribute_descriptions.resize(vertex_inputs.size());
 		uint32_t offset = 0;
 		uint32_t binding = 0;
 		if (binding_descriptions.size() != 0) {
-			for (size_t i = 0; i < reflected_attributes.size(); ++i) {
+			for (size_t i = 0; i < vertex_inputs.size(); ++i) {
 				for (size_t j = 0; j < binding_descriptions.size() - 1; ++j) {
 					if (binding == binding_descriptions[j].binding && offset == binding_descriptions[j].stride) {
 						offset = 0;
@@ -72,11 +72,11 @@ namespace HBE {
 						break;
 					}
 				}
-				attribute_descriptions[i].location = reflected_attributes[i].location;
-				attribute_descriptions[i].format = reflected_attributes[i].format;
+				attribute_descriptions[i].location = vertex_inputs[i].location;
+				attribute_descriptions[i].format = vertex_inputs[i].format;
 				attribute_descriptions[i].offset = offset;
 				attribute_descriptions[i].binding = binding;
-				offset += reflected_attributes[i].size;
+				offset += vertex_inputs[i].size;
 
 			}
 			vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attribute_descriptions.size());

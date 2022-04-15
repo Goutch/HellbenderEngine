@@ -4,9 +4,9 @@
 #include "Examples/Instancing.h"
 #include "Pathfinder/Pathfinder.h"
 #include "Raytracing/RaytracingExemple.h"
+
 using namespace HBE;
 bool fullscreen = false;
-bool controller = false;
 
 void onAppUpdate(float delta) {
 	if (Input::getKeyDown(KEY::ESCAPE)) {
@@ -22,14 +22,12 @@ void onAppUpdate(float delta) {
 	}
 
 	if (Input::getKeyDown(KEY::C)) {
-		if (controller) {
-			controller = false;
-			Application::getScene()->getCameraEntity()->detach<CameraController>();
+		Entity cam = *Application::getScene()->getCameraEntity();
+		if (cam.has<CameraController>()) {
+			cam.detach<CameraController>();
 		} else {
-			controller = true;
-			Application::getScene()->getCameraEntity()->attach<CameraController>();
+			cam.attach<CameraController>();
 		}
-
 	}
 }
 
@@ -41,9 +39,9 @@ int main() {
 	//Pathfinder *pathfinder = new Pathfinder();
 
 	{
-		RaytracingExemple raytracer;
-
-		//VoxelModule::init();
+		//RaytracingExemple raytracer;
+		//Pathfinder pathfinder;
+		VoxelModule::init();
 		//Pong::init();
 		//Instancing::init();
 		//-----------------------EVENTS------------------

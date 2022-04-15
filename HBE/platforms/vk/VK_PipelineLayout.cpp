@@ -11,52 +11,61 @@ namespace HBE {
 										 size_t count) {
 
 		this->device = device;
+		std::vector<UniformInfo> merged_unfiorms;
+		std::vector<PushConstantInfo> merged_push_constants;
+
+		//merge the shaders inputs into one.
 		for (size_t i = 0; i < count; ++i) {
-			auto shader_bindings = shaders[i]->getLayoutBindings();
-			auto shader_inputs = shaders[i]->getInputs();
-			int binding_count = 0;
-			for (size_t j = 0; j < shader_inputs.size(); ++j) {
-				uint32_t binding = shader_inputs[j].binding;
-				auto it = name_input_index.find(shader_inputs[j].name);
-				//binding already exist
-				if (it != name_input_index.end()) {
-					if (shader_inputs[j].type == UNIFORM_INPUT_TYPE_PUSH_CONSTANT)
-						Log::warning("Trying to use multiple push constant declaration but it is not supported at the moment");
-					HB_ASSERT(inputs[it->second].binding == shader_inputs[j].binding, "Binding#" + std::to_string(shader_inputs[j].binding) + " has multiple definitions");
-					HB_ASSERT(inputs[it->second].name == shader_inputs[j].name, "Binding#" + std::to_string(shader_inputs[j].binding) + " has multiple name definitions");
-					HB_ASSERT(inputs[it->second].size == shader_inputs[j].size, "Binding#" + std::to_string(shader_inputs[j].binding) + " has different sizes");
-					//if has the same name then add the shader stage bit
-					inputs[binding_input_index[binding]].stage |= shaders[i]->getVkStage();
-					descriptor_set_layout_bindings[binding_input_index[binding]].stageFlags |= shaders[i]->getVkStage();
+			//merge uniforms
+			std::vector<UniformInfo> uniforms = shaders[i]->getUniforms();
+			for (size_t j = 0; j < uniforms.size(); ++j) {
+				auto it = uniform_binding_to_index.find(uniforms[j].layout_binding.binding);
+
+				if (it != uniform_binding_to_index.end()) {
+					uint32_t merged_index = it->second;
+					HB_ASSERT(merged_unfiorms[it->second].name == uniforms[j].name, "Binding#" + std::to_string(uniforms[j].layout_binding.binding) + " has multiple name definitions");
+					HB_ASSERT(merged_unfiorms[it->second].size == uniforms[j].size, "Binding#" + std::to_string(uniforms[j].layout_binding.binding) + " has different sizes");
+					//merge shader stages.
+					merged_unfiorms[merged_index].layout_binding.stageFlags |= uniforms[j].layout_binding.stageFlags;
+					uniform_descriptor_set_layout_bindings[merged_index].stageFlags |= uniforms[j].layout_binding.stageFlags;
 				} else {
-					name_input_index.emplace(shader_inputs[j].name, inputs.size());
-					inputs.emplace_back(shader_inputs[j]);
-					if (shader_inputs[j].type != UNIFORM_INPUT_TYPE_PUSH_CONSTANT) {
-						binding_input_index.emplace(shader_inputs[j].binding, inputs.size());
-						descriptor_set_layout_bindings.emplace_back(shader_bindings[binding_count]);
-						binding_count++;
-					}
+					merged_unfiorms.emplace_back(uniforms[j]);
+					uniform_sizes.emplace_back(merged_unfiorms[j].size);
+					uniform_descriptor_set_layout_bindings.emplace_back(merged_unfiorms[j].layout_binding);
+
+					uniform_binding_to_index.emplace(uniforms[j].layout_binding.binding, merged_unfiorms.size() - 1);
+					uniform_names_to_index.emplace(uniforms[j].name, merged_unfiorms.size() - 1);
 				}
 			}
 
-			auto shader_ranges = shaders[i]->getPushConstantRanges();
-			push_constants_ranges.insert(push_constants_ranges.end(), shader_ranges.begin(), shader_ranges.end());
+			//merge push_constants
+			std::vector<PushConstantInfo> push_constants = shaders[i]->getPushConstants();
+			for (int j = 0; j < push_constants.size(); ++j) {
+				merged_push_constants.emplace_back(push_constants[j]);
+				push_constants_ranges.emplace_back(push_constants[j].push_constant_range);
+				push_constant_name_to_index.emplace(push_constants[j].name, merged_push_constants.size() - 1);
+
+			}
 		}
+		std::sort(uniform_descriptor_set_layout_bindings.begin(), uniform_descriptor_set_layout_bindings.end(),
+				  [](VkDescriptorSetLayoutBinding i, VkDescriptorSetLayoutBinding j) {
+					  return (i.binding < j.binding);
+				  });
 
 		VkDescriptorSetLayoutCreateInfo layoutInfo{};
 		layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-		layoutInfo.bindingCount = descriptor_set_layout_bindings.size();
-		layoutInfo.pBindings = descriptor_set_layout_bindings.data();
+		layoutInfo.bindingCount = uniform_descriptor_set_layout_bindings.size();
+		layoutInfo.pBindings = uniform_descriptor_set_layout_bindings.data();
 
 		vkCreateDescriptorSetLayout(device->getHandle(), &layoutInfo, nullptr, &descriptor_set_layout_handle);
 
-		for (size_t i = 0; i < descriptor_set_layout_bindings.size(); ++i) {
-			if (descriptor_set_layout_bindings[i].descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
-				uint32_t binding = descriptor_set_layout_bindings[i].binding;
+		for (size_t i = 0; i < uniform_descriptor_set_layout_bindings.size(); ++i) {
+			if (uniform_descriptor_set_layout_bindings[i].descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
+				uint32_t binding = uniform_descriptor_set_layout_bindings[i].binding;
 				for (uint32_t j = 0; j < MAX_FRAMES_IN_FLIGHT; ++j) {
 					uniform_buffers.emplace(binding, std::vector<VK_Buffer *>());
-					uniform_buffers[descriptor_set_layout_bindings[i].binding].emplace_back(
-							new VK_Buffer(device, inputs[binding_input_index[binding]].size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+					uniform_buffers[uniform_descriptor_set_layout_bindings[i].binding].emplace_back(
+							new VK_Buffer(device, uniform_sizes[uniform_binding_to_index[binding]], VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 										  ALLOC_FLAGS::ALLOC_FLAG_MAPPABLE));
 				}
 			}
@@ -67,7 +76,7 @@ namespace HBE {
 		size_t separate_image_count = 0;
 		size_t storage_image_count = 0;
 		size_t uniform_buffer_count = 0;
-		for (auto layout_binding: descriptor_set_layout_bindings) {
+		for (auto layout_binding: uniform_descriptor_set_layout_bindings) {
 			switch (layout_binding.descriptorType) {
 				case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
 					uniform_buffer_count++;
@@ -161,11 +170,6 @@ namespace HBE {
 		allocInfo.descriptorSetCount = MAX_FRAMES_IN_FLIGHT;
 		allocInfo.pSetLayouts = layouts.data();
 
-
-		std::sort(descriptor_set_layout_bindings.begin(), descriptor_set_layout_bindings.end(),
-				  [](VkDescriptorSetLayoutBinding i, VkDescriptorSetLayoutBinding j) {
-					  return (i.binding < j.binding);
-				  });
 		if (vkAllocateDescriptorSets(device->getHandle(), &allocInfo, descriptor_set_handles.data()) != VK_SUCCESS) {
 			Log::error("failed to allocate descriptor sets!");
 		}
@@ -174,27 +178,28 @@ namespace HBE {
 			std::vector<VkWriteDescriptorSet> writes;
 			std::vector<VkDescriptorBufferInfo> buffers_info;
 			std::vector<VkDescriptorImageInfo> images_info;
-			buffers_info.resize(descriptor_set_layout_bindings.size(), {});
-			images_info.resize(descriptor_set_layout_bindings.size(), {});
-			writes.resize(descriptor_set_layout_bindings.size(), {});
+			buffers_info.resize(uniform_descriptor_set_layout_bindings.size(), {});
+			images_info.resize(uniform_descriptor_set_layout_bindings.size(), {});
+			writes.resize(uniform_descriptor_set_layout_bindings.size(), {});
 			VK_Image *default_texture = (VK_Image *) Resources::get<Texture>("DEFAULT_TEXTURE");
 			VK_Image *default_image = (VK_Image *) Resources::get<Texture>("DEFAULT_IMAGE");
 
-			for (size_t binding_index = 0; binding_index < descriptor_set_layout_bindings.size(); ++binding_index) {
+			for (size_t binding_index = 0; binding_index < uniform_descriptor_set_layout_bindings.size(); ++binding_index) {
+
 				writes[binding_index].pBufferInfo = nullptr;
 				writes[binding_index].pImageInfo = nullptr;
-				uint32_t binding = descriptor_set_layout_bindings[binding_index].binding;
-				switch (descriptor_set_layout_bindings[binding_index].descriptorType) {
+				uint32_t binding = uniform_descriptor_set_layout_bindings[binding_index].binding;
+				switch (uniform_descriptor_set_layout_bindings[binding_index].descriptorType) {
 					case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER: {
-						buffers_info[binding_index].buffer = uniform_buffers[binding_index][frame_index]->getHandle();
 						buffers_info[binding_index].offset = 0;
 						auto it = uniform_buffers.find(binding);
 						if (it != uniform_buffers.end()) {
+							buffers_info[binding_index].buffer = uniform_buffers[binding][frame_index]->getHandle();
 							buffers_info[binding_index].range = it->second[frame_index]->getSize();
 							writes[binding_index].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 							writes[binding_index].pBufferInfo = &buffers_info[binding_index];
 						} else {
-							Log::error("Could not find uniform at binding " + std::to_string(descriptor_set_layout_bindings[binding_index].binding));
+							Log::error("Could not find uniform at binding " + std::to_string(uniform_descriptor_set_layout_bindings[binding_index].binding));
 						}
 						break;
 					}
@@ -237,7 +242,7 @@ namespace HBE {
 
 				writes[binding_index].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 				writes[binding_index].dstSet = descriptor_set_handles[frame_index];
-				writes[binding_index].dstBinding = descriptor_set_layout_bindings[binding_index].binding;
+				writes[binding_index].dstBinding = uniform_descriptor_set_layout_bindings[binding_index].binding;
 				writes[binding_index].dstArrayElement = 0;
 
 				writes[binding_index].descriptorCount = 1;//for arrays
@@ -280,23 +285,23 @@ namespace HBE {
 	}
 
 	void VK_PipelineLayout::setTexture(const std::string &name, const RenderTarget *render_target) {
-		auto it = name_input_index.find(name);
-		HB_ASSERT(it != name_input_index.end(), "No shader input is named:" + name);
-		HB_ASSERT(inputs[it->second].type == UNIFORM_INPUT_TYPE_TEXTURE_SAMPLER ||
-				  inputs[it->second].type == UNIFORM_INPUT_TYPE_STORAGE_IMAGE ||
-				  inputs[it->second].type == UNIFORM_INPUT_TYPE_IMAGE, name + " is not a texture binding");
+		auto it = uniform_names_to_index.find(name);
+		HB_ASSERT(it != uniform_names_to_index.end(), "No shader input is named:" + name);
+		HB_ASSERT(uniform_descriptor_set_layout_bindings[it->second].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ||
+				  uniform_descriptor_set_layout_bindings[it->second].descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_IMAGE ||
+				  uniform_descriptor_set_layout_bindings[it->second].descriptorType == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, name + " is not a texture binding");
 
-		setTexture(inputs[it->second].binding, render_target);
+		setTexture(uniform_descriptor_set_layout_bindings[it->second].binding, render_target);
 	}
 
 	void VK_PipelineLayout::setTexture(const std::string &name, const Texture *texture) {
-		auto it = name_input_index.find(name);
-		HB_ASSERT(it != name_input_index.end(), "No shader input is named:" + name);
-		HB_ASSERT(inputs[it->second].type == UNIFORM_INPUT_TYPE_TEXTURE_SAMPLER ||
-				  inputs[it->second].type == UNIFORM_INPUT_TYPE_STORAGE_IMAGE ||
-				  inputs[it->second].type == UNIFORM_INPUT_TYPE_IMAGE, name + " is not a texture binding");
+		auto it = uniform_names_to_index.find(name);
+		HB_ASSERT(it != uniform_names_to_index.end(), "No shader input is named:" + name);
+		HB_ASSERT(uniform_descriptor_set_layout_bindings[it->second].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ||
+				  uniform_descriptor_set_layout_bindings[it->second].descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_IMAGE ||
+				  uniform_descriptor_set_layout_bindings[it->second].descriptorType == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, name + " is not a texture binding");
 
-		setTexture(inputs[it->second].binding, texture);
+		setTexture(uniform_descriptor_set_layout_bindings[it->second].binding, texture);
 	}
 
 	void VK_PipelineLayout::setTexture(uint32_t binding, const Texture *texture) {
@@ -314,11 +319,11 @@ namespace HBE {
 	}
 
 	void VK_PipelineLayout::setUniform(const std::string &name, const void *data) {
-		auto it = name_input_index.find(name);
-		HB_ASSERT(it != name_input_index.end(), "No shader input is named:" + name);
-		HB_ASSERT(inputs[it->second].type == UNIFORM_INPUT_TYPE_BUFFER, name + " is not a uniform buffer");
+		auto it = uniform_names_to_index.find(name);
+		HB_ASSERT(it != uniform_names_to_index.end(), "No shader input is named:" + name);
+		HB_ASSERT(uniform_descriptor_set_layout_bindings[it->second].descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, name + " is not a uniform buffer");
 
-		setUniform(inputs[it->second].binding, data);
+		setUniform(uniform_descriptor_set_layout_bindings[it->second].binding, data);
 
 	}
 
@@ -329,11 +334,14 @@ namespace HBE {
 	}
 
 	void VK_PipelineLayout::pushConstant(VkCommandBuffer command_buffer, const std::string &name, const void *data) {
-		auto it = name_input_index.find(name);
-		HB_ASSERT(it != name_input_index.end(), "No shader input is named:" + name);
-		HB_ASSERT(inputs[it->second].type == UNIFORM_INPUT_TYPE_PUSH_CONSTANT, name + " is not a push constant");
-		vkCmdPushConstants(command_buffer, handle,
-						   inputs[it->second].stage, inputs[it->second].offset, inputs[it->second].size, data);
+		auto it = push_constant_name_to_index.find(name);
+		HB_ASSERT(it != push_constant_name_to_index.end(), "No push constant is named:" + name);
+		vkCmdPushConstants(command_buffer,
+						   handle,
+						   push_constants_ranges[it->second].stageFlags,
+						   push_constants_ranges[it->second].offset,
+						   push_constants_ranges[it->second].size,
+						   data);
 
 	}
 
