@@ -197,8 +197,6 @@ namespace HBE {
 
 			UniformInfo uniform_info{};
 
-			uint32_t array_stride = spvc_compiler_get_decoration(compiler_glsl, uniform_list[i].id, SpvDecorationArrayStride);
-
 			VkDescriptorSetLayoutBinding layout_binding = {};
 			layout_binding.binding = spvc_compiler_get_decoration(compiler_glsl, storage_image_list[i].id, SpvDecorationBinding);
 			layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;

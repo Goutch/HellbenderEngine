@@ -44,9 +44,9 @@ namespace HBE {
 
         void pushConstant(const std::string &name, const void *data) override;
 
-        void setTexture(uint32_t binding, const Texture *texture) override;
+        void setTexture(uint32_t binding, const Texture *texture,uint32_t mip_level) override;
 
-        void setTexture(const std::string &name, const Texture *texture) override;
+        void setTexture(const std::string &name, const Texture *texture,uint32_t mip_level) override;
 
         void setTexture(uint32_t binding, const RenderTarget *render_target) override;
 

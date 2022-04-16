@@ -21,7 +21,7 @@ namespace HBE {
 		VkImageLayout desired_layout;
 		VK_Device *device;
 		VkImage handle = VK_NULL_HANDLE;
-		VkImageView view_hanlde = VK_NULL_HANDLE;
+		std::vector<VkImageView> image_views;
 		VkSampler sampler_handle = VK_NULL_HANDLE;
 		VkImageLayout layout;
 		IMAGE_FORMAT format;
@@ -43,13 +43,13 @@ namespace HBE {
 		void update(const void *data) override;
 
 		const VkSampler &getSampler() const;
-		const VkImageView &getImageView() const;
 		const VkImage &getHandle() const;
 		void setImageLayout(VkImageLayout layout);
 		const VkImageLayout getImageLayout() const;
 		const VkFormat getVkFormat() const;
 		const uint32_t bytePerPixel() const;
 		const VkImageLayout getDesiredLayout() const;
+		VkImageView const &getImageView(uint32_t mip_level = 0) const;
 		uint32_t getMipLevelCount() const;
 	private:
 		VkImageLayout chooseLayout();

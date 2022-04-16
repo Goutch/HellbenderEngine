@@ -65,9 +65,9 @@ namespace HBE {
 		virtual void setUniform(const std::string &name, const void *data) = 0;
 		virtual void setUniform(uint32_t binding, const void *data) = 0;
 		virtual void pushConstant(const std::string &name, const void *data) = 0;
-		virtual void setTexture(uint32_t binding, const Texture *texture) = 0;
+		virtual void setTexture(uint32_t binding, const Texture *texture, uint32_t mip_level = 0) = 0;
 		virtual void setTexture(uint32_t binding, const RenderTarget *render_target) = 0;
-		virtual void setTexture(const std::string &name, const Texture *texture) = 0;
+		virtual void setTexture(const std::string &name, const Texture *texture, uint32_t mip_level = 0) = 0;
 		virtual void setTexture(const std::string &name, const RenderTarget *render_target) = 0;
 	};
 

@@ -26,13 +26,13 @@ vec3 Atmosphere(float t)
     return exp(-0.005*t*vec3(4, 2, 1));
 }
 void main() {
-    int lod=0;
+    int lod=4;
     ivec3 resolution = ivec3(VoxelData.resolution);
 
     vec3 half_size=(VoxelData.bounding_box_size/2.0f);
     vec3 voxel_size=VoxelData.bounding_box_size/vec3(resolution);
 
-    for (int i =0;i<=lod;i++)
+    for (int i =0;i<lod;i++)
     {
         resolution/=2;
         voxel_size*=2;
@@ -75,11 +75,13 @@ void main() {
 
         voxel_pos[step_index] += step[step_index];
 
+
         if (voxel_pos[step_index]<0 || voxel_pos[step_index] >= resolution[step_index])
         {
             sucess=false;
             break;
         }
+
         planes[step_index] += step[step_index]*voxel_size[step_index];
         v=imageLoad(voxels, voxel_pos).r;
     }

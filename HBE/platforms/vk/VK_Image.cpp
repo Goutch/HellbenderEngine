@@ -150,18 +150,23 @@ namespace HBE {
 		//image view
 		VkImageViewCreateInfo viewInfo{};
 		viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		viewInfo.image = handle;
 		viewInfo.viewType = view_type;
 		viewInfo.format = vk_format;
 		viewInfo.subresourceRange.aspectMask |= info.flags & IMAGE_FLAG_DEPTH ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
-		viewInfo.subresourceRange.baseMipLevel = 0;
-		viewInfo.subresourceRange.levelCount = mip_levels;
-		viewInfo.subresourceRange.baseArrayLayer = 0;
-		viewInfo.subresourceRange.layerCount = 1;
 
-		if (vkCreateImageView(device->getHandle(), &viewInfo, nullptr, &view_hanlde) != VK_SUCCESS) {
-			Log::error("failed to create texture image view!");
+		image_views.resize(mip_levels);
+		for (int i = 0; i < image_views.size(); ++i) {
+			viewInfo.image = handle;
+			viewInfo.subresourceRange.baseMipLevel = i;
+			viewInfo.subresourceRange.levelCount = mip_levels - viewInfo.subresourceRange.baseMipLevel;
+			viewInfo.subresourceRange.baseArrayLayer = 0;
+			viewInfo.subresourceRange.layerCount = 1;
+
+			if (vkCreateImageView(device->getHandle(), &viewInfo, nullptr, &image_views[i]) != VK_SUCCESS) {
+				Log::error("failed to create texture image view!");
+			}
 		}
+
 
 		if ((flags & IMAGE_FLAG_NO_SAMPLER) != IMAGE_FLAG_NO_SAMPLER) {
 			VkSamplerCreateInfo samplerInfo{};
@@ -197,9 +202,10 @@ namespace HBE {
 		if (sampler_handle != VK_NULL_HANDLE) {
 			vkDestroySampler(device->getHandle(), sampler_handle, nullptr);
 		}
-		if (view_hanlde != VK_NULL_HANDLE) {
-			vkDestroyImageView(device->getHandle(), view_hanlde, nullptr);
+		for (int i = 0; i < image_views.size(); ++i) {
+			vkDestroyImageView(device->getHandle(), image_views[i], nullptr);
 		}
+
 		if (handle != VK_NULL_HANDLE) {
 			vkDestroyImage(device->getHandle(), handle, nullptr);
 		}
@@ -210,8 +216,8 @@ namespace HBE {
 		return sampler_handle;
 	}
 
-	const VkImageView &VK_Image::getImageView() const {
-		return view_hanlde;
+	const VkImageView &VK_Image::getImageView(uint32_t mip_level) const {
+		return image_views[mip_level];
 	}
 
 	uint32_t VK_Image::getWidth() const {

@@ -205,21 +205,21 @@ namespace HBE {
 					}
 					case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
 						writes[binding_index].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-						images_info[binding_index].imageView = default_texture->getImageView();
+						images_info[binding_index].imageView = default_texture->getImageView(0);
 						images_info[binding_index].sampler = default_texture->getSampler();
 						images_info[binding_index].imageLayout = default_texture->getImageLayout();
 						writes[binding_index].pImageInfo = &images_info[binding_index];
 						break;
 					case VK_DESCRIPTOR_TYPE_STORAGE_IMAGE:
 						writes[binding_index].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-						images_info[binding_index].imageView = default_image->getImageView();
+						images_info[binding_index].imageView = default_image->getImageView(0);
 						images_info[binding_index].sampler = VK_NULL_HANDLE;
 						images_info[binding_index].imageLayout = default_image->getImageLayout();
 						writes[binding_index].pImageInfo = &images_info[binding_index];
 						break;
 					case VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE:
 						writes[binding_index].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-						images_info[binding_index].imageView = default_texture->getImageView();
+						images_info[binding_index].imageView = default_texture->getImageView(0);
 						images_info[binding_index].sampler = default_texture->getSampler();
 						images_info[binding_index].imageLayout = default_texture->getImageLayout();
 						writes[binding_index].pImageInfo = &images_info[binding_index];
@@ -276,7 +276,7 @@ namespace HBE {
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
 			const VK_Image *vk_image = render_pass->getImage(i);
 			VkDescriptorImageInfo image_info;
-			image_info.imageView = vk_image->getImageView();
+			image_info.imageView = vk_image->getImageView(0);
 			image_info.sampler = vk_image->getSampler();
 			image_info.imageLayout = vk_image->getImageLayout();
 			descriptor_sets_writes[i][binding].pImageInfo = &image_info;
@@ -294,23 +294,23 @@ namespace HBE {
 		setTexture(uniform_descriptor_set_layout_bindings[it->second].binding, render_target);
 	}
 
-	void VK_PipelineLayout::setTexture(const std::string &name, const Texture *texture) {
+	void VK_PipelineLayout::setTexture(const std::string &name, const Texture *texture, uint32_t mip_level) {
 		auto it = uniform_names_to_index.find(name);
 		HB_ASSERT(it != uniform_names_to_index.end(), "No shader input is named:" + name);
 		HB_ASSERT(uniform_descriptor_set_layout_bindings[it->second].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ||
 				  uniform_descriptor_set_layout_bindings[it->second].descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_IMAGE ||
 				  uniform_descriptor_set_layout_bindings[it->second].descriptorType == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, name + " is not a texture binding");
 
-		setTexture(uniform_descriptor_set_layout_bindings[it->second].binding, texture);
+		setTexture(uniform_descriptor_set_layout_bindings[it->second].binding, texture, mip_level);
 	}
 
-	void VK_PipelineLayout::setTexture(uint32_t binding, const Texture *texture) {
+	void VK_PipelineLayout::setTexture(uint32_t binding, const Texture *texture, uint32_t mip_level) {
 		//todo undefined behavior when texture data is not set;
 		//use texture event
 		VK_Image *vk_texture = (VK_Image *) texture;
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
 			VkDescriptorImageInfo image_info;
-			image_info.imageView = vk_texture->getImageView();
+			image_info.imageView = vk_texture->getImageView(mip_level);
 			image_info.sampler = vk_texture->getSampler();
 			image_info.imageLayout = vk_texture->getImageLayout();
 			descriptor_sets_writes[i][binding].pImageInfo = &image_info;

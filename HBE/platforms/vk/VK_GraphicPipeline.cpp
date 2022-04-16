@@ -262,12 +262,12 @@ namespace HBE {
 		layout->pushConstant(renderer->getCommandPool()->getCurrentBuffer(), name, data);
 	}
 
-	void VK_GraphicPipeline::setTexture(uint32_t binding, const Texture *texture) {
-		layout->setTexture(binding, texture);
+	void VK_GraphicPipeline::setTexture(uint32_t binding, const Texture *texture, uint32_t mip_level) {
+		layout->setTexture(binding, texture, mip_level);
 	}
 
-	void VK_GraphicPipeline::setTexture(const std::string &name, const Texture *texture) {
-		layout->setTexture(name, texture);
+	void VK_GraphicPipeline::setTexture(const std::string &name, const Texture *texture, uint32_t mip_level) {
+		layout->setTexture(name, texture, mip_level);
 	}
 
 	void VK_GraphicPipeline::setTexture(uint32_t binding, const RenderTarget *render_target) {

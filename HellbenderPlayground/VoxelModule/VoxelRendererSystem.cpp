@@ -84,7 +84,8 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 				  raw_voxels->getDepth()),
 			vec3(2.0f)};
 	pipeline->setUniform("VoxelData", static_cast<void *>(&voxel_info));
-	pipeline->setTexture("voxels", raw_voxels);
+	pipeline->setTexture("voxels", raw_voxels,4);
+
 }
 
 void VoxelRendererSystem::draw() {
