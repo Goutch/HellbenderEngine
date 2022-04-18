@@ -7,16 +7,18 @@
 
 namespace HBE {
 
-	void Shader::getSource(const std::string &path, std::vector<char> &buffer) {
+	void Shader::getSource(const std::string &path, char **buffer, size_t &size) {
 		try {
 			std::ifstream file;
 			std::string res_path = RESOURCE_PATH + path;
 			file.open(res_path, std::ios::ate);
 			if (file.is_open()) {
-				size_t size = (size_t) file.tellg();
-				buffer.resize(size);
+				size = (size_t) file.tellg();
+				*buffer = (char *) malloc(size * sizeof(char));
+
 				file.seekg(0);
-				file.read(buffer.data(), size);
+				file.read(*buffer, size);
+
 				file.close();
 			} else {
 				Log::error("Unable to find file:" + path);

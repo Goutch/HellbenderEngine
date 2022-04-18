@@ -15,7 +15,7 @@ namespace HBE {
 
 	struct ShaderInfo {
 		SHADER_STAGE stage = SHADER_STAGE_NONE;
-		std::string path="";
+		std::string path = "";
 	};
 
 	class HB_API Shader : public Resource {
@@ -24,8 +24,8 @@ namespace HBE {
 
 		virtual ~Shader() = default;
 
-	protected:
-		void getSource(const std::string &path, std::vector<char> &buffer);
+	public:
+		static void getSource(const std::string &path, char **buffer, size_t &size);
 
 	};
 }

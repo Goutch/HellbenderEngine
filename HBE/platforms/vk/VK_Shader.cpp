@@ -56,11 +56,13 @@ namespace HBE {
 	}
 
 	void VK_Shader::load(const std::string &path) {
-		std::vector<char> source;
-		getSource(path, source);
+		char *source = nullptr;
+		size_t size = 0;
+		getSource(path, &source, size);
 		std::vector<uint32_t> spirv;
-		ShaderCompiler::GLSLToSpirV(source, spirv, stage);
+		ShaderCompiler::GLSLToSpirV(source, size, spirv, stage, path);
 		setSource(spirv);
+		delete source;
 	}
 
 	void VK_Shader::reflect(const std::vector<uint32_t> &spirv) {
@@ -204,7 +206,7 @@ namespace HBE {
 			layout_binding.descriptorCount = 1;//this is for array
 			layout_binding.pImmutableSamplers = nullptr;
 
-			uniform_info.layout_binding=layout_binding;
+			uniform_info.layout_binding = layout_binding;
 			uniform_info.name = name;
 			uniform_info.size = 0;
 

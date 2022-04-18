@@ -5,7 +5,7 @@
 namespace HBE{
     class ShaderCompiler {
     public:
-        static void GLSLToSpirV(const std::vector<char> &source, std::vector<uint32_t> &buffer, SHADER_STAGE type);
+        static void GLSLToSpirV(const char* source, size_t size, std::vector<uint32_t> &spirv, SHADER_STAGE type, const std::string& string);
     };
 
 }

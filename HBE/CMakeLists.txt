@@ -3,9 +3,14 @@ set(CMAKE_CXX_STANDARD 20)
 
 project(HBE CXX)
 add_compile_definitions(HB_BUILD)
+
+
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --std=c++17 -O3 -fPIC")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3 -fPIC")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    set(MSVC_COMPILE_FLAGS "/MP")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_COMPILE_FLAGS}" )
 endif ()
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 

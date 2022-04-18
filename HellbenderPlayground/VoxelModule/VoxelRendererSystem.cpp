@@ -56,23 +56,26 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 
 
 	TextureInfo texture_info{};
-	texture_info.width = 128;
-	texture_info.height = 128;
-	texture_info.depth = 128;
+	texture_info.width = 8;
+	texture_info.height = 8;
+	texture_info.depth = 8;
 	texture_info.flags = IMAGE_FLAG_NO_SAMPLER;
 	texture_info.format = IMAGE_FORMAT_R8;
-	texture_info.generate_mip_maps=true;
+	texture_info.generate_mip_maps = true;
 	auto raw_voxels = Resources::createTexture(texture_info, "voxels");
 	std::vector<uint8_t> data;
 	vec3 resoluton = vec3(raw_voxels->getWidth(), raw_voxels->getHeight(), raw_voxels->getDepth());
 	for (int x = 0; x < raw_voxels->getWidth(); ++x) {
 		for (int y = 0; y < raw_voxels->getHeight(); ++y) {
 			for (int z = 0; z < raw_voxels->getDepth(); ++z) {
-				float distance = glm::distance(vec3(x, y, z) - (resoluton / 2.0f), vec3(0, 0, 0));
-				if (distance < (resoluton.x / 2.0f))
+				if (x <=3)
 					data.emplace_back(1);
-				else
-					data.emplace_back(0);
+				else data.emplace_back(0);
+				//float distance = glm::distance(vec3(x, y, z) - (resoluton / 2.0f), vec3(0, 0, 0));
+				//if (distance < (resoluton.x / 2.0f))
+				//	data.emplace_back(1);
+				//else
+				//	data.emplace_back(0);
 			}
 		}
 	}
@@ -84,7 +87,10 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 				  raw_voxels->getDepth()),
 			vec3(2.0f)};
 	pipeline->setUniform("VoxelData", static_cast<void *>(&voxel_info));
-	pipeline->setTexture("voxels", raw_voxels,4);
+	pipeline->setTexture("voxels0", raw_voxels, 0);
+	pipeline->setTexture("voxels1", raw_voxels, 1);
+	pipeline->setTexture("voxels2", raw_voxels, 2);
+	pipeline->setTexture("voxels3", raw_voxels, 3);
 
 }
 
