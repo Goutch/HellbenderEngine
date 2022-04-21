@@ -1,9 +1,9 @@
 # HellbenderEngine
-
+## My personnal toy Rendering engine/framework.
 # Goals 
-- **Simple and easy to read for programmers**
+- **Simple API**
 - **Cross platforms**
-- **Easy to use and modular API.**
+- **Easy to use**
 - **Minimal dependencies and lightweight.**
 
 # Why?
