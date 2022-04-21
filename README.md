@@ -16,7 +16,7 @@
 
 # Features
 #### HB Graphics library:
-- 3D rendering with Vukkan
+- 3D rendering with Vulkan
 - Instancing
 - Resource loading:
 	 - Textures
