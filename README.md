@@ -1,6 +1,5 @@
 # HellbenderEngine
 ## My personnal toy Rendering engine/framework.
-### /!\ WIP: not even in alpha /!\ please keep that in mind while checking the code.
 
 # Goals 
 - **Simple API**
