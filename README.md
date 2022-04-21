@@ -1,5 +1,7 @@
 # HellbenderEngine
 ## My personnal toy Rendering engine/framework.
+### /!\ WIP: not even in alpha /!\ please keep that in mind while checking the code.
+
 # Goals 
 - **Simple API**
 - **Cross platforms**
@@ -33,10 +35,11 @@
 - Event system
 - keyboard and mouse input handling
 
-#### planned for 1.0:
+#### planned for Alpha 1.0:
 - Compute shaders
 - Ray tracing pipelines
 - Model loading and animations
+- Font rendering
 
 ## Getting started
 
