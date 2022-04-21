@@ -56,13 +56,11 @@ namespace HBE {
 	}
 
 	void VK_Shader::load(const std::string &path) {
-		char *source = nullptr;
-		size_t size = 0;
-		getSource(path, &source, size);
+		std::string source;
+		getSource(path, source);
 		std::vector<uint32_t> spirv;
-		ShaderCompiler::GLSLToSpirV(source, size, spirv, stage, path);
+		ShaderCompiler::GLSLToSpirV(source.c_str(), source.size(), spirv, stage, path);
 		setSource(spirv);
-		delete source;
 	}
 
 	void VK_Shader::reflect(const std::vector<uint32_t> &spirv) {

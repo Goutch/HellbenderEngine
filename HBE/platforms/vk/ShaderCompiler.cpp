@@ -1,13 +1,26 @@
 
+//#define GLSLANG_C
+
+#ifdef GLSLANG_C
+#include "glslang/Include/glslang_c_interface.h"
+#else
 
 #include "glslang/Public/ShaderLang.h"
 #include "glslang/Include/intermediate.h"
+
+#endif
+
 #include "SPIRV/GlslangToSpv.h"
 #include "ShaderCompiler.h"
 
 
 namespace HBE {
+#ifdef GLSLANG_C
+	const glslang_resource_s DEFAULT_BUILT_IN_RESOURCE_LIMIT = {
+#else
 	const TBuiltInResource DEFAULT_BUILT_IN_RESOURCE_LIMIT = {
+#endif
+
 			/* .MaxLights = */ 32,
 			/* .MaxClipPlanes = */ 6,
 			/* .MaxTextureUnits = */ 32,
@@ -114,6 +127,8 @@ namespace HBE {
 									   /* .generalConstantMatrixVectorIndexing = */ 1,
 							   }};
 
+#ifndef GLSLANG_C
+
 
 	struct HBE_Includer : glslang::TShader::Includer {
 		std::string path;
@@ -145,10 +160,9 @@ namespace HBE {
 
 
 		IncludeResult *includeSystem(const char *file_path, const char *includer_name, size_t inclusion_depth) override {
-			char *data= nullptr;
-			size_t size=0;
-			Shader::getSource(file_path, &data, size);
-			IncludeResult *result = new IncludeResult(path, data, size, nullptr);
+			std::string *source = new std::string();
+			Shader::getSource(file_path, *source);
+			IncludeResult *result = new IncludeResult(path, source->c_str(), source->size(), source);
 			results.emplace(result);
 			return result;
 		}
@@ -157,18 +171,16 @@ namespace HBE {
 		// "system" paths, because on returning a failure, the parser will
 		// call includeSystem() to look in the "system" locations.
 		IncludeResult *includeLocal(const char *file_path, const char *includer_name, size_t inclusion_depth) override {
-			char *data= nullptr;
-			size_t size=0;
-
-			Shader::getSource(path + file_path, &data, size);
-			IncludeResult *result = new IncludeResult(path, data, size, nullptr);
+			std::string *source = new std::string();
+			Shader::getSource(path + file_path, *source);
+			IncludeResult *result = new IncludeResult(path + file_path, source->c_str(), source->size(), source);
 			results.emplace(result);
 			return result;
 		}
 
 		void releaseInclude(IncludeResult *result) override {
 			results.erase(result);
-			delete[] result->headerData;
+			delete (std::string *) result->userData;
 			delete result;
 		}
 
@@ -180,9 +192,13 @@ namespace HBE {
 		}
 	};
 
+#endif
+
 	//https://lxjk.github.io/2020/03/10/Translate-GLSL-to-SPIRV-for-Vulkan-at-Runtime.html
 	void ShaderCompiler::GLSLToSpirV(const char *source, size_t size, std::vector<uint32_t> &spirv, SHADER_STAGE type, const std::string &shader_path) {
+
 		Log::message("Compiling shader at: " + shader_path);
+#ifndef GLSLANG_C
 		glslang::InitializeProcess();
 		EShLanguage stage;
 		switch (type) {
@@ -206,23 +222,34 @@ namespace HBE {
 		{
 			glslang::TShader shader(stage);
 
-#ifdef DEBUG_MODE
-			shader.getIntermediate()->addSourceText(source, size);
-			shader.getIntermediate()->setSource(glslang::EShSourceGlsl);
-#endif
-			int l=(int)size;
-			shader.setStringsWithLengths(&source,&l, 1);
+			std::string source_str = source;
+			const char *source_str_ptr = source_str.c_str();
+			const char *const *source_ptr = &source_str_ptr;
+			int lenght = source_str.size();
 			shader.setEnvClient(glslang::EShClient::EShClientVulkan, glslang::EShTargetVulkan_1_2);
-			shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_2);
+			shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_1);
+			shader.setStringsWithLengths(source_ptr, &lenght, 1);
+			shader.setSourceEntryPoint("main");
+			shader.setEntryPoint("main");
+
+			shader.getIntermediate()->setSource(glslang::EShSourceGlsl);
+			shader.getIntermediate()->setSourceFile(shader_path.c_str());
+			shader.getIntermediate()->setEntryPointName("main");
+
+#ifdef DEBUG_MODE
+			//shader.getIntermediate()->addSourceText(source, size);
+
+#endif
+			//shader.getIntermediate()->setSource(glslang::EShSourceGlsl);
 
 			HBE_Includer includer(shader_path);
-
+			EShMessages message = EShMsgDefault;// (EShMessages) (EShMessages::EShMsgVulkanRules | EShMessages::EShMsgSpvRules)
 			if (!shader.parse(&DEFAULT_BUILT_IN_RESOURCE_LIMIT,
-							  330,
+							  450,
 							  ENoProfile,
 							  false,
 							  false,
-							  (EShMessages) (EShMessages::EShMsgVulkanRules | EShMessages::EShMsgSpvRules),
+							  message,
 							  includer)) {
 				Log::warning(shader.getInfoDebugLog());
 				Log::error(shader.getInfoLog());
@@ -232,8 +259,8 @@ namespace HBE {
 				glslang::TProgram program;
 
 				program.addShader(&shader);
-
-				if (!program.link((EShMessages) (EShMessages::EShMsgVulkanRules | EShMessages::EShMsgSpvRules))) {
+				//program.getIntermediate(stage)->addSourceText(source, size);
+				if (!program.link(message)) {
 					Log::warning(program.getInfoDebugLog());
 					Log::error(program.getInfoLog());
 				}
@@ -241,7 +268,8 @@ namespace HBE {
 			}
 		}
 		glslang::FinalizeProcess();
-		/*glslang_stage_t stage = GLSLANG_STAGE_VERTEX;;
+#else
+		glslang_stage_t stage = GLSLANG_STAGE_VERTEX;;
 		switch (type) {
 			case SHADER_STAGE::SHADER_STAGE_COMPUTE:
 				stage = GLSLANG_STAGE_COMPUTE;
@@ -266,7 +294,7 @@ namespace HBE {
 						.client_version = GLSLANG_TARGET_VULKAN_1_2,
 						.target_language = GLSLANG_TARGET_SPV,
 						.target_language_version = GLSLANG_TARGET_SPV_1_1,
-						.code = source.data(),
+						.code = source,
 						.default_version = 100,
 						.default_profile = GLSLANG_NO_PROFILE,
 						.force_default_version_and_profile = false,
@@ -276,14 +304,14 @@ namespace HBE {
 				};
 
 		glslang_initialize_process();
-		//glslang_shader_t *shader = glslang_shader_create(&input);
+		glslang_shader_t *shader = glslang_shader_create(&input);
 
 
 		if (!glslang_shader_preprocess(shader, &input)) {
 			const char *info = glslang_shader_get_info_log(shader);
-			// const char *debug_info = glslang_shader_get_info_debug_log(shader);
+			const char *debug_info = glslang_shader_get_info_debug_log(shader);
 			Log::warning(info);
-			//Log::debug(debug_info);
+			Log::debug(debug_info);
 		}
 
 		if (!glslang_shader_parse(shader, &input)) {
@@ -311,14 +339,15 @@ namespace HBE {
 		glslang_shader_delete(shader);
 
 		const uint32_t *code = glslang_program_SPIRV_get_ptr(program);
-		size_t size = glslang_program_SPIRV_get_size(program);
+		size_t spv_size = glslang_program_SPIRV_get_size(program);
 
 		//todo: Find a way to create the shader before deleting the data to stop copying the data
-		buffer = std::vector<uint32_t>();
-		buffer.assign(code, code + size);
+		spirv = std::vector<uint32_t>();
+		spirv.assign(code, code + spv_size);
 
 
-		glslang_program_delete(program);*/
+		glslang_program_delete(program);
+#endif
 	}
 }
 

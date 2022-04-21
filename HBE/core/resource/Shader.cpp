@@ -1,29 +1,41 @@
 
 #include "Shader.h"
-#include <fstream>
-#include "sstream"
-#include "core/graphics/Renderer.h"
 #include "core/resource/ResourceFactory.h"
-
+#include "fstream"
 namespace HBE {
 
-	void Shader::getSource(const std::string &path, char **buffer, size_t &size) {
+	void Shader::getSource(const std::string &path, std::string& buffer) {
 		try {
-			std::ifstream file;
 			std::string res_path = RESOURCE_PATH + path;
-			file.open(res_path, std::ios::ate);
+			std::ifstream file;
+			file.open(res_path,std::ios::ate);
 			if (file.is_open()) {
-				size = (size_t) file.tellg();
-				*buffer = (char *) malloc(size * sizeof(char));
-
+				size_t size=(size_t) file.tellg();
+				buffer.resize(size);
 				file.seekg(0);
-				file.read(*buffer, size);
-
+				file.read(buffer.data(), size);
 				file.close();
 			} else {
 				Log::error("Unable to find file:" + path);
 			}
+			/*
 
+			FILE *file = fopen(res_path.c_str(), "r");
+			if (ferror(file)) {
+				Log::error("Unable to find file:" + path);
+			}
+			while (!feof(file)) {
+				fgetc(file);
+				size++;
+			}
+			rewind(file);
+			*buffer = new char[size + 1];
+			for (int i = 0; i < size; ++i) {
+				char c = getc(file);
+				(*buffer)[i] = c;
+			}
+			buffer[size] = 0;
+			fclose(file);*/
 		}
 		catch (std::exception &e) {
 			Log::error("failed to read file " + path + "\n" + e.what());

@@ -25,7 +25,7 @@ namespace HBE {
 		virtual ~Shader() = default;
 
 	public:
-		static void getSource(const std::string &path, char **buffer, size_t &size);
+		static void getSource(const std::string &path,std::string& buffer);
 
 	};
 }

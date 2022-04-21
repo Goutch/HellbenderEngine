@@ -110,6 +110,7 @@ void main() {
             break;
         }
 
+        //just calculae new t for step_index
         vec3 ts = (planes - ray.origin) / ray.direction;
         step_index=0;
 
