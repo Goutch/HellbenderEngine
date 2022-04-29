@@ -25,12 +25,12 @@ namespace HBE {
 		command_buffers.clear();
 	}
 
-	VK_CommandPool::VK_CommandPool(VK_Device &device, int command_buffers_count) : device(device) {
+	VK_CommandPool::VK_CommandPool(VK_Device &device, int command_buffers_count,const VK_Queue& queue) : device(device) {
 		QueueFamilyIndices queueFamilyIndices = device.getPhysicalDevice().getQueueFamilyIndices();
 
 		VkCommandPoolCreateInfo poolInfo{};
 		poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-		poolInfo.queueFamilyIndex = queueFamilyIndices.graphics_family.value();
+		poolInfo.queueFamilyIndex = queue.getFamilyIndex();
 
 		poolInfo.flags = VkCommandPoolCreateFlagBits::VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT |
 						 VkCommandPoolCreateFlagBits::VK_COMMAND_POOL_CREATE_TRANSIENT_BIT;

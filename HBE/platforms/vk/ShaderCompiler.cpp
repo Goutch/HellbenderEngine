@@ -227,7 +227,7 @@ namespace HBE {
 			const char *const *source_ptr = &source_str_ptr;
 			int lenght = source_str.size();
 			shader.setEnvClient(glslang::EShClient::EShClientVulkan, glslang::EShTargetVulkan_1_2);
-			shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_1);
+			shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_3);
 			shader.setStringsWithLengths(source_ptr, &lenght, 1);
 			shader.setSourceEntryPoint("main");
 			shader.setEntryPoint("main");
@@ -236,12 +236,11 @@ namespace HBE {
 			shader.getIntermediate()->setSourceFile(shader_path.c_str());
 			shader.getIntermediate()->setEntryPointName("main");
 
+
 #ifdef DEBUG_MODE
-			//shader.getIntermediate()->addSourceText(source, size);
-
+			shader.getIntermediate()->addSourceText(source, size);
+			shader.getIntermediate()->setSourceFile((RESOURCE_PATH + shader_path).c_str());
 #endif
-			//shader.getIntermediate()->setSource(glslang::EShSourceGlsl);
-
 			HBE_Includer includer(shader_path);
 			EShMessages message = EShMsgDefault;// (EShMessages) (EShMessages::EShMsgVulkanRules | EShMessages::EShMsgSpvRules)
 			if (!shader.parse(&DEFAULT_BUILT_IN_RESOURCE_LIMIT,
@@ -254,17 +253,30 @@ namespace HBE {
 				Log::warning(shader.getInfoDebugLog());
 				Log::error(shader.getInfoLog());
 			}
-
+#ifdef DEBUG_MODE
+			shader.getIntermediate()->addSourceText(source, size);
+			shader.getIntermediate()->setSourceFile((RESOURCE_PATH + shader_path).c_str());
+#endif
 			{
 				glslang::TProgram program;
-
 				program.addShader(&shader);
+				program.buildReflection(EShReflectionDefault);
 				//program.getIntermediate(stage)->addSourceText(source, size);
 				if (!program.link(message)) {
 					Log::warning(program.getInfoDebugLog());
 					Log::error(program.getInfoLog());
 				}
-				glslang::GlslangToSpv(*program.getIntermediate(stage), spirv);
+				glslang::SpvOptions options{};
+#ifdef DEBUG_MODE
+				options.generateDebugInfo = true;
+				options.stripDebugInfo = false;
+				options.disableOptimizer = true;
+#elif
+				options.generateDebugInfo=false;
+				options.stripDebugInfo=true;
+				options.disableOptimizer=false;
+#endif
+				glslang::GlslangToSpv(*program.getIntermediate(stage), spirv, &options);
 			}
 		}
 		glslang::FinalizeProcess();

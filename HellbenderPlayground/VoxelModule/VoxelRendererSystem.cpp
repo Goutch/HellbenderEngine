@@ -8,6 +8,17 @@ struct VoxelChunkInfo {
 VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 	scene->onDraw.subscribe(this, &VoxelRendererSystem::draw);
 
+
+	ShaderInfo compute_info{};
+	compute_info.path = "shaders/pathTracer/MipGeneration.comp";
+	compute_info.stage = SHADER_STAGE_COMPUTE;
+
+	Shader *compute_shader = Resources::createShader(compute_info, "MipMapperShader");
+	ComputePipelineInfo compute_pipeline_info{};
+	compute_pipeline_info.compute_shader = compute_shader;
+	compute_pipeline_info.flags = COMPUTE_PIPELINE_FLAG_NONE;
+	compute_pipeline = Resources::createComputePipeline(compute_pipeline_info, "MipMapperPipeline");
+
 	VertexBindingInfo binding_infos[2];
 	binding_infos[0].flags = VERTEX_BINDING_FLAG_NONE;
 	binding_infos[0].binding = 0;
@@ -40,7 +51,7 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 
 	Geometry::createCube(*mesh, 1, 1, 1, 0);
 
-	int32_t range = 2; //10*10*10 = 1000 cubes
+	int32_t range = 10; //10*10*10 = 1000 cubes
 	uint32_t count = 0;
 	for (int i = -range; i < range; ++i) {
 		for (int j = -range; j < range; ++j) {
@@ -54,12 +65,11 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 	}
 	mesh->setInstanceBuffer(1, transforms.data(), transforms.size());
 
-
 	TextureInfo texture_info{};
-	texture_info.width = 8;
-	texture_info.height = 8;
-	texture_info.depth = 8;
-	texture_info.flags = IMAGE_FLAG_NO_SAMPLER;
+	texture_info.width = 32;
+	texture_info.height = 32;
+	texture_info.depth = 32;
+	texture_info.flags = IMAGE_FLAG_NO_SAMPLER|IMAGE_FLAG_SHADER_WRITE;
 	texture_info.format = IMAGE_FORMAT_R8;
 	texture_info.generate_mip_maps = true;
 	auto raw_voxels = Resources::createTexture(texture_info, "voxels");
@@ -68,19 +78,30 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 	for (int x = 0; x < raw_voxels->getWidth(); ++x) {
 		for (int y = 0; y < raw_voxels->getHeight(); ++y) {
 			for (int z = 0; z < raw_voxels->getDepth(); ++z) {
-				if (x <=3)
+				/*if (x <= raw_voxels->getDepth() + 1)
 					data.emplace_back(1);
-				else data.emplace_back(0);
-				//float distance = glm::distance(vec3(x, y, z) - (resoluton / 2.0f), vec3(0, 0, 0));
-				//if (distance < (resoluton.x / 2.0f))
-				//	data.emplace_back(1);
-				//else
-				//	data.emplace_back(0);
+				else data.emplace_back(0);*/
+				float distance = glm::distance(vec3(x, y, z) - (resoluton / 2.0f), vec3(0, 0, 0));
+				if (distance < (resoluton.x / 2.0f))
+					data.emplace_back(1);
+				else
+					data.emplace_back(0);
 			}
 		}
 	}
 	raw_voxels->update(data.data());
-
+	compute_pipeline->setTexture("inTexture", raw_voxels, 0);
+	compute_pipeline->setTexture("outTexture", raw_voxels, 1);
+	compute_pipeline->dispatch(raw_voxels->getWidth() /  2, raw_voxels->getHeight() / 2, raw_voxels->getWidth() / 2);
+	compute_pipeline->wait();
+	compute_pipeline->setTexture("inTexture", raw_voxels, 1);
+	compute_pipeline->setTexture("outTexture", raw_voxels, 2);
+	compute_pipeline->dispatch(raw_voxels->getWidth() / 4, raw_voxels->getHeight() / 4, raw_voxels->getWidth() / 4);
+	compute_pipeline->wait();
+	compute_pipeline->setTexture("inTexture", raw_voxels, 2);
+	compute_pipeline->setTexture("outTexture", raw_voxels, 3);
+	compute_pipeline->dispatch(raw_voxels->getWidth() / 8, raw_voxels->getHeight() / 8, raw_voxels->getWidth() / 8);
+	compute_pipeline->wait();
 	VoxelChunkInfo voxel_info = {
 			uvec3(raw_voxels->getWidth(),
 				  raw_voxels->getHeight(),

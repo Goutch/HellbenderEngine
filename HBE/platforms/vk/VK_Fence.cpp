@@ -13,9 +13,10 @@ namespace HBE {
 			Log::error("failed to create fence!");
 		}
 	}
+
 	VK_Fence::VK_Fence(const VK_Fence &&other) {
 		this->device_handle = other.device_handle;
-		this->handle=other.handle;
+		this->handle = other.handle;
 	}
 
 	VK_Fence::~VK_Fence() {
@@ -32,6 +33,11 @@ namespace HBE {
 
 	void VK_Fence::reset() const {
 		vkResetFences(device_handle, 1, &handle);
+	}
+
+	bool VK_Fence::isSet() const {
+
+		return vkGetFenceStatus(device_handle, handle) == VK_SUCCESS;
 	}
 }
 

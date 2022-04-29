@@ -33,7 +33,7 @@ namespace HBE {
 		std::map<std::string, size_t> push_constant_name_to_index;
 
 		std::array<std::unordered_map<uint32_t, VkWriteDescriptorSet>, MAX_FRAMES_IN_FLIGHT> descriptor_sets_writes;
-
+		VkPipelineBindPoint bind_point = VK_PIPELINE_BIND_POINT_GRAPHICS;
 		void createDescriptorSets();
 
 	public:

@@ -14,9 +14,8 @@ namespace HBE {
 	VK_Queue::VK_Queue(VK_Device *device, uint32_t family_index) {
 		this->device_handle = device->getHandle();
 		vkGetDeviceQueue(device_handle, family_index, 0, &handle);
-
-		command_pool = new VK_CommandPool(*		device, 1);
 		this->family_index = family_index;
+		command_pool = new VK_CommandPool(*device, 1, *this);
 	}
 
 
@@ -74,7 +73,7 @@ namespace HBE {
 
 	}
 
-	uint32_t VK_Queue::getFamilyIndex() {
+	uint32_t VK_Queue::getFamilyIndex() const {
 		return family_index;
 	}
 

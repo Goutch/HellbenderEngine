@@ -25,7 +25,7 @@ namespace HBE {
 		IMAGE_FLAG_SHADER_WRITE = 1 << 0,
 		IMAGE_FLAG_RENDER_TARGET = 1 << 1,
 		IMAGE_FLAG_DEPTH = 1 << 2,
-		IMAGE_FLAG_NO_SAMPLER = 1 << 3,// image2D in glsl aecessed with imageLoad and imageStore.
+		IMAGE_FLAG_NO_SAMPLER = 1 << 3,// image2D in glsl accessed with imageLoad and imageStore.
 	};
 	/**
 	 * @param data can be nullptr

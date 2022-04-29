@@ -15,6 +15,7 @@ namespace HBE {
 		~VK_Fence();
 		void wait() const;
 		void reset() const;
+		bool isSet() const;
 		const VkFence &getHandle() const;
 	};
 

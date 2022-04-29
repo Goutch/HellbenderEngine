@@ -290,7 +290,10 @@ public:
         resources(TBuiltInResource{}),
         numEntryPoints(0), numErrors(0), numPushConstants(0), recursive(false),
         invertY(false),
+        dxPositionW(false),
+        enhancedMsgs(false),
         useStorageBuffer(false),
+        invariantAll(false),
         nanMinMaxClamp(false),
         depthReplacing(false),
         uniqueId(0),
@@ -306,7 +309,7 @@ public:
         useVulkanMemoryModel(false),
         invocations(TQualifier::layoutNotSet), vertices(TQualifier::layoutNotSet),
         inputPrimitive(ElgNone), outputPrimitive(ElgNone),
-        pixelCenterInteger(false), originUpperLeft(false),
+        pixelCenterInteger(false), originUpperLeft(false),texCoordBuiltinRedeclared(false),
         vertexSpacing(EvsNone), vertexOrder(EvoNone), interlockOrdering(EioNone), pointMode(false), earlyFragmentTests(false),
         postDepthCoverage(false), depthLayout(EldNone),
         hlslFunctionality1(false),
@@ -328,7 +331,10 @@ public:
         textureSamplerTransformMode(EShTexSampTransKeep),
         needToLegalize(false),
         binaryDoubleOutput(false),
+        subgroupUniformControlFlow(false),
         usePhysicalStorageBuffer(false),
+        spirvRequirement(nullptr),
+        spirvExecutionMode(nullptr),
         uniformLocationBase(0)
 #endif
     {
@@ -393,6 +399,9 @@ public:
         case EShTargetSpv_1_5:
             processes.addProcess("target-env spirv1.5");
             break;
+        case EShTargetSpv_1_6:
+            processes.addProcess("target-env spirv1.6");
+            break;
         default:
             processes.addProcess("target-env spirvUnknown");
             break;
@@ -410,6 +419,9 @@ public:
             break;
         case EShTargetVulkan_1_2:
             processes.addProcess("target-env vulkan1.2");
+            break;
+        case EShTargetVulkan_1_3:
+            processes.addProcess("target-env vulkan1.3");
             break;
         default:
             processes.addProcess("target-env vulkanUnknown");
@@ -455,6 +467,20 @@ public:
             processes.addProcess("invert-y");
     }
     bool getInvertY() const { return invertY; }
+
+    void setDxPositionW(bool dxPosW)
+    {
+        dxPositionW = dxPosW;
+        if (dxPositionW)
+            processes.addProcess("dx-position-w");
+    }
+    bool getDxPositionW() const { return dxPositionW; }
+
+    void setEnhancedMsgs()
+    {
+        enhancedMsgs = true;
+    }
+    bool getEnhancedMsgs() const { return enhancedMsgs && source == EShSourceGlsl; }
 
 #ifdef ENABLE_HLSL
     void setSource(EShSource s) { source = s; }
@@ -535,7 +561,7 @@ public:
     TIntermTyped* foldSwizzle(TIntermTyped* node, TSwizzleSelectors<TVectorSelector>& fields, const TSourceLoc&);
 
     // Tree ops
-    static const TIntermTyped* findLValueBase(const TIntermTyped*, bool swizzleOkay);
+    static const TIntermTyped* findLValueBase(const TIntermTyped*, bool swizzleOkay , bool BufferReferenceOk = false);
 
     // Linkage related
     void addSymbolLinkageNodes(TIntermAggregate*& linkage, EShLanguage, TSymbolTable&);
@@ -557,6 +583,8 @@ public:
 
     void setUseStorageBuffer() { useStorageBuffer = true; }
     bool usingStorageBuffer() const { return useStorageBuffer; }
+    void setInvariantAll() { invariantAll = true; }
+    bool isInvariantAll() const { return invariantAll; }
     void setDepthReplacing() { depthReplacing = true; }
     bool isDepthReplacing() const { return depthReplacing; }
     bool setLocalSize(int dim, int size)
@@ -806,6 +834,8 @@ public:
     bool getOriginUpperLeft() const { return originUpperLeft; }
     void setPixelCenterInteger() { pixelCenterInteger = true; }
     bool getPixelCenterInteger() const { return pixelCenterInteger; }
+    void setTexCoordRedeclared() { texCoordBuiltinRedeclared = true; }
+    bool getTexCoordRedeclared() const { return texCoordBuiltinRedeclared; }
     void addBlendEquation(TBlendEquationShift b) { blendEquations |= (1 << b); }
     unsigned int getBlendEquations() const { return blendEquations; }
     bool setXfbBufferStride(int buffer, unsigned stride)
@@ -864,6 +894,18 @@ public:
 
     void setBinaryDoubleOutput() { binaryDoubleOutput = true; }
     bool getBinaryDoubleOutput() { return binaryDoubleOutput; }
+
+    void setSubgroupUniformControlFlow() { subgroupUniformControlFlow = true; }
+    bool getSubgroupUniformControlFlow() const { return subgroupUniformControlFlow; }
+
+    // GL_EXT_spirv_intrinsics
+    void insertSpirvRequirement(const TSpirvRequirement* spirvReq);
+    bool hasSpirvRequirement() const { return spirvRequirement != nullptr; }
+    const TSpirvRequirement& getSpirvRequirement() const { return *spirvRequirement; }
+    void insertSpirvExecutionMode(int executionMode, const TIntermAggregate* args = nullptr);
+    void insertSpirvExecutionModeId(int executionMode, const TIntermAggregate* args);
+    bool hasSpirvExecutionMode() const { return spirvExecutionMode != nullptr; }
+    const TSpirvExecutionMode& getSpirvExecutionMode() const { return *spirvExecutionMode; }
 #endif // GLSLANG_WEB
 
     void addBlockStorageOverride(const char* nameStr, TBlockStorageClass backing)
@@ -909,6 +951,11 @@ public:
                 return true;
         }
         return false;
+    }
+
+    bool IsRequestedExtension(const char* extension) const
+    {
+        return (requestedExtensions.find(extension) != requestedExtensions.end());
     }
 
     void addToCallGraph(TInfoSink&, const TString& caller, const TString& callee);
@@ -993,8 +1040,8 @@ public:
 
 protected:
     TIntermSymbol* addSymbol(long long Id, const TString&, const TType&, const TConstUnionArray&, TIntermTyped* subtree, const TSourceLoc&);
-    void error(TInfoSink& infoSink, const char*);
-    void warn(TInfoSink& infoSink, const char*);
+    void error(TInfoSink& infoSink, const char*, EShLanguage unitStage = EShLangCount);
+    void warn(TInfoSink& infoSink, const char*, EShLanguage unitStage = EShLangCount);
     void mergeCallGraphs(TInfoSink&, TIntermediate&);
     void mergeModes(TInfoSink&, TIntermediate&);
     void mergeTrees(TInfoSink&, TIntermediate&);
@@ -1047,7 +1094,10 @@ protected:
     int numPushConstants;
     bool recursive;
     bool invertY;
+    bool dxPositionW;
+    bool enhancedMsgs;
     bool useStorageBuffer;
+    bool invariantAll;
     bool nanMinMaxClamp;            // true if desiring min/max/clamp to favor non-NaN over NaN
     bool depthReplacing;
     int localSize[3];
@@ -1074,6 +1124,7 @@ protected:
     TLayoutGeometry outputPrimitive;
     bool pixelCenterInteger;
     bool originUpperLeft;
+    bool texCoordBuiltinRedeclared;
     TVertexSpacing vertexSpacing;
     TVertexOrder vertexOrder;
     TInterlockOrdering interlockOrdering;
@@ -1115,7 +1166,11 @@ protected:
 
     bool needToLegalize;
     bool binaryDoubleOutput;
+    bool subgroupUniformControlFlow;
     bool usePhysicalStorageBuffer;
+
+    TSpirvRequirement* spirvRequirement;
+    TSpirvExecutionMode* spirvExecutionMode;
 
     std::unordered_map<std::string, int> uniformLocationOverrides;
     int uniformLocationBase;
@@ -1130,6 +1185,7 @@ protected:
                                             // for callableData/callableDataIn
     // set of names of statically read/written I/O that might need extra checking
     std::set<TString> ioAccessed;
+
     // source code of shader, useful as part of debug information
     std::string sourceFile;
     std::string sourceText;

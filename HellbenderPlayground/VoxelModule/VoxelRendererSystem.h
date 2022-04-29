@@ -12,6 +12,7 @@ class VoxelRendererSystem : public System {
 	Shader *fragment_shader;
 	Shader *vertex_shader;
 	GraphicPipeline *pipeline;
+	ComputePipeline *compute_pipeline;
 	std::vector<mat4> transforms;
 	~VoxelRendererSystem();
 public:

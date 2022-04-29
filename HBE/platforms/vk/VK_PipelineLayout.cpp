@@ -13,7 +13,9 @@ namespace HBE {
 		this->device = device;
 		std::vector<UniformInfo> merged_unfiorms;
 		std::vector<PushConstantInfo> merged_push_constants;
-
+		if (shaders[0]->getVkStage() == VK_SHADER_STAGE_COMPUTE_BIT) {
+			bind_point = VK_PIPELINE_BIND_POINT_COMPUTE;
+		}
 		//merge the shaders inputs into one.
 		for (size_t i = 0; i < count; ++i) {
 			//merge uniforms
@@ -347,7 +349,7 @@ namespace HBE {
 
 	void VK_PipelineLayout::bindDescriptors(VkCommandBuffer buffer, int frame) {
 		vkCmdBindDescriptorSets(buffer,
-								VK_PIPELINE_BIND_POINT_GRAPHICS,
+								bind_point,
 								handle,
 								0,
 								1,

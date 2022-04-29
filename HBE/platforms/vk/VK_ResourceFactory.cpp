@@ -7,6 +7,7 @@
 #include "VK_Mesh.h"
 #include "VK_Shader.h"
 #include "VK_RenderPass.h"
+#include "VK_ComputePipeline.h"
 
 namespace HBE {
 	VK_ResourceFactory::VK_ResourceFactory(VK_Renderer *renderer) {
@@ -30,8 +31,7 @@ namespace HBE {
 	}
 
 	ComputePipeline *VK_ResourceFactory::createComputePipeline(const ComputePipelineInfo &info) const {
-		Log::error("Compute shaders not implemented in Vulkan");
-		return nullptr;
+		return new VK_ComputePipeline(renderer, info);
 	}
 
 	RenderTarget *VK_ResourceFactory::createRenderTarget(const RenderTargetInfo &info) const {

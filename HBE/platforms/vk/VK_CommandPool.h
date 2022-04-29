@@ -5,6 +5,7 @@
 #include "VK_Fence.h"
 #include "VK_Queue.h"
 #include "memory"
+
 namespace HBE {
 	class VK_Device;
 
@@ -15,7 +16,7 @@ namespace HBE {
 		VkCommandPool handle;
 		VK_Device &device;
 		std::vector<VkCommandBuffer> command_buffers;
-		std::vector<VK_Fence*> fences;
+		std::vector<VK_Fence *> fences;
 		void begin(uint32_t i) const;
 
 		void end(uint32_t i) const;
@@ -23,7 +24,7 @@ namespace HBE {
 	public:
 		~VK_CommandPool();
 
-		VK_CommandPool(VK_Device &device, int command_buffers_count);
+		VK_CommandPool(VK_Device &device, int command_buffers_count, const VK_Queue &queue);
 
 		void begin() const;
 		void end() const;

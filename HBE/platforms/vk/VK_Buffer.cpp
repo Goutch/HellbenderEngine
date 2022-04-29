@@ -10,11 +10,18 @@ namespace HBE {
 	VK_Buffer::VK_Buffer(VK_Device *device, VkDeviceSize size, VkBufferUsageFlags usage, ALLOC_FLAGS flags) {
 		this->device = device;
 		this->size = size;
+		uint32_t families[3] = {
+				device->getQueue(QUEUE_FAMILY_COMPUTE)->getFamilyIndex(),
+				device->getQueue(QUEUE_FAMILY_GRAPHICS)->getFamilyIndex(),
+				device->getQueue(QUEUE_FAMILY_TRANSFER)->getFamilyIndex()
+		};
 		VkBufferCreateInfo bufferInfo{};
 		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 		bufferInfo.size = size;
 		bufferInfo.usage = flags & ALLOC_FLAG_MAPPABLE ? usage : usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-		bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		bufferInfo.sharingMode = VK_SHARING_MODE_CONCURRENT;
+		bufferInfo.queueFamilyIndexCount = 3;
+		bufferInfo.pQueueFamilyIndices = families;
 
 		if (vkCreateBuffer(device->getHandle(), &bufferInfo, nullptr, &handle) != VK_SUCCESS) {
 			Log::error("failed to create buffer!");

@@ -32,7 +32,7 @@ namespace HBE {
 
 	VK_Allocator::VK_Allocator(VK_Device *device) {
 		this->device = device;
-		this->command_pool = new VK_CommandPool(*device, 1);
+		this->command_pool = new VK_CommandPool(*device, 1,*device->getQueue(QUEUE_FAMILY_GRAPHICS));
 		memory_propeties = &device->getPhysicalDevice().getMemoryProperties();
 		for (size_t i = 0; i < memory_propeties->memoryTypeCount; ++i) {
 			blocks.emplace(i, std::vector<Block *>());
@@ -107,12 +107,12 @@ namespace HBE {
 	}
 
 	StagingBuffer VK_Allocator::createTempStagingBuffer(const void *data, size_t size) {
+
 		VkBufferCreateInfo staging_buffer_info{};
 		staging_buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 		staging_buffer_info.size = size;
 		staging_buffer_info.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 		staging_buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
 		VkBuffer buffer;
 		if (vkCreateBuffer(device->getHandle(), &staging_buffer_info, nullptr, &buffer) != VK_SUCCESS) {
 			Log::error("failed to create buffer!");
@@ -269,8 +269,8 @@ namespace HBE {
 		barriers[0].offset = 0;
 		barriers[0].srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 		barriers[0].dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT | VK_ACCESS_MEMORY_WRITE_BIT;
-		barriers[0].dstQueueFamilyIndex = device->getQueue(QUEUE_FAMILY_GRAPHICS)->getFamilyIndex();
-		barriers[0].srcQueueFamilyIndex = device->getQueue(QUEUE_FAMILY_GRAPHICS)->getFamilyIndex();
+		barriers[0].dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		barriers[0].srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 		barriers[0].pNext = nullptr;
 		barriers[1] = {};
 		barriers[1].sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
@@ -279,8 +279,8 @@ namespace HBE {
 		barriers[1].offset = 0;
 		barriers[1].srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
 		barriers[1].dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT | VK_ACCESS_MEMORY_WRITE_BIT;
-		barriers[1].dstQueueFamilyIndex = device->getQueue(QUEUE_FAMILY_GRAPHICS)->getFamilyIndex();
-		barriers[1].srcQueueFamilyIndex = device->getQueue(QUEUE_FAMILY_GRAPHICS)->getFamilyIndex();
+		barriers[1].dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		barriers[1].srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 		barriers[1].pNext = nullptr;
 		vkCmdPipelineBarrier(command_pool->getCurrentBuffer(),
 							 VK_PIPELINE_STAGE_TRANSFER_BIT,

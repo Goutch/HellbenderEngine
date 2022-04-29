@@ -1,5 +1,6 @@
 #pragma once
 #define _USE_MATH_DEFINES
+
 #include "Core.h"
 #include "Configs.h"
 #include "core/scene/Components.h"
@@ -7,6 +8,7 @@
 #include "Application.h"
 #include "Core.h"
 
+#include "core/resource/ComputePipeline.h"
 #include "core/resource/GraphicPipeline.h"
 #include "core/resource/Mesh.h"
 #include "core/resource/Texture.h"

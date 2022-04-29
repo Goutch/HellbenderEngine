@@ -87,6 +87,8 @@ layout(binding = 0, set=0) uniform UniformBufferObject {
 } ubo;
 
 const int LOD_COUNT=4;
+
+//todo switch to 1 sampler
 layout(binding = 1, set=0, r8ui) uniform readonly uimage3D voxels0;
 layout(binding = 2, set=0, r8ui) uniform readonly uimage3D voxels1;
 layout(binding = 3, set=0, r8ui) uniform readonly uimage3D voxels2;
@@ -128,8 +130,8 @@ void main() {
     Intersection intersection = intersectCube(ray, cube);
     float t=intersection.t;
 
-    int lod=2;
-
+    int lod=3;
+    int min_lod=0;
     ivec3 resolutions[LOD_COUNT];
     vec3 voxel_sizes[LOD_COUNT];
 
@@ -158,18 +160,17 @@ void main() {
 
         while (true)
         {
-            if (lod==0||v==0)
-            break;
-            //should be position compared to voxel position
-            //step = ivec3(a>b)
+            if (lod==min_lod||v==0)
+                break;
 
             vec3 voxel_world_position=(voxel_pos*voxel_sizes[lod])+(voxel_sizes[lod]/2.)+cube.min;
 
             lod--;
-            voxel_pos = (voxel_pos*2) + ivec3(int(position.x > voxel_world_position.x),
+            voxel_pos = (voxel_pos*2) + ivec3(
+            int(position.x > voxel_world_position.x),
             int(position.y > voxel_world_position.y),
             int(position.z > voxel_world_position.z));
-            vec3 planes =cube.min + vec3(
+            planes =cube.min + vec3(
             (voxel_pos.x+int(step.x > 0)) * voxel_sizes[lod].x,
             (voxel_pos.y+int(step.y > 0)) * voxel_sizes[lod].y,
             (voxel_pos.z+int(step.z > 0)) * voxel_sizes[lod].z);
@@ -196,7 +197,7 @@ void main() {
         t=ts[step_index];
 
         voxel_pos[step_index] += step[step_index];
-        position[step_index]=planes[step_index];
+        position=(ray.origin+(ray.direction*t));
         planes[step_index] += step[step_index]*voxel_sizes[lod][step_index];
 
         //out of bound

@@ -42,7 +42,7 @@ namespace HBE {
 		physical_device = new VK_PhysicalDevice(instance->getHandle(), surface->getHandle());
 		device = new VK_Device(*physical_device);
 		swapchain = new VK_Swapchain(width, height, surface->getHandle(), *device);
-		command_pool = new VK_CommandPool(*device, MAX_FRAMES_IN_FLIGHT);
+		command_pool = new VK_CommandPool(*device, MAX_FRAMES_IN_FLIGHT, *device->getQueue(QUEUE_FAMILY_GRAPHICS));
 
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
 
