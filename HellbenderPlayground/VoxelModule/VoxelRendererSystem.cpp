@@ -80,8 +80,8 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 		for (int y = 0; y < raw_voxels->getHeight(); ++y) {
 			for (int z = 0; z < raw_voxels->getDepth(); ++z) {
 
-				float distance = glm::distance(vec3(x, y, z) - (resoluton / 2.0f), vec3(0, 0, 0));
-				if (distance < (resoluton.x / 2.0f))
+				float distance = glm::distance(vec3(x+0.5, y+0.5, z+0.5) - (resoluton / 2.0f), vec3(0, 0, 0));
+				if (distance <= (resoluton.x / 2.0f))
 					//if (z == 7 && y ==7)
 					data.emplace_back(1);
 				else

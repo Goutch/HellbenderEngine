@@ -138,7 +138,7 @@ void main() {
 
     //vec3 voxel_pos=clamp(floor(position_unit_voxel_space*resolutions[lod]), vec3(0., 0., 0.), resolutions[lod]-vec3(1., 1., 1.));
 
-    vec3 voxel_unit_pos = ((position_unit_voxel_space-mod(position_unit_voxel_space,voxel_unit_sizes[lod])))+half_unit_sizes[lod];
+    vec3 voxel_unit_pos = ((position_unit_voxel_space-mod(position_unit_voxel_space, voxel_unit_sizes[lod])))+half_unit_sizes[lod];
 
     ivec3 voxel_position = ivec3(floor(voxel_unit_pos*resolutions[lod]));
     vec3 planes = aabb.min + (voxel_unit_pos * resolutions[lod] * voxel_sizes[lod]) + (step_sign*half_sizes[lod]);
@@ -156,20 +156,17 @@ void main() {
 
         /*while (lod!=MIN_LOD&&v!=0)
         {
-            vec3 voxel_world_position=(voxel_pos*voxel_sizes[lod])+(voxel_sizes[lod]/2.)+cube.min;
+            vec3 voxel_world_position=(voxel_unit_pos*resolutions[lod]*voxel_sizes[lod])+aabb.min;
 
             lod--;
-            voxel_pos = (voxel_pos*2) + ivec3(
-            int(position.x > voxel_world_position.x),
-            int(position.y > voxel_world_position.y),
-            int(position.z > voxel_world_position.z));
+            voxel_unit_pos = ((voxel_unit_pos-(half_unit_sizes[lod]))) + vec3(
+            voxel_unit_sizes[lod].x*int(position.x > voxel_world_position.x),
+            voxel_unit_sizes[lod].y*int(position.y > voxel_world_position.y),
+            voxel_unit_sizes[lod].z*int(position.z > voxel_world_position.z));
 
-            planes =cube.min + vec3(
-            (voxel_pos.x+int(step.x > 0)) * voxel_sizes[lod].x,
-            (voxel_pos.y+int(step.y > 0)) * voxel_sizes[lod].y,
-            (voxel_pos.z+int(step.z > 0)) * voxel_sizes[lod].z);
+            planes = aabb.min + (voxel_unit_pos * resolutions[lod] * voxel_sizes[lod]) + (step_sign*half_sizes[lod]);
 
-            v=loadVoxel(lod, voxel_pos);
+            v=loadVoxel(lod, voxel_unit_pos);
         }*/
 
         //found voxel
@@ -178,28 +175,40 @@ void main() {
             break;
         }
 
-        x_lesser_than_y=int(ts.x < ts.y);
-        y_lesser_than_x=int(ts.y < ts.x);
-        xy_lesser_than_z = int(ts[y_lesser_than_x]< ts.z);
-        z_lesser_than_xy = int(ts.z<ts[y_lesser_than_x]);
-        step_axis_index = y_lesser_than_x + z_lesser_than_xy+(x_lesser_than_y * z_lesser_than_xy);
-
-        vec3 axis=vec3(0);
-        axis[step_axis_index]+=1.0f;
-
-        voxel_unit_pos += unit_steps[lod]*axis;
-
-        //out of bound
-        if (voxel_unit_pos[step_axis_index] <0.0f || voxel_unit_pos[step_axis_index] >= 1.0f)
+        if (ts.x<ts.y&&ts.x<ts.z)
         {
-            v=0;
-            break;
+
+            t=ts.x;
+            voxel_unit_pos.x += unit_steps[lod].x;
+            planes.x += step_sign.x * voxel_sizes[lod].x;
+            if (voxel_unit_pos.x <0.0f || voxel_unit_pos.x >= 1.0f)
+            {
+                v=0;
+                break;
+            }
         }
-
-        t=ts[step_axis_index];
-
-        planes += step_sign * axis * voxel_sizes[lod];
-
+        else if (ts.z<ts.x&&ts.z<ts.y)
+        {
+            t=ts.z;
+            voxel_unit_pos.z += unit_steps[lod].z;
+            planes.z += step_sign.z * voxel_sizes[lod].z;
+            if (voxel_unit_pos.z <0.0f || voxel_unit_pos.z >= 1.0f)
+            {
+                v=0;
+                break;
+            }
+        }
+        else
+        {
+            t=ts.y;
+            voxel_unit_pos.y += unit_steps[lod].y;
+            planes.y += step_sign.y * voxel_sizes[lod].y;
+            if (voxel_unit_pos.y <0.0f || voxel_unit_pos.y >= 1.0f)
+            {
+                v=0;
+                break;
+            }
+        }
 
         ts = (planes - ray.origin) / ray.direction;
         position=(ray.origin+(ray.direction*t));
