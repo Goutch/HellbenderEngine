@@ -7,7 +7,7 @@
 namespace HBE {
 
 	enum IMAGE_FORMAT {
-		IMAGE_FORMAT_R8 = 0,
+		IMAGE_FORMAT_R8= 0,
 		IMAGE_FORMAT_RG8 = 1,
 		IMAGE_FORMAT_RGB8 = 2,
 		IMAGE_FORMAT_RGBA8 = 3,
@@ -26,6 +26,7 @@ namespace HBE {
 		IMAGE_FLAG_RENDER_TARGET = 1 << 1,
 		IMAGE_FLAG_DEPTH = 1 << 2,
 		IMAGE_FLAG_NO_SAMPLER = 1 << 3,// image2D in glsl accessed with imageLoad and imageStore.
+		IMAGE_FLAG_FILTER_NEAREST = 1 << 4,//for non-interpolated samples
 	};
 	/**
 	 * @param data can be nullptr

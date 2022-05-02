@@ -28,7 +28,10 @@ namespace HBE {
 	}
 
 	void VK_Fence::wait() const {
-		vkWaitForFences(device_handle, 1, &handle, VK_TRUE, UINT64_MAX);
+		if(vkWaitForFences(device_handle, 1, &handle, VK_TRUE, UINT64_MAX)==VK_TIMEOUT)
+		{
+			Log::error("Timeout");
+		}
 	}
 
 	void VK_Fence::reset() const {

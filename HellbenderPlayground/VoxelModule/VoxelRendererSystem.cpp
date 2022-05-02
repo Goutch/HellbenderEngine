@@ -36,7 +36,7 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 	ShaderInfo frag_info{};
 	frag_info.stage = SHADER_STAGE_FRAGMENT;
 	vert_info.stage = SHADER_STAGE_VERTEX;
-	frag_info.path = "shaders/pathTracer/PathTracer.frag";
+	frag_info.path = "shaders/pathTracer/SamplerPathTracer.frag";
 	vert_info.path = "shaders/pathTracer/PathTracer.vert";
 	vertex_shader = Resources::createShader(vert_info);
 	fragment_shader = Resources::createShader(frag_info);
@@ -66,10 +66,11 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 	mesh->setInstanceBuffer(1, transforms.data(), transforms.size());
 
 	TextureInfo texture_info{};
-	texture_info.width = 32;
-	texture_info.height = 32;
-	texture_info.depth = 32;
-	texture_info.flags = IMAGE_FLAG_NO_SAMPLER|IMAGE_FLAG_SHADER_WRITE;
+	texture_info.width = 64;
+	texture_info.height =64;
+	texture_info.depth = 64;
+	//texture_info.flags = IMAGE_FLAG_NO_SAMPLER;
+	texture_info.flags = IMAGE_FLAG_SHADER_WRITE | IMAGE_FLAG_FILTER_NEAREST;
 	texture_info.format = IMAGE_FORMAT_R8;
 	texture_info.generate_mip_maps = true;
 	auto raw_voxels = Resources::createTexture(texture_info, "voxels");
@@ -78,11 +79,10 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 	for (int x = 0; x < raw_voxels->getWidth(); ++x) {
 		for (int y = 0; y < raw_voxels->getHeight(); ++y) {
 			for (int z = 0; z < raw_voxels->getDepth(); ++z) {
-				/*if (x <= raw_voxels->getDepth() + 1)
-					data.emplace_back(1);
-				else data.emplace_back(0);*/
+
 				float distance = glm::distance(vec3(x, y, z) - (resoluton / 2.0f), vec3(0, 0, 0));
 				if (distance < (resoluton.x / 2.0f))
+					//if (z == 7 && y ==7)
 					data.emplace_back(1);
 				else
 					data.emplace_back(0);
@@ -92,7 +92,7 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 	raw_voxels->update(data.data());
 	compute_pipeline->setTexture("inTexture", raw_voxels, 0);
 	compute_pipeline->setTexture("outTexture", raw_voxels, 1);
-	compute_pipeline->dispatch(raw_voxels->getWidth() /  2, raw_voxels->getHeight() / 2, raw_voxels->getWidth() / 2);
+	compute_pipeline->dispatch(raw_voxels->getWidth() / 2, raw_voxels->getHeight() / 2, raw_voxels->getWidth() / 2);
 	compute_pipeline->wait();
 	compute_pipeline->setTexture("inTexture", raw_voxels, 1);
 	compute_pipeline->setTexture("outTexture", raw_voxels, 2);
@@ -108,11 +108,11 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 				  raw_voxels->getDepth()),
 			vec3(2.0f)};
 	pipeline->setUniform("VoxelData", static_cast<void *>(&voxel_info));
-	pipeline->setTexture("voxels0", raw_voxels, 0);
-	pipeline->setTexture("voxels1", raw_voxels, 1);
-	pipeline->setTexture("voxels2", raw_voxels, 2);
-	pipeline->setTexture("voxels3", raw_voxels, 3);
-
+	pipeline->setTexture("voxels", raw_voxels);
+	//pipeline->setTexture("voxels0", raw_voxels, 0);
+	//pipeline->setTexture("voxels1", raw_voxels, 1);
+	//pipeline->setTexture("voxels2", raw_voxels, 2);
+	//pipeline->setTexture("voxels3", raw_voxels, 3);
 }
 
 void VoxelRendererSystem::draw() {

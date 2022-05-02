@@ -130,7 +130,7 @@ void main() {
     Intersection intersection = intersectCube(ray, cube);
     float t=intersection.t;
 
-    int lod=3;
+    int lod=0;
     int min_lod=0;
     ivec3 resolutions[LOD_COUNT];
     vec3 voxel_sizes[LOD_COUNT];
@@ -158,7 +158,7 @@ void main() {
     while (true)
     {
 
-        while (true)
+        /*while (true)
         {
             if (lod==min_lod||v==0)
                 break;
@@ -176,7 +176,7 @@ void main() {
             (voxel_pos.z+int(step.z > 0)) * voxel_sizes[lod].z);
 
             v=loadVoxel(lod, voxel_pos);
-        }
+        }*/
         //found voxel
         if (v!=0)
         {
@@ -215,7 +215,7 @@ void main() {
         float depth=t/100;
         vec3 color= vec3(voxel_pos)/vec3(resolutions[0]);
         vec3 atmosphere =Atmosphere(t);
-        color=(atmosphere*color) + ((vec3(1)-atmosphere)*vec3(0.5, 0.5, 0.5));
+        //color=(atmosphere*color) + ((vec3(1)-atmosphere)*vec3(0.5, 0.5, 0.5));
         gl_FragDepth=depth;
         outColor=vec4(color, 1.0f);
     }

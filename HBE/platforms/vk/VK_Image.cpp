@@ -125,7 +125,7 @@ namespace HBE {
 		imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 		imageInfo.flags = 0; // Optional
 		imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT;
-		imageInfo.usage |= ((info.flags & IMAGE_FLAG_DEPTH) != IMAGE_FLAG_DEPTH && (info.flags & IMAGE_FLAG_NO_SAMPLER) != IMAGE_FLAG_NO_SAMPLER) ? VK_IMAGE_USAGE_SAMPLED_BIT : 0;
+		imageInfo.usage |= (info.flags & IMAGE_FLAG_NO_SAMPLER) ? 0 : VK_IMAGE_USAGE_SAMPLED_BIT;
 		imageInfo.usage |= (info.flags & IMAGE_FLAG_RENDER_TARGET) ? VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT : 0;
 		imageInfo.usage |= (info.flags & IMAGE_FLAG_DEPTH) ? VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT : 0;
 		imageInfo.usage |= (info.flags & IMAGE_FLAG_SHADER_WRITE || info.flags & IMAGE_FLAG_NO_SAMPLER) ? VK_IMAGE_USAGE_STORAGE_BIT : 0;
@@ -171,8 +171,8 @@ namespace HBE {
 		if ((flags & IMAGE_FLAG_NO_SAMPLER) != IMAGE_FLAG_NO_SAMPLER) {
 			VkSamplerCreateInfo samplerInfo{};
 			samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-			samplerInfo.magFilter = VK_FILTER_NEAREST;//If the object is close to the camera,
-			samplerInfo.minFilter = VK_FILTER_NEAREST;//If the object is further from the camera
+			samplerInfo.magFilter = (info.flags & IMAGE_FLAG_FILTER_NEAREST) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;//If the object is close to the camera,
+			samplerInfo.minFilter = (info.flags & IMAGE_FLAG_FILTER_NEAREST) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;//If the object is further from the camera
 			samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
 			samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
 			samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
@@ -217,6 +217,7 @@ namespace HBE {
 	}
 
 	const VkImageView &VK_Image::getImageView(uint32_t mip_level) const {
+		HB_ASSERT(mip_level < mip_levels, "Texture does not have mip level " + std::to_string(mip_level));
 		return image_views[mip_level];
 	}
 

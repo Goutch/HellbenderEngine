@@ -18,12 +18,6 @@ set(PATHFINDER_FILES
 
 set(VOXEL_MODULE_FILES
         VoxelModule/VoxelRendererSystem.cpp
-        VoxelModule/Octree.cpp
-        VoxelModule/Octree.h
-        VoxelModule/Server.cpp
-        VoxelModule/Server.h
-        VoxelModule/VoxelChunk.cpp
-        VoxelModule/VoxelChunk.h
         )
 
 

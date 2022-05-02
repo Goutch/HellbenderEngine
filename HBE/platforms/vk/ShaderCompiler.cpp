@@ -253,10 +253,6 @@ namespace HBE {
 				Log::warning(shader.getInfoDebugLog());
 				Log::error(shader.getInfoLog());
 			}
-#ifdef DEBUG_MODE
-			shader.getIntermediate()->addSourceText(source, size);
-			shader.getIntermediate()->setSourceFile((RESOURCE_PATH + shader_path).c_str());
-#endif
 			{
 				glslang::TProgram program;
 				program.addShader(&shader);
@@ -271,7 +267,7 @@ namespace HBE {
 				options.generateDebugInfo = true;
 				options.stripDebugInfo = false;
 				options.disableOptimizer = true;
-#elif
+#else
 				options.generateDebugInfo=false;
 				options.stripDebugInfo=true;
 				options.disableOptimizer=false;
