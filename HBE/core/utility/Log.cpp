@@ -27,7 +27,7 @@ namespace HBE {
 
 	void Log::message(const std::string &s) {
 		if (Log::log_flags & MESSAGE) {
-			std::cout << "[MESSAGE|" + std::to_string(Application::getTime()) + "]" << s << std::endl;
+			std::cout << s << std::endl;
 		}
 	}
 

@@ -25,13 +25,20 @@ namespace HBE {
 		std::vector<const char *> required_extensions;
 
 		getRequiredExtensions(required_extensions);
-		create_info.enabledExtensionCount = static_cast<uint32_t>(required_extensions.size());
-		create_info.ppEnabledExtensionNames = required_extensions.data();
 
 
-		if (!checkExtensionsSupported(required_extensions))
-			Log::error("Missing extensions to create vulkan instance");
+		std::vector<const char *> extensions;
 
+
+		Log::message("Looking for required vulkan extensions:");
+		if (!checkExtensionsSupported(required_extensions)) {
+			Log::error("Missing required extensions to create vulkan instance");
+		}
+		extensions.insert(extensions.end(), required_extensions.begin(), required_extensions.end());
+
+
+		create_info.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+		create_info.ppEnabledExtensionNames = extensions.data();
 
 		if (ENABLE_VALIDATION_LAYERS) {
 			validation_layers = new VK_ValidationLayers();
@@ -51,7 +58,7 @@ namespace HBE {
 			Log::error("Failed to create vulkan instance!");
 		if (ENABLE_VALIDATION_LAYERS)
 			validation_layers->init(handle);
-		Log::message("Created vulkan instance succesfully");
+		Log::status("Created vulkan instance succesfully");
 	}
 
 	void VK_Instance::getRequiredExtensions(std::vector<const char *> &required_extensions) {
@@ -74,11 +81,12 @@ namespace HBE {
 											   instance_supported_extensions.data());
 
 
-		std::string extension_support_message = "\nLooking for required vulkan extensions:";
+		std::string extension_support_message = "";
 		bool succes = true;
 		for (auto extension_name:extensions) {
-			extension_support_message += "\n\t";
+			extension_support_message += "\t";
 			extension_support_message += extension_name;
+
 			bool found = false;
 			for (const auto &supported_extension:instance_supported_extensions) {
 				if (strcmp(extension_name, supported_extension.extensionName) == 0) {
@@ -91,6 +99,7 @@ namespace HBE {
 				succes = false;
 				extension_support_message += "...MISSING!";
 			}
+			extension_support_message += "\n";
 		}
 		Log::message(extension_support_message);
 		return succes;

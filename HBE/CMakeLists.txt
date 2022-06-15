@@ -169,7 +169,7 @@ set(CORE_FILES
 
         core/threading/JobManager.cpp
         core/threading/JobManager.h
-        )
+        platforms/vk/VK_AccelerationStructure.cpp platforms/vk/VK_AccelerationStructure.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

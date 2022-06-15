@@ -34,25 +34,24 @@ namespace HBE {
 		VkPhysicalDeviceFeatures device_features{};
 		device_features.samplerAnisotropy = physical_device.getFeatures().samplerAnisotropy;
 		device_create_info.pEnabledFeatures = &device_features;
-		auto &enabled_extensions = physical_device.getRequiredExtensions();
+		auto &enabled_extensions = physical_device.getExtensions();
 		device_create_info.enabledExtensionCount = enabled_extensions.size();
 		device_create_info.ppEnabledExtensionNames = enabled_extensions.data();
 
 		if (vkCreateDevice(physical_device.getHandle(), &device_create_info, nullptr, &handle) != VK_SUCCESS) {
 			Log::error("Failed to create logical device");
 		}
-		queues.emplace(QUEUE_FAMILY_GRAPHICS, new VK_Queue(this, indices.graphics_family.value()));
-		queues.emplace(QUEUE_FAMILY_PRESENT, new VK_Queue(this, indices.present_family.value()));
-		queues.emplace(QUEUE_FAMILY_COMPUTE, new VK_Queue(this, indices.compute_family.value()));
-		queues.emplace(QUEUE_FAMILY_TRANSFER, new VK_Queue(this, indices.transfer_family.value()));
+		queues.try_emplace(QUEUE_FAMILY_GRAPHICS, this, indices.graphics_family.value());
+		queues.try_emplace(QUEUE_FAMILY_PRESENT, this, indices.present_family.value());
+		queues.try_emplace(QUEUE_FAMILY_COMPUTE, this, indices.compute_family.value());
+		queues.try_emplace(QUEUE_FAMILY_TRANSFER, this, indices.transfer_family.value());
 
 		allocator = new VK_Allocator(this);
+
+		initFunctionPointers();
 	}
 
 	VK_Device::~VK_Device() {
-		for (auto queue:queues) {
-			delete queue.second;
-		}
 		queues.clear();
 		delete allocator;
 		vkDestroyDevice(handle, nullptr);
@@ -90,8 +89,21 @@ namespace HBE {
 		return allocator;
 	}
 
-	VK_Queue *VK_Device::getQueue(QUEUE_FAMILY family) {
-		return queues[family];
+	VK_Queue &VK_Device::getQueue(QUEUE_FAMILY family) {
+		return queues.at(family);
+	}
+
+	void VK_Device::initFunctionPointers() {
+		vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(vkGetDeviceProcAddr(handle, "vkGetBufferDeviceAddressKHR"));
+		vkCmdBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkCmdBuildAccelerationStructuresKHR>(vkGetDeviceProcAddr(handle, "vkCmdBuildAccelerationStructuresKHR"));
+		vkBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkBuildAccelerationStructuresKHR>(vkGetDeviceProcAddr(handle, "vkBuildAccelerationStructuresKHR"));
+		vkCreateAccelerationStructureKHR = reinterpret_cast<PFN_vkCreateAccelerationStructureKHR>(vkGetDeviceProcAddr(handle, "vkCreateAccelerationStructureKHR"));
+		vkDestroyAccelerationStructureKHR = reinterpret_cast<PFN_vkDestroyAccelerationStructureKHR>(vkGetDeviceProcAddr(handle, "vkDestroyAccelerationStructureKHR"));
+		vkGetAccelerationStructureBuildSizesKHR = reinterpret_cast<PFN_vkGetAccelerationStructureBuildSizesKHR>(vkGetDeviceProcAddr(handle, "vkGetAccelerationStructureBuildSizesKHR"));
+		vkGetAccelerationStructureDeviceAddressKHR = reinterpret_cast<PFN_vkGetAccelerationStructureDeviceAddressKHR>(vkGetDeviceProcAddr(handle, "vkGetAccelerationStructureDeviceAddressKHR"));
+		vkCmdTraceRaysKHR = reinterpret_cast<PFN_vkCmdTraceRaysKHR>(vkGetDeviceProcAddr(handle, "vkCmdTraceRaysKHR"));
+		vkGetRayTracingShaderGroupHandlesKHR = reinterpret_cast<PFN_vkGetRayTracingShaderGroupHandlesKHR>(vkGetDeviceProcAddr(handle, "vkGetRayTracingShaderGroupHandlesKHR"));
+		vkCreateRayTracingPipelinesKHR = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(vkGetDeviceProcAddr(handle, "vkCreateRayTracingPipelinesKHR"));
 	}
 
 }

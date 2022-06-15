@@ -3,7 +3,9 @@
 #include "vulkan/vulkan.h"
 #include "optional"
 #include "vector"
-
+#include "unordered_map"
+#include "set"
+#include "map"
 namespace HBE {
 	struct QueueFamilyIndices {
 		std::optional<uint32_t> graphics_family;
@@ -26,10 +28,18 @@ namespace HBE {
 	};
 
 	class VK_PhysicalDevice {
-		const std::vector<const char *> device_required_extensions = {
+		const std::vector<const char *> REQUIRED_EXTENSIONS = {
 				VK_KHR_SWAPCHAIN_EXTENSION_NAME
 		};
-
+		const std::vector<const char*> RAYTRACING_EXTENSIONS = {VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME,
+																VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME,
+																VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME,
+																VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME,
+																VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME,
+																VK_KHR_SPIRV_1_4_EXTENSION_NAME,
+																VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME,
+																//VK_KHR_RAY_QUERY_EXTENSION_NAME
+																};
 
 		VkInstance vk_instance_handle;
 		VkSurfaceKHR surface_handle;
@@ -42,6 +52,10 @@ namespace HBE {
 		VkFormatProperties format_properties;
 		VkPhysicalDeviceAccelerationStructureFeaturesKHR acceleration_structure_features;
 		VkPhysicalDeviceRayTracingPipelineFeaturesKHR ray_tracing_pipeline_features;
+
+		std::vector<const char *> enabled_extensions;
+		std::multimap<uint32_t ,VkPhysicalDevice> device_score;
+		std::unordered_map<VkPhysicalDevice,std::vector<const char*>> device_enabled_extensions;
 	public:
 		VK_PhysicalDevice(VkInstance vk_instance_handle, VkSurfaceKHR surface_handle);
 
@@ -53,7 +67,7 @@ namespace HBE {
 
 		const VkPhysicalDeviceProperties &getProperties() const;
 
-		const std::vector<const char *> &getRequiredExtensions() const;
+		const std::vector<const char *> &getExtensions() const;
 
 		const SwapchainSupportDetails &getSwapchainSupportDetails() const;
 
@@ -68,14 +82,14 @@ namespace HBE {
 	private:
 		void pickBestPhysicalDevice();
 
-		bool checkExtensionsSupport(const VkPhysicalDevice &physical_device);
+		bool checkExtensionsSupport(const VkPhysicalDevice &physical_device,const std::vector<const char*>& extensions);
 
 		QueueFamilyIndices getSupportedQueueFamilies(const VkPhysicalDevice &physical_device);
 
 
 		bool isDeviceSuitable(const VkPhysicalDevice &physical_device);
 
-		int getScore(const VkPhysicalDevice &physical_device);
+		void calculateScore(const VkPhysicalDevice &physical_device);
 
 	};
 

@@ -45,7 +45,7 @@ namespace HBE {
 																		  ALLOC_FLAG_NONE);
 
 		} else {
-			device->getQueue(QUEUE_FAMILY_GRAPHICS)->wait();
+			device->getQueue(QUEUE_FAMILY_GRAPHICS).wait();
 			if (buffers[binding][0]) {
 				delete buffers[binding][0];
 			}
@@ -78,7 +78,7 @@ namespace HBE {
 																		  ALLOC_FLAG_NONE);
 
 		} else {
-			device->getQueue(QUEUE_FAMILY_GRAPHICS)->wait();
+			device->getQueue(QUEUE_FAMILY_GRAPHICS).wait();
 			if (buffers[binding][0]) {
 				delete buffers[binding][0];
 			}
@@ -108,7 +108,7 @@ namespace HBE {
 	}
 
 	void VK_Mesh::setVertexIndices(const std::vector<uint32_t> &data) {
-		device->getQueue(QUEUE_FAMILY_GRAPHICS)->wait();
+		device->getQueue(QUEUE_FAMILY_GRAPHICS).wait();
 		if (has_index_buffer) {
 			delete indices_buffer;
 		}

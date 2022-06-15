@@ -36,10 +36,10 @@ namespace HBE {
 									  uint32_t group_count_z) {
 		fence->wait();
 
-		VK_Queue *queue = renderer->getDevice()->getQueue(QUEUE_FAMILY_COMPUTE);
-		queue->beginCommand();
+		VK_Queue& queue = renderer->getDevice()->getQueue(QUEUE_FAMILY_COMPUTE);
+		queue.beginCommand();
 
-		const VkCommandBuffer &command_buffer = queue->getCommandPool()->getCurrentBuffer();
+		const VkCommandBuffer &command_buffer = queue.getCommandPool()->getCurrentBuffer();
 		vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_COMPUTE, handle);
 
 		layout->bindDescriptors(command_buffer, renderer->getCurrentFrame());
@@ -56,10 +56,10 @@ namespace HBE {
 							 0,
 							 nullptr);
 		vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_COMPUTE, handle);*/
-		queue->endCommand();
+		queue.endCommand();
 
 		fence->reset();
-		queue->submit(command_buffer, fence->getHandle());
+		queue.submit(command_buffer, fence->getHandle());
 	}
 
 	bool VK_ComputePipeline::isDispatchFinished() {

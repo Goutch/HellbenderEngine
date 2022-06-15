@@ -32,7 +32,7 @@ namespace HBE {
 
 	VK_Allocator::VK_Allocator(VK_Device *device) {
 		this->device = device;
-		this->command_pool = new VK_CommandPool(*device, 1,*device->getQueue(QUEUE_FAMILY_GRAPHICS));
+		this->command_pool = new VK_CommandPool(*device, 1,device->getQueue(QUEUE_FAMILY_GRAPHICS));
 		memory_propeties = &device->getPhysicalDevice().getMemoryProperties();
 		for (size_t i = 0; i < memory_propeties->memoryTypeCount; ++i) {
 			blocks.emplace(i, std::vector<Block *>());

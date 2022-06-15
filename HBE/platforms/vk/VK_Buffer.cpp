@@ -11,9 +11,9 @@ namespace HBE {
 		this->device = device;
 		this->size = size;
 		uint32_t families[3] = {
-				device->getQueue(QUEUE_FAMILY_COMPUTE)->getFamilyIndex(),
-				device->getQueue(QUEUE_FAMILY_GRAPHICS)->getFamilyIndex(),
-				device->getQueue(QUEUE_FAMILY_TRANSFER)->getFamilyIndex()
+				device->getQueue(QUEUE_FAMILY_COMPUTE).getFamilyIndex(),
+				device->getQueue(QUEUE_FAMILY_GRAPHICS).getFamilyIndex(),
+				device->getQueue(QUEUE_FAMILY_TRANSFER).getFamilyIndex()
 		};
 		VkBufferCreateInfo bufferInfo{};
 		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;

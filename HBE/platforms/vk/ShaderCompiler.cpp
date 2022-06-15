@@ -197,7 +197,7 @@ namespace HBE {
 	//https://lxjk.github.io/2020/03/10/Translate-GLSL-to-SPIRV-for-Vulkan-at-Runtime.html
 	void ShaderCompiler::GLSLToSpirV(const char *source, size_t size, std::vector<uint32_t> &spirv, SHADER_STAGE type, const std::string &shader_path) {
 
-		Log::message("Compiling shader at: " + shader_path);
+		Log::status("Compiling shader at: " + shader_path);
 #ifndef GLSLANG_C
 		glslang::InitializeProcess();
 		EShLanguage stage;

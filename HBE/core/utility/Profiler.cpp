@@ -34,7 +34,7 @@ namespace HBE {
 
 	void Profiler::printAverange() {
 		for (std::pair<std::string, std::pair<uint32_t, double>> message_key_and_count_value_pair:averange) {
-			Log::message("[" + message_key_and_count_value_pair.first + "]" + std::to_string(message_key_and_count_value_pair.second.second) + "ms");
+			Log::profile("[" + message_key_and_count_value_pair.first + "]" + std::to_string(message_key_and_count_value_pair.second.second) + "ms");
 		}
 	}
 }

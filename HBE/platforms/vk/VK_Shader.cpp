@@ -261,9 +261,6 @@ namespace HBE {
 						break;
 				}
 				vertex_inputs.emplace_back(attribute_description);
-				Log::message(std::string(vertex_input_list[i].name) +
-							 " location:" + std::to_string(location) +
-							 " size:" + std::to_string(size * 4));
 				location++;
 			}
 

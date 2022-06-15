@@ -111,7 +111,7 @@ namespace HBE {
 
 	void VK_CommandPool::submit(HBE::QUEUE_FAMILY queue, VkSemaphore *wait, VkPipelineStageFlags *wait_stage, uint32_t wait_count, VkSemaphore *signal, uint32_t signal_count) {
 		fences[current]->reset();
-		device.getQueue(queue)->submit(command_buffers[current], fences[current]->getHandle(), wait, wait_stage, wait_count, signal, signal_count);
+		device.getQueue(queue).submit(command_buffers[current], fences[current]->getHandle(), wait, wait_stage, wait_count, signal, signal_count);
 		current++;
 		current %= command_buffers.size();
 	}
