@@ -2,33 +2,43 @@
 #include "Core.h"
 #include "core/resource/Mesh.h"
 #include "core/utility/Log.h"
-#include "core/utility/ModelImporter.h"
 #include "core/resource/GraphicPipeline.h"
-#include "mutex"
+#include "string"
+
 namespace HBE {
-    class HB_API Model : public Resource {
-        std::string path;
-        std::vector<std::pair<Mesh *, GraphicPipeline *>> meshes;
-        std::vector<std::pair<MeshData, MaterialData >> meshes_data;
-        std::mutex data_mutex;
-        void clearMeshes();
+	typedef uint32_t MODEL_FLAGS;
+	enum MODEL_FLAG {
+		MODEL_FLAG_NONE = 0,
+	};
 
-    public:
-        void setPipeline(GraphicPipeline *pipeline, int mesh_index = 0);
+	struct ModelVertex {
+		vec3 position;
+		vec2 uv;
+		vec3 normal;
+	};
+	struct ModelInfo {
+		std::string path;
+		MODEL_FLAGS flags = MODEL_FLAG_NONE;
+	};
 
-        Model *load(std::string path);
+	struct ModelMaterial {
+		vec4 color = vec4(1.0f);
+		Texture *texture = nullptr;
+	};
+	struct ModelNode {
+		Mesh *mesh;
+		GraphicPipeline *pipeline;
+		ModelMaterial material;
+	};
 
-        const std::string &getPath();
-
-        void loadAsync(std::string path);
-
-        void constructModel(std::vector<std::pair<MeshData, MaterialData>> *meshes_data);
-
-        const std::vector<std::pair<Mesh *, GraphicPipeline *>> &getMeshes() const;
-
-        virtual ~Model();
-
-        void constructModel();
-    };
+	class HB_API Model : public Resource {
+		friend class Resources;
+		std::vector<ModelNode> nodes;
+		void load(const std::string &path);
+	public:
+		Model(const ModelInfo &info);
+		~Model();
+		std::vector<ModelNode> getNodes();
+	};
 
 }

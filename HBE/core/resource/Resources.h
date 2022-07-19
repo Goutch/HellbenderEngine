@@ -69,15 +69,15 @@ namespace HBE {
 		}
 
 
-		static Model *createModel(const MeshInfo &info, const std::string &name) {
-			auto m = new Model();
+		static Model *createModel(const ModelInfo &info, const std::string &name) {
+			auto m = new Model(info);
 			add(name, m);
 			return m;
 		}
 
-		static Model *createModel(const MeshInfo &info) {
+		static Model *createModel(const ModelInfo &info) {
 
-			return new Model;
+			return new Model(info);
 		}
 
 		static Mesh *createMesh(const MeshInfo &info, const std::string &name) {
@@ -89,6 +89,7 @@ namespace HBE {
 		static Mesh *createMesh(const MeshInfo &info) {
 			return factory->createMesh(info);
 		}
+
 
 		static Shader *createShader(const ShaderInfo &info, const std::string &name) {
 			auto s = factory->createShader(info);

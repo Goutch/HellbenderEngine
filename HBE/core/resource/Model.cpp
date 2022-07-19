@@ -4,89 +4,127 @@
 #include "Model.h"
 #include "Resources.h"
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#define TINYGLTF_IMPLEMENTATION
+
+#include "tiny_gltf.h"
+
 namespace HBE {
-	const std::vector<std::pair<Mesh *, GraphicPipeline *>> &Model::getMeshes() const {
-		return meshes;
-	}
-
 	Model::~Model() {
-		clearMeshes();
+		for (auto &node:nodes) {
+			delete node.mesh;
+		}
+		nodes.clear();
+	}
+
+	Model::Model(const ModelInfo &info) {
+		load(info.path);
+		for (auto &node:nodes) {
+			node.pipeline = Resources::get<GraphicPipeline>("MODEL_PIPELINE");
+		}
 	}
 
 
-	Model *Model::load(std::string path) {
-		this->path = path;
-		Log::status("Loading:" + path);
-		data_mutex.lock();
-		ModelImporter::load(path, meshes_data);
-		data_mutex.unlock();
-		constructModel();
-		return this;
-	}
+	Mesh *bindMesh(tinygltf::Model &model, tinygltf::Mesh &mesh) {
+		//mesh
+		VertexBindingInfo binding_info{};
+		binding_info.binding = 0;
+		binding_info.size = sizeof(vec3)+sizeof(vec3);
+		binding_info.flags = VERTEX_BINDING_FLAG_NONE;
 
-	void Model::setPipeline(GraphicPipeline *pipeline, int mesh_index) {
-		if (meshes.size() <= (size_t) mesh_index)
-			meshes.resize(mesh_index + 1);
-		meshes[mesh_index].second = pipeline;
-	}
+		MeshInfo mesh_info{};
+		mesh_info.binding_infos = &binding_info;
+		mesh_info.binding_info_count = 1;
+		mesh_info.flags = MESH_FLAG_NONE;
 
-	void Model::loadAsync(std::string path) {
-		this->path = path;
-		Log::status("Loading async:" + path);
-		Log::warning("Not implemented: Loading async");
 
-		/*auto job = JobManager::create<void,std::vector<std::pair<MeshData, MaterialData>>&, std::string>();
-		job->setCallback<Model>(this, &Model::constructModel);
-
-		job->run(&ModelImporter::load, path, meshes_data);		*/
-	}
-
-	void Model::constructModel() {
-		uint32_t vertex_count = 0;
-		clearMeshes();
-		data_mutex.lock();
-		for (std::size_t i = 0; i < meshes_data.size(); ++i) {
-			//todo:info bindings
-			MeshInfo mesh_info{};
-			std::vector<VertexBindingInfo> binding_infos = {{0, sizeof(float) * 7, VERTEX_BINDING_FLAG_NONE}};
-			meshes.emplace_back(Resources::createMesh(mesh_info), nullptr);
-			meshes[i].first->setVertexIndices(meshes_data[i].first.indices);
-			vertex_count += meshes_data[i].first.indices.size();
-
-			const MeshData &mesh_data = meshes_data[i].first;
-			const MaterialData &material_data = meshes_data[i].second;
-			if (!mesh_data.positions.empty()) {
-				meshes[i].first->setBuffer(0, mesh_data.positions.data(), mesh_data.positions.size());
+		Mesh *mesh_ptr = Resources::createMesh(mesh_info);
+		for (size_t i = 0; i < mesh.primitives.size(); ++i) {
+			tinygltf::Primitive primitive = mesh.primitives[i];
+			tinygltf::Accessor index_accessor = model.accessors[primitive.indices];
+			const tinygltf::BufferView &index_buffer_view = model.bufferViews[index_accessor.bufferView];
+			if (index_buffer_view.target != 0) {
+				const tinygltf::Buffer &index_buffer = model.buffers[index_buffer_view.buffer];
+				size_t index_count = index_buffer_view.byteLength / sizeof(uint32_t);
+				std::vector<uint32_t> indices;
+				indices.assign(index_buffer.data.begin(), index_buffer.data.begin() + index_buffer_view.byteLength);
+				indices.resize(index_count);
+				mesh_ptr->setVertexIndices(indices);
 			}
-			if (!mesh_data.uvs.empty()) {
-				meshes[i].first->setBuffer(1, mesh_data.uvs.data(), mesh_data.uvs.size());
-			}
-			if (!mesh_data.normals.empty()) {
-				meshes[i].first->setBuffer(2, mesh_data.normals.data(), mesh_data.normals.size());
-			}
-			if (!material_data.diffuse_texture_paths.empty()) {
-				auto t = Texture::load(material_data.diffuse_texture_paths[0]);
-				meshes[i].second->setTexture(0, t);
+			for (auto &attrib : primitive.attributes) {
+				tinygltf::Accessor accessor = model.accessors[attrib.second];
+				const tinygltf::BufferView &bufferView = model.bufferViews[accessor.bufferView];
+				int vaa = -1;
+				if (attrib.first.compare("POSITION") == 0) vaa = 0;
+					else if (attrib.first.compare("NORMAL") == 0) vaa = 1;
+					//else if (attrib.first.compare("TEXCOORD_0") == 0) vaa = 2;
+				else continue;
+
+				if (bufferView.target == 0) {
+					continue;
+				}
+				const tinygltf::Buffer &buffer = model.buffers[bufferView.buffer];
+
+				size_t count = bufferView.byteLength / binding_info.size;
+
+				mesh_ptr->setBuffer(0, &buffer.data.at(bufferView.byteOffset), count);
 			}
 		}
-		meshes_data.clear();
-		data_mutex.unlock();
-		Log::status(path + " loaded \n\tVertex count = " + std::to_string(vertex_count));
 
+
+		return mesh_ptr;
 	}
 
-	void Model::clearMeshes() {
-		for (std::size_t i = 0; i < meshes_data.size(); ++i) {
-			if (meshes[i].first)
-				delete meshes[i].first;
-			if (meshes[i].second)
-				delete meshes[i].second;
+	void bindModelNodes(tinygltf::Model &model, const tinygltf::Node &node, std::vector<ModelNode> &model_nodes) {
+		ModelMaterial material{};
+		material.color = vec4(1.0f);
+		material.texture = nullptr;
+
+		ModelNode model_node{};
+		model_node.material = material;
+
+		if ((node.mesh >= 0) && (node.mesh < model.meshes.size())) {
+
+			model_node.mesh = bindMesh(model, model.meshes[node.mesh]);
+			if (model_node.mesh)
+				model_nodes.push_back(model_node);
 		}
-		meshes.clear();
+
+		for (size_t i = 0; i < node.children.size(); i++) {
+			assert((node.children[i] >= 0) && (node.children[i] < model.nodes.size()));
+			bindModelNodes(model, model.nodes[node.children[i]], model_nodes);
+		}
 	}
 
-	const std::string &Model::getPath() {
-		return path;
+	void Model::load(const std::string &path) {
+		tinygltf::TinyGLTF loader;
+		tinygltf::Model model;
+		std::string err;
+		std::string warn;
+		bool res = loader.LoadASCIIFromFile(&model, &err, &warn, RESOURCE_PATH + path);
+		if (!warn.empty()) {
+			Log::warning(warn);
+		}
+
+		if (!err.empty()) {
+			Log::error(err);
+		}
+
+		if (!res)
+			Log::error("Failed to load glTF: ");
+
+
+		const tinygltf::Scene &scene = model.scenes[model.defaultScene];
+		//root nodes
+		for (size_t i = 0; i < scene.nodes.size(); ++i) {
+			assert((scene.nodes[i] >= 0) && (scene.nodes[i] < model.nodes.size()));
+			bindModelNodes(model, model.nodes[scene.nodes[i]], nodes);
+		}
+
+	}
+
+	std::vector<ModelNode> Model::getNodes() {
+		return nodes;
 	}
 
 

@@ -102,6 +102,11 @@ endif ()
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
 
+set(TINYGLTF_HEADER_ONLY ON CACHE INTERNAL "" FORCE)
+set(TINYGLTF_INSTALL OFF CACHE INTERNAL "" FORCE)
+set(TINYGLTF_NO_INCLUDE_STB_IMAGE ON CACHE INTERNAL "" FORCE)
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf")
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf)
 include_directories(.)
 set(CORE_FILES
         HBE.h
@@ -159,8 +164,6 @@ set(CORE_FILES
         core/utility/Geometry.cpp
         core/utility/Geometry.h
         core/utility/Clock.cpp
-        core/utility/ModelImporter.cpp
-        core/utility/ModelImporter.h
         core/utility/Random.cpp
         core/utility/Random.h
         core/utility/RawVector.h
@@ -169,7 +172,7 @@ set(CORE_FILES
 
         core/threading/JobManager.cpp
         core/threading/JobManager.h
-        platforms/vk/VK_AccelerationStructure.cpp platforms/vk/VK_AccelerationStructure.h)
+        platforms/vk/VK_BottomLevelAccelerationStructure.cpp platforms/vk/VK_BottomLevelAccelerationStructure.h core/scene/systems/ModelRendererSystem.cpp core/scene/systems/ModelRendererSystem.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

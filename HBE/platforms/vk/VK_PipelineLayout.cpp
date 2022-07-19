@@ -32,8 +32,8 @@ namespace HBE {
 					uniform_descriptor_set_layout_bindings[merged_index].stageFlags |= uniforms[j].layout_binding.stageFlags;
 				} else {
 					merged_unfiorms.emplace_back(uniforms[j]);
-					uniform_sizes.emplace_back(merged_unfiorms[j].size);
-					uniform_descriptor_set_layout_bindings.emplace_back(merged_unfiorms[j].layout_binding);
+					uniform_sizes.emplace_back(uniforms[j].size);
+					uniform_descriptor_set_layout_bindings.emplace_back(uniforms[j].layout_binding);
 
 					uniform_binding_to_index.emplace(uniforms[j].layout_binding.binding, merged_unfiorms.size() - 1);
 					uniform_names_to_index.emplace(uniforms[j].name, merged_unfiorms.size() - 1);

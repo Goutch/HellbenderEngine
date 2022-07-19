@@ -28,6 +28,8 @@ namespace HBE {
 		uint32_t instance_count = 1;
 		std::unordered_map<uint32_t, VertexBindingInfo> bindings;
 	public:
+		void load(std::string path);
+		void loadAsync(std::string path);
 		virtual ~Mesh() = default;
 		uint32_t getVertexCount() const;
 		uint32_t getIndexCount() const;

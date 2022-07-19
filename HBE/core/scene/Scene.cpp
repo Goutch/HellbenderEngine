@@ -1,3 +1,4 @@
+#include <core/scene/systems/ModelRendererSystem.h>
 #include "Scene.h"
 #include "core/graphics/Graphics.h"
 
@@ -23,6 +24,7 @@ namespace HBE {
 
 	Scene::Scene() {
 		systems.push_back(new MeshRendererSystem(this));
+		systems.push_back(new ModelRendererSystem(this));
 		systems.push_back(new CameraSystem(this));
 		systems.push_back(new CameraControllerSystem(this));
 		systems.push_back(new InstancedRendererSystem(this));

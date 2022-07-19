@@ -66,7 +66,7 @@ namespace HBE {
 	struct HB_API Camera2D {
 		bool active = true;
 		mat4 projection = mat3(1.0f);
-		float zoom_ratio=10;
+		float zoom_ratio = 10;
 		RenderTarget *render_target = nullptr;
 		void calculateProjection();
 		float aspectRatio();
@@ -86,6 +86,11 @@ namespace HBE {
 	struct HB_API MeshRenderer {
 		Mesh *mesh = nullptr;
 		GraphicPipeline *pipeline = nullptr;
+		bool active = true;
+	};
+
+	struct HB_API ModelRenderer {
+		Model *model = nullptr;
 		bool active = true;
 	};
 
