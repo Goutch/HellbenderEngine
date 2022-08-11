@@ -15,6 +15,6 @@ namespace HBE {
 	}
 
 	bool Mesh::hasIndexBuffer() const {
-		return has_index_buffer;
+		return indices_type != INDICES_TYPE_NONE;
 	}
 }

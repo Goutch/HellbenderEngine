@@ -59,9 +59,5 @@ namespace HBE {
         void unbind() const override;
 
         void createPipelineLayout();
-
-        void createDescriptorSets();
-
-
     };
 }

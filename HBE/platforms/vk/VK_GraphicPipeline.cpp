@@ -49,8 +49,7 @@ namespace HBE {
 		for (size_t i = 0; i < info.binding_info_count; ++i) {
 			binding_descriptions[i].binding = info.binding_infos[i].binding;
 			binding_descriptions[i].inputRate =
-					(info.binding_infos[i].flags & VERTEX_BINDING_FLAG_PER_INSTANCE) == VERTEX_BINDING_FLAG_PER_INSTANCE
-					?
+					(info.binding_infos[i].flags & VERTEX_BINDING_FLAG_PER_INSTANCE) == VERTEX_BINDING_FLAG_PER_INSTANCE ?
 					VK_VERTEX_INPUT_RATE_INSTANCE :
 					VK_VERTEX_INPUT_RATE_VERTEX;
 			binding_descriptions[i].stride = info.binding_infos[i].size;

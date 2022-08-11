@@ -15,7 +15,7 @@ void Navmesh::draw() {
 		}
 		if (mesh->getIndexCount() != mesh_indices.size() || mesh_indices.size() != mesh->getVertexCount()) {
 			mesh->setBuffer(0, mesh_vertices.data(), mesh_vertices.size());
-			mesh->setVertexIndices(mesh_indices);
+			mesh->setVertexIndices(mesh_indices.data(), mesh_indices.size());
 		}
 	}
 

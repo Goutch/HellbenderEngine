@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Core.h"
 #include "core/resource/Mesh.h"
 #include "core/utility/Log.h"
@@ -11,11 +12,6 @@ namespace HBE {
 		MODEL_FLAG_NONE = 0,
 	};
 
-	struct ModelVertex {
-		vec3 position;
-		vec2 uv;
-		vec3 normal;
-	};
 	struct ModelInfo {
 		std::string path;
 		MODEL_FLAGS flags = MODEL_FLAG_NONE;
@@ -26,17 +22,18 @@ namespace HBE {
 		Texture *texture = nullptr;
 	};
 	struct ModelNode {
-		Mesh *mesh;
-		GraphicPipeline *pipeline;
-		ModelMaterial material;
+		Mesh *mesh = nullptr;
+		GraphicPipeline *pipeline = nullptr;
+		ModelMaterial material{};
 	};
 
 	class HB_API Model : public Resource {
 		friend class Resources;
+
 		std::vector<ModelNode> nodes;
 		void load(const std::string &path);
-	public:
 		Model(const ModelInfo &info);
+	public:
 		~Model();
 		std::vector<ModelNode> getNodes();
 	};

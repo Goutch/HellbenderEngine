@@ -54,7 +54,7 @@ namespace HBE {
 					0, 1, 2,
 					2, 3, 0,
 			};
-			mesh.setVertexIndices(indices);
+			mesh.setVertexIndices(indices.data(), indices.size());
 		}
 	}
 
@@ -66,7 +66,7 @@ namespace HBE {
 		vec3 size = vec3(0.5f * size_x, 0.5f * size_y, 0.5f * size_z);
 		std::vector<float> vertices;
 		switch (flags) {
-			case 0x0://VERTEX_FLAG_NONE
+			case 0://VERTEX_FLAG_NONE
 				vertices.assign({
 										size.x, -size.y, size.z,
 										size.x, size.y, size.z,
@@ -102,45 +102,101 @@ namespace HBE {
 				mesh.setBuffer(0, vertices.data(), vertices.size() / 3);
 				break;
 
-			case 0x1://VERTEX_FLAG_UV
+			case 1://VERTEX_FLAG_UV
 				vertices.assign({
-										size.x, -size.y, size.z, 0.0f, 0.0f,
-										size.x, size.y, size.z, 0.0f, 1.0f,
-										-size.x, size.y, size.z, 1.0f, 1.0f,
-										-size.x, -size.y, size.z, 1.0f, 0.0f,
+										size.x, -size.y, size.z, 	0.0f, 0.0f,
+										size.x, size.y, size.z, 	0.0f, 1.0f,
+										-size.x, size.y, size.z, 	1.0f, 1.0f,
+										-size.x, -size.y, size.z, 	1.0f, 0.0f,
 
-										size.x, -size.y, -size.z, 0.0f, 0.0f,
-										size.x, size.y, -size.z, 0.0f, 1.0f,
-										size.x, size.y, size.z, 1.0f, 1.0f,
-										size.x, -size.y, size.z, 1.0f, 0.0f,
+										size.x, -size.y, -size.z, 	0.0f, 0.0f,
+										size.x, size.y, -size.z, 	0.0f, 1.0f,
+										size.x, size.y, size.z, 	1.0f, 1.0f,
+										size.x, -size.y, size.z, 	1.0f, 0.0f,
 
-										-size.x, -size.y, -size.z, 0.0f, 0.0f,
-										-size.x, size.y, -size.z, 0.0f, 1.0f,
-										size.x, size.y, -size.z, 1.0f, 1.0f,
-										size.x, -size.y, -size.z, 1.0f, 0.0f,
+										-size.x, -size.y, -size.z, 	0.0f, 0.0f,
+										-size.x, size.y, -size.z, 	0.0f, 1.0f,
+										size.x, size.y, -size.z, 	1.0f, 1.0f,
+										size.x, -size.y, -size.z, 	1.0f, 0.0f,
 
-										-size.x, -size.y, size.z, 0.0f, 0.0f,
-										-size.x, size.y, size.z, 0.0f, 1.0f,
-										-size.x, size.y, -size.z, 1.0f, 1.0f,
-										-size.x, -size.y, -size.z, 1.0f, 0.0f,
+										-size.x, -size.y, size.z, 	0.0f, 0.0f,
+										-size.x, size.y, size.z, 	0.0f, 1.0f,
+										-size.x, size.y, -size.z, 	1.0f, 1.0f,
+										-size.x, -size.y, -size.z, 	1.0f, 0.0f,
 
-										-size.x, size.y, -size.z, 0.0f, 0.0f,
-										-size.x, size.y, size.z, 0.0f, 1.0f,
-										size.x, size.y, size.z, 1.0f, 1.0f,
-										size.x, size.y, -size.z, 1.0f, 0.0f,
+										-size.x, size.y, -size.z, 	0.0f, 0.0f,
+										-size.x, size.y, size.z, 	0.0f, 1.0f,
+										size.x, size.y, size.z, 	1.0f, 1.0f,
+										size.x, size.y, -size.z, 	1.0f, 0.0f,
 
-										size.x, -size.y, size.z, 0.0f, 0.0f,
-										-size.x, -size.y, size.z, 0.0f, 1.0f,
-										-size.x, -size.y, -size.z, 1.0f, 1.0f,
-										size.x, -size.y, -size.z, 1.0f, 0.0f,
+										size.x, -size.y, size.z, 	0.0f, 0.0f,
+										-size.x, -size.y, size.z, 	0.0f, 1.0f,
+										-size.x, -size.y, -size.z, 	1.0f, 1.0f,
+										size.x, -size.y, -size.z, 	1.0f, 0.0f,
 
 								});
 				mesh.setBuffer(0, vertices.data(), vertices.size() / 5);
 				break;
 
-			case 0x10://VERTEX_FLAG_NORMAL
+			case 2://VERTEX_FLAG_NORMAL
+				vertices.assign({
+										size.x, -size.y, size.z, 	0.5,0.5,0.5,
+										size.x, size.y, size.z, 	0.5,0.5,0.5,
+										-size.x, size.y, size.z, 	0.5,0.5,0.5,
+										-size.x, -size.y, size.z, 	0.5,0.5,0.5,
+										size.x, -size.y, -size.z, 	0.5,0.5,0.5,
+										size.x, size.y, -size.z, 	0.5,0.5,0.5,
+										size.x, size.y, size.z, 	0.5,0.5,0.5,
+										size.x, -size.y, size.z, 	0.5,0.5,0.5,
+										-size.x, -size.y, -size.z, 	0.5,0.5,0.5,
+										-size.x, size.y, -size.z, 	0.5,0.5,0.5,
+										size.x, size.y, -size.z, 	0.5,0.5,0.5,
+										size.x, -size.y, -size.z, 	0.5,0.5,0.5,
+										-size.x, -size.y, size.z, 	0.5,0.5,0.5,
+										-size.x, size.y, size.z, 	0.5,0.5,0.5,
+										-size.x, size.y, -size.z, 	0.5,0.5,0.5,
+										-size.x, -size.y, -size.z, 	0.5,0.5,0.5,
+										-size.x, size.y, -size.z, 	0.5,0.5,0.5,
+										-size.x, size.y, size.z, 	0.5,0.5,0.5,
+										size.x, size.y, size.z, 	0.5,0.5,0.5,
+										size.x, size.y, -size.z, 	0.5,0.5,0.5,
+										size.x, -size.y, size.z, 	0.5,0.5,0.5,
+										-size.x, -size.y, size.z, 	0.5,0.5,0.5,
+										-size.x, -size.y, -size.z, 	0.5,0.5,0.5,
+										size.x, -size.y, -size.z, 	0.5,0.5,0.5,
+
+								});
+				mesh.setBuffer(0, vertices.data(), vertices.size() /6);
 				break;
-			case 0x11://VERTEX_FLAG_NORMAL&VERTEX_FLAG_UV
+			case 3://VERTEX_FLAG_NORMAL&VERTEX_FLAG_UV
+				vertices.assign({
+										size.x, -size.y, size.z, 	0.0f, 0.0f,		0.5,0.5,0.5,
+										size.x, size.y, size.z, 	0.0f, 1.0f,		0.5,0.5,0.5,
+										-size.x, size.y, size.z, 	1.0f, 1.0f,		0.5,0.5,0.5,
+										-size.x, -size.y, size.z, 	1.0f, 0.0f,		0.5,0.5,0.5,
+										size.x, -size.y, -size.z, 	0.0f, 0.0f,		0.5,0.5,0.5,
+										size.x, size.y, -size.z, 	0.0f, 1.0f,		0.5,0.5,0.5,
+										size.x, size.y, size.z, 	1.0f, 1.0f,		0.5,0.5,0.5,
+										size.x, -size.y, size.z, 	1.0f, 0.0f,		0.5,0.5,0.5,
+										-size.x, -size.y, -size.z, 	0.0f, 0.0f,		0.5,0.5,0.5,
+										-size.x, size.y, -size.z, 	0.0f, 1.0f,		0.5,0.5,0.5,
+										size.x, size.y, -size.z, 	1.0f, 1.0f,		0.5,0.5,0.5,
+										size.x, -size.y, -size.z, 	1.0f, 0.0f,		0.5,0.5,0.5,
+										-size.x, -size.y, size.z, 	0.0f, 0.0f,		0.5,0.5,0.5,
+										-size.x, size.y, size.z, 	0.0f, 1.0f,		0.5,0.5,0.5,
+										-size.x, size.y, -size.z, 	1.0f, 1.0f,		0.5,0.5,0.5,
+										-size.x, -size.y, -size.z, 	1.0f, 0.0f,		0.5,0.5,0.5,
+										-size.x, size.y, -size.z, 	0.0f, 0.0f,		0.5,0.5,0.5,
+										-size.x, size.y, size.z, 	0.0f, 1.0f,		0.5,0.5,0.5,
+										size.x, size.y, size.z, 	1.0f, 1.0f,		0.5,0.5,0.5,
+										size.x, size.y, -size.z, 	1.0f, 0.0f,		0.5,0.5,0.5,
+										size.x, -size.y, size.z, 	0.0f, 0.0f,		0.5,0.5,0.5,
+										-size.x, -size.y, size.z, 	0.0f, 1.0f,		0.5,0.5,0.5,
+										-size.x, -size.y, -size.z, 	1.0f, 1.0f,		0.5,0.5,0.5,
+										size.x, -size.y, -size.z, 	1.0f, 0.0f,		0.5,0.5,0.5,
+
+								});
+				mesh.setBuffer(0, vertices.data(), vertices.size() / 8);
 				break;
 		}
 
@@ -158,7 +214,7 @@ namespace HBE {
 				0 + 20, 1 + 20, 2 + 20,
 				2 + 20, 3 + 20, 0 + 20,
 		};
-		mesh.setVertexIndices(indices);
+		mesh.setVertexIndices(indices.data(), indices.size());
 	}
 
 }

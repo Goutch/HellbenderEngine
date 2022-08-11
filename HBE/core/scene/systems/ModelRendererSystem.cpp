@@ -5,12 +5,12 @@
 
 namespace HBE {
 	ModelRendererSystem::ModelRendererSystem(Scene *scene) : System(scene) {
-		scene->onUpdate.subscribe(this, &ModelRendererSystem::update);
+		scene->onDraw.subscribe(this, &ModelRendererSystem::draw);
 
 
 	}
 
-	void ModelRendererSystem::update(float delta) {
+	void ModelRendererSystem::draw() {
 
 		Profiler::begin("ModelRendererUpdate");
 		Profiler::begin("ModelRendererUpdateGroup");
@@ -32,7 +32,7 @@ namespace HBE {
 	}
 
 	ModelRendererSystem::~ModelRendererSystem() {
-
+		scene->onDraw.unsubscribe(this);
 	}
 
 }

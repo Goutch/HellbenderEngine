@@ -10,7 +10,7 @@ namespace HBE {
 	public:
 		ModelRendererSystem(Scene* scene);
 		~ModelRendererSystem();
-		void update(float delta);
+		void draw();
 	};
 
 }

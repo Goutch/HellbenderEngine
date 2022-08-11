@@ -86,7 +86,7 @@ AgentSystem::AgentSystem(Scene *scene) : System(scene) {
 			};
 	mesh->setBuffer(0, vertices.data(), 3);
 	std::vector<uint32_t> indices = {0, 1, 2};
-	mesh->setVertexIndices(indices);
+	mesh->setVertexIndices(indices.data(), indices.size());
 
 	scene->onUpdate.subscribe(this, &AgentSystem::onUpdate);
 	scene->onDraw.subscribe(this, &AgentSystem::onDraw);

@@ -95,7 +95,6 @@ namespace HBE {
 	}
 
 	VK_Mesh::~VK_Mesh() {
-		;
 		for (size_t i = 0; i < bindings.size(); ++i) {
 			for (size_t j = 0; j < buffers[i].size(); ++j) {
 				if (buffers[i][j])
@@ -103,29 +102,37 @@ namespace HBE {
 			}
 		}
 		buffers.clear();
-		if (has_index_buffer)
+		if (indices_buffer)
 			delete indices_buffer;
 	}
 
-	void VK_Mesh::setVertexIndices(const std::vector<uint32_t> &data) {
+	void VK_Mesh::setVertexIndices(const void *data, size_t count, size_t element_size) {
 		device->getQueue(QUEUE_FAMILY_GRAPHICS).wait();
-		if (has_index_buffer) {
+		if (indices_buffer) {
 			delete indices_buffer;
 		}
-		this->has_index_buffer = true;
-		this->index_count = data.size();
-		VkDeviceSize buffer_size = sizeof(data[0]) * data.size();
+		VkDeviceSize buffer_size = element_size * count;
 
 
 		indices_buffer = new VK_Buffer(device,
-									   reinterpret_cast<const void *>(data.data()),
+									   reinterpret_cast<const void *>(data),
 									   buffer_size,
 									   VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
 									   ALLOC_FLAGS::ALLOC_FLAG_NONE);
+		index_count = count;
+	}
+
+	void VK_Mesh::setVertexIndices(const uint16_t *data, size_t count) {
+		indices_type = INDICES_TYPE_UINT16;
+		setVertexIndices(data, count, sizeof(data[0]));
+	}
+
+	void VK_Mesh::setVertexIndices(const uint32_t *data, size_t count) {
+		indices_type = INDICES_TYPE_UINT32;
+		setVertexIndices(data, count, sizeof(data[0]));
 	}
 
 	void VK_Mesh::bind() const {
-
 		//todo: cleanup this
 		VkBuffer *flat_buffers = new VkBuffer[buffers.size()];
 		VkDeviceSize *offsets = new VkDeviceSize[buffers.size()];
@@ -142,12 +149,19 @@ namespace HBE {
 			i++;
 		}
 
-		vkCmdBindVertexBuffers(command_pool->getCurrentBuffer(), 0, buffers.size(), flat_buffers, offsets);
-		if (has_index_buffer)
-			vkCmdBindIndexBuffer(command_pool->getCurrentBuffer(), indices_buffer->getHandle(), 0, VK_INDEX_TYPE_UINT32);
-
-		delete offsets;
-		delete flat_buffers;
+		vkCmdBindVertexBuffers(command_pool->getCurrentBuffer(),
+							   0,
+							   buffers.size(),
+							   flat_buffers,
+							   offsets);
+		if (indices_type != INDICES_TYPE_NONE) {
+			vkCmdBindIndexBuffer(command_pool->getCurrentBuffer(),
+								 indices_buffer->getHandle(),
+								 0,
+								 indices_type == INDICES_TYPE_UINT32 ? VK_INDEX_TYPE_UINT32 : VK_INDEX_TYPE_UINT16);
+		}
+		delete[] offsets;
+		delete[] flat_buffers;
 	}
 
 	void VK_Mesh::unbind() const {
