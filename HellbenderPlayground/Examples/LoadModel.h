@@ -4,8 +4,8 @@ class LoadModelExemple {
 public:
 	static void init() {
 		//-------------------RESOURCES CREATION--------------------------------------
-		ShaderInfo frag_info{SHADER_STAGE_FRAGMENT, "/shaders/defaults/Model.frag"};
-		ShaderInfo vert_info{SHADER_STAGE_VERTEX, "/shaders/defaults/Model.vert"};
+		ShaderInfo frag_info{SHADER_STAGE_FRAGMENT, "/shaders/defaults/PositionUVNormal.frag"};
+		ShaderInfo vert_info{SHADER_STAGE_VERTEX, "/shaders/defaults/PositionUVNormal.vert"};
 		auto frag = Resources::createShader(frag_info, "frag");
 		auto vert = Resources::createShader(vert_info, "vert");
 
@@ -17,11 +17,11 @@ public:
 		binding_infos[0].flags = VERTEX_BINDING_FLAG_NONE;
 		binding_infos.emplace_back();
 		binding_infos[1].binding = 1;
-		binding_infos[1].size = sizeof(vec3) ;
+		binding_infos[1].size = sizeof(vec2) ;
 		binding_infos[1].flags = VERTEX_BINDING_FLAG_NONE;
 		binding_infos.emplace_back();
 		binding_infos[2].binding = 2;
-		binding_infos[2].size = sizeof(vec2);
+		binding_infos[2].size = sizeof(vec3);
 		binding_infos[2].flags = VERTEX_BINDING_FLAG_NONE;
 		GraphicPipelineInfo pipeline_info{};
 		pipeline_info.binding_infos = binding_infos.data();
@@ -34,7 +34,7 @@ public:
 
 
 		ModelInfo model_info{};
-		model_info.path = "/models/Duck.gltf";
+		model_info.path = "/models/Sponza.gltf";
 		model_info.flags = MODEL_FLAG_NONE;
 
 		Model *model = Resources::createModel(model_info, "model");
@@ -53,10 +53,10 @@ public:
 		ModelRenderer &renderer = cube_entity.attach<ModelRenderer>();
 		cube_entity.get<Transform>().translate(vec3(0, 0, -5));
 		renderer.model = model;
-
-		auto cube_entity2 = scene->createEntity("Cube2");
+		cube_entity.get<Transform>().setScale(vec3(0.01f));
+		/*auto cube_entity2 = scene->createEntity("Cube2");
 		ModelRenderer &renderer2 = cube_entity2.attach<ModelRenderer>();
 		cube_entity2.get<Transform>().translate(vec3(0, 0, 5));
-		renderer2.model = model;
+		renderer2.model = model;*/
 	}
 };

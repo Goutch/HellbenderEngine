@@ -22,7 +22,7 @@ void onAppUpdate(float delta) {
 	}
 
 	if (Input::getKeyDown(KEY::C)) {
-		Entity cam = *Application::getScene()->getCameraEntity();
+		Entity cam = Application::getScene()->getCameraEntity();
 		if (cam.has<CameraController>()) {
 			cam.detach<CameraController>();
 		} else {

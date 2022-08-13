@@ -14,7 +14,7 @@ struct Agent {
 class AgentSystem : public System {
 	Mesh *mesh;
 	GraphicPipeline *pipeline;
-	Entity *camera_entity;
+	Entity camera_entity;
 
 public:
 	void onUpdate(float delta);

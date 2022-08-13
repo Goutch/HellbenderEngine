@@ -353,12 +353,12 @@ namespace HBE {
 
 		ShaderInfo shader_info{};
 		shader_info.stage = SHADER_STAGE_VERTEX;
-		shader_info.path = "shaders/defaults/VK_Screen.vert";
+		shader_info.path = "shaders/defaults/TexturedFullScreenTriangle.vert";
 		Shader *vert = new VK_Shader(device, shader_info);
 		Resources::add("DEFAULT_SCREEN_VERT_SHADER", vert);
 
 		shader_info.stage = SHADER_STAGE_FRAGMENT;
-		shader_info.path = "shaders/defaults/VK_Screen.frag";
+		shader_info.path = "shaders/defaults/TexturedFullScreenTriangle.frag";
 		Shader *frag = new VK_Shader(device, shader_info);
 		Resources::add("DEFAULT_SCREEN_FRAG_SHADER", frag);
 

@@ -10,6 +10,21 @@ namespace HBE {
 
 	}
 
+	void drawNode(const ModelNode *node, mat4 parent_transform) {
+		mat4 transform = parent_transform * node->transform;
+		for (int i = 0; i < node->primitives.size(); ++i) {
+			const ModelPrimitive &primitive = node->primitives[i];
+			if (primitive.mesh && primitive.pipeline)
+				primitive.pipeline->setUniform("material", &primitive.material);
+			Graphics::draw(transform, *primitive.mesh, *primitive.pipeline);
+			else
+			Log::warning("Model node does not have a material and/or a mesh assigned");
+		}
+		for (int i = 0; i < node->children.size(); ++i) {
+			drawNode(node->children[i], transform);
+		}
+	}
+
 	void ModelRendererSystem::draw() {
 
 		Profiler::begin("ModelRendererUpdate");
@@ -19,12 +34,8 @@ namespace HBE {
 		Profiler::end();
 		for (auto[handle, transform, model_renderer]:group) {
 			if (model_renderer.active) {
-				for (const ModelNode &node:model_renderer.model->getNodes()) {
-					if (node.mesh && node.pipeline)
-						Graphics::draw(transform.world(), *node.mesh, *node.pipeline);
-					else
-						Log::warning("Model node does not have a material and/or a mesh assigned");
-
+				for (const ModelNode *node:model_renderer.model->getNodes()) {
+					drawNode(node, transform.world());
 				}
 			}
 		}

@@ -7,6 +7,8 @@ namespace HBE {
     class VK_Window : public Window {
         GLFWwindow *handle;
         uint32_t width,height;
+        uint32_t last_width, last_height;
+        int last_x,last_y;
     public:
         VK_Window(uint32_t width, uint32_t height);
 

@@ -73,7 +73,7 @@ namespace HBE {
 		Entity createEntity(const std::string &name);
 		Entity createEntity();
 		void destroyEntity(Entity entity);
-		Entity *getCameraEntity();
+		Entity getCameraEntity();
 		void setCameraEntity(Entity camera);
 		void addSystem(System *system);
 

@@ -22,8 +22,8 @@ namespace HBE {
 	}
 
 	void VK_Swapchain::recreate(uint32_t width, uint32_t height) {
-		this->extent.width=width;
-		this->extent.height=height;
+		this->extent.width = width;
+		this->extent.height = height;
 		if (handle != VK_NULL_HANDLE) {
 			for (auto imageView: image_views) {
 				vkDestroyImageView(device->getHandle(), imageView, nullptr);
@@ -113,8 +113,8 @@ namespace HBE {
 	}
 
 	VkPresentModeKHR VK_Swapchain::chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &available_present_modes) {
-		VkPresentModeKHR preferred = Configs::getVerticalSync() ? VK_PRESENT_MODE_FIFO_KHR
-																: VK_PRESENT_MODE_MAILBOX_KHR;
+		VkPresentModeKHR preferred = Configs::getVerticalSync() ? VK_PRESENT_MODE_FIFO_KHR :
+									 VK_PRESENT_MODE_MAILBOX_KHR;
 		for (const auto &available_present_mode: available_present_modes) {
 			if (available_present_mode == preferred)
 				return preferred;
@@ -124,12 +124,12 @@ namespace HBE {
 
 	void VK_Swapchain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities) {
 		if (capabilities.currentExtent.width != UINT32_MAX) {
-			extent= capabilities.currentExtent;
+			extent = capabilities.currentExtent;
 		} else {
 			extent.width = std::clamp(extent.width, capabilities.minImageExtent.width,
-											capabilities.maxImageExtent.width);
+									  capabilities.maxImageExtent.width);
 			extent.height = std::clamp(extent.height, capabilities.minImageExtent.height,
-											 capabilities.maxImageExtent.height);
+									   capabilities.maxImageExtent.height);
 
 		}
 	}
@@ -277,7 +277,5 @@ namespace HBE {
 	VkRenderPass &VK_Swapchain::getRenderPass() {
 		return render_pass;
 	}
-
-
 }
 

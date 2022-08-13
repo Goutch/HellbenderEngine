@@ -496,7 +496,7 @@ namespace HBE {
 		template<typename ... Components>
 		Group<Components...> group() {
 			constexpr size_t size = sizeof...(Components);
-			bool availableType[size] = {types.find(typeHash<Components>())!=types.end()...};
+			bool availableType[size] = {types.find(typeHash<Components>()) != types.end()...};
 			for (int i = 0; i < size; ++i) {
 				if (!availableType[i]) {
 					return Group<Components...>(pages);
@@ -535,7 +535,7 @@ namespace HBE {
 
 		bool valid(entity_handle handle) {
 			size_t page = getPage(handle);
-			if (pages[page] != nullptr) {
+			if (pages.size() > page && pages[page] != nullptr) {
 				return pages[page]->valid(handle);
 			}
 			return false;
@@ -559,7 +559,7 @@ namespace HBE {
 			const size_t hash = typeHash<Component>();
 			ComponentTypeInfo &type = types[hash];
 			size_t page = getPage(handle);
-			pages[page]->detach(handle,types[hash]);
+			pages[page]->detach(handle, types[hash]);
 		}
 	};
 }

@@ -19,9 +19,9 @@ void PlayerInputSystem::update(float delta) {
 
 	f32 step = f32(delta);
 	fixed3<f32> click_position = fixed3<f32>(0, 0, 0);
-	SimCamera2D &sim_camera = scene->getCameraEntity()->get<SimCamera2D>();
-	Camera2D &camera = scene->getCameraEntity()->get<Camera2D>();
-	SimTransform &camera_transform = scene->getCameraEntity()->get<SimTransform>();
+	SimCamera2D &sim_camera = scene->getCameraEntity().get<SimCamera2D>();
+	Camera2D &camera = scene->getCameraEntity().get<Camera2D>();
+	SimTransform &camera_transform = scene->getCameraEntity().get<SimTransform>();
 	f32 zoom_ratio = f32(camera.zoom_ratio);
 	bool right_button = Input::getKey(KEY::MOUSE_BUTTON_RIGHT);
 	bool left_button = Input::getKey(KEY::MOUSE_BUTTON_LEFT);

@@ -24,6 +24,11 @@ namespace HBE {
 
 	void VK_Mesh::setBuffer(uint32_t binding, const void *vertices, size_t count) {
 		this->vertex_count = count;
+		auto it = buffers.find(binding);
+		if (it == buffers.end()) {
+			Log::warning("Trying to set a mesh buffer at binding#" + std::to_string(binding) + " but no such binding exists");
+			return;
+		}
 		if (count == 0) {
 			Log::warning("Trying to set a mesh buffer with vertex count = 0");
 			return;

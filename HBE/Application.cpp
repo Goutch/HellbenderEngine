@@ -56,7 +56,9 @@ namespace HBE {
 		time = new Clock();
 		Clock update_clock = Clock();
 		float delta_t = 0.0f;
-
+		if (current_scene == nullptr) {
+			setScene(new Scene());
+		}
 		while (!window->shouldClose() && current_scene != nullptr) {
 			window->swapBuffers();
 			Input::pollEvents();
@@ -66,25 +68,32 @@ namespace HBE {
 			onUpdate.invoke(delta_t);
 			current_scene->update(delta_t);
 			Profiler::end();
-			Entity camera_entity = *current_scene->getCameraEntity();
+			if (current_scene != nullptr) {
+				Entity camera_entity = current_scene->getCameraEntity();
 
-			if (camera_entity.valid()) {
-				if (camera_entity.has<Camera>() ||
-					camera_entity.has<Camera2D>()) {
-					Profiler::begin("DRAW");
-					onDraw.invoke();
-					current_scene->draw();
-					Profiler::end();
-					Profiler::begin("RENDER");
-					Graphics::beginFrame();
-					onRender.invoke();
-					current_scene->render();
-					Graphics::endFrame();
-					Profiler::end();
+				if (camera_entity.valid()) {
+					if (camera_entity.has<Camera>() ||
+						camera_entity.has<Camera2D>()) {
+						Profiler::begin("DRAW");
+						onDraw.invoke();
+						current_scene->draw();
+						Profiler::end();
+						Profiler::begin("RENDER");
+						Graphics::beginFrame();
+						onRender.invoke();
+						current_scene->render();
+						Graphics::endFrame();
+						Profiler::end();
+					}
+				} else {
+					//Log::warning("No camera in current scene");
 				}
-			} else {
-				Log::warning("No camera in current scene");
 			}
+			else
+			{
+				//Log::warning("No scene set");
+			}
+
 			Profiler::end();
 			delta_t = update_clock.ns() * NANOSECONDS_TO_SECONDS;
 			update_clock.reset();

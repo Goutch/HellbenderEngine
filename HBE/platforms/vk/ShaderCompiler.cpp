@@ -250,7 +250,7 @@ namespace HBE {
 							  false,
 							  message,
 							  includer)) {
-				Log::warning(shader.getInfoDebugLog());
+			//	Log::warning(shader.getInfoDebugLog());
 				Log::error(shader.getInfoLog());
 			}
 			{

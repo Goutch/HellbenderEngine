@@ -1,8 +1,10 @@
 
 
-#include <core/threading/JobManager.h>
 #include "Model.h"
 #include "Resources.h"
+#include "set"
+#include "core/scene/Components.h"
+#include <glm/ext/matrix_transform.hpp>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #define TINYGLTF_IMPLEMENTATION
@@ -12,18 +14,21 @@
 
 namespace HBE {
 	Model::~Model() {
-		for (auto &node:nodes) {
-			delete node.mesh;
+		for (int i = 0; i < root_nodes.size(); ++i) {
+			delete root_nodes[i];
 		}
-		nodes.clear();
+		for (auto &mesh_vector : meshes) {
+			for (auto mesh:mesh_vector.second) {
+				delete mesh;
+			}
+		}
+
+		meshes.clear();
+		root_nodes.clear();
 	}
 
 	Model::Model(const ModelInfo &info) {
 		load(info.path);
-		for (auto &node:nodes) {
-			node.pipeline = Resources::get<GraphicPipeline>("MODEL_PIPELINE");
-			node.pipeline->setUniform("material", &node.material);
-		}
 	}
 
 
@@ -43,8 +48,6 @@ namespace HBE {
 			const tinygltf::Accessor index_accessor = model.accessors[primitive.indices];
 			const tinygltf::BufferView &index_buffer_view = model.bufferViews[index_accessor.bufferView];
 			const tinygltf::Buffer &index_buffer = model.buffers[index_buffer_view.buffer];
-			const uint16_t *index_ptr = reinterpret_cast<const uint16_t *>(index_buffer.data.data() + index_buffer_view.byteOffset);
-			std::vector<uint16_t> indices = std::vector<uint16_t>(index_ptr, index_ptr + index_accessor.count);
 			indices_buffer.data = reinterpret_cast<const void *>(&index_buffer.data.at(index_buffer_view.byteOffset));
 			indices_buffer.count = index_accessor.count;
 			indices_buffer.element_size = tinygltf::GetComponentSizeInBytes(index_accessor.componentType);
@@ -52,10 +55,19 @@ namespace HBE {
 
 		std::vector<VertexBindingInfo> binding_infos;
 		std::vector<MeshBuffer> buffers;
-		for (const auto &attribute : primitive.attributes) {
-			uint32_t accessor_index = attribute.second;
-			std::string attribute_name = attribute.first;
 
+		//Interleaved if buffer view is equal and accessor offset is less than stride
+		//non Interleaved if accessor offset is == stride
+		std::set<uint32_t> accessors;
+		for (const auto &attribute : primitive.attributes) {
+			std::string attribute_name = attribute.first;
+			if(attribute_name =="TANGENT")
+			{
+				continue;
+			}
+			accessors.emplace(attribute.second);
+		}
+		for (uint32_t accessor_index : accessors) {
 			const tinygltf::Accessor &accessor = model.accessors[accessor_index];
 			int buffer_view_index = accessor.bufferView;
 			const tinygltf::BufferView &buffer_view = model.bufferViews[buffer_view_index];
@@ -95,8 +107,6 @@ namespace HBE {
 				mesh_buffer.element_size = stride;
 				buffers.emplace_back(mesh_buffer);
 			}
-
-
 		}
 
 		MeshInfo mesh_info{};
@@ -122,33 +132,71 @@ namespace HBE {
 		return mesh_ptr;
 	}
 
-	void bindModelNodes(tinygltf::Model &model, const tinygltf::Node &node, std::vector<ModelNode> &model_nodes) {
-		ModelMaterial material{};
-		material.color = vec4(1.0f);
-		material.texture = nullptr;
-
-		ModelNode model_node{};
-		model_node.material = material;
+	void Model::processNodes(tinygltf::Model &model, const tinygltf::Node &node, std::vector<ModelNode *> &node_array) {
+		ModelNode *model_node = new ModelNode();
 
 
 		if ((node.mesh >= 0) && (node.mesh < model.meshes.size())) {
-			tinygltf::Mesh &mesh = model.meshes[node.mesh];
-			for (size_t i = 0; i < mesh.primitives.size(); ++i) {
-				tinygltf::Primitive &primitive = mesh.primitives[i];
-				model_node.mesh = createPrimitive(model, primitive);
-				if (model_node.mesh) {
-					model_nodes.push_back(model_node);
+			auto mesh_it = data.meshes.find(node.mesh);
+			if (mesh_it == data.meshes.end()) {
+				auto meshes_it = data.meshes.emplace(node.mesh, std::vector<Mesh *>());
+				auto materials_it = data.materials.emplace(node.mesh, std::vector<ModelMaterial>());
+				auto pipeline_it = data.pipelines.emplace(node.mesh, std::vector<GraphicPipeline *>());
+				std::vector<Mesh *> &meshes_vector = meshes_it.first->second;
+				std::vector<ModelMaterial> &materials_vector = materials_it.first->second;
+				std::vector<GraphicPipeline *> &pipelines_vector = pipeline_it.first->second;
+				tinygltf::Mesh &mesh = model.meshes[node.mesh];
+				for (size_t i = 0; i < mesh.primitives.size(); ++i) {
+					tinygltf::Primitive &primitive = mesh.primitives[i];
+
+					ModelMaterial primitive_material{};
+					GraphicPipeline *primitive_pipeline = Resources::get<GraphicPipeline>("MODEL_PIPELINE");
+					Mesh* primitive_mesh = createPrimitive(model, primitive);
+
+					if (primitive.material != -1) {
+						tinygltf::Material &m = model.materials[primitive.material];
+						if (m.pbrMetallicRoughness.baseColorFactor.size() == 4) {
+							primitive_material.color.r = static_cast<float>(m.pbrMetallicRoughness.baseColorFactor[0]);
+							primitive_material.color.g = static_cast<float>(m.pbrMetallicRoughness.baseColorFactor[1]);
+							primitive_material.color.b = static_cast<float>(m.pbrMetallicRoughness.baseColorFactor[2]);
+							primitive_material.color.a = static_cast<float>(m.pbrMetallicRoughness.baseColorFactor[3]);
+						}
+						//todo: handle textures
+						primitive_material.texture = nullptr;
+					}
+
+					pipelines_vector.emplace_back(primitive_pipeline);
+					materials_vector.emplace_back(primitive_material);
+					meshes_vector.emplace_back(primitive_mesh);
+
+					ModelPrimitive model_primitive{};
+					model_primitive.material=data.materials[i];
+					model_primitive.mesh = data.meshes[i];
+					model_primitive.pipeline = data.pipelines[i];
+					model_node->primitives.emplace_back(model_primitive);
 				}
-				if (primitive.material != -1) {
-					//todo:handle material
-				}
+
 			}
 
+
+
+
 		}
+		if (node.matrix.size() == 16) {
+			for (size_t i = 0; i < 4; i++) {
+				for (int j = 0; j < 4; ++j) {
+					model_node->transform[i][j] = static_cast<float>(node.matrix[i]);
+				}
+			}
+		} else {
+			model_node->transform = mat4(1.0f);
+		}
+		node_array.emplace_back(model_node);
+
 
 		for (size_t i = 0; i < node.children.size(); i++) {
 			assert((node.children[i] >= 0) && (node.children[i] < model.nodes.size()));
-			bindModelNodes(model, model.nodes[node.children[i]], model_nodes);
+			processNodes(model, model.nodes[node.children[i]], model_node->children);
 		}
 	}
 
@@ -174,13 +222,13 @@ namespace HBE {
 		//root nodes
 		for (size_t i = 0; i < scene.nodes.size(); ++i) {
 			assert((scene.nodes[i] >= 0) && (scene.nodes[i] < model.nodes.size()));
-			bindModelNodes(model, model.nodes[scene.nodes[i]], nodes);
+			processNodes(model, model.nodes[scene.nodes[i]], data.nodes);
 		}
 
 	}
 
-	std::vector<ModelNode> Model::getNodes() {
-		return nodes;
+	std::vector<ModelNode *> Model::getNodes() {
+		return data.nodes;
 	}
 
 

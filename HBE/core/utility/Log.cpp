@@ -8,7 +8,7 @@
 #include "Application.h"
 
 namespace HBE {
-	uint32_t Log::log_flags = ERROR | STATUS | WARNING | MESSAGE | DEBUG;
+	uint32_t Log::log_flags = ERROR | STATUS | WARNING | MESSAGE | DEBUG ;
 
 
 	void Log::setFlags(uint32_t flags) {

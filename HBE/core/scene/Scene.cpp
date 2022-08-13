@@ -5,7 +5,7 @@
 namespace HBE {
 
 	bool Entity::valid() {
-		return scene->valid(handle);
+		return scene != nullptr && scene->valid(handle);
 	}
 
 	entity_handle Entity::getHandle() {
@@ -32,8 +32,8 @@ namespace HBE {
 	}
 
 
-	Entity* Scene::getCameraEntity() {
-		return &main_camera_entity;
+	Entity Scene::getCameraEntity() {
+		return main_camera_entity;
 	}
 
 	void Scene::destroyEntity(Entity entity) {
@@ -42,13 +42,10 @@ namespace HBE {
 	}
 
 	void Scene::calculateCameraProjection(RenderTarget *renderTarget) {
-
-		if(main_camera_entity.has<Camera>())
-		{
+		if (!main_camera_entity.valid()) return;
+		if (main_camera_entity.has<Camera>()) {
 			main_camera_entity.get<Camera>().calculateProjection();
-		}
-		else if(main_camera_entity.has<Camera2D>())
-		{
+		} else if (main_camera_entity.has<Camera2D>()) {
 			main_camera_entity.get<Camera2D>().calculateProjection();
 		}
 	}
@@ -82,6 +79,7 @@ namespace HBE {
 	}
 
 	bool Scene::valid(entity_handle handle) {
+
 		return registry.valid(handle);
 	}
 
