@@ -3,7 +3,6 @@
 //----------------------inputs----------------------
 layout (location = 0) in vec4 fragmentPos;
 layout(location = 1) in vec3 fragmentNormal;
-layout(location = 2) in vec2 fragmentUV;
 
 //----------------------outputs----------------------
 layout(location = 0) out vec4 outColor;

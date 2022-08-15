@@ -20,6 +20,8 @@ namespace HBE {
 		this->device = device;
 		this->renderer = renderer;
 
+		this->info = info;
+		this->binding_infos = std::vector<VertexBindingInfo>(info.binding_infos, info.binding_infos + info.binding_info_count);
 
 		const VK_Shader *vk_vertex = (dynamic_cast<const VK_Shader *>(info.vertex_shader));
 		const VK_Shader *vk_frag = (dynamic_cast<const VK_Shader *>(info.fragement_shader));
@@ -229,7 +231,6 @@ namespace HBE {
 		if (layout != nullptr)
 			delete layout;
 	}
-
 
 	void VK_GraphicPipeline::bind() const {
 		vkCmdBindPipeline(renderer->getCommandPool()->getCurrentBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, handle);

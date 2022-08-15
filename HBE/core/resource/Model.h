@@ -22,32 +22,25 @@ namespace HBE {
 	struct ModelMaterial {
 		vec4 color = vec4(1.0f);
 		Texture *texture = nullptr;
+		GraphicPipeline *pipeline = nullptr;
 	};
 
 	struct ModelPrimitive {
 		Mesh *mesh = nullptr;
 		ModelMaterial material;
-		GraphicPipeline *pipeline = nullptr;
 	};
 
 	//A node represent an object in the model hierarchy. with zero, one or multiple meshes to render.
 	struct ModelNode {
 		mat4 transform;
 		std::vector<ModelPrimitive> primitives;
-		std::vector<ModelNode *> children;
-
-		~ModelNode() {
-			for (int i = 0; i < children.size(); ++i) {
-				delete children[i];
-			}
-		}
+		std::vector<ModelNode> children;
 	};
 
 	struct ModelData {
-		std::vector<ModelNode *> nodes;
-		std::unordered_map<int, std::vector<Mesh *>> meshes;
-		std::unordered_map<int, std::vector<ModelMaterial>> materials;
-		std::unordered_map<int, std::vector<GraphicPipeline *>> pipelines;
+		std::vector<ModelNode> nodes;
+		std::vector<std::vector<Mesh *>> meshes;
+		std::vector<ModelMaterial> materials;
 	};
 
 
@@ -57,10 +50,13 @@ namespace HBE {
 		ModelData data;
 		void load(const std::string &path);
 		Model(const ModelInfo &info);
-		void processNodes(tinygltf::Model &model, const tinygltf::Node &node, std::vector<ModelNode *> &parent_node_array);
+		void processNodes(tinygltf::Model &model, const tinygltf::Node &node, std::vector<ModelNode> &parent_node_array);
+		void createMaterials(tinygltf::Model &model);
+		void createMeshes(tinygltf::Model &model);
 	public:
 		~Model();
-		std::vector<ModelNode *> getNodes();
+		const std::vector<ModelNode> &getNodes();
+
 	};
 
 }

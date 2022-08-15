@@ -172,7 +172,7 @@ set(CORE_FILES
 
         core/threading/JobManager.cpp
         core/threading/JobManager.h
-        platforms/vk/VK_BottomLevelAccelerationStructure.cpp platforms/vk/VK_BottomLevelAccelerationStructure.h core/scene/systems/ModelRendererSystem.cpp core/scene/systems/ModelRendererSystem.h core/utility/GLTFLoader.cpp core/utility/GLTFLoader.h)
+        platforms/vk/VK_BottomLevelAccelerationStructure.cpp platforms/vk/VK_BottomLevelAccelerationStructure.h core/scene/systems/ModelRendererSystem.cpp core/scene/systems/ModelRendererSystem.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

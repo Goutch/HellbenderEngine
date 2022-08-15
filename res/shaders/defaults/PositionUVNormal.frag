@@ -14,7 +14,6 @@ layout(location = 0) out vec4 outColor;
 //----------------------uniforms----------------------
 layout(binding = 1) uniform MaterialUniform {
     vec4 color;
-    bool hasTexture;
 } material;
 
 void main() {

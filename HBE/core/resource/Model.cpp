@@ -14,17 +14,14 @@
 
 namespace HBE {
 	Model::~Model() {
-		for (int i = 0; i < root_nodes.size(); ++i) {
-			delete root_nodes[i];
-		}
-		for (auto &mesh_vector : meshes) {
-			for (auto mesh:mesh_vector.second) {
+		for (std::vector<Mesh *> primitives:data.meshes) {
+			for (Mesh *mesh: primitives) {
 				delete mesh;
 			}
 		}
-
-		meshes.clear();
-		root_nodes.clear();
+		for (ModelMaterial material:data.materials) {
+			delete material.texture;
+		}
 	}
 
 	Model::Model(const ModelInfo &info) {
@@ -38,9 +35,44 @@ namespace HBE {
 		size_t element_size = 0;
 	};
 
+
+	void Model::processNodes(tinygltf::Model &model, const tinygltf::Node &node, std::vector<ModelNode> &node_array) {
+		ModelNode model_node{};
+
+
+		if ((node.mesh >= 0) && (node.mesh < model.meshes.size())) {
+			tinygltf::Mesh gltf_mesh = model.meshes[node.mesh];
+			for (int i = 0; i < gltf_mesh.primitives.size(); ++i) {
+				size_t material_index = gltf_mesh.primitives[i].material;
+				model_node.primitives.emplace_back();
+				model_node.primitives[i].mesh = data.meshes[node.mesh][i];
+				if (material_index != -1)
+					model_node.primitives[i].material = data.materials[material_index];
+				else
+					model_node.primitives[i].material = ModelMaterial{};
+				model_node.primitives[i].material.pipeline = Resources::get<GraphicPipeline>("DEFAULT_MODEL_PIPELINE");
+			}
+		}
+		if (node.matrix.size() == 16) {
+			for (size_t i = 0; i < 4; i++) {
+				for (int j = 0; j < 4; ++j) {
+					model_node.transform[i][j] = static_cast<float>(node.matrix[i]);
+				}
+			}
+		} else {
+			model_node.transform = mat4(1.0f);
+		}
+		node_array.emplace_back(model_node);
+
+		for (size_t i = 0; i < node.children.size(); i++) {
+			assert((node.children[i] >= 0) && (node.children[i] < model.nodes.size()));
+			processNodes(model, model.nodes[node.children[i]], model_node.children);
+		}
+	}
+
 	//https://github.com/KhronosGroup/glTF-Tutorials/blob/master/gltfTutorial/gltfTutorial_005_BuffersBufferViewsAccessors.md
 	//https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#meshes
-	Mesh *createPrimitive(tinygltf::Model &model, tinygltf::Primitive &primitive) {
+	Mesh *createPrimitive(const tinygltf::Model &model, const tinygltf::Primitive &primitive) {
 		//mesh
 		MeshBuffer indices_buffer{};
 
@@ -61,8 +93,7 @@ namespace HBE {
 		std::set<uint32_t> accessors;
 		for (const auto &attribute : primitive.attributes) {
 			std::string attribute_name = attribute.first;
-			if(attribute_name =="TANGENT")
-			{
+			if (attribute_name == "TANGENT") {
 				continue;
 			}
 			accessors.emplace(attribute.second);
@@ -132,73 +163,35 @@ namespace HBE {
 		return mesh_ptr;
 	}
 
-	void Model::processNodes(tinygltf::Model &model, const tinygltf::Node &node, std::vector<ModelNode *> &node_array) {
-		ModelNode *model_node = new ModelNode();
+	void Model::createMeshes(tinygltf::Model &model) {
+		for (size_t i = 0; i < model.meshes.size(); i++) {
+			const tinygltf::Mesh &gltf_mesh = model.meshes[i];
+			data.meshes.emplace_back();
+			std::vector<Mesh *> &meshes = data.meshes[i];
+			for (size_t gltf_primitive_index = 0; gltf_primitive_index < gltf_mesh.primitives.size(); ++gltf_primitive_index) {
+				const tinygltf::Primitive &gltf_primitive = gltf_mesh.primitives[gltf_primitive_index];
 
+				Mesh *mesh = createPrimitive(model, gltf_primitive);
 
-		if ((node.mesh >= 0) && (node.mesh < model.meshes.size())) {
-			auto mesh_it = data.meshes.find(node.mesh);
-			if (mesh_it == data.meshes.end()) {
-				auto meshes_it = data.meshes.emplace(node.mesh, std::vector<Mesh *>());
-				auto materials_it = data.materials.emplace(node.mesh, std::vector<ModelMaterial>());
-				auto pipeline_it = data.pipelines.emplace(node.mesh, std::vector<GraphicPipeline *>());
-				std::vector<Mesh *> &meshes_vector = meshes_it.first->second;
-				std::vector<ModelMaterial> &materials_vector = materials_it.first->second;
-				std::vector<GraphicPipeline *> &pipelines_vector = pipeline_it.first->second;
-				tinygltf::Mesh &mesh = model.meshes[node.mesh];
-				for (size_t i = 0; i < mesh.primitives.size(); ++i) {
-					tinygltf::Primitive &primitive = mesh.primitives[i];
-
-					ModelMaterial primitive_material{};
-					GraphicPipeline *primitive_pipeline = Resources::get<GraphicPipeline>("MODEL_PIPELINE");
-					Mesh* primitive_mesh = createPrimitive(model, primitive);
-
-					if (primitive.material != -1) {
-						tinygltf::Material &m = model.materials[primitive.material];
-						if (m.pbrMetallicRoughness.baseColorFactor.size() == 4) {
-							primitive_material.color.r = static_cast<float>(m.pbrMetallicRoughness.baseColorFactor[0]);
-							primitive_material.color.g = static_cast<float>(m.pbrMetallicRoughness.baseColorFactor[1]);
-							primitive_material.color.b = static_cast<float>(m.pbrMetallicRoughness.baseColorFactor[2]);
-							primitive_material.color.a = static_cast<float>(m.pbrMetallicRoughness.baseColorFactor[3]);
-						}
-						//todo: handle textures
-						primitive_material.texture = nullptr;
-					}
-
-					pipelines_vector.emplace_back(primitive_pipeline);
-					materials_vector.emplace_back(primitive_material);
-					meshes_vector.emplace_back(primitive_mesh);
-
-					ModelPrimitive model_primitive{};
-					model_primitive.material=data.materials[i];
-					model_primitive.mesh = data.meshes[i];
-					model_primitive.pipeline = data.pipelines[i];
-					model_node->primitives.emplace_back(model_primitive);
-				}
-
+				meshes.emplace_back(mesh);
 			}
-
-
-
-
-		}
-		if (node.matrix.size() == 16) {
-			for (size_t i = 0; i < 4; i++) {
-				for (int j = 0; j < 4; ++j) {
-					model_node->transform[i][j] = static_cast<float>(node.matrix[i]);
-				}
-			}
-		} else {
-			model_node->transform = mat4(1.0f);
-		}
-		node_array.emplace_back(model_node);
-
-
-		for (size_t i = 0; i < node.children.size(); i++) {
-			assert((node.children[i] >= 0) && (node.children[i] < model.nodes.size()));
-			processNodes(model, model.nodes[node.children[i]], model_node->children);
 		}
 	}
+
+	void Model::createMaterials(tinygltf::Model &model) {
+		for (size_t i = 0; i < model.materials.size(); i++) {
+			const tinygltf::Material &gltf_material = model.materials[i];
+			data.materials.emplace_back();
+			ModelMaterial &material = data.materials[i];
+			if (gltf_material.pbrMetallicRoughness.baseColorFactor.size() == 4) {
+				material.color.r = static_cast<float>(gltf_material.pbrMetallicRoughness.baseColorFactor[0]);
+				material.color.g = static_cast<float>(gltf_material.pbrMetallicRoughness.baseColorFactor[1]);
+				material.color.b = static_cast<float>(gltf_material.pbrMetallicRoughness.baseColorFactor[2]);
+				material.color.a = static_cast<float>(gltf_material.pbrMetallicRoughness.baseColorFactor[3]);
+			}
+		}
+	}
+
 
 	void Model::load(const std::string &path) {
 		tinygltf::TinyGLTF loader;
@@ -218,6 +211,10 @@ namespace HBE {
 			Log::error("Failed to load glTF: ");
 
 
+		createMeshes(model);
+		createMaterials(model);
+
+
 		const tinygltf::Scene &scene = model.scenes[model.defaultScene];
 		//root nodes
 		for (size_t i = 0; i < scene.nodes.size(); ++i) {
@@ -227,7 +224,7 @@ namespace HBE {
 
 	}
 
-	std::vector<ModelNode *> Model::getNodes() {
+	const std::vector<ModelNode>& Model::getNodes() {
 		return data.nodes;
 	}
 
