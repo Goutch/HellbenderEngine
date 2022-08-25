@@ -157,8 +157,6 @@ set(CORE_FILES
         core/scene/systems/CameraControllerSystem.h
         core/scene/systems/RotatorSystem.cpp
         core/scene/systems/RotatorSystem.h
-        core/scene/systems/InstancedRendererSystem.cpp
-        core/scene/systems/InstancedRendererSystem.h
 
         core/utility/Log.cpp
         core/utility/Geometry.cpp
@@ -172,7 +170,7 @@ set(CORE_FILES
 
         core/threading/JobManager.cpp
         core/threading/JobManager.h
-        platforms/vk/VK_BottomLevelAccelerationStructure.cpp platforms/vk/VK_BottomLevelAccelerationStructure.h core/scene/systems/ModelRendererSystem.cpp core/scene/systems/ModelRendererSystem.h)
+        platforms/vk/VK_BottomLevelAccelerationStructure.cpp platforms/vk/VK_BottomLevelAccelerationStructure.h core/scene/systems/ModelRendererSystem.cpp core/scene/systems/ModelRendererSystem.h core/resource/Material.h platforms/vk/VK_PipelineDescriptors.cpp platforms/vk/VK_PipelineDescriptors.h platforms/vk/VK_Material.cpp platforms/vk/VK_Material.h platforms/vk/VK_ComputeInstance.cpp platforms/vk/VK_ComputeInstance.h core/resource/ComputeInstance.h core/resource/IPipelineInstance.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

@@ -3,6 +3,7 @@
 #include "CameraControllerSystem.h"
 #include "core/scene/Scene.h"
 #include "core/input/Input.h"
+#include "core/resource/Resources.h"
 #include "core/utility/Profiler.h"
 
 namespace HBE {
@@ -17,24 +18,24 @@ namespace HBE {
 		Profiler::end();
 		for (auto[handle, transform, camera, controller]:group) {
 			float max_pitch_radian = glm::radians(controller.max_pitch);
-			uint32_t w, h;
-			camera.render_target->getResolution(w, h);
-			float width = static_cast<float>(w), height = static_cast<float>(h);
-			double x, y;
-			Input::getMousePosition(x, y);
-			Input::setCursorPosition(w / 2.0, h / 2.0f);
+
+			vec2i resolution = camera.render_target->getResolution();
+			float width = static_cast<float>(resolution.x), height = static_cast<float>(resolution.y);
+
+			vec2 mouse_pos = Input::getMousePosition();
+			Input::setCursorPosition(resolution.x / 2.0, resolution.y / 2.0f);
 
 			float fov = glm::radians(camera.fov);
-			vec2 change;
-			change.x = (((width / 2.0f) - x) / width) * fov;
-			change.y = (((height / 2.0f) - y) / height) * (fov * camera.aspectRatio());
+			vec2 mouse_delta;
+			mouse_delta.x = (((width / 2.0f) - mouse_pos.x) / width) * fov;
+			mouse_delta.y = (((height / 2.0f) - mouse_pos.y) / height) * (fov * camera.aspectRatio());
 
 			//go to pitch 0
 			transform.rotate(vec3(-controller.current_pitch, 0, 0));
 			//rotate on y axis
-			transform.rotate(vec3(0, change.x, 0));
+			transform.rotate(vec3(0, mouse_delta.x, 0));
 			//go back to current pitch
-			controller.current_pitch += change.y;
+			controller.current_pitch += mouse_delta.y;
 			controller.current_pitch = glm::clamp(controller.current_pitch, -max_pitch_radian, max_pitch_radian);
 
 			transform.rotate(vec3(controller.current_pitch, 0, 0));

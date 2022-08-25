@@ -26,13 +26,13 @@ void PlayerInputSystem::update(float delta) {
 	bool right_button = Input::getKey(KEY::MOUSE_BUTTON_RIGHT);
 	bool left_button = Input::getKey(KEY::MOUSE_BUTTON_LEFT);
 	if (right_button || left_button) {
-		double x, y;
-		Input::getMousePosition(x, y);
+		vec2i mouse_pos = Input::getMousePosition();
+
 		uint32_t width, height;
 		Graphics::getWindow()->getSize(width, height);
 
-		click_position = fixed3<f32>(f32(x) - (f32(static_cast<int32_t>(width)) * f32::HALF),
-									 (f32(static_cast<int32_t>(height)) - f32(y)) - (f32(static_cast<int32_t>(height)) * f32::HALF),
+		click_position = fixed3<f32>(f32(mouse_pos.x) - (f32(static_cast<int32_t>(width)) * f32::HALF),
+									 (f32(static_cast<int32_t>(height)) - f32(mouse_pos.y)) - (f32(static_cast<int32_t>(height)) * f32::HALF),
 									 0);
 		click_position /= fixed3<f32>(f32(static_cast<int32_t>(width)) / (zoom_ratio * f32(camera.aspectRatio())),
 									  f32(static_cast<int32_t>(height)) / zoom_ratio,

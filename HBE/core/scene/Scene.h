@@ -11,10 +11,9 @@
 #include "unordered_map"
 #include "core/scene/systems/CameraSystem.h"
 #include "core/scene/systems/MeshRendererSystem.h"
-#include "core/scene/systems/InstancedRendererSystem.h"
 #include "core/scene/systems/CameraControllerSystem.h"
 #include "typeinfo"
-
+#include "core/utility/Event.h"
 
 namespace HBE {
 

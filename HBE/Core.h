@@ -31,13 +31,13 @@
 #endif
 
 
-//#ifndef RESOURCE_PATH
-//#ifdef NDEBUG
-//#define RESOURCE_PATH "res/"
-//#else
+#ifndef RESOURCE_PATH
+#ifdef NDEBUG
+#define RESOURCE_PATH "res/"
+#else
 #define RESOURCE_PATH "../../res/"
-//#endif
-//#endif
+#endif
+#endif
 
 
 #include "HBETypes.h"

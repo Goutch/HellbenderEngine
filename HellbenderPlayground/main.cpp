@@ -1,6 +1,5 @@
 #include "HBE.h"
 #include "VoxelModule/VoxelModule.h"
-#include "Examples/Instancing.h"
 #include "Pathfinder/Pathfinder.h"
 #include "Raytracing/RaytracingExemple.h"
 #include "Examples/LoadModel.h"

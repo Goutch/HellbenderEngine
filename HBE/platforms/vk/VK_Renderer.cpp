@@ -23,6 +23,8 @@
 #include "VK_RenderTarget.h"
 #include "core/graphics/Graphics.h"
 #include "core/utility/Profiler.h"
+#include "VK_PipelineDescriptors.h"
+#include "VK_Material.h"
 
 namespace HBE {
 	struct UniformBufferObject {
@@ -82,7 +84,7 @@ namespace HBE {
 
 		default_render_target->setResolution(width, height);
 
-		screen_pipeline->setTexture("texture0", default_render_target);
+		screen_material->setTexture("texture0", default_render_target);
 	}
 
 	void VK_Renderer::onWindowClosed() {
@@ -118,19 +120,18 @@ namespace HBE {
 		Profiler::begin("RenderPass");
 		const VK_RenderPass *render_pass = dynamic_cast<const VK_RenderPass *>(render_target);
 
-		uint32_t width, height;
-		render_target->getResolution(width, height);
+		vec2i resolution = render_target->getResolution();
 		VkViewport viewport{};
 		viewport.x = 0.0f;
-		viewport.y = static_cast<float>(height);
-		viewport.width = static_cast<float>(width);
-		viewport.height = -static_cast<float>(height);
+		viewport.y = static_cast<float>(resolution.y);
+		viewport.width = static_cast<float>(resolution.x);
+		viewport.height = -static_cast<float>(resolution.y);
 		viewport.minDepth = 0.0f;
 		viewport.maxDepth = 1.0f;
 
 		VkRect2D scissor{};
 		scissor.offset = {0, 0};
-		scissor.extent = VkExtent2D{(uint32_t) width, (uint32_t) height};
+		scissor.extent = VkExtent2D{(uint32_t) resolution.x, (uint32_t) resolution.y};
 
 		//static_cast<VK_RenderTarget*>(render_target)->begin(command_pool->getCurrentBuffer());
 		vkCmdSetViewport(command_pool->getCurrentBuffer(), 0, 1, &viewport);
@@ -140,37 +141,49 @@ namespace HBE {
 		ubo.projection = projection_matrix;
 		render_pass->begin(command_pool->getCurrentBuffer(), current_frame);
 		for (const auto &pipeline_kv: render_cache) {
-			GraphicPipeline *pipeline = pipeline_kv.first;
+			const GraphicPipeline *pipeline = pipeline_kv.first;
 			pipeline->bind();
-			pipeline->setUniform("ubo", &ubo);
-			for (const auto &mesh_kv: pipeline_kv.second) {
-				const Mesh *mesh = mesh_kv.first;
-				mesh->bind();
-				for (const mat4 &transform_matrix: mesh_kv.second) {
-					pipeline->pushConstant("constants", static_cast<const void *>(&transform_matrix[0]));
+			for (const auto &material_kv:pipeline_kv.second) {
+				Material *material = material_kv.first;
+				material->setUniform("ubo", &ubo);
+				material->bind();
+				for (const auto &mesh_kv: material_kv.second) {
+					const Mesh *mesh = mesh_kv.first;
+					mesh->bind();
+					for (const mat4 &transform_matrix: mesh_kv.second) {
+						pipeline->pushConstant("constants", static_cast<const void *>(&transform_matrix[0]));
+						if (mesh->hasIndexBuffer()) {
+							vkCmdDrawIndexed(command_pool->getCurrentBuffer(), mesh->getIndexCount(), mesh->getInstanceCount(), 0, 0, 0);
+						} else {
+							vkCmdDraw(command_pool->getCurrentBuffer(), mesh->getVertexCount(), mesh->getInstanceCount(), 0, 0);
+						}
+
+					}
+					mesh->unbind();
+				}
+				material->unbind();
+			}
+			pipeline->unbind();
+		}
+		for (const auto &pipeline_kv: instanced_cache) {
+			const GraphicPipeline *pipeline = pipeline_kv.first;
+			pipeline->bind();
+			for (const auto &material_kv: pipeline_kv.second) {
+				Material *material = material_kv.first;
+				material->setUniform("ubo", &ubo);
+				material->bind();
+
+				std::vector<const Mesh *> meshes = material_kv.second;
+				for (const Mesh *mesh : meshes) {
+					mesh->bind();
 					if (mesh->hasIndexBuffer()) {
 						vkCmdDrawIndexed(command_pool->getCurrentBuffer(), mesh->getIndexCount(), mesh->getInstanceCount(), 0, 0, 0);
 					} else {
 						vkCmdDraw(command_pool->getCurrentBuffer(), mesh->getVertexCount(), mesh->getInstanceCount(), 0, 0);
 					}
-
+					mesh->unbind();
 				}
-				mesh->unbind();
 			}
-			pipeline->unbind();
-		}
-		for (const auto &pipeline_kv: instanced_cache) {
-			auto pipeline = pipeline_kv.first;
-			auto mesh = pipeline_kv.second;
-			pipeline->bind();
-			pipeline->setUniform("ubo", &ubo);
-			mesh->bind();
-			if (mesh->hasIndexBuffer()) {
-				vkCmdDrawIndexed(command_pool->getCurrentBuffer(), mesh->getIndexCount(), mesh->getInstanceCount(), 0, 0, 0);
-			} else {
-				vkCmdDraw(command_pool->getCurrentBuffer(), mesh->getVertexCount(), mesh->getInstanceCount(), 0, 0);
-			}
-			mesh->unbind();
 			pipeline->unbind();
 		}
 		render_pass->end(command_pool->getCurrentBuffer());
@@ -209,20 +222,20 @@ namespace HBE {
 			Profiler::end();
 			images_in_flight_fences[current_image] = &command_pool->getCurrentFence();
 			command_pool->getCurrentFence().reset();
-			//reset here idk why
-			uint32_t width, height;
-			current_render_pass->getResolution(width, height);
+
+
+			vec2i resolution = current_render_pass->getResolution();
 			VkViewport viewport{};
 			viewport.x = 0.0f;
-			viewport.y = static_cast<float>(height);
-			viewport.width = static_cast<float>(width);
-			viewport.height = -static_cast<float>(height);
+			viewport.y = static_cast<float>(resolution.y);
+			viewport.width = static_cast<float>(resolution.x);
+			viewport.height = -static_cast<float>(resolution.y);
 			viewport.minDepth = 0.0f;
 			viewport.maxDepth = 1.0f;
 
 			VkRect2D scissor{};
 			scissor.offset = {0, 0};
-			scissor.extent = VkExtent2D{(uint32_t) width, (uint32_t) height};
+			scissor.extent = VkExtent2D{(uint32_t) resolution.x, (uint32_t) resolution.y};
 
 			//static_cast<VK_RenderTarget*>(render_target)->begin(command_pool->getCurrentBuffer());
 			vkCmdSetViewport(command_pool->getCurrentBuffer(), 0, 1, &viewport);
@@ -231,7 +244,9 @@ namespace HBE {
 			swapchain->beginRenderPass(current_image, command_pool->getCurrentBuffer());
 
 			screen_pipeline->bind();
+			screen_material->bind();
 			vkCmdDraw(command_pool->getCurrentBuffer(), 3, 1, 0, 0);
+			screen_material->unbind();
 			screen_pipeline->unbind();
 
 			swapchain->endRenderPass(command_pool->getCurrentBuffer());
@@ -280,21 +295,29 @@ namespace HBE {
 		Profiler::end();
 	}
 
-	void VK_Renderer::draw(mat4 transform_matrix, const Mesh &mesh, GraphicPipeline &pipeline) {
-		auto pipeline_it = render_cache.find(&pipeline);
+	void VK_Renderer::draw(mat4 transform_matrix, const Mesh &mesh, Material &material) {
+		auto pipeline_it = render_cache.find(material.getGraphicPipeline());
 		if (pipeline_it == render_cache.end())
-			pipeline_it = render_cache.emplace(&pipeline, MAP(const Mesh*, std::vector<mat4>)()).first;
-		auto mesh_it = pipeline_it->second.find(&mesh);
-		if (mesh_it == pipeline_it->second.end())
-			mesh_it = pipeline_it->second.emplace(&mesh, std::vector<mat4>()).first;
+			pipeline_it = render_cache.emplace(material.getGraphicPipeline(), MAP(Material*, MAP(const Mesh*, std::vector<mat4>))()).first;
+		auto material_it = pipeline_it->second.find(&material);
+		if (material_it == pipeline_it->second.end())
+			material_it = pipeline_it->second.emplace(&material, MAP(const Mesh*, std::vector<mat4>)()).first;
+		auto mesh_it = material_it->second.find(&mesh);
+		if (mesh_it == material_it->second.end())
+			mesh_it = material_it->second.emplace(&mesh, std::vector<mat4>()).first;
 
 		mesh_it->second.emplace_back(transform_matrix);
 	}
 
 	void VK_Renderer::drawInstanced(const HBE::Mesh &mesh,
-									GraphicPipeline &pipeline) {
-		auto it_material = instanced_cache.try_emplace(&pipeline).first;
-		it_material->second = &mesh;
+									Material &material) {
+		auto pipeline_it = instanced_cache.find(material.getGraphicPipeline());
+		if (pipeline_it == instanced_cache.end())
+			pipeline_it = instanced_cache.emplace(material.getGraphicPipeline(), MAP(Material *, std::vector<const Mesh *>)()).first;
+		auto material_it = pipeline_it->second.find(&material);
+		if (material_it == pipeline_it->second.end())
+			material_it = pipeline_it->second.emplace(&material, std::vector<const Mesh *>()).first;
+		material_it->second.emplace_back(&mesh);
 	}
 
 	const VK_Swapchain &VK_Renderer::getSwapchain() const {
@@ -368,12 +391,17 @@ namespace HBE {
 		screen_pipeline = new VK_GraphicPipeline(device, this, pipeline_info, swapchain->getRenderPass());
 		Resources::add("DEFAULT_SCREEN_PIPELINE", screen_pipeline);
 
+		MaterialInfo screen_material_info{};
+		screen_material_info.graphic_pipeline = screen_pipeline;
+		screen_material = new VK_Material(this, screen_material_info);
+		Resources::add("DEFAULT_SCREEN_MATERIAL", screen_material);
+
 		setCurrentRenderTarget(default_render_target);
 	}
 
 	void VK_Renderer::setCurrentRenderTarget(RenderTarget *render_target) {
 		current_render_pass = dynamic_cast<VK_RenderPass *>(render_target);
-		screen_pipeline->setTexture("texture0", render_target);
+		screen_material->setTexture("texture0", render_target);
 	}
 
 	void VK_Renderer::waitCurrentFrame() {

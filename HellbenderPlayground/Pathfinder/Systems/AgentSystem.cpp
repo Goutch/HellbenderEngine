@@ -38,7 +38,7 @@ void AgentSystem::onDraw() {
 	}
 
 	mesh->setInstanceBuffer(1, transforms.data(), count);
-	Graphics::drawInstanced(*mesh, *pipeline);
+	Graphics::drawInstanced(*mesh, *material);
 }
 
 AgentSystem::AgentSystem(Scene *scene) : System(scene) {
@@ -69,6 +69,11 @@ AgentSystem::AgentSystem(Scene *scene) : System(scene) {
 	pipeline_info.flags = GRAPHIC_PIPELINE_FLAG_NONE;
 
 	pipeline = Resources::createGraphicPipeline(pipeline_info, "pipeline");
+
+	MaterialInfo material_info{};
+	material_info.graphic_pipeline = pipeline;
+	material_info.flags = MATERIAL_FLAG_NONE;
+	material = Resources::createMaterial(material_info, "material");
 
 	MeshInfo mesh_info{};
 	mesh_info.binding_infos = binding_infos.data();

@@ -12,6 +12,10 @@
 #include "map"
 #include "tiny_gltf.h"
 
+#include "GraphicPipeline.h"
+#include "Mesh.h"
+#include "Material.h"
+
 namespace HBE {
 	Model::~Model() {
 		for (std::vector<Mesh *> primitives:data.meshes) {
@@ -19,8 +23,13 @@ namespace HBE {
 				delete mesh;
 			}
 		}
-		for (ModelMaterial material:data.materials) {
-			delete material.texture;
+		for (Material *material:data.materials) {
+			delete material;
+		}
+		for (const ModelMaterialProperties &material_properties:data.material_properties) {
+			if (material_properties.texture != nullptr) {
+				delete material_properties.texture;
+			}
 		}
 	}
 
@@ -36,7 +45,7 @@ namespace HBE {
 	};
 
 
-	void Model::processNodes(tinygltf::Model &model, const tinygltf::Node &node, std::vector<ModelNode> &node_array) {
+	void processNodes(ModelData &data, tinygltf::Model &model, const tinygltf::Node &node, std::vector<ModelNode> &node_array) {
 		ModelNode model_node{};
 
 
@@ -49,14 +58,13 @@ namespace HBE {
 				if (material_index != -1)
 					model_node.primitives[i].material = data.materials[material_index];
 				else
-					model_node.primitives[i].material = ModelMaterial{};
-				model_node.primitives[i].material.pipeline = Resources::get<GraphicPipeline>("DEFAULT_MODEL_PIPELINE");
+					Log::warning("Can't find material for mesh" + std::to_string(i));
 			}
 		}
 		if (node.matrix.size() == 16) {
-			for (size_t i = 0; i < 4; i++) {
-				for (int j = 0; j < 4; ++j) {
-					model_node.transform[i][j] = static_cast<float>(node.matrix[i]);
+			for (uint32_t i = 0; i < 4; i++) {
+				for (uint32_t j = 0; j < 4; ++j) {
+					model_node.transform[j][i] = static_cast<float>(node.matrix[i]);
 				}
 			}
 		} else {
@@ -66,13 +74,13 @@ namespace HBE {
 
 		for (size_t i = 0; i < node.children.size(); i++) {
 			assert((node.children[i] >= 0) && (node.children[i] < model.nodes.size()));
-			processNodes(model, model.nodes[node.children[i]], model_node.children);
+			processNodes(data, model, model.nodes[node.children[i]], model_node.children);
 		}
 	}
 
 	//https://github.com/KhronosGroup/glTF-Tutorials/blob/master/gltfTutorial/gltfTutorial_005_BuffersBufferViewsAccessors.md
 	//https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#meshes
-	Mesh *createPrimitive(const tinygltf::Model &model, const tinygltf::Primitive &primitive) {
+	Mesh *createPrimitive(ModelData &data, const tinygltf::Model &model, const tinygltf::Primitive &primitive) {
 		//mesh
 		MeshBuffer indices_buffer{};
 
@@ -163,7 +171,7 @@ namespace HBE {
 		return mesh_ptr;
 	}
 
-	void Model::createMeshes(tinygltf::Model &model) {
+	void createMeshes(ModelData &data, tinygltf::Model &model) {
 		for (size_t i = 0; i < model.meshes.size(); i++) {
 			const tinygltf::Mesh &gltf_mesh = model.meshes[i];
 			data.meshes.emplace_back();
@@ -171,24 +179,33 @@ namespace HBE {
 			for (size_t gltf_primitive_index = 0; gltf_primitive_index < gltf_mesh.primitives.size(); ++gltf_primitive_index) {
 				const tinygltf::Primitive &gltf_primitive = gltf_mesh.primitives[gltf_primitive_index];
 
-				Mesh *mesh = createPrimitive(model, gltf_primitive);
+				Mesh *mesh = createPrimitive(data, model, gltf_primitive);
 
 				meshes.emplace_back(mesh);
 			}
 		}
 	}
 
-	void Model::createMaterials(tinygltf::Model &model) {
+	void createMaterials(ModelData &data, tinygltf::Model &model) {
 		for (size_t i = 0; i < model.materials.size(); i++) {
 			const tinygltf::Material &gltf_material = model.materials[i];
-			data.materials.emplace_back();
-			ModelMaterial &material = data.materials[i];
+			MaterialInfo material_info{};
+			material_info.flags = MATERIAL_FLAG_NONE;
+			material_info.graphic_pipeline = Resources::get<GraphicPipeline>("DEFAULT_MODEL_PIPELINE");
+			data.materials.emplace_back(Resources::createMaterial(material_info));
+
+
+			ModelMaterialProperties material_properties{};
 			if (gltf_material.pbrMetallicRoughness.baseColorFactor.size() == 4) {
-				material.color.r = static_cast<float>(gltf_material.pbrMetallicRoughness.baseColorFactor[0]);
-				material.color.g = static_cast<float>(gltf_material.pbrMetallicRoughness.baseColorFactor[1]);
-				material.color.b = static_cast<float>(gltf_material.pbrMetallicRoughness.baseColorFactor[2]);
-				material.color.a = static_cast<float>(gltf_material.pbrMetallicRoughness.baseColorFactor[3]);
+				material_properties.color.r = static_cast<float>(gltf_material.pbrMetallicRoughness.baseColorFactor[0]);
+				material_properties.color.g = static_cast<float>(gltf_material.pbrMetallicRoughness.baseColorFactor[1]);
+				material_properties.color.b = static_cast<float>(gltf_material.pbrMetallicRoughness.baseColorFactor[2]);
+				material_properties.color.a = static_cast<float>(gltf_material.pbrMetallicRoughness.baseColorFactor[3]);
 			}
+			//todo:texture
+			data.material_properties.emplace_back(material_properties);
+
+			data.materials[i]->setUniform("material", &data.material_properties[i].color);
 		}
 	}
 
@@ -211,20 +228,20 @@ namespace HBE {
 			Log::error("Failed to load glTF: ");
 
 
-		createMeshes(model);
-		createMaterials(model);
+		createMeshes(data, model);
+		createMaterials(data, model);
 
 
 		const tinygltf::Scene &scene = model.scenes[model.defaultScene];
 		//root nodes
 		for (size_t i = 0; i < scene.nodes.size(); ++i) {
 			assert((scene.nodes[i] >= 0) && (scene.nodes[i] < model.nodes.size()));
-			processNodes(model, model.nodes[scene.nodes[i]], data.nodes);
+			processNodes(data, model, model.nodes[scene.nodes[i]], data.nodes);
 		}
 
 	}
 
-	const std::vector<ModelNode>& Model::getNodes() {
+	const std::vector<ModelNode> &Model::getNodes() {
 		return data.nodes;
 	}
 

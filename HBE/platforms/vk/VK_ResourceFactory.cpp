@@ -8,6 +8,8 @@
 #include "VK_Shader.h"
 #include "VK_RenderPass.h"
 #include "VK_ComputePipeline.h"
+#include "VK_Material.h"
+#include "VK_ComputeInstance.h"
 
 namespace HBE {
 	VK_ResourceFactory::VK_ResourceFactory(VK_Renderer *renderer) {
@@ -37,6 +39,15 @@ namespace HBE {
 	RenderTarget *VK_ResourceFactory::createRenderTarget(const RenderTargetInfo &info) const {
 		return new VK_RenderPass(renderer, info);
 	}
+
+	Material *VK_ResourceFactory::createMaterial(const MaterialInfo &info) const {
+		return new VK_Material(renderer, info);
+	}
+
+	ComputeInstance *VK_ResourceFactory::createComputeInstance(const ComputeInstanceInfo &info) const {
+		return new VK_ComputeInstance(renderer, info);
+	}
+
 
 }
 

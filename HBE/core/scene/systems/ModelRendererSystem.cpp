@@ -2,6 +2,7 @@
 #include "core/scene/Scene.h"
 #include "core/utility/Profiler.h"
 #include "core/graphics/Graphics.h"
+#include "core/resource/Resources.h"
 
 namespace HBE {
 	ModelRendererSystem::ModelRendererSystem(Scene *scene) : System(scene) {
@@ -12,10 +13,8 @@ namespace HBE {
 		mat4 transform = parent_transform * node.transform;
 		for (int i = 0; i < node.primitives.size(); ++i) {
 			const ModelPrimitive &primitive = node.primitives[i];
-			if (primitive.mesh && primitive.material.pipeline) {
-
-				primitive.material.pipeline->setUniform("material", &primitive.material.color);
-				Graphics::draw(transform, *primitive.mesh, *primitive.material.pipeline);
+			if (primitive.mesh && primitive.material) {
+				Graphics::draw(transform, *primitive.mesh, *primitive.material);
 			} else {
 				Log::warning("Model node does not have a material and/or a mesh assigned");
 			}

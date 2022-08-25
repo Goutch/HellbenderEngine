@@ -7,6 +7,7 @@ using namespace HBE;
 class Navmesh {
 	Mesh *mesh;
 	GraphicPipeline *pipeline;
+	Material *material;
 	const bool *map;
 	uint32_t size_x;
 	uint32_t size_y;
@@ -39,10 +40,11 @@ public:
 
 	struct Triangle {
 		size_t v1, v2, v3;
-		Triangle(size_t v1, size_t v2,size_t v3)
-		{
+
+		Triangle(size_t v1, size_t v2, size_t v3) {
 
 		}
+
 		fixed2<f32> circumcenter;
 		f32 radius;
 	};

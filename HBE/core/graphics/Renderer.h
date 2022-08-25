@@ -21,6 +21,8 @@ namespace HBE {
 
 	class GraphicPipeline;
 
+	class Material;
+
 	class Renderer {
 	public:
 		static Renderer *create();
@@ -36,14 +38,14 @@ namespace HBE {
 
 		virtual void setCurrentRenderTarget(RenderTarget *renderTarget) = 0;
 
-		virtual void draw(mat4 transform_matrix, const Mesh &mesh, GraphicPipeline &pipeline) = 0;
+		virtual void draw(mat4 transform_matrix, const Mesh &mesh, Material &material) = 0;
 
-		virtual void drawInstanced(const Mesh &mesh, GraphicPipeline &pipeline) = 0;
+		virtual void drawInstanced(const Mesh &mesh, Material &material) = 0;
 
 		virtual RenderTarget *getDefaultRenderTarget() = 0;
 
 		virtual const ResourceFactory *getResourceFactory() const = 0;
 
-		virtual void createDefaultResources() =0;
+		virtual void createDefaultResources() = 0;
 	};
 }

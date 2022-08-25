@@ -14,8 +14,8 @@ private:
 	Map *map;
 public:
 	void onUpdate(float delta) {
-		float wheel = 0.0f;
-		Input::getMouseWheelInput(wheel);
+
+		float wheel = Input::getMouseWheelInput();
 		SimCamera2D &cam = camera.get<SimCamera2D>();
 
 		cam.zoom_ratio -= cam.zoom_ratio * f32(wheel) * f32(delta) * 100;

@@ -12,7 +12,8 @@
 #include "core/resource/Texture.h"
 #include "core/resource/Model.h"
 #include "core/resource/RenderTarget.h"
-
+#include "core/resource/Material.h"
+#include "core/resource/ComputeInstance.h"
 
 namespace HBE {
 	class HB_API Resources {
@@ -67,7 +68,6 @@ namespace HBE {
 		static void add(const std::string &unique_name, Resource *r) {
 			registry.emplace(unique_name, r);
 		}
-
 
 		static Model *createModel(const ModelInfo &info, const std::string &name) {
 			auto m = new Model(info);
@@ -141,6 +141,26 @@ namespace HBE {
 			auto rt = factory->createRenderTarget(info);
 			add(name, rt);
 			return rt;
+		}
+
+		static Material *createMaterial(const MaterialInfo &info, const std::string &name) {
+			Material *m = factory->createMaterial(info);
+			add(name, m);
+			return m;
+		}
+
+		static Material *createMaterial(const MaterialInfo &info) {
+			return factory->createMaterial(info);
+		}
+
+		static ComputeInstance *createComputeInstance(const ComputeInstanceInfo &info, const std::string &name) {
+			ComputeInstance *c = factory->createComputeInstance(info);
+			add(name, c);
+			return c;
+		}
+
+		static ComputeInstance *createComputeInstance(const ComputeInstanceInfo &info) {
+			return factory->createComputeInstance(info);
 		}
 	};
 

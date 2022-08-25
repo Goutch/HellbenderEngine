@@ -38,10 +38,9 @@ namespace HBE {
 			VK_Semaphore *image_available_semaphore;
 		};
 
-
-		MAP(GraphicPipeline*, MAP(const Mesh*, std::vector<mat4>)) render_cache;
-		MAP(GraphicPipeline*, MAP(const Mesh*, std::vector<mat3>)) render_cache_2D;
-		MAP(GraphicPipeline*, const Mesh*) instanced_cache;
+		MAP(const GraphicPipeline*, MAP(Material * , MAP(const Mesh*, std::vector<mat4>))) render_cache;
+		MAP(const GraphicPipeline*, MAP(Material * , MAP(const Mesh*, std::vector<mat3>))) render_cache_2D;
+		MAP(const GraphicPipeline*, MAP(Material * , std::vector<const Mesh *>)) instanced_cache;
 
 		VK_Window *window;
 		VK_Instance *instance;
@@ -58,6 +57,7 @@ namespace HBE {
 		std::array<FrameState, MAX_FRAMES_IN_FLIGHT> frames;
 		std::vector<VK_Fence *> images_in_flight_fences;
 		GraphicPipeline *screen_pipeline = nullptr;
+		Material *screen_material = nullptr;
 		bool windowResized = false;
 	public:
 		void render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix) override;
@@ -66,15 +66,15 @@ namespace HBE {
 
 
 		void waitCurrentFrame();
-		RenderTarget* getDefaultRenderTarget() override;
+		RenderTarget *getDefaultRenderTarget() override;
 
 		void beginFrame() override;
 
 		void endFrame(bool present) override;
 
-		void draw(mat4 transform_matrix, const Mesh &mesh, GraphicPipeline &pipeline) override;
+		void draw(mat4 transform_matrix, const Mesh &mesh, Material &material) override;
 
-		void drawInstanced(const Mesh &mesh, GraphicPipeline &pipeline) override;
+		void drawInstanced(const Mesh &mesh, Material &material) override;
 
 		VK_Renderer();
 
@@ -98,7 +98,7 @@ namespace HBE {
 
 		void createDefaultResources() override;
 
-		const VK_Instance* getInstance() const;
+		const VK_Instance *getInstance() const;
 		void waitAll();
 	};
 }

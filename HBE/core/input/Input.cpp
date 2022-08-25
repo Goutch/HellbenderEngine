@@ -31,8 +31,10 @@ namespace HBE {
 		return released[code];
 	}
 
-	void Input::getMousePosition(double &x, double &y) {
-		glfwGetCursorPos(window, &x, &y);
+	vec2 Input::getMousePosition() {
+		double mouse_x, mouse_y;
+		glfwGetCursorPos(window, &mouse_x, &mouse_y);
+		return vec2(static_cast<float>(mouse_x), static_cast<float>(mouse_y));
 	}
 
 	void Input::init() {
@@ -48,8 +50,8 @@ namespace HBE {
 		}
 	}
 
-	void Input::getMouseWheelInput(float &value) {
-		value = wheel_offset;
+	float Input::getMouseWheelInput() {
+		return wheel_offset;
 	}
 
 	void Input::setCursorVisible(bool visible) {
@@ -57,8 +59,8 @@ namespace HBE {
 																							   GLFW_CURSOR_HIDDEN);
 	}
 
-	void Input::setCursorPosition(double x, double y) {
-		glfwSetCursorPos(window, x, y);
+	void Input::setCursorPosition(float x, float y) {
+		glfwSetCursorPos(window, static_cast<double>(x), static_cast<float>(y));
 	}
 
 	void Input::scrollCallback(GLFWwindow *window, double x_offset, double y_offset) {
@@ -84,8 +86,8 @@ namespace HBE {
 			reset_queue.emplace(key);
 		}
 	}
-	void Input::mouseButtonCallback(GLFWwindow* window, int key, int action, int mods)
-	{
+
+	void Input::mouseButtonCallback(GLFWwindow *window, int key, int action, int mods) {
 		released[key] = false;
 		down[key] = false;
 		repeat[key] = false;
@@ -114,7 +116,6 @@ namespace HBE {
 		wheel_offset = 0;
 		glfwPollEvents();
 	}
-
 
 
 }

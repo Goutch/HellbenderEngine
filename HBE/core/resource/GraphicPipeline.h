@@ -23,24 +23,6 @@ namespace HBE {
 		GRAPHIC_PIPELINE_FLAG_IGNORE_DEPTH_TEST = 1 << 2,
 	};
 
-	typedef uint32_t VERTEX_BINDING_FLAGS;
-	enum VERTEX_BINDING_FLAG {
-		VERTEX_BINDING_FLAG_NONE = 0,
-		VERTEX_BINDING_FLAG_PER_INSTANCE = 1 << 0,
-		/// Disable device local memory and skip staging buffer. May result in slower read in shader.
-		VERTEX_BINDING_FLAG_FAST_WRITE = 1 << 1,
-		///Recommended for buffer changing every frame, dont wait for rendering to finish but double or triple memory usage.
-		VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS = 1 << 2,
-	};
-	enum VERTEX_TOPOLOGY {
-		VERTEX_TOPOLOGY_TRIANGLE,
-		VERTEX_TOPOLOGY_LINE,
-	};
-	struct VertexBindingInfo {
-		uint32_t binding = 0;
-		uint32_t size = 0;
-		VERTEX_BINDING_FLAGS flags = VERTEX_BINDING_FLAG_NONE;
-	};
 	struct GraphicPipelineInfo {
 		const Shader *vertex_shader = nullptr;
 		const Shader *fragement_shader = nullptr;
@@ -59,16 +41,7 @@ namespace HBE {
 
 		virtual void unbind() const = 0;
 
-		virtual void setDynamicUniform(const std::string &name, const void *data) = 0;
-		virtual void setDynamicUniform(uint32_t binding, const void *data) = 0;
-
-		virtual void setUniform(const std::string &name, const void *data) = 0;
-		virtual void setUniform(uint32_t binding, const void *data) = 0;
-		virtual void pushConstant(const std::string &name, const void *data) = 0;
-		virtual void setTexture(uint32_t binding, const Texture *texture, uint32_t mip_level = 0) = 0;
-		virtual void setTexture(uint32_t binding, const RenderTarget *render_target) = 0;
-		virtual void setTexture(const std::string &name, const Texture *texture, uint32_t mip_level = 0) = 0;
-		virtual void setTexture(const std::string &name, const RenderTarget *render_target) = 0;
+		virtual void pushConstant(const std::string &name, const void *data) const = 0;
 	};
 
 

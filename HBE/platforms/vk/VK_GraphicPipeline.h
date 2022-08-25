@@ -31,29 +31,16 @@ namespace HBE {
 
 		std::vector<VertexBindingInfo> binding_infos;
 		GraphicPipelineInfo info;
+
+		mutable bool is_bound = false;
+
 	public:
 		VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const GraphicPipelineInfo &info);
 
 		VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const GraphicPipelineInfo &info,
 						   const VkRenderPass &render_pass);
 
-		void setDynamicUniform(const std::string &name, const void *data) override;
-
-		void setDynamicUniform(uint32_t binding, const void *data) override;
-
-		void setUniform(const std::string &name, const void *data) override;
-
-		void setUniform(uint32_t binding, const void *data) override;
-
-		void pushConstant(const std::string &name, const void *data) override;
-
-		void setTexture(uint32_t binding, const Texture *texture, uint32_t mip_level) override;
-
-		void setTexture(const std::string &name, const Texture *texture, uint32_t mip_level) override;
-
-		void setTexture(uint32_t binding, const RenderTarget *render_target) override;
-
-		void setTexture(const std::string &name, const RenderTarget *render_target) override;
+		void pushConstant(const std::string &name, const void *data) const override;
 
 		~VK_GraphicPipeline() override;
 
@@ -62,5 +49,9 @@ namespace HBE {
 		void unbind() const override;
 
 		void createPipelineLayout();
+
+		bool bound();
+
+		const VK_PipelineLayout *getPipelineLayout() const;
 	};
 }

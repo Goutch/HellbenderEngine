@@ -12,7 +12,7 @@
 
 #include "SPIRV/GlslangToSpv.h"
 #include "ShaderCompiler.h"
-
+#include "core/utility/Log.h"
 
 namespace HBE {
 #ifdef GLSLANG_C
@@ -250,7 +250,7 @@ namespace HBE {
 							  false,
 							  message,
 							  includer)) {
-			//	Log::warning(shader.getInfoDebugLog());
+				//	Log::warning(shader.getInfoDebugLog());
 				Log::error(shader.getInfoLog());
 			}
 			{

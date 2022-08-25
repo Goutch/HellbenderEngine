@@ -49,7 +49,7 @@ namespace HBE {
 
 		void setResolution(uint32_t width, uint32_t height) override;
 
-		void getResolution(uint32_t &width, uint32_t &height) const override;
+		vec2i getResolution() const override;
 
 		const VK_Image *getImage(uint32_t i) const;
 

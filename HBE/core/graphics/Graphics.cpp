@@ -102,12 +102,12 @@ void main()
 		renderer->createDefaultResources();
 	}
 
-	void Graphics::draw(mat4 transform_matrix, const Mesh &mesh, GraphicPipeline &pipeline) {
-		renderer->draw(transform_matrix, mesh, pipeline);
+	void Graphics::draw(mat4 transform_matrix, const Mesh &mesh, Material &material) {
+		renderer->draw(transform_matrix, mesh, material);
 	}
 
-	void Graphics::drawInstanced(const Mesh &mesh, GraphicPipeline &pipeline) {
-		renderer->drawInstanced(mesh, pipeline);
+	void Graphics::drawInstanced(const Mesh &mesh, Material &material) {
+		renderer->drawInstanced(mesh, material);
 	}
 
 	void Graphics::render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix) {
@@ -123,7 +123,7 @@ void main()
 		delete window;
 	}
 
-	 RenderTarget *Graphics::getDefaultRenderTarget() {
+	RenderTarget *Graphics::getDefaultRenderTarget() {
 		return renderer->getDefaultRenderTarget();
 	}
 

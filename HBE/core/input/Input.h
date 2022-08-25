@@ -152,17 +152,17 @@ namespace HBE {
 	public:
 		static void init();
 
-		static void getMousePosition(double &x, double &y);
+		static vec2 getMousePosition();
 
 		static void pollEvents();
 
 		static bool getKey(KEY code);
 		static bool getKeyDown(KEY code);
-		static void getMouseWheelInput(float &value);
+		static float getMouseWheelInput();
 
 		static void setCursorVisible(bool visible);
 
-		static void setCursorPosition(double x, double y);
+		static void setCursorPosition(float x, float y);
 		static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
 		static void mouseButtonCallback(GLFWwindow *window, int key, int action, int mods);
 		static bool getKeyUp(KEY code);

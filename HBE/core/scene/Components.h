@@ -3,13 +3,19 @@
 
 #include "Core.h"
 #include "HBETypes.h"
-#include "core/resource/Mesh.h"
-#include "core/resource/GraphicPipeline.h"
-#include "core/resource/RenderTarget.h"
 #include <glm/detail/type_quat.hpp>
-#include <core/resource/Model.h>
+#include "string"
 
 namespace HBE {
+	class GraphicPipeline;
+
+	class Mesh;
+
+	class Material;
+
+	class RenderTarget;
+
+	class Model;
 
 	struct HB_API Identity {
 		std::string name = "Default";
@@ -85,18 +91,12 @@ namespace HBE {
 
 	struct HB_API MeshRenderer {
 		Mesh *mesh = nullptr;
-		GraphicPipeline *pipeline = nullptr;
+		Material *material = nullptr;
 		bool active = true;
 	};
 
 	struct HB_API ModelRenderer {
 		Model *model = nullptr;
-		bool active = true;
-	};
-
-	struct HB_API InstancedRenderer {
-		Mesh *mesh = nullptr;
-		GraphicPipeline *pipeline = nullptr;
 		bool active = true;
 	};
 

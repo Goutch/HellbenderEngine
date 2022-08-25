@@ -1,16 +1,18 @@
 
 #include "Shader.h"
 #include "core/resource/ResourceFactory.h"
+#include "core/utility/Log.h"
 #include "fstream"
+
 namespace HBE {
 
-	void Shader::getSource(const std::string &path, std::string& buffer) {
+	void Shader::getSource(const std::string &path, std::string &buffer) {
 		try {
 			std::string res_path = RESOURCE_PATH + path;
 			std::ifstream file;
-			file.open(res_path,std::ios::ate);
+			file.open(res_path, std::ios::ate);
 			if (file.is_open()) {
-				size_t size=(size_t) file.tellg();
+				size_t size = (size_t) file.tellg();
 				buffer.resize(size);
 				file.seekg(0);
 				file.read(buffer.data(), size);

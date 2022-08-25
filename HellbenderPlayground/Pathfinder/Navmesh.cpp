@@ -20,7 +20,7 @@ void Navmesh::draw() {
 	}
 
 	if (mesh->getVertexCount() > 0) {
-		Graphics::drawInstanced(*mesh, *pipeline);
+		Graphics::drawInstanced(*mesh, *material);
 	}
 }
 
@@ -69,8 +69,13 @@ Navmesh::Navmesh(const bool *map, uint32_t size_x, uint32_t size_y, f32 cell_siz
 	graphic_pipeline_info.vertex_shader = vertex_shader;
 	graphic_pipeline_info.fragement_shader = fragment_shader;
 	pipeline = Resources::createGraphicPipeline(graphic_pipeline_info);
+
+	MaterialInfo material_info{};
+	material_info.graphic_pipeline = pipeline;
+	material = Resources::createMaterial(material_info);
+
 	vec4 color = vec4(0, 1, 0, 1);
-	pipeline->setUniform("material", &color);
+	material->setUniform("material", &color);
 	delete vertex_shader;
 	delete fragment_shader;
 }
@@ -339,6 +344,7 @@ void Navmesh::createOutline() {
 
 Navmesh::~Navmesh() {
 	delete mesh;
+	delete material;
 	delete pipeline;
 }
 

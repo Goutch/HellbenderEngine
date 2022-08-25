@@ -30,6 +30,11 @@ public:
 
 		auto pipeline = Resources::createGraphicPipeline(pipeline_info, "pipeline");
 
+		MaterialInfo material_info{};
+		material_info.graphic_pipeline = pipeline;
+		auto material = Resources::createMaterial(material_info, "material");
+
+
 		MeshInfo mesh_info{};
 		mesh_info.binding_infos = binding_infos.data();
 		mesh_info.binding_info_count = binding_infos.size();
@@ -40,7 +45,7 @@ public:
 
 		vec3 positions[3] = {vec3(-1, -0.5, 0), vec3(0, 1, 0), vec3(1, -0.5, 0)};
 		vec4 colors[3] = {vec4(1, 0, 0, 1), vec4(0, 1, 0, 1), vec4(0, 0, 1, 1)};
-		mesh->setBuffer(0, positions, 3 );
+		mesh->setBuffer(0, positions, 3);
 		mesh->setBuffer(1, colors, 3 * sizeof(vec4));
 
 		//-------------------SCENE CREATION--------------------------------------
@@ -57,11 +62,11 @@ public:
 		MeshRenderer &renderer = cube_entity.attach<MeshRenderer>();
 		cube_entity.get<Transform>().translate(vec3(0, 0, -5));
 		renderer.mesh = mesh;
-		renderer.pipeline = pipeline;
+		renderer.material = material;
 		auto cube_entity2 = scene->createEntity("Cube2");
 		MeshRenderer &renderer2 = cube_entity2.attach<MeshRenderer>();
 		cube_entity2.get<Transform>().translate(vec3(0, 0, 5));
 		renderer2.mesh = mesh;
-		renderer2.pipeline = pipeline;
+		renderer2.material = material;
 	}
 };

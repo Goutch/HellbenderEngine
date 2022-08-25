@@ -4,7 +4,7 @@
 #include "VK_Renderer.h"
 #include "VK_CommandPool.h"
 #include "VK_Fence.h"
-
+#include "core/utility/Log.h"
 namespace HBE {
 
 	VkFormat getVkFormat(IMAGE_FORMAT format) {
@@ -287,9 +287,8 @@ namespace HBE {
 		onResolutionChange.invoke(this);
 	}
 
-	void VK_RenderPass::getResolution(uint32_t &width, uint32_t &height) const {
-		width = this->width;
-		height = this->height;
+	vec2i VK_RenderPass::getResolution() const {
+		return vec2i(width, height);
 	}
 
 	const VK_Image *VK_RenderPass::getImage(uint32_t i) const {

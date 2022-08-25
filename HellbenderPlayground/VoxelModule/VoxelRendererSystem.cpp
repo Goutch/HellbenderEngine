@@ -19,6 +19,11 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 	compute_pipeline_info.flags = COMPUTE_PIPELINE_FLAG_NONE;
 	compute_pipeline = Resources::createComputePipeline(compute_pipeline_info, "MipMapperPipeline");
 
+	ComputeInstanceInfo compute_instance_info{};
+	compute_instance_info.compute_pipeline = compute_pipeline;
+	compute_instance_info.flags = COMPUTE_INSTANCE_FLAG_NONE;
+	compute_instance = Resources::createComputeInstance(compute_instance_info, "MipMapperInstance");
+
 	VertexBindingInfo binding_infos[2];
 	binding_infos[0].flags = VERTEX_BINDING_FLAG_NONE;
 	binding_infos[0].binding = 0;
@@ -49,6 +54,11 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 	pipeline_info.flags = GRAPHIC_PIPELINE_FLAG_CULL_FRONT;
 	pipeline = Resources::createGraphicPipeline(pipeline_info);
 
+	MaterialInfo material_info{};
+	material_info.graphic_pipeline = pipeline;
+	material_info.flags = MATERIAL_FLAG_NONE;
+	material = Resources::createMaterial(material_info);
+
 	Geometry::createCube(*mesh, 1, 1, 1, 0);
 
 	int32_t range = 10; //10*10*10 = 1000 cubes
@@ -67,7 +77,7 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 
 	TextureInfo texture_info{};
 	texture_info.width = 64;
-	texture_info.height =64;
+	texture_info.height = 64;
 	texture_info.depth = 64;
 	//texture_info.flags = IMAGE_FLAG_NO_SAMPLER;
 	texture_info.flags = IMAGE_FLAG_SHADER_WRITE | IMAGE_FLAG_FILTER_NEAREST;
@@ -80,7 +90,7 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 		for (int y = 0; y < raw_voxels->getHeight(); ++y) {
 			for (int z = 0; z < raw_voxels->getDepth(); ++z) {
 
-				float distance = glm::distance(vec3(x+0.5, y+0.5, z+0.5) - (resoluton / 2.0f), vec3(0, 0, 0));
+				float distance = glm::distance(vec3(x + 0.5, y + 0.5, z + 0.5) - (resoluton / 2.0f), vec3(0, 0, 0));
 				if (distance <= (resoluton.x / 2.0f))
 					//if (z == 7 && y ==7)
 					data.emplace_back(1);
@@ -90,25 +100,25 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 		}
 	}
 	raw_voxels->update(data.data());
-	compute_pipeline->setTexture("inTexture", raw_voxels, 0);
-	compute_pipeline->setTexture("outTexture", raw_voxels, 1);
-	compute_pipeline->dispatch(raw_voxels->getWidth() / 2, raw_voxels->getHeight() / 2, raw_voxels->getWidth() / 2);
-	compute_pipeline->wait();
-	compute_pipeline->setTexture("inTexture", raw_voxels, 1);
-	compute_pipeline->setTexture("outTexture", raw_voxels, 2);
-	compute_pipeline->dispatch(raw_voxels->getWidth() / 4, raw_voxels->getHeight() / 4, raw_voxels->getWidth() / 4);
-	compute_pipeline->wait();
-	compute_pipeline->setTexture("inTexture", raw_voxels, 2);
-	compute_pipeline->setTexture("outTexture", raw_voxels, 3);
-	compute_pipeline->dispatch(raw_voxels->getWidth() / 8, raw_voxels->getHeight() / 8, raw_voxels->getWidth() / 8);
-	compute_pipeline->wait();
+	compute_instance->setTexture("inTexture", raw_voxels, 0);
+	compute_instance->setTexture("outTexture", raw_voxels, 1);
+	compute_instance->dispatch(raw_voxels->getWidth() / 2, raw_voxels->getHeight() / 2, raw_voxels->getWidth() / 2);
+	compute_instance->wait();
+	compute_instance->setTexture("inTexture", raw_voxels, 1);
+	compute_instance->setTexture("outTexture", raw_voxels, 2);
+	compute_instance->dispatch(raw_voxels->getWidth() / 4, raw_voxels->getHeight() / 4, raw_voxels->getWidth() / 4);
+	compute_instance->wait();
+	compute_instance->setTexture("inTexture", raw_voxels, 2);
+	compute_instance->setTexture("outTexture", raw_voxels, 3);
+	compute_instance->dispatch(raw_voxels->getWidth() / 8, raw_voxels->getHeight() / 8, raw_voxels->getWidth() / 8);
+	compute_instance->wait();
 	VoxelChunkInfo voxel_info = {
 			uvec3(raw_voxels->getWidth(),
 				  raw_voxels->getHeight(),
 				  raw_voxels->getDepth()),
 			vec3(2.0f)};
-	pipeline->setUniform("VoxelData", static_cast<void *>(&voxel_info));
-	pipeline->setTexture("voxels", raw_voxels);
+	material->setUniform("VoxelData", static_cast<void *>(&voxel_info));
+	material->setTexture("voxels", raw_voxels);
 	//pipeline->setTexture("voxels0", raw_voxels, 0);
 	//pipeline->setTexture("voxels1", raw_voxels, 1);
 	//pipeline->setTexture("voxels2", raw_voxels, 2);
@@ -118,7 +128,7 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 void VoxelRendererSystem::draw() {
 	Profiler::begin("CubeRendererUpdate");
 
-	Graphics::drawInstanced(*mesh, *pipeline);
+	Graphics::drawInstanced(*mesh, *material);
 
 	Profiler::end();
 }
@@ -128,6 +138,7 @@ VoxelRendererSystem::~VoxelRendererSystem() {
 	delete mesh;
 	delete vertex_shader;
 	delete fragment_shader;
+	delete material;
 	delete pipeline;
 	scene->onDraw.unsubscribe(this);
 }

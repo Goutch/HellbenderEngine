@@ -233,53 +233,30 @@ namespace HBE {
 	}
 
 	void VK_GraphicPipeline::bind() const {
+		if(is_bound) return;
 		vkCmdBindPipeline(renderer->getCommandPool()->getCurrentBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, handle);
-		layout->bindDescriptors(renderer->getCommandPool()->getCurrentBuffer(), renderer->getCurrentFrame());
-
+		is_bound = true;
 	}
 
 	void VK_GraphicPipeline::unbind() const {
 		vkCmdBindPipeline(renderer->getCommandPool()->getCurrentBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, handle);
+		is_bound = false;
 	}
 
-	void VK_GraphicPipeline::setDynamicUniform(const std::string &name, const void *data) {
-		//todo
-	}
-
-	void VK_GraphicPipeline::setDynamicUniform(uint32_t binding, const void *data) {
-		//todo
-	}
-
-	void VK_GraphicPipeline::setUniform(const std::string &name, const void *data) {
-		layout->setUniform(name, data);
-	}
-
-	void VK_GraphicPipeline::setUniform(uint32_t binding, const void *data) {
-		layout->setUniform(binding, data);
-	}
-
-	void VK_GraphicPipeline::pushConstant(const std::string &name, const void *data) {
+	void VK_GraphicPipeline::pushConstant(const std::string &name, const void *data) const {
 		layout->pushConstant(renderer->getCommandPool()->getCurrentBuffer(), name, data);
-	}
-
-	void VK_GraphicPipeline::setTexture(uint32_t binding, const Texture *texture, uint32_t mip_level) {
-		layout->setTexture(binding, texture, mip_level);
-	}
-
-	void VK_GraphicPipeline::setTexture(const std::string &name, const Texture *texture, uint32_t mip_level) {
-		layout->setTexture(name, texture, mip_level);
-	}
-
-	void VK_GraphicPipeline::setTexture(uint32_t binding, const RenderTarget *render_target) {
-		layout->setTexture(binding, render_target);
-	}
-
-	void VK_GraphicPipeline::setTexture(const std::string &name, const RenderTarget *render_target) {
-		layout->setTexture(name, render_target);
 	}
 
 	void VK_GraphicPipeline::createPipelineLayout() {
 		layout = new VK_PipelineLayout(device, shaders.data(), shaders.size());
+	}
+
+	bool VK_GraphicPipeline::bound() {
+		return is_bound;
+	}
+
+	const VK_PipelineLayout *VK_GraphicPipeline::getPipelineLayout() const{
+		return layout;
 	}
 
 

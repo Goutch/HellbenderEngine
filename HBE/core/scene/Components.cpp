@@ -2,6 +2,10 @@
 #include "Components.h"
 #include "glm/gtc/quaternion.hpp"
 
+#include <core/resource/Model.h>
+#include <core/resource/Mesh.h>
+#include <core/resource/Material.h>
+#include <core/resource/RenderTarget.h>
 namespace HBE {
     void Transform::translate(vec3 translation) {
         local = glm::translate(local, translation);
@@ -138,9 +142,9 @@ namespace HBE {
     }
 
     float Camera::aspectRatio() {
-        uint32_t w, h;
-        render_target->getResolution(w, h);
-        return static_cast<float>(w) / static_cast<float>(h);
+
+       	vec2i res=render_target->getResolution();
+        return static_cast<float>(res.x) / static_cast<float>(res.y);
     }
 
 
@@ -209,8 +213,7 @@ namespace HBE {
     }
 
     float Camera2D::aspectRatio() {
-        uint32_t w, h;
-        render_target->getResolution(w, h);
-        return static_cast<float>(w) / static_cast<float>(h);
+        vec2i res = render_target->getResolution();
+        return static_cast<float>(res.x) / static_cast<float>(res.y);
     }
 }

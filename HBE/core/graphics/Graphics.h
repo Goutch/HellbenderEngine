@@ -19,6 +19,8 @@ namespace HBE {
 
 	class Window;
 
+	class Material;
+
 	template<typename... Args>
 	class Event;
 
@@ -33,10 +35,9 @@ namespace HBE {
 
 		static Window *getWindow();
 
-		static void
-		draw(mat4 transform_matrix, const Mesh &mesh, GraphicPipeline &material);
+		static void draw(mat4 transform_matrix, const Mesh &mesh, Material &material);
 
-		static void drawInstanced(const Mesh &mesh, GraphicPipeline &pipeline);
+		static void drawInstanced(const Mesh &mesh, Material &material);
 
 		static void render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix);
 
