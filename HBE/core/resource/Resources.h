@@ -14,6 +14,7 @@
 #include "core/resource/RenderTarget.h"
 #include "core/resource/Material.h"
 #include "core/resource/ComputeInstance.h"
+#include "core/resource/raytracing/AccelerationStructure.h"
 
 namespace HBE {
 	class HB_API Resources {
@@ -162,6 +163,37 @@ namespace HBE {
 		static ComputeInstance *createComputeInstance(const ComputeInstanceInfo &info) {
 			return factory->createComputeInstance(info);
 		}
+
+		static RootAccelerationStructure *createRootAccelerationStructure(const RootAccelerationStructureInfo &info, const std::string &name) {
+			RootAccelerationStructure *r = factory->createRootAccelerationStructure(info);
+			add(name, r);
+			return r;
+		}
+
+		static RootAccelerationStructure *createRootAccelerationStructure(const RootAccelerationStructureInfo &info) {
+			return factory->createRootAccelerationStructure(info);
+		}
+
+		static AABBAccelerationStructure *createAABBAccelerationStructure(const AABBAccelerationStructureInfo &info, const std::string &name) {
+			AABBAccelerationStructure *a = factory->createAABBAccelerationStructure(info);
+			add(name, a);
+			return a;
+		}
+
+		static AABBAccelerationStructure *createAABBAccelerationStructure(const AABBAccelerationStructureInfo &info) {
+			return factory->createAABBAccelerationStructure(info);
+		}
+
+		static MeshAccelerationStructure *createMeshAccelerationStructure(const MeshAccelerationStructureInfo &info, const std::string &name) {
+			MeshAccelerationStructure *m = factory->createMeshAccelerationStructure(info);
+			add(name, m);
+			return m;
+		}
+
+		static MeshAccelerationStructure *createMeshAccelerationStructure(const MeshAccelerationStructureInfo &info) {
+			return factory->createMeshAccelerationStructure(info);
+		}
+
 	};
 
 

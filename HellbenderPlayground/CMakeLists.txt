@@ -22,8 +22,10 @@ set(VOXEL_MODULE_FILES
 
 
 set(EXEMPLES_FILES
-        Raytracing/RaytracingExemple.cpp
-        Raytracing/RaytracingExemple.h VoxelModule/VoxTree.h Examples/LoadModel.h Examples/MeshRendering.h)
+        VoxelModule/VoxTree.h
+        Examples/LoadModel.h
+        Examples/MeshRendering.h
+        Examples/Raytracing.h)
 
 add_executable(${PROJECT_NAME}
         main.cpp

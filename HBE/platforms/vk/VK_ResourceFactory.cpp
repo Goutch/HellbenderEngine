@@ -10,6 +10,9 @@
 #include "VK_ComputePipeline.h"
 #include "VK_Material.h"
 #include "VK_ComputeInstance.h"
+#include "raytracing/VK_TopLevelAccelerationStructure.h"
+#include "raytracing/VK_AABBBottomLevelAccelerationStructure.h"
+#include "raytracing/VK_MeshBottomLevelAccelerationStructure.h"
 
 namespace HBE {
 	VK_ResourceFactory::VK_ResourceFactory(VK_Renderer *renderer) {
@@ -48,6 +51,17 @@ namespace HBE {
 		return new VK_ComputeInstance(renderer, info);
 	}
 
+	RootAccelerationStructure *VK_ResourceFactory::createRootAccelerationStructure(const RootAccelerationStructureInfo &info) const {
+		return new VK_TopLevelAccelerationStructure(renderer->getDevice(), info);
+	}
+
+	AABBAccelerationStructure *VK_ResourceFactory::createAABBAccelerationStructure(const AABBAccelerationStructureInfo &info) const {
+		return new VK_AABBBottomLevelAccelerationStructure(renderer->getDevice(), info);
+	}
+
+	MeshAccelerationStructure *VK_ResourceFactory::createMeshAccelerationStructure(const MeshAccelerationStructureInfo &info) const {
+		return new VK_MeshBottomLevelAccelerationStructure(renderer->getDevice(), info);
+	}
 
 }
 

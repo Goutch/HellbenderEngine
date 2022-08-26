@@ -36,7 +36,7 @@ public:
 		pipeline_info.binding_info_count = binding_infos.size();
 		pipeline_info.fragement_shader = frag;
 		pipeline_info.vertex_shader = vert;
-		pipeline_info.flags = GRAPHIC_PIPELINE_FLAG_NONE;
+		pipeline_info.flags = GRAPHIC_PIPELINE_FLAG_CULL_BACK;
 
 		auto model_pipeline = Resources::createGraphicPipeline(pipeline_info, "DEFAULT_MODEL_PIPELINE");
 
@@ -88,8 +88,9 @@ public:
 		MeshRenderer &ground_renderer = ground_entity.attach<MeshRenderer>();
 		ground_renderer.mesh = ground_mesh;
 		ground_renderer.material = ground_material;
-		ground_entity.get<Transform>().rotate(vec3(M_PI / 2, 0, 0));
-		ground_entity.get<Transform>().translate(vec3(0, 0.5, 0));
+		ground_entity.get<Transform>().translate(vec3(0, -0.7, 0));
+		ground_entity.get<Transform>().rotate(vec3(-M_PI / 2, 0, 0));
+
 
 		auto teapot = scene->createEntity("teapot");
 		ModelRenderer &teapot_renderer = teapot.attach<ModelRenderer>();

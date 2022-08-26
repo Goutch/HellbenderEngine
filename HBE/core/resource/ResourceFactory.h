@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include "Core.h"
 #include "GLSL_TYPE.h"
 
@@ -37,6 +38,18 @@ namespace HBE {
 
 	struct ComputeInstanceInfo;
 
+	struct RootAccelerationStructureInfo;
+
+	class RootAccelerationStructure;
+
+	struct AABBAccelerationStructureInfo;
+
+	class AABBAccelerationStructure;
+
+	struct MeshAccelerationStructureInfo;;
+
+	class MeshAccelerationStructure;
+
 	class HB_API ResourceFactory {
 	public:
 		virtual ~ResourceFactory() = default;
@@ -56,5 +69,11 @@ namespace HBE {
 		virtual Material *createMaterial(const MaterialInfo &info) const = 0;
 
 		virtual ComputeInstance *createComputeInstance(const ComputeInstanceInfo &info) const = 0;
+
+		virtual RootAccelerationStructure *createRootAccelerationStructure(const RootAccelerationStructureInfo &info) const = 0;
+
+		virtual AABBAccelerationStructure *createAABBAccelerationStructure(const AABBAccelerationStructureInfo &info) const = 0;
+
+		virtual MeshAccelerationStructure *createMeshAccelerationStructure(const MeshAccelerationStructureInfo &info) const = 0;
 	};
 }

@@ -13,11 +13,16 @@ namespace HBE {
 		this->renderer = renderer;
 		this->device = renderer->getDevice();
 		this->command_pool = command_pool;
+		if ((info.flags & MESH_FLAG_USED_IN_RAYTRACING) != 0) {
+
+			this->extra_usages |= VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
+			this->extra_usages |= VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR;
+		}
 
 		for (size_t i = 0; i < info.binding_info_count; ++i) {
-			buffers.emplace(info.binding_infos[i].binding, std::vector<VK_Buffer *>(
-					(info.binding_infos[i].flags & VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS) == VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS ?
-					MAX_FRAMES_IN_FLIGHT : 1, nullptr));
+			size_t number_of_buffers = (info.binding_infos[i].flags & VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS) != 0 ?
+									   MAX_FRAMES_IN_FLIGHT : 1;
+			buffers.emplace(info.binding_infos[i].binding, std::vector<VK_Buffer *>(number_of_buffers, nullptr));
 			bindings.emplace(info.binding_infos[i].binding, info.binding_infos[i]);
 		}
 	}
@@ -44,7 +49,7 @@ namespace HBE {
 			buffers[binding][renderer->getCurrentFrame()] = new VK_Buffer(device,
 																		  vertices,
 																		  buffer_size,
-																		  VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+																		  VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
 																		  ((binding_info.flags & VERTEX_BINDING_FLAG_FAST_WRITE) == VERTEX_BINDING_FLAG_FAST_WRITE) ?
 																		  ALLOC_FLAG_MAPPABLE :
 																		  ALLOC_FLAG_NONE);
@@ -57,7 +62,7 @@ namespace HBE {
 			buffers[binding][0] = new VK_Buffer(device,
 												vertices,
 												buffer_size,
-												VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+												VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
 												((binding_info.flags & VERTEX_BINDING_FLAG_FAST_WRITE) == VERTEX_BINDING_FLAG_FAST_WRITE) ?
 												ALLOC_FLAG_MAPPABLE :
 												ALLOC_FLAG_NONE);
@@ -77,7 +82,7 @@ namespace HBE {
 			buffers[binding][renderer->getCurrentFrame()] = new VK_Buffer(device,
 																		  data,
 																		  buffer_size,
-																		  VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+																		  VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
 																		  ((binding_info.flags & VERTEX_BINDING_FLAG_FAST_WRITE) == VERTEX_BINDING_FLAG_FAST_WRITE) ?
 																		  ALLOC_FLAG_MAPPABLE :
 																		  ALLOC_FLAG_NONE);
@@ -91,7 +96,7 @@ namespace HBE {
 			buffers[binding][0] = new VK_Buffer(device,
 												data,
 												buffer_size,
-												VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+												VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
 												((binding_info.flags & VERTEX_BINDING_FLAG_FAST_WRITE) == VERTEX_BINDING_FLAG_FAST_WRITE) ?
 												ALLOC_FLAG_MAPPABLE :
 												ALLOC_FLAG_NONE);
@@ -122,7 +127,7 @@ namespace HBE {
 		indices_buffer = new VK_Buffer(device,
 									   reinterpret_cast<const void *>(data),
 									   buffer_size,
-									   VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+									   VK_BUFFER_USAGE_INDEX_BUFFER_BIT | extra_usages,
 									   ALLOC_FLAGS::ALLOC_FLAG_NONE);
 		index_count = count;
 	}
@@ -171,6 +176,14 @@ namespace HBE {
 
 	void VK_Mesh::unbind() const {
 
+	}
+
+	const VK_Buffer *VK_Mesh::getBuffer(uint32_t binding, uint32_t frame) const {
+		return buffers.at(binding).at(frame);
+	}
+
+	const VK_Buffer *VK_Mesh::getIndicesBuffer() const {
+		return indices_buffer;
 	}
 
 

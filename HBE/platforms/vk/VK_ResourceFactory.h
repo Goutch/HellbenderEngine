@@ -20,6 +20,9 @@ namespace HBE {
 		RenderTarget *createRenderTarget(const RenderTargetInfo &info) const override;
 		Material *createMaterial(const MaterialInfo &info) const override;
 		ComputeInstance *createComputeInstance(const ComputeInstanceInfo &info) const override;
+		RootAccelerationStructure *createRootAccelerationStructure(const RootAccelerationStructureInfo &info) const override;
+		AABBAccelerationStructure *createAABBAccelerationStructure(const AABBAccelerationStructureInfo &info) const override;
+		MeshAccelerationStructure *createMeshAccelerationStructure(const MeshAccelerationStructureInfo &info) const override;
 	};
 }
 

@@ -17,4 +17,13 @@ namespace HBE {
 	bool Mesh::hasIndexBuffer() const {
 		return indices_type != INDICES_TYPE_NONE;
 	}
+
+	size_t Mesh::getIndicesSize() const {
+		return indices_type == INDICES_TYPE_UINT32 ? sizeof(uint32_t) : sizeof(uint16_t);
+	}
+
+	size_t Mesh::getBindingSize(uint32_t binding) const {
+		return bindings.at(binding).size;
+	}
+
 }

@@ -1,9 +1,10 @@
 #include "HBE.h"
 #include "VoxelModule/VoxelModule.h"
 #include "Pathfinder/Pathfinder.h"
-#include "Raytracing/RaytracingExemple.h"
 #include "Examples/LoadModel.h"
 #include "Examples/MeshRendering.h"
+#include "Examples/Raytracing.h"
+
 using namespace HBE;
 bool fullscreen = false;
 
@@ -41,9 +42,10 @@ int main() {
 		//RaytracingExemple raytracer;
 		//Pathfinder pathfinder;
 		//MeshRendering::init();
-		LoadModelExemple::init();
+		//LoadModelExemple::init();
 		//Instancing::init();
 		//VoxelModule::init();
+		Raytracing::init();
 		//-----------------------EVENTS------------------
 		Application::onUpdate.subscribe(&onAppUpdate);
 		//-----------------------LOOP--------------------

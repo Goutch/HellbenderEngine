@@ -8,9 +8,9 @@ add_compile_definitions(HB_BUILD)
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --std=c++17 -O3 -fPIC")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3 -fPIC")
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     set(MSVC_COMPILE_FLAGS "/MP")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_COMPILE_FLAGS}" )
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_COMPILE_FLAGS}")
 endif ()
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
@@ -70,7 +70,19 @@ if (VULKAN_FOUND)
             platforms/vk/VK_ComputePipeline.cpp
             platforms/vk/VK_ComputePipeline.h
             platforms/vk/VK_PipelineLayout.cpp
-            platforms/vk/VK_PipelineLayout.h)
+            platforms/vk/VK_PipelineLayout.h
+            platforms/vk/VK_PipelineDescriptors.cpp
+            platforms/vk/VK_PipelineDescriptors.h
+            platforms/vk/VK_Material.cpp
+            platforms/vk/VK_Material.h
+            platforms/vk/VK_ComputeInstance.cpp
+            platforms/vk/VK_ComputeInstance.h
+            platforms/vk/raytracing/VK_TopLevelAccelerationStructure.cpp
+            platforms/vk/raytracing/VK_TopLevelAccelerationStructure.h
+            platforms/vk/raytracing/VK_MeshBottomLevelAccelerationStructure.cpp
+            platforms/vk/raytracing/VK_MeshBottomLevelAccelerationStructure.h
+            platforms/vk/raytracing/VK_AABBBottomLevelAccelerationStructure.cpp
+            platforms/vk/raytracing/VK_MeshBottomLevelAccelerationStructure.cpp)
 
     add_compile_definitions(VULKAN_RENDERER)
 
@@ -132,6 +144,9 @@ set(CORE_FILES
         core/resource/Resources.h
         core/resource/Resources.cpp
         core/resource/Texture.cpp
+        core/resource/Material.h
+        core/resource/ComputeInstance.h
+        core/resource/IPipelineInstance.h
 
         core/graphics/Window.h
         core/graphics/Renderer.h
@@ -157,6 +172,8 @@ set(CORE_FILES
         core/scene/systems/CameraControllerSystem.h
         core/scene/systems/RotatorSystem.cpp
         core/scene/systems/RotatorSystem.h
+        core/scene/systems/ModelRendererSystem.cpp
+        core/scene/systems/ModelRendererSystem.h
 
         core/utility/Log.cpp
         core/utility/Geometry.cpp
@@ -170,7 +187,8 @@ set(CORE_FILES
 
         core/threading/JobManager.cpp
         core/threading/JobManager.h
-        platforms/vk/VK_BottomLevelAccelerationStructure.cpp platforms/vk/VK_BottomLevelAccelerationStructure.h core/scene/systems/ModelRendererSystem.cpp core/scene/systems/ModelRendererSystem.h core/resource/Material.h platforms/vk/VK_PipelineDescriptors.cpp platforms/vk/VK_PipelineDescriptors.h platforms/vk/VK_Material.cpp platforms/vk/VK_Material.h platforms/vk/VK_ComputeInstance.cpp platforms/vk/VK_ComputeInstance.h core/resource/ComputeInstance.h core/resource/IPipelineInstance.h)
+
+)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

@@ -5,13 +5,14 @@
 #include "glm/glm.hpp"
 #include "Resource.h"
 #include "unordered_map"
+
 namespace HBE {
 
 	typedef uint32_t MESH_FLAGS;
 	enum MESH_FLAG {
 		MESH_FLAG_NONE = 0,
+		MESH_FLAG_USED_IN_RAYTRACING = 1 << 0,
 	};
-
 
 	struct MeshInfo {
 		const VertexBindingInfo *binding_infos = nullptr;
@@ -38,6 +39,8 @@ namespace HBE {
 		uint32_t getVertexCount() const;
 		uint32_t getIndexCount() const;
 		uint32_t getInstanceCount() const;
+		size_t getIndicesSize() const;
+		size_t getBindingSize(uint32_t binding) const;
 		bool hasIndexBuffer() const;
 		virtual void setVertexIndices(const uint32_t *vertices, size_t count) = 0;
 		virtual void setVertexIndices(const uint16_t *vertices, size_t count) = 0;
