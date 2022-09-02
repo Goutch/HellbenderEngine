@@ -18,17 +18,8 @@ namespace HBE {
 		VK_Mesh *mesh = dynamic_cast<VK_Mesh *>(info.mesh);
 		VkDeviceSize vertex_size = mesh->getBindingSize(0);
 
-		VkBufferDeviceAddressInfo buffer_address_info{};
-		buffer_address_info.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
-
-		buffer_address_info.buffer = mesh->getBuffer(0)->getHandle();
-		vertexBufferDeviceAddress.deviceAddress = vkGetBufferDeviceAddress(device->getHandle(), &buffer_address_info);
-
-		buffer_address_info.buffer = mesh->getIndicesBuffer()->getHandle();
-		indexBufferDeviceAddress.deviceAddress = vkGetBufferDeviceAddress(device->getHandle(), &buffer_address_info);
-
-		buffer_address_info.buffer = mesh->getBuffer(1)->getHandle();
-		transformBufferDeviceAddress.deviceAddress = vkGetBufferDeviceAddress(device->getHandle(), &buffer_address_info);
+		//buffer_address_info.buffer = mesh->getBuffer(1)->getHandle();
+		//transformBufferDeviceAddress.deviceAddress = vkGetBufferDeviceAddress(device->getHandle(), &buffer_address_info);
 
 		VkAccelerationStructureGeometryKHR accelerationStructureGeometry{};
 		accelerationStructureGeometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
@@ -37,14 +28,14 @@ namespace HBE {
 		accelerationStructureGeometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
 		accelerationStructureGeometry.geometry.triangles.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
 		accelerationStructureGeometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
-		accelerationStructureGeometry.geometry.triangles.vertexData = vertexBufferDeviceAddress;
+		accelerationStructureGeometry.geometry.triangles.vertexData = mesh->getBuffer(0)->getDeviceAddress();
 		accelerationStructureGeometry.geometry.triangles.maxVertex = mesh->getVertexCount();
 		accelerationStructureGeometry.geometry.triangles.vertexStride = vertex_size;
 		accelerationStructureGeometry.geometry.triangles.indexType = mesh->getIndicesSize() == sizeof(uint32_t) ? VK_INDEX_TYPE_UINT32 : VK_INDEX_TYPE_UINT16;
-		accelerationStructureGeometry.geometry.triangles.indexData = indexBufferDeviceAddress;
+		accelerationStructureGeometry.geometry.triangles.indexData = mesh->getIndicesBuffer()->getDeviceAddress();
 		accelerationStructureGeometry.geometry.triangles.transformData.deviceAddress = 0;
 		accelerationStructureGeometry.geometry.triangles.transformData.hostAddress = nullptr;
-		accelerationStructureGeometry.geometry.triangles.transformData = transformBufferDeviceAddress;
+		//accelerationStructureGeometry.geometry.triangles.transformData = transformBufferDeviceAddress;
 
 
 		// Get size info
@@ -85,9 +76,6 @@ namespace HBE {
 											VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
 											ALLOC_FLAG_NONE);
 
-		buffer_address_info.buffer = scratchBuffer.getHandle();
-		VkDeviceOrHostAddressConstKHR scratch_buffer_address{};
-		scratch_buffer_address.deviceAddress = device->vkGetBufferDeviceAddressKHR(device->getHandle(), &buffer_address_info);
 
 		VkAccelerationStructureBuildGeometryInfoKHR accelerationBuildGeometryInfo{};
 		accelerationBuildGeometryInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
@@ -97,7 +85,7 @@ namespace HBE {
 		accelerationBuildGeometryInfo.dstAccelerationStructure = handle;
 		accelerationBuildGeometryInfo.geometryCount = 1;
 		accelerationBuildGeometryInfo.pGeometries = &accelerationStructureGeometry;
-		accelerationBuildGeometryInfo.scratchData.deviceAddress = scratch_buffer_address.deviceAddress;
+		accelerationBuildGeometryInfo.scratchData.deviceAddress = scratchBuffer.getDeviceAddress().deviceAddress;
 
 		VkAccelerationStructureBuildRangeInfoKHR accelerationStructureBuildRangeInfo{};
 		accelerationStructureBuildRangeInfo.primitiveCount = numTriangles;
@@ -121,12 +109,15 @@ namespace HBE {
 		accelerationDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
 		accelerationDeviceAddressInfo.accelerationStructure = handle;
 
-		VkDeviceOrHostAddressConstKHR address{};
 		address.deviceAddress = device->vkGetAccelerationStructureDeviceAddressKHR(device->getHandle(), &accelerationDeviceAddressInfo);
 	}
 
 	VK_MeshBottomLevelAccelerationStructure::~VK_MeshBottomLevelAccelerationStructure() {
 		delete buffer;
 		device->vkDestroyAccelerationStructureKHR(device->getHandle(), handle, nullptr);
+	}
+
+	VkDeviceOrHostAddressConstKHR VK_MeshBottomLevelAccelerationStructure::getDeviceAddress() const {
+		return address;
 	}
 }

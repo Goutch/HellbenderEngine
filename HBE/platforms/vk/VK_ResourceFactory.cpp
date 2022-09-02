@@ -63,5 +63,9 @@ namespace HBE {
 		return new VK_MeshBottomLevelAccelerationStructure(renderer->getDevice(), info);
 	}
 
+	RaytracingPipeline *VK_ResourceFactory::createRaytracingPipeline(const RaytracingPipelineInfo &info) const {
+		return new VK_RaytracingPipeline(renderer, info);
+	}
+
 }
 

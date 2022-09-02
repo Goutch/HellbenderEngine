@@ -82,7 +82,7 @@ if (VULKAN_FOUND)
             platforms/vk/raytracing/VK_MeshBottomLevelAccelerationStructure.cpp
             platforms/vk/raytracing/VK_MeshBottomLevelAccelerationStructure.h
             platforms/vk/raytracing/VK_AABBBottomLevelAccelerationStructure.cpp
-            platforms/vk/raytracing/VK_MeshBottomLevelAccelerationStructure.cpp)
+            platforms/vk/raytracing/VK_MeshBottomLevelAccelerationStructure.cpp platforms/vk/raytracing/VK_RaytracingPipeline.cpp platforms/vk/raytracing/VK_RaytracingPipeline.h)
 
     add_compile_definitions(VULKAN_RENDERER)
 
@@ -188,7 +188,7 @@ set(CORE_FILES
         core/threading/JobManager.cpp
         core/threading/JobManager.h
 
-)
+        core/resource/raytracing/RaytracingPipeline.h platforms/vk/raytracing/VK_RaytracingMaterial.cpp platforms/vk/raytracing/VK_RaytracingMaterial.h core/resource/raytracing/RaytracingMaterial.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

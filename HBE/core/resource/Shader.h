@@ -10,8 +10,16 @@
 
 namespace HBE {
 	enum SHADER_STAGE {
-		SHADER_STAGE_NONE, SHADER_STAGE_COMPUTE, SHADER_STAGE_VERTEX, SHADER_STAGE_FRAGMENT, SHADER_STAGE_GEOMETRY
+		SHADER_STAGE_NONE,
+		SHADER_STAGE_COMPUTE,
+		SHADER_STAGE_VERTEX,
+		SHADER_STAGE_FRAGMENT,
+		SHADER_STAGE_GEOMETRY,
+		SHADER_STAGE_RAY_GEN,
+		SHADER_STAGE_RAY_MISS,
+		SHADER_STAGE_CLOSEST_HIT,
 	};
+
 
 	struct ShaderInfo {
 		SHADER_STAGE stage = SHADER_STAGE_NONE;
@@ -25,7 +33,7 @@ namespace HBE {
 		virtual ~Shader() = default;
 
 	public:
-		static void getSource(const std::string &path,std::string& buffer);
+		static void getSource(const std::string &path, std::string &buffer);
 
 	};
 }

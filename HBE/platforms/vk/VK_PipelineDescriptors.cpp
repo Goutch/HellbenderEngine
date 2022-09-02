@@ -50,9 +50,12 @@ namespace HBE {
 			std::vector<VkDescriptorBufferInfo> buffers_info;
 			std::vector<VkDescriptorImageInfo> images_info;
 
+			std::vector<VkWriteDescriptorSetAccelerationStructureKHR> acceleration_structure_writes;
+
 			buffers_info.resize(descriptor_set_layout_bindings.size(), {});
 			images_info.resize(descriptor_set_layout_bindings.size(), {});
 			writes.resize(descriptor_set_layout_bindings.size(), {});
+			acceleration_structure_writes.resize(descriptor_set_layout_bindings.size(), {});
 			VK_Image *default_texture = (VK_Image *) Resources::get<Texture>("DEFAULT_TEXTURE");
 			VK_Image *default_image = (VK_Image *) Resources::get<Texture>("DEFAULT_IMAGE");
 
@@ -90,7 +93,8 @@ namespace HBE {
 						writes[binding_index].pImageInfo = &images_info[binding_index];
 						break;
 					case VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE:
-						writes[binding_index].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+						writes[binding_index].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;\
+						writes[binding_index].dstBinding = &images_info[binding_index];
 						images_info[binding_index].imageView = default_texture->getImageView(0);
 						images_info[binding_index].sampler = default_texture->getSampler();
 						images_info[binding_index].imageLayout = default_texture->getImageLayout();
@@ -105,6 +109,13 @@ namespace HBE {
 					case VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT:
 					case VK_DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK:
 					case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR:
+						/*If the nullDescriptor feature is enabled, the buffer, acceleration structure, imageView, or bufferView can be VK_NULL_HANDLE. Loads from a null descriptor return zero values and stores and atomics to a null descriptor are discarded. A null acceleration structure descriptor results in the miss shader being invoked.*/
+						writes[binding_index].descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
+						writes[binding_index].pNext = &acceleration_structure_writes[binding_index];
+						acceleration_structure_writes[binding_index].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
+						acceleration_structure_writes[binding_index].accelerationStructureCount = 1;
+						acceleration_structure_writes[binding_index].pAccelerationStructures = VK_NULL_HANDLE;//todo]
+						acceleration_structure_writes[binding_index]. = 1;
 					case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_NV:
 					case VK_DESCRIPTOR_TYPE_MUTABLE_VALVE:
 					case VK_DESCRIPTOR_TYPE_MAX_ENUM:

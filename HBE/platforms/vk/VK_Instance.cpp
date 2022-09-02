@@ -27,7 +27,7 @@ namespace HBE {
 		getRequiredExtensions(required_extensions);
 
 
-		std::vector<const char *> extensions;
+		std::vector<const char *> extensions{};
 
 
 		Log::message("Looking for required vulkan extensions:");

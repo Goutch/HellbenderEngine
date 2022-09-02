@@ -28,6 +28,15 @@ namespace HBE {
 			case SHADER_STAGE::SHADER_STAGE_GEOMETRY:
 				vk_stage = VK_SHADER_STAGE_GEOMETRY_BIT;
 				break;
+			case SHADER_STAGE::SHADER_STAGE_RAY_GEN:
+				vk_stage = VK_SHADER_STAGE_RAYGEN_BIT_KHR;
+				break;
+			case SHADER_STAGE::SHADER_STAGE_RAY_MISS:
+				vk_stage = VK_SHADER_STAGE_MISS_BIT_KHR;
+				break;
+			case SHADER_STAGE::SHADER_STAGE_CLOSEST_HIT:
+				vk_stage = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
+				break;
 			case SHADER_STAGE_NONE:
 				break;
 		}
@@ -211,10 +220,31 @@ namespace HBE {
 			uniforms.emplace_back(uniform_info);
 		}
 
-		std::sort(uniforms.begin(), uniforms.end(),
-				  [](const UniformInfo &a, const UniformInfo &b) -> bool {
-					  return a.layout_binding.binding < b.layout_binding.binding;
-				  });
+
+		//----------------------------------------------------------ACCELERATION_STRUCTURES----------------------------------------------------------
+		const spvc_reflected_resource *acceleration_structure_list;
+		size_t acceleration_structure_count;
+
+		spvc_resources_get_resource_list_for_type(resources, SPVC_RESOURCE_TYPE_ACCELERATION_STRUCTURE, &acceleration_structure_list, &acceleration_structure_count);
+		for (uint32_t i = 0; i < acceleration_structure_count; ++i) {
+
+			std::string name = spvc_compiler_get_name(compiler_glsl, acceleration_structure_list[i].id);
+
+			UniformInfo uniform_info{};
+
+			VkDescriptorSetLayoutBinding layout_binding = {};
+			layout_binding.binding = spvc_compiler_get_decoration(compiler_glsl, acceleration_structure_list[i].id, SpvDecorationBinding);
+			layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
+			layout_binding.stageFlags = vk_stage;
+			layout_binding.descriptorCount = 1;//this is for array
+			layout_binding.pImmutableSamplers = nullptr;
+
+			uniform_info.layout_binding = layout_binding;
+			uniform_info.name = name;
+			uniform_info.size = 0;
+
+			uniforms.emplace_back(uniform_info);
+		}
 
 		//----------------------------------------------------------VERTEX INPUTS-----------------------------
 		const spvc_reflected_resource *vertex_input_list = nullptr;
@@ -266,6 +296,11 @@ namespace HBE {
 
 		}
 
+
+		std::sort(uniforms.begin(), uniforms.end(),
+				  [](const UniformInfo &a, const UniformInfo &b) -> bool {
+					  return a.layout_binding.binding < b.layout_binding.binding;
+				  });
 		std::sort(vertex_inputs.begin(), vertex_inputs.end(),
 				  [](const VertexInputInfo &a, const VertexInputInfo &b) -> bool {
 					  return a.location < b.location;

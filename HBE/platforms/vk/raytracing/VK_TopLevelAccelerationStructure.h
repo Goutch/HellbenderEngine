@@ -7,8 +7,12 @@ namespace HBE {
 
 	class VK_TopLevelAccelerationStructure : public RootAccelerationStructure {
 		VK_Device *device;
+		VkAccelerationStructureKHR handle;
+		VK_Buffer *buffer;
+		VkDeviceOrHostAddressConstKHR address{};
 	public:
 		VK_TopLevelAccelerationStructure(VK_Device *device, RootAccelerationStructureInfo info);
+		VkDeviceOrHostAddressConstKHR getDeviceAddress() const;
 	};
 
 

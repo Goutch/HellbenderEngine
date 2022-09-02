@@ -226,7 +226,10 @@ namespace HBE {
 			allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 			allocInfo.allocationSize = block->size;
 			allocInfo.memoryTypeIndex = memory_type;
-
+			VkMemoryAllocateFlagsInfo flagsInfo{};
+			flagsInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO;
+			flagsInfo.flags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT;
+			allocInfo.pNext = &flagsInfo;
 			if (vkAllocateMemory(device->getHandle(), &allocInfo, nullptr, &block->memory) != VK_SUCCESS) {
 				Log::error("failed to allocate buffer memory!");
 			}

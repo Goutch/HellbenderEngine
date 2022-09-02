@@ -12,10 +12,13 @@ namespace HBE {
 		VkAccelerationStructureKHR handle;
 		VK_Device *device;
 		VK_Buffer *buffer;
+		VkDeviceOrHostAddressConstKHR address;
 	public:
 		VK_MeshBottomLevelAccelerationStructure(VK_Device *device, MeshAccelerationStructureInfo info);
 		VkAccelerationStructureKHR getHandle() const;
 
 		~VK_MeshBottomLevelAccelerationStructure();
+
+		VkDeviceOrHostAddressConstKHR getDeviceAddress() const;
 	};
 }

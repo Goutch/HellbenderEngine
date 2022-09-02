@@ -35,6 +35,8 @@ namespace HBE {
 		const Allocation &getAllocation() const;
 
 		VkDeviceSize getSize() const;
+
+		VkDeviceOrHostAddressConstKHR getDeviceAddress() const;
 	};
 
 }

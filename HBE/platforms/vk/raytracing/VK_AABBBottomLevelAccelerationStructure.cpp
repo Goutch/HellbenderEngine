@@ -80,12 +80,6 @@ namespace HBE {
 											VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
 											ALLOC_FLAG_NONE);
 
-		bufferDeviceAddressInfo.buffer = aabb_positions_buffer->getHandle();
-
-		VkDeviceOrHostAddressConstKHR scratch_buffer_address{};
-
-		scratch_buffer_address.deviceAddress = device->vkGetBufferDeviceAddressKHR(device->getHandle(), &bufferDeviceAddressInfo);
-
 		VkAccelerationStructureBuildGeometryInfoKHR accelerationBuildGeometryInfo{};
 		accelerationBuildGeometryInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
 		accelerationBuildGeometryInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
@@ -94,7 +88,7 @@ namespace HBE {
 		accelerationBuildGeometryInfo.dstAccelerationStructure = handle;
 		accelerationBuildGeometryInfo.geometryCount = 1;
 		accelerationBuildGeometryInfo.pGeometries = &accelerationStructureGeometry;
-		accelerationBuildGeometryInfo.scratchData.deviceAddress = scratch_buffer_address.deviceAddress;
+		accelerationBuildGeometryInfo.scratchData.deviceAddress = scratchBuffer.getDeviceAddress().deviceAddress;
 
 		VkAccelerationStructureBuildRangeInfoKHR accelerationStructureBuildRangeInfo{};
 		accelerationStructureBuildRangeInfo.primitiveCount = numTriangles;
@@ -118,7 +112,6 @@ namespace HBE {
 		accelerationDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
 		accelerationDeviceAddressInfo.accelerationStructure = handle;
 
-		VkDeviceOrHostAddressConstKHR address{};
 		address.deviceAddress = device->vkGetAccelerationStructureDeviceAddressKHR(device->getHandle(), &accelerationDeviceAddressInfo);
 	}
 
@@ -130,6 +123,10 @@ namespace HBE {
 
 	VkAccelerationStructureKHR VK_AABBBottomLevelAccelerationStructure::getHandle() const {
 		return handle;
+	}
+
+	VkDeviceOrHostAddressConstKHR VK_AABBBottomLevelAccelerationStructure::getDeviceAddress() const {
+		return address;
 	}
 
 }

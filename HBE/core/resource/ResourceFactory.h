@@ -50,6 +50,11 @@ namespace HBE {
 
 	class MeshAccelerationStructure;
 
+	struct RaytracingPipelineInfo;
+
+	class RaytracingPipeline;
+
+
 	class HB_API ResourceFactory {
 	public:
 		virtual ~ResourceFactory() = default;
@@ -75,5 +80,8 @@ namespace HBE {
 		virtual AABBAccelerationStructure *createAABBAccelerationStructure(const AABBAccelerationStructureInfo &info) const = 0;
 
 		virtual MeshAccelerationStructure *createMeshAccelerationStructure(const MeshAccelerationStructureInfo &info) const = 0;
+
+		virtual RaytracingPipeline *createRayTracingPipeline(const RaytracingPipelineInfo &info) const = 0;
+
 	};
 }

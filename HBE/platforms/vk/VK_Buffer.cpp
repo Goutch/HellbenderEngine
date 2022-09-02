@@ -87,4 +87,14 @@ namespace HBE {
 		}*/
 
 	}
+
+	VkDeviceOrHostAddressConstKHR VK_Buffer::getDeviceAddress() const {
+		VkBufferDeviceAddressInfo bufferDeviceAddressInfo{};
+		bufferDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
+		bufferDeviceAddressInfo.buffer = handle;
+
+		VkDeviceOrHostAddressConstKHR buffer_address{};
+		buffer_address.deviceAddress = vkGetBufferDeviceAddress(device->getHandle(), &bufferDeviceAddressInfo);
+		return buffer_address;
+	}
 }

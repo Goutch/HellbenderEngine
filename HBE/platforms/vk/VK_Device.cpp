@@ -38,6 +38,28 @@ namespace HBE {
 		device_create_info.enabledExtensionCount = enabled_extensions.size();
 		device_create_info.ppEnabledExtensionNames = enabled_extensions.data();
 
+		VkPhysicalDeviceBufferDeviceAddressFeatures buffer_device_address_features{};
+		buffer_device_address_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
+		buffer_device_address_features.bufferDeviceAddress = true;
+
+		VkPhysicalDeviceRayTracingPipelineFeaturesKHR ray_tracing_features{};
+		ray_tracing_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
+		ray_tracing_features.rayTracingPipeline = true;
+
+		VkPhysicalDeviceAccelerationStructureFeaturesKHR acceleration_structure_features{};
+		acceleration_structure_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
+		acceleration_structure_features.accelerationStructure = true;
+
+		VkPhysicalDeviceRobustness2FeaturesEXT robustness_features{};
+		robustness_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT;
+		robustness_features.nullDescriptor = true;
+
+
+		device_create_info.pNext = &buffer_device_address_features;
+		buffer_device_address_features.pNext = &ray_tracing_features;
+		ray_tracing_features.pNext = &acceleration_structure_features;
+		acceleration_structure_features.pNext = &robustness_features;
+
 		if (vkCreateDevice(physical_device.getHandle(), &device_create_info, nullptr, &handle) != VK_SUCCESS) {
 			Log::error("Failed to create logical device");
 		}
