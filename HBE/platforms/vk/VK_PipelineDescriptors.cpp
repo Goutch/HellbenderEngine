@@ -8,6 +8,7 @@
 #include "VK_RenderPass.h"
 #include "VK_Renderer.h"
 #include "VK_CommandPool.h"
+#include "raytracing/VK_TopLevelAccelerationStructure.h"
 
 namespace HBE {
 
@@ -58,7 +59,7 @@ namespace HBE {
 			acceleration_structure_writes.resize(descriptor_set_layout_bindings.size(), {});
 			VK_Image *default_texture = (VK_Image *) Resources::get<Texture>("DEFAULT_TEXTURE");
 			VK_Image *default_image = (VK_Image *) Resources::get<Texture>("DEFAULT_IMAGE");
-
+			VkAccelerationStructureKHR default_acceleration_structure = VK_NULL_HANDLE;
 			for (size_t binding_index = 0; binding_index < descriptor_set_layout_bindings.size(); ++binding_index) {
 
 				writes[binding_index].pBufferInfo = nullptr;
@@ -93,13 +94,25 @@ namespace HBE {
 						writes[binding_index].pImageInfo = &images_info[binding_index];
 						break;
 					case VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE:
-						writes[binding_index].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;\
-						writes[binding_index].dstBinding = &images_info[binding_index];
+						writes[binding_index].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
 						images_info[binding_index].imageView = default_texture->getImageView(0);
 						images_info[binding_index].sampler = default_texture->getSampler();
 						images_info[binding_index].imageLayout = default_texture->getImageLayout();
 						writes[binding_index].pImageInfo = &images_info[binding_index];
 						break;
+
+					case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR:
+						/*If the nullDescriptor feature is enabled, the buffer, acceleration structure, imageView, or bufferView can be VK_NULL_HANDLE. Loads from a null descriptor return zero values and stores and atomics to a null descriptor are discarded. A null acceleration structure descriptor results in the miss shader being invoked.*/
+						writes[binding_index].descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
+
+						writes[binding_index].pNext = &acceleration_structure_writes[binding_index];
+
+						acceleration_structure_writes[binding_index].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
+						acceleration_structure_writes[binding_index].accelerationStructureCount = 1;
+						acceleration_structure_writes[binding_index].pAccelerationStructures = &default_acceleration_structure;
+						break;
+					case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_NV:
+					case VK_DESCRIPTOR_TYPE_MUTABLE_VALVE:
 					case VK_DESCRIPTOR_TYPE_SAMPLER:
 					case VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
 					case VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
@@ -108,16 +121,6 @@ namespace HBE {
 					case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC:
 					case VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT:
 					case VK_DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK:
-					case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR:
-						/*If the nullDescriptor feature is enabled, the buffer, acceleration structure, imageView, or bufferView can be VK_NULL_HANDLE. Loads from a null descriptor return zero values and stores and atomics to a null descriptor are discarded. A null acceleration structure descriptor results in the miss shader being invoked.*/
-						writes[binding_index].descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
-						writes[binding_index].pNext = &acceleration_structure_writes[binding_index];
-						acceleration_structure_writes[binding_index].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
-						acceleration_structure_writes[binding_index].accelerationStructureCount = 1;
-						acceleration_structure_writes[binding_index].pAccelerationStructures = VK_NULL_HANDLE;//todo]
-						acceleration_structure_writes[binding_index]. = 1;
-					case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_NV:
-					case VK_DESCRIPTOR_TYPE_MUTABLE_VALVE:
 					case VK_DESCRIPTOR_TYPE_MAX_ENUM:
 						Log::error("Descriptor type not supported");
 						break;
@@ -127,8 +130,8 @@ namespace HBE {
 				writes[binding_index].dstSet = handles[frame_index];
 				writes[binding_index].dstBinding = descriptor_set_layout_bindings[binding_index].binding;
 				writes[binding_index].dstArrayElement = 0;
-
 				writes[binding_index].descriptorCount = 1;//for arrays
+
 				writes[binding_index].pTexelBufferView = nullptr; // Optional
 				descriptor_sets_writes[frame_index].emplace(writes[binding_index].dstBinding, writes[binding_index]);
 			}
@@ -325,6 +328,30 @@ namespace HBE {
 
 	void VK_PipelineDescriptors::setDynamicUniform(uint32_t binding, const void *data) {
 		Log::warning("Dynamic uniform buffers are not implemented yet!");
+	}
+
+	void VK_PipelineDescriptors::setAccelerationStructure(uint32_t binding, const VK_TopLevelAccelerationStructure *acceleration_structure) {
+		const VkAccelerationStructureKHR acceleration_structure_handle = acceleration_structure->getHandle();
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+			HB_ASSERT(descriptor_set_layout_bindings[uniform_binding_to_index[binding]].descriptorType == VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, "descriptor type mismatch");
+
+			VkWriteDescriptorSetAccelerationStructureKHR accelerationStructureInfo{};
+			accelerationStructureInfo.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
+			accelerationStructureInfo.accelerationStructureCount = 1;
+			accelerationStructureInfo.pAccelerationStructures = &acceleration_structure_handle;
+
+
+			descriptor_sets_writes[i][binding].pNext = &accelerationStructureInfo;
+			vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_sets_writes[i][binding], 0, nullptr);
+		}
+	}
+
+	void VK_PipelineDescriptors::setAccelerationStructure(const std::string &name, const VK_TopLevelAccelerationStructure *acceleration_structure) {
+		auto it = uniform_name_to_index.find(name);
+		HB_ASSERT(it != uniform_name_to_index.end(), "No shader input is named:" + name);
+		HB_ASSERT(descriptor_set_layout_bindings[it->second].descriptorType == VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, name + " is not an acceleration structure");
+
+		setAccelerationStructure(descriptor_set_layout_bindings[it->second].binding, acceleration_structure);
 	}
 
 

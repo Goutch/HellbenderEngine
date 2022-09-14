@@ -9,9 +9,12 @@ namespace HBE {
 
 	class VK_Renderer;
 
+	class VK_GraphicPipeline;
+
 	class VK_Material : public Material {
 		VK_PipelineDescriptors *descriptors;
 		GraphicPipeline *pipeline;
+		VK_GraphicPipeline *vk_pipeline;
 	public:
 		VK_Material(VK_Renderer *renderer, const MaterialInfo &info);
 		~VK_Material() override;
@@ -26,5 +29,7 @@ namespace HBE {
 		void setTexture(const std::string &name, const Texture *texture, uint32_t mip_level) override;
 		void setTexture(const std::string &name, const RenderTarget *render_target) override;
 		const GraphicPipeline *getGraphicPipeline() const override;
+		VK_GraphicPipeline *getVkGraphicPipeline();
+
 	};
 }

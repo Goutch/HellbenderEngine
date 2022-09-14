@@ -100,8 +100,7 @@ namespace HBE {
 		Event<Entity> &onAttach();
 		template<typename Component>
 		Event<Entity> &onDetach();
-		template<typename Component>
-		Component *getAll();
+
 		void calculateCameraProjection(RenderTarget *renderTarget);
 	};
 

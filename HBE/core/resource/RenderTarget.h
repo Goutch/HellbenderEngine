@@ -14,11 +14,12 @@ namespace HBE {
 	enum RENDER_TARGET_FLAG {
 		RENDER_TARGET_FLAG_NONE = 0,
 		RENDER_TARGET_FLAG_DEPTH_TEST = 1,
+		RENDER_TARGET_FLAG_USED_IN_RAYTRACING = 2,
 	};
 	struct RenderTargetInfo {
 		uint32_t width = 0;
 		uint32_t height = 0;
-		IMAGE_FORMAT format = IMAGE_FORMAT_RGBA8;
+		IMAGE_FORMAT format = IMAGE_FORMAT_RGBA32F;
 		vec4 clear_color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 		RENDER_TARGET_FLAGS flags = RENDER_TARGET_FLAG_NONE;
 	};

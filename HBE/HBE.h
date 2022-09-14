@@ -9,6 +9,18 @@
 #include "Core.h"
 
 #include "core/resource/Resources.h"
+#include "core/resource/Shader.h"
+#include "core/resource/GraphicPipeline.h"
+#include "core/resource/ComputePipeline.h"
+#include "core/resource/Mesh.h"
+#include "core/resource/Texture.h"
+#include "core/resource/Model.h"
+#include "core/resource/RenderTarget.h"
+#include "core/resource/Material.h"
+#include "core/resource/ComputeInstance.h"
+#include "core/resource/raytracing/AccelerationStructure.h"
+#include "core/resource/raytracing/RaytracingPipeline.h"
+#include "core/resource/raytracing/RaytracingPipelineInstance.h"
 
 #include "core/graphics/Graphics.h"
 #include "core/graphics/Window.h"

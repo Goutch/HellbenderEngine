@@ -25,7 +25,7 @@ namespace HBE {
 		command_buffers.clear();
 	}
 
-	VK_CommandPool::VK_CommandPool(VK_Device &device, int command_buffers_count,const VK_Queue& queue) : device(device) {
+	VK_CommandPool::VK_CommandPool(VK_Device &device, int command_buffers_count, const VK_Queue &queue) : device(device) {
 		QueueFamilyIndices queueFamilyIndices = device.getPhysicalDevice().getQueueFamilyIndices();
 
 		VkCommandPoolCreateInfo poolInfo{};
@@ -77,7 +77,7 @@ namespace HBE {
 		beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT; // Optional
 		beginInfo.pInheritanceInfo = nullptr; // Optional
 
-		if (vkBeginCommandBuffer(command_buffers[i], &beginInfo) != VK_SUCCESS) {
+		if (vkBeginCommandBuffer(command_buffers[current], &beginInfo) != VK_SUCCESS) {
 			Log::error("failed to begin recording command buffer!");
 		}
 	}
@@ -109,13 +109,19 @@ namespace HBE {
 		return handle;
 	}
 
-	void VK_CommandPool::submit(HBE::QUEUE_FAMILY queue, VkSemaphore *wait, VkPipelineStageFlags *wait_stage, uint32_t wait_count, VkSemaphore *signal, uint32_t signal_count) {
+	VK_Fence &VK_CommandPool::submit(HBE::QUEUE_FAMILY queue, VkSemaphore *wait, VkPipelineStageFlags *wait_stage, uint32_t wait_count, VkSemaphore *signal, uint32_t signal_count) {
 		fences[current]->reset();
-		device.getQueue(queue).submit(command_buffers[current], fences[current]->getHandle(), wait, wait_stage, wait_count, signal, signal_count);
+		device.getQueue(queue).submit(command_buffers[current],
+									  fences[current]->getHandle(),
+									  wait,
+									  wait_stage,
+									  wait_count,
+									  signal,
+									  signal_count);
 		current++;
 		current %= command_buffers.size();
+
+		return *fences[current];
 	}
-
-
 }
 

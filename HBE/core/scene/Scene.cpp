@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "core/graphics/Graphics.h"
 #include "core/resource/Resources.h"
+#include "core/resource/RenderTarget.h"
 namespace HBE {
 
 	bool Entity::valid() {

@@ -1,4 +1,5 @@
 #include <platforms/vk/VK_Buffer.h>
+#include <core/utility/Profiler.h>
 #include "VK_TopLevelAccelerationStructure.h"
 #include "vector"
 #include "VK_AABBBottomLevelAccelerationStructure.h"
@@ -10,16 +11,17 @@ namespace HBE {
 
 
 	VK_TopLevelAccelerationStructure::VK_TopLevelAccelerationStructure(VK_Device *device, RootAccelerationStructureInfo info) {
-
+		this->device = device;
+		Profiler::begin("Build root Acceleration Structure");
 		std::vector<VkAccelerationStructureInstanceKHR> instances;
 		instances.resize(info.instance_count);
 		for (int i = 0; i < info.instance_count; ++i) {
 
 			VkTransformMatrixKHR t = {
 					{
-							{info.instances[i].transform[0][0], info.instances[i].transform[0][1], info.instances[i].transform[0][2], info.instances[i].transform[0][3]},
-							{info.instances[i].transform[1][0], info.instances[i].transform[1][1], info.instances[i].transform[1][2], info.instances[i].transform[1][3]},
-							{info.instances[i].transform[2][0], info.instances[i].transform[2][1], info.instances[i].transform[2][2], info.instances[i].transform[2][3]},
+							{info.instances[i].transform[0][0], info.instances[i].transform[1][0], info.instances[i].transform[2][0], info.instances[i].transform[3][0]},
+							{info.instances[i].transform[0][1], info.instances[i].transform[1][1], info.instances[i].transform[2][1], info.instances[i].transform[3][1]},
+							{info.instances[i].transform[0][2], info.instances[i].transform[1][2], info.instances[i].transform[2][2], info.instances[i].transform[3][2]},
 					}
 			};
 
@@ -48,7 +50,7 @@ namespace HBE {
 		accelerationStructureGeometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
 		accelerationStructureGeometry.geometry.instances.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_INSTANCES_DATA_KHR;
 		accelerationStructureGeometry.geometry.instances.arrayOfPointers = VK_FALSE;
-		accelerationStructureGeometry.geometry.instances.data = instances_buffer.getDeviceAddress();;
+		accelerationStructureGeometry.geometry.instances.data = instances_buffer.getDeviceAddress();
 
 		// Get size info
 		/*
@@ -61,7 +63,7 @@ namespace HBE {
 		accelerationStructureBuildGeometryInfo.geometryCount = 1;
 		accelerationStructureBuildGeometryInfo.pGeometries = &accelerationStructureGeometry;
 
-		uint32_t primitive_count = 1;
+		uint32_t primitive_count = instances.size();
 
 		VkAccelerationStructureBuildSizesInfoKHR accelerationStructureBuildSizesInfo{};
 		accelerationStructureBuildSizesInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
@@ -101,7 +103,7 @@ namespace HBE {
 		accelerationBuildGeometryInfo.scratchData.deviceAddress = scratchBuffer.getDeviceAddress().deviceAddress;
 
 		VkAccelerationStructureBuildRangeInfoKHR accelerationStructureBuildRangeInfo{};
-		accelerationStructureBuildRangeInfo.primitiveCount = 1;
+		accelerationStructureBuildRangeInfo.primitiveCount = instances.size();
 		accelerationStructureBuildRangeInfo.primitiveOffset = 0;
 		accelerationStructureBuildRangeInfo.firstVertex = 0;
 		accelerationStructureBuildRangeInfo.transformOffset = 0;
@@ -116,7 +118,7 @@ namespace HBE {
 				&accelerationBuildGeometryInfo,
 				accelerationBuildStructureRangeInfos.data());
 		device->getQueue(QUEUE_FAMILY_GRAPHICS).endCommand();
-		device->getQueue(QUEUE_FAMILY_GRAPHICS).submitCommand();
+		device->getQueue(QUEUE_FAMILY_GRAPHICS).submitCommand().wait();
 
 		VkAccelerationStructureDeviceAddressInfoKHR accelerationDeviceAddressInfo{};
 		accelerationDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
@@ -124,11 +126,21 @@ namespace HBE {
 
 
 		address.deviceAddress = device->vkGetAccelerationStructureDeviceAddressKHR(device->getHandle(), &accelerationDeviceAddressInfo);
-
+		Profiler::end();
 	}
 
 	VkDeviceOrHostAddressConstKHR VK_TopLevelAccelerationStructure::getDeviceAddress() const {
 		return address;
+	}
+
+	VK_TopLevelAccelerationStructure::~VK_TopLevelAccelerationStructure() {
+		delete buffer;
+		device->vkDestroyAccelerationStructureKHR(device->getHandle(), handle, nullptr);
+
+	}
+
+	const VkAccelerationStructureKHR VK_TopLevelAccelerationStructure::getHandle() const {
+		return handle;
 	}
 
 }

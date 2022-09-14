@@ -40,7 +40,7 @@ namespace HBE {
         std::vector<PushConstantInfo> push_constants;
 
         SHADER_STAGE stage;
-        VkShaderStageFlags vk_stage;
+        VkShaderStageFlagBits vk_stage;
 
     public:
 
@@ -57,7 +57,7 @@ namespace HBE {
         const std::vector<VertexInputInfo> &getVertexInputs() const;
 
         SHADER_STAGE getStage() const override;
-		VkShaderStageFlags getVkStage() const;
+		VkShaderStageFlagBits getVkStage() const;
 
     private:
         void load(const std::string &path);

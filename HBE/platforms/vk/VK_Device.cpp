@@ -63,11 +63,10 @@ namespace HBE {
 		if (vkCreateDevice(physical_device.getHandle(), &device_create_info, nullptr, &handle) != VK_SUCCESS) {
 			Log::error("Failed to create logical device");
 		}
-		queues.try_emplace(QUEUE_FAMILY_GRAPHICS, this, indices.graphics_family.value());
-		queues.try_emplace(QUEUE_FAMILY_PRESENT, this, indices.present_family.value());
-		queues.try_emplace(QUEUE_FAMILY_COMPUTE, this, indices.compute_family.value());
-		queues.try_emplace(QUEUE_FAMILY_TRANSFER, this, indices.transfer_family.value());
-
+		queues.try_emplace(QUEUE_FAMILY_GRAPHICS, this, QUEUE_FAMILY_GRAPHICS, indices.graphics_family.value());
+		queues.try_emplace(QUEUE_FAMILY_PRESENT, this, QUEUE_FAMILY_PRESENT, indices.present_family.value());
+		queues.try_emplace(QUEUE_FAMILY_COMPUTE, this, QUEUE_FAMILY_COMPUTE, indices.compute_family.value());
+		queues.try_emplace(QUEUE_FAMILY_TRANSFER, this, QUEUE_FAMILY_TRANSFER, indices.transfer_family.value());
 		allocator = new VK_Allocator(this);
 
 		initFunctionPointers();
@@ -88,20 +87,6 @@ namespace HBE {
 		return *physical_device;
 	}
 
-	/* const VkQueue &VK_Device::getGraphicsQueue() const {
-		 return graphics_queue;
-	 }
-	 const VkQueue &VK_Device::getPresentQueue() const {
-		 return present_queue;
-	 }
-
-	 const VkQueue &VK_Device::getComputeQueue() const {
-		 return compute_queue;
-	 }
-
-	 const VkQueue &VK_Device::getTransferQueue() const {
-		 return transfer_queue;
-	 }*/
 	void VK_Device::wait() {
 		vkDeviceWaitIdle(handle);
 	}

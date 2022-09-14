@@ -5,6 +5,7 @@
 #include "VK_CommandPool.h"
 #include "VK_Fence.h"
 #include "core/utility/Log.h"
+
 namespace HBE {
 
 	VkFormat getVkFormat(IMAGE_FORMAT format) {
@@ -60,8 +61,9 @@ namespace HBE {
 	}
 
 	void VK_RenderPass::recreate() {
-		if (handle != VK_NULL_HANDLE) {
 
+		if (handle != VK_NULL_HANDLE) {
+			renderer->waitAll();
 			vkDestroyRenderPass(device->getHandle(), handle, nullptr);
 			for (auto framebuffer: frame_buffers) {
 				vkDestroyFramebuffer(device->getHandle(), framebuffer, nullptr);
@@ -86,7 +88,7 @@ namespace HBE {
 		colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 		colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 		colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		colorAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		colorAttachment.finalLayout = (flags | RENDER_TARGET_FLAG_USED_IN_RAYTRACING) == RENDER_TARGET_FLAG_USED_IN_RAYTRACING ? VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		VkAttachmentReference color_attachment_ref{};
 		color_attachment_ref.attachment = 0;
@@ -216,7 +218,9 @@ namespace HBE {
 			info.format = format;
 			info.width = width;
 			info.height = height;
+			info.generate_mip_maps = false;
 			info.flags = IMAGE_FLAG_RENDER_TARGET;
+			info.flags |= (flags & RENDER_TARGET_FLAG_USED_IN_RAYTRACING) ? IMAGE_FLAG_SHADER_WRITE : 0;
 			images[i] = new VK_Image(renderer->getDevice(), info);
 			image_views[i] = images[i]->getImageView();
 		}

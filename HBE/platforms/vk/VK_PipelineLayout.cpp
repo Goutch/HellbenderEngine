@@ -7,7 +7,8 @@
 
 namespace HBE {
 
-	VK_PipelineLayout::VK_PipelineLayout(VK_Device *device, const VK_Shader **shaders,
+	VK_PipelineLayout::VK_PipelineLayout(VK_Device *device,
+										 const VK_Shader **shaders,
 										 size_t count) {
 
 		this->device = device;
@@ -15,6 +16,9 @@ namespace HBE {
 		std::vector<PushConstantInfo> merged_push_constants;
 		if (shaders[0]->getVkStage() == VK_SHADER_STAGE_COMPUTE_BIT) {
 			bind_point = VK_PIPELINE_BIND_POINT_COMPUTE;
+		}
+		if (shaders[0]->getVkStage() == VK_SHADER_STAGE_RAYGEN_BIT_KHR) {
+			bind_point = VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR;
 		}
 		//merge the shaders inputs into one.
 		for (size_t i = 0; i < count; ++i) {
@@ -114,7 +118,7 @@ namespace HBE {
 		return uniform_sizes;
 	}
 
-	VkDescriptorSetLayout VK_PipelineLayout::getDescriptorSetLayout() const{
+	VkDescriptorSetLayout VK_PipelineLayout::getDescriptorSetLayout() const {
 		return descriptor_set_layout_handle;
 	}
 

@@ -1,12 +1,11 @@
 #pragma once
 
-
-
 #include "core/resource/ResourceFactory.h"
 
 namespace HBE {
 
     class VK_Renderer;
+
 
     class VK_ResourceFactory : public ResourceFactory {
         VK_Renderer* renderer;
@@ -24,6 +23,7 @@ namespace HBE {
 		AABBAccelerationStructure *createAABBAccelerationStructure(const AABBAccelerationStructureInfo &info) const override;
 		MeshAccelerationStructure *createMeshAccelerationStructure(const MeshAccelerationStructureInfo &info) const override;
 		RaytracingPipeline *createRaytracingPipeline(const RaytracingPipelineInfo &info) const override;
+		RaytracingPipelineInstance *createRaytracingPipelineInstance(const RaytracingPipelineInstanceInfo &info) const override;
 	};
 }
 

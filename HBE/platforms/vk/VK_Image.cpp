@@ -13,12 +13,10 @@ namespace HBE {
 	VkImageLayout VK_Image::chooseLayout() {
 		if (flags & IMAGE_FLAG_DEPTH) {
 			return VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-		} else if (flags & IMAGE_FLAG_RENDER_TARGET) {
+		} else if (flags & IMAGE_FLAG_RENDER_TARGET && !(flags & IMAGE_FLAG_SHADER_WRITE)) {
 			return VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		} else if (flags & IMAGE_FLAG_SHADER_WRITE || flags & IMAGE_FLAG_NO_SAMPLER) {
-			return VK_IMAGE_LAYOUT_GENERAL;
 		}
-		return VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		return VK_IMAGE_LAYOUT_GENERAL;
 	}
 
 	void VK_Image::update(const void *data) {
@@ -153,6 +151,7 @@ namespace HBE {
 		viewInfo.viewType = view_type;
 		viewInfo.format = vk_format;
 		viewInfo.subresourceRange.aspectMask |= info.flags & IMAGE_FLAG_DEPTH ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
+
 
 		image_views.resize(mip_levels);
 		for (int i = 0; i < image_views.size(); ++i) {

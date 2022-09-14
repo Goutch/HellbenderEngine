@@ -54,6 +54,9 @@ namespace HBE {
 
 	class RaytracingPipeline;
 
+	struct RaytracingPipelineInstanceInfo;
+
+	class RaytracingPipelineInstance;
 
 	class HB_API ResourceFactory {
 	public:
@@ -81,7 +84,8 @@ namespace HBE {
 
 		virtual MeshAccelerationStructure *createMeshAccelerationStructure(const MeshAccelerationStructureInfo &info) const = 0;
 
-		virtual RaytracingPipeline *createRayTracingPipeline(const RaytracingPipelineInfo &info) const = 0;
+		virtual RaytracingPipeline *createRaytracingPipeline(const RaytracingPipelineInfo &info) const = 0;
 
+		virtual RaytracingPipelineInstance* createRaytracingPipelineInstance(const RaytracingPipelineInstanceInfo &info) const = 0;
 	};
 }

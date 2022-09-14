@@ -37,6 +37,12 @@ namespace HBE {
 			case SHADER_STAGE::SHADER_STAGE_CLOSEST_HIT:
 				vk_stage = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
 				break;
+			case SHADER_STAGE::SHADER_STAGE_ANY_HIT:
+				vk_stage = VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
+				break;
+			case SHADER_STAGE::SHADER_STAGE_INTERSECTION:
+				vk_stage = VK_SHADER_STAGE_INTERSECTION_BIT_KHR;
+				break;
 			case SHADER_STAGE_NONE:
 				break;
 		}
@@ -312,7 +318,7 @@ namespace HBE {
 	}
 
 
-	VkShaderStageFlags VK_Shader::getVkStage() const {
+	VkShaderStageFlagBits VK_Shader::getVkStage() const {
 		return vk_stage;
 	}
 

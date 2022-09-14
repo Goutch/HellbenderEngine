@@ -37,6 +37,8 @@ namespace HBE {
 		VkDeviceSize getSize() const;
 
 		VkDeviceOrHostAddressConstKHR getDeviceAddress() const;
+
+		void map(void* data);
 	};
 
 }

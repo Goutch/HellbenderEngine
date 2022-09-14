@@ -1,4 +1,5 @@
 #include <core/resource/Resources.h>
+#include <platforms/vk/raytracing/VK_RaytracingPipeline.h>
 #include "VK_Renderer.h"
 #include "VK_Fence.h"
 
@@ -25,6 +26,7 @@
 #include "core/utility/Profiler.h"
 #include "VK_PipelineDescriptors.h"
 #include "VK_Material.h"
+#include "raytracing/VK_RaytracingPipelineInstance.h"
 
 namespace HBE {
 	struct UniformBufferObject {
@@ -62,6 +64,7 @@ namespace HBE {
 		window->onSizeChange.subscribe(this, &VK_Renderer::onWindowSizeChange);
 	}
 
+
 	void VK_Renderer::onWindowSizeChange(uint32_t width, uint32_t height) {
 		windowResized = true;
 	}
@@ -79,12 +82,12 @@ namespace HBE {
 		command_pool->clear();
 
 		swapchain->recreate(width, height);
-
+		//todo: check if nessesary
 		command_pool->createCommandBuffers(MAX_FRAMES_IN_FLIGHT);
 
 		default_render_target->setResolution(width, height);
 
-		screen_material->setTexture("texture0", default_render_target);
+		screen_material->setTexture("texture0", current_render_pass);
 	}
 
 	void VK_Renderer::onWindowClosed() {
@@ -112,6 +115,49 @@ namespace HBE {
 
 	const ResourceFactory *VK_Renderer::getResourceFactory() const {
 		return factory;
+	}
+
+	void VK_Renderer::raytrace(const RootAccelerationStructure &root_acceleration_structure,
+							   RaytracingPipelineInstance &pipeline,
+							   const RenderTarget &render_target,
+							   const mat4 &projection_matrix,
+							   const mat4 &view_matrix) {
+		/*vec2i resolution = render_target.getResolution();
+		VkViewport viewport{};
+		viewport.x = 0.0f;
+		viewport.y = static_cast<float>(resolution.y);
+		viewport.width = static_cast<float>(resolution.x);
+		viewport.height = -static_cast<float>(resolution.y);
+		viewport.minDepth = 0.0f;
+		viewport.maxDepth = 1.0f;
+
+		VkRect2D scissor{};
+		scissor.offset = {0, 0};
+		scissor.extent = VkExtent2D{(uint32_t) resolution.x, (uint32_t) resolution.y};
+
+		vkCmdSetViewport(command_pool->getCurrentBuffer(), 0, 1, &viewport);
+		vkCmdSetScissor(command_pool->getCurrentBuffer(), 0, 1, &scissor);*/
+
+		VK_RaytracingPipelineInstance *vk_pipeline_instance = dynamic_cast<VK_RaytracingPipelineInstance *>(&pipeline);
+		const VK_RaytracingPipeline *vk_pipeline = vk_pipeline_instance->getPipeline();
+		const VK_RenderPass *render_pass = dynamic_cast<const VK_RenderPass *>(&render_target);
+		UniformBufferObject ubo = {glm::inverse(view_matrix), glm::inverse(projection_matrix)};
+		vk_pipeline_instance->setUniform("cam", &ubo);
+		vk_pipeline->bind();
+		vk_pipeline_instance->bind();
+
+		device->vkCmdTraceRaysKHR(command_pool->getCurrentBuffer(),
+								  &vk_pipeline->getRaygenShaderBindingTable(),
+								  &vk_pipeline->getMissShaderBindingTable(),
+								  &vk_pipeline->getHitShaderBindingTable(),
+								  &vk_pipeline->getCallableShaderBindingTable(),
+								  render_pass->getResolution().x,
+								  render_pass->getResolution().y,
+								  1);
+		//vkCmdPipelineBarrier(command_pool->getCurrentBuffer(), VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_DEPENDENCY_BY_REGION_BIT, 0, nullptr, 0, nullptr, 0, nullptr);
+
+		vk_pipeline_instance->unbind();
+		vk_pipeline->unbind();
 	}
 
 	void VK_Renderer::render(const RenderTarget *render_target,
@@ -227,9 +273,9 @@ namespace HBE {
 			vec2i resolution = current_render_pass->getResolution();
 			VkViewport viewport{};
 			viewport.x = 0.0f;
-			viewport.y = static_cast<float>(resolution.y);
+			viewport.y = 0;//static_cast<float>(resolution.y);
 			viewport.width = static_cast<float>(resolution.x);
-			viewport.height = -static_cast<float>(resolution.y);
+			viewport.height = static_cast<float>(resolution.y);
 			viewport.minDepth = 0.0f;
 			viewport.maxDepth = 1.0f;
 
@@ -256,6 +302,7 @@ namespace HBE {
 			VkPipelineStageFlags stages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
 			VkSemaphore signal_semaphores[] = {frames[current_frame].finished_semaphore->getHandle()};
 
+
 			command_pool->submit(QUEUE_FAMILY_GRAPHICS,
 								 wait_semaphores,
 								 stages,
@@ -263,7 +310,7 @@ namespace HBE {
 								 signal_semaphores,
 								 1);
 
-
+			waitAll();
 			VkPresentInfoKHR presentInfo{};
 			presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 
@@ -292,7 +339,9 @@ namespace HBE {
 		}
 		current_frame = (current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
 		render_cache.clear();
+		waitAll();
 		Profiler::end();
+
 	}
 
 	void VK_Renderer::draw(mat4 transform_matrix, const Mesh &mesh, Material &material) {
@@ -407,5 +456,11 @@ namespace HBE {
 	void VK_Renderer::waitCurrentFrame() {
 		command_pool->getCurrentFence().wait();
 	}
+
+	void VK_Renderer::waitAll() {
+		device->wait();
+	}
+
+
 }
 

@@ -3,6 +3,7 @@
 #include "VK_Device.h"
 
 #include "cstring"
+#include "array"
 
 namespace HBE {
 
@@ -10,18 +11,16 @@ namespace HBE {
 	VK_Buffer::VK_Buffer(VK_Device *device, VkDeviceSize size, VkBufferUsageFlags usage, ALLOC_FLAGS flags) {
 		this->device = device;
 		this->size = size;
-		uint32_t families[3] = {
-				device->getQueue(QUEUE_FAMILY_COMPUTE).getFamilyIndex(),
-				device->getQueue(QUEUE_FAMILY_GRAPHICS).getFamilyIndex(),
-				device->getQueue(QUEUE_FAMILY_TRANSFER).getFamilyIndex()
-		};
+		std::array<uint32_t, 3> queues = {device->getQueue(QUEUE_FAMILY_GRAPHICS).getFamilyIndex(),
+										  device->getQueue(QUEUE_FAMILY_TRANSFER).getFamilyIndex(),
+										  device->getQueue(QUEUE_FAMILY_COMPUTE).getFamilyIndex()};
 		VkBufferCreateInfo bufferInfo{};
 		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 		bufferInfo.size = size;
 		bufferInfo.usage = flags & ALLOC_FLAG_MAPPABLE ? usage : usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 		bufferInfo.sharingMode = VK_SHARING_MODE_CONCURRENT;
-		bufferInfo.queueFamilyIndexCount = 3;
-		bufferInfo.pQueueFamilyIndices = families;
+		bufferInfo.queueFamilyIndexCount = queues.size();
+		bufferInfo.pQueueFamilyIndices = queues.data();
 
 		if (vkCreateBuffer(device->getHandle(), &bufferInfo, nullptr, &handle) != VK_SUCCESS) {
 			Log::error("failed to create buffer!");
@@ -96,5 +95,13 @@ namespace HBE {
 		VkDeviceOrHostAddressConstKHR buffer_address{};
 		buffer_address.deviceAddress = vkGetBufferDeviceAddress(device->getHandle(), &bufferDeviceAddressInfo);
 		return buffer_address;
+	}
+
+	void VK_Buffer::map(void *data) {
+		if (allocation.flags | ALLOC_FLAG_MAPPABLE) {
+			vkMapMemory(device->getHandle(), allocation.block->memory, allocation.offset, allocation.size, 0, &data);
+		} else {
+			Log::error("Buffer is not mappable");
+		}
 	}
 }

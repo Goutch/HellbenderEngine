@@ -13,7 +13,8 @@
 #include "raytracing/VK_TopLevelAccelerationStructure.h"
 #include "raytracing/VK_AABBBottomLevelAccelerationStructure.h"
 #include "raytracing/VK_MeshBottomLevelAccelerationStructure.h"
-
+#include "raytracing/VK_RaytracingPipeline.h"
+#include "raytracing/VK_RaytracingPipelineInstance.h"
 namespace HBE {
 	VK_ResourceFactory::VK_ResourceFactory(VK_Renderer *renderer) {
 		this->renderer = renderer;
@@ -66,6 +67,10 @@ namespace HBE {
 	RaytracingPipeline *VK_ResourceFactory::createRaytracingPipeline(const RaytracingPipelineInfo &info) const {
 		return new VK_RaytracingPipeline(renderer, info);
 	}
+	RaytracingPipelineInstance *VK_ResourceFactory::createRaytracingPipelineInstance(const RaytracingPipelineInstanceInfo &info) const {
+		return new VK_RaytracingPipelineInstance(*renderer, info);
+	}
 
 }
+
 

@@ -23,12 +23,15 @@ void onAppUpdate(float delta) {
 
 	if (Input::getKeyDown(KEY::C)) {
 		Entity cam = Application::getScene()->getCameraEntity();
-		if (cam.has<CameraController>()) {
-			cam.detach<CameraController>();
-		} else {
-			cam.attach<CameraController>();
+		if (cam.valid()) {
+			if (cam.has<CameraController>()) {
+				cam.detach<CameraController>();
+			} else {
+				cam.attach<CameraController>();
+			}
 		}
 	}
+
 }
 
 

@@ -25,8 +25,9 @@ namespace HBE {
 		VkDevice device_handle;
 		VK_CommandPool *command_pool = nullptr;
 		uint32_t family_index;
+		QUEUE_FAMILY queue_family;
 	public:
-		VK_Queue(VK_Device *device, uint32_t family_index);
+		VK_Queue(VK_Device *device, QUEUE_FAMILY family, uint32_t family_index);
 		~VK_Queue();
 		const VkQueue &getHandle() const;
 
@@ -36,7 +37,7 @@ namespace HBE {
 
 		void endCommand();
 
-		void submitCommand();
+		VK_Fence &submitCommand();
 
 		uint32_t getFamilyIndex() const;
 

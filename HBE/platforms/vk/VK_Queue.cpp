@@ -10,14 +10,13 @@
 
 namespace HBE {
 
-
-	VK_Queue::VK_Queue(VK_Device *device, uint32_t family_index) {
+	VK_Queue::VK_Queue(VK_Device *device, QUEUE_FAMILY family, uint32_t family_index) {
 		this->device_handle = device->getHandle();
 		vkGetDeviceQueue(device_handle, family_index, 0, &handle);
 		this->family_index = family_index;
+		this->queue_family = family;
 		command_pool = new VK_CommandPool(*device, 1, *this);
 	}
-
 
 
 	void VK_Queue::submit(VkCommandBuffer const &command_buffer,
@@ -61,8 +60,8 @@ namespace HBE {
 		command_pool->end();
 	}
 
-	void VK_Queue::submitCommand() {
-		submit(command_pool->getCurrentBuffer());
+	VK_Fence& VK_Queue::submitCommand() {
+		return command_pool->submit(queue_family);
 	}
 
 	VK_CommandPool *VK_Queue::getCommandPool() {

@@ -12,7 +12,9 @@ namespace HBE {
 		VkDeviceOrHostAddressConstKHR address{};
 	public:
 		VK_TopLevelAccelerationStructure(VK_Device *device, RootAccelerationStructureInfo info);
+		~VK_TopLevelAccelerationStructure() override;
 		VkDeviceOrHostAddressConstKHR getDeviceAddress() const;
+		const VkAccelerationStructureKHR getHandle() const;
 	};
 
 

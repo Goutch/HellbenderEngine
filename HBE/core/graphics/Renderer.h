@@ -23,13 +23,18 @@ namespace HBE {
 
 	class Material;
 
+	class RootAccelerationStructure;
+
+	class RaytracingPipelineInstance;
+
 	class Renderer {
 	public:
 		static Renderer *create();
 
 		virtual ~Renderer() = default;
 
-		virtual void render(const RenderTarget *render_target, const mat4 &projection_matrix,
+		virtual void render(const RenderTarget *render_target,
+							const mat4 &projection_matrix,
 							const mat4 &view_matrix) = 0;
 
 		virtual void beginFrame() = 0;
@@ -47,5 +52,11 @@ namespace HBE {
 		virtual const ResourceFactory *getResourceFactory() const = 0;
 
 		virtual void createDefaultResources() = 0;
+
+		virtual void raytrace(const RootAccelerationStructure &root_acceleration_structure,
+							  RaytracingPipelineInstance &pipeline,
+							  const RenderTarget &target,
+							  const mat4 &projection_matrix,
+							  const mat4 &view_matrix) = 0;
 	};
 }

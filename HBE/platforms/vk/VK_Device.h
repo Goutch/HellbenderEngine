@@ -21,12 +21,9 @@ namespace HBE {
 
 	class VK_Device {
 		VkDevice handle;
-
-
 		std::unordered_map<QUEUE_FAMILY, VK_Queue> queues;
 		VK_PhysicalDevice *physical_device;
 		VK_Allocator *allocator;
-
 
 	public:
 		VK_Device(VK_PhysicalDevice &physical_device);

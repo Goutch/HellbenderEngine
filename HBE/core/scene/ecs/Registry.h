@@ -508,6 +508,7 @@ namespace HBE {
 
 		template<typename Component>
 		bool has(entity_handle handle) {
+			HB_ASSERT(valid(handle), "Entity does not exist");
 			const size_t hash = typeHash<Component>();
 			auto page = pages[getPage(handle)];
 			auto comp_page_it = page->component_pages.find(hash);

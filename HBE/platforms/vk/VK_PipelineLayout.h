@@ -36,7 +36,7 @@ namespace HBE {
 
 
 	public:
-		VK_PipelineLayout(VK_Device *device, const VK_Shader **shaders, size_t count);
+		VK_PipelineLayout(VK_Device *device,const VK_Shader **shaders, size_t count);
 		~VK_PipelineLayout();
 
 		VkPipelineLayout getHandle() const;

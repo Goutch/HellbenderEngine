@@ -1,3 +1,4 @@
+#include <core/utility/Profiler.h>
 #include "VK_MeshBottomLevelAccelerationStructure.h"
 #include "../VK_Device.h"
 #include "../VK_Buffer.h"
@@ -5,21 +6,12 @@
 
 namespace HBE {
 	VK_MeshBottomLevelAccelerationStructure::VK_MeshBottomLevelAccelerationStructure(VK_Device *device, MeshAccelerationStructureInfo info) {
-
-
 		this->device = device;
-
-
-		VkDeviceOrHostAddressConstKHR vertexBufferDeviceAddress{};
-		VkDeviceOrHostAddressConstKHR indexBufferDeviceAddress{};
-		VkDeviceOrHostAddressConstKHR transformBufferDeviceAddress{};
+		Profiler::begin("Build Mesh Acceleration Structure");
 
 		//todo:initialize this
 		VK_Mesh *mesh = dynamic_cast<VK_Mesh *>(info.mesh);
 		VkDeviceSize vertex_size = mesh->getBindingSize(0);
-
-		//buffer_address_info.buffer = mesh->getBuffer(1)->getHandle();
-		//transformBufferDeviceAddress.deviceAddress = vkGetBufferDeviceAddress(device->getHandle(), &buffer_address_info);
 
 		VkAccelerationStructureGeometryKHR accelerationStructureGeometry{};
 		accelerationStructureGeometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
@@ -35,8 +27,6 @@ namespace HBE {
 		accelerationStructureGeometry.geometry.triangles.indexData = mesh->getIndicesBuffer()->getDeviceAddress();
 		accelerationStructureGeometry.geometry.triangles.transformData.deviceAddress = 0;
 		accelerationStructureGeometry.geometry.triangles.transformData.hostAddress = nullptr;
-		//accelerationStructureGeometry.geometry.triangles.transformData = transformBufferDeviceAddress;
-
 
 		// Get size info
 		VkAccelerationStructureBuildGeometryInfoKHR accelerationStructureBuildGeometryInfo{};
@@ -103,13 +93,15 @@ namespace HBE {
 				&accelerationBuildGeometryInfo,
 				accelerationBuildStructureRangeInfos.data());
 		device->getQueue(QUEUE_FAMILY_GRAPHICS).endCommand();
-		device->getQueue(QUEUE_FAMILY_GRAPHICS).submitCommand();
+		device->getQueue(QUEUE_FAMILY_GRAPHICS).submitCommand().wait();
 
 		VkAccelerationStructureDeviceAddressInfoKHR accelerationDeviceAddressInfo{};
 		accelerationDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
 		accelerationDeviceAddressInfo.accelerationStructure = handle;
 
 		address.deviceAddress = device->vkGetAccelerationStructureDeviceAddressKHR(device->getHandle(), &accelerationDeviceAddressInfo);
+
+		Profiler::end();
 	}
 
 	VK_MeshBottomLevelAccelerationStructure::~VK_MeshBottomLevelAccelerationStructure() {

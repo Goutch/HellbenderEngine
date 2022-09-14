@@ -80,7 +80,7 @@ namespace HBE {
 
 	struct HB_API Camera {
 		mat4 projection = mat4(1.0f);
-		float fov = 90.0f;
+		float fov = 70.0f;
 		float render_distance = 100.0f;
 		float near = 0.001f;
 		bool active = true;
@@ -107,4 +107,5 @@ namespace HBE {
 		float max_pitch = 90.0f;
 		bool active = true;
 	};
+
 }

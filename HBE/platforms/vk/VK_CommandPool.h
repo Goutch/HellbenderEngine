@@ -39,7 +39,7 @@ namespace HBE {
 
 
 		const VkCommandPool &getHandle() const;
-		void submit(HBE::QUEUE_FAMILY queue, VkSemaphore *wait = nullptr,
+		VK_Fence& submit(HBE::QUEUE_FAMILY queue, VkSemaphore *wait = nullptr,
 					VkPipelineStageFlags *wait_stage = nullptr,
 					uint32_t wait_count = 0,
 					VkSemaphore *signal = nullptr,

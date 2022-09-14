@@ -5,10 +5,11 @@
 
 namespace HBE {
 	VK_Material::VK_Material(VK_Renderer *renderer, const MaterialInfo &info) {
-		const VK_GraphicPipeline *graphic_pipeline = dynamic_cast<const VK_GraphicPipeline *>(info.graphic_pipeline);
+		VK_GraphicPipeline *graphic_pipeline = dynamic_cast<VK_GraphicPipeline *>(info.graphic_pipeline);
 		const VK_PipelineLayout *layout = graphic_pipeline->getPipelineLayout();
 		descriptors = new VK_PipelineDescriptors(renderer, *layout);
 		this->pipeline = info.graphic_pipeline;
+		this->vk_pipeline = graphic_pipeline;
 	}
 
 	VK_Material::~VK_Material() {
@@ -57,6 +58,10 @@ namespace HBE {
 
 	const GraphicPipeline *HBE::VK_Material::getGraphicPipeline() const {
 		return pipeline;
+	}
+
+	VK_GraphicPipeline *VK_Material::getVkGraphicPipeline(){
+		return vk_pipeline;
 	}
 
 

@@ -3,9 +3,8 @@
 #include "CameraControllerSystem.h"
 #include "core/scene/Scene.h"
 #include "core/input/Input.h"
-#include "core/resource/Resources.h"
 #include "core/utility/Profiler.h"
-
+#include "core/resource/RenderTarget.h"
 namespace HBE {
 	CameraControllerSystem::CameraControllerSystem(Scene *scene) : System(scene) {
 		scene->onUpdate.subscribe(this, &CameraControllerSystem::update);

@@ -24,6 +24,12 @@ namespace HBE {
 	template<typename... Args>
 	class Event;
 
+	class RaytracingPipelineInstance;
+
+	class RootAccelerationStructure;
+
+	class RenderTarget;
+
 	class HB_API Graphics {
 		static Renderer *renderer;
 		static Window *window;
@@ -39,6 +45,12 @@ namespace HBE {
 
 		static void drawInstanced(const Mesh &mesh, Material &material);
 
+		static void raytrace(const RootAccelerationStructure &root_acceleration_structure,
+							 RaytracingPipelineInstance &pipeline,
+							 const RenderTarget &target,
+							 const mat4 &projection_matrix,
+							 const mat4 &view_matrix);
+
 		static void render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix);
 
 		static void setRenderTarget(RenderTarget *render_target);
@@ -52,9 +64,6 @@ namespace HBE {
 		static void endFrame(bool present = true);
 
 		static Renderer *getRenderer();
-
-	private:
-		static void initializeDefaultVariables();
 
 	};
 

@@ -1,3 +1,4 @@
+#include <core/utility/Profiler.h>
 #include "../VK_Device.h"
 #include "VK_AABBBottomLevelAccelerationStructure.h"
 #include "../VK_Buffer.h"
@@ -7,10 +8,8 @@
 namespace HBE {
 	VK_AABBBottomLevelAccelerationStructure::VK_AABBBottomLevelAccelerationStructure(VK_Device *device, AABBAccelerationStructureInfo info) {
 		this->device = device;
+		Profiler::begin("Build AABB Acceleration Structure");
 
-
-		VkAccelerationStructureGeometryKHR accelerationStructureGeometry{};
-		accelerationStructureGeometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
 
 		VkAabbPositionsKHR aabb_positions{};
 		aabb_positions.maxX = info.max.x;
@@ -35,6 +34,8 @@ namespace HBE {
 		VkDeviceOrHostAddressConstKHR aabb_position_buffer_address{};
 		aabb_position_buffer_address.deviceAddress = vkGetBufferDeviceAddress(device->getHandle(), &bufferDeviceAddressInfo);
 
+		VkAccelerationStructureGeometryKHR accelerationStructureGeometry{};
+		accelerationStructureGeometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
 		accelerationStructureGeometry.geometryType = VK_GEOMETRY_TYPE_AABBS_KHR;
 		accelerationStructureGeometry.geometry.aabbs.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_AABBS_DATA_KHR;
 		accelerationStructureGeometry.geometry.aabbs.data = aabb_position_buffer_address;
@@ -52,13 +53,13 @@ namespace HBE {
 
 		VkAccelerationStructureBuildSizesInfoKHR accelerationStructureBuildSizesInfo{};
 		accelerationStructureBuildSizesInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
-		const uint32_t numTriangles = 1;
+
 
 		device->vkGetAccelerationStructureBuildSizesKHR(
 				device->getHandle(),
 				VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
 				&accelerationStructureBuildGeometryInfo,
-				&numTriangles,
+				&accelerationStructureBuildGeometryInfo.geometryCount,
 				&accelerationStructureBuildSizesInfo);
 
 		buffer = new VK_Buffer(device,
@@ -90,15 +91,11 @@ namespace HBE {
 		accelerationBuildGeometryInfo.pGeometries = &accelerationStructureGeometry;
 		accelerationBuildGeometryInfo.scratchData.deviceAddress = scratchBuffer.getDeviceAddress().deviceAddress;
 
+
 		VkAccelerationStructureBuildRangeInfoKHR accelerationStructureBuildRangeInfo{};
-		accelerationStructureBuildRangeInfo.primitiveCount = numTriangles;
-		accelerationStructureBuildRangeInfo.primitiveOffset = 0;
-		accelerationStructureBuildRangeInfo.firstVertex = 0;
-		accelerationStructureBuildRangeInfo.transformOffset = 0;
+		accelerationStructureBuildRangeInfo.primitiveCount = 1;
 		std::vector<VkAccelerationStructureBuildRangeInfoKHR *> accelerationBuildStructureRangeInfos = {&accelerationStructureBuildRangeInfo};
 
-		// Build the acceleration structure on the device via a one-time command buffer submission
-		// Some implementations may support acceleration structure building on the host (VkPhysicalDeviceAccelerationStructureFeaturesKHR->accelerationStructureHostCommands), but we prefer device builds
 		device->getQueue(QUEUE_FAMILY_GRAPHICS).beginCommand();
 		device->vkCmdBuildAccelerationStructuresKHR(
 				device->getQueue(QUEUE_FAMILY_GRAPHICS).getCommandPool()->getCurrentBuffer(),
@@ -106,13 +103,16 @@ namespace HBE {
 				&accelerationBuildGeometryInfo,
 				accelerationBuildStructureRangeInfos.data());
 		device->getQueue(QUEUE_FAMILY_GRAPHICS).endCommand();
-		device->getQueue(QUEUE_FAMILY_GRAPHICS).submitCommand();
+		device->getQueue(QUEUE_FAMILY_GRAPHICS).submitCommand().wait();
+
 
 		VkAccelerationStructureDeviceAddressInfoKHR accelerationDeviceAddressInfo{};
 		accelerationDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
 		accelerationDeviceAddressInfo.accelerationStructure = handle;
 
 		address.deviceAddress = device->vkGetAccelerationStructureDeviceAddressKHR(device->getHandle(), &accelerationDeviceAddressInfo);
+
+		Profiler::end();
 	}
 
 	VK_AABBBottomLevelAccelerationStructure::~VK_AABBBottomLevelAccelerationStructure() {

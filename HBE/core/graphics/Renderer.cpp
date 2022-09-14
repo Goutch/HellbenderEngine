@@ -9,6 +9,9 @@
 #else
 #ifdef VULKAN_RENDERER
 #include <platforms/vk/VK_Renderer.h>
+#include <core/resource/raytracing/AccelerationStructure.h>
+#include <core/resource/raytracing/RaytracingPipeline.h>
+
 #endif
 #endif
 
@@ -23,7 +26,6 @@ namespace HBE {
 #endif
         return nullptr;
     }
-
 
 
 }

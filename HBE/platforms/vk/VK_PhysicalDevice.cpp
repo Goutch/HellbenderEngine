@@ -14,7 +14,28 @@ namespace HBE {
 
 		support_details = querySwapchainSupportDetails(handle);
 		vkGetPhysicalDeviceMemoryProperties(handle, &memory_properties);
-		vkGetPhysicalDeviceFeatures(handle, &supported_features);
+
+
+		VkPhysicalDeviceFeatures2 features2{};
+		features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+		acceleration_structure_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
+		ray_tracing_pipeline_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
+		features2.pNext = &acceleration_structure_features;
+		acceleration_structure_features.pNext = &ray_tracing_pipeline_features;
+		vkGetPhysicalDeviceFeatures2(handle, &features2);
+
+		VkPhysicalDeviceProperties2 properties2{};
+		properties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+		acceleration_structure_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_PROPERTIES_KHR;
+		ray_tracing_pipeline_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
+
+		properties2.pNext = &acceleration_structure_properties;
+		acceleration_structure_properties.pNext = &ray_tracing_pipeline_properties;
+		ray_tracing_pipeline_properties.pNext = nullptr;
+		vkGetPhysicalDeviceProperties2(handle, &properties2);
+
+		features = features2.features;
+		properties = properties2.properties;
 	}
 
 	void VK_PhysicalDevice::pickBestPhysicalDevice() {
@@ -110,6 +131,7 @@ namespace HBE {
 			else if ((supported_queue_families.at(i).queueFlags & VK_QUEUE_TRANSFER_BIT)) {
 				indices.transfer_family = i;
 			}
+
 			//complete?
 			if (indices.isComplete())break;
 		}
@@ -118,21 +140,10 @@ namespace HBE {
 	}
 
 
-	const VkPhysicalDeviceMemoryProperties &VK_PhysicalDevice::getMemoryProperties() const {
-		return memory_properties;
-	}
-
 	const VkPhysicalDevice &VK_PhysicalDevice::getHandle() const {
 		return handle;
 	}
 
-	const VkPhysicalDeviceFeatures &VK_PhysicalDevice::getFeatures() const {
-		return supported_features;
-	}
-
-	const VkPhysicalDeviceProperties &VK_PhysicalDevice::getProperties() const {
-		return properties;
-	}
 
 	bool VK_PhysicalDevice::checkExtensionsSupport(VkPhysicalDevice const &physical_device, const std::vector<const char *> &extensions) {
 		uint32_t extention_count = 0;
@@ -203,15 +214,37 @@ namespace HBE {
 		return support_details;
 	}
 
-	const VkPhysicalDeviceAccelerationStructureFeaturesKHR VK_PhysicalDevice::getAccelerationStructureFeatures() {
+	const VkPhysicalDeviceAccelerationStructureFeaturesKHR &VK_PhysicalDevice::getAccelerationStructureFeatures() {
 		return acceleration_structure_features;
 	}
 
-	const VkPhysicalDeviceRayTracingPipelineFeaturesKHR VK_PhysicalDevice::getRayTracingPipelineFeatures() {
+	const VkPhysicalDeviceRayTracingPipelineFeaturesKHR &VK_PhysicalDevice::getRayTracingPipelineFeatures() {
 		return ray_tracing_pipeline_features;
 	}
 
+	const VkPhysicalDeviceFeatures &VK_PhysicalDevice::getFeatures() const {
+		return features;
+	}
 
+	const VkPhysicalDeviceMemoryProperties &VK_PhysicalDevice::getMemoryProperties() const {
+		return memory_properties;
+	}
+
+	const VkPhysicalDeviceProperties &VK_PhysicalDevice::getProperties() const {
+		return properties;
+	}
+
+	const VkFormatProperties &VK_PhysicalDevice::getFormatProperties() const {
+		return format_properties;
+	}
+
+	const VkPhysicalDeviceRayTracingPipelinePropertiesKHR &VK_PhysicalDevice::getRayTracingPipelineProperties() const {
+		return ray_tracing_pipeline_properties;
+	}
+
+	const VkPhysicalDeviceAccelerationStructurePropertiesKHR &VK_PhysicalDevice::getAccelerationStructureProperties() const {
+		return acceleration_structure_properties;
+	}
 }
 
 

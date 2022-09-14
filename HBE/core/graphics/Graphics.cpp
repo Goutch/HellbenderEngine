@@ -96,7 +96,7 @@ void main()
 
 
 	void Graphics::init() {
-		window = Window::create(900, 600);
+		window = Window::create(1920, 1080);
 		renderer = Renderer::create();
 		Resources::init(*renderer->getResourceFactory());
 		renderer->createDefaultResources();
@@ -115,8 +115,6 @@ void main()
 	}
 
 	void Graphics::terminate() {
-
-
 		delete DEFAULT_QUAD;
 		delete DEFAULT_CUBE;
 		delete renderer;
@@ -146,6 +144,11 @@ void main()
 	void Graphics::setRenderTarget(RenderTarget *render_target) {
 		renderer->setCurrentRenderTarget(render_target);
 	}
+
+	void Graphics::raytrace(const RootAccelerationStructure &root_acceleration_structure, RaytracingPipelineInstance &pipeline, const RenderTarget &target, const mat4 &projection_matrix, const mat4 &view_matrix) {
+		renderer->raytrace(root_acceleration_structure, pipeline, target, projection_matrix, view_matrix);
+	}
+
 
 }
 

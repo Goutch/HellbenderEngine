@@ -4,13 +4,13 @@ set(CMAKE_CXX_STANDARD 20)
 project(HBE CXX)
 add_compile_definitions(HB_BUILD)
 
-
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --std=c++17 -O3 -fPIC")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3 -fPIC")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    set(MSVC_COMPILE_FLAGS "/MP")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_COMPILE_FLAGS}")
+    set(MSVC_COMPILE_FLAGS "/MP /Ot")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_COMPILE_FLAGS}" )
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 endif ()
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
@@ -188,7 +188,7 @@ set(CORE_FILES
         core/threading/JobManager.cpp
         core/threading/JobManager.h
 
-        core/resource/raytracing/RaytracingPipeline.h platforms/vk/raytracing/VK_RaytracingMaterial.cpp platforms/vk/raytracing/VK_RaytracingMaterial.h core/resource/raytracing/RaytracingMaterial.h)
+        core/resource/raytracing/RaytracingPipeline.h platforms/vk/raytracing/VK_RaytracingPipelineInstance.cpp platforms/vk/raytracing/VK_RaytracingPipelineInstance.h core/resource/raytracing/RaytracingPipelineInstance.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}
@@ -210,29 +210,6 @@ target_include_directories(${PROJECT_NAME}
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/")
 
-
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    message("Using Clang not supported")
-
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    if (WIN32)
-        message("Using mingw compiler")
-    else ()
-        message("Using GCC Compiler")
-    endif ()
-
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
-    error(FATAL_ERROR "Using Intel compiler is not supported")
-    # using Intel C++
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    # using Visual Studio C++
-    message("Using visual studio compiler")
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        MESSAGE("debug mode")
-    else ()
-        MESSAGE("release mode")
-    endif ()
-endif ()
 if (VULKAN_FOUND)
     set(GLSLANG_LIBS
             OSDependent

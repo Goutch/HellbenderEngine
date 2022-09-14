@@ -6,6 +6,7 @@
 #include "unordered_map"
 #include "set"
 #include "map"
+
 namespace HBE {
 	struct QueueFamilyIndices {
 		std::optional<uint32_t> graphics_family;
@@ -31,31 +32,34 @@ namespace HBE {
 		const std::vector<const char *> REQUIRED_EXTENSIONS = {
 				VK_KHR_SWAPCHAIN_EXTENSION_NAME
 		};
-		const std::vector<const char*> RAYTRACING_EXTENSIONS = {VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME,
-																VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME,
-																VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME,
-																VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME,
-																VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME,
-																VK_KHR_SPIRV_1_4_EXTENSION_NAME,
-																VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME,
-																//VK_KHR_RAY_QUERY_EXTENSION_NAME
-																};
+		const std::vector<const char *> RAYTRACING_EXTENSIONS = {VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME,
+																 VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME,
+																 VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME,
+																 VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME,
+																 VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME,
+																 VK_KHR_SPIRV_1_4_EXTENSION_NAME,
+																 VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME,
+				//VK_KHR_RAY_QUERY_EXTENSION_NAME
+		};
 
 		VkInstance vk_instance_handle;
 		VkSurfaceKHR surface_handle;
 		VkPhysicalDevice handle = VK_NULL_HANDLE;
-		VkPhysicalDeviceProperties properties;
-		VkPhysicalDeviceFeatures supported_features;
+		VkPhysicalDeviceProperties properties{};
+		VkPhysicalDeviceFeatures features{};
 		QueueFamilyIndices queue_family_indices{};
-		SwapchainSupportDetails support_details;
-		VkPhysicalDeviceMemoryProperties memory_properties;
-		VkFormatProperties format_properties;
-		VkPhysicalDeviceAccelerationStructureFeaturesKHR acceleration_structure_features;
-		VkPhysicalDeviceRayTracingPipelineFeaturesKHR ray_tracing_pipeline_features;
+		SwapchainSupportDetails support_details{};
+		VkPhysicalDeviceMemoryProperties memory_properties{};
+		VkFormatProperties format_properties{};
+
+		VkPhysicalDeviceAccelerationStructurePropertiesKHR acceleration_structure_properties{};
+		VkPhysicalDeviceRayTracingPipelinePropertiesKHR ray_tracing_pipeline_properties{};
+		VkPhysicalDeviceAccelerationStructureFeaturesKHR acceleration_structure_features{};
+		VkPhysicalDeviceRayTracingPipelineFeaturesKHR ray_tracing_pipeline_features{};
 
 		std::vector<const char *> enabled_extensions;
-		std::multimap<uint32_t ,VkPhysicalDevice> device_score;
-		std::unordered_map<VkPhysicalDevice,std::vector<const char*>> device_enabled_extensions;
+		std::multimap<uint32_t, VkPhysicalDevice> device_score;
+		std::unordered_map<VkPhysicalDevice, std::vector<const char *>> device_enabled_extensions;
 	public:
 		VK_PhysicalDevice(VkInstance vk_instance_handle, VkSurfaceKHR surface_handle);
 
@@ -63,9 +67,6 @@ namespace HBE {
 
 		const VkPhysicalDevice &getHandle() const;
 
-		const VkPhysicalDeviceFeatures &getFeatures() const;
-
-		const VkPhysicalDeviceProperties &getProperties() const;
 
 		const std::vector<const char *> &getExtensions() const;
 
@@ -73,16 +74,21 @@ namespace HBE {
 
 		SwapchainSupportDetails querySwapchainSupportDetails(const VkPhysicalDevice &physical_device) const;
 
-		const VkFormatProperties& getFormatProperties() const;
 
-		const VkPhysicalDeviceAccelerationStructureFeaturesKHR getAccelerationStructureFeatures();
-		const VkPhysicalDeviceRayTracingPipelineFeaturesKHR getRayTracingPipelineFeatures();
+		const VkPhysicalDeviceFeatures &getFeatures() const;
+		const VkPhysicalDeviceAccelerationStructureFeaturesKHR &getAccelerationStructureFeatures();
+		const VkPhysicalDeviceRayTracingPipelineFeaturesKHR &getRayTracingPipelineFeatures();
 
+		const VkPhysicalDeviceProperties &getProperties() const;
+		const VkFormatProperties &getFormatProperties() const;
 		const VkPhysicalDeviceMemoryProperties &getMemoryProperties() const;
+		const VkPhysicalDeviceRayTracingPipelinePropertiesKHR &getRayTracingPipelineProperties() const;
+		const VkPhysicalDeviceAccelerationStructurePropertiesKHR &getAccelerationStructureProperties() const;
+
 	private:
 		void pickBestPhysicalDevice();
 
-		bool checkExtensionsSupport(const VkPhysicalDevice &physical_device,const std::vector<const char*>& extensions);
+		bool checkExtensionsSupport(const VkPhysicalDevice &physical_device, const std::vector<const char *> &extensions);
 
 		QueueFamilyIndices getSupportedQueueFamilies(const VkPhysicalDevice &physical_device);
 

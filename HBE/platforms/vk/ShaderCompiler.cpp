@@ -214,6 +214,22 @@ namespace HBE {
 			case SHADER_STAGE::SHADER_STAGE_GEOMETRY:
 				stage = EShLangGeometry;
 				break;
+			case SHADER_STAGE::SHADER_STAGE_RAY_GEN:
+				stage = EShLangRayGen;
+				break;
+			case SHADER_STAGE::SHADER_STAGE_RAY_MISS:
+				stage = EShLangMiss;
+				break;
+			case SHADER_STAGE::SHADER_STAGE_CLOSEST_HIT:
+				stage = EShLangClosestHit;
+				break;
+			case SHADER_STAGE::SHADER_STAGE_ANY_HIT:
+				stage = EShLangAnyHit;
+				break;
+			case SHADER_STAGE::SHADER_STAGE_INTERSECTION:
+				stage = EShLangIntersect;
+				break;
+
 			case SHADER_STAGE_NONE:
 				break;
 		}
@@ -226,8 +242,8 @@ namespace HBE {
 			const char *source_str_ptr = source_str.c_str();
 			const char *const *source_ptr = &source_str_ptr;
 			int lenght = source_str.size();
-			shader.setEnvClient(glslang::EShClient::EShClientVulkan, glslang::EShTargetVulkan_1_2);
-			shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_3);
+			shader.setEnvClient(glslang::EShClient::EShClientVulkan, glslang::EShTargetVulkan_1_3);
+			shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_4);
 			shader.setStringsWithLengths(source_ptr, &lenght, 1);
 			shader.setSourceEntryPoint("main");
 			shader.setEntryPoint("main");

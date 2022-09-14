@@ -39,6 +39,9 @@ namespace HBE {
 	}
 
 	Scene *Application::getScene() {
+		if (current_scene == nullptr) {
+			setScene(new Scene(), false);
+		}
 		return current_scene;
 	}
 
@@ -79,18 +82,18 @@ namespace HBE {
 						current_scene->draw();
 						Profiler::end();
 						Profiler::begin("RENDER");
+
 						Graphics::beginFrame();
 						onRender.invoke();
 						current_scene->render();
 						Graphics::endFrame();
+
 						Profiler::end();
 					}
 				} else {
 					//Log::warning("No camera in current scene");
 				}
-			}
-			else
-			{
+			} else {
 				//Log::warning("No scene set");
 			}
 

@@ -1,5 +1,5 @@
 #pragma once
-
+#include "HBE.h"
 class LoadModelExemple {
 public:
 	static void init() {
@@ -88,8 +88,8 @@ public:
 		MeshRenderer &ground_renderer = ground_entity.attach<MeshRenderer>();
 		ground_renderer.mesh = ground_mesh;
 		ground_renderer.material = ground_material;
+		ground_entity.get<Transform>().rotate(vec3(- M_PI / 2, 0, 0));
 		ground_entity.get<Transform>().translate(vec3(0, -0.7, 0));
-		ground_entity.get<Transform>().rotate(vec3(-M_PI / 2, 0, 0));
 
 
 		auto teapot = scene->createEntity("teapot");

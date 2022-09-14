@@ -22,7 +22,6 @@ namespace HBE {
 	};
 
 	class HB_API ComputePipeline : public Resource {
-	public:
-		virtual ~ComputePipeline() {};
+
 	};
 }

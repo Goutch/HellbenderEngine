@@ -100,6 +100,11 @@ namespace HBE {
 
 		const VK_Instance *getInstance() const;
 		void waitAll();
+		void raytrace(const RootAccelerationStructure &root_acceleration_structure,
+					  RaytracingPipelineInstance &pipeline,
+					  const RenderTarget &target,
+					  const mat4 &projection_matrix,
+					  const mat4 &view_matrix) override;
 	};
 }
 

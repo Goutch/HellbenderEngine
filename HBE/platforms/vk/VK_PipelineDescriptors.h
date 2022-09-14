@@ -20,6 +20,7 @@ namespace HBE {
 
 	class VK_ComputePipeline;
 
+	class VK_TopLevelAccelerationStructure;
 
 	class Material;
 
@@ -58,6 +59,8 @@ namespace HBE {
 		void setTexture(uint32_t binding, const RenderTarget *render_target);
 		void setTexture(const std::string &name, const Texture *texture, uint32_t mip_level);
 		void setTexture(const std::string &name, const RenderTarget *render_target);
+		void setAccelerationStructure(uint32_t binding, const VK_TopLevelAccelerationStructure *acceleration_structure);
+		void setAccelerationStructure(const std::string &name, const VK_TopLevelAccelerationStructure *acceleration_structure);
 		void createDescriptorSets();
 		void createDescriptorPool();
 	};
