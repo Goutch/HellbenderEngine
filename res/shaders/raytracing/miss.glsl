@@ -3,6 +3,7 @@
 
 layout(location = 0) rayPayloadInEXT vec3 hitValue;
 
+
 void main()
 {
     vec3 position = gl_WorldRayOriginEXT + (gl_WorldRayDirectionEXT * gl_RayTmaxEXT);

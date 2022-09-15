@@ -17,8 +17,9 @@
 #include "Material.h"
 
 namespace HBE {
+
 	Model::~Model() {
-		for (std::vector<Mesh *> primitives:data.meshes) {
+		for (const std::vector<Mesh *> &primitives:data.meshes) {
 			for (Mesh *mesh: primitives) {
 				delete mesh;
 			}
@@ -34,7 +35,7 @@ namespace HBE {
 	}
 
 	Model::Model(const ModelInfo &info) {
-		load(info.path);
+		load(info);
 	}
 
 
@@ -48,17 +49,17 @@ namespace HBE {
 	void processNodes(ModelData &data, tinygltf::Model &model, const tinygltf::Node &node, std::vector<ModelNode> &node_array) {
 		ModelNode model_node{};
 
-
 		if ((node.mesh >= 0) && (node.mesh < model.meshes.size())) {
 			tinygltf::Mesh gltf_mesh = model.meshes[node.mesh];
 			for (int i = 0; i < gltf_mesh.primitives.size(); ++i) {
 				size_t material_index = gltf_mesh.primitives[i].material;
 				model_node.primitives.emplace_back();
 				model_node.primitives[i].mesh = data.meshes[node.mesh][i];
-				if (material_index != -1)
+				if (data.materials.size() > material_index) {
 					model_node.primitives[i].material = data.materials[material_index];
-				else
+				} else {
 					Log::warning("Can't find material for mesh" + std::to_string(i));
+				}
 			}
 		}
 		if (node.matrix.size() == 16) {
@@ -80,7 +81,7 @@ namespace HBE {
 
 	//https://github.com/KhronosGroup/glTF-Tutorials/blob/master/gltfTutorial/gltfTutorial_005_BuffersBufferViewsAccessors.md
 	//https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#meshes
-	Mesh *createPrimitive(ModelData &data, const tinygltf::Model &model, const tinygltf::Primitive &primitive) {
+	Mesh *createPrimitive(ModelData &data, const tinygltf::Model &model, const tinygltf::Primitive &primitive, MODEL_FLAGS flags) {
 		//mesh
 		MeshBuffer indices_buffer{};
 
@@ -152,6 +153,7 @@ namespace HBE {
 		mesh_info.binding_infos = binding_infos.data();
 		mesh_info.binding_info_count = binding_infos.size();
 		mesh_info.flags = MESH_FLAG_NONE;
+		mesh_info.flags |= (flags & MODEL_FLAG_USED_IN_RAYTRACING)==MODEL_FLAG_USED_IN_RAYTRACING ? MESH_FLAG_USED_IN_RAYTRACING : MESH_FLAG_NONE;
 
 		Mesh *mesh_ptr = Resources::createMesh(mesh_info);
 		switch (indices_buffer.element_size) {
@@ -171,7 +173,7 @@ namespace HBE {
 		return mesh_ptr;
 	}
 
-	void createMeshes(ModelData &data, tinygltf::Model &model) {
+	void createMeshes(ModelData &data, tinygltf::Model &model, MODEL_FLAGS flags) {
 		for (size_t i = 0; i < model.meshes.size(); i++) {
 			const tinygltf::Mesh &gltf_mesh = model.meshes[i];
 			data.meshes.emplace_back();
@@ -179,7 +181,7 @@ namespace HBE {
 			for (size_t gltf_primitive_index = 0; gltf_primitive_index < gltf_mesh.primitives.size(); ++gltf_primitive_index) {
 				const tinygltf::Primitive &gltf_primitive = gltf_mesh.primitives[gltf_primitive_index];
 
-				Mesh *mesh = createPrimitive(data, model, gltf_primitive);
+				Mesh *mesh = createPrimitive(data, model, gltf_primitive, flags);
 
 				meshes.emplace_back(mesh);
 			}
@@ -210,12 +212,12 @@ namespace HBE {
 	}
 
 
-	void Model::load(const std::string &path) {
+	void Model::load(const ModelInfo &info) {
 		tinygltf::TinyGLTF loader;
 		tinygltf::Model model;
 		std::string err;
 		std::string warn;
-		bool res = loader.LoadASCIIFromFile(&model, &err, &warn, RESOURCE_PATH + path);
+		bool res = loader.LoadASCIIFromFile(&model, &err, &warn, RESOURCE_PATH + info.path);
 		if (!warn.empty()) {
 			Log::warning(warn);
 		}
@@ -228,8 +230,10 @@ namespace HBE {
 			Log::error("Failed to load glTF: ");
 
 
-		createMeshes(data, model);
-		createMaterials(data, model);
+		createMeshes(data, model, info.flags);
+		if ((info.flags & MODEL_FLAG_DONT_LOAD_MATERIALS) != MODEL_FLAG_DONT_LOAD_MATERIALS) {
+			createMaterials(data, model);
+		}
 
 
 		const tinygltf::Scene &scene = model.scenes[model.defaultScene];

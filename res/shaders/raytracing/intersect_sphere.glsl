@@ -1,6 +1,6 @@
 #version 460
 #extension GL_EXT_ray_tracing : require
-// this method is documented in raytracing gems book
+
 vec2 gems_intersections(vec3 orig, vec3 dir, vec3 center, float radius)
 {
     vec3 f = orig - center;
@@ -22,19 +22,21 @@ vec2 gems_intersections(vec3 orig, vec3 dir, vec3 center, float radius)
 
 void main()
 {
+    mat4x3 transform = gl_ObjectToWorldEXT;
 
-    vec3 orig = gl_WorldRayOriginEXT;
-    vec3 dir = gl_WorldRayDirectionEXT;
+    vec3 p = vec3(transform[3][0], transform[3][0], transform[3][2]);
+    vec3 s = vec3(length(transform[0].xyz), length(transform[1].xyz), length(transform[2].xyz));
+    vec3 half_s = s * 0.5;
 
-    vec3 aabb_max = vec3(sph.aabb_maxx, sph.aabb_maxy, sph.aabb_maxz);
-    vec3 aabb_min = vec3(sph.aabb_minx, sph.aabb_miny, sph.aabb_minz);
-    vec3 center = (aabb_max + aabb_min) / vec3(2.0);
-    float radius = (aabb_max.x - aabb_min.x) / 2.0;
-
-    vec2 t = gems_intersections(orig, dir, center, radius);
-
-    sphere_point =  orig + t.x * dir;
-    reportIntersectionEXT(t.x, 0);
-    sphere_point =  orig + t.y * dir;
-    reportIntersectionEXT(t.y, 0);
+    vec2 ts = gems_intersections(gl_WorldRayOriginEXT, gl_WorldRayDirectionEXT, p, half_s.x);
+    if (ts.x>0.0)
+    {
+        //sphere_point =  orig + t.x * dir;
+        reportIntersectionEXT(ts.x, 0);
+    }
+    if (ts.y>0.0)
+    {
+       // sphere_point =  orig + t.y * dir;
+        reportIntersectionEXT(ts.y, 0);
+    }
 }

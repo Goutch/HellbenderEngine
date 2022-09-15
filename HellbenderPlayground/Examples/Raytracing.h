@@ -44,9 +44,9 @@ public:
 		Shader *closest_hit_shader = Resources::createShader(closest_hit_shader_info, "closesthit");
 
 		ShaderInfo box_intersection_shader_info{};
-		box_intersection_shader_info.path = "shaders/raytracing/intersect_box.glsl";
+		box_intersection_shader_info.path = "shaders/raytracing/intersect_sphere.glsl";
 		box_intersection_shader_info.stage = SHADER_STAGE_INTERSECTION;
-		Shader *box_intersection_shader = Resources::createShader(box_intersection_shader_info, "box_intersection");
+		Shader *box_intersection_shader = Resources::createShader(box_intersection_shader_info, "intersect_sphere");
 
 		std::vector<Shader *> hit_shaders;
 		hit_shaders.push_back(closest_hit_shader);
@@ -92,9 +92,13 @@ public:
 		mesh_info.binding_infos = vertex_binding_infos.data();
 		mesh_info.binding_info_count = vertex_binding_infos.size();
 
-		Mesh *mesh = Resources::createMesh(mesh_info, "mesh");
+		ModelInfo model_info{};
+		model_info.path = "models/dragon.gltf";
+		model_info.flags = MODEL_FLAG_DONT_LOAD_MATERIALS | MODEL_FLAG_USED_IN_RAYTRACING;
 
-		Geometry::createCube(*mesh, 2, 2, 2, VERTEX_FLAG_NONE);
+		Model *model = Resources::createModel(model_info, "model");
+
+		Mesh *mesh = model->getNodes()[0].primitives[0].mesh;
 
 		MeshAccelerationStructureInfo mesh_acceleration_structure_info{};
 		mesh_acceleration_structure_info.mesh = mesh;

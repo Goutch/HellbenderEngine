@@ -5,10 +5,14 @@
 #include "string"
 #include "vector"
 #include "Resource.h"
+
 namespace HBE {
 	class Material;
+
 	class GraphicPipeline;
+
 	class Mesh;
+
 	class Texture;
 
 	typedef uint32_t MODEL_FLAGS;
@@ -17,6 +21,7 @@ namespace HBE {
 		MODEL_FLAG_NONE = 0,
 		MODEL_FLAG_DONT_LOAD_TEXTURES = 1 << 0,
 		MODEL_FLAG_DONT_LOAD_MATERIALS = 1 << 1,
+		MODEL_FLAG_USED_IN_RAYTRACING = 1 << 2,
 	};
 
 	struct ModelInfo {
@@ -53,8 +58,10 @@ namespace HBE {
 		friend class Resources;
 
 		ModelData data;
-		void load(const std::string &path);
+		void load(const ModelInfo &info);
 		Model(const ModelInfo &info);
+
+
 	public:
 		~Model();
 		const std::vector<ModelNode> &getNodes();

@@ -21,7 +21,7 @@ void main()
 
     vec3 p = vec3(transform[3][0], transform[3][0], transform[3][2]);
     vec3 s = vec3(length(transform[0].xyz), length(transform[1].xyz), length(transform[2].xyz));
-
+    vec3 half_s =s*-0.5; 
     float t = intersection(gl_WorldRayOriginEXT, gl_WorldRayDirectionEXT, p-s, p+s);
     if (t>0)
     {
