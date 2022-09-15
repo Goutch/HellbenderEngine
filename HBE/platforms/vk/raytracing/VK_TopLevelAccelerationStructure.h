@@ -11,7 +11,7 @@ namespace HBE {
 		VK_Buffer *buffer;
 		VkDeviceOrHostAddressConstKHR address{};
 	public:
-		VK_TopLevelAccelerationStructure(VK_Device *device, RootAccelerationStructureInfo info);
+		VK_TopLevelAccelerationStructure(VK_Device *device,const  RootAccelerationStructureInfo& info);
 		~VK_TopLevelAccelerationStructure() override;
 		VkDeviceOrHostAddressConstKHR getDeviceAddress() const;
 		const VkAccelerationStructureKHR getHandle() const;

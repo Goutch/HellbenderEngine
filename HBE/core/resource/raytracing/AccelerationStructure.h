@@ -30,6 +30,7 @@ namespace HBE {
 	};
 	struct AccelerationStructureInstance {
 		uint32_t acceleration_structure_index;
+		uint32_t shader_group_index;
 		mat4 transform;
 		ACCELERATION_STRUCTURE_TYPE type;
 	};

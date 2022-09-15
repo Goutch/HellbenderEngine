@@ -10,7 +10,7 @@
 namespace HBE {
 
 
-	VK_TopLevelAccelerationStructure::VK_TopLevelAccelerationStructure(VK_Device *device, RootAccelerationStructureInfo info) {
+	VK_TopLevelAccelerationStructure::VK_TopLevelAccelerationStructure(VK_Device *device, const RootAccelerationStructureInfo& info) {
 		this->device = device;
 		Profiler::begin("Build root Acceleration Structure");
 		std::vector<VkAccelerationStructureInstanceKHR> instances;
@@ -28,7 +28,7 @@ namespace HBE {
 			instances[i].transform = t;
 			instances[i].instanceCustomIndex = 0;
 			instances[i].mask = 0xFF;
-			instances[i].instanceShaderBindingTableRecordOffset = 0;
+			instances[i].instanceShaderBindingTableRecordOffset = info.instances[i].shader_group_index;
 			instances[i].flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
 			if (info.instances[i].type == ACCELERATION_STRUCTURE_TYPE_AABB) {
 				auto *aabb_as = (VK_AABBBottomLevelAccelerationStructure *) info.aabb_acceleration_structures[info.instances[i].acceleration_structure_index];

@@ -43,26 +43,26 @@ public:
 		closest_hit_shader_info.stage = SHADER_STAGE_CLOSEST_HIT;
 		Shader *closest_hit_shader = Resources::createShader(closest_hit_shader_info, "closesthit");
 
-		ShaderInfo box_intersection_shader_info{};
-		box_intersection_shader_info.path = "shaders/raytracing/intersect_sphere.glsl";
-		box_intersection_shader_info.stage = SHADER_STAGE_INTERSECTION;
-		Shader *box_intersection_shader = Resources::createShader(box_intersection_shader_info, "intersect_sphere");
+		ShaderInfo sphere_intersection_shader_info{};
+		sphere_intersection_shader_info.path = "shaders/raytracing/intersect_sphere.glsl";
+		sphere_intersection_shader_info.stage = SHADER_STAGE_INTERSECTION;
+		Shader *sphere_intersection_shader = Resources::createShader(sphere_intersection_shader_info, "intersect_sphere");
 
+		ShaderInfo box_intersection_shader_info{};
+		box_intersection_shader_info.path = "shaders/raytracing/intersect_box.glsl";
+		box_intersection_shader_info.stage = SHADER_STAGE_INTERSECTION;
+		Shader *box_intersection_shader = Resources::createShader(box_intersection_shader_info, "intersect_box");
 		std::vector<Shader *> hit_shaders;
 		hit_shaders.push_back(closest_hit_shader);
 		hit_shaders.push_back(box_intersection_shader);
+		hit_shaders.push_back(sphere_intersection_shader);
 
-		RaytracingShaderGroup triangle_shader_group{};
-		triangle_shader_group.closest_hit_shader_index = 0;
+		std::vector<RaytracingShaderGroup> shader_groups{
+				{0, -1, -1},//triangle
+				{0, -1, 1},//box
+				{0, -1, 2},//sphere
+		};
 
-		RaytracingShaderGroup aabb_shader_group{};
-		aabb_shader_group.closest_hit_shader_index = 0;
-		aabb_shader_group.intersection_shader_index = 1;
-
-
-		std::vector<RaytracingShaderGroup> shader_groups;
-		shader_groups.push_back(aabb_shader_group);
-		shader_groups.push_back(triangle_shader_group);
 
 		RaytracingPipelineInfo raytracing_pipeline_info{};
 		raytracing_pipeline_info.raygen_shader = ray_gen_shader;
@@ -83,8 +83,8 @@ public:
 
 		AABBAccelerationStructure *aabb_acceleration_structure = Resources::createAABBAccelerationStructure(aabb__acceleration_structure_info, "aabbas");
 
+		std::vector<AABBAccelerationStructure *> aabb_acceleration_structures{aabb_acceleration_structure};
 
-		Log::message("Raytracing init");
 		std::vector<VertexBindingInfo> vertex_binding_infos{};
 		vertex_binding_infos.push_back(VertexBindingInfo{0, sizeof(vec3), VERTEX_BINDING_FLAG_NONE});
 		MeshInfo mesh_info{};
@@ -110,16 +110,21 @@ public:
 		Transform transform_mesh{};
 		transform_mesh.translate(vec3(0, 0, 5));
 
-		Transform transform_aabb{};
-		transform_aabb.translate(vec3(0, 0, -5));
+		Transform transform_aabb_sphere{};
+		transform_aabb_sphere.translate(vec3(0, 0, -5));
 
-		acceleration_structure_instances.push_back(AccelerationStructureInstance{0, transform_aabb.world(), ACCELERATION_STRUCTURE_TYPE_AABB});
-		acceleration_structure_instances.push_back(AccelerationStructureInstance{0, transform_mesh.world(), ACCELERATION_STRUCTURE_TYPE_MESH});
+		Transform transform_aabb_floor{};
+		transform_aabb_floor.translate(vec3(0, -0.5, 0));
+		transform_aabb_floor.setScale(vec3(100, 1, 100));
+
+		acceleration_structure_instances.push_back(AccelerationStructureInstance{0, 0, transform_mesh.world(), ACCELERATION_STRUCTURE_TYPE_MESH});
+		acceleration_structure_instances.push_back(AccelerationStructureInstance{0, 1, transform_aabb_floor.world(), ACCELERATION_STRUCTURE_TYPE_AABB});
+		acceleration_structure_instances.push_back(AccelerationStructureInstance{0, 2, transform_aabb_sphere.world(), ACCELERATION_STRUCTURE_TYPE_AABB});
 
 
 		RootAccelerationStructureInfo root_acceleration_structure_info{};
-		root_acceleration_structure_info.aabb_acceleration_structures = &aabb_acceleration_structure;
-		root_acceleration_structure_info.aabb_acceleration_structure_count = 1;
+		root_acceleration_structure_info.aabb_acceleration_structures = aabb_acceleration_structures.data();
+		root_acceleration_structure_info.aabb_acceleration_structure_count = aabb_acceleration_structures.size();
 		root_acceleration_structure_info.mesh_acceleration_structures = &mesh_acceleration_structure;
 		root_acceleration_structure_info.mesh_acceleration_structure_count = 1;
 		root_acceleration_structure_info.instances = acceleration_structure_instances.data();

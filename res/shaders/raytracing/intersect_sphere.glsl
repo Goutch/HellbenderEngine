@@ -24,7 +24,7 @@ void main()
 {
     mat4x3 transform = gl_ObjectToWorldEXT;
 
-    vec3 p = vec3(transform[3][0], transform[3][0], transform[3][2]);
+    vec3 p = vec3(transform[3][0], transform[3][1], transform[3][2]);
     vec3 s = vec3(length(transform[0].xyz), length(transform[1].xyz), length(transform[2].xyz));
     vec3 half_s = s * 0.5;
 
