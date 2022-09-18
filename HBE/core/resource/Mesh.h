@@ -5,7 +5,7 @@
 #include "glm/glm.hpp"
 #include "Resource.h"
 #include "unordered_map"
-
+#include "string"
 namespace HBE {
 
 	typedef uint32_t MESH_FLAGS;

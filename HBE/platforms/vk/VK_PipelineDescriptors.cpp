@@ -120,7 +120,6 @@ namespace HBE {
 					case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC:
 					case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC:
 					case VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT:
-					case VK_DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK:
 					case VK_DESCRIPTOR_TYPE_MAX_ENUM:
 						Log::error("Descriptor type not supported");
 						break;

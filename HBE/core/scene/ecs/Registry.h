@@ -17,6 +17,7 @@
 #include "core/utility/Log.h"
 #include <cstring>
 #include "algorithm"
+#include "string"
 
 #ifndef REGISTRY_PAGE_SIZE
 #define REGISTRY_PAGE_SIZE 128
@@ -525,7 +526,7 @@ namespace HBE {
 			HB_ASSERT(has<Component>(handle),
 					  std::string("tried to get ") + typeName<Component>() + " in entity#" + std::to_string(handle) + std::string(" but has<") + typeName<Component>() + ">(" + std::to_string(handle) + ") = false");
 
-			return pages[getPage(handle)]->component_pages[typeHash<Component>()]->getAs<Component>(handle);
+			return pages[getPage(handle)]->component_pages[typeHash<Component>()]->template getAs<Component>(handle);
 		}
 
 

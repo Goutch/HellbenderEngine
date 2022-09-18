@@ -1,5 +1,5 @@
 //========================================================================
-// GLFW 3.4 OSMesa - www.glfw.org
+// GLFW 3.3 OSMesa - www.glfw.org
 //------------------------------------------------------------------------
 // Copyright (c) 2016 Google Inc.
 // Copyright (c) 2016-2017 Camilla Löwy <elmindreda@glfw.org>
@@ -66,7 +66,6 @@ typedef struct _GLFWcontextOSMesa
     int                 width;
     int                 height;
     void*               buffer;
-
 } _GLFWcontextOSMesa;
 
 // OSMesa-specific global data
@@ -82,7 +81,6 @@ typedef struct _GLFWlibraryOSMesa
     PFN_OSMesaGetColorBuffer        GetColorBuffer;
     PFN_OSMesaGetDepthBuffer        GetDepthBuffer;
     PFN_OSMesaGetProcAddress        GetProcAddress;
-
 } _GLFWlibraryOSMesa;
 
 

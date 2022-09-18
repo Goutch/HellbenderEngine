@@ -2155,7 +2155,7 @@ Once the code changes for the fix is done, we need to commit the changes:
 >>> git commit -m "Resolve the issue that caused problem with a specific fix #432"
 ```
 
-The commit message should be as specific as possible and isEnd by the bug number in the [GLM GitHub issue page](https://github.com/g-truc/glm/issues)
+The commit message should be as specific as possible and finished by the bug number in the [GLM GitHub issue page](https://github.com/g-truc/glm/issues)
 
 Finally, we need to push our changes in our branch to our GitHub fork using:
 ```

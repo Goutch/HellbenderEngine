@@ -74,7 +74,7 @@ namespace HBE {
 		node_array.emplace_back(model_node);
 
 		for (size_t i = 0; i < node.children.size(); i++) {
-			assert((node.children[i] >= 0) && (node.children[i] < model.nodes.size()));
+			assert((node.children[i] >= 0) && (node.children[i] < (int)model.nodes.size()));
 			processNodes(data, model, model.nodes[node.children[i]], model_node.children);
 		}
 	}

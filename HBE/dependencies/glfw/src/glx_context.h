@@ -1,5 +1,5 @@
 //========================================================================
-// GLFW 3.4 GLX - www.glfw.org
+// GLFW 3.3 GLX - www.glfw.org
 //------------------------------------------------------------------------
 // Copyright (c) 2002-2006 Marcus Geelnard
 // Copyright (c) 2006-2017 Camilla Löwy <elmindreda@glfw.org>
@@ -117,7 +117,6 @@ typedef struct _GLFWcontextGLX
 {
     GLXContext      handle;
     GLXWindow       window;
-
 } _GLFWcontextGLX;
 
 // GLX-specific global data
@@ -165,7 +164,6 @@ typedef struct _GLFWlibraryGLX
     GLFWbool        EXT_create_context_es2_profile;
     GLFWbool        ARB_create_context_no_error;
     GLFWbool        ARB_context_flush_control;
-
 } _GLFWlibraryGLX;
 
 GLFWbool _glfwInitGLX(void);

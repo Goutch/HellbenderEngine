@@ -1,5 +1,5 @@
 //========================================================================
-// GLFW 3.4 - www.glfw.org
+// GLFW 3.3 - www.glfw.org
 //------------------------------------------------------------------------
 // Copyright (c) 2016 Google Inc.
 // Copyright (c) 2016-2019 Camilla Löwy <elmindreda@glfw.org>
@@ -67,6 +67,9 @@ int _glfwPlatformCreateWindow(_GLFWwindow* window,
             _glfwInputError(GLFW_API_UNAVAILABLE, "Null: EGL not available");
             return GLFW_FALSE;
         }
+
+        if (!_glfwRefreshContextAttribs(window, ctxconfig))
+            return GLFW_FALSE;
     }
 
     return GLFW_TRUE;

@@ -3,6 +3,8 @@
 #include "platforms/vk/VK_CommandPool.h"
 #include "platforms/vk/VK_Image.h"
 #include "platforms/vk/VK_Buffer.h"
+#include "cstring"
+
 /*
  *
 todo: use somne kind of ring buffer for staging and wait and free only when ring buffer is full

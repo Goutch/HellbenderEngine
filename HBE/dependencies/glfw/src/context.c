@@ -1,5 +1,5 @@
 //========================================================================
-// GLFW 3.4 - www.glfw.org
+// GLFW 3.3 - www.glfw.org
 //------------------------------------------------------------------------
 // Copyright (c) 2002-2006 Marcus Geelnard
 // Copyright (c) 2006-2016 Camilla Löwy <elmindreda@glfw.org>
@@ -193,12 +193,6 @@ const _GLFWfbconfig* _glfwChooseFBConfig(const _GLFWfbconfig* desired,
         if (desired->stereo > 0 && current->stereo == 0)
         {
             // Stereo is a hard constraint
-            continue;
-        }
-
-        if (desired->doublebuffer != current->doublebuffer)
-        {
-            // Double buffering is a hard constraint
             continue;
         }
 
@@ -570,7 +564,9 @@ GLFWbool _glfwRefreshContextAttribs(_GLFWwindow* window,
         PFNGLCLEARPROC glClear = (PFNGLCLEARPROC)
             window->context.getProcAddress("glClear");
         glClear(GL_COLOR_BUFFER_BIT);
-        window->context.swapBuffers(window);
+
+        if (window->doublebuffer)
+            window->context.swapBuffers(window);
     }
 
     glfwMakeContextCurrent((GLFWwindow*) previous);
@@ -613,9 +609,11 @@ GLFWbool _glfwStringInExtensionString(const char* string, const char* extensions
 GLFWAPI void glfwMakeContextCurrent(GLFWwindow* handle)
 {
     _GLFWwindow* window = (_GLFWwindow*) handle;
-    _GLFWwindow* previous = _glfwPlatformGetTls(&_glfw.contextSlot);
+    _GLFWwindow* previous;
 
     _GLFW_REQUIRE_INIT();
+
+    previous = _glfwPlatformGetTls(&_glfw.contextSlot);
 
     if (window && window->context.client == GLFW_NO_API)
     {
@@ -650,7 +648,7 @@ GLFWAPI void glfwSwapBuffers(GLFWwindow* handle)
     if (window->context.client == GLFW_NO_API)
     {
         _glfwInputError(GLFW_NO_WINDOW_CONTEXT,
-                        "Cannot swapBuffers buffers of a window that has no OpenGL or OpenGL ES context");
+                        "Cannot swap buffers of a window that has no OpenGL or OpenGL ES context");
         return;
     }
 
@@ -667,7 +665,7 @@ GLFWAPI void glfwSwapInterval(int interval)
     if (!window)
     {
         _glfwInputError(GLFW_NO_CURRENT_CONTEXT,
-                        "Cannot set swapBuffers interval without a current OpenGL or OpenGL ES context");
+                        "Cannot set swap interval without a current OpenGL or OpenGL ES context");
         return;
     }
 
