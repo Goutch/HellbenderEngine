@@ -1,6 +1,11 @@
 #version 460
 #extension GL_EXT_ray_tracing : require
 
+hitAttributeEXT HitResult
+{
+    vec3 normal;
+} hitResult;
+
 vec2 gems_intersections(vec3 orig, vec3 dir, vec3 center, float radius)
 {
     vec3 f = orig - center;
@@ -29,14 +34,17 @@ void main()
     vec3 half_s = s * 0.5;
 
     vec2 ts = gems_intersections(gl_WorldRayOriginEXT, gl_WorldRayDirectionEXT, p, half_s.x);
-    if (ts.x>0.0)
+
+    if (ts.x > 0.0)
     {
-        //sphere_point =  orig + t.x * dir;
+        vec3 hitPosition =gl_WorldRayOriginEXT + (ts.x*gl_WorldRayDirectionEXT);
+        hitResult.normal = normalize(hitPosition-p);
         reportIntersectionEXT(ts.x, 0);
     }
-    if (ts.y>0.0)
+    if (ts.y > 0.0)
     {
-       // sphere_point =  orig + t.y * dir;
+        vec3 hitPosition =gl_WorldRayOriginEXT + (ts.y*gl_WorldRayDirectionEXT);
+        hitResult.normal = normalize(hitPosition-p);
         reportIntersectionEXT(ts.y, 0);
     }
 }

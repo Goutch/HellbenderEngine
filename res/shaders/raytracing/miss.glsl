@@ -1,8 +1,10 @@
 #version 460
 #extension GL_EXT_ray_tracing : enable
 
-layout(location = 0) rayPayloadInEXT vec3 hitValue;
-
+layout(location = 0) rayPayloadInEXT PrimaryRayPayLoad
+{
+    vec3 color;
+} primaryRayPayload;
 
 void main()
 {
@@ -10,5 +12,5 @@ void main()
     position.y+=750;
     float ratio = (((position.y/2)+(gl_RayTmaxEXT/2))/gl_RayTmaxEXT);
     vec3 colorValue = vec3(1-ratio, 0.3, ratio * 0.5);
-    hitValue = colorValue;
+    primaryRayPayload.color = colorValue;
 }

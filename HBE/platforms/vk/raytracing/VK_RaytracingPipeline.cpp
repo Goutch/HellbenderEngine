@@ -111,9 +111,9 @@ namespace HBE {
 		rayTracingPipelineInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_PIPELINE_CREATE_INFO_KHR;
 		rayTracingPipelineInfo.stageCount = shaderStages.size();
 		rayTracingPipelineInfo.pStages = shaderStages.data();
-		rayTracingPipelineInfo.groupCount = static_cast<uint32_t>(shader_groups.size());
+		rayTracingPipelineInfo.groupCount = shader_groups.size();
 		rayTracingPipelineInfo.pGroups = shader_groups.data();
-		rayTracingPipelineInfo.maxPipelineRayRecursionDepth = 1;
+		rayTracingPipelineInfo.maxPipelineRayRecursionDepth = 2;
 		rayTracingPipelineInfo.layout = pipeline_layout->getHandle();
 
 		if (device->vkCreateRayTracingPipelinesKHR(device->getHandle(),
