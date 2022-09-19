@@ -21,7 +21,7 @@ public:
 
     static void onRender() {
         Entity camera_entity = Application::getScene()->getCameraEntity();
-        float time = Application::getTime();
+        float time = Application::getTime()*0.01;
         RaytracingPipelineInstance *pipeline_instance = Resources::get<RaytracingPipelineInstance>("rtpi");
         pipeline_instance->setUniform("time", &time);
 
@@ -126,11 +126,12 @@ public:
         transform_mesh.translate(vec3(0, 0, 5));
 
         Transform transform_aabb_sphere{};
-        transform_aabb_sphere.translate(vec3(0, 0, -5));
+        transform_aabb_sphere.translate(vec3(0, 0, -4));
         Transform transform_aabb_sphere2{};
         transform_aabb_sphere2.translate(vec3(0, 0, -6));
 
-
+		Transform transform_aabb_cube{};
+		transform_aabb_cube.translate(vec3(0, 0, -5));
         Transform transform_aabb_floor{};
         transform_aabb_floor.translate(vec3(0, -1, 0));
         transform_aabb_floor.setScale(vec3(100, 1, 100));
@@ -142,7 +143,21 @@ public:
                 AccelerationStructureInstance{0, 2, transform_aabb_sphere.world(), ACCELERATION_STRUCTURE_TYPE_AABB});
         acceleration_structure_instances.push_back(
                 AccelerationStructureInstance{0, 2, transform_aabb_sphere2.world(), ACCELERATION_STRUCTURE_TYPE_AABB});
+		acceleration_structure_instances.push_back(
+				AccelerationStructureInstance{0, 1, transform_aabb_cube.world(), ACCELERATION_STRUCTURE_TYPE_AABB});
 
+		for (int i = 0; i < 400; ++i) {
+			Transform t{};
+			t.translate(vec3(Random::floatRange(-50,50), 0, Random::floatRange(-50, 50)));
+			acceleration_structure_instances.push_back(
+					AccelerationStructureInstance{0, 2, t.world(), ACCELERATION_STRUCTURE_TYPE_AABB});
+		}
+		for (int i = 0; i < 400; ++i) {
+			Transform t{};
+			t.translate(vec3(Random::floatRange(-50,50), 0, Random::floatRange(-50, 50)));
+			acceleration_structure_instances.push_back(
+					AccelerationStructureInstance{0, 1, t.world(), ACCELERATION_STRUCTURE_TYPE_AABB});
+		}
         RootAccelerationStructureInfo root_acceleration_structure_info{};
         root_acceleration_structure_info.aabb_acceleration_structures = aabb_acceleration_structures.data();
         root_acceleration_structure_info.aabb_acceleration_structure_count = aabb_acceleration_structures.size();
@@ -167,6 +182,10 @@ public:
         raytracing_pipeline_instance_info.root_acceleration_structure = root_acceleration_structure;
         RaytracingPipelineInstance *pipeline_instance = Resources::createRaytracingPipelineInstance(
                 raytracing_pipeline_instance_info, "rtpi");
+
+
+
+
 
         pipeline_instance->setTexture("image", render_target);
         Scene *scene = Application::getScene();
