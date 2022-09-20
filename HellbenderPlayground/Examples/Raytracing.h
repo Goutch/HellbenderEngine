@@ -66,6 +66,8 @@ public:
         box_intersection_shader_info.path = "shaders/raytracing/intersect_box.glsl";
         box_intersection_shader_info.stage = SHADER_STAGE_INTERSECTION;
         Shader *box_intersection_shader = Resources::createShader(box_intersection_shader_info, "intersect_box");
+        ShaderInfo any_hit_shader_info{};
+        any_hit_shader_info.path = "shaders/raytracing/anyhit_occlusion.glsl";
 
         std::vector<Shader *> miss_shaders = {miss_shader, miss_shadow_shader};
         std::vector<Shader *> hit_shaders{closest_hit_shader, box_intersection_shader, sphere_intersection_shader};
@@ -73,7 +75,9 @@ public:
         std::vector<RaytracingShaderGroup> shader_groups{
                 {0, -1, -1},//triangle
                 {0, -1, 1},//box
+                {0, 3, 1},//box ao
                 {0, -1, 2},//sphere
+                {0, 3, 2},//sphere ao
         };
 
 
@@ -139,18 +143,12 @@ public:
         //	acceleration_structure_instances.push_back(AccelerationStructureInstance{0, 0, transform_mesh.world(), ACCELERATION_STRUCTURE_TYPE_MESH});
         acceleration_structure_instances.push_back(
                 AccelerationStructureInstance{0, 1, transform_aabb_floor.world(), ACCELERATION_STRUCTURE_TYPE_AABB});
-        acceleration_structure_instances.push_back(
-                AccelerationStructureInstance{0, 2, transform_aabb_sphere.world(), ACCELERATION_STRUCTURE_TYPE_AABB});
-        acceleration_structure_instances.push_back(
-                AccelerationStructureInstance{0, 2, transform_aabb_sphere2.world(), ACCELERATION_STRUCTURE_TYPE_AABB});
-		acceleration_structure_instances.push_back(
-				AccelerationStructureInstance{0, 1, transform_aabb_cube.world(), ACCELERATION_STRUCTURE_TYPE_AABB});
 
 		for (int i = 0; i < 400; ++i) {
 			Transform t{};
 			t.translate(vec3(Random::floatRange(-50,50), 0, Random::floatRange(-50, 50)));
 			acceleration_structure_instances.push_back(
-					AccelerationStructureInstance{0, 2, t.world(), ACCELERATION_STRUCTURE_TYPE_AABB});
+					AccelerationStructureInstance{0, 3, t.world(), ACCELERATION_STRUCTURE_TYPE_AABB});
 		}
 		for (int i = 0; i < 400; ++i) {
 			Transform t{};
