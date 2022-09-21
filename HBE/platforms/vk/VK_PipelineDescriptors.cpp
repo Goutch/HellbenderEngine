@@ -60,6 +60,7 @@ namespace HBE {
 			VK_Image *default_texture = (VK_Image *) Resources::get<Texture>("DEFAULT_TEXTURE");
 			VK_Image *default_image = (VK_Image *) Resources::get<Texture>("DEFAULT_IMAGE");
 			VkAccelerationStructureKHR default_acceleration_structure = VK_NULL_HANDLE;
+			VkBuffer default_storage_buffer = VK_NULL_HANDLE;
 			for (size_t binding_index = 0; binding_index < descriptor_set_layout_bindings.size(); ++binding_index) {
 
 				writes[binding_index].pBufferInfo = nullptr;
@@ -69,14 +70,11 @@ namespace HBE {
 					case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER: {
 						buffers_info[binding_index].offset = 0;
 						auto it = uniform_buffers.find(binding);
-						if (it != uniform_buffers.end()) {
-							buffers_info[binding_index].buffer = uniform_buffers[binding][frame_index]->getHandle();
-							buffers_info[binding_index].range = it->second[frame_index]->getSize();
-							writes[binding_index].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-							writes[binding_index].pBufferInfo = &buffers_info[binding_index];
-						} else {
-							Log::error("Could not find uniform at binding " + std::to_string(descriptor_set_layout_bindings[binding_index].binding));
-						}
+						HB_ASSERT(it != uniform_buffers.end(), "Could not find uniform at binding " + std::to_string(descriptor_set_layout_bindings[binding_index].binding));
+						buffers_info[binding_index].buffer = uniform_buffers[binding][frame_index]->getHandle();
+						buffers_info[binding_index].range = it->second[frame_index]->getSize();
+						writes[binding_index].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+						writes[binding_index].pBufferInfo = &buffers_info[binding_index];
 						break;
 					}
 					case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
@@ -102,7 +100,6 @@ namespace HBE {
 						break;
 
 					case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR:
-						/*If the nullDescriptor feature is enabled, the buffer, acceleration structure, imageView, or bufferView can be VK_NULL_HANDLE. Loads from a null descriptor return zero values and stores and atomics to a null descriptor are discarded. A null acceleration structure descriptor results in the miss shader being invoked.*/
 						writes[binding_index].descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
 
 						writes[binding_index].pNext = &acceleration_structure_writes[binding_index];
@@ -111,12 +108,21 @@ namespace HBE {
 						acceleration_structure_writes[binding_index].accelerationStructureCount = 1;
 						acceleration_structure_writes[binding_index].pAccelerationStructures = &default_acceleration_structure;
 						break;
+					case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
+						/*writes[binding_index].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+						buffers_info[binding_index].offset = 0;
+						auto it = uniform_buffers.find(binding);
+						HB_ASSERT(it != uniform_buffers.end(), "Could not find uniform at binding " + std::to_string(descriptor_set_layout_bindings[binding_index].binding));
+						buffers_info[binding_index].buffer = default_storage_buffer;
+						buffers_info[binding_index].range = 0;
+						writes[binding_index].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+						writes[binding_index].pBufferInfo = &buffers_info[binding_index];*/
+						break;
 					case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_NV:
 					case VK_DESCRIPTOR_TYPE_MUTABLE_VALVE:
 					case VK_DESCRIPTOR_TYPE_SAMPLER:
 					case VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
 					case VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
-					case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
 					case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC:
 					case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC:
 					case VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT:

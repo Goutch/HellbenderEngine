@@ -6,64 +6,68 @@ hitAttributeEXT HitResult
     vec3 normal;
 } hitResult;
 
-struct Intersection {
-    float t;
-    vec3 normal;
-};
-
-Intersection intersectAABB(vec3 o, vec3 d, vec3 aabb_max, vec3 aabb_min)
+vec4 intersectAABB(vec3 o, vec3 d, vec3 aabb_max, vec3 aabb_min)
 {
-    vec3 min_ts = vec3((aabb_min - o) / d);
-    vec3 max_ts = vec3((aabb_max - o) / d);
-
-    vec3 ts0 = min(min_ts, max_ts);
-
-    vec3 ts1 = max(min_ts, max_ts);
-
-    uint t0_index = ts0.x > ts0.y ?
-    (ts0.x > ts0.z ? 0 : 2) :
-    (ts0.y > ts0.z ? 1 : 2);
-
-    uint t1_index = ts1.x < ts1.y ?
-    (ts1.x < ts1.z ? 0 : 2) :
-    (ts1.y < ts1.z ? 1 : 2);
-
-    vec3 t0_normal = vec3(0., 0., 0.);
-    vec3 t1_normal = vec3(0., 0., 0.);
-
-    float t0 = ts0[t0_index];
-    float t1 = ts1[t1_index];
-
-    t0_normal[t0_index] = (-d[t0_index]);
-    t0_normal = normalize(t0_normal);
-
-    t1_normal[t1_index] = (d[t1_index]);
-    t1_normal = normalize(t1_normal);
-
-    Intersection intersection;
-
-    if (t0 > 0.001 && t0 < t1)
+    if (o.x>aabb_min.x+gl_RayTminEXT &&
+    o.y>aabb_min.y+gl_RayTminEXT&&
+    o.z>aabb_min.z+gl_RayTminEXT&&
+    o.x<aabb_max.x-gl_RayTminEXT &&
+    o.y<aabb_max.y-gl_RayTminEXT&&
+    o.z<aabb_max.z-gl_RayTminEXT)
     {
-        intersection.t = t0;
-        intersection.normal = t0_normal;
+        return vec4(-d.x, -d.y, -d.z, gl_RayTminEXT+0.001);
     }
-    else if (t1 >= 0.001 && t1 < t0)
+    vec3 inv_dir = 1.0 / d;
+    vec3 aabb_min_ts = vec3((aabb_min - o) * inv_dir);
+    vec3 aabb_max_ts = vec3((aabb_max - o) * inv_dir);
+
+    vec3 ts_min= min(aabb_min_ts, aabb_max_ts);
+    vec3 ts_max = max(aabb_min_ts, aabb_max_ts);
+
+    uint t_near_index=ts_min.x>ts_min.y?
+    (ts_min.x>ts_min.z?0:2):
+    (ts_min.y>ts_min.z?1:2);
+    uint t_far_index=ts_max.x<ts_max.y?
+    (ts_max.x<ts_max.z?0:2):
+    (ts_max.y<ts_max.z?1:2);
+
+    float t_near = ts_min[t_near_index];
+    float t_far = ts_max[t_far_index];
+
+    vec3 normal =vec3(0.);
+    if (t_far >= t_near)
     {
-        intersection.t = t1;
-        intersection.normal = t1_normal;
+        if (t_near >= gl_RayTminEXT)
+        {
+            normal[t_near_index] = -d[t_near_index];
+            normal = normalize(normal);
+            return vec4(normal.xyz, t_near);
+        }
+
+        if (t_far >= gl_RayTminEXT)
+        {
+            normal[t_near_index] = d[t_near_index];
+            normal = normalize(normal);
+            return vec4(normal.xyz, t_far);
+        }
     }
 
-    return intersection;
+    return vec4(0., 0., 0., -1);
 }
 void main()
 {
     mat4x3 transform = gl_ObjectToWorldEXT;
     vec3 p = vec3(transform[3][0], transform[3][1], transform[3][2]);
     vec3 s = vec3(length(transform[0].xyz), length(transform[1].xyz), length(transform[2].xyz));
-    vec3 half_s = s * 0.5;
-    Intersection intersection = intersectAABB(gl_WorldRayOriginEXT, gl_WorldRayDirectionEXT, p - half_s, p + half_s);
+    vec3 half_size = s * 0.5;
+    vec4 result = intersectAABB(gl_WorldRayOriginEXT, gl_WorldRayDirectionEXT, p + half_size, p -half_size);
+    float t = result.w;
+    if (t > 0.0)
+    {
+        vec3 normal = result.xyz;
+        vec3 hitPos = gl_WorldRayOriginEXT + (gl_WorldRayDirectionEXT*t);
 
-    hitResult.normal = intersection.normal;
-
-    reportIntersectionEXT(intersection.t, 0);
+        hitResult.normal = normalize(normal);
+        reportIntersectionEXT(t, 0);
+    }
 }

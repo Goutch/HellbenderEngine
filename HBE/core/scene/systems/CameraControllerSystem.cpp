@@ -5,7 +5,12 @@
 #include "core/input/Input.h"
 #include "core/utility/Profiler.h"
 #include "core/resource/RenderTarget.h"
+#include "core/graphics/Graphics.h"
+#include "core/input/Input.h"
+#include "Application.h"
+
 namespace HBE {
+
 	CameraControllerSystem::CameraControllerSystem(Scene *scene) : System(scene) {
 		scene->onUpdate.subscribe(this, &CameraControllerSystem::update);
 	}

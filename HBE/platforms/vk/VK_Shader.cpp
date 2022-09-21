@@ -252,6 +252,31 @@ namespace HBE {
 			uniforms.emplace_back(uniform_info);
 		}
 
+		//----------------------------------------------------------BUFFERS----------------------------------------------------------
+		const spvc_reflected_resource *buffer_list = nullptr;
+		size_t buffer_count = 0;
+		spvc_resources_get_resource_list_for_type(resources, SPVC_RESOURCE_TYPE_STORAGE_BUFFER, &buffer_list, &buffer_count);
+
+		for (uint32_t i = 0; i < buffer_count; ++i) {
+
+			std::string name = spvc_compiler_get_name(compiler_glsl, buffer_list[i].id);
+
+			UniformInfo uniform_info{};
+
+			VkDescriptorSetLayoutBinding layout_binding = {};
+			layout_binding.binding = spvc_compiler_get_decoration(compiler_glsl, buffer_list[i].id, SpvDecorationBinding);
+			layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+			layout_binding.stageFlags = vk_stage;
+			layout_binding.descriptorCount = 1;//this is for array
+			layout_binding.pImmutableSamplers = nullptr;
+
+			uniform_info.layout_binding = layout_binding;
+			uniform_info.name = name;
+			uniform_info.size = 0;
+
+			uniforms.emplace_back(uniform_info);
+		}
+
 		//----------------------------------------------------------VERTEX INPUTS-----------------------------
 		const spvc_reflected_resource *vertex_input_list = nullptr;
 		size_t vertex_inputs_count;

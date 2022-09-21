@@ -58,7 +58,7 @@ namespace HBE {
 				if (data.materials.size() > material_index) {
 					model_node.primitives[i].material = data.materials[material_index];
 				} else {
-					Log::warning("Can't find material for mesh" + std::to_string(i));
+					//Log::warning("Can't find material for mesh" + std::to_string(i));
 				}
 			}
 		}

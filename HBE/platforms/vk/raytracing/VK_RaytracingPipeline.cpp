@@ -99,9 +99,9 @@ namespace HBE {
 							   VK_RAY_TRACING_SHADER_GROUP_TYPE_PROCEDURAL_HIT_GROUP_KHR :
 							   VK_RAY_TRACING_SHADER_GROUP_TYPE_TRIANGLES_HIT_GROUP_KHR;
 			shaderGroup.generalShader = VK_SHADER_UNUSED_KHR;
-			shaderGroup.closestHitShader = closest_hit_index + offset;
-			shaderGroup.anyHitShader = any_hit_index > 0 ? any_hit_index + offset : VK_SHADER_UNUSED_KHR;
-			shaderGroup.intersectionShader = intersection_index > 0 ? intersection_index + offset : VK_SHADER_UNUSED_KHR;
+			shaderGroup.closestHitShader = closest_hit_index >= 0 ? closest_hit_index + offset : VK_SHADER_UNUSED_KHR;
+			shaderGroup.anyHitShader = any_hit_index >= 0 ? any_hit_index + offset : VK_SHADER_UNUSED_KHR;
+			shaderGroup.intersectionShader = intersection_index >= 0 ? intersection_index + offset : VK_SHADER_UNUSED_KHR;
 			shader_groups.push_back(shaderGroup);
 		}
 

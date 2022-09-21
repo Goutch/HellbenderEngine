@@ -25,8 +25,10 @@ void onAppUpdate(float delta) {
 		Entity cam = Application::getScene()->getCameraEntity();
 		if (cam.valid()) {
 			if (cam.has<CameraController>()) {
+				Input::setCursorVisible(true);
 				cam.detach<CameraController>();
 			} else {
+				Input::setCursorVisible(false);
 				cam.attach<CameraController>();
 			}
 		}
