@@ -56,3 +56,6 @@ These are 3 tested compilers :
 ## Qestions and Answers
 Q: Why should I use this engine instead of unity/unreal?  
 A: You shouldn't this is a toy engine for me.  
+
+![Path Tracing Screenshot](https://github.com/Goutch/HellbenderEngine/blob/develop/Screenshots/pathtracing.PNG)
+
