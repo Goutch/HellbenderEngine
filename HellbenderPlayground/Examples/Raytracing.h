@@ -5,111 +5,165 @@
 
 using namespace HBE;
 
-class Raytracing {
+struct RaytracingPipelineResources {
+	RaytracingPipelineInstance *pipeline_instance;
+	RaytracingPipeline *pipeline;
+	Shader *raygen_shader;
+	std::vector<Shader *> miss_shaders;
+	std::vector<Shader *> hit_shaders;
+	std::vector<RaytracingShaderGroup> shader_groups;
+};
+
+class RaytracingScene {
+private:
+	RaytracingPipelineResources raytracing_resources;
+	RaytracingPipelineResources pathtracing_resources;
+	std::vector<Shader *> common_hit_shaders;
+	RenderTarget *render_target;
+	RootAccelerationStructure *root_acceleration_structure;
+	AABBAccelerationStructure *aabb_acceleration_structure;
+	bool use_pathtracing = false;
 public:
-	static void onResolutionChange(RenderTarget *render_target) {
-		Resources::get<RenderTarget>("rt")->setResolution(render_target->getResolution().x,
-														  render_target->getResolution().y);
-		RaytracingPipelineInstance *pipeline_instance = Resources::get<RaytracingPipelineInstance>("rtpi");
-		pipeline_instance->setTexture("image", Resources::get<RenderTarget>("rt"));
+	void onResolutionChange(RenderTarget *rt) {
+		render_target->setResolution(rt->getResolution().x, rt->getResolution().y);
+
+		raytracing_resources.pipeline_instance->setTexture("image", render_target);
+		pathtracing_resources.pipeline_instance->setTexture("image", render_target);
 
 		Scene *scene = Application::getScene();
 		Camera &camera = scene->getCameraEntity().get<Camera>();
-		camera.render_target = Resources::get<RenderTarget>("rt");
+		camera.render_target = render_target;
 		camera.calculateProjection();
 	}
 
-	static void onRender() {
+	void onRender() {
 		Entity camera_entity = Application::getScene()->getCameraEntity();
-		float time = Application::getTime() * 0.01;
-		RaytracingPipelineInstance *pipeline_instance = Resources::get<RaytracingPipelineInstance>("rtpi");
-		pipeline_instance->setUniform("time", &time);
+		float time = Application::getTime() * 0.05;
 
 
+		RaytracingPipelineResources resources = use_pathtracing ? pathtracing_resources : raytracing_resources;
+
+		resources.pipeline_instance->setUniform("time", &time);
 		Graphics::raytrace(
-				*Resources::get<RootAccelerationStructure>("rootas"),
-				*Resources::get<RaytracingPipelineInstance>("rtpi"),
-				*Resources::get<RenderTarget>("rt"),
+				*root_acceleration_structure,
+				*resources.pipeline_instance,
+				*render_target,
 				camera_entity.get<Camera>().projection,
 				glm::inverse(camera_entity.get<Transform>().world()));
 	}
 
+	void onUpdate(float delta) {
+		if (Input::getKeyDown(KEY::P)) {
+			use_pathtracing = !use_pathtracing;
+		}
+	}
 
-	static void init() {
-		ShaderInfo raygen_shader_info{};
-		raygen_shader_info.path = "shaders/raytracing/raygen.glsl";
-		raygen_shader_info.stage = SHADER_STAGE_RAY_GEN;
-		Shader *ray_gen_shader = Resources::createShader(raygen_shader_info, "raygen");
+	~RaytracingScene() {
+		for (Shader *shader : raytracing_resources.miss_shaders) {
+			delete shader;
+		}
+		for (Shader *shader : pathtracing_resources.miss_shaders) {
+			delete shader;
+		}
+		for (Shader *shader : raytracing_resources.hit_shaders) {
+			delete shader;
+		}
+		for (Shader *shader : pathtracing_resources.hit_shaders) {
+			delete shader;
+		}
+		delete raytracing_resources.raygen_shader;
+		delete pathtracing_resources.raygen_shader;
 
-		ShaderInfo miss_shader_info{};
-		miss_shader_info.path = "shaders/raytracing/miss.glsl";
-		miss_shader_info.stage = SHADER_STAGE_RAY_MISS;
-		Shader *miss_shader = Resources::createShader(miss_shader_info, "miss");
+		delete aabb_acceleration_structure;
+		delete root_acceleration_structure;
+		delete raytracing_resources.pipeline_instance;
+		delete raytracing_resources.pipeline;
+		delete pathtracing_resources.pipeline_instance;
+		delete pathtracing_resources.pipeline;
 
-		ShaderInfo miss_occlusion_shader_info{};
-		miss_occlusion_shader_info.stage = SHADER_STAGE_RAY_MISS;
-		miss_occlusion_shader_info.path = "shaders/raytracing/miss_occlusion.glsl";
-		Shader *miss_occlusion_shader = Resources::createShader(miss_occlusion_shader_info, "miss_occlusion");
+		delete render_target;
+	}
 
-		ShaderInfo closest_hit_shader_info{};
-		closest_hit_shader_info.path = "shaders/raytracing/closesthit.glsl";
-		closest_hit_shader_info.stage = SHADER_STAGE_CLOSEST_HIT;
-		Shader *closest_hit_shader = Resources::createShader(closest_hit_shader_info, "closesthit");
-
-		ShaderInfo sphere_intersection_shader_info{};
-		sphere_intersection_shader_info.path = "shaders/raytracing/intersect_sphere.glsl";
-		sphere_intersection_shader_info.stage = SHADER_STAGE_INTERSECTION;
-		Shader *sphere_intersection_shader = Resources::createShader(sphere_intersection_shader_info,
-																	 "intersect_sphere");
-
-		ShaderInfo box_intersection_shader_info{};
-		box_intersection_shader_info.path = "shaders/raytracing/intersect_box.glsl";
-		box_intersection_shader_info.stage = SHADER_STAGE_INTERSECTION;
-		Shader *box_intersection_shader = Resources::createShader(box_intersection_shader_info, "intersect_box");
-
-		ShaderInfo closest_hit_ao_shader_info{};
-		closest_hit_ao_shader_info.path = "shaders/raytracing/closest_hit_occlusion.glsl";
-		closest_hit_ao_shader_info.stage = SHADER_STAGE_CLOSEST_HIT;
-		Shader *closest_hit_ao_shader = Resources::createShader(closest_hit_ao_shader_info, "closest_hit_occlusion");
+	RaytracingScene() {
+		ShaderInfo shader_info{};
 
 
-		std::vector<Shader *> miss_shaders = {miss_shader,
-											  miss_occlusion_shader};
-		std::vector<Shader *> hit_shaders{closest_hit_shader,
-										  closest_hit_ao_shader,
-										  box_intersection_shader,
-										  sphere_intersection_shader,
-		};
+		shader_info.stage = SHADER_STAGE_RAY_GEN;
+		shader_info.path = "shaders/raytracing/raygen.glsl";
+		raytracing_resources.raygen_shader = Resources::createShader(shader_info);
+		shader_info.path = "shaders/pathtracing/raygen_pathtrace.glsl";
+		pathtracing_resources.raygen_shader = Resources::createShader(shader_info);
 
-		std::vector<RaytracingShaderGroup> shader_groups{
-				{0, -1, 2},//box
-				{0, -1, 3},//sphere
-				{1, -1, 2},//box ao
-				{1, -1, 3},//sphere ao
-				//{0, -1, -1},//triangle
-		};
+
+		shader_info.stage = SHADER_STAGE_RAY_MISS;
+		shader_info.path = "shaders/raytracing/miss.glsl";
+		raytracing_resources.miss_shaders.push_back(Resources::createShader(shader_info));
+		shader_info.path = "shaders/raytracing/miss_occlusion.glsl";
+		raytracing_resources.miss_shaders.push_back(Resources::createShader(shader_info));
+		shader_info.path = "shaders/pathtracing/miss_pathtrace.glsl";
+		pathtracing_resources.miss_shaders.push_back(Resources::createShader(shader_info));
+
+
+		shader_info.stage = SHADER_STAGE_CLOSEST_HIT;
+		shader_info.path = "shaders/raytracing/closesthit.glsl";
+		raytracing_resources.hit_shaders.push_back(Resources::createShader(shader_info));
+		shader_info.path = "shaders/raytracing/closest_hit_occlusion.glsl";
+		raytracing_resources.hit_shaders.push_back(Resources::createShader(shader_info));
+		shader_info.path = "shaders/pathtracing/closesthit_pathtrace.glsl";
+		pathtracing_resources.hit_shaders.push_back(Resources::createShader(shader_info));
+
+
+		shader_info.stage = SHADER_STAGE_INTERSECTION;
+		shader_info.path = "shaders/raytracing/intersect_box.glsl";
+		raytracing_resources.hit_shaders.push_back(Resources::createShader(shader_info));
+		pathtracing_resources.hit_shaders.push_back(Resources::createShader(shader_info));
+		shader_info.path = "shaders/raytracing/intersect_sphere.glsl";
+		raytracing_resources.hit_shaders.push_back(Resources::createShader(shader_info));
+		pathtracing_resources.hit_shaders.push_back(Resources::createShader(shader_info));
+
+
+		raytracing_resources.shader_groups.push_back({0, -1, 2});//box
+		raytracing_resources.shader_groups.push_back({0, -1, 3});//sphere
+		raytracing_resources.shader_groups.push_back({1, -1, 2});//box ao
+		raytracing_resources.shader_groups.push_back({1, -1, 3});//sphere ao
+
+		pathtracing_resources.shader_groups.push_back({0, -1, 1});//box
+		pathtracing_resources.shader_groups.push_back({0, -1, 2});//sphere
+
 
 
 		RaytracingPipelineInfo raytracing_pipeline_info{};
-		raytracing_pipeline_info.raygen_shader = ray_gen_shader;
-		raytracing_pipeline_info.miss_shaders = miss_shaders.data();
-		raytracing_pipeline_info.miss_shader_count = miss_shaders.size();
-		raytracing_pipeline_info.hit_shaders = hit_shaders.data();
-		raytracing_pipeline_info.hit_shader_count = hit_shaders.size();
+		raytracing_pipeline_info.raygen_shader = raytracing_resources.raygen_shader;
+		raytracing_pipeline_info.miss_shaders = raytracing_resources.miss_shaders.data();
+		raytracing_pipeline_info.miss_shader_count = raytracing_resources.miss_shaders.size();
+		raytracing_pipeline_info.hit_shaders = raytracing_resources.hit_shaders.data();
+		raytracing_pipeline_info.hit_shader_count = raytracing_resources.hit_shaders.size();
 
-		raytracing_pipeline_info.shader_group_count = shader_groups.size();
-		raytracing_pipeline_info.shader_groups = shader_groups.data();
+		raytracing_pipeline_info.shader_group_count = raytracing_resources.shader_groups.size();
+		raytracing_pipeline_info.shader_groups = raytracing_resources.shader_groups.data();
+		raytracing_pipeline_info.max_recursion_depth = 2;
 
-		RaytracingPipeline *raytracing_pipeline = Resources::createRaytracingPipeline(raytracing_pipeline_info,
-																					  "raytracing_pipeline");
+		raytracing_resources.pipeline = Resources::createRaytracingPipeline(raytracing_pipeline_info);
+
+
+		raytracing_pipeline_info.raygen_shader = pathtracing_resources.raygen_shader;
+		raytracing_pipeline_info.miss_shaders = pathtracing_resources.miss_shaders.data();
+		raytracing_pipeline_info.miss_shader_count = pathtracing_resources.miss_shaders.size();
+		raytracing_pipeline_info.hit_shaders = pathtracing_resources.hit_shaders.data();
+		raytracing_pipeline_info.hit_shader_count = pathtracing_resources.hit_shaders.size();
+
+		raytracing_pipeline_info.shader_group_count = pathtracing_resources.shader_groups.size();
+		raytracing_pipeline_info.shader_groups = pathtracing_resources.shader_groups.data();
+		raytracing_pipeline_info.max_recursion_depth = 16;
+
+		pathtracing_resources.pipeline = Resources::createRaytracingPipeline(raytracing_pipeline_info);
 
 
 		AABBAccelerationStructureInfo aabb__acceleration_structure_info{};
 		aabb__acceleration_structure_info.max = vec3(0.5, 0.5, 0.5);
 		aabb__acceleration_structure_info.min = vec3(-0.5, -0.5, -0.5);
 
-		AABBAccelerationStructure *aabb_acceleration_structure = Resources::createAABBAccelerationStructure(
-				aabb__acceleration_structure_info, "aabbas");
+		aabb_acceleration_structure = Resources::createAABBAccelerationStructure(aabb__acceleration_structure_info);
 
 		std::vector<AABBAccelerationStructure *> aabb_acceleration_structures{aabb_acceleration_structure};
 
@@ -123,15 +177,6 @@ public:
 		ModelInfo model_info{};
 		model_info.path = "models/dragon.gltf";
 		model_info.flags = MODEL_FLAG_DONT_LOAD_MATERIALS | MODEL_FLAG_USED_IN_RAYTRACING;
-
-		Model *model = Resources::createModel(model_info, "model");
-
-		Mesh *mesh = model->getNodes()[0].primitives[0].mesh;
-
-		//MeshAccelerationStructureInfo mesh_acceleration_structure_info{};
-		//mesh_acceleration_structure_info.mesh = mesh;
-		//MeshAccelerationStructure *mesh_acceleration_structure = Resources::createMeshAccelerationStructure(mesh_acceleration_structure_info, "meshas");
-
 
 		std::vector<AccelerationStructureInstance> acceleration_structure_instances{};
 
@@ -149,9 +194,8 @@ public:
 		transform_aabb_floor.translate(vec3(0, -1, 0));
 		transform_aabb_floor.setScale(vec3(100, 1, 100));
 
-		//	acceleration_structure_instances.push_back(AccelerationStructureInstance{0, 0, transform_mesh.world(), ACCELERATION_STRUCTURE_TYPE_MESH});
-		acceleration_structure_instances.push_back(
-				AccelerationStructureInstance{0, 0, transform_aabb_floor.world(), ACCELERATION_STRUCTURE_TYPE_AABB});
+		acceleration_structure_instances.push_back(AccelerationStructureInstance{0, 0, transform_aabb_floor.world(), ACCELERATION_STRUCTURE_TYPE_AABB});
+
 		for (int i = 0; i < 1000; ++i) {
 			Transform t{};
 			t.translate(vec3(Random::floatRange(-50, 50), 0, Random::floatRange(-50, 50)));
@@ -173,44 +217,43 @@ public:
 		root_acceleration_structure_info.instances = acceleration_structure_instances.data();
 		root_acceleration_structure_info.instance_count = acceleration_structure_instances.size();
 
-		RootAccelerationStructure *root_acceleration_structure = Resources::createRootAccelerationStructure(
-				root_acceleration_structure_info, "rootas");
+		root_acceleration_structure = Resources::createRootAccelerationStructure(root_acceleration_structure_info);
 
 		RenderTargetInfo render_target_info{};
 		render_target_info.width = Graphics::getDefaultRenderTarget()->getResolution().x;
 		render_target_info.height = Graphics::getDefaultRenderTarget()->getResolution().y;
 		render_target_info.flags = RENDER_TARGET_FLAG_USED_IN_RAYTRACING;
 
-		RenderTarget *render_target = Resources::createRenderTarget(render_target_info, "rt");
+		render_target = Resources::createRenderTarget(render_target_info);
 		Graphics::setRenderTarget(render_target);
 
 		RaytracingPipelineInstanceInfo raytracing_pipeline_instance_info{};
-		raytracing_pipeline_instance_info.raytracing_pipeline = raytracing_pipeline;
+		raytracing_pipeline_instance_info.raytracing_pipeline = raytracing_resources.pipeline;
 		raytracing_pipeline_instance_info.root_acceleration_structure = root_acceleration_structure;
-		RaytracingPipelineInstance *pipeline_instance = Resources::createRaytracingPipelineInstance(
-				raytracing_pipeline_instance_info, "rtpi");
+		raytracing_resources.pipeline_instance = Resources::createRaytracingPipelineInstance(raytracing_pipeline_instance_info);
 
 
-		pipeline_instance->setTexture("image", render_target);
+		raytracing_pipeline_instance_info.raytracing_pipeline = pathtracing_resources.pipeline;
+		raytracing_pipeline_instance_info.root_acceleration_structure = root_acceleration_structure;
+		pathtracing_resources.pipeline_instance = Resources::createRaytracingPipelineInstance(raytracing_pipeline_instance_info);
+
+
+		raytracing_resources.pipeline_instance->setTexture("image", render_target);
+		pathtracing_resources.pipeline_instance->setTexture("image", render_target);
+
 		Scene *scene = Application::getScene();
 
-		scene->onRender.subscribe(onRender);
-
-		auto group = scene->group<Camera>();
-
-		for (auto[handle, camera]: group) {
-			Log::message("Camera found");
-		}
-
+		scene->onRender.subscribe(this, &RaytracingScene::onRender);
+		scene->onUpdate.subscribe(this, &RaytracingScene::onUpdate);
 		Entity camera_entity = scene->createEntity();
 		camera_entity.attach<Camera>();
-		camera_entity.get<Camera>().render_target = Resources::get<RenderTarget>("rt");
+		camera_entity.get<Camera>().render_target = render_target;
 		camera_entity.get<Camera>().calculateProjection();
 		camera_entity.get<Camera>().active = false;
 		scene->setCameraEntity(camera_entity);
 
 
-		Graphics::getDefaultRenderTarget()->onResolutionChange.subscribe(onResolutionChange);
+		Graphics::getDefaultRenderTarget()->onResolutionChange.subscribe(this, &RaytracingScene::onResolutionChange);
 	}
 };
 

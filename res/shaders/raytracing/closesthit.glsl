@@ -70,7 +70,7 @@ float occlusionRay(vec3 origin, vec3 dir, float tmax)
     occlusionRayPayload.occlusion = 0.0;
     // Trace shadow ray and offset indices to match shadow hit/miss shader group indices
     traceRayEXT(topLevelAS, //topLevelacceleationStructure
-    gl_RayFlagsOpaqueEXT |gl_RayFlagsTerminateOnFirstHitEXT, // | gl_RayFlagsSkipClosestHitShaderEXT|  gl_RayFlagsTerminateOnFirstHitEXT, //rayFlags
+    gl_RayFlagsOpaqueEXT, // | gl_RayFlagsSkipClosestHitShaderEXT|  gl_RayFlagsTerminateOnFirstHitEXT, //rayFlags
     0xFF, //cullMask
     2, //sbtRecordOffset
     1, //sbtRecordStride
@@ -85,8 +85,15 @@ float occlusionRay(vec3 origin, vec3 dir, float tmax)
 
 void main()
 {
-    vec3 material_color= vec3(0.5);//hitResult.normal;
-
+    vec3 material_color = vec3(0.5);
+    switch (gl_InstanceID%5)
+    {
+        case 0:material_color=vec3(0.5, 0.5, 0.5); break;
+        case 1:material_color=vec3(1.0, 0.0, 0.0); break;
+        case 2:material_color=vec3(0.0, 0.0, 1.0); break;
+        case 3:material_color=vec3(0.0, 1.0, 0.0); break;
+        case 4:material_color=vec3(1.0, 1.0, 1.0); break;
+    }
     vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
 
     vec3 toLightDir = normalize(vec3(sin(time.value), sin(time.value), cos(time.value)));
@@ -102,8 +109,8 @@ void main()
     }
 
     //specular
-    float specularStrength=0.2;
-    float specularSpread =8;
+    float specularStrength=0.7;
+    float specularSpread =4;
     float specular=0;
     if (!isInShadow) {
         vec3 viewDir = gl_WorldRayDirectionEXT;
@@ -116,7 +123,7 @@ void main()
     //occlusion
     float occlusionStrength=1.0f;
     float occlusion = 0.0;
-    const int numSamples =1;
+    const int numSamples =4;
     //0.5 ray per pixel
     if ((gl_LaunchIDEXT.x+gl_LaunchIDEXT.y)%2==0)
     {

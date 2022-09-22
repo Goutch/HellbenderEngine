@@ -50,7 +50,7 @@ int main() {
 		//LoadModelExemple::init();
 		//Instancing::init();
 		//VoxelModule::init();
-		Raytracing::init();
+		RaytracingScene rts = RaytracingScene();
 		//-----------------------EVENTS------------------
 		Application::onUpdate.subscribe(&onAppUpdate);
 		//-----------------------LOOP--------------------

@@ -23,6 +23,8 @@ namespace HBE {
 
 		RaytracingShaderGroup *shader_groups;
 		uint32_t shader_group_count;
+
+		uint32_t max_recursion_depth = 1;
 	};
 
 	class HB_API RaytracingPipeline : public Resource {

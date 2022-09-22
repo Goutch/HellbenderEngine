@@ -113,7 +113,7 @@ namespace HBE {
 		rayTracingPipelineInfo.pStages = shaderStages.data();
 		rayTracingPipelineInfo.groupCount = shader_groups.size();
 		rayTracingPipelineInfo.pGroups = shader_groups.data();
-		rayTracingPipelineInfo.maxPipelineRayRecursionDepth = 2;
+		rayTracingPipelineInfo.maxPipelineRayRecursionDepth = info.max_recursion_depth;
 		rayTracingPipelineInfo.layout = pipeline_layout->getHandle();
 
 		if (device->vkCreateRayTracingPipelinesKHR(device->getHandle(),
