@@ -2,7 +2,8 @@
 #extension GL_EXT_ray_tracing: enable
 #extension GL_EXT_nonuniform_qualifier: enable
 //-------------------------------CONSTANTS-------------------------------------
-const float AMBIENT_LIGHT_INTENSITY = 0.15;
+const float PI = 3.1415926535897932384626433832795;
+const float TWO_PI = 2.0 * PI;
 const float PHI = 1.61803398874989484820459;// Φ = Golden Ratio
 struct MaterialData
 {
@@ -13,11 +14,12 @@ struct MaterialData
 
 //------------------------------------ UNIFORMS ------------------------------------
 layout (binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
-layout (binding = 3, set = 0) uniform TimeUBO
-{
-    float value;
-} time;
 
+layout (binding = 3, set = 0) uniform Frame
+{
+    float time;
+    uint index;
+} frame;
 //layout(binding = 4, set = 0) readonly buffer MaterialDataBuffer
 //{
 //    MaterialData materials[];
@@ -29,8 +31,8 @@ layout (location = 0) rayPayloadInEXT PrimaryRayPayLoad
 {
     vec3 color;
     int depth;
-    int sample_id;
-    float hit_t;
+    uint rng_state;
+    bool hit_sky;
 } primaryRayPayload;
 
 
@@ -39,27 +41,76 @@ hitAttributeEXT HitResult
     vec3 normal;
 } hitResult;
 
+
+
+struct Material {
+    vec3 albedo;
+    vec3 emissive;
+};
+
+const Material materials[]= Material[6](
+Material(vec3(0.5, 0.5, 0.5), vec3(0.0, 0.0, 0.0)),
+Material(vec3(0.5, 0.1, 0.1), vec3(0.0, 0.0, 0.0)),
+Material(vec3(0.1, 0.5, 0.1), vec3(0.0, 0.0, 0.0)),
+Material(vec3(0.1, 0.1, 0.5), vec3(0.0, 0.0, 0.0)),
+Material(vec3(1.0, 1.0, 1.0), vec3(0, 0, 0)),
+Material(vec3(1.0, 1.0, 1.0), vec3(0.0, 0.0, 0.0))
+);
+
 //------------------------------------ FUNCTIONS ------------------------------------
-float random(vec3 pos) {
-    pos = vec3(mod(pos.x, 1.0), mod(pos.y, 1.0), mod(pos.z, 1.0));
-    return fract(sin(dot(pos, vec3(64.25375463, 23.27536534, 86.29678483))) * 59482.7542);
+
+uint wang_hash(inout uint seed)
+{
+    seed = uint(seed ^ uint(61)) ^ uint(seed >> uint(16));
+    seed *= uint(9);
+    seed = seed ^ (seed >> 4);
+    seed *= uint(0x27d4eb2d);
+    seed = seed ^ (seed >> 15);
+    return seed;
 }
 
-vec3 RandDirHemisphere(vec3 normal, vec3 coord)
+float RandomFloat01(inout uint state)
 {
-    vec3 dir = vec3(random(coord) - 0.5, random(coord+vec3(PHI)) - 0.5, random(coord+vec3(PHI*2)) - 0.5);
-    dir = normalize(dir);
-    if (dot(normal, dir) < 0.0)
-    {
-        dir = -dir;
-    }
-    return dir;
+    return float(wang_hash(state)) / 4294967296.0;
+}
+
+vec3 RandomUnitVector(inout uint state)
+{
+    float z = RandomFloat01(state) * 2.0f - 1.0f;
+    float a = RandomFloat01(state) * TWO_PI;
+    float r = sqrt(1.0f - z * z);
+    float x = r * cos(a);
+    float y = r * sin(a);
+    return vec3(x, y, z);
+}
+vec3 RandomDiffuseVector(vec3 normal)
+{
+    return normalize(RandomUnitVector(primaryRayPayload.rng_state)+normal);
+}
+vec3 RandomSpecularVector(vec3 direction, vec3 diffuse, float roughness)
+{
+    return normalize(mix(direction, diffuse, roughness));
+}
+
+void traceLight(vec3 origin, vec3 dir, float tmax)
+{
+    const float tmin = 0.0001;
+    traceRayEXT(topLevelAS, //topLevelacceleationStructure
+    gl_RayFlagsOpaqueEXT|gl_RayFlagsSkipClosestHitShaderEXT|  gl_RayFlagsTerminateOnFirstHitEXT, //rayFlags
+    0xFF, //cullMask
+    0, //sbtRecordOffset
+    1, //sbtRecordStride
+    0, //missIndex
+    origin, //origin
+    tmin, //Tmin
+    dir, //direction
+    tmax, //Tmax
+    0);//payload location
 }
 void trace(vec3 origin, vec3 dir, float tmax)
 {
     const float tmin = 0.0001;
-
-    primaryRayPayload.depth++;
+    primaryRayPayload.color=vec3(0.0);
     traceRayEXT(topLevelAS, //topLevelacceleationStructure
     gl_RayFlagsOpaqueEXT, //rayFlags
     0xFF, //cullMask
@@ -74,34 +125,58 @@ void trace(vec3 origin, vec3 dir, float tmax)
 }
 
 
+const int MAX_DEPTH =4;
+const float LIGHT_BIAS = 0.3;
 void main()
 {
 
-    primaryRayPayload.depth++;
+
     vec3 normal = hitResult.normal;
-    const int MAX_DEPTH = 6;
-    vec3 toLightDir = normalize(vec3(sin(time.value), sin(time.value), cos(time.value)));
+
     vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-    //send a new ray
+
+
+    primaryRayPayload.depth++;
+    int numSamples = primaryRayPayload.depth==1?4:1;
+    //numSamples = depth ==2?4:1;
+    Material material  = materials[gl_InstanceID%6];
+
+    vec3 to_light_dir= normalize(vec3(sin(frame.time), sin(frame.time), cos(frame.time)));
+    float light_dot_product=dot(hitResult.normal, to_light_dir);;
+    vec3 color =vec3(0.0);
+    int num_sun_samples = 0;
     if (primaryRayPayload.depth<MAX_DEPTH)
     {
-        vec2 coord = vec2(gl_LaunchIDEXT.xy) / vec2(gl_LaunchSizeEXT.xy);
-        vec3 pos = vec3(coord.x, coord.y, time.value + (((MAX_DEPTH*primaryRayPayload.sample_id) + primaryRayPayload.depth) * PHI));
-        vec3 newDir = RandDirHemisphere(hitResult.normal, pos);
-        trace(origin, newDir, 1000.0);
+        for (int i = 0; i < numSamples; i++)
+        {
+            vec3 newDir;
+            if (primaryRayPayload.depth==1&&light_dot_product>RandomFloat01(primaryRayPayload.rng_state))
+            {
+                primaryRayPayload.hit_sky=false;
+                primaryRayPayload.color = vec3(0.0);
+                newDir = RandomSpecularVector(to_light_dir, RandomDiffuseVector(to_light_dir), LIGHT_BIAS);
+                traceLight(origin, newDir, 1000.0);;
+
+                if (primaryRayPayload.hit_sky)
+                {
+                    color += primaryRayPayload.color;
+                    num_sun_samples++;
+                }
+            }
+
+            primaryRayPayload.hit_sky=false;
+            newDir = RandomDiffuseVector(hitResult.normal);
+            trace(origin, newDir, 1000.0);
+            color += primaryRayPayload.color;
+
+
+            color += primaryRayPayload.color;
+        }
+        color /= float(numSamples+num_sun_samples);
     }
 
-    vec3 material_color = vec3(0.5);
-    switch (gl_InstanceID%5)
-    {
-        case 0:material_color=vec3(0.5, 0.5, 0.5); break;
-        case 1:material_color=vec3(1.0, 0.0, 0.0); break;
-        case 2:material_color=vec3(0.0, 0.0, 1.0); break;
-        case 3:material_color=vec3(0.0, 1.0, 0.0); break;
-        case 4:material_color=vec3(1.0, 1.0, 1.0); break;
-    }
+    primaryRayPayload.color = (material.emissive) + (material.albedo*color);
 
-    primaryRayPayload.color += material_color * (1.0 / primaryRayPayload.depth);
-    primaryRayPayload.hit_t = gl_HitTEXT;
+    primaryRayPayload.depth = primaryRayPayload.depth-1;
 }
 

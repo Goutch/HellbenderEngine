@@ -14,6 +14,11 @@ struct RaytracingPipelineResources {
 	std::vector<RaytracingShaderGroup> shader_groups;
 };
 
+struct Frame {
+	float time = 0;
+	uint32_t index = 0;
+};
+
 class RaytracingScene {
 private:
 	RaytracingPipelineResources raytracing_resources;
@@ -23,6 +28,7 @@ private:
 	RootAccelerationStructure *root_acceleration_structure;
 	AABBAccelerationStructure *aabb_acceleration_structure;
 	bool use_pathtracing = false;
+	Frame frame{};
 public:
 	void onResolutionChange(RenderTarget *rt) {
 		render_target->setResolution(rt->getResolution().x, rt->getResolution().y);
@@ -38,18 +44,20 @@ public:
 
 	void onRender() {
 		Entity camera_entity = Application::getScene()->getCameraEntity();
-		float time = Application::getTime() * 0.05;
+		frame.time = Application::getTime() * 0.05;
 
 
 		RaytracingPipelineResources resources = use_pathtracing ? pathtracing_resources : raytracing_resources;
 
-		resources.pipeline_instance->setUniform("time", &time);
+
+		resources.pipeline_instance->setUniform("frame", &frame);
 		Graphics::raytrace(
 				*root_acceleration_structure,
 				*resources.pipeline_instance,
 				*render_target,
 				camera_entity.get<Camera>().projection,
 				glm::inverse(camera_entity.get<Transform>().world()));
+		frame.index++;
 	}
 
 	void onUpdate(float delta) {
@@ -196,12 +204,12 @@ public:
 
 		acceleration_structure_instances.push_back(AccelerationStructureInstance{0, 0, transform_aabb_floor.world(), ACCELERATION_STRUCTURE_TYPE_AABB});
 
-		for (int i = 0; i < 1000; ++i) {
-			Transform t{};
-			t.translate(vec3(Random::floatRange(-50, 50), 0, Random::floatRange(-50, 50)));
-			acceleration_structure_instances.push_back(
-					AccelerationStructureInstance{0, 0, t.world(), ACCELERATION_STRUCTURE_TYPE_AABB});
-		}
+		//for (int i = 0; i < 1000; ++i) {
+		//	Transform t{};
+		//	t.translate(vec3(Random::floatRange(-50, 50), 0, Random::floatRange(-50, 50)));
+		//	acceleration_structure_instances.push_back(
+		//			AccelerationStructureInstance{0, 0, t.world(), ACCELERATION_STRUCTURE_TYPE_AABB});
+		//}
 		for (int i = 0; i < 1000; ++i) {
 			Transform t{};
 			t.translate(vec3(Random::floatRange(-50, 50), 0, Random::floatRange(-50, 50)));

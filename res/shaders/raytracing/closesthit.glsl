@@ -13,11 +13,11 @@ struct MaterialData
 
 //------------------------------------ UNIFORMS ------------------------------------
 layout (binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
-layout (binding = 3, set = 0) uniform TimeUBO
+layout (binding = 3, set = 0) uniform Frame
 {
-    float value;
-} time;
-
+    float time;
+    uint index;
+} frame;
 //layout(binding = 4, set = 0) readonly buffer MaterialDataBuffer
 //{
 //    MaterialData materials[];
@@ -60,7 +60,7 @@ vec3 RandDirHemisphere(vec3 normal, vec3 coord)
 
 vec3 atmosphere(vec3 color, float t, float maxT)
 {
-    vec3 a = exp(-(4.6/maxT)*t*vec3(2+(sin(time.value)*1.5), 2, 2+cos(time.value)));
+    vec3 a = exp(-(4.6/maxT)*t*vec3(2+(sin(frame.time)*1.5), 2, 2+cos(frame.time)));
     return (color*a) + ((1.0-a) * vec3(0.5, 0.5, 0.5));
 }
 float occlusionRay(vec3 origin, vec3 dir, float tmax)
@@ -96,7 +96,7 @@ void main()
     }
     vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
 
-    vec3 toLightDir = normalize(vec3(sin(time.value), sin(time.value), cos(time.value)));
+    vec3 toLightDir = normalize(vec3(sin(frame.time), sin(frame.time), cos(frame.time)));
     bool isInShadow = false;
     //if ((gl_LaunchIDEXT.x+gl_LaunchIDEXT.y)%2==0)
     isInShadow = occlusionRay(origin, toLightDir, 1000.0)>=0.01;
@@ -131,7 +131,7 @@ void main()
         for (int i = 0; i < numSamples; i++)
         {
             vec2 coord = vec2(gl_LaunchIDEXT.xy) / vec2(gl_LaunchSizeEXT.xy);
-            vec3 pos = vec3(coord.x, coord.y, time.value + (i * PHI));
+            vec3 pos = vec3(coord.x, coord.y, frame.time + (i * PHI));
             float o = occlusionRay(origin, RandDirHemisphere(hitResult.normal, pos), 0.7);
             //if (o>0.01)
             // occlusion += 1;

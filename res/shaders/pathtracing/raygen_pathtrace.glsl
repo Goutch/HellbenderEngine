@@ -8,13 +8,17 @@ layout(binding = 2, set = 0) uniform CameraProperties
     mat4 viewInverse;
     mat4 projInverse;
 } cam;
-
+layout (binding = 3, set = 0) uniform Frame
+{
+    float time;
+    uint index;
+} frame;
 layout(location = 0) rayPayloadEXT PrimaryRayPayLoad
 {
     vec3 color;
     int depth;
-    int sample_id;
-    float hit_t;
+    uint rng_state;
+    bool hit_sky;
 } primaryRayPayload;
 
 void main()
@@ -30,15 +34,15 @@ void main()
     float tmin = 0.001;
     float tmax = 1000.0;
 
-    int num_samples = 32;
 
     vec3 color=vec3(0.0, 0.0, 0.0);
-    for (int i = 0; i < num_samples; i++)
+    int numSamples=1;
+    primaryRayPayload.rng_state = uint(uint(gl_LaunchIDEXT.x) * uint(1973) + uint(gl_LaunchIDEXT.y) * uint(9277) + uint(frame.index) * uint(26699)) | uint(1);
+    for (int i=0; i<numSamples; i++)
     {
-        primaryRayPayload.sample_id=i;
         primaryRayPayload.depth = 0;
-        primaryRayPayload.color = vec3(0.0, 0., 0.);
-        primaryRayPayload.hit_t = 0.0;
+        primaryRayPayload.color = vec3(0.0, 0.0, 0.0);
+        primaryRayPayload.hit_sky = false;
         traceRayEXT(topLevelAS, //topLevelacceleationStructure
         gl_RayFlagsOpaqueEXT, //rayFlags
         0xff, //cullMask
@@ -50,8 +54,10 @@ void main()
         direction.xyz, //direction
         tmax, //Tmax
         0);//payload location
-        color += (primaryRayPayload.color/primaryRayPayload.depth)/num_samples;
+        color += primaryRayPayload.color;
     }
+    color/=float(numSamples);
+
 
     imageStore(image, ivec2(gl_LaunchIDEXT.xy), vec4(color, 0.0));
 }
