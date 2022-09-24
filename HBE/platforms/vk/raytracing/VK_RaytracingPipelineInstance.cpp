@@ -27,36 +27,20 @@ namespace HBE {
 		descriptors->unbind();
 	}
 
-	void VK_RaytracingPipelineInstance::setDynamicUniform(uint32_t binding, const void *data) {
-		descriptors->setDynamicUniform(binding, data);
+	void VK_RaytracingPipelineInstance::setUniform(uint32_t binding, const void *data, int32_t frame) {
+		descriptors->setUniform(binding, data, frame);
 	}
 
-	void VK_RaytracingPipelineInstance::setUniform(uint32_t binding, const void *data) {
-		descriptors->setUniform(binding, data);
+	void VK_RaytracingPipelineInstance::setTexture(uint32_t binding, const Texture *texture, int32_t frame, uint32_t mip_level) {
+		descriptors->setTexture(binding, texture, mip_level, frame);
 	}
 
-	void VK_RaytracingPipelineInstance::setTexture(uint32_t binding, const Texture *texture, uint32_t mip_level) {
-		descriptors->setTexture(binding, texture, mip_level);
+	void VK_RaytracingPipelineInstance::setUniform(const std::string &name, const void *data, int32_t frame) {
+		descriptors->setUniform(name, data, frame);
 	}
 
-	void VK_RaytracingPipelineInstance::setTexture(uint32_t binding, const RenderTarget *render_target) {
-		descriptors->setTexture(binding, render_target);
-	}
-
-	void VK_RaytracingPipelineInstance::setDynamicUniform(const std::string &name, const void *data) {
-		descriptors->setDynamicUniform(name, data);
-	}
-
-	void VK_RaytracingPipelineInstance::setUniform(const std::string &name, const void *data) {
-		descriptors->setUniform(name, data);
-	}
-
-	void VK_RaytracingPipelineInstance::setTexture(const std::string &name, const Texture *texture, uint32_t mip_level) {
-		descriptors->setTexture(name, texture, mip_level);
-	}
-
-	void VK_RaytracingPipelineInstance::setTexture(const std::string &name, const RenderTarget *render_target) {
-		descriptors->setTexture(name, render_target);
+	void VK_RaytracingPipelineInstance::setTexture(const std::string &name, const Texture *texture, int32_t frame, uint32_t mip_level) {
+		descriptors->setTexture(name, texture, frame, mip_level);
 	}
 
 	const VK_RaytracingPipeline *VK_RaytracingPipelineInstance::getPipeline() const {
@@ -65,5 +49,14 @@ namespace HBE {
 
 	VK_RaytracingPipelineInstance::~VK_RaytracingPipelineInstance() {
 		delete descriptors;
+	}
+
+	void VK_RaytracingPipelineInstance::setTextureArray(const std::string &name, const Texture **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) {
+		descriptors->setTextureArray(name, texture, texture_count, frame, mip_level);
+	}
+
+	void VK_RaytracingPipelineInstance::setTextureArray(uint32_t binding, const Texture **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) {
+		descriptors->setTextureArray(binding, texture, texture_count, mip_level, frame);
+
 	}
 }

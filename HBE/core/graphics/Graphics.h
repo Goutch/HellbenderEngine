@@ -30,6 +30,8 @@ namespace HBE {
 
 	class RenderTarget;
 
+	class Texture;
+
 	class HB_API Graphics {
 		static Renderer *renderer;
 		static Window *window;
@@ -47,13 +49,12 @@ namespace HBE {
 
 		static void raytrace(const RootAccelerationStructure &root_acceleration_structure,
 							 RaytracingPipelineInstance &pipeline,
-							 const RenderTarget &target,
 							 const mat4 &projection_matrix,
-							 const mat4 &view_matrix);
-
+							 const mat4 &view_matrix,
+							 vec2u resolution);
+		/// <summary>
+		/// Render the drawn geometry to the render_target
 		static void render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix);
-
-		static void setRenderTarget(RenderTarget *render_target);
 
 		static RenderTarget *getDefaultRenderTarget();
 
@@ -61,10 +62,14 @@ namespace HBE {
 
 		static void beginFrame();
 
-		static void endFrame(bool present = true);
+		static void present(Texture *texture);
+
+		static void endFrame();
 
 		static Renderer *getRenderer();
 
-	};
+		static uint32_t getCurrentFrame();
 
+		static uint32_t getFrameCount();
+	};
 }

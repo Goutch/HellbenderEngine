@@ -88,7 +88,7 @@ namespace HBE {
 		colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 		colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 		colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		colorAttachment.finalLayout = (flags | RENDER_TARGET_FLAG_USED_IN_RAYTRACING) == RENDER_TARGET_FLAG_USED_IN_RAYTRACING ? VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		colorAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		VkAttachmentReference color_attachment_ref{};
 		color_attachment_ref.attachment = 0;
@@ -220,7 +220,6 @@ namespace HBE {
 			info.height = height;
 			info.generate_mip_maps = false;
 			info.flags = IMAGE_FLAG_RENDER_TARGET;
-			info.flags |= (flags & RENDER_TARGET_FLAG_USED_IN_RAYTRACING) ? IMAGE_FLAG_SHADER_WRITE : 0;
 			images[i] = new VK_Image(renderer->getDevice(), info);
 			image_views[i] = images[i]->getImageView();
 		}
@@ -299,7 +298,10 @@ namespace HBE {
 		return images[i];
 	}
 
-
+	Texture *VK_RenderPass::getFramebufferTexture(uint32_t frame) const {
+		HB_ASSERT(frame < images.size(), "Frame index out of bounds");
+		return images[frame];
+	}
 }
 
 

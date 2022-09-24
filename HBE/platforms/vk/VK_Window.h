@@ -3,29 +3,32 @@
 #include "core/graphics/Window.h"
 #include "vulkan/vulkan.h"
 #include "string"
+
 struct GLFWwindow;
 namespace HBE {
-    class VK_Window : public Window {
-        GLFWwindow *handle;
-        uint32_t width,height;
-        uint32_t last_width, last_height;
-        int last_x,last_y;
-    public:
-        VK_Window(uint32_t width, uint32_t height);
+	class VK_Window : public Window {
+		GLFWwindow *handle;
+		uint32_t width, height;
+		uint32_t last_width, last_height;
+		int last_x, last_y;
+		bool minimized = false;
+	public:
+		VK_Window(uint32_t width, uint32_t height);
 
-        ~VK_Window();
+		~VK_Window();
 
-        bool shouldClose() override;
+		bool shouldClose() override;
 		void setFullscreen(bool fullscreen) override;
 		void swapBuffers() override;
 
-        void getSize(uint32_t &width, uint32_t &height) override;
+		void getSize(uint32_t &width, uint32_t &height) override;
 
-        GLFWwindow *getHandle() override;
+		GLFWwindow *getHandle() override;
 
-        void requestClose() override;
+		void requestClose() override;
 
-        static void windowSizeCallback(GLFWwindow *handle, int width, int height);
+		bool isMinimized() override;
+		static void windowSizeCallback(GLFWwindow *handle, int width, int height);
 		void onTitleChange(std::string title);
 	};
 }

@@ -11,11 +11,10 @@ struct MaterialData
     float roughness;
 };
 
-
 //------------------------------------ UNIFORMS ------------------------------------
 layout (binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
 
-layout (binding = 3, set = 0) uniform Frame
+layout (binding = 4, set = 0) uniform Frame
 {
     float time;
     uint index;
@@ -41,8 +40,6 @@ hitAttributeEXT HitResult
     vec3 normal;
 } hitResult;
 
-
-
 struct Material {
     vec3 albedo;
     vec3 emissive;
@@ -53,8 +50,8 @@ Material(vec3(0.5, 0.5, 0.5), vec3(0.0, 0.0, 0.0)),
 Material(vec3(0.5, 0.1, 0.1), vec3(0.0, 0.0, 0.0)),
 Material(vec3(0.1, 0.5, 0.1), vec3(0.0, 0.0, 0.0)),
 Material(vec3(0.1, 0.1, 0.5), vec3(0.0, 0.0, 0.0)),
-Material(vec3(1.0, 1.0, 1.0), vec3(0, 0, 0)),
-Material(vec3(1.0, 1.0, 1.0), vec3(0.0, 0.0, 0.0))
+Material(vec3(0.2, 0.2, 0.2), vec3(0, 0, 0)),
+Material(vec3(0.8, 0.8, 0.8), vec3(0.0, 0.0, 0.0))
 );
 
 //------------------------------------ FUNCTIONS ------------------------------------
@@ -126,23 +123,20 @@ void trace(vec3 origin, vec3 dir, float tmax)
 
 
 const int MAX_DEPTH =4;
-const float LIGHT_BIAS = 0.3;
+const float LIGHT_BIAS = 0.15;
 void main()
 {
-
-
     vec3 normal = hitResult.normal;
 
     vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
 
-
     primaryRayPayload.depth++;
-    int numSamples = primaryRayPayload.depth==1?4:1;
+    int numSamples = primaryRayPayload.depth==1?1:1;
     //numSamples = depth ==2?4:1;
     Material material  = materials[gl_InstanceID%6];
 
     vec3 to_light_dir= normalize(vec3(sin(frame.time), sin(frame.time), cos(frame.time)));
-    float light_dot_product=dot(hitResult.normal, to_light_dir);;
+    float light_dot_product=dot(hitResult.normal, to_light_dir);
     vec3 color =vec3(0.0);
     int num_sun_samples = 0;
     if (primaryRayPayload.depth<MAX_DEPTH)
@@ -150,7 +144,7 @@ void main()
         for (int i = 0; i < numSamples; i++)
         {
             vec3 newDir;
-            if (primaryRayPayload.depth==1&&light_dot_product>RandomFloat01(primaryRayPayload.rng_state))
+            if (smoothstep(0, 1, light_dot_product)>RandomFloat01(primaryRayPayload.rng_state))
             {
                 primaryRayPayload.hit_sky=false;
                 primaryRayPayload.color = vec3(0.0);
@@ -166,6 +160,7 @@ void main()
 
             primaryRayPayload.hit_sky=false;
             newDir = RandomDiffuseVector(hitResult.normal);
+            //newDir = RandomSpecularVector(reflect(gl_WorldRayDirectionEXT,hitResult.normal), newDir, 1.0);
             trace(origin, newDir, 1000.0);
             color += primaryRayPayload.color;
 
@@ -176,7 +171,6 @@ void main()
     }
 
     primaryRayPayload.color = (material.emissive) + (material.albedo*color);
-
     primaryRayPayload.depth = primaryRayPayload.depth-1;
 }
 

@@ -1,9 +1,10 @@
 #version 460
 #extension GL_EXT_ray_tracing : enable
-
+#define HISTORY_COUNT 4
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
-layout(binding = 1, set = 0, rgba32f) uniform image2D image;
-layout(binding = 2, set = 0) uniform CameraProperties
+layout(binding = 1, set = 0, rgba32f) uniform image2D outputImage;
+layout(binding = 2, set = 0, rgba32f) uniform image2D history[HISTORY_COUNT];
+layout(binding = 3, set = 0) uniform CameraProperties
 {
     mat4 viewInverse;
     mat4 projInverse;
@@ -31,5 +32,5 @@ void main()
     primaryRayPayload.color = vec3(0.0);
     traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
 
-    imageStore(image, ivec2(gl_LaunchIDEXT.xy), vec4(primaryRayPayload.color , 0.0));
+    imageStore(outputImage, ivec2(gl_LaunchIDEXT.xy), vec4(primaryRayPayload.color, 0.0));
 }

@@ -13,8 +13,7 @@ namespace HBE {
 	typedef uint32_t RENDER_TARGET_FLAGS;
 	enum RENDER_TARGET_FLAG {
 		RENDER_TARGET_FLAG_NONE = 0,
-		RENDER_TARGET_FLAG_DEPTH_TEST = 1,
-		RENDER_TARGET_FLAG_USED_IN_RAYTRACING = 2,
+		RENDER_TARGET_FLAG_DEPTH_TEST = 1
 	};
 	struct RenderTargetInfo {
 		uint32_t width = 0;
@@ -32,6 +31,6 @@ namespace HBE {
 		virtual vec2i getResolution() const = 0;
 		virtual void setClearColor(vec4 color) = 0;
 		virtual const vec4 &getClearColor() const = 0;
-
+		virtual Texture *getFramebufferTexture(uint32_t frame) const = 0;
 	};
 }

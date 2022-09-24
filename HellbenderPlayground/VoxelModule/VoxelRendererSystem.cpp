@@ -100,16 +100,16 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 		}
 	}
 	raw_voxels->update(data.data());
-	compute_instance->setTexture("inTexture", raw_voxels, 0);
-	compute_instance->setTexture("outTexture", raw_voxels, 1);
+	compute_instance->setTexture("inTexture", raw_voxels, 0, 0);
+	compute_instance->setTexture("outTexture", raw_voxels, 0, 1);
 	compute_instance->dispatch(raw_voxels->getWidth() / 2, raw_voxels->getHeight() / 2, raw_voxels->getWidth() / 2);
 	compute_instance->wait();
-	compute_instance->setTexture("inTexture", raw_voxels, 1);
-	compute_instance->setTexture("outTexture", raw_voxels, 2);
+	compute_instance->setTexture("inTexture", raw_voxels, 0, 1);
+	compute_instance->setTexture("outTexture", raw_voxels, 0, 2);
 	compute_instance->dispatch(raw_voxels->getWidth() / 4, raw_voxels->getHeight() / 4, raw_voxels->getWidth() / 4);
 	compute_instance->wait();
-	compute_instance->setTexture("inTexture", raw_voxels, 2);
-	compute_instance->setTexture("outTexture", raw_voxels, 3);
+	compute_instance->setTexture("inTexture", raw_voxels, 0, 2);
+	compute_instance->setTexture("outTexture", raw_voxels, 0, 3);
 	compute_instance->dispatch(raw_voxels->getWidth() / 8, raw_voxels->getHeight() / 8, raw_voxels->getWidth() / 8);
 	compute_instance->wait();
 	VoxelChunkInfo voxel_info = {
@@ -117,8 +117,8 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 				  raw_voxels->getHeight(),
 				  raw_voxels->getDepth()),
 			vec3(2.0f)};
-	material->setUniform("VoxelData", static_cast<void *>(&voxel_info));
-	material->setTexture("voxels", raw_voxels);
+	material->setUniform("VoxelData", static_cast<void *>(&voxel_info), -1);
+	material->setTexture("voxels", raw_voxels, 0, 0);
 	//pipeline->setTexture("voxels0", raw_voxels, 0);
 	//pipeline->setTexture("voxels1", raw_voxels, 1);
 	//pipeline->setTexture("voxels2", raw_voxels, 2);

@@ -12,6 +12,7 @@
 #include "core/resource/Shader.h"
 #include "core/resource/GraphicPipeline.h"
 #include "core/resource/ComputePipeline.h"
+#include "core/resource/ComputeInstance.h"
 #include "core/resource/Mesh.h"
 #include "core/resource/Texture.h"
 #include "core/resource/Model.h"

@@ -2,6 +2,7 @@
 
 #include "Core.h"
 #include "core/utility/Event.h"
+
 struct GLFWwindow;
 namespace HBE {
 	class HB_API Window {
@@ -25,6 +26,8 @@ namespace HBE {
 		virtual void getSize(uint32_t &width, uint32_t &height) = 0;
 
 		virtual void setFullscreen(bool fullscreen) = 0;
+
+		virtual bool isMinimized() = 0;
 	};
 }
 

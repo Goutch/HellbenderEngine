@@ -63,11 +63,13 @@ namespace HBE {
 			setScene(new Scene());
 		}
 		while (!window->shouldClose() && current_scene != nullptr) {
+
 			window->swapBuffers();
 			Input::pollEvents();
 			Profiler::begin("TOTAL_FRAME");
 			JobManager::updateJobsStatus();
 			Profiler::begin("UPDATE");
+
 			onUpdate.invoke(delta_t);
 			current_scene->update(delta_t);
 			Profiler::end();
@@ -75,19 +77,23 @@ namespace HBE {
 				Entity camera_entity = current_scene->getCameraEntity();
 
 				if (camera_entity.valid()) {
-					if (camera_entity.has<Camera>() ||
-						camera_entity.has<Camera2D>()) {
+
+					if (!window->isMinimized() &&
+						(camera_entity.has<Camera>() ||
+						 camera_entity.has<Camera2D>())) {
 						Profiler::begin("DRAW");
 						onDraw.invoke();
 						current_scene->draw();
 						Profiler::end();
-						Profiler::begin("RENDER");
 
+
+						Profiler::begin("RENDER");
 						Graphics::beginFrame();
+
 						onRender.invoke();
 						current_scene->render();
-						Graphics::endFrame();
 
+						Graphics::endFrame();
 						Profiler::end();
 					}
 				} else {

@@ -21,7 +21,6 @@
 #include "VK_Mesh.h"
 
 #include "VK_GraphicPipeline.h"
-#include "VK_RenderTarget.h"
 #include "core/graphics/Graphics.h"
 #include "core/utility/Profiler.h"
 #include "VK_PipelineDescriptors.h"
@@ -70,11 +69,17 @@ namespace HBE {
 	}
 
 	void VK_Renderer::reCreateSwapchain() {
+		if(window->isMinimized()){
+			return;
+		}
 		uint32_t width, height;
 		window->getSize(width, height);
 
 		device->wait();
-
+		if (width == 0 || height == 0) {
+			width = 1;
+			height = 1;
+		}
 		for (size_t i = 0; i < swapchain->getImagesCount(); ++i) {
 			images_in_flight_fences[i] = nullptr;
 		}
@@ -85,9 +90,9 @@ namespace HBE {
 		//todo: check if nessesary
 		command_pool->createCommandBuffers(MAX_FRAMES_IN_FLIGHT);
 
-		default_render_target->setResolution(width, height);
+		main_render_target->setResolution(width, height);
 
-		screen_material->setTexture("texture0", current_render_pass);
+		screen_material->setTexture("texture0", main_render_target->getFramebufferTexture(current_frame), current_frame, 0);
 	}
 
 	void VK_Renderer::onWindowClosed() {
@@ -104,6 +109,7 @@ namespace HBE {
 			delete frames[i].image_available_semaphore;
 			delete frames[i].finished_semaphore;
 		}
+		vkDestroySampler(device->getHandle(), default_sampler, VK_NULL_HANDLE);
 		delete factory;
 		delete command_pool;
 		delete swapchain;
@@ -119,9 +125,9 @@ namespace HBE {
 
 	void VK_Renderer::raytrace(const RootAccelerationStructure &root_acceleration_structure,
 							   RaytracingPipelineInstance &pipeline,
-							   const RenderTarget &render_target,
 							   const mat4 &projection_matrix,
-							   const mat4 &view_matrix) {
+							   const mat4 &view_matrix,
+							   const vec2i resolution) {
 		/*vec2i resolution = render_target.getResolution();
 		VkViewport viewport{};
 		viewport.x = 0.0f;
@@ -140,9 +146,8 @@ namespace HBE {
 
 		VK_RaytracingPipelineInstance *vk_pipeline_instance = dynamic_cast<VK_RaytracingPipelineInstance *>(&pipeline);
 		const VK_RaytracingPipeline *vk_pipeline = vk_pipeline_instance->getPipeline();
-		const VK_RenderPass *render_pass = dynamic_cast<const VK_RenderPass *>(&render_target);
 		UniformBufferObject ubo = {glm::inverse(view_matrix), glm::inverse(projection_matrix)};
-		vk_pipeline_instance->setUniform("cam", &ubo);
+		vk_pipeline_instance->setUniform("cam", &ubo, current_frame);
 		vk_pipeline->bind();
 		vk_pipeline_instance->bind();
 
@@ -151,8 +156,8 @@ namespace HBE {
 								  &vk_pipeline->getMissShaderBindingTable(),
 								  &vk_pipeline->getHitShaderBindingTable(),
 								  &vk_pipeline->getCallableShaderBindingTable(),
-								  render_pass->getResolution().x,
-								  render_pass->getResolution().y,
+								  resolution.x,
+								  resolution.y,
 								  1);
 		//vkCmdPipelineBarrier(command_pool->getCurrentBuffer(), VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_DEPENDENCY_BY_REGION_BIT, 0, nullptr, 0, nullptr, 0, nullptr);
 
@@ -191,7 +196,7 @@ namespace HBE {
 			pipeline->bind();
 			for (const auto &material_kv:pipeline_kv.second) {
 				Material *material = material_kv.first;
-				material->setUniform("ubo", &ubo);
+				material->setUniform("ubo", &ubo, -1);
 				material->bind();
 				for (const auto &mesh_kv: material_kv.second) {
 					const Mesh *mesh = mesh_kv.first;
@@ -216,7 +221,7 @@ namespace HBE {
 			pipeline->bind();
 			for (const auto &material_kv: pipeline_kv.second) {
 				Material *material = material_kv.first;
-				material->setUniform("ubo", &ubo);
+				material->setUniform("ubo", &ubo, -1);
 				material->bind();
 
 				std::vector<const Mesh *> meshes = material_kv.second;
@@ -244,102 +249,107 @@ namespace HBE {
 		Profiler::end();
 	}
 
-	void VK_Renderer::endFrame(bool present) {
-		Profiler::begin("endFrame");
-		if (present) {
-			Profiler::begin("AquireImage");
-			VkResult result = vkAcquireNextImageKHR(device->getHandle(),
-													swapchain->getHandle(),
-													UINT64_MAX,
-													frames[current_frame].image_available_semaphore->getHandle(),
-													VK_NULL_HANDLE,
-													&current_image);
-			if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-				reCreateSwapchain();
-				return;
-			} else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-				Log::error("failed to acquire swap chain image!");
-			}
-			Profiler::end();
-			Profiler::begin("WaitImageInflight");
-			if (images_in_flight_fences[current_image] != nullptr) {
-				images_in_flight_fences[current_image]->wait();
-			}
-			Profiler::end();
-			images_in_flight_fences[current_image] = &command_pool->getCurrentFence();
-			command_pool->getCurrentFence().reset();
+	void VK_Renderer::present(Texture *image) {
+		HB_ASSERT(frame_presented == false, "Frame already presented, call beginFrame() before present() and endFrame() after present()");
+		Profiler::begin("AquireImage");
 
+		VkResult result = vkAcquireNextImageKHR(device->getHandle(),
+												swapchain->getHandle(),
+												UINT64_MAX,
+												frames[current_frame].image_available_semaphore->getHandle(),
+												VK_NULL_HANDLE,
+												&current_image);
 
-			vec2i resolution = current_render_pass->getResolution();
-			VkViewport viewport{};
-			viewport.x = 0.0f;
-			viewport.y = 0;//static_cast<float>(resolution.y);
-			viewport.width = static_cast<float>(resolution.x);
-			viewport.height = static_cast<float>(resolution.y);
-			viewport.minDepth = 0.0f;
-			viewport.maxDepth = 1.0f;
-
-			VkRect2D scissor{};
-			scissor.offset = {0, 0};
-			scissor.extent = VkExtent2D{(uint32_t) resolution.x, (uint32_t) resolution.y};
-
-			//static_cast<VK_RenderTarget*>(render_target)->begin(command_pool->getCurrentBuffer());
-			vkCmdSetViewport(command_pool->getCurrentBuffer(), 0, 1, &viewport);
-			vkCmdSetScissor(command_pool->getCurrentBuffer(), 0, 1, &scissor);
-
-			swapchain->beginRenderPass(current_image, command_pool->getCurrentBuffer());
-
-			screen_pipeline->bind();
-			screen_material->bind();
-			vkCmdDraw(command_pool->getCurrentBuffer(), 3, 1, 0, 0);
-			screen_material->unbind();
-			screen_pipeline->unbind();
-
-			swapchain->endRenderPass(command_pool->getCurrentBuffer());
-
-			command_pool->end();
-			VkSemaphore wait_semaphores[] = {frames[current_frame].image_available_semaphore->getHandle()};
-			VkPipelineStageFlags stages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-			VkSemaphore signal_semaphores[] = {frames[current_frame].finished_semaphore->getHandle()};
-
-
-			command_pool->submit(QUEUE_FAMILY_GRAPHICS,
-								 wait_semaphores,
-								 stages,
-								 1,
-								 signal_semaphores,
-								 1);
-
-			waitAll();
-			VkPresentInfoKHR presentInfo{};
-			presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-
-			presentInfo.waitSemaphoreCount = 1;
-			presentInfo.pWaitSemaphores = signal_semaphores;
-
-			VkSwapchainKHR swapChains[] = {swapchain->getHandle()};
-			presentInfo.swapchainCount = 1;
-			presentInfo.pSwapchains = swapChains;
-			presentInfo.pImageIndices = &current_image;
-			presentInfo.pResults = nullptr; // Optional
-
-			Profiler::begin("Present");
-			result = vkQueuePresentKHR(device->getQueue(QUEUE_FAMILY_PRESENT).getHandle(), &presentInfo);
-			Profiler::end();
-			if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || windowResized) {
-				windowResized = false;
-				reCreateSwapchain();
-				return;
-			} else if (result != VK_SUCCESS) {
-				Log::error("failed to present swap chain image!");
-			}
-		} else {
-			command_pool->end();
-			command_pool->submit(QUEUE_FAMILY_GRAPHICS);
+		if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+			reCreateSwapchain();
+			return;
+		} else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+			Log::error("failed to acquire swap chain image!");
 		}
+		Profiler::end();
+		Profiler::begin("WaitImageInflight");
+		if (images_in_flight_fences[current_image] != nullptr) {
+			images_in_flight_fences[current_image]->wait();
+		}
+		Profiler::end();
+		images_in_flight_fences[current_image] = &command_pool->getCurrentFence();
+		command_pool->getCurrentFence().reset();
+
+
+		vec2i resolution = vec2i(swapchain->getExtent().width, swapchain->getExtent().height);
+		VkViewport viewport{};
+		viewport.x = 0.0f;
+		viewport.y = 0;//static_cast<float>(resolution.y);
+		viewport.width = static_cast<float>(resolution.x);
+		viewport.height = static_cast<float>(resolution.y);
+		viewport.minDepth = 0.0f;
+		viewport.maxDepth = 1.0f;
+
+		VkRect2D scissor{};
+		scissor.offset = {0, 0};
+		scissor.extent = VkExtent2D{(uint32_t) resolution.x, (uint32_t) resolution.y};
+
+		//static_cast<VK_RenderTarget*>(render_target)->begin(command_pool->getCurrentBuffer());
+		vkCmdSetViewport(command_pool->getCurrentBuffer(), 0, 1, &viewport);
+		vkCmdSetScissor(command_pool->getCurrentBuffer(), 0, 1, &scissor);
+
+		screen_material->setTexture("texture0", image, current_frame, 0);
+		swapchain->beginRenderPass(current_image, command_pool->getCurrentBuffer());
+
+		screen_pipeline->bind();
+		screen_material->bind();
+		vkCmdDraw(command_pool->getCurrentBuffer(), 3, 1, 0, 0);
+		screen_material->unbind();
+		screen_pipeline->unbind();
+
+		swapchain->endRenderPass(command_pool->getCurrentBuffer());
+
+		command_pool->end();
+		VkSemaphore wait_semaphores[] = {frames[current_frame].image_available_semaphore->getHandle()};
+		VkPipelineStageFlags stages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+		VkSemaphore signal_semaphores[] = {frames[current_frame].finished_semaphore->getHandle()};
+
+		command_pool->submit(QUEUE_FAMILY_GRAPHICS,
+							 wait_semaphores,
+							 stages,
+							 1,
+							 signal_semaphores,
+							 1);
+		VkPresentInfoKHR presentInfo{};
+		presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+		presentInfo.waitSemaphoreCount = 1;
+		presentInfo.pWaitSemaphores = signal_semaphores;
+
+		VkSwapchainKHR swapChains[] = {swapchain->getHandle()};
+		presentInfo.swapchainCount = 1;
+		presentInfo.pSwapchains = swapChains;
+		presentInfo.pImageIndices = &current_image;
+		presentInfo.pResults = nullptr; // Optional
+
+		Profiler::begin("Present");
+		result = vkQueuePresentKHR(device->getQueue(QUEUE_FAMILY_PRESENT).getHandle(), &presentInfo);
+		Profiler::end();
+		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || windowResized) {
+			windowResized = false;
+			reCreateSwapchain();
+		} else if (result != VK_SUCCESS) {
+			Log::error("failed to present swap chain image!");
+		}
+		frame_presented = true;
+	}
+
+
+	void VK_Renderer::endFrame() {
+		Profiler::begin("endFrame");
+
+		if (!frame_presented) {
+			present(main_render_target->getFramebufferTexture(current_frame));
+		}
+
+		frame_presented = false;
 		current_frame = (current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
 		render_cache.clear();
-		waitAll();
 		Profiler::end();
 
 	}
@@ -386,33 +396,35 @@ namespace HBE {
 	}
 
 	RenderTarget *VK_Renderer::getDefaultRenderTarget() {
-		return default_render_target;
+		return main_render_target;
 	}
 
 	void VK_Renderer::createDefaultResources() {
-		uint8_t texture_data[16] = {255, 0, 0, 255,
-									0, 255, 0, 255,
-									0, 0, 255, 255,
-									0, 0, 0, 255};
-		float image_data[16]{1, 0, 0, 1,
-							 0, 1, 0, 1,
-							 0, 0, 1, 1,
-							 0, 0, 0, 1};
-		TextureInfo texture_info{};
-		texture_info.data = &texture_data;
-		texture_info.width = 2;
-		texture_info.height = 2;
-		texture_info.format = IMAGE_FORMAT_RGBA8;
-		texture_info.flags = IMAGE_FLAG_NONE;
-		Resources::add("DEFAULT_TEXTURE", factory->createTexture(texture_info));
+		VkSamplerCreateInfo samplerInfo{};
+		samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+		samplerInfo.magFilter = VK_FILTER_NEAREST;//If the object is close to the camera,
+		samplerInfo.minFilter = VK_FILTER_NEAREST;//If the object is further from the camera
+		samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+		samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+		samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
 
-		TextureInfo image_info{};
-		image_info.data = &image_data;
-		image_info.width = 2;
-		image_info.height = 2;
-		image_info.format = IMAGE_FORMAT_RGBA32F;
-		image_info.flags = IMAGE_FLAG_NO_SAMPLER;
-		Resources::add("DEFAULT_IMAGE", factory->createTexture(image_info));
+		samplerInfo.anisotropyEnable = device->getPhysicalDevice().getFeatures().samplerAnisotropy;
+		samplerInfo.maxAnisotropy = device->getPhysicalDevice().getProperties().limits.maxSamplerAnisotropy;
+
+		samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+		samplerInfo.unnormalizedCoordinates = VK_FALSE;
+
+		samplerInfo.compareEnable = VK_FALSE;
+		samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+
+		samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+		samplerInfo.minLod = 0.0f; // 0 when close the camera.
+		samplerInfo.maxLod = static_cast<float>(0);
+		samplerInfo.mipLodBias = 0.0f; // Optional
+
+		if (vkCreateSampler(device->getHandle(), &samplerInfo, nullptr, &default_sampler) != VK_SUCCESS) {
+			Log::error("failed to create texture sampler!");
+		}
 
 
 		RenderTargetInfo render_target_info{};
@@ -421,7 +433,7 @@ namespace HBE {
 		render_target_info.clear_color = vec4(0.f, 0.f, 0.f, 1.f);
 		render_target_info.format = IMAGE_FORMAT_RGBA32F;
 		render_target_info.flags = RENDER_TARGET_FLAG_DEPTH_TEST;
-		default_render_target = Resources::createRenderTarget(render_target_info, "DEFAULT_RENDER_TARGET");
+		main_render_target = Resources::createRenderTarget(render_target_info, "DEFAULT_RENDER_TARGET");
 
 		ShaderInfo shader_info{};
 		shader_info.stage = SHADER_STAGE_VERTEX;
@@ -444,21 +456,22 @@ namespace HBE {
 		screen_material_info.graphic_pipeline = screen_pipeline;
 		screen_material = new VK_Material(this, screen_material_info);
 		Resources::add("DEFAULT_SCREEN_MATERIAL", screen_material);
-
-		setCurrentRenderTarget(default_render_target);
-	}
-
-	void VK_Renderer::setCurrentRenderTarget(RenderTarget *render_target) {
-		current_render_pass = dynamic_cast<VK_RenderPass *>(render_target);
-		screen_material->setTexture("texture0", render_target);
 	}
 
 	void VK_Renderer::waitCurrentFrame() {
 		command_pool->getCurrentFence().wait();
 	}
 
+	uint32_t VK_Renderer::getFrameCount() const {
+		return MAX_FRAMES_IN_FLIGHT;
+	}
+
 	void VK_Renderer::waitAll() {
 		device->wait();
+	}
+
+	VkSampler VK_Renderer::getDefaultSampler() {
+		return default_sampler;
 	}
 
 

@@ -13,7 +13,7 @@ struct MaterialData
 
 //------------------------------------ UNIFORMS ------------------------------------
 layout (binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
-layout (binding = 3, set = 0) uniform Frame
+layout (binding = 4, set = 0) uniform Frame
 {
     float time;
     uint index;

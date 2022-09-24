@@ -48,60 +48,50 @@ namespace HBE {
 		for (uint32_t frame_index = 0; frame_index < MAX_FRAMES_IN_FLIGHT; ++frame_index) {
 
 			std::vector<VkWriteDescriptorSet> writes;
-			std::vector<VkDescriptorBufferInfo> buffers_info;
-			std::vector<VkDescriptorImageInfo> images_info;
-
+			std::vector<std::vector<VkDescriptorBufferInfo>> buffers_info;
+			std::vector<std::vector<VkDescriptorImageInfo>> images_info;
 			std::vector<VkWriteDescriptorSetAccelerationStructureKHR> acceleration_structure_writes;
 
 			buffers_info.resize(descriptor_set_layout_bindings.size(), {});
 			images_info.resize(descriptor_set_layout_bindings.size(), {});
 			writes.resize(descriptor_set_layout_bindings.size(), {});
 			acceleration_structure_writes.resize(descriptor_set_layout_bindings.size(), {});
-			VK_Image *default_texture = (VK_Image *) Resources::get<Texture>("DEFAULT_TEXTURE");
-			VK_Image *default_image = (VK_Image *) Resources::get<Texture>("DEFAULT_IMAGE");
 			VkAccelerationStructureKHR default_acceleration_structure = VK_NULL_HANDLE;
-			VkBuffer default_storage_buffer = VK_NULL_HANDLE;
+			VkSampler default_sampler = renderer->getDefaultSampler();
 			for (size_t binding_index = 0; binding_index < descriptor_set_layout_bindings.size(); ++binding_index) {
 
 				writes[binding_index].pBufferInfo = nullptr;
 				writes[binding_index].pImageInfo = nullptr;
 				uint32_t binding = descriptor_set_layout_bindings[binding_index].binding;
-				switch (descriptor_set_layout_bindings[binding_index].descriptorType) {
+				uint32_t descriptor_count = descriptor_set_layout_bindings[binding_index].descriptorCount;
+				auto descriptor_type = descriptor_set_layout_bindings[binding_index].descriptorType;
+				switch (descriptor_type) {
 					case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER: {
-						buffers_info[binding_index].offset = 0;
+						buffers_info[binding_index].resize(descriptor_count, {});
+						buffers_info[binding_index][0].offset = 0;
 						auto it = uniform_buffers.find(binding);
 						HB_ASSERT(it != uniform_buffers.end(), "Could not find uniform at binding " + std::to_string(descriptor_set_layout_bindings[binding_index].binding));
-						buffers_info[binding_index].buffer = uniform_buffers[binding][frame_index]->getHandle();
-						buffers_info[binding_index].range = it->second[frame_index]->getSize();
+						buffers_info[binding_index][0].buffer = uniform_buffers[binding][frame_index]->getHandle();
+						buffers_info[binding_index][0].range = it->second[frame_index]->getSize();
 						writes[binding_index].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-						writes[binding_index].pBufferInfo = &buffers_info[binding_index];
+						writes[binding_index].pBufferInfo = &buffers_info[binding_index][0];
 						break;
 					}
 					case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
-						writes[binding_index].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-						images_info[binding_index].imageView = default_texture->getImageView(0);
-						images_info[binding_index].sampler = default_texture->getSampler();
-						images_info[binding_index].imageLayout = default_texture->getImageLayout();
-						writes[binding_index].pImageInfo = &images_info[binding_index];
-						break;
 					case VK_DESCRIPTOR_TYPE_STORAGE_IMAGE:
-						writes[binding_index].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-						images_info[binding_index].imageView = default_image->getImageView(0);
-						images_info[binding_index].sampler = VK_NULL_HANDLE;
-						images_info[binding_index].imageLayout = default_image->getImageLayout();
-						writes[binding_index].pImageInfo = &images_info[binding_index];
-						break;
 					case VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE:
-						writes[binding_index].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-						images_info[binding_index].imageView = default_texture->getImageView(0);
-						images_info[binding_index].sampler = default_texture->getSampler();
-						images_info[binding_index].imageLayout = default_texture->getImageLayout();
-						writes[binding_index].pImageInfo = &images_info[binding_index];
+
+						images_info[binding_index].resize(descriptor_count, {});
+						for (int i = 0; i < images_info[binding_index].size(); ++i) {
+							images_info[binding_index][i].imageView = VK_NULL_HANDLE;
+							images_info[binding_index][i].sampler = default_sampler;
+							images_info[binding_index][i].imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+						}
+						writes[binding_index].pImageInfo = &images_info[binding_index][0];
 						break;
 
 					case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR:
 						writes[binding_index].descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
-
 						writes[binding_index].pNext = &acceleration_structure_writes[binding_index];
 
 						acceleration_structure_writes[binding_index].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
@@ -134,8 +124,9 @@ namespace HBE {
 				writes[binding_index].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 				writes[binding_index].dstSet = handles[frame_index];
 				writes[binding_index].dstBinding = descriptor_set_layout_bindings[binding_index].binding;
+				writes[binding_index].descriptorType = descriptor_type;
 				writes[binding_index].dstArrayElement = 0;
-				writes[binding_index].descriptorCount = 1;//for arrays
+				writes[binding_index].descriptorCount = descriptor_count;//for arrays
 
 				writes[binding_index].pTexelBufferView = nullptr; // Optional
 				descriptor_sets_writes[frame_index].emplace(writes[binding_index].dstBinding, writes[binding_index]);
@@ -174,65 +165,100 @@ namespace HBE {
 
 	}
 
-	void VK_PipelineDescriptors::setTexture(uint32_t binding, const RenderTarget *render_target) {
-		VK_RenderPass *render_pass = (VK_RenderPass *) render_target;
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-			const VK_Image *vk_image = render_pass->getImage(i);
-			VkDescriptorImageInfo image_info;
-			image_info.imageView = vk_image->getImageView(0);
-			image_info.sampler = vk_image->getSampler();
-			image_info.imageLayout = vk_image->getImageLayout();
-			descriptor_sets_writes[i][binding].pImageInfo = &image_info;
-			vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_sets_writes[i][binding], 0, nullptr);
+	void VK_PipelineDescriptors::setTextureArray(const std::string &name, const Texture **textures, uint32_t texture_count, uint32_t frame, int32_t mip_level) {
+		auto it = uniform_name_to_index.find(name);
+		HB_ASSERT(it != uniform_name_to_index.end(), "No shader input is named:" + name);
+		HB_ASSERT(descriptor_set_layout_bindings[it->second].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ||
+				  descriptor_set_layout_bindings[it->second].descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_IMAGE ||
+				  descriptor_set_layout_bindings[it->second].descriptorType == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, name + " is not a texture binding");
+
+		setTextureArray(descriptor_set_layout_bindings[it->second].binding, textures, texture_count, frame, mip_level);
+	}
+
+	void VK_PipelineDescriptors::setTextureArray(uint32_t binding, const Texture **textures, uint32_t texture_count, uint32_t frame, int32_t mip_level) {
+		HB_ASSERT(frame < MAX_FRAMES_IN_FLIGHT, "Frame index out of range");
+		HB_ASSERT(texture_count == descriptor_set_layout_bindings[binding].descriptorCount, "Too many textures for descriptor");
+		const VK_Image **vk_texture = reinterpret_cast<const VK_Image **>(textures);
+		std::vector<VkDescriptorImageInfo> image_infos;
+		image_infos.resize(texture_count);
+
+		for (uint32_t i = 0; i < texture_count; ++i) {
+			image_infos[i].imageLayout = vk_texture[i]->getImageLayout();
+			image_infos[i].imageView = vk_texture[i]->getImageView(mip_level);
+			image_infos[i].sampler = vk_texture[i]->getSampler();
+		}
+
+		if (frame < 0) {
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+				descriptor_sets_writes[i][binding].pImageInfo = image_infos.data();
+				vkUpdateDescriptorSets(device->getHandle(),
+									   1,
+									   &descriptor_sets_writes[i][binding],
+									   0,
+									   nullptr);
+			}
+		} else {
+			descriptor_sets_writes[frame][binding].pImageInfo = image_infos.data();
+			vkUpdateDescriptorSets(device->getHandle(),
+								   1,
+								   &descriptor_sets_writes[frame][binding],
+								   0,
+								   nullptr);
 		}
 	}
 
-	void VK_PipelineDescriptors::setTexture(const std::string &name, const RenderTarget *render_target) {
+	void VK_PipelineDescriptors::setTexture(const std::string &name, const Texture *texture, int32_t frame, uint32_t mip_level) {
 		auto it = uniform_name_to_index.find(name);
 		HB_ASSERT(it != uniform_name_to_index.end(), "No shader input is named:" + name);
 		HB_ASSERT(descriptor_set_layout_bindings[it->second].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ||
 				  descriptor_set_layout_bindings[it->second].descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_IMAGE ||
 				  descriptor_set_layout_bindings[it->second].descriptorType == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, name + " is not a texture binding");
 
-		setTexture(descriptor_set_layout_bindings[it->second].binding, render_target);
+		setTexture(descriptor_set_layout_bindings[it->second].binding, texture, frame, mip_level);
 	}
 
-	void VK_PipelineDescriptors::setTexture(const std::string &name, const Texture *texture, uint32_t mip_level) {
-		auto it = uniform_name_to_index.find(name);
-		HB_ASSERT(it != uniform_name_to_index.end(), "No shader input is named:" + name);
-		HB_ASSERT(descriptor_set_layout_bindings[it->second].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ||
-				  descriptor_set_layout_bindings[it->second].descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_IMAGE ||
-				  descriptor_set_layout_bindings[it->second].descriptorType == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, name + " is not a texture binding");
+	void VK_PipelineDescriptors::setTexture(uint32_t binding, const Texture *texture, int32_t frame, uint32_t mip_level) {
 
-		setTexture(descriptor_set_layout_bindings[it->second].binding, texture, mip_level);
-	}
-
-	void VK_PipelineDescriptors::setTexture(uint32_t binding, const Texture *texture, uint32_t mip_level) {
-		//todo undefined behavior when texture data is not set;
-		//use texture event
 		VK_Image *vk_texture = (VK_Image *) texture;
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+
+		HB_ASSERT(descriptor_sets_writes[0][binding].descriptorCount == 1, "Texture binding is an array");
+
+		if (frame < 0) {
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+
+				VkDescriptorImageInfo image_info;
+				image_info.imageView = vk_texture->getImageView(mip_level);
+				image_info.sampler = vk_texture->getSampler();
+				image_info.imageLayout = vk_texture->getImageLayout();
+				descriptor_sets_writes[i][binding].pImageInfo = &image_info;
+				vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_sets_writes[i][binding], 0, nullptr);
+			}
+		} else {
 			VkDescriptorImageInfo image_info;
 			image_info.imageView = vk_texture->getImageView(mip_level);
 			image_info.sampler = vk_texture->getSampler();
 			image_info.imageLayout = vk_texture->getImageLayout();
-			descriptor_sets_writes[i][binding].pImageInfo = &image_info;
-			vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_sets_writes[i][binding], 0, nullptr);
+			descriptor_sets_writes[frame][binding].pImageInfo = &image_info;
+			vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_sets_writes[frame][binding], 0, nullptr);
+
 		}
 	}
 
-	void VK_PipelineDescriptors::setUniform(const std::string &name, const void *data) {
+	void VK_PipelineDescriptors::setUniform(const std::string &name, const void *data, int32_t frame) {
 		auto it = uniform_name_to_index.find(name);
 		HB_ASSERT(it != uniform_name_to_index.end(), "No shader input is named:" + name);
 		HB_ASSERT(descriptor_set_layout_bindings[it->second].descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, name + " is not a uniform buffer");
 
-		setUniform(descriptor_set_layout_bindings[it->second].binding, data);
-
+		setUniform(descriptor_set_layout_bindings[it->second].binding, data, frame);
 	}
 
-	void VK_PipelineDescriptors::setUniform(uint32_t binding, const void *data) {
-		for (VK_Buffer *buffer: uniform_buffers[binding]) {
-			buffer->update(data);
+	void VK_PipelineDescriptors::setUniform(uint32_t binding, const void *data, int32_t frame) {
+		if (frame < 0) {
+			for (VK_Buffer *buffer: uniform_buffers[binding]) {
+				buffer->update(data);
+			}
+		} else {
+			uniform_buffers[binding][frame]->update(data);
 		}
 	}
 
@@ -258,18 +284,18 @@ namespace HBE {
 		for (auto layout_binding: descriptor_set_layout_bindings) {
 			switch (layout_binding.descriptorType) {
 				case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
-					uniform_buffer_count++;
+					uniform_buffer_count += layout_binding.descriptorCount;
 					break;
 				case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
-					combined_image_sampler_count++;
+					combined_image_sampler_count += layout_binding.descriptorCount;
 					break;
 				case VK_DESCRIPTOR_TYPE_SAMPLER:
 					break;
 				case VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE:
-					separate_image_count++;
+					separate_image_count += layout_binding.descriptorCount;
 					break;
 				case VK_DESCRIPTOR_TYPE_STORAGE_IMAGE:
-					storage_image_count++;
+					storage_image_count += layout_binding.descriptorCount;
 					break;
 				case VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
 					break;
@@ -297,7 +323,7 @@ namespace HBE {
 		if (uniform_buffer_count > 0) {
 			poolSizes.emplace_back();
 			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			poolSizes[poolSizes.size() - 1].descriptorCount = MAX_FRAMES_IN_FLIGHT;// uniform_buffer_count * MAX_FRAMES_IN_FLIGHT;
+			poolSizes[poolSizes.size() - 1].descriptorCount = uniform_buffer_count * MAX_FRAMES_IN_FLIGHT;
 		}
 		if (combined_image_sampler_count > 0) {
 			poolSizes.emplace_back();
@@ -315,7 +341,6 @@ namespace HBE {
 			poolSizes[poolSizes.size() - 1].descriptorCount = separate_image_count * MAX_FRAMES_IN_FLIGHT;
 		}
 
-
 		VkDescriptorPoolCreateInfo poolInfo{};
 		poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 		poolInfo.poolSizeCount = poolSizes.size();
@@ -325,14 +350,6 @@ namespace HBE {
 		if (vkCreateDescriptorPool(device->getHandle(), &poolInfo, nullptr, &pool_handle) != VK_SUCCESS) {
 			Log::error("failed to create descriptor pool!");
 		}
-	}
-
-	void VK_PipelineDescriptors::setDynamicUniform(const std::string &name, const void *data) {
-		Log::warning("Dynamic uniform buffers are not implemented yet!");
-	}
-
-	void VK_PipelineDescriptors::setDynamicUniform(uint32_t binding, const void *data) {
-		Log::warning("Dynamic uniform buffers are not implemented yet!");
 	}
 
 	void VK_PipelineDescriptors::setAccelerationStructure(uint32_t binding, const VK_TopLevelAccelerationStructure *acceleration_structure) {

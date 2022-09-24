@@ -140,7 +140,7 @@ namespace HBE {
 
 		if (info.data != nullptr) {
 			update(info.data);
-		} else if (flags & IMAGE_FLAG_RENDER_TARGET) {
+		} else {
 			device->getAllocator()->setImageLayout(this, desired_layout);
 		}
 

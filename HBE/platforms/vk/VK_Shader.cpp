@@ -159,13 +159,20 @@ namespace HBE {
 		for (uint32_t i = 0; i < texture_sampler_count; ++i) {
 			std::string name = spvc_compiler_get_name(compiler_glsl, texture_sampler_list[i].id);
 
-			UniformInfo uniform_info{};
 
+			spvc_type type = spvc_compiler_get_type_handle(compiler_glsl, texture_sampler_list[i].type_id);
+
+			uint32_t descriptor_count = 1;
+			if (spvc_type_get_image_arrayed(type)) {
+
+				descriptor_count = spvc_type_get_array_dimension(type, 0);
+			}
+			UniformInfo uniform_info{};
 			VkDescriptorSetLayoutBinding layout_binding = {};
 			layout_binding.binding = spvc_compiler_get_decoration(compiler_glsl, texture_sampler_list[i].id, SpvDecorationBinding);
 			layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 			layout_binding.stageFlags = vk_stage;
-			layout_binding.descriptorCount = 1;//this is for array
+			layout_binding.descriptorCount = descriptor_count;//this is for arrays
 			layout_binding.pImmutableSamplers = nullptr;
 
 			uniform_info.layout_binding = layout_binding;
@@ -184,13 +191,22 @@ namespace HBE {
 		for (uint32_t i = 0; i < separate_image_count; ++i) {
 			std::string name = spvc_compiler_get_name(compiler_glsl, separate_image_list[i].id);
 
+			spvc_type type = spvc_compiler_get_type_handle(compiler_glsl, separate_image_list[i].type_id);
+
+			uint32_t descriptor_count = 1;
+			if (spvc_type_get_image_arrayed(type)) {
+
+				descriptor_count = spvc_type_get_array_dimension(type, 0);
+			}
+
 			UniformInfo uniform_info{};
+
 
 			VkDescriptorSetLayoutBinding layout_binding = {};
 			layout_binding.binding = spvc_compiler_get_decoration(compiler_glsl, separate_image_list[i].id, SpvDecorationBinding);
 			layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
 			layout_binding.stageFlags = vk_stage;
-			layout_binding.descriptorCount = 1;//this is for array
+			layout_binding.descriptorCount = descriptor_count;//this is for array
 			layout_binding.pImmutableSamplers = nullptr;
 
 
@@ -210,13 +226,23 @@ namespace HBE {
 
 			std::string name = spvc_compiler_get_name(compiler_glsl, storage_image_list[i].id);
 
+			spvc_type type = spvc_compiler_get_type_handle(compiler_glsl, storage_image_list[i].type_id);
+
+			uint32_t descriptor_count = 1;
+			uint32_t array_dimension = spvc_type_get_num_array_dimensions(type);
+			if (array_dimension == 1) {
+
+				descriptor_count = spvc_type_get_array_dimension(type, 0);
+			}
+
+
 			UniformInfo uniform_info{};
 
 			VkDescriptorSetLayoutBinding layout_binding = {};
 			layout_binding.binding = spvc_compiler_get_decoration(compiler_glsl, storage_image_list[i].id, SpvDecorationBinding);
 			layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
 			layout_binding.stageFlags = vk_stage;
-			layout_binding.descriptorCount = 1;//this is for array
+			layout_binding.descriptorCount = descriptor_count;//this is for array
 			layout_binding.pImmutableSamplers = nullptr;
 
 			uniform_info.layout_binding = layout_binding;

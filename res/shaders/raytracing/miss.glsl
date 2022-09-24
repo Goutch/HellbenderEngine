@@ -5,7 +5,7 @@ layout(location = 0) rayPayloadInEXT PrimaryRayPayLoad
 {
     vec3 color;
 } primaryRayPayload;
-layout (binding = 3, set = 0) uniform Frame
+layout (binding = 4, set = 0) uniform Frame
 {
     float time;
     uint index;

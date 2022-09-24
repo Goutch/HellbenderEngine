@@ -18,45 +18,82 @@ struct Frame {
 	float time = 0;
 	uint32_t index = 0;
 };
+#define HYSTORY_COUNT 4
 
 class RaytracingScene {
+
 private:
 	RaytracingPipelineResources raytracing_resources;
 	RaytracingPipelineResources pathtracing_resources;
 	std::vector<Shader *> common_hit_shaders;
-	RenderTarget *render_target;
 	RootAccelerationStructure *root_acceleration_structure;
 	AABBAccelerationStructure *aabb_acceleration_structure;
+	std::vector<Texture *> history_textures;
+	Texture *output_texture = nullptr;
 	bool use_pathtracing = false;
 	Frame frame{};
 public:
-	void onResolutionChange(RenderTarget *rt) {
-		render_target->setResolution(rt->getResolution().x, rt->getResolution().y);
+	void createFrameBuffers(uint32_t width, uint32_t height) {
+		for (Texture *frame_buffer : history_textures) {
+			delete frame_buffer;
+		}
+		if (output_texture != nullptr) {
+			delete output_texture;
+		}
+		history_textures.clear();
+		TextureInfo info{};
+		info.width = width;
+		info.height = height;
+		info.format = IMAGE_FORMAT_RGBA32F;
+		info.flags = IMAGE_FLAG_SHADER_WRITE |
+					 IMAGE_FLAG_FILTER_NEAREST;
 
-		raytracing_resources.pipeline_instance->setTexture("image", render_target);
-		pathtracing_resources.pipeline_instance->setTexture("image", render_target);
+		for (uint32_t i = 0; i < HYSTORY_COUNT; i++) {
+			history_textures.push_back(Resources::createTexture(info));
+		}
+
+		output_texture = Resources::createTexture(info);
+	}
+
+	void onResolutionChange(RenderTarget *rt) {
+		createFrameBuffers(rt->getResolution().x, rt->getResolution().y);
 
 		Scene *scene = Application::getScene();
 		Camera &camera = scene->getCameraEntity().get<Camera>();
-		camera.render_target = render_target;
+		camera.render_target = rt;
 		camera.calculateProjection();
 	}
+
 
 	void onRender() {
 		Entity camera_entity = Application::getScene()->getCameraEntity();
 		frame.time = Application::getTime() * 0.05;
 
-
 		RaytracingPipelineResources resources = use_pathtracing ? pathtracing_resources : raytracing_resources;
 
 
-		resources.pipeline_instance->setUniform("frame", &frame);
-		Graphics::raytrace(
-				*root_acceleration_structure,
-				*resources.pipeline_instance,
-				*render_target,
-				camera_entity.get<Camera>().projection,
-				glm::inverse(camera_entity.get<Transform>().world()));
+		const Texture *frame_buffer_array[HYSTORY_COUNT];
+		for (uint32_t i = 0; i < HYSTORY_COUNT; i++) {
+			uint32_t f = (frame.index - i) % history_textures.size();
+			frame_buffer_array[i] = history_textures[f];
+		}
+
+
+		resources.pipeline_instance->setUniform("frame", &frame, Graphics::getCurrentFrame());
+		resources.pipeline_instance->setTexture("outputImage", output_texture, Graphics::getCurrentFrame(), 0);
+		resources.pipeline_instance->setTextureArray("history", frame_buffer_array, HYSTORY_COUNT, Graphics::getCurrentFrame(), 0);
+		Graphics::raytrace(*root_acceleration_structure,
+						   *resources.pipeline_instance,
+						   camera_entity.get<Camera>().projection,
+						   glm::inverse(camera_entity.get<Transform>().world()),
+						   output_texture->getSize());
+
+		/*	denoiser_instance->setTextureArray("history", frame_buffer_array, HYSTORY_COUNT, Graphics::getCurrentFrame(), 0);
+			denoiser_instance->setTexture("outputImage", output_texture, Graphics::getCurrentFrame(), 0);
+			denoiser_instance->dispatch(output_texture->getWidth(), output_texture->getHeight(), 1);
+			denoiser_instance->wait();
+	*/
+		Graphics::present(output_texture);
 		frame.index++;
 	}
 
@@ -79,6 +116,12 @@ public:
 		for (Shader *shader : pathtracing_resources.hit_shaders) {
 			delete shader;
 		}
+		for (auto &history_texture : history_textures) {
+			delete history_texture;
+		}
+		history_textures.clear();
+
+		delete output_texture;
 		delete raytracing_resources.raygen_shader;
 		delete pathtracing_resources.raygen_shader;
 
@@ -89,12 +132,11 @@ public:
 		delete pathtracing_resources.pipeline_instance;
 		delete pathtracing_resources.pipeline;
 
-		delete render_target;
 	}
 
 	RaytracingScene() {
+		createFrameBuffers(Graphics::getDefaultRenderTarget()->getResolution().x, Graphics::getDefaultRenderTarget()->getResolution().y);
 		ShaderInfo shader_info{};
-
 
 		shader_info.stage = SHADER_STAGE_RAY_GEN;
 		shader_info.path = "shaders/raytracing/raygen.glsl";
@@ -129,7 +171,6 @@ public:
 		raytracing_resources.hit_shaders.push_back(Resources::createShader(shader_info));
 		pathtracing_resources.hit_shaders.push_back(Resources::createShader(shader_info));
 
-
 		raytracing_resources.shader_groups.push_back({0, -1, 2});//box
 		raytracing_resources.shader_groups.push_back({0, -1, 3});//sphere
 		raytracing_resources.shader_groups.push_back({1, -1, 2});//box ao
@@ -137,8 +178,6 @@ public:
 
 		pathtracing_resources.shader_groups.push_back({0, -1, 1});//box
 		pathtracing_resources.shader_groups.push_back({0, -1, 2});//sphere
-
-
 
 		RaytracingPipelineInfo raytracing_pipeline_info{};
 		raytracing_pipeline_info.raygen_shader = raytracing_resources.raygen_shader;
@@ -165,7 +204,6 @@ public:
 		raytracing_pipeline_info.max_recursion_depth = 16;
 
 		pathtracing_resources.pipeline = Resources::createRaytracingPipeline(raytracing_pipeline_info);
-
 
 		AABBAccelerationStructureInfo aabb__acceleration_structure_info{};
 		aabb__acceleration_structure_info.max = vec3(0.5, 0.5, 0.5);
@@ -227,14 +265,6 @@ public:
 
 		root_acceleration_structure = Resources::createRootAccelerationStructure(root_acceleration_structure_info);
 
-		RenderTargetInfo render_target_info{};
-		render_target_info.width = Graphics::getDefaultRenderTarget()->getResolution().x;
-		render_target_info.height = Graphics::getDefaultRenderTarget()->getResolution().y;
-		render_target_info.flags = RENDER_TARGET_FLAG_USED_IN_RAYTRACING;
-
-		render_target = Resources::createRenderTarget(render_target_info);
-		Graphics::setRenderTarget(render_target);
-
 		RaytracingPipelineInstanceInfo raytracing_pipeline_instance_info{};
 		raytracing_pipeline_instance_info.raytracing_pipeline = raytracing_resources.pipeline;
 		raytracing_pipeline_instance_info.root_acceleration_structure = root_acceleration_structure;
@@ -246,20 +276,16 @@ public:
 		pathtracing_resources.pipeline_instance = Resources::createRaytracingPipelineInstance(raytracing_pipeline_instance_info);
 
 
-		raytracing_resources.pipeline_instance->setTexture("image", render_target);
-		pathtracing_resources.pipeline_instance->setTexture("image", render_target);
-
 		Scene *scene = Application::getScene();
 
 		scene->onRender.subscribe(this, &RaytracingScene::onRender);
 		scene->onUpdate.subscribe(this, &RaytracingScene::onUpdate);
 		Entity camera_entity = scene->createEntity();
 		camera_entity.attach<Camera>();
-		camera_entity.get<Camera>().render_target = render_target;
+		camera_entity.get<Camera>().render_target = Graphics::getDefaultRenderTarget();
 		camera_entity.get<Camera>().calculateProjection();
 		camera_entity.get<Camera>().active = false;
 		scene->setCameraEntity(camera_entity);
-
 
 		Graphics::getDefaultRenderTarget()->onResolutionChange.subscribe(this, &RaytracingScene::onResolutionChange);
 	}

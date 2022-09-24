@@ -1,5 +1,6 @@
 #pragma once
 
+#include <core/resource/Texture.h>
 #include "Core.h"
 #include "vector"
 #include "glm/glm.hpp"
@@ -37,11 +38,13 @@ namespace HBE {
 							const mat4 &projection_matrix,
 							const mat4 &view_matrix) = 0;
 
+		virtual void raytrace(const RootAccelerationStructure &root_acceleration_structure, RaytracingPipelineInstance &pipeline, const mat4 &projection_matrix, const mat4 &view_matrix, const vec2i resolution) = 0;
+
 		virtual void beginFrame() = 0;
 
-		virtual void endFrame(bool present) = 0;
+		virtual void present(HBE::Texture *image) = 0;
 
-		virtual void setCurrentRenderTarget(RenderTarget *renderTarget) = 0;
+		virtual void endFrame() = 0;
 
 		virtual void draw(mat4 transform_matrix, const Mesh &mesh, Material &material) = 0;
 
@@ -53,10 +56,8 @@ namespace HBE {
 
 		virtual void createDefaultResources() = 0;
 
-		virtual void raytrace(const RootAccelerationStructure &root_acceleration_structure,
-							  RaytracingPipelineInstance &pipeline,
-							  const RenderTarget &target,
-							  const mat4 &projection_matrix,
-							  const mat4 &view_matrix) = 0;
+		virtual uint32_t getFrameCount() const = 0;
+
+		virtual uint32_t getCurrentFrame() const = 0;
 	};
 }

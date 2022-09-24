@@ -50,19 +50,29 @@ namespace HBE {
 		VK_ResourceFactory *factory;
 		VK_Swapchain *swapchain;
 		VK_CommandPool *command_pool;
-		VK_RenderPass *current_render_pass = nullptr;
-		RenderTarget *default_render_target = nullptr;
+
+		VkSampler default_sampler;
+
 		uint32_t current_frame = 0;
 		uint32_t current_image = 0;
 		std::array<FrameState, MAX_FRAMES_IN_FLIGHT> frames;
 		std::vector<VK_Fence *> images_in_flight_fences;
+
+		RenderTarget *main_render_target = nullptr;
 		GraphicPipeline *screen_pipeline = nullptr;
 		Material *screen_material = nullptr;
 		bool windowResized = false;
+		bool frame_presented = false;
 	public:
-		void render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix) override;
+		void render(const RenderTarget *render_target,
+					const mat4 &projection_matrix,
+					const mat4 &view_matrix) override;
 
-		void setCurrentRenderTarget(RenderTarget *render_target) override;
+		void raytrace(const RootAccelerationStructure &root_acceleration_structure,
+					  RaytracingPipelineInstance &pipeline,
+					  const mat4 &projection_matrix,
+					  const mat4 &view_matrix,
+					  const vec2i resolution) override;
 
 
 		void waitCurrentFrame();
@@ -70,7 +80,9 @@ namespace HBE {
 
 		void beginFrame() override;
 
-		void endFrame(bool present) override;
+		void present(Texture *image) override;
+
+		void endFrame() override;
 
 		void draw(mat4 transform_matrix, const Mesh &mesh, Material &material) override;
 
@@ -85,6 +97,7 @@ namespace HBE {
 		VK_CommandPool *getCommandPool();
 
 		VK_Device *getDevice();
+		uint32_t getFrameCount() const override;
 
 		void onWindowClosed();
 
@@ -94,17 +107,13 @@ namespace HBE {
 
 		const VK_Swapchain &getSwapchain() const;
 
-		uint32_t getCurrentFrame() const;
+		uint32_t getCurrentFrame() const override;
 
 		void createDefaultResources() override;
 
 		const VK_Instance *getInstance() const;
 		void waitAll();
-		void raytrace(const RootAccelerationStructure &root_acceleration_structure,
-					  RaytracingPipelineInstance &pipeline,
-					  const RenderTarget &target,
-					  const mat4 &projection_matrix,
-					  const mat4 &view_matrix) override;
+		VkSampler getDefaultSampler();
 	};
 }
 

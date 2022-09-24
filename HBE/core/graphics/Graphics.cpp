@@ -129,8 +129,8 @@ void main()
 		return window;
 	}
 
-	void Graphics::endFrame(bool present) {
-		renderer->endFrame(present);
+	void Graphics::endFrame() {
+		renderer->endFrame();
 	}
 
 	Renderer *Graphics::getRenderer() {
@@ -141,15 +141,26 @@ void main()
 		renderer->beginFrame();
 	}
 
-	void Graphics::setRenderTarget(RenderTarget *render_target) {
-		renderer->setCurrentRenderTarget(render_target);
+	void Graphics::raytrace(const RootAccelerationStructure &root_acceleration_structure,
+							RaytracingPipelineInstance &pipeline,
+							const mat4 &projection_matrix,
+							const mat4 &view_matrix,
+							vec2u resolution) {
+		renderer->raytrace(root_acceleration_structure, pipeline, projection_matrix, view_matrix, resolution);
 	}
 
-	void Graphics::raytrace(const RootAccelerationStructure &root_acceleration_structure, RaytracingPipelineInstance &pipeline, const RenderTarget &target, const mat4 &projection_matrix, const mat4 &view_matrix) {
-		renderer->raytrace(root_acceleration_structure, pipeline, target, projection_matrix, view_matrix);
+
+	uint32_t Graphics::getCurrentFrame() {
+		return renderer->getCurrentFrame();
 	}
 
+	uint32_t Graphics::getFrameCount() {
+		return renderer->getFrameCount();
+	}
 
+	void Graphics::present(Texture *texture) {
+		renderer->present(texture);
+	}
 }
 
 

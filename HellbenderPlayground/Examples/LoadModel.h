@@ -55,7 +55,7 @@ public:
 
 
 		vec4 ground_material_color = vec4(0.2, 0.7, 0., 1.);
-		ground_material->setUniform("material", &ground_material_color);
+		ground_material->setUniform("material", &ground_material_color, -1);
 
 
 		ModelInfo model_info{};

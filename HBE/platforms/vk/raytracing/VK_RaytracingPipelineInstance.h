@@ -19,15 +19,13 @@ namespace HBE {
 		~VK_RaytracingPipelineInstance() override;
 		void bind() const override;
 		void unbind() const override;
-		void setDynamicUniform(uint32_t binding, const void *data) override;
-		void setUniform(uint32_t binding, const void *data) override;
-		void setTexture(uint32_t binding, const Texture *texture, uint32_t mip_level) override;
-		void setTexture(uint32_t binding, const RenderTarget *render_target) override;
-		void setDynamicUniform(const std::string &name, const void *data) override;
-		void setUniform(const std::string &name, const void *data) override;
-		void setTexture(const std::string &name, const Texture *texture, uint32_t mip_level) override;
-		void setTexture(const std::string &name, const RenderTarget *render_target) override;
+		void setUniform(uint32_t binding, const void *data, int32_t frame) override;
+		void setTexture(uint32_t binding, const Texture *texture, int32_t frame, uint32_t mip_level) override;
+		void setUniform(const std::string &name, const void *data, int32_t frame) override;
+		void setTexture(const std::string &name, const Texture *texture, int32_t frame, uint32_t mip_level) override;
+		void setTextureArray(uint32_t binding, const Texture **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) override;
 		const VK_RaytracingPipeline *getPipeline() const;
+		void setTextureArray(const std::string &name, const Texture **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) override;
 	};
 
 }

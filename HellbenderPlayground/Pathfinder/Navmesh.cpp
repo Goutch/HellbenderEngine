@@ -75,7 +75,7 @@ Navmesh::Navmesh(const bool *map, uint32_t size_x, uint32_t size_y, f32 cell_siz
 	material = Resources::createMaterial(material_info);
 
 	vec4 color = vec4(0, 1, 0, 1);
-	material->setUniform("material", &color);
+	material->setUniform("material", &color, -1);
 	delete vertex_shader;
 	delete fragment_shader;
 }

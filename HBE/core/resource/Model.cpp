@@ -207,7 +207,7 @@ namespace HBE {
 			//todo:texture
 			data.material_properties.emplace_back(material_properties);
 
-			data.materials[i]->setUniform("material", &data.material_properties[i].color);
+			data.materials[i]->setUniform("material", &data.material_properties[i].color, -1);
 		}
 	}
 

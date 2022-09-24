@@ -143,7 +143,6 @@ namespace HBE {
 	}
 
 	float Camera::aspectRatio() {
-
 		vec2i res = render_target->getResolution();
 		return static_cast<float>(res.x) / static_cast<float>(res.y);
 	}

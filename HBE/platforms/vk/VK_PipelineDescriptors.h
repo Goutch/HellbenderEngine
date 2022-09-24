@@ -51,18 +51,17 @@ namespace HBE {
 		void bind() const;
 		void bind(VkCommandBuffer command_buffer, uint32_t frame) const;
 		void unbind() const;
-		void setDynamicUniform(const std::string &name, const void *data);
-		void setDynamicUniform(uint32_t binding, const void *data);
-		void setUniform(const std::string &name, const void *data);
-		void setUniform(uint32_t binding, const void *data);
-		void setTexture(uint32_t binding, const Texture *texture, uint32_t mip_level);
-		void setTexture(uint32_t binding, const RenderTarget *render_target);
-		void setTexture(const std::string &name, const Texture *texture, uint32_t mip_level);
-		void setTexture(const std::string &name, const RenderTarget *render_target);
+		void setUniform(const std::string &name, const void *data, int32_t frame);
+		void setUniform(uint32_t binding, const void *data, int32_t frame);
+		void setTexture(uint32_t binding, const Texture *texture, int32_t frame,uint32_t mip_level);
+		void setTexture(const std::string &name, const Texture *texture, int32_t frame, uint32_t mip_level);
+		void setTextureArray(const std::string &name, const Texture **textures, uint32_t texture_count, uint32_t frame, int32_t mip_level);
+		void setTextureArray(uint32_t binding, const Texture **textures, uint32_t texture_count, uint32_t frame, int32_t mip_level);
 		void setAccelerationStructure(uint32_t binding, const VK_TopLevelAccelerationStructure *acceleration_structure);
 		void setAccelerationStructure(const std::string &name, const VK_TopLevelAccelerationStructure *acceleration_structure);
 		void createDescriptorSets();
 		void createDescriptorPool();
+
 	};
 
 }
