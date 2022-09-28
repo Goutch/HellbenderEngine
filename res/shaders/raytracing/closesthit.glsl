@@ -1,6 +1,7 @@
 #version 460
 #extension GL_EXT_ray_tracing: enable
 #extension GL_EXT_nonuniform_qualifier: enable
+
 //-------------------------------CONSTANTS-------------------------------------
 const float AMBIENT_LIGHT_INTENSITY = 0.15;
 const float PHI = 1.61803398874989484820459;// Φ = Golden Ratio
@@ -17,6 +18,7 @@ layout (binding = 4, set = 0) uniform Frame
 {
     float time;
     uint index;
+    uint sample_count;
 } frame;
 //layout(binding = 4, set = 0) readonly buffer MaterialDataBuffer
 //{

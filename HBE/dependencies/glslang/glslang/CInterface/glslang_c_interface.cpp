@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "glslang/Include/ResourceLimits.h"
 #include "glslang/MachineIndependent/Versions.h"
+#include "glslang/MachineIndependent/localintermediate.h"
 
 static_assert(int(GLSLANG_STAGE_COUNT) == EShLangCount, "");
 static_assert(int(GLSLANG_STAGE_MASK_COUNT) == EShLanguageMaskCount, "");
@@ -191,10 +192,10 @@ static EShLanguage c_shader_stage(glslang_stage_t stage)
         return EShLangMiss;
     case GLSLANG_STAGE_CALLABLE_NV:
         return EShLangCallable;
-    case GLSLANG_STAGE_TASK_NV:
-        return EShLangTaskNV;
-    case GLSLANG_STAGE_MESH_NV:
-        return EShLangMeshNV;
+    case GLSLANG_STAGE_TASK:
+        return EShLangTask;
+    case GLSLANG_STAGE_MESH:
+        return EShLangMesh;
     default:
         break;
     }
@@ -382,7 +383,7 @@ GLSLANG_EXPORT void glslang_shader_set_glsl_version(glslang_shader_t* shader, in
     shader->shader->setOverrideVersion(version);
 }
 
-GLSLANG_EXPORT const char* glslang_shader_get_preprocessed_code(glslang_shader_t* shader)
+GLSLANG_EXPORT const char* 		glslang_shader_get_preprocessed_code(glslang_shader_t* shader)
 {
     return shader->preprocessedGLSL.c_str();
 }
@@ -453,6 +454,16 @@ GLSLANG_EXPORT void glslang_program_add_shader(glslang_program_t* program, glsla
 GLSLANG_EXPORT int glslang_program_link(glslang_program_t* program, int messages)
 {
     return (int)program->program->link((EShMessages)messages);
+}
+
+GLSLANG_EXPORT void glslang_program_add_source_text(glslang_program_t* program, glslang_stage_t stage, const char* text, size_t len) {
+    glslang::TIntermediate* intermediate = program->program->getIntermediate(c_shader_stage(stage));
+    intermediate->addSourceText(text, len);
+}
+
+GLSLANG_EXPORT void glslang_program_set_source_file(glslang_program_t* program, glslang_stage_t stage, const char* file) {
+    glslang::TIntermediate* intermediate = program->program->getIntermediate(c_shader_stage(stage));
+    intermediate->setSourceFile(file);
 }
 
 GLSLANG_EXPORT int glslang_program_map_io(glslang_program_t* program)

@@ -17,8 +17,10 @@ struct RaytracingPipelineResources {
 struct Frame {
 	float time = 0;
 	uint32_t index = 0;
+	uint32_t sample_count = 1;
+	uint32_t max_bounces = 3;
 };
-#define HYSTORY_COUNT 4
+#define HYSTORY_COUNT 8
 
 class RaytracingScene {
 
@@ -100,6 +102,29 @@ public:
 	void onUpdate(float delta) {
 		if (Input::getKeyDown(KEY::P)) {
 			use_pathtracing = !use_pathtracing;
+		}
+		if (Input::getKeyDown(KEY::R)) {
+			frame.sample_count = 1;
+		}
+		if (Input::getKeyDown(KEY::UP)) {
+			frame.sample_count++;
+			Log::message("Sample count:" + std::to_string(frame.sample_count));
+		}
+		if (Input::getKeyDown(KEY::DOWN)) {
+			if (frame.sample_count > 0) {
+				frame.sample_count--;
+			}
+			Log::message("Sample count:" + std::to_string(frame.sample_count));
+		}
+		if (Input::getKeyDown(KEY::RIGHT)) {
+			frame.max_bounces++;
+			Log::message("Max bounces:" + std::to_string(frame.max_bounces));
+		}
+		if (Input::getKeyDown(KEY::LEFT)) {
+			if (frame.max_bounces > 0) {
+				frame.max_bounces--;
+			}
+			Log::message("Max bounces:" + std::to_string(frame.max_bounces));
 		}
 	}
 
@@ -240,6 +265,9 @@ public:
 		transform_aabb_floor.translate(vec3(0, -1, 0));
 		transform_aabb_floor.setScale(vec3(100, 1, 100));
 
+		acceleration_structure_instances.push_back(AccelerationStructureInstance{0, 0, transform_aabb_floor.world(), ACCELERATION_STRUCTURE_TYPE_AABB});
+		transform_aabb_floor.setScale(vec3(50, 1, 50));
+		transform_aabb_floor.translate(vec3(0, 10, 0));
 		acceleration_structure_instances.push_back(AccelerationStructureInstance{0, 0, transform_aabb_floor.world(), ACCELERATION_STRUCTURE_TYPE_AABB});
 
 		//for (int i = 0; i < 1000; ++i) {

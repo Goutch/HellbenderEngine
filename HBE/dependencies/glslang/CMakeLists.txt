@@ -33,7 +33,7 @@
 
 # increase to 3.1 once all major distributions
 # include a version of CMake >= 3.1
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.14.0)
 if (POLICY CMP0048)
   cmake_policy(SET CMP0048 NEW)
 endif()
@@ -50,6 +50,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Adhere to GNU filesystem layout conventions
 include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
 
 # Needed for CMAKE_DEPENDENT_OPTION macro
 include(CMakeDependentOption)
@@ -73,7 +74,7 @@ endif()
 
 option(SKIP_GLSLANG_INSTALL "Skip installation" ${SKIP_GLSLANG_INSTALL})
 if(NOT ${SKIP_GLSLANG_INSTALL})
-  set(ENABLE_GLSLANG_INSTALL OFF)
+  set(ENABLE_GLSLANG_INSTALL ON)
 endif()
 option(ENABLE_SPVREMAPPER "Enables building of SPVRemapper" ON)
 
@@ -100,9 +101,8 @@ CMAKE_DEPENDENT_OPTION(ENABLE_EMSCRIPTEN_ENVIRONMENT_NODE
 
 CMAKE_DEPENDENT_OPTION(ENABLE_HLSL
     "Enables HLSL input support"
-    OFF "NOT ENABLE_GLSLANG_WEBMIN"
+    ON "NOT ENABLE_GLSLANG_WEBMIN"
     OFF)
-
 
 option(ENABLE_RTTI "Enables RTTI" OFF)
 option(ENABLE_EXCEPTIONS "Enables Exceptions" OFF)
@@ -115,7 +115,7 @@ if(MINGW OR (CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND ${CMAKE_CXX_COMPILER_ID} MA
 else()
     option(ENABLE_PCH "Enables Precompiled header" ON)
 endif()
-option(ENABLE_CTEST "Enables testing" OFF)
+option(ENABLE_CTEST "Enables testing" ON)
 
 if(ENABLE_GLSLANG_INSTALL AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND WIN32)
     set(CMAKE_INSTALL_PREFIX "install" CACHE STRING "..." FORCE)
@@ -192,7 +192,11 @@ elseif(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang" AND NOT MSVC)
         # Error if there's symbols that are not found at link time.
         # add_link_options() was added in CMake 3.13 - if using an earlier
         # version don't set this - it should be caught by presubmits anyway.
-        add_link_options("-Wl,-undefined,error")
+        if (WIN32)
+            add_link_options("-Wl,--no-undefined")
+        else()
+            add_link_options("-Wl,-undefined,error")
+        endif()
     endif()
 elseif(MSVC)
     if(NOT ENABLE_RTTI)
@@ -363,4 +367,39 @@ if(ENABLE_CTEST AND BUILD_TESTING)
     add_test(NAME glslang-testsuite
         COMMAND bash ${IGNORE_CR_FLAG} runtests ${RESULTS_PATH} ${VALIDATOR_PATH} ${REMAP_PATH}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Test/)
+endif()
+
+if(ENABLE_GLSLANG_INSTALL)
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/glslang-config.cmake.in" [=[
+        @PACKAGE_INIT@
+        include("@PACKAGE_PATH_EXPORT_TARGETS@")
+    ]=])
+    
+    set(PATH_EXPORT_TARGETS "${CMAKE_INSTALL_LIBDIR}/${PROJECT_NAME}/glslang-targets.cmake")
+    configure_package_config_file(
+        "${CMAKE_CURRENT_BINARY_DIR}/glslang-config.cmake.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/glslang-config.cmake"
+        PATH_VARS
+            PATH_EXPORT_TARGETS
+        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/${PROJECT_NAME}
+    )
+    
+    write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/glslang-config-version.cmake"
+        VERSION ${GLSLANG_VERSION}
+        COMPATIBILITY SameMajorVersion
+    )
+    
+    install(
+        EXPORT      glslang-targets
+        NAMESPACE   "glslang::"
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/${PROJECT_NAME}"
+    )
+    
+    install(
+        FILES
+            "${CMAKE_CURRENT_BINARY_DIR}/glslang-config.cmake"
+            "${CMAKE_CURRENT_BINARY_DIR}/glslang-config-version.cmake"
+        DESTINATION
+            "${CMAKE_INSTALL_LIBDIR}/${PROJECT_NAME}"
+    )
 endif()

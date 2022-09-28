@@ -13,6 +13,8 @@ namespace HBE {
 
 	CameraControllerSystem::CameraControllerSystem(Scene *scene) : System(scene) {
 		scene->onUpdate.subscribe(this, &CameraControllerSystem::update);
+		Event<Entity> &e = scene->onDetach<CameraController>();
+		e.subscribe(this, &CameraControllerSystem::onDetach);
 	}
 
 	void CameraControllerSystem::update(float delta_t) {
@@ -77,5 +79,12 @@ namespace HBE {
 	CameraControllerSystem::~CameraControllerSystem() {
 		scene->onUpdate.unsubscribe(this);
 	}
+
+	void CameraControllerSystem::onDetach(Entity entity) {
+		CameraController &c = entity.get<CameraController>();
+		Transform &t = entity.get<Transform>();
+		t.rotate(vec3(-c.current_pitch, 0, 0));
+	}
+
 }
 

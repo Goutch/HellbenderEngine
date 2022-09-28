@@ -1,6 +1,6 @@
 #version 460
 #extension GL_EXT_ray_tracing : enable
-#define HISTORY_COUNT 4
+#define HISTORY_COUNT 8
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
 layout(binding = 1, set = 0, rgba32f) uniform image2D outputImage;
 layout(binding = 2, set = 0, rgba32f) uniform image2D history[HISTORY_COUNT];

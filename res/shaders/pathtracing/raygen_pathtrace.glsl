@@ -1,19 +1,18 @@
 #version 460
 #extension GL_EXT_ray_tracing : enable
-#define HISTORY_COUNT 4
+#extension GL_GOOGLE_include_directive : require
+#define HISTORY_COUNT 8
+#include "common.glsl"
+
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
 layout(binding = 1, set = 0, rgba32f) uniform image2D history[HISTORY_COUNT];
-layout(binding = 2, set = 0, rgba32f) uniform image2D outputImage;
+layout(binding = 2, set = 0, rgba32f) uniform writeonly image2D outputImage;
 layout(binding = 3, set = 0) uniform CameraProperties
 {
     mat4 viewInverse;
     mat4 projInverse;
 } cam;
-layout (binding = 4, set = 0) uniform Frame
-{
-    float time;
-    uint index;
-} frame;
+
 
 layout(location = 0) rayPayloadEXT PrimaryRayPayLoad
 {
@@ -42,6 +41,7 @@ vec2(0.437500, 0.814815),
 vec2(0.937500, 0.259259),
 vec2(0.031250, 0.592593),
 };
+const float PHI = 1.61803398874989484820459;// Φ = Golden Ratio
 void main()
 {
     const vec2 pixelCenter = vec2(gl_LaunchIDEXT.xy) + vec2(0.5);
@@ -63,7 +63,12 @@ void main()
 
     vec3 color=vec3(0.0, 0.0, 0.0);
     int numSamples=1;
-    primaryRayPayload.rng_state = uint(uint(gl_LaunchIDEXT.x) * uint(1973) + uint(gl_LaunchIDEXT.y) * uint(9277) + uint(frame.index) * uint(26699)) | uint(1);
+
+    float x = frame.index*PHI;
+    x=mod(x, 1.0);
+    x*=1000;
+
+    primaryRayPayload.rng_state = uint(uint(gl_LaunchIDEXT.x) * uint(1973) + uint(gl_LaunchIDEXT.y) * uint(9277) + uint(floor(x)) * uint(26699)) | uint(1);
     for (int i=0; i<numSamples; i++)
     {
 
@@ -85,11 +90,12 @@ void main()
     }
     imageStore(history[0], ivec2(gl_LaunchIDEXT.xy), vec4(color, 0.0));
 
-    for (int i=1; i<HISTORY_COUNT; i++)
-    {
-        color += imageLoad(history[i], ivec2(gl_LaunchIDEXT.xy)).xyz;
-    }
+   for (int i=1; i<HISTORY_COUNT; i++)
+   {
+       color += imageLoad(history[i], ivec2(gl_LaunchIDEXT.xy)).xyz;
+   }
 
 
     imageStore(outputImage, ivec2(gl_LaunchIDEXT.xy), vec4(color/float(HISTORY_COUNT), 0.0));
+   // imageStore(outputImage, ivec2(gl_LaunchIDEXT.xy), vec4(color/float(HISTORY_COUNT), 0.0));
 }

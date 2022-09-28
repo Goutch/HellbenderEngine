@@ -9,7 +9,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3 -fPIC")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     set(MSVC_COMPILE_FLAGS "/MP /Ot")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_COMPILE_FLAGS}" )
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_COMPILE_FLAGS}")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 endif ()
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
@@ -80,7 +80,11 @@ if (VULKAN_FOUND)
             platforms/vk/raytracing/VK_MeshBottomLevelAccelerationStructure.cpp
             platforms/vk/raytracing/VK_MeshBottomLevelAccelerationStructure.h
             platforms/vk/raytracing/VK_AABBBottomLevelAccelerationStructure.cpp
-            platforms/vk/raytracing/VK_MeshBottomLevelAccelerationStructure.cpp platforms/vk/raytracing/VK_RaytracingPipeline.cpp platforms/vk/raytracing/VK_RaytracingPipeline.h)
+            platforms/vk/raytracing/VK_MeshBottomLevelAccelerationStructure.cpp
+            platforms/vk/raytracing/VK_RaytracingPipeline.cpp
+            platforms/vk/raytracing/VK_RaytracingPipeline.h
+            platforms/vk/raytracing/VK_RaytracingPipelineInstance.cpp
+            platforms/vk/raytracing/VK_RaytracingPipelineInstance.h)
 
     add_compile_definitions(VULKAN_RENDERER)
 
@@ -145,12 +149,14 @@ set(CORE_FILES
         core/resource/Material.h
         core/resource/ComputeInstance.h
         core/resource/IPipelineInstance.h
+        core/resource/RenderTarget.h
+        core/resource/raytracing/RaytracingPipeline.h
+        core/resource/raytracing/RaytracingPipelineInstance.h
 
         core/graphics/Window.h
         core/graphics/Renderer.h
         core/graphics/Graphics.cpp
         core/graphics/Graphics.h
-        core/resource/RenderTarget.h
         core/graphics/Renderer.cpp
         core/graphics/Window.cpp
 
@@ -185,8 +191,7 @@ set(CORE_FILES
 
         core/threading/JobManager.cpp
         core/threading/JobManager.h
-
-        core/resource/raytracing/RaytracingPipeline.h platforms/vk/raytracing/VK_RaytracingPipelineInstance.cpp platforms/vk/raytracing/VK_RaytracingPipelineInstance.h core/resource/raytracing/RaytracingPipelineInstance.h)
+        )
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

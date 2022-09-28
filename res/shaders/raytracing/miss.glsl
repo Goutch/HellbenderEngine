@@ -9,6 +9,7 @@ layout (binding = 4, set = 0) uniform Frame
 {
     float time;
     uint index;
+    uint sample_count;
 } frame;
 const float E =  2.71828182845904523536028747135266249;
 void main()

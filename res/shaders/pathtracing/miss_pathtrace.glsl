@@ -1,5 +1,7 @@
 #version 460
 #extension GL_EXT_ray_tracing : enable
+#extension GL_GOOGLE_include_directive : require
+#include "common.glsl"
 
 layout(location = 0) rayPayloadInEXT PrimaryRayPayLoad
 {
@@ -8,11 +10,7 @@ layout(location = 0) rayPayloadInEXT PrimaryRayPayLoad
     uint rng_state;
     bool hit_sky;
 } primaryRayPayload;
-layout (binding = 4, set = 0) uniform Frame
-{
-    float time;
-    uint index;
-} frame;
+
 const float E =  2.71828182845904523536028747135266249;
 
 void main()
