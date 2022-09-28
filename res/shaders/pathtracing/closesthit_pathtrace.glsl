@@ -4,9 +4,7 @@
 #extension GL_GOOGLE_include_directive : require
 #include "common.glsl"
 //-------------------------------CONSTANTS-------------------------------------
-const float PI = 3.1415926535897932384626433832795;
-const float TWO_PI = 2.0 * PI;
-const float PHI = 1.61803398874989484820459;// Φ = Golden Ratio
+
 struct MaterialData
 {
     vec4 color;

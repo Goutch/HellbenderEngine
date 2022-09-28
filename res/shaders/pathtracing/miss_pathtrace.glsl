@@ -11,8 +11,6 @@ layout(location = 0) rayPayloadInEXT PrimaryRayPayLoad
     bool hit_sky;
 } primaryRayPayload;
 
-const float E =  2.71828182845904523536028747135266249;
-
 void main()
 {
     vec3 position = gl_WorldRayOriginEXT + (gl_WorldRayDirectionEXT * gl_RayTmaxEXT);

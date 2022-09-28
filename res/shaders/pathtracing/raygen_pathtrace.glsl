@@ -41,7 +41,7 @@ vec2(0.437500, 0.814815),
 vec2(0.937500, 0.259259),
 vec2(0.031250, 0.592593),
 };
-const float PHI = 1.61803398874989484820459;// Φ = Golden Ratio
+
 void main()
 {
     const vec2 pixelCenter = vec2(gl_LaunchIDEXT.xy) + vec2(0.5);
@@ -97,5 +97,4 @@ void main()
 
 
     imageStore(outputImage, ivec2(gl_LaunchIDEXT.xy), vec4(color/float(HISTORY_COUNT), 0.0));
-   // imageStore(outputImage, ivec2(gl_LaunchIDEXT.xy), vec4(color/float(HISTORY_COUNT), 0.0));
 }
