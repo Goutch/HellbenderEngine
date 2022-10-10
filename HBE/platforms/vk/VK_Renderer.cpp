@@ -24,7 +24,7 @@
 #include "core/graphics/Graphics.h"
 #include "core/utility/Profiler.h"
 #include "VK_PipelineDescriptors.h"
-#include "VK_Material.h"
+#include "VK_GraphicPipelineInstance.h"
 #include "raytracing/VK_RaytracingPipelineInstance.h"
 
 namespace HBE {
@@ -195,7 +195,7 @@ namespace HBE {
 			const GraphicPipeline *pipeline = pipeline_kv.first;
 			pipeline->bind();
 			for (const auto &material_kv:pipeline_kv.second) {
-				Material *material = material_kv.first;
+				GraphicPipelineInstance *material = material_kv.first;
 				material->setUniform("ubo", &ubo, -1);
 				material->bind();
 				for (const auto &mesh_kv: material_kv.second) {
@@ -220,7 +220,7 @@ namespace HBE {
 			const GraphicPipeline *pipeline = pipeline_kv.first;
 			pipeline->bind();
 			for (const auto &material_kv: pipeline_kv.second) {
-				Material *material = material_kv.first;
+				GraphicPipelineInstance *material = material_kv.first;
 				material->setUniform("ubo", &ubo, -1);
 				material->bind();
 
@@ -349,15 +349,16 @@ namespace HBE {
 
 		frame_presented = false;
 		current_frame = (current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
+		onFrameChange.invoke(current_frame);
 		render_cache.clear();
 		Profiler::end();
 
 	}
 
-	void VK_Renderer::draw(mat4 transform_matrix, const Mesh &mesh, Material &material) {
+	void VK_Renderer::draw(mat4 transform_matrix, const Mesh &mesh, GraphicPipelineInstance &material) {
 		auto pipeline_it = render_cache.find(material.getGraphicPipeline());
 		if (pipeline_it == render_cache.end())
-			pipeline_it = render_cache.emplace(material.getGraphicPipeline(), MAP(Material*, MAP(const Mesh*, std::vector<mat4>))()).first;
+			pipeline_it = render_cache.emplace(material.getGraphicPipeline(), MAP(GraphicPipelineInstance*, MAP(const Mesh*, std::vector<mat4>))()).first;
 		auto material_it = pipeline_it->second.find(&material);
 		if (material_it == pipeline_it->second.end())
 			material_it = pipeline_it->second.emplace(&material, MAP(const Mesh*, std::vector<mat4>)()).first;
@@ -369,10 +370,10 @@ namespace HBE {
 	}
 
 	void VK_Renderer::drawInstanced(const HBE::Mesh &mesh,
-									Material &material) {
+									GraphicPipelineInstance &material) {
 		auto pipeline_it = instanced_cache.find(material.getGraphicPipeline());
 		if (pipeline_it == instanced_cache.end())
-			pipeline_it = instanced_cache.emplace(material.getGraphicPipeline(), MAP(Material *, std::vector<const Mesh *>)()).first;
+			pipeline_it = instanced_cache.emplace(material.getGraphicPipeline(), MAP(GraphicPipelineInstance *, std::vector<const Mesh *>)()).first;
 		auto material_it = pipeline_it->second.find(&material);
 		if (material_it == pipeline_it->second.end())
 			material_it = pipeline_it->second.emplace(&material, std::vector<const Mesh *>()).first;
@@ -454,7 +455,7 @@ namespace HBE {
 
 		MaterialInfo screen_material_info{};
 		screen_material_info.graphic_pipeline = screen_pipeline;
-		screen_material = new VK_Material(this, screen_material_info);
+		screen_material = new VK_GraphicPipelineInstance(this, screen_material_info);
 		Resources::add("DEFAULT_SCREEN_MATERIAL", screen_material);
 	}
 

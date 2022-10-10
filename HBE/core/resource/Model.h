@@ -7,7 +7,7 @@
 #include "Resource.h"
 
 namespace HBE {
-	class Material;
+	class GraphicPipelineInstance;
 
 	class GraphicPipeline;
 
@@ -36,7 +36,7 @@ namespace HBE {
 
 	struct ModelPrimitive {
 		Mesh *mesh = nullptr;
-		Material *material = nullptr;
+		GraphicPipelineInstance *material = nullptr;
 	};
 
 	//A node represent an object in the model hierarchy. with zero, one or multiple meshes to render.
@@ -49,7 +49,7 @@ namespace HBE {
 	struct ModelData {
 		std::vector<ModelNode> nodes;
 		std::vector<std::vector<Mesh *>> meshes;
-		std::vector<Material *> materials;
+		std::vector<GraphicPipelineInstance *> materials;
 		std::vector<ModelMaterialProperties> material_properties;
 	};
 

@@ -19,7 +19,7 @@ namespace HBE {
 	/**
 	 * @brief A Material contains the uniform buffers(descriptorSets) and textures to use in a graphic pipeline.
 	 */
-	class HB_API Material : public IPipelineInstance {
+	class HB_API GraphicPipelineInstance : public IPipelineInstance {
 	public:
 		virtual const GraphicPipeline *getGraphicPipeline() const = 0;
 	};

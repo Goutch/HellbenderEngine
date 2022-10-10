@@ -19,7 +19,7 @@ namespace HBE {
 
 	class Window;
 
-	class Material;
+	class GraphicPipelineInstance;
 
 	template<typename... Args>
 	class Event;
@@ -43,9 +43,9 @@ namespace HBE {
 
 		static Window *getWindow();
 
-		static void draw(mat4 transform_matrix, const Mesh &mesh, Material &material);
+		static void draw(mat4 transform_matrix, const Mesh &mesh, GraphicPipelineInstance &material);
 
-		static void drawInstanced(const Mesh &mesh, Material &material);
+		static void drawInstanced(const Mesh &mesh, GraphicPipelineInstance &material);
 
 		static void raytrace(const RootAccelerationStructure &root_acceleration_structure,
 							 RaytracingPipelineInstance &pipeline,

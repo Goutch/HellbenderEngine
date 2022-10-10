@@ -25,8 +25,7 @@ namespace HBE {
 		std::vector<VkDeviceSize> uniform_sizes;
 		std::map<std::string, size_t> uniform_name_to_index;
 		std::map<uint32_t, size_t> uniform_binding_to_index;
-
-		std::unordered_map<uint32_t, std::vector<VK_Buffer *>> uniform_buffers;
+		std::vector<bool> variable_descriptor_count;
 
 		std::vector<VkPushConstantRange> push_constants_ranges;
 		std::map<std::string, size_t> push_constant_name_to_index;
@@ -36,7 +35,7 @@ namespace HBE {
 
 
 	public:
-		VK_PipelineLayout(VK_Device *device,const VK_Shader **shaders, size_t count);
+		VK_PipelineLayout(VK_Device *device, const VK_Shader **shaders, size_t count);
 		~VK_PipelineLayout();
 
 		VkPipelineLayout getHandle() const;
@@ -50,6 +49,7 @@ namespace HBE {
 		const std::vector<VkDeviceSize> &getUniformSizes() const;
 
 		VkDescriptorSetLayout getDescriptorSetLayout() const;
+		bool IsBindingVariableSize(uint32_t binding) const;
 	};
 }
 

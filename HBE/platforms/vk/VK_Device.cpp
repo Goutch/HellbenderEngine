@@ -54,12 +54,26 @@ namespace HBE {
 		robustness_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT;
 		robustness_features.nullDescriptor = true;
 
+		VkPhysicalDeviceDescriptorIndexingFeatures descriptor_indexing_features{};
+		descriptor_indexing_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
+		descriptor_indexing_features.runtimeDescriptorArray = true;
+		descriptor_indexing_features.descriptorBindingPartiallyBound = true;
+		descriptor_indexing_features.descriptorBindingVariableDescriptorCount = true;
+		descriptor_indexing_features.shaderSampledImageArrayNonUniformIndexing = true;
+		descriptor_indexing_features.shaderStorageBufferArrayNonUniformIndexing = true;
+		descriptor_indexing_features.shaderStorageImageArrayNonUniformIndexing = true;
+		descriptor_indexing_features.shaderUniformBufferArrayNonUniformIndexing = true;
+		descriptor_indexing_features.shaderUniformTexelBufferArrayNonUniformIndexing = true;
+		descriptor_indexing_features.shaderStorageTexelBufferArrayNonUniformIndexing = true;
+		descriptor_indexing_features.descriptorBindingUpdateUnusedWhilePending = true;
+		descriptor_indexing_features.descriptorBindingPartiallyBound = true;
+		descriptor_indexing_features.descriptorBindingVariableDescriptorCount = true;
 
 		device_create_info.pNext = &buffer_device_address_features;
 		buffer_device_address_features.pNext = &ray_tracing_features;
 		ray_tracing_features.pNext = &acceleration_structure_features;
 		acceleration_structure_features.pNext = &robustness_features;
-
+		robustness_features.pNext = &descriptor_indexing_features;
 		if (vkCreateDevice(physical_device.getHandle(), &device_create_info, nullptr, &handle) != VK_SUCCESS) {
 			Log::error("Failed to create logical device");
 		}

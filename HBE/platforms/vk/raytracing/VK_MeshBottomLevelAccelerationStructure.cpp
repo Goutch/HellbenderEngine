@@ -50,7 +50,7 @@ namespace HBE {
 		buffer = new VK_Buffer(device,
 							   accelerationStructureBuildSizesInfo.accelerationStructureSize,
 							   VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
-							   ALLOC_FLAGS::ALLOC_FLAG_NONE);
+							   ALLOC_FLAG_NONE);
 
 
 		VkAccelerationStructureCreateInfoKHR accelerationStructureCreateInfo{};

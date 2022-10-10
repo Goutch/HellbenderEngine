@@ -8,13 +8,15 @@
 #include "VK_Shader.h"
 #include "VK_RenderPass.h"
 #include "VK_ComputePipeline.h"
-#include "VK_Material.h"
+#include "VK_GraphicPipelineInstance.h"
 #include "VK_ComputeInstance.h"
 #include "raytracing/VK_TopLevelAccelerationStructure.h"
 #include "raytracing/VK_AABBBottomLevelAccelerationStructure.h"
 #include "raytracing/VK_MeshBottomLevelAccelerationStructure.h"
 #include "raytracing/VK_RaytracingPipeline.h"
 #include "raytracing/VK_RaytracingPipelineInstance.h"
+#include "VK_StorageBuffer.h"
+
 namespace HBE {
 	VK_ResourceFactory::VK_ResourceFactory(VK_Renderer *renderer) {
 		this->renderer = renderer;
@@ -44,8 +46,8 @@ namespace HBE {
 		return new VK_RenderPass(renderer, info);
 	}
 
-	Material *VK_ResourceFactory::createMaterial(const MaterialInfo &info) const {
-		return new VK_Material(renderer, info);
+	GraphicPipelineInstance *VK_ResourceFactory::createMaterial(const MaterialInfo &info) const {
+		return new VK_GraphicPipelineInstance(renderer, info);
 	}
 
 	ComputeInstance *VK_ResourceFactory::createComputeInstance(const ComputeInstanceInfo &info) const {
@@ -67,8 +69,13 @@ namespace HBE {
 	RaytracingPipeline *VK_ResourceFactory::createRaytracingPipeline(const RaytracingPipelineInfo &info) const {
 		return new VK_RaytracingPipeline(renderer, info);
 	}
+
 	RaytracingPipelineInstance *VK_ResourceFactory::createRaytracingPipelineInstance(const RaytracingPipelineInstanceInfo &info) const {
 		return new VK_RaytracingPipelineInstance(*renderer, info);
+	}
+
+	StorageBuffer *VK_ResourceFactory::createStorageBuffer(const StorageBufferInfo &info) const {
+		return new VK_StorageBuffer(renderer->getDevice(), info);
 	}
 
 }

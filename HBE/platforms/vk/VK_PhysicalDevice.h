@@ -38,7 +38,7 @@ namespace HBE {
 																 VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME,
 																 VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME,
 																 VK_KHR_SPIRV_1_4_EXTENSION_NAME,
-																 VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME,
+																 VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME
 				//VK_KHR_RAY_QUERY_EXTENSION_NAME
 		};
 
@@ -54,8 +54,12 @@ namespace HBE {
 
 		VkPhysicalDeviceAccelerationStructurePropertiesKHR acceleration_structure_properties{};
 		VkPhysicalDeviceRayTracingPipelinePropertiesKHR ray_tracing_pipeline_properties{};
+		VkPhysicalDeviceDescriptorIndexingProperties descriptor_indexing_properties{};
+		VkPhysicalDeviceVulkan11Features vulkan_11_features{};
+
 		VkPhysicalDeviceAccelerationStructureFeaturesKHR acceleration_structure_features{};
 		VkPhysicalDeviceRayTracingPipelineFeaturesKHR ray_tracing_pipeline_features{};
+		VkPhysicalDeviceDescriptorIndexingFeatures descriptor_indexing_features{};
 
 		std::vector<const char *> enabled_extensions;
 		std::multimap<uint32_t, VkPhysicalDevice> device_score;

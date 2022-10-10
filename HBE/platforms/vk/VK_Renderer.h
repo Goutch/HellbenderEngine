@@ -7,6 +7,7 @@
 #include "VK_CONSTANTS.h"
 #include "list"
 #include "array"
+#include "core/utility/Event.h"
 
 namespace HBE {
 	class VK_Window;
@@ -29,6 +30,7 @@ namespace HBE {
 
 	class VK_Fence;
 
+
 	class VK_Renderer : public Renderer {
 #define MAP(T1, T2) std::unordered_map<T1,T2>
 	private:
@@ -38,9 +40,9 @@ namespace HBE {
 			VK_Semaphore *image_available_semaphore;
 		};
 
-		MAP(const GraphicPipeline*, MAP(Material * , MAP(const Mesh*, std::vector<mat4>))) render_cache;
-		MAP(const GraphicPipeline*, MAP(Material * , MAP(const Mesh*, std::vector<mat3>))) render_cache_2D;
-		MAP(const GraphicPipeline*, MAP(Material * , std::vector<const Mesh *>)) instanced_cache;
+		MAP(const GraphicPipeline*, MAP(GraphicPipelineInstance * , MAP(const Mesh*, std::vector<mat4>))) render_cache;
+		MAP(const GraphicPipeline*, MAP(GraphicPipelineInstance * , MAP(const Mesh*, std::vector<mat3>))) render_cache_2D;
+		MAP(const GraphicPipeline*, MAP(GraphicPipelineInstance * , std::vector<const Mesh *>)) instanced_cache;
 
 		VK_Window *window;
 		VK_Instance *instance;
@@ -60,10 +62,14 @@ namespace HBE {
 
 		RenderTarget *main_render_target = nullptr;
 		GraphicPipeline *screen_pipeline = nullptr;
-		Material *screen_material = nullptr;
+		GraphicPipelineInstance *screen_material = nullptr;
 		bool windowResized = false;
 		bool frame_presented = false;
+
+
 	public:
+		Event<uint32_t> onFrameChange;
+
 		void render(const RenderTarget *render_target,
 					const mat4 &projection_matrix,
 					const mat4 &view_matrix) override;
@@ -84,9 +90,9 @@ namespace HBE {
 
 		void endFrame() override;
 
-		void draw(mat4 transform_matrix, const Mesh &mesh, Material &material) override;
+		void draw(mat4 transform_matrix, const Mesh &mesh, GraphicPipelineInstance &material) override;
 
-		void drawInstanced(const Mesh &mesh, Material &material) override;
+		void drawInstanced(const Mesh &mesh, GraphicPipelineInstance &material) override;
 
 		VK_Renderer();
 

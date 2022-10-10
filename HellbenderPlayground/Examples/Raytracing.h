@@ -2,6 +2,7 @@
 
 #include "HBE.h"
 #include "vector"
+#include "array"
 
 using namespace HBE;
 
@@ -19,21 +20,39 @@ struct Frame {
 	uint32_t index = 0;
 	uint32_t sample_count = 1;
 	uint32_t max_bounces = 3;
+	float scattering_multiplier = 12.0f;
+	float density_falloff = 10.0f;
 };
 #define HYSTORY_COUNT 8
+
+struct MaterialData {
+	vec4 albedo;
+	vec4 emission;
+	alignas(16) float roughness;
+};
 
 class RaytracingScene {
 
 private:
-	RaytracingPipelineResources raytracing_resources;
 	RaytracingPipelineResources pathtracing_resources;
 	std::vector<Shader *> common_hit_shaders;
 	RootAccelerationStructure *root_acceleration_structure;
 	AABBAccelerationStructure *aabb_acceleration_structure;
+	AABBAccelerationStructure *mesh_acceleration_structure;
+	StorageBuffer *material_buffer;
+	const std::array<MaterialData, 7> materials = {{
+														   {vec4(0.8, 0.8, 0.8, 0.0), vec4(0.0, 0.0, 0.0, 0.0), 1.0},
+														   {vec4(0.5, 0.5, 0.5, 0.0), vec4(1.0, 1.0, 1.0, 1.0), 1.0},
+														   {vec4(1.0, 0.1, 0.1, 0.0), vec4(0.0, 0.0, 0.0, 0.0), 1.0},
+														   {vec4(0.1, 0.5, 0.1, 0.0), vec4(0.0, 0.0, 0.0, 0.0), 1.0},
+														   {vec4(0.1, 0.1, 0.5, 0.0), vec4(0.0, 0.0, 0.0, 0.0), 1.0},
+														   {vec4(0.2, 0.2, 0.2, 0.0), vec4(0.0, 0.0, 0.0, 0.0), 0.4},
+														   {vec4(0.8, 0.8, 0.8, 0.0), vec4(0.0, 0.0, 0.0, 0.0), 0.0}}
+	};
 	std::vector<Texture *> history_textures;
 	Texture *output_texture = nullptr;
-	bool use_pathtracing = false;
 	Frame frame{};
+	bool paused = false;
 public:
 	void createFrameBuffers(uint32_t width, uint32_t height) {
 		for (Texture *frame_buffer : history_textures) {
@@ -69,9 +88,10 @@ public:
 
 	void onRender() {
 		Entity camera_entity = Application::getScene()->getCameraEntity();
-		frame.time = Application::getTime() * 0.05;
+		if (!paused)
+			frame.time = Application::getTime() * 0.05;
 
-		RaytracingPipelineResources resources = use_pathtracing ? pathtracing_resources : raytracing_resources;
+		RaytracingPipelineResources resources = pathtracing_resources;
 
 
 		const Texture *frame_buffer_array[HYSTORY_COUNT];
@@ -79,7 +99,6 @@ public:
 			uint32_t f = (frame.index - i) % history_textures.size();
 			frame_buffer_array[i] = history_textures[f];
 		}
-
 
 		resources.pipeline_instance->setUniform("frame", &frame, Graphics::getCurrentFrame());
 		resources.pipeline_instance->setTexture("outputImage", output_texture, Graphics::getCurrentFrame(), 0);
@@ -90,18 +109,30 @@ public:
 						   glm::inverse(camera_entity.get<Transform>().world()),
 						   output_texture->getSize());
 
-		/*	denoiser_instance->setTextureArray("history", frame_buffer_array, HYSTORY_COUNT, Graphics::getCurrentFrame(), 0);
-			denoiser_instance->setTexture("outputImage", output_texture, Graphics::getCurrentFrame(), 0);
-			denoiser_instance->dispatch(output_texture->getWidth(), output_texture->getHeight(), 1);
-			denoiser_instance->wait();
-	*/
 		Graphics::present(output_texture);
 		frame.index++;
 	}
 
 	void onUpdate(float delta) {
 		if (Input::getKeyDown(KEY::P)) {
-			use_pathtracing = !use_pathtracing;
+			paused = !paused;
+		}
+		if (Input::getKey(KEY::MINUS)) {
+			frame.scattering_multiplier -= 5.0f * delta;
+			Log::message("Scattering multiplier:" + std::to_string(frame.scattering_multiplier));
+		}
+		if (Input::getKey(KEY::EQUAL)) {
+			frame.scattering_multiplier += 5.0f * delta;
+
+			Log::message("Scattering multiplier:" + std::to_string(frame.scattering_multiplier));
+		}
+		if (Input::getKey(KEY::LEFT_BRACKET)) {
+			frame.density_falloff -= 5.0f * delta;
+			Log::message("Density falloff:" + std::to_string(frame.density_falloff));
+		}
+		if (Input::getKey(KEY::RIGHT_BRACKET)) {
+			frame.density_falloff += 5.0f * delta;
+			Log::message("Density falloff:" + std::to_string(frame.density_falloff));
 		}
 		if (Input::getKeyDown(KEY::R)) {
 			frame.sample_count = 1;
@@ -129,13 +160,8 @@ public:
 	}
 
 	~RaytracingScene() {
-		for (Shader *shader : raytracing_resources.miss_shaders) {
-			delete shader;
-		}
+
 		for (Shader *shader : pathtracing_resources.miss_shaders) {
-			delete shader;
-		}
-		for (Shader *shader : raytracing_resources.hit_shaders) {
 			delete shader;
 		}
 		for (Shader *shader : pathtracing_resources.hit_shaders) {
@@ -147,13 +173,12 @@ public:
 		history_textures.clear();
 
 		delete output_texture;
-		delete raytracing_resources.raygen_shader;
 		delete pathtracing_resources.raygen_shader;
 
+		delete material_buffer;
+		//delete mesh_acceleration_structure;
 		delete aabb_acceleration_structure;
 		delete root_acceleration_structure;
-		delete raytracing_resources.pipeline_instance;
-		delete raytracing_resources.pipeline;
 		delete pathtracing_resources.pipeline_instance;
 		delete pathtracing_resources.pipeline;
 
@@ -164,71 +189,42 @@ public:
 		ShaderInfo shader_info{};
 
 		shader_info.stage = SHADER_STAGE_RAY_GEN;
-		shader_info.path = "shaders/raytracing/raygen.glsl";
-		raytracing_resources.raygen_shader = Resources::createShader(shader_info);
 		shader_info.path = "shaders/pathtracing/raygen_pathtrace.glsl";
 		pathtracing_resources.raygen_shader = Resources::createShader(shader_info);
 
 
 		shader_info.stage = SHADER_STAGE_RAY_MISS;
-		shader_info.path = "shaders/raytracing/miss.glsl";
-		raytracing_resources.miss_shaders.push_back(Resources::createShader(shader_info));
-		shader_info.path = "shaders/raytracing/miss_occlusion.glsl";
-		raytracing_resources.miss_shaders.push_back(Resources::createShader(shader_info));
 		shader_info.path = "shaders/pathtracing/miss_pathtrace.glsl";
 		pathtracing_resources.miss_shaders.push_back(Resources::createShader(shader_info));
 
 
 		shader_info.stage = SHADER_STAGE_CLOSEST_HIT;
-		shader_info.path = "shaders/raytracing/closesthit.glsl";
-		raytracing_resources.hit_shaders.push_back(Resources::createShader(shader_info));
-		shader_info.path = "shaders/raytracing/closest_hit_occlusion.glsl";
-		raytracing_resources.hit_shaders.push_back(Resources::createShader(shader_info));
-		shader_info.path = "shaders/pathtracing/closesthit_pathtrace.glsl";
+		shader_info.path = "shaders/pathtracing/closesthit_aabb.glsl";
 		pathtracing_resources.hit_shaders.push_back(Resources::createShader(shader_info));
 
 
 		shader_info.stage = SHADER_STAGE_INTERSECTION;
-		shader_info.path = "shaders/raytracing/intersect_box.glsl";
-		raytracing_resources.hit_shaders.push_back(Resources::createShader(shader_info));
+		shader_info.path = "shaders/pathtracing/intersect_box.glsl";
 		pathtracing_resources.hit_shaders.push_back(Resources::createShader(shader_info));
-		shader_info.path = "shaders/raytracing/intersect_sphere.glsl";
-		raytracing_resources.hit_shaders.push_back(Resources::createShader(shader_info));
+		shader_info.path = "shaders/pathtracing/intersect_sphere.glsl";
 		pathtracing_resources.hit_shaders.push_back(Resources::createShader(shader_info));
-
-		raytracing_resources.shader_groups.push_back({0, -1, 2});//box
-		raytracing_resources.shader_groups.push_back({0, -1, 3});//sphere
-		raytracing_resources.shader_groups.push_back({1, -1, 2});//box ao
-		raytracing_resources.shader_groups.push_back({1, -1, 3});//sphere ao
 
 		pathtracing_resources.shader_groups.push_back({0, -1, 1});//box
 		pathtracing_resources.shader_groups.push_back({0, -1, 2});//sphere
 
-		RaytracingPipelineInfo raytracing_pipeline_info{};
-		raytracing_pipeline_info.raygen_shader = raytracing_resources.raygen_shader;
-		raytracing_pipeline_info.miss_shaders = raytracing_resources.miss_shaders.data();
-		raytracing_pipeline_info.miss_shader_count = raytracing_resources.miss_shaders.size();
-		raytracing_pipeline_info.hit_shaders = raytracing_resources.hit_shaders.data();
-		raytracing_pipeline_info.hit_shader_count = raytracing_resources.hit_shaders.size();
+		RaytracingPipelineInfo pathtracing_pipeline_info{};
 
-		raytracing_pipeline_info.shader_group_count = raytracing_resources.shader_groups.size();
-		raytracing_pipeline_info.shader_groups = raytracing_resources.shader_groups.data();
-		raytracing_pipeline_info.max_recursion_depth = 2;
+		pathtracing_pipeline_info.raygen_shader = pathtracing_resources.raygen_shader;
+		pathtracing_pipeline_info.miss_shaders = pathtracing_resources.miss_shaders.data();
+		pathtracing_pipeline_info.miss_shader_count = pathtracing_resources.miss_shaders.size();
+		pathtracing_pipeline_info.hit_shaders = pathtracing_resources.hit_shaders.data();
+		pathtracing_pipeline_info.hit_shader_count = pathtracing_resources.hit_shaders.size();
 
-		raytracing_resources.pipeline = Resources::createRaytracingPipeline(raytracing_pipeline_info);
+		pathtracing_pipeline_info.shader_group_count = pathtracing_resources.shader_groups.size();
+		pathtracing_pipeline_info.shader_groups = pathtracing_resources.shader_groups.data();
+		pathtracing_pipeline_info.max_recursion_depth = 16;
 
-
-		raytracing_pipeline_info.raygen_shader = pathtracing_resources.raygen_shader;
-		raytracing_pipeline_info.miss_shaders = pathtracing_resources.miss_shaders.data();
-		raytracing_pipeline_info.miss_shader_count = pathtracing_resources.miss_shaders.size();
-		raytracing_pipeline_info.hit_shaders = pathtracing_resources.hit_shaders.data();
-		raytracing_pipeline_info.hit_shader_count = pathtracing_resources.hit_shaders.size();
-
-		raytracing_pipeline_info.shader_group_count = pathtracing_resources.shader_groups.size();
-		raytracing_pipeline_info.shader_groups = pathtracing_resources.shader_groups.data();
-		raytracing_pipeline_info.max_recursion_depth = 16;
-
-		pathtracing_resources.pipeline = Resources::createRaytracingPipeline(raytracing_pipeline_info);
+		pathtracing_resources.pipeline = Resources::createRaytracingPipeline(pathtracing_pipeline_info);
 
 		AABBAccelerationStructureInfo aabb__acceleration_structure_info{};
 		aabb__acceleration_structure_info.max = vec3(0.5, 0.5, 0.5);
@@ -238,8 +234,22 @@ public:
 
 		std::vector<AABBAccelerationStructure *> aabb_acceleration_structures{aabb_acceleration_structure};
 
-		std::vector<VertexBindingInfo> vertex_binding_infos{};
+		/*std::vector<StorageBuffer *> storage_buffer_array(output_texture->getWidth(), nullptr);
+		for (int i = 0; i < output_texture->getWidth(); ++i) {
+			StorageBufferInfo storageBufferInfo{};
+			storageBufferInfo.count = output_texture->getHeight();
+			storageBufferInfo.stride = sizeof(vec4);
+			std::vector<vec4> data(output_texture->getHeight(), vec4(0, 0, 0, 0));
+			for (int j = 0; j < output_texture->getHeight(); ++j) {
+				data[j] = vec4(Random::floatRange(0, 1), Random::floatRange(0, 1), Random::floatRange(0, 1), 1);
+			}
+			storage_buffer_array[i] = Resources::createStorageBuffer(storageBufferInfo);
+			storage_buffer_array[i]->update(data.data());
+		}*/
+
+		/*std::vector<VertexBindingInfo> vertex_binding_infos{};
 		vertex_binding_infos.push_back(VertexBindingInfo{0, sizeof(vec3), VERTEX_BINDING_FLAG_NONE});
+
 		MeshInfo mesh_info{};
 		mesh_info.flags = MESH_FLAG_USED_IN_RAYTRACING;
 		mesh_info.binding_infos = vertex_binding_infos.data();
@@ -248,6 +258,9 @@ public:
 		ModelInfo model_info{};
 		model_info.path = "models/dragon.gltf";
 		model_info.flags = MODEL_FLAG_DONT_LOAD_MATERIALS | MODEL_FLAG_USED_IN_RAYTRACING;
+		MeshAccelerationStructureInfo mesh_acceleration_structure_info{};
+
+		std::vector<MeshAccelerationStructure *> mesh_acceleration_structures{};*/
 
 		std::vector<AccelerationStructureInstance> acceleration_structure_instances{};
 
@@ -265,22 +278,20 @@ public:
 		transform_aabb_floor.translate(vec3(0, -1, 0));
 		transform_aabb_floor.setScale(vec3(100, 1, 100));
 
-		acceleration_structure_instances.push_back(AccelerationStructureInstance{0, 0, transform_aabb_floor.world(), ACCELERATION_STRUCTURE_TYPE_AABB});
+		acceleration_structure_instances.push_back(AccelerationStructureInstance{0, 0, transform_aabb_floor.world(), ACCELERATION_STRUCTURE_TYPE_AABB, 0});
 		transform_aabb_floor.setScale(vec3(50, 1, 50));
-		transform_aabb_floor.translate(vec3(0, 10, 0));
-		acceleration_structure_instances.push_back(AccelerationStructureInstance{0, 0, transform_aabb_floor.world(), ACCELERATION_STRUCTURE_TYPE_AABB});
 
-		//for (int i = 0; i < 1000; ++i) {
-		//	Transform t{};
-		//	t.translate(vec3(Random::floatRange(-50, 50), 0, Random::floatRange(-50, 50)));
-		//	acceleration_structure_instances.push_back(
-		//			AccelerationStructureInstance{0, 0, t.world(), ACCELERATION_STRUCTURE_TYPE_AABB});
-		//}
-		for (int i = 0; i < 1000; ++i) {
+		for (uint32_t i = 0; i < 7; ++i) {
 			Transform t{};
-			t.translate(vec3(Random::floatRange(-50, 50), 0, Random::floatRange(-50, 50)));
+			t.translate(vec3(2 * (i + 1), 0, 0));
 			acceleration_structure_instances.push_back(
-					AccelerationStructureInstance{0, 1, t.world(), ACCELERATION_STRUCTURE_TYPE_AABB});
+					AccelerationStructureInstance{0, 0, t.world(), ACCELERATION_STRUCTURE_TYPE_AABB, i});
+		}
+		for (uint32_t i = 0; i < 7; ++i) {
+			Transform t{};
+			t.translate(vec3(0, 0, 2 * (i + 1)));
+			acceleration_structure_instances.push_back(
+					AccelerationStructureInstance{0, 1, t.world(), ACCELERATION_STRUCTURE_TYPE_AABB, i % 7});
 		}
 
 		RootAccelerationStructureInfo root_acceleration_structure_info{};
@@ -293,16 +304,21 @@ public:
 
 		root_acceleration_structure = Resources::createRootAccelerationStructure(root_acceleration_structure_info);
 
-		RaytracingPipelineInstanceInfo raytracing_pipeline_instance_info{};
-		raytracing_pipeline_instance_info.raytracing_pipeline = raytracing_resources.pipeline;
-		raytracing_pipeline_instance_info.root_acceleration_structure = root_acceleration_structure;
-		raytracing_resources.pipeline_instance = Resources::createRaytracingPipelineInstance(raytracing_pipeline_instance_info);
 
+		StorageBufferInfo storage_buffer_info{};
+		storage_buffer_info.stride = sizeof(MaterialData);
+		storage_buffer_info.count = materials.size();
+		storage_buffer_info.flags = STORAGE_BUFFER_FLAG_NONE;
+		material_buffer = Resources::createStorageBuffer(storage_buffer_info);
+		material_buffer->update(materials.data());
 
-		raytracing_pipeline_instance_info.raytracing_pipeline = pathtracing_resources.pipeline;
-		raytracing_pipeline_instance_info.root_acceleration_structure = root_acceleration_structure;
-		pathtracing_resources.pipeline_instance = Resources::createRaytracingPipelineInstance(raytracing_pipeline_instance_info);
-
+		RaytracingPipelineInstanceInfo pathtracing_pipeline_instance_info{};
+		pathtracing_pipeline_instance_info.raytracing_pipeline = pathtracing_resources.pipeline;
+		pathtracing_resources.pipeline_instance = Resources::createRaytracingPipelineInstance(pathtracing_pipeline_instance_info);
+		pathtracing_resources.pipeline_instance->setAccelerationStructure("topLevelAS", root_acceleration_structure);
+		pathtracing_resources.pipeline_instance->setStorageBuffer("materials", material_buffer);
+		//StorageBuffer **pbuffers = storage_buffer_array.data();
+		//pathtracing_resources.pipeline_instance->setStorageBufferArray("vertices", pbuffers, storage_buffer_array.size());
 
 		Scene *scene = Application::getScene();
 

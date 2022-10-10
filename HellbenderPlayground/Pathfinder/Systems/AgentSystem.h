@@ -14,7 +14,7 @@ struct Agent {
 class AgentSystem : public System {
 	Mesh *mesh;
 	GraphicPipeline *pipeline;
-	Material *material;
+	GraphicPipelineInstance *material;
 	Entity camera_entity;
 
 public:

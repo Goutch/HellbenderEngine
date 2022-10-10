@@ -1,7 +1,7 @@
 #pragma once
 
 #include "vulkan/vulkan.h"
-
+#include "core/utility/Event.h"
 namespace HBE {
 	class VK_Device;
 
@@ -9,6 +9,7 @@ namespace HBE {
 
 		VkDevice device_handle = VK_NULL_HANDLE;
 		VkFence handle = VK_NULL_HANDLE;
+
 	public:
 		VK_Fence(const VK_Device &device);
 		VK_Fence(const VK_Fence &&other);

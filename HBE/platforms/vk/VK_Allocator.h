@@ -22,7 +22,9 @@ namespace HBE {
 	class VK_Renderer;
 
 	struct Block;
-	enum ALLOC_FLAGS {
+
+	typedef uint32_t ALLOC_FLAGS;
+	enum ALLOC_FLAG {
 		ALLOC_FLAG_NONE = 0,
 		ALLOC_FLAG_MAPPABLE = 1,
 	};

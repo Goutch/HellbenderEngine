@@ -4,7 +4,7 @@
 
 #include <core/resource/Model.h>
 #include <core/resource/Mesh.h>
-#include <core/resource/Material.h>
+#include <core/resource/GraphicPipelineInstance.h>
 #include <core/resource/RenderTarget.h>
 
 namespace HBE {

@@ -128,7 +128,7 @@ namespace HBE {
 									   reinterpret_cast<const void *>(data),
 									   buffer_size,
 									   VK_BUFFER_USAGE_INDEX_BUFFER_BIT | extra_usages,
-									   ALLOC_FLAGS::ALLOC_FLAG_NONE);
+									   ALLOC_FLAG_NONE);
 		index_count = count;
 	}
 

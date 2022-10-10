@@ -1,8 +1,13 @@
 #version 460
 #extension GL_EXT_ray_tracing : enable
 #extension GL_GOOGLE_include_directive : require
+#extension GL_EXT_nonuniform_qualifier :require
 #define HISTORY_COUNT 8
 #include "common.glsl"
+
+struct Vertex{
+    vec4 pos;
+};
 
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
 layout(binding = 1, set = 0, rgba32f) uniform image2D history[HISTORY_COUNT];
@@ -12,14 +17,19 @@ layout(binding = 3, set = 0) uniform CameraProperties
     mat4 viewInverse;
     mat4 projInverse;
 } cam;
-
+//layout(binding = 6, set = 0) buffer VertexBuffer
+//{
+//    Vertex vertices[];
+//} vertices[];
 
 layout(location = 0) rayPayloadEXT PrimaryRayPayLoad
 {
     vec3 color;
-    int depth;
+    int bounce_count;
     uint rng_state;
     bool hit_sky;
+    vec3 hit_normal;
+    float hit_t;
 } primaryRayPayload;
 
 vec2 offsets[16] =
@@ -52,10 +62,10 @@ void main()
     offset.x = ((offset.x-0.5f) / gl_LaunchSizeEXT.x) *2;
     offset.y = ((offset.y-0.5f) / gl_LaunchSizeEXT.y) *2;
 
-    vec4 origin = cam.viewInverse * vec4(0, 0, 0, 1);
+    vec4 origin = cam.viewInverse* vec4(0, 0, 0, 1);
     vec4 target = cam.projInverse * vec4(d.x+offset.x, d.y+offset.y, 1, 1);
 
-    vec4 direction = cam.viewInverse*vec4(normalize(target.xyz), 0);
+    vec4 direction = normalize(cam.viewInverse*vec4(normalize(target.xyz), 0));
 
     float tmin = 0.001;
     float tmax = 1000.0;
@@ -72,9 +82,10 @@ void main()
     for (int i=0; i<numSamples; i++)
     {
 
-        primaryRayPayload.depth = 0;
+        primaryRayPayload.bounce_count = 0;
         primaryRayPayload.color = vec3(0.0, 0.0, 0.0);
         primaryRayPayload.hit_sky = false;
+        primaryRayPayload.hit_t = 0.0;
         traceRayEXT(topLevelAS, //topLevelacceleationStructure
         gl_RayFlagsOpaqueEXT, //rayFlags
         0xff, //cullMask
@@ -90,11 +101,20 @@ void main()
     }
     imageStore(history[0], ivec2(gl_LaunchIDEXT.xy), vec4(color, 0.0));
 
-   for (int i=1; i<HISTORY_COUNT; i++)
-   {
-       color += imageLoad(history[i], ivec2(gl_LaunchIDEXT.xy)).xyz;
-   }
+    for (int i=1; i<HISTORY_COUNT; i++)
+    {
+        color += imageLoad(history[i], ivec2(gl_LaunchIDEXT.xy)).rgb;
+    }
 
+    color /= float(HISTORY_COUNT);
+    const float gamma = 2.0;
+    float exposure = 0.5;
+    //tone mapping
+    vec3 mapped = vec3(1.0) - exp(-color * exposure);
+    //exposure
+    mapped = pow(mapped, vec3(1.0 / gamma));
 
-    imageStore(outputImage, ivec2(gl_LaunchIDEXT.xy), vec4(color/float(HISTORY_COUNT), 0.0));
+    //mapped = vertices[nonuniformEXT(gl_LaunchIDEXT.x)].vertices[gl_LaunchIDEXT.y].pos.rgb;
+
+    imageStore(outputImage, ivec2(gl_LaunchIDEXT.xy), vec4(color, 0.0));
 }

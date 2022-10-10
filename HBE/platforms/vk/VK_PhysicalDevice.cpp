@@ -17,22 +17,39 @@ namespace HBE {
 
 
 		VkPhysicalDeviceFeatures2 features2{};
+		features2.features.shaderStorageBufferArrayDynamicIndexing = VK_TRUE;
 		features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+
 		acceleration_structure_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
 		ray_tracing_pipeline_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
+		descriptor_indexing_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
+		descriptor_indexing_features.runtimeDescriptorArray = VK_TRUE;
+		descriptor_indexing_features.shaderStorageBufferArrayNonUniformIndexing = VK_TRUE;
+		descriptor_indexing_features.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
+		descriptor_indexing_features.shaderStorageBufferArrayNonUniformIndexing = VK_TRUE;
+		descriptor_indexing_features.shaderStorageImageArrayNonUniformIndexing = VK_TRUE;
+		descriptor_indexing_features.shaderInputAttachmentArrayNonUniformIndexing = VK_TRUE;
+		descriptor_indexing_features.descriptorBindingVariableDescriptorCount = VK_TRUE;
+		vulkan_11_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
+
+
 		features2.pNext = &acceleration_structure_features;
 		acceleration_structure_features.pNext = &ray_tracing_pipeline_features;
+		ray_tracing_pipeline_features.pNext = &descriptor_indexing_features;
+		descriptor_indexing_features.pNext = &vulkan_11_features;
 		vkGetPhysicalDeviceFeatures2(handle, &features2);
 
 		VkPhysicalDeviceProperties2 properties2{};
 		properties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
 		acceleration_structure_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_PROPERTIES_KHR;
 		ray_tracing_pipeline_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
+		descriptor_indexing_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES;
 
 		properties2.pNext = &acceleration_structure_properties;
 		acceleration_structure_properties.pNext = &ray_tracing_pipeline_properties;
-		ray_tracing_pipeline_properties.pNext = nullptr;
+		ray_tracing_pipeline_properties.pNext = &descriptor_indexing_properties;
 		vkGetPhysicalDeviceProperties2(handle, &properties2);
+
 
 		features = features2.features;
 		properties = properties2.properties;

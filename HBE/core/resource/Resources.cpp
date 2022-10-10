@@ -7,11 +7,12 @@
 #include "core/resource/Texture.h"
 #include "core/resource/Model.h"
 #include "core/resource/RenderTarget.h"
-#include "core/resource/Material.h"
+#include "core/resource/GraphicPipelineInstance.h"
 #include "core/resource/ComputeInstance.h"
 #include "core/resource/raytracing/AccelerationStructure.h"
 #include "core/resource/raytracing/RaytracingPipeline.h"
 #include "core/resource/raytracing/RaytracingPipelineInstance.h"
+#include "core/resource/StorageBuffer.h"
 
 namespace HBE {
 	const ResourceFactory *Resources::factory = nullptr;
@@ -91,13 +92,13 @@ namespace HBE {
 		return rt;
 	}
 
-	Material *Resources::createMaterial(const MaterialInfo &info, const std::string &name) {
-		Material *m = factory->createMaterial(info);
+	GraphicPipelineInstance *Resources::createMaterial(const MaterialInfo &info, const std::string &name) {
+		GraphicPipelineInstance *m = factory->createMaterial(info);
 		add(name, m);
 		return m;
 	}
 
-	Material *Resources::createMaterial(const MaterialInfo &info) {
+	GraphicPipelineInstance *Resources::createMaterial(const MaterialInfo &info) {
 		return factory->createMaterial(info);
 	}
 
@@ -159,5 +160,15 @@ namespace HBE {
 
 	RaytracingPipelineInstance *Resources::createRaytracingPipelineInstance(const RaytracingPipelineInstanceInfo &info) {
 		return factory->createRaytracingPipelineInstance(info);
+	}
+
+	StorageBuffer *Resources::createStorageBuffer(const StorageBufferInfo &info, const std::string &name) {
+		StorageBuffer *sb = factory->createStorageBuffer(info);
+		add(name, sb);
+		return sb;
+	}
+
+	StorageBuffer *Resources::createStorageBuffer(const StorageBufferInfo &info) {
+		return factory->createStorageBuffer(info);
 	}
 }

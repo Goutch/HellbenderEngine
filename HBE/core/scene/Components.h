@@ -11,7 +11,7 @@ namespace HBE {
 
 	class Mesh;
 
-	class Material;
+	class GraphicPipelineInstance;
 
 	class RenderTarget;
 
@@ -91,7 +91,7 @@ namespace HBE {
 
 	struct HB_API MeshRenderer {
 		Mesh *mesh = nullptr;
-		Material *material = nullptr;
+		GraphicPipelineInstance *material = nullptr;
 		bool active = true;
 	};
 

@@ -8,12 +8,12 @@ hitAttributeEXT HitResult
 
 vec4 intersectAABB(vec3 o, vec3 d, vec3 aabb_max, vec3 aabb_min)
 {
-    if (o.x>aabb_min.x+gl_RayTminEXT &&
-    o.y>aabb_min.y+gl_RayTminEXT&&
-    o.z>aabb_min.z+gl_RayTminEXT&&
-    o.x<aabb_max.x-gl_RayTminEXT &&
-    o.y<aabb_max.y-gl_RayTminEXT&&
-    o.z<aabb_max.z-gl_RayTminEXT)
+    if (!(o.x<=aabb_min.x+gl_RayTminEXT||
+    o.y<=aabb_min.y+gl_RayTminEXT||
+    o.z<=aabb_min.z+gl_RayTminEXT||
+    o.x>=aabb_max.x-gl_RayTminEXT||
+    o.y>=aabb_max.y-gl_RayTminEXT||
+    o.z>=aabb_max.z-gl_RayTminEXT))
     {
         return vec4(-d.x, -d.y, -d.z, gl_RayTminEXT+0.001);
     }
@@ -21,7 +21,7 @@ vec4 intersectAABB(vec3 o, vec3 d, vec3 aabb_max, vec3 aabb_min)
     vec3 aabb_min_ts = vec3((aabb_min - o) * inv_dir);
     vec3 aabb_max_ts = vec3((aabb_max - o) * inv_dir);
 
-    vec3 ts_min= min(aabb_min_ts, aabb_max_ts);
+    vec3 ts_min = min(aabb_min_ts, aabb_max_ts);
     vec3 ts_max = max(aabb_min_ts, aabb_max_ts);
 
     uint t_near_index=ts_min.x>ts_min.y?

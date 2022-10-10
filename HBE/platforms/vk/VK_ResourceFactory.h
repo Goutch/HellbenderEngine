@@ -17,13 +17,15 @@ namespace HBE {
 		Mesh *createMesh(const MeshInfo &info) const override;
 		ComputePipeline *createComputePipeline(const ComputePipelineInfo &info) const override;
 		RenderTarget *createRenderTarget(const RenderTargetInfo &info) const override;
-		Material *createMaterial(const MaterialInfo &info) const override;
+		GraphicPipelineInstance *createMaterial(const MaterialInfo &info) const override;
 		ComputeInstance *createComputeInstance(const ComputeInstanceInfo &info) const override;
 		RootAccelerationStructure *createRootAccelerationStructure(const RootAccelerationStructureInfo &info) const override;
 		AABBAccelerationStructure *createAABBAccelerationStructure(const AABBAccelerationStructureInfo &info) const override;
 		MeshAccelerationStructure *createMeshAccelerationStructure(const MeshAccelerationStructureInfo &info) const override;
 		RaytracingPipeline *createRaytracingPipeline(const RaytracingPipelineInfo &info) const override;
 		RaytracingPipelineInstance *createRaytracingPipelineInstance(const RaytracingPipelineInstanceInfo &info) const override;
+
+		StorageBuffer *createStorageBuffer(const StorageBufferInfo &info) const override;
 	};
 }
 

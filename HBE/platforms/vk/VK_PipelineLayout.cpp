@@ -20,6 +20,8 @@ namespace HBE {
 		if (shaders[0]->getVkStage() == VK_SHADER_STAGE_RAYGEN_BIT_KHR) {
 			bind_point = VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR;
 		}
+
+
 		//merge the shaders inputs into one.
 		for (size_t i = 0; i < count; ++i) {
 			//merge uniforms
@@ -31,6 +33,7 @@ namespace HBE {
 					uint32_t merged_index = it->second;
 					HB_ASSERT(merged_unfiorms[it->second].name == uniforms[j].name, "Binding#" + std::to_string(uniforms[j].layout_binding.binding) + " has multiple name definitions");
 					HB_ASSERT(merged_unfiorms[it->second].size == uniforms[j].size, "Binding#" + std::to_string(uniforms[j].layout_binding.binding) + " has different sizes");
+					HB_ASSERT(merged_unfiorms[it->second].layout_binding.descriptorCount == uniforms[j].layout_binding.descriptorCount, "Binding#" + std::to_string(uniforms[j].layout_binding.binding) + " has different array counts");
 					//merge shader stages.
 					merged_unfiorms[merged_index].layout_binding.stageFlags |= uniforms[j].layout_binding.stageFlags;
 					uniform_descriptor_set_layout_bindings[merged_index].stageFlags |= uniforms[j].layout_binding.stageFlags;
@@ -42,6 +45,7 @@ namespace HBE {
 					uniform_binding_to_index.emplace(uniforms[j].layout_binding.binding, merged_unfiorms.size() - 1);
 					uniform_name_to_index.emplace(uniforms[j].name, merged_unfiorms.size() - 1);
 				}
+
 			}
 
 			//merge push_constants
@@ -53,15 +57,45 @@ namespace HBE {
 
 			}
 		}
-		std::sort(uniform_descriptor_set_layout_bindings.begin(), uniform_descriptor_set_layout_bindings.end(),
+
+		/*std::sort(uniform_descriptor_set_layout_bindings.begin(), uniform_descriptor_set_layout_bindings.end(),
 				  [](VkDescriptorSetLayoutBinding i, VkDescriptorSetLayoutBinding j) {
 					  return (i.binding < j.binding);
-				  });
+				  });*/
+		std::vector<VkDescriptorBindingFlagsEXT> binding_flags(uniform_descriptor_set_layout_bindings.size(), 0);
+		variable_descriptor_count.resize(uniform_descriptor_set_layout_bindings.size(), false);
+		int variable_size_binding = -1;
+		for (int i = 0; i < merged_unfiorms.size(); ++i) {
+			if (merged_unfiorms[i].variable_size) {
+				HB_ASSERT(variable_size_binding < 0, "Only one variable size binding per descriptor set is allowed");
+				variable_descriptor_count[i] = true;
+				variable_size_binding = merged_unfiorms[i].layout_binding.binding;
+				binding_flags[i] = VK_DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT_BIT;
+			}
+		}
+		if (variable_size_binding != -1) {
+			uint32_t binding_index = uniform_binding_to_index[variable_size_binding];
+			UniformInfo &uniform_info = merged_unfiorms[binding_index];
+			for (int i = 0; i < merged_unfiorms.size(); ++i) {
+				HB_ASSERT(variable_size_binding >= merged_unfiorms[i].layout_binding.binding, "Variable size binding must be the last binding of the set");
+				if (variable_size_binding != merged_unfiorms[i].layout_binding.binding &&
+					merged_unfiorms[i].layout_binding.descriptorType == uniform_info.layout_binding.descriptorType) {
+					uniform_info.layout_binding.descriptorCount -= merged_unfiorms[i].layout_binding.descriptorCount;
+					uniform_descriptor_set_layout_bindings[binding_index].descriptorCount -= merged_unfiorms[i].layout_binding.descriptorCount;
+				}
+			}
+		}
 
 		VkDescriptorSetLayoutCreateInfo layoutInfo{};
 		layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 		layoutInfo.bindingCount = uniform_descriptor_set_layout_bindings.size();
 		layoutInfo.pBindings = uniform_descriptor_set_layout_bindings.data();
+
+		VkDescriptorSetLayoutBindingFlagsCreateInfoEXT flagsInfo{};
+		layoutInfo.pNext = &flagsInfo;
+		flagsInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO_EXT;
+		flagsInfo.bindingCount = uniform_descriptor_set_layout_bindings.size();
+		flagsInfo.pBindingFlags = binding_flags.data();
 
 		vkCreateDescriptorSetLayout(device->getHandle(), &layoutInfo, nullptr, &descriptor_set_layout_handle);
 
@@ -120,6 +154,10 @@ namespace HBE {
 
 	VkDescriptorSetLayout VK_PipelineLayout::getDescriptorSetLayout() const {
 		return descriptor_set_layout_handle;
+	}
+
+	bool VK_PipelineLayout::IsBindingVariableSize(uint32_t binding) const {
+		return variable_descriptor_count[uniform_binding_to_index.find(binding)->second];
 	}
 
 

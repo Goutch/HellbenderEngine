@@ -2,7 +2,7 @@
 #include "GL_Renderer.h"
 #include "glad/glad.h"
 #include <core/resource/GraphicPipeline.h>
-#include <core/resource/Material.h>
+#include <core/resource/GraphicPipelineInstance.h>
 #include <core/resource/Mesh.h>
 #include <core/entity/component/Transform.h>
 #include <Configs.h>

@@ -300,14 +300,13 @@ namespace HBE {
 			shader.setSourceEntryPoint("main");
 			shader.setEntryPoint("main");
 
-
 			shader.getIntermediate()->setSource(glslang::EShSourceGlsl);
-			shader.getIntermediate()->setSourceFile(shader_path.c_str());
-			shader.getIntermediate()->setEntryPointName("main");
+			//shader.getIntermediate()->setSourceFile(shader_path.c_str());
+			//shader.getIntermediate()->setEntryPointName("main");
 
 #ifdef DEBUG_MODE
-			shader.getIntermediate()->addSourceText(source, size);
-			shader.getIntermediate()->setSourceFile((RESOURCE_PATH + shader_path).c_str());
+			//shader.getIntermediate()->addSourceText(source, size);
+			//shader.getIntermediate()->setSourceFile((RESOURCE_PATH + shader_path).c_str());
 #endif
 			HBE_Includer includer(shader_path);
 			EShMessages message = static_cast<EShMessages>(EShMessages::EShMsgVulkanRules | EShMessages::EShMsgSpvRules);
@@ -325,7 +324,7 @@ namespace HBE {
 			{
 				glslang::TProgram program;
 				program.addShader(&shader);
-				program.buildReflection(EShReflectionDefault);
+				//program.buildReflection(EShReflectionDefault);
 				//program.getIntermediate(stage)->addSourceText(source, size);
 				if (!program.link(message)) {
 					Log::warning(program.getInfoDebugLog());
@@ -333,9 +332,9 @@ namespace HBE {
 				}
 				glslang::SpvOptions options{};
 #ifdef DEBUG_MODE
-				options.generateDebugInfo = true;
-				options.stripDebugInfo = false;
-				options.disableOptimizer = true;
+				//options.generateDebugInfo = true;
+				//options.stripDebugInfo = false;
+				//options.disableOptimizer = true;
 #else
 				options.generateDebugInfo=false;
 				options.stripDebugInfo=true;

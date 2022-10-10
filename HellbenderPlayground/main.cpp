@@ -48,8 +48,6 @@ int main() {
 		//Pathfinder pathfinder;
 		//MeshRendering::init();
 		//LoadModelExemple::init();
-		//Instancing::init();
-		//VoxelModule::init();
 		RaytracingScene rts = RaytracingScene();
 		//-----------------------EVENTS------------------
 		Application::onUpdate.subscribe(&onAppUpdate);

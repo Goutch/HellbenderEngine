@@ -7,7 +7,7 @@ using namespace HBE;
 class Navmesh {
 	Mesh *mesh;
 	GraphicPipeline *pipeline;
-	Material *material;
+	GraphicPipelineInstance *material;
 	const bool *map;
 	uint32_t size_x;
 	uint32_t size_y;

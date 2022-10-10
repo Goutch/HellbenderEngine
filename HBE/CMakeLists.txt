@@ -71,8 +71,8 @@ if (VULKAN_FOUND)
             platforms/vk/VK_PipelineLayout.h
             platforms/vk/VK_PipelineDescriptors.cpp
             platforms/vk/VK_PipelineDescriptors.h
-            platforms/vk/VK_Material.cpp
-            platforms/vk/VK_Material.h
+            platforms/vk/VK_GraphicPipelineInstance.cpp
+            platforms/vk/VK_GraphicPipelineInstance.h
             platforms/vk/VK_ComputeInstance.cpp
             platforms/vk/VK_ComputeInstance.h
             platforms/vk/raytracing/VK_TopLevelAccelerationStructure.cpp
@@ -84,13 +84,15 @@ if (VULKAN_FOUND)
             platforms/vk/raytracing/VK_RaytracingPipeline.cpp
             platforms/vk/raytracing/VK_RaytracingPipeline.h
             platforms/vk/raytracing/VK_RaytracingPipelineInstance.cpp
-            platforms/vk/raytracing/VK_RaytracingPipelineInstance.h)
+            platforms/vk/raytracing/VK_RaytracingPipelineInstance.h platforms/vk/VK_StorageBuffer.cpp platforms/vk/VK_StorageBuffer.h)
 
     add_compile_definitions(VULKAN_RENDERER)
 
 
     add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/")
     add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/")
+    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/RayTracingDenoiser/")
+    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/RayTracingDenoiser/Include")
 else ()
     add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/")
     add_compile_definitions(OPENGL_RENDERER)
@@ -121,6 +123,7 @@ set(TINYGLTF_INSTALL OFF CACHE INTERNAL "" FORCE)
 set(TINYGLTF_NO_INCLUDE_STB_IMAGE ON CACHE INTERNAL "" FORCE)
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf)
+
 include_directories(.)
 set(CORE_FILES
         HBE.h
@@ -146,7 +149,7 @@ set(CORE_FILES
         core/resource/Resources.h
         core/resource/Resources.cpp
         core/resource/Texture.cpp
-        core/resource/Material.h
+        core/resource/GraphicPipelineInstance.h
         core/resource/ComputeInstance.h
         core/resource/IPipelineInstance.h
         core/resource/RenderTarget.h
@@ -191,7 +194,7 @@ set(CORE_FILES
 
         core/threading/JobManager.cpp
         core/threading/JobManager.h
-        )
+        core/resource/StorageBuffer.h platforms/vk/VK_DescriptorAllocator.cpp platforms/vk/VK_DescriptorAllocator.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}
@@ -205,13 +208,13 @@ target_include_directories(${PROJECT_NAME}
         PUBLIC "${${CMAKE_CURRENT_SOURCE_DIR}}"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/contrib/zlib/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm/"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/entt/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/include/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/include"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/include/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/")
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/"
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/RayTracingDenoiser/")
 
 if (VULKAN_FOUND)
     set(GLSLANG_LIBS
@@ -228,7 +231,8 @@ if (VULKAN_FOUND)
             PUBLIC spirv-cross-reflect
             PUBLIC spirv-cross-msl
             PUBLIC spirv-cross-util
-            PUBLIC spirv-cross-core)
+            PUBLIC spirv-cross-core
+            PUBLIC NRD)
 else ()
     target_link_libraries(${PROJECT_NAME} PUBLIC glad)
 endif ()

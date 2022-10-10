@@ -14,11 +14,13 @@ namespace HBE {
 	};
 	struct RaytracingPipelineInstanceInfo {
 		RaytracingPipeline *raytracing_pipeline = nullptr;
-		RootAccelerationStructure *root_acceleration_structure = nullptr;
 		RAYTRACING_PIPELINE_INSTANCE_FLAGS flags = RAYTRACING_INSTANCE_FLAG_NONE;
 	};
 
 	class HB_API RaytracingPipelineInstance : public IPipelineInstance {
+	public:
+		virtual void setAccelerationStructure(uint32_t binding, const RootAccelerationStructure *accelerationStructure, int32_t frame = -1) = 0;
 
+		virtual void setAccelerationStructure(const std::string &name, const RootAccelerationStructure *accelerationStructure, int32_t frame = -1) = 0;
 	};
 }

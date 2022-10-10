@@ -22,7 +22,7 @@ namespace HBE {
 
 	class GraphicPipeline;
 
-	class Material;
+	class GraphicPipelineInstance;
 
 	class RootAccelerationStructure;
 
@@ -46,9 +46,9 @@ namespace HBE {
 
 		virtual void endFrame() = 0;
 
-		virtual void draw(mat4 transform_matrix, const Mesh &mesh, Material &material) = 0;
+		virtual void draw(mat4 transform_matrix, const Mesh &mesh, GraphicPipelineInstance &material) = 0;
 
-		virtual void drawInstanced(const Mesh &mesh, Material &material) = 0;
+		virtual void drawInstanced(const Mesh &mesh, GraphicPipelineInstance &material) = 0;
 
 		virtual RenderTarget *getDefaultRenderTarget() = 0;
 

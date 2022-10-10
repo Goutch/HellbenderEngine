@@ -14,7 +14,7 @@
 
 #include "GraphicPipeline.h"
 #include "Mesh.h"
-#include "Material.h"
+#include "GraphicPipelineInstance.h"
 
 namespace HBE {
 
@@ -24,7 +24,7 @@ namespace HBE {
 				delete mesh;
 			}
 		}
-		for (Material *material:data.materials) {
+		for (GraphicPipelineInstance *material:data.materials) {
 			delete material;
 		}
 		for (const ModelMaterialProperties &material_properties:data.material_properties) {

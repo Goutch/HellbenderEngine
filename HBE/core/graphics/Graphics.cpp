@@ -102,11 +102,11 @@ void main()
 		renderer->createDefaultResources();
 	}
 
-	void Graphics::draw(mat4 transform_matrix, const Mesh &mesh, Material &material) {
+	void Graphics::draw(mat4 transform_matrix, const Mesh &mesh, GraphicPipelineInstance &material) {
 		renderer->draw(transform_matrix, mesh, material);
 	}
 
-	void Graphics::drawInstanced(const Mesh &mesh, Material &material) {
+	void Graphics::drawInstanced(const Mesh &mesh, GraphicPipelineInstance &material) {
 		renderer->drawInstanced(mesh, material);
 	}
 

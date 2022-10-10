@@ -30,7 +30,7 @@ namespace HBE {
 
 	struct RenderTargetInfo;
 
-	class Material;
+	class GraphicPipelineInstance;
 
 	struct MaterialInfo;
 
@@ -58,6 +58,10 @@ namespace HBE {
 
 	class RaytracingPipelineInstance;
 
+	struct StorageBufferInfo;
+
+	class StorageBuffer;
+
 	class HB_API ResourceFactory {
 	public:
 		virtual ~ResourceFactory() = default;
@@ -74,7 +78,7 @@ namespace HBE {
 
 		virtual RenderTarget *createRenderTarget(const RenderTargetInfo &info) const = 0;
 
-		virtual Material *createMaterial(const MaterialInfo &info) const = 0;
+		virtual GraphicPipelineInstance *createMaterial(const MaterialInfo &info) const = 0;
 
 		virtual ComputeInstance *createComputeInstance(const ComputeInstanceInfo &info) const = 0;
 
@@ -86,6 +90,8 @@ namespace HBE {
 
 		virtual RaytracingPipeline *createRaytracingPipeline(const RaytracingPipelineInfo &info) const = 0;
 
-		virtual RaytracingPipelineInstance* createRaytracingPipelineInstance(const RaytracingPipelineInstanceInfo &info) const = 0;
+		virtual RaytracingPipelineInstance *createRaytracingPipelineInstance(const RaytracingPipelineInstanceInfo &info) const = 0;
+
+		virtual StorageBuffer *createStorageBuffer(const StorageBufferInfo &info) const = 0;
 	};
 }

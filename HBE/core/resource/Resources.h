@@ -26,7 +26,7 @@ namespace HBE {
 
 	class RenderTarget;
 
-	class Material;
+	class GraphicPipelineInstance;
 
 	class ComputeInstance;
 
@@ -122,8 +122,8 @@ namespace HBE {
 		static Texture *createTexture(const TextureInfo &info);
 		static RenderTarget *createRenderTarget(const RenderTargetInfo &info);
 		static RenderTarget *createRenderTarget(const RenderTargetInfo &info, const std::string &name);
-		static Material *createMaterial(const MaterialInfo &info, const std::string &name);
-		static Material *createMaterial(const MaterialInfo &info);
+		static GraphicPipelineInstance *createMaterial(const MaterialInfo &info, const std::string &name);
+		static GraphicPipelineInstance *createMaterial(const MaterialInfo &info);
 		static ComputeInstance *createComputeInstance(const ComputeInstanceInfo &info, const std::string &name);
 		static ComputeInstance *createComputeInstance(const ComputeInstanceInfo &info);
 		static RootAccelerationStructure *createRootAccelerationStructure(const RootAccelerationStructureInfo &info, const std::string &name);
@@ -136,6 +136,8 @@ namespace HBE {
 		static RaytracingPipeline *createRaytracingPipeline(const RaytracingPipelineInfo &info);
 		static RaytracingPipelineInstance *createRaytracingPipelineInstance(const RaytracingPipelineInstanceInfo &info, const std::string &name);
 		static RaytracingPipelineInstance *createRaytracingPipelineInstance(const RaytracingPipelineInstanceInfo &info);
+		static StorageBuffer *createStorageBuffer(const StorageBufferInfo &info, const std::string &name);
+		static StorageBuffer *createStorageBuffer(const StorageBufferInfo &info);
 	};
 
 

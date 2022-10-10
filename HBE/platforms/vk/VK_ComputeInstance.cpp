@@ -48,11 +48,11 @@ namespace HBE {
 	}
 
 	void VK_ComputeInstance::setUniform(const std::string &name, const void *data, int32_t frame) {
-		descriptors->setUniform(name, data, frame);
+		descriptors->setUniform(descriptors->getBinding(name), data, frame);
 	}
 
 	void VK_ComputeInstance::setTexture(const std::string &name, const Texture *texture, int32_t frame, uint32_t mip_level) {
-		descriptors->setTexture(name, texture, frame, mip_level);
+		descriptors->setTexture(descriptors->getBinding(name), texture, frame, mip_level);
 	}
 
 	void VK_ComputeInstance::dispatch(uint32_t group_count_x,
@@ -99,7 +99,23 @@ namespace HBE {
 	}
 
 	void VK_ComputeInstance::setTextureArray(const std::string &name, const Texture **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) {
-		descriptors->setTextureArray(name, texture, texture_count, frame, mip_level);
+		descriptors->setTextureArray(descriptors->getBinding(name), texture, texture_count, frame, mip_level);
+	}
+
+	void VK_ComputeInstance::setStorageBuffer(uint32_t binding, StorageBuffer *buffer, int32_t frame) {
+		descriptors->setStorageBuffer(binding, buffer, frame);
+	}
+
+	void VK_ComputeInstance::setStorageBufferArray(uint32_t binding, StorageBuffer **buffers, uint32_t count, int32_t frame) {
+		descriptors->setStorageBufferArray(binding, buffers, count, frame);
+	}
+
+	void VK_ComputeInstance::setStorageBuffer(const std::string &name, StorageBuffer *buffer, int32_t frame) {
+		descriptors->setStorageBuffer(descriptors->getBinding(name), buffer, frame);
+	}
+
+	void VK_ComputeInstance::setStorageBufferArray(const std::string &name, StorageBuffer **buffer, uint32_t count, int32_t frame) {
+		descriptors->setStorageBufferArray(descriptors->getBinding(name), buffer, count, frame);
 	}
 
 }

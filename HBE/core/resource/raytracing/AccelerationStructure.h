@@ -33,6 +33,7 @@ namespace HBE {
 		uint32_t shader_group_index;
 		mat4 transform;
 		ACCELERATION_STRUCTURE_TYPE type;
+		uint32_t custom_index=0;
 	};
 	struct RootAccelerationStructureInfo {
 		AABBAccelerationStructure **aabb_acceleration_structures;
