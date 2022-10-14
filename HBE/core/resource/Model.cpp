@@ -94,7 +94,7 @@ namespace HBE {
 			indices_buffer.element_size = tinygltf::GetComponentSizeInBytes(index_accessor.componentType);
 		}
 
-		std::vector<VertexBindingInfo> binding_infos;
+		std::vector<VertexAttributeInfo> attribute_infos;
 		std::vector<MeshBuffer> buffers;
 
 		//Interleaved if buffer view is equal and accessor offset is less than stride
@@ -118,11 +118,11 @@ namespace HBE {
 			}
 			//first one add buffer
 			if (accessor.byteOffset == 0) {
-				VertexBindingInfo binding_info{};
-				binding_info.binding = buffers.size();
-				binding_info.size = stride;
-				binding_info.flags = VERTEX_BINDING_FLAG_NONE;
-				binding_infos.emplace_back(binding_info);
+				VertexAttributeInfo attribute_info{};
+				attribute_info.binding = buffers.size();
+				attribute_info.size = stride;
+				attribute_info.flags = VERTEX_ATTRIBUTE_FLAG_NONE;
+				attribute_infos.emplace_back(attribute_info);
 
 				MeshBuffer mesh_buffer{};
 				mesh_buffer.data = reinterpret_cast<const void *>(&buffer.data.at(buffer_view.byteOffset));
@@ -135,11 +135,11 @@ namespace HBE {
 			}
 				//not inside a stride so it is its own buffer
 			else if (accessor.byteOffset > stride) {
-				VertexBindingInfo binding_info{};
+				VertexAttributeInfo binding_info{};
 				binding_info.binding = buffers.size();
 				binding_info.size = stride;
-				binding_info.flags = VERTEX_BINDING_FLAG_NONE;
-				binding_infos.emplace_back(binding_info);
+				binding_info.flags = VERTEX_ATTRIBUTE_FLAG_NONE;
+				attribute_infos.emplace_back(binding_info);
 
 				MeshBuffer mesh_buffer{};
 				mesh_buffer.data = reinterpret_cast<const void *>(&buffer.data.at(buffer_view.byteOffset));
@@ -150,8 +150,8 @@ namespace HBE {
 		}
 
 		MeshInfo mesh_info{};
-		mesh_info.binding_infos = binding_infos.data();
-		mesh_info.binding_info_count = binding_infos.size();
+		mesh_info.attribute_infos = attribute_infos.data();
+		mesh_info.attribute_info_count = attribute_infos.size();
 		mesh_info.flags = MESH_FLAG_NONE;
 		mesh_info.flags |= (flags & MODEL_FLAG_USED_IN_RAYTRACING)==MODEL_FLAG_USED_IN_RAYTRACING ? MESH_FLAG_USED_IN_RAYTRACING : MESH_FLAG_NONE;
 

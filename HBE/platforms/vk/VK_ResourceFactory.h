@@ -26,6 +26,7 @@ namespace HBE {
 		RaytracingPipelineInstance *createRaytracingPipelineInstance(const RaytracingPipelineInstanceInfo &info) const override;
 
 		StorageBuffer *createStorageBuffer(const StorageBufferInfo &info) const override;
+		TexelBuffer* createTexelBuffer(const TexelBufferInfo& info) const override;
 	};
 }
 

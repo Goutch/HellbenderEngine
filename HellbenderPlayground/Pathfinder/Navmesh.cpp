@@ -38,13 +38,13 @@ Navmesh::Navmesh(const bool *map, uint32_t size_x, uint32_t size_y, f32 cell_siz
 
 	update();
 
-	VertexBindingInfo binding_info{};
+	VertexAttributeInfo binding_info{};
 	binding_info.size = sizeof(vec2);
 	binding_info.binding = 0;
-	binding_info.flags = VERTEX_BINDING_FLAG_FAST_WRITE | VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS;
+	binding_info.flags = VERTEX_ATTRIBUTE_FLAG_FAST_WRITE | VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS;
 	MeshInfo mesh_info{};
-	mesh_info.binding_info_count = 1;
-	mesh_info.binding_infos = &binding_info;
+	mesh_info.attribute_info_count = 1;
+	mesh_info.attribute_infos = &binding_info;
 	mesh = Resources::createMesh(mesh_info);
 
 
@@ -63,8 +63,8 @@ Navmesh::Navmesh(const bool *map, uint32_t size_x, uint32_t size_y, f32 cell_siz
 
 	GraphicPipelineInfo graphic_pipeline_info{};
 	graphic_pipeline_info.topology = VERTEX_TOPOLOGY_LINE;
-	graphic_pipeline_info.binding_infos = &binding_info;
-	graphic_pipeline_info.binding_info_count = 1;
+	graphic_pipeline_info.attribute_infos = &binding_info;
+	graphic_pipeline_info.attribute_info_count = 1;
 	graphic_pipeline_info.flags = GRAPHIC_PIPELINE_FLAG_IGNORE_DEPTH_TEST;
 	graphic_pipeline_info.vertex_shader = vertex_shader;
 	graphic_pipeline_info.fragement_shader = fragment_shader;

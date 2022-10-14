@@ -62,6 +62,10 @@ namespace HBE {
 
 	class StorageBuffer;
 
+	struct TexelBufferInfo;
+
+	class TexelBuffer;
+
 	class HB_API ResourceFactory {
 	public:
 		virtual ~ResourceFactory() = default;
@@ -93,5 +97,7 @@ namespace HBE {
 		virtual RaytracingPipelineInstance *createRaytracingPipelineInstance(const RaytracingPipelineInstanceInfo &info) const = 0;
 
 		virtual StorageBuffer *createStorageBuffer(const StorageBufferInfo &info) const = 0;
+
+		virtual TexelBuffer *createTexelBuffer(const TexelBufferInfo &info) const = 0;
 	};
 }

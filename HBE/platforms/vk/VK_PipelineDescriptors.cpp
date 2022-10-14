@@ -134,6 +134,8 @@ namespace HBE {
 		size_t storage_image_count = 0;
 		size_t uniform_buffer_count = 0;
 		size_t storage_buffer_count = 0;
+		size_t storage_texel_buffer_count = 0;
+		size_t uniform_texel_buffer_count = 0;
 		for (auto layout_binding: descriptor_set_layout_bindings) {
 			if (pipeline_layout->IsBindingVariableSize(layout_binding.binding)) {
 				continue;
@@ -156,23 +158,11 @@ namespace HBE {
 				case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
 					storage_buffer_count += layout_binding.descriptorCount;
 					break;
-				case VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
-					break;
 				case VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
+					storage_texel_buffer_count += layout_binding.descriptorCount;
 					break;
-				case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC:
-					break;
-				case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC:
-					break;
-				case VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT:
-					break;
-				case VK_DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK_EXT:
-					break;
-				case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR:
-					break;
-				case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_NV:
-					break;
-				case VK_DESCRIPTOR_TYPE_MAX_ENUM:
+				case VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
+					uniform_texel_buffer_count += layout_binding.descriptorCount;
 					break;
 			}
 		}
@@ -193,6 +183,12 @@ namespace HBE {
 					break;
 				case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
 					storage_buffer_count += variable_descriptor.count;
+					break;
+				case VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
+					storage_texel_buffer_count += variable_descriptor.count;
+					break;
+				case VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
+					uniform_texel_buffer_count += variable_descriptor.count;
 					break;
 			}
 		}
@@ -221,6 +217,16 @@ namespace HBE {
 			poolSizes.emplace_back();
 			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 			poolSizes[poolSizes.size() - 1].descriptorCount = storage_buffer_count * MAX_FRAMES_IN_FLIGHT;
+		}
+		if(storage_texel_buffer_count > 0) {
+			poolSizes.emplace_back();
+			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
+			poolSizes[poolSizes.size() - 1].descriptorCount = storage_texel_buffer_count * MAX_FRAMES_IN_FLIGHT;
+		}
+		if(uniform_texel_buffer_count > 0) {
+			poolSizes.emplace_back();
+			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+			poolSizes[poolSizes.size() - 1].descriptorCount = uniform_texel_buffer_count * MAX_FRAMES_IN_FLIGHT;
 		}
 
 		VkDescriptorPoolCreateInfo poolInfo{};

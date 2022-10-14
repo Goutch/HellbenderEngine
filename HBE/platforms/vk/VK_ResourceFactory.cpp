@@ -16,6 +16,7 @@
 #include "raytracing/VK_RaytracingPipeline.h"
 #include "raytracing/VK_RaytracingPipelineInstance.h"
 #include "VK_StorageBuffer.h"
+#include "VK_TexelBuffer.h"
 
 namespace HBE {
 	VK_ResourceFactory::VK_ResourceFactory(VK_Renderer *renderer) {
@@ -76,6 +77,10 @@ namespace HBE {
 
 	StorageBuffer *VK_ResourceFactory::createStorageBuffer(const StorageBufferInfo &info) const {
 		return new VK_StorageBuffer(renderer->getDevice(), info);
+	}
+
+	TexelBuffer *VK_ResourceFactory::createTexelBuffer(const TexelBufferInfo &info) const {
+		return new VK_TexelBuffer(renderer->getDevice(), info);
 	}
 
 }

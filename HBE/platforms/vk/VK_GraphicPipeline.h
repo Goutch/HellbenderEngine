@@ -29,7 +29,7 @@ namespace HBE {
 		VK_RenderPass *render_pass = nullptr;
 		std::vector<const VK_Shader *> shaders;
 
-		std::vector<VertexBindingInfo> binding_infos;
+		std::vector<VertexAttributeInfo> binding_infos;
 		GraphicPipelineInfo info;
 
 		mutable bool is_bound = false;

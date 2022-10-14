@@ -21,7 +21,7 @@ namespace HBE {
 		this->renderer = renderer;
 
 		this->info = info;
-		this->binding_infos = std::vector<VertexBindingInfo>(info.binding_infos, info.binding_infos + info.binding_info_count);
+		this->binding_infos = std::vector<VertexAttributeInfo>(info.attribute_infos, info.attribute_infos + info.attribute_info_count);
 
 		const VK_Shader *vk_vertex = (dynamic_cast<const VK_Shader *>(info.vertex_shader));
 		const VK_Shader *vk_frag = (dynamic_cast<const VK_Shader *>(info.fragement_shader));
@@ -48,14 +48,14 @@ namespace HBE {
 		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
 		std::vector<VkVertexInputBindingDescription> binding_descriptions;
-		binding_descriptions.resize(info.binding_info_count);
-		for (size_t i = 0; i < info.binding_info_count; ++i) {
-			binding_descriptions[i].binding = info.binding_infos[i].binding;
+		binding_descriptions.resize(info.attribute_info_count);
+		for (size_t i = 0; i < info.attribute_info_count; ++i) {
+			binding_descriptions[i].binding = info.attribute_infos[i].binding;
 			binding_descriptions[i].inputRate =
-					(info.binding_infos[i].flags & VERTEX_BINDING_FLAG_PER_INSTANCE) == VERTEX_BINDING_FLAG_PER_INSTANCE ?
+					(info.attribute_infos[i].flags & VERTEX_ATTRIBUTE_FLAG_PER_INSTANCE) == VERTEX_ATTRIBUTE_FLAG_PER_INSTANCE ?
 					VK_VERTEX_INPUT_RATE_INSTANCE :
 					VK_VERTEX_INPUT_RATE_VERTEX;
-			binding_descriptions[i].stride = info.binding_infos[i].size;
+			binding_descriptions[i].stride = info.attribute_infos[i].size;
 		}
 		vertexInputInfo.vertexBindingDescriptionCount = binding_descriptions.size();
 		vertexInputInfo.pVertexBindingDescriptions = binding_descriptions.data();

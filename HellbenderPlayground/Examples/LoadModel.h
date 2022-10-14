@@ -9,31 +9,31 @@ public:
 		auto frag = Resources::createShader(frag_info, "frag");
 		auto vert = Resources::createShader(vert_info, "vert");
 
-		std::vector<VertexBindingInfo> binding_infos;
+		std::vector<VertexAttributeInfo> attribute_infos;
 		//vertex binding
-		binding_infos.emplace_back();
-		binding_infos[0].binding = 0;
-		binding_infos[0].size = sizeof(vec3);
-		binding_infos[0].flags = VERTEX_BINDING_FLAG_NONE;
+		attribute_infos.emplace_back();
+		attribute_infos[0].binding = 0;
+		attribute_infos[0].size = sizeof(vec3);
+		attribute_infos[0].flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 		/*binding_infos.emplace_back();
 		binding_infos[2].binding = 2;
 		binding_infos[2].size = sizeof(vec3);
 		binding_infos[2].flags = VERTEX_BINDING_FLAG_NONE;*/
-		binding_infos.emplace_back();
-		binding_infos[1].binding = 1;
-		binding_infos[1].size = sizeof(vec3);
-		binding_infos[1].flags = VERTEX_BINDING_FLAG_NONE;
+		attribute_infos.emplace_back();
+		attribute_infos[1].binding = 1;
+		attribute_infos[1].size = sizeof(vec3);
+		attribute_infos[1].flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 
-		std::vector<VertexBindingInfo> ground_binding_infos;
+		std::vector<VertexAttributeInfo> ground_binding_infos;
 		//vertex binding
 		ground_binding_infos.emplace_back();
 		ground_binding_infos[0].binding = 0;
 		ground_binding_infos[0].size = sizeof(vec3) * 2;
-		ground_binding_infos[0].flags = VERTEX_BINDING_FLAG_NONE;
+		ground_binding_infos[0].flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 
 		GraphicPipelineInfo pipeline_info{};
-		pipeline_info.binding_infos = binding_infos.data();
-		pipeline_info.binding_info_count = binding_infos.size();
+		pipeline_info.attribute_infos = attribute_infos.data();
+		pipeline_info.attribute_info_count = attribute_infos.size();
 		pipeline_info.fragement_shader = frag;
 		pipeline_info.vertex_shader = vert;
 		pipeline_info.flags = GRAPHIC_PIPELINE_FLAG_CULL_BACK;
@@ -44,8 +44,8 @@ public:
 		model_material_info.graphic_pipeline = model_pipeline;
 		Resources::createMaterial(model_material_info, "DEFAULT_MODEL_MATERIAL");
 
-		pipeline_info.binding_infos = ground_binding_infos.data();
-		pipeline_info.binding_info_count = ground_binding_infos.size();
+		pipeline_info.attribute_infos = ground_binding_infos.data();
+		pipeline_info.attribute_info_count = ground_binding_infos.size();
 
 		auto ground_pipeline = Resources::createGraphicPipeline(pipeline_info, "GROUND_PIPELINE");
 
@@ -69,8 +69,8 @@ public:
 
 
 		MeshInfo mesh_info{};
-		mesh_info.binding_infos = ground_binding_infos.data();
-		mesh_info.binding_info_count = ground_binding_infos.size();
+		mesh_info.attribute_infos = ground_binding_infos.data();
+		mesh_info.attribute_info_count = ground_binding_infos.size();
 		mesh_info.flags = MESH_FLAG_NONE;
 		Mesh *ground_mesh = Resources::createMesh(mesh_info, "ground");
 		Geometry::createQuad(*ground_mesh, 20, 20, VERTEX_FLAG_NORMAL);

@@ -15,8 +15,8 @@ namespace HBE {
 	};
 
 	struct MeshInfo {
-		const VertexBindingInfo *binding_infos = nullptr;
-		size_t binding_info_count = 0;
+		const VertexAttributeInfo *attribute_infos = nullptr;
+		size_t attribute_info_count = 0;
 		MESH_FLAGS flags = MESH_FLAG_NONE;
 	};
 
@@ -31,7 +31,7 @@ namespace HBE {
 		uint32_t index_count = 0;
 		uint32_t instance_count = 1;
 		INDICES_TYPE indices_type = INDICES_TYPE_NONE;
-		std::unordered_map<uint32_t, VertexBindingInfo> bindings;
+		std::unordered_map<uint32_t, VertexAttributeInfo> bindings;
 	public:
 		void load(std::string path);
 		void loadAsync(std::string path);
@@ -44,8 +44,8 @@ namespace HBE {
 		bool hasIndexBuffer() const;
 		virtual void setVertexIndices(const uint32_t *vertices, size_t count) = 0;
 		virtual void setVertexIndices(const uint16_t *vertices, size_t count) = 0;
-		virtual void setBuffer(uint32_t binding, const void *vertices, size_t count) = 0;
-		virtual void setInstanceBuffer(uint32_t binding, const void *data, size_t count) = 0;
+		virtual void setBuffer(uint32_t location, const void *vertices, size_t count) = 0;
+		virtual void setInstanceBuffer(uint32_t location, const void *data, size_t count) = 0;
 		virtual void bind() const = 0;
 		virtual void unbind() const = 0;
 

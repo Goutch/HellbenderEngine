@@ -24,17 +24,17 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 	compute_instance_info.flags = COMPUTE_INSTANCE_FLAG_NONE;
 	compute_instance = Resources::createComputeInstance(compute_instance_info, "MipMapperInstance");
 
-	VertexBindingInfo binding_infos[2];
-	binding_infos[0].flags = VERTEX_BINDING_FLAG_NONE;
+	VertexAttributeInfo binding_infos[2];
+	binding_infos[0].flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 	binding_infos[0].binding = 0;
 	binding_infos[0].size = sizeof(vec3);
 	binding_infos[1].binding = 1;
-	binding_infos[1].flags = VERTEX_BINDING_FLAG_PER_INSTANCE;
+	binding_infos[1].flags = VERTEX_ATTRIBUTE_FLAG_PER_INSTANCE;
 	binding_infos[1].size = sizeof(mat4);
 	MeshInfo mesh_info{};
 	mesh_info.flags = MESH_FLAG_NONE;
-	mesh_info.binding_info_count = 2;
-	mesh_info.binding_infos = binding_infos;
+	mesh_info.attribute_info_count = 2;
+	mesh_info.attribute_infos = binding_infos;
 	mesh = Resources::createMesh(mesh_info);
 
 	ShaderInfo vert_info{};
@@ -47,8 +47,8 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 	fragment_shader = Resources::createShader(frag_info);
 
 	GraphicPipelineInfo pipeline_info{};
-	pipeline_info.binding_infos = binding_infos;
-	pipeline_info.binding_info_count = 2;
+	pipeline_info.attribute_infos = binding_infos;
+	pipeline_info.attribute_info_count = 2;
 	pipeline_info.vertex_shader = vertex_shader;
 	pipeline_info.fragement_shader = fragment_shader;
 	pipeline_info.flags = GRAPHIC_PIPELINE_FLAG_CULL_FRONT;

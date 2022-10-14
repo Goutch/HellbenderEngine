@@ -26,8 +26,8 @@ namespace HBE {
 		void setVertexIndices(const uint32_t *data, size_t count) override;
 		void setVertexIndices(const uint16_t *data, size_t count) override;
 		void setVertexIndices(const void *data, size_t count, size_t element_size);
-		void setBuffer(uint32_t binding, const void *vertices, size_t count) override;
-		void setInstanceBuffer(uint32_t binding, const void *data, size_t count) override;
+		void setBuffer(uint32_t location, const void *vertices, size_t count) override;
+		void setInstanceBuffer(uint32_t location, const void *data, size_t count) override;
 
 		const VK_Buffer *getBuffer(uint32_t binding,uint32_t frame = 0) const;
 		const VK_Buffer *getIndicesBuffer() const;

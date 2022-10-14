@@ -329,6 +329,47 @@ namespace HBE {
 
 			uniforms.emplace_back(uniform_info);
 		}
+		//----------------------------------------------------------STORAGE TEXEL BUFFERS----------------------------------------------------------
+		const spvc_reflected_resource *texel_buffer_list = nullptr;
+		size_t texel_buffer_count = 0;
+		spvc_resources_get_resource_list_for_type(resources, SPVC_RESOURCE_TYPE_STORAGE_BUFFER, &texel_buffer_list, &buffer_count);
+
+		for (uint32_t i = 0; i < buffer_count; ++i) {
+
+			uint32_t descriptor_count = 1;
+
+			spvc_type type = spvc_compiler_get_type_handle(compiler_glsl, texel_buffer_list[i].type_id);
+
+			uint32_t array_dimension = spvc_type_get_num_array_dimensions(type);
+
+			if (array_dimension == 1) {
+
+				descriptor_count = spvc_type_get_array_dimension(type, 0);
+			}
+
+			std::string name = spvc_compiler_get_name(compiler_glsl, texel_buffer_list[i].id);
+
+			UniformInfo uniform_info{};
+			if (descriptor_count == 0) {
+				uniform_info.variable_size = true;
+				descriptor_count = limits.maxPerStageDescriptorStorageBuffers;
+			}
+
+
+			VkDescriptorSetLayoutBinding layout_binding = {};
+
+			layout_binding.binding = spvc_compiler_get_decoration(compiler_glsl, texel_buffer_list[i].id, SpvDecorationBinding);
+			layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
+			layout_binding.stageFlags = vk_stage;
+			layout_binding.descriptorCount = descriptor_count;//this is for array
+			layout_binding.pImmutableSamplers = nullptr;
+
+			uniform_info.layout_binding = layout_binding;
+			uniform_info.name = name;
+			uniform_info.size = 0;
+
+			uniforms.emplace_back(uniform_info);
+		}
 
 		//----------------------------------------------------------VERTEX INPUTS-----------------------------
 		const spvc_reflected_resource *vertex_input_list = nullptr;

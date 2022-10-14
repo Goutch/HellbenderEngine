@@ -48,22 +48,22 @@ AgentSystem::AgentSystem(Scene *scene) : System(scene) {
 	auto frag = Resources::createShader(frag_info, "frag");
 	auto vert = Resources::createShader(vert_info, "vert");
 
-	std::vector<VertexBindingInfo> binding_infos;
+	std::vector<VertexAttributeInfo> attribute_infos;
 	//vertex binding
-	binding_infos.emplace_back();
-	binding_infos[0].binding = 0;
-	binding_infos[0].size = sizeof(vec3) + sizeof(vec2);
+	attribute_infos.emplace_back();
+	attribute_infos[0].binding = 0;
+	attribute_infos[0].size = sizeof(vec3) + sizeof(vec2);
 	//instance binding
-	binding_infos.emplace_back();
-	binding_infos[1].binding = 1;
-	binding_infos[1].size = sizeof(mat4);
-	binding_infos[1].flags = VERTEX_BINDING_FLAG_PER_INSTANCE |
-							 VERTEX_BINDING_FLAG_FAST_WRITE | //Use host visible memory.
-							 VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS;//We are updating this binding every frame so having multiple buffers is nice.
+	attribute_infos.emplace_back();
+	attribute_infos[1].binding = 1;
+	attribute_infos[1].size = sizeof(mat4);
+	attribute_infos[1].flags = VERTEX_ATTRIBUTE_FLAG_PER_INSTANCE |
+							   VERTEX_ATTRIBUTE_FLAG_FAST_WRITE | //Use host visible memory.
+							 VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS;//We are updating this binding every frame so having multiple buffers is nice.
 
 	GraphicPipelineInfo pipeline_info{};
-	pipeline_info.binding_infos = binding_infos.data();
-	pipeline_info.binding_info_count = binding_infos.size();
+	pipeline_info.attribute_infos = attribute_infos.data();
+	pipeline_info.attribute_info_count = attribute_infos.size();
 	pipeline_info.fragement_shader = frag;
 	pipeline_info.vertex_shader = vert;
 	pipeline_info.flags = GRAPHIC_PIPELINE_FLAG_NONE;
@@ -76,8 +76,8 @@ AgentSystem::AgentSystem(Scene *scene) : System(scene) {
 	material = Resources::createMaterial(material_info, "material");
 
 	MeshInfo mesh_info{};
-	mesh_info.binding_infos = binding_infos.data();
-	mesh_info.binding_info_count = binding_infos.size();
+	mesh_info.attribute_infos = attribute_infos.data();
+	mesh_info.attribute_info_count = attribute_infos.size();
 	mesh_info.flags = MESH_FLAG_NONE;
 
 	mesh = Resources::createMesh(mesh_info, "mesh");

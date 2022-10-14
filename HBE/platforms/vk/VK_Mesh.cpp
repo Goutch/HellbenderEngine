@@ -19,85 +19,85 @@ namespace HBE {
 			this->extra_usages |= VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR;
 		}
 
-		for (size_t i = 0; i < info.binding_info_count; ++i) {
-			size_t number_of_buffers = (info.binding_infos[i].flags & VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS) != 0 ?
+		for (size_t i = 0; i < info.attribute_info_count; ++i) {
+			size_t number_of_buffers = (info.attribute_infos[i].flags & VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) != 0 ?
 									   MAX_FRAMES_IN_FLIGHT : 1;
-			buffers.emplace(info.binding_infos[i].binding, std::vector<VK_Buffer *>(number_of_buffers, nullptr));
-			bindings.emplace(info.binding_infos[i].binding, info.binding_infos[i]);
+			buffers.emplace(info.attribute_infos[i].binding, std::vector<VK_Buffer *>(number_of_buffers, nullptr));
+			bindings.emplace(info.attribute_infos[i].binding, info.attribute_infos[i]);
 		}
 	}
 
-	void VK_Mesh::setBuffer(uint32_t binding, const void *vertices, size_t count) {
+	void VK_Mesh::setBuffer(uint32_t location, const void *vertices, size_t count) {
 		this->vertex_count = count;
-		auto it = buffers.find(binding);
+		auto it = buffers.find(location);
 		if (it == buffers.end()) {
-			Log::warning("Trying to set a mesh buffer at binding#" + std::to_string(binding) + " but no such binding exists");
+			Log::warning("Trying to set a mesh buffer at binding#" + std::to_string(location) + " but no such binding exists");
 			return;
 		}
 		if (count == 0) {
 			Log::warning("Trying to set a mesh buffer with vertex count = 0");
 			return;
 		}
-		VertexBindingInfo &binding_info = bindings[binding];
+		VertexAttributeInfo &binding_info = bindings[location];
 		VkDeviceSize buffer_size = binding_info.size * count;
 
-		if ((binding_info.flags & VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS) == VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS) {
+		if ((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) == VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) {
 			renderer->waitCurrentFrame();
-			if (buffers[binding][renderer->getCurrentFrame()]) {
-				delete buffers[binding][renderer->getCurrentFrame()];
+			if (buffers[location][renderer->getCurrentFrame()]) {
+				delete buffers[location][renderer->getCurrentFrame()];
 			}
-			buffers[binding][renderer->getCurrentFrame()] = new VK_Buffer(device,
-																		  vertices,
-																		  buffer_size,
+			buffers[location][renderer->getCurrentFrame()] = new VK_Buffer(device,
+																		   vertices,
+																		   buffer_size,
 																		  VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
-																		  ((binding_info.flags & VERTEX_BINDING_FLAG_FAST_WRITE) == VERTEX_BINDING_FLAG_FAST_WRITE) ?
+																		  ((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
 																		  ALLOC_FLAG_MAPPABLE :
 																		  ALLOC_FLAG_NONE);
 
 		} else {
 			device->getQueue(QUEUE_FAMILY_GRAPHICS).wait();
-			if (buffers[binding][0]) {
-				delete buffers[binding][0];
+			if (buffers[location][0]) {
+				delete buffers[location][0];
 			}
-			buffers[binding][0] = new VK_Buffer(device,
-												vertices,
-												buffer_size,
+			buffers[location][0] = new VK_Buffer(device,
+												 vertices,
+												 buffer_size,
 												VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
-												((binding_info.flags & VERTEX_BINDING_FLAG_FAST_WRITE) == VERTEX_BINDING_FLAG_FAST_WRITE) ?
+												((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
 												ALLOC_FLAG_MAPPABLE :
 												ALLOC_FLAG_NONE);
 		}
 	}
 
-	void VK_Mesh::setInstanceBuffer(uint32_t binding, const void *data, size_t count) {
+	void VK_Mesh::setInstanceBuffer(uint32_t location, const void *data, size_t count) {
 		this->instance_count = count;
-		VertexBindingInfo &binding_info = bindings[binding];
+		VertexAttributeInfo &binding_info = bindings[location];
 		VkDeviceSize buffer_size = binding_info.size * count;
 
-		if ((binding_info.flags & VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS) == VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS) {
+		if ((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) == VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) {
 			renderer->waitCurrentFrame();
-			if (buffers[binding][renderer->getCurrentFrame()]) {
-				delete buffers[binding][renderer->getCurrentFrame()];
+			if (buffers[location][renderer->getCurrentFrame()]) {
+				delete buffers[location][renderer->getCurrentFrame()];
 			}
-			buffers[binding][renderer->getCurrentFrame()] = new VK_Buffer(device,
-																		  data,
-																		  buffer_size,
+			buffers[location][renderer->getCurrentFrame()] = new VK_Buffer(device,
+																		   data,
+																		   buffer_size,
 																		  VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
-																		  ((binding_info.flags & VERTEX_BINDING_FLAG_FAST_WRITE) == VERTEX_BINDING_FLAG_FAST_WRITE) ?
+																		  ((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
 																		  ALLOC_FLAG_MAPPABLE :
 																		  ALLOC_FLAG_NONE);
 
 		} else {
 			device->getQueue(QUEUE_FAMILY_GRAPHICS).wait();
-			if (buffers[binding][0]) {
-				delete buffers[binding][0];
+			if (buffers[location][0]) {
+				delete buffers[location][0];
 			}
 
-			buffers[binding][0] = new VK_Buffer(device,
-												data,
-												buffer_size,
+			buffers[location][0] = new VK_Buffer(device,
+												 data,
+												 buffer_size,
 												VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
-												((binding_info.flags & VERTEX_BINDING_FLAG_FAST_WRITE) == VERTEX_BINDING_FLAG_FAST_WRITE) ?
+												((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
 												ALLOC_FLAG_MAPPABLE :
 												ALLOC_FLAG_NONE);
 		}
@@ -148,7 +148,7 @@ namespace HBE {
 		VkDeviceSize *offsets = new VkDeviceSize[buffers.size()];
 		int i = 0;
 		for (auto buffer: buffers) {
-			if ((bindings.at(buffer.first).flags & VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS) == VERTEX_BINDING_FLAG_MULTIPLE_BUFFERS) {
+			if ((bindings.at(buffer.first).flags & VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) == VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) {
 				flat_buffers[i] = buffer.second[renderer->getCurrentFrame()]->getHandle();
 			} else {
 				flat_buffers[i] = buffer.second[0]->getHandle();
