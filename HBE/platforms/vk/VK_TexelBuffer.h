@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/resource/StorageBuffer.h>
+#include <core/resource/TexelBuffer.h>
 namespace HBE {
 	class VK_Device;
 	class VK_Buffer;

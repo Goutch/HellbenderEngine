@@ -91,7 +91,7 @@ if (VULKAN_FOUND)
 
     add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/")
     add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/")
-    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/RayTracingDenoiser/")
+#    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/RayTracingDenoiser/")
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/RayTracingDenoiser/Include")
 else ()
     add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/")
@@ -196,7 +196,7 @@ set(CORE_FILES
         core/threading/JobManager.h
         core/resource/StorageBuffer.h
         platforms/vk/VK_DescriptorAllocator.cpp
-        platforms/vk/VK_DescriptorAllocator.h platforms/vk/VK_TexelBuffer.cpp platforms/vk/VK_TexelBuffer.h)
+        platforms/vk/VK_DescriptorAllocator.h platforms/vk/VK_TexelBuffer.cpp platforms/vk/VK_TexelBuffer.h core/resource/TexelBuffer.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}
@@ -234,7 +234,8 @@ if (VULKAN_FOUND)
             PUBLIC spirv-cross-msl
             PUBLIC spirv-cross-util
             PUBLIC spirv-cross-core
-            PUBLIC NRD)
+            #PUBLIC NRD
+            )
 else ()
     target_link_libraries(${PROJECT_NAME} PUBLIC glad)
 endif ()
