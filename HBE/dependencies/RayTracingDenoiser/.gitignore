@@ -1,0 +1,49 @@
+# cmake
+CMakeFiles/
+.cmake/
+*.dir/
+*.tlog/
+CMakeCache.txt
+cmake_install.cmake
+*.recipe
+
+# make
+Makefile
+
+# VS
+*.vcxproj*
+*.sln
+.vs/
+
+# VS Code
+.vscode/
+
+# shaders
+*.dxbc
+*.dxil
+*.spirv
+*.dxbc.h
+*.dxil.h
+*.spirv.h
+
+# ninja
+.ninja_deps
+.ninja_log
+build.ninja
+compile_commands.json
+*.log
+
+# library
+*.lib
+*.exp
+*.dll
+*.ilk
+*.pdb
+*.so
+*.so.*
+*.manifest
+
+# generated folders
+_Build/
+_Compiler/
+_NRD_SDK/

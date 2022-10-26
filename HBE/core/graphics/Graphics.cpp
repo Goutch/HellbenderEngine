@@ -158,7 +158,7 @@ void main()
 		return renderer->getFrameCount();
 	}
 
-	void Graphics::present(Texture *texture) {
+	void Graphics::present(const Texture *texture) {
 		renderer->present(texture);
 	}
 }

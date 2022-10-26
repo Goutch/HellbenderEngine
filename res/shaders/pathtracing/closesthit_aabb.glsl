@@ -4,7 +4,7 @@
 #extension GL_GOOGLE_include_directive : require
 #include "common.glsl"
 //------------------------------------ UNIFORMS ------------------------------------
-layout (binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
+
 
 
 hitAttributeEXT HitResult

@@ -22,8 +22,9 @@ struct Frame {
 	uint32_t max_bounces = 3;
 	float scattering_multiplier = 12.0f;
 	float density_falloff = 10.0f;
+	int use_blue_noise = 0;
 };
-#define HYSTORY_COUNT 8
+#define HYSTORY_COUNT 16
 
 struct MaterialData {
 	vec4 albedo;
@@ -34,6 +35,12 @@ struct MaterialData {
 class RaytracingScene {
 
 private:
+	enum RENDER_MODE {
+		DENOISED = 0,
+		ALBEDO = 1,
+		NORMAL = 2,
+		MOTION = 3,
+	};
 	RaytracingPipelineResources pathtracing_resources;
 	std::vector<Shader *> common_hit_shaders;
 	RootAccelerationStructure *root_acceleration_structure;
@@ -49,19 +56,34 @@ private:
 														   {vec4(0.2, 0.2, 0.2, 0.0), vec4(0.0, 0.0, 0.0, 0.0), 0.4},
 														   {vec4(0.8, 0.8, 0.8, 0.0), vec4(0.0, 0.0, 0.0, 0.0), 0.0}}
 	};
-	std::vector<Texture *> history_textures;
+	std::vector<Texture *> history_albedo;
+	std::vector<Texture *> history_normal_depth;
+	std::vector<Texture *> history_motion;
+	Texture *blue_noise;
 	Texture *output_texture = nullptr;
 	Frame frame{};
 	bool paused = false;
+	RENDER_MODE render_mode = DENOISED;
+
+	mat4 last_camera_matrices[2] = {mat4(1.0), mat4(1.0)};
 public:
 	void createFrameBuffers(uint32_t width, uint32_t height) {
-		for (Texture *frame_buffer : history_textures) {
-			delete frame_buffer;
+		for (Texture *albedo : history_albedo) {
+			delete albedo;
+		}
+		for (Texture *normal_depth : history_normal_depth) {
+			delete normal_depth;
+		}
+		for (Texture *motion : history_motion) {
+			delete motion;
 		}
 		if (output_texture != nullptr) {
 			delete output_texture;
 		}
-		history_textures.clear();
+		history_albedo.clear();
+		history_normal_depth.clear();
+		history_motion.clear();
+
 		TextureInfo info{};
 		info.width = width;
 		info.height = height;
@@ -70,7 +92,9 @@ public:
 					 IMAGE_FLAG_FILTER_NEAREST;
 
 		for (uint32_t i = 0; i < HYSTORY_COUNT; i++) {
-			history_textures.push_back(Resources::createTexture(info));
+			history_albedo.push_back(Resources::createTexture(info));
+			history_normal_depth.push_back(Resources::createTexture(info));
+			history_motion.push_back(Resources::createTexture(info));
 		}
 
 		output_texture = Resources::createTexture(info);
@@ -94,26 +118,70 @@ public:
 		RaytracingPipelineResources resources = pathtracing_resources;
 
 
-		const Texture *frame_buffer_array[HYSTORY_COUNT];
+		const Texture *albedo_history_buffer[HYSTORY_COUNT];
+		const Texture *normal_depth_history_buffer[HYSTORY_COUNT];
+		const Texture *motion_history_buffer[HYSTORY_COUNT];
+
 		for (uint32_t i = 0; i < HYSTORY_COUNT; i++) {
-			uint32_t f = (frame.index - i) % history_textures.size();
-			frame_buffer_array[i] = history_textures[f];
+			uint32_t f = (frame.index - i) % HYSTORY_COUNT;
+			albedo_history_buffer[i] = history_albedo[f];
+			normal_depth_history_buffer[i] = history_normal_depth[f];
+			motion_history_buffer[i] = history_motion[f];
 		}
 
+		mat4 camera_projection = camera_entity.get<Camera>().projection;
+		mat4 camera_view = glm::inverse(camera_entity.get<Transform>().world());
+
 		resources.pipeline_instance->setUniform("frame", &frame, Graphics::getCurrentFrame());
-		resources.pipeline_instance->setTexture("outputImage", output_texture, Graphics::getCurrentFrame(), 0);
-		resources.pipeline_instance->setTextureArray("history", frame_buffer_array, HYSTORY_COUNT, Graphics::getCurrentFrame(), 0);
+		resources.pipeline_instance->setTexture("outputAlbedo", output_texture, Graphics::getCurrentFrame(), 0);
+		resources.pipeline_instance->setTextureArray("historyAlbedo", albedo_history_buffer, HYSTORY_COUNT, Graphics::getCurrentFrame(), 0);
+		resources.pipeline_instance->setTextureArray("historyNormalDepth", normal_depth_history_buffer, HYSTORY_COUNT, Graphics::getCurrentFrame(), 0);
+		resources.pipeline_instance->setTextureArray("historyMotion", motion_history_buffer, HYSTORY_COUNT, Graphics::getCurrentFrame(), 0);
+		resources.pipeline_instance->setTexture("blueNoise", blue_noise, Graphics::getCurrentFrame(), 0);
+
+		resources.pipeline_instance->setUniform("last_cam", &last_camera_matrices, Graphics::getCurrentFrame());
 		Graphics::raytrace(*root_acceleration_structure,
 						   *resources.pipeline_instance,
-						   camera_entity.get<Camera>().projection,
-						   glm::inverse(camera_entity.get<Transform>().world()),
+						   camera_projection,
+						   camera_view,
 						   output_texture->getSize());
 
-		Graphics::present(output_texture);
+		last_camera_matrices[0] = camera_view;
+		last_camera_matrices[1] = camera_projection;
+		switch (render_mode) {
+			case DENOISED:
+				Graphics::present(output_texture);
+				break;
+			case ALBEDO:
+				Graphics::present(albedo_history_buffer[0]);
+				break;
+			case NORMAL:
+				Graphics::present(normal_depth_history_buffer[0]);
+				break;
+			case MOTION:
+				Graphics::present(motion_history_buffer[0]);
+				break;
+		}
+
 		frame.index++;
 	}
 
 	void onUpdate(float delta) {
+		if (Input::getKeyDown(KEY::NUMBER_0)) {
+			frame.use_blue_noise = !bool(frame.use_blue_noise);
+		}
+		if (Input::getKeyDown(KEY::NUMBER_1)) {
+			render_mode = DENOISED;
+		}
+		if (Input::getKeyDown(KEY::NUMBER_2)) {
+			render_mode = ALBEDO;
+		}
+		if (Input::getKeyDown(KEY::NUMBER_3)) {
+			render_mode = NORMAL;
+		}
+		if (Input::getKeyDown(KEY::NUMBER_4)) {
+			render_mode = MOTION;
+		}
 		if (Input::getKeyDown(KEY::P)) {
 			paused = !paused;
 		}
@@ -167,14 +235,23 @@ public:
 		for (Shader *shader : pathtracing_resources.hit_shaders) {
 			delete shader;
 		}
-		for (auto &history_texture : history_textures) {
-			delete history_texture;
+		for (Texture *albedo : history_albedo) {
+			delete albedo;
 		}
-		history_textures.clear();
-
-		delete output_texture;
+		for (Texture *normal_depth : history_normal_depth) {
+			delete normal_depth;
+		}
+		for (Texture *motion : history_motion) {
+			delete motion;
+		}
+		if (output_texture != nullptr) {
+			delete output_texture;
+		}
+		history_albedo.clear();
+		history_normal_depth.clear();
+		history_motion.clear();
 		delete pathtracing_resources.raygen_shader;
-
+		delete blue_noise;
 		delete material_buffer;
 		//delete mesh_acceleration_structure;
 		delete aabb_acceleration_structure;
@@ -186,6 +263,9 @@ public:
 
 	RaytracingScene() {
 		createFrameBuffers(Graphics::getDefaultRenderTarget()->getResolution().x, Graphics::getDefaultRenderTarget()->getResolution().y);
+
+		blue_noise = Texture::load("/textures/BlueNoiseRGB.png", IMAGE_FORMAT_RGBA8, IMAGE_FLAG_FILTER_NEAREST | IMAGE_FLAG_NO_SAMPLER);
+
 		ShaderInfo shader_info{};
 
 		shader_info.stage = SHADER_STAGE_RAY_GEN;

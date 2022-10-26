@@ -7,29 +7,56 @@
 #include "Resources.h"
 
 namespace HBE {
-	Texture *Texture::load(std::string path) {
-		std::ifstream file((RESOURCE_PATH+path).c_str());
-		if (file.good()) {
-			TextureInfo info{};
-			Texture *texture;
-			int32_t width, height;
-			unsigned char *buffer;
-			int nb_channels;
-			stbi_set_flip_vertically_on_load(true);
-			buffer = stbi_load(path.c_str(), &width, &height, &nb_channels, 4);
-			info.width = width;
-			info.height = height;
-			info.format = IMAGE_FORMAT_RGBA8;
-			info.flags = IMAGE_FLAG_NONE;
-			info.data=buffer;
-			texture = Resources::createTexture(info);
-			if (buffer) {
-				stbi_image_free(buffer);
-			}
-			return texture;
-		}
-		Log::error("Failed to load texture:" + path);
-		return nullptr;
+	int getFormatNumberOfChannels(IMAGE_FORMAT format) {
+		switch (format) {
+			case IMAGE_FORMAT_R32F:
+			case IMAGE_FORMAT_R8:
+				return 1;
+			case IMAGE_FORMAT_RG32F:
+			case IMAGE_FORMAT_RG8:
+				return 2;
+			case IMAGE_FORMAT_RGB32F:
+			case IMAGE_FORMAT_RGB8:
+				return 3;
+			case IMAGE_FORMAT_RGBA32F:
+			case IMAGE_FORMAT_RGBA8:
+				return 4;
+			default:
+				return 4;
 
+		}
 	}
+
+
+	Texture *Texture::load(const std::string &path, IMAGE_FORMAT format, IMAGE_FLAGS flags) {
+		FILE *file = fopen((RESOURCE_PATH + path).c_str(), "rb");
+
+		TextureInfo info{};
+		Texture *texture;
+		int32_t width, height;
+		unsigned char *buffer;
+
+		stbi_set_flip_vertically_on_load(true);
+		int nb_channels;
+		int expected_channels = getFormatNumberOfChannels(format);
+		buffer = stbi_load_from_file(file, &width, &height, &nb_channels, expected_channels);
+
+		if (nb_channels != expected_channels) {
+			Log::error("Texture format missmatch. Expected " + std::to_string(expected_channels) + " channels, got " + std::to_string(nb_channels));
+		}
+		if (buffer == nullptr) {
+			Log::error("Failed to load texture: " + path);
+		}
+		info.width = width;
+		info.height = height;
+		info.format = format;
+		info.flags = flags;
+		info.data = buffer;
+		texture = Resources::createTexture(info);
+		stbi_image_free(buffer);
+		stbi_set_flip_vertically_on_load(true);
+		fclose(file);
+		return texture;
+	}
+
 }

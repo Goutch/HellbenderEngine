@@ -105,6 +105,8 @@ namespace HBE {
 			spvc_type type = spvc_compiler_get_type_handle(compiler_glsl, push_constant_list[i].type_id);
 			spvc_compiler_get_declared_struct_size(compiler_glsl, type, &size);
 
+			HB_ASSERT(size <= limits.maxPushConstantsSize, "Push constant size is too big!");
+
 			//uint32_t binding = spvc_compiler_get_decoration(compiler_glsl, push_constant_list[i].id, SpvDecorationBinding);
 			std::string name = spvc_compiler_get_name(compiler_glsl, push_constant_list[i].id);
 
@@ -135,6 +137,7 @@ namespace HBE {
 			spvc_compiler_get_declared_struct_size(compiler_glsl, type, &size);
 
 			UniformInfo uniform_info{};
+			HB_ASSERT(size <= limits.maxUniformBufferRange, "Uniform buffer size is too big!");
 
 			VkDescriptorSetLayoutBinding layout_binding = {};
 			layout_binding.binding = spvc_compiler_get_decoration(compiler_glsl, uniform_list[i].id, SpvDecorationBinding);

@@ -249,7 +249,7 @@ namespace HBE {
 		Profiler::end();
 	}
 
-	void VK_Renderer::present(Texture *image) {
+	void VK_Renderer::present(const Texture *image) {
 		HB_ASSERT(frame_presented == false, "Frame already presented, call beginFrame() before present() and endFrame() after present()");
 		Profiler::begin("AquireImage");
 

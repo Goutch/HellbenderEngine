@@ -86,7 +86,7 @@ namespace HBE {
 
 		void beginFrame() override;
 
-		void present(Texture *image) override;
+		void present(const Texture *image) override;
 
 		void endFrame() override;
 

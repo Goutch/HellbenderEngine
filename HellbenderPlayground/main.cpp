@@ -36,6 +36,37 @@ void onAppUpdate(float delta) {
 
 }
 
+/*#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+
+#include "stb_image.h"
+#include "stb_image_write.h"
+
+void generateBlueNoiseRGB() {
+	FILE *file = fopen((RESOURCE_PATH + std::string("textures/BlueNoise.png")).c_str(), "rb");
+	int width, height, nb_channels;
+	unsigned char *data = stbi_load_from_file(file, &width, &height, &nb_channels, 0);
+	unsigned char *out = new unsigned char[width * height * 4];
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width; ++x) {
+			int i = ((y * width) + x);
+			int index = i * 4;
+
+			out[index] = data[(i * nb_channels)];
+
+			int i2 = (i + (width * 1) + 1) % (width * height);
+			out[index + 1] = data[(i2 * nb_channels)];
+
+			int i3 = (i + (width * 2) + 2) % (width * height);
+			out[index + 2] = data[(i3 * nb_channels)];
+
+			out[index + 3] = 255;
+		}
+	}
+	stbi_write_png((RESOURCE_PATH + std::string("textures/BlueNoise8.png")).c_str(), width, height, 4, out, width * 4);
+	stbi_image_free(data);
+	delete out;
+}*/
 
 int main() {
 	Application::init();

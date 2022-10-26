@@ -196,7 +196,7 @@ set(CORE_FILES
         core/threading/JobManager.h
         core/resource/StorageBuffer.h
         platforms/vk/VK_DescriptorAllocator.cpp
-        platforms/vk/VK_DescriptorAllocator.h platforms/vk/VK_TexelBuffer.cpp platforms/vk/VK_TexelBuffer.h core/resource/TexelBuffer.h)
+        platforms/vk/VK_DescriptorAllocator.h platforms/vk/VK_TexelBuffer.cpp platforms/vk/VK_TexelBuffer.h core/resource/TexelBuffer.h dependencies/stb/stb_image_write.h)
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}

@@ -8,6 +8,7 @@ layout(location = 0) rayPayloadInEXT PrimaryRayPayLoad
 {
     vec3 color;
     int bounce_count;
+    uint noise_sample_count;
     uint rng_state;
     bool hit_sky;
     vec3 hit_normal;

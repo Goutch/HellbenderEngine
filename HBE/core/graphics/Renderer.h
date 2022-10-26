@@ -42,7 +42,7 @@ namespace HBE {
 
 		virtual void beginFrame() = 0;
 
-		virtual void present(HBE::Texture *image) = 0;
+		virtual void present(const Texture *image) = 0;
 
 		virtual void endFrame() = 0;
 

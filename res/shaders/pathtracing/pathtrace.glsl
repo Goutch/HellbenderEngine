@@ -1,14 +1,17 @@
-layout(binding = 5, set = 0, std430) readonly buffer MaterialDataBuffer
+layout (binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
+layout(binding = 9, set = 0, std430) readonly buffer MaterialDataBuffer
 {
     MaterialData materials[];
 } materials;
 
+layout(binding = 10, set = 0, rgba8ui) uniform readonly uimage2D blueNoise;
 
 // -------------------------- RAY PAYLOADS --------------------------------
 layout (location = 0) rayPayloadInEXT PrimaryRayPayLoad
 {
     vec3 color;
     int bounce_count;
+    uint noise_sample_count;
     uint rng_state;
     bool hit_sky;
     vec3 hit_normal;
@@ -16,7 +19,11 @@ layout (location = 0) rayPayloadInEXT PrimaryRayPayLoad
 } primaryRayPayload;
 
 const float LIGHT_BIAS = 0.3;
-
+vec3 sampleBlueNoise(ivec2 coord)
+{
+    vec4 noise = imageLoad(blueNoise, coord);
+    return vec3(noise.rgb)/vec3(255.0);
+}
 uint wang_hash(inout uint seed)
 {
     seed = uint(seed ^ uint(61)) ^ uint(seed >> uint(16));
@@ -32,7 +39,7 @@ float RandomFloat01(inout uint state)
     return float(wang_hash(state)) / 4294967296.0;
 }
 
-vec3 RandomUnitVector(inout uint state)
+vec3 RandomUnitVectorRNG(inout uint state)
 {
     float z = RandomFloat01(state) * 2.0f - 1.0f;
     float a = RandomFloat01(state) * TWO_PI;
@@ -41,9 +48,27 @@ vec3 RandomUnitVector(inout uint state)
     float y = r * sin(a);
     return vec3(x, y, z);
 }
-vec3 RandomDiffuseVector(vec3 normal)
+vec3 RandomUnitVectorNoise()
 {
-    return normalize(RandomUnitVector(primaryRayPayload.rng_state)+normal);
+    ivec2 coord = ivec2(gl_LaunchIDEXT.xy);
+    float index = float(frame.index+primaryRayPayload.noise_sample_count);
+    vec2 offset = vec2(index*PHI,index*E);
+
+    offset=mod(offset,1.0);
+    offset *= 469.0;
+    coord += ivec2(offset);
+    coord = ivec2(mod(vec2(coord), vec2(469)));
+    primaryRayPayload.noise_sample_count++;
+    vec3 noise = sampleBlueNoise(coord);
+    return normalize(noise-vec3(0.5));
+}
+vec3 RandomDiffuseVectorFromNoise(vec3 normal)
+{
+    return normalize(RandomUnitVectorNoise() + normal);
+}
+vec3 RandomDiffuseVectorFromRNG(vec3 normal)
+{
+    return normalize(RandomUnitVectorRNG(primaryRayPayload.rng_state)+normal);
 }
 vec3 RandomSpecularVector(vec3 direction, vec3 diffuse, float roughness)
 {
@@ -98,8 +123,6 @@ void traceRays(vec3 normal)
     }
     MaterialData material  = materials.materials[gl_InstanceCustomIndexEXT];
 
-
-
     vec3 to_light_dir= normalize(vec3(sin(frame.time), sin(frame.time), cos(frame.time)));
     float light_dot_product=dot(hitResult.normal, to_light_dir);
     vec3 color =vec3(0.0);
@@ -114,7 +137,16 @@ void traceRays(vec3 normal)
 
                 primaryRayPayload.hit_sky=false;
                 primaryRayPayload.color = vec3(0.0);
-                newDir = RandomSpecularVector(to_light_dir, RandomDiffuseVector(to_light_dir), LIGHT_BIAS);
+                vec3 diffuseVector;
+                if (bool(frame.use_blue_noise))
+                {
+                    diffuseVector = RandomDiffuseVectorFromNoise(to_light_dir);
+                }
+                else
+                {
+                    diffuseVector = RandomDiffuseVectorFromRNG(to_light_dir);
+                }
+                newDir = RandomSpecularVector(to_light_dir, diffuseVector, LIGHT_BIAS);
                 traceLight(origin, newDir, 1000.0);;
 
                 if (primaryRayPayload.hit_sky)
@@ -125,7 +157,15 @@ void traceRays(vec3 normal)
             }
 
             primaryRayPayload.hit_sky=false;
-            newDir = RandomDiffuseVector(hitResult.normal);
+
+            if(bool(frame.use_blue_noise))
+            {
+                newDir = RandomDiffuseVectorFromNoise(hitResult.normal);
+            }
+            else
+            {
+                newDir = RandomDiffuseVectorFromRNG(hitResult.normal);
+            }
 
             if (material.roughness<0.999)
             {

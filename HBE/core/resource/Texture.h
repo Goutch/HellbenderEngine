@@ -7,7 +7,7 @@
 namespace HBE {
 
 	enum IMAGE_FORMAT {
-		IMAGE_FORMAT_R8= 0,
+		IMAGE_FORMAT_R8 = 0,
 		IMAGE_FORMAT_RG8 = 1,
 		IMAGE_FORMAT_RGB8 = 2,
 		IMAGE_FORMAT_RGBA8 = 3,
@@ -62,8 +62,7 @@ namespace HBE {
 
 		virtual void update(const void *data) = 0;
 
-		static Texture *load(std::string path);
-
+		static Texture *load(const std::string& path, IMAGE_FORMAT format, IMAGE_FLAGS flags);
 	};
 
 }

@@ -2,7 +2,7 @@
 #extension GL_EXT_ray_tracing : enable
 #extension GL_GOOGLE_include_directive : require
 #extension GL_EXT_nonuniform_qualifier :require
-#define HISTORY_COUNT 8
+#define HISTORY_COUNT 16
 #include "common.glsl"
 
 struct Vertex{
@@ -10,13 +10,24 @@ struct Vertex{
 };
 
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
-layout(binding = 1, set = 0, rgba32f) uniform image2D history[HISTORY_COUNT];
-layout(binding = 2, set = 0, rgba32f) uniform writeonly image2D outputImage;
-layout(binding = 3, set = 0) uniform CameraProperties
+layout(binding = 1, set = 0, rgba32f) uniform writeonly image2D outputAlbedo;
+layout(binding = 2, set = 0, rgba32f) uniform writeonly image2D outputNormalDepth;
+layout(binding = 3, set = 0, rgba32f) uniform image2D outputMotion;
+layout(binding = 4, set = 0, rgba32f) uniform image2D historyAlbedo[HISTORY_COUNT];
+layout(binding = 5, set = 0, rgba32f) uniform image2D historyNormalDepth[HISTORY_COUNT];
+layout(binding = 6, set = 0, rgba32f) uniform image2D historyMotion[HISTORY_COUNT];
+
+layout(binding = 7, set = 0) uniform CameraProperties
 {
     mat4 viewInverse;
     mat4 projInverse;
 } cam;
+
+layout(binding = 11, set = 0) uniform LastCameraProperties
+{
+    mat4 view;
+    mat4 projection;
+} last_cam;
 //layout(binding = 6, set = 0) buffer VertexBuffer
 //{
 //    Vertex vertices[];
@@ -26,10 +37,12 @@ layout(location = 0) rayPayloadEXT PrimaryRayPayLoad
 {
     vec3 color;
     int bounce_count;
+    uint noise_sample_count;
     uint rng_state;
     bool hit_sky;
     vec3 hit_normal;
     float hit_t;
+    vec3 hit_velocity;
 } primaryRayPayload;
 
 vec2 offsets[16] =
@@ -51,7 +64,17 @@ vec2(0.437500, 0.814815),
 vec2(0.937500, 0.259259),
 vec2(0.031250, 0.592593),
 };
+vec2 calculateVelocity(vec3 ray_dir, vec3 ray_origin)
+{
+    mat4 viewProj = inverse(cam.projInverse)*inverse(cam.viewInverse);
+    mat4 lastViewProj =  last_cam.projection*last_cam.view;
+    vec4 prev_screen_space = lastViewProj * vec4((primaryRayPayload.hit_t*ray_dir) + ray_origin, 1.0);
+    vec2 prev_uv = 0.5 * (prev_screen_space.xy / prev_screen_space.w) + 0.5;
+    vec2 uv = (vec2(gl_LaunchIDEXT.xy) + vec2(0.5)) / vec2(gl_LaunchSizeEXT.xy);
+    vec2 velocity = (uv-prev_uv);
 
+    return velocity.xy;
+}
 void main()
 {
     const vec2 pixelCenter = vec2(gl_LaunchIDEXT.xy) + vec2(0.5);
@@ -63,50 +86,64 @@ void main()
     offset.y = ((offset.y-0.5f) / gl_LaunchSizeEXT.y) *2;
 
     vec4 origin = cam.viewInverse* vec4(0, 0, 0, 1);
-    vec4 target = cam.projInverse * vec4(d.x+offset.x, d.y+offset.y, 1, 1);
+    vec4 target_jittered = cam.projInverse * vec4(d + offset, 1, 1);
+    vec4 target = cam.projInverse * vec4(d.x, d.y, 1, 1);
 
     vec4 direction = normalize(cam.viewInverse*vec4(normalize(target.xyz), 0));
-
+    vec4 direction_jittered = normalize(cam.viewInverse*vec4(normalize(target_jittered.xyz), 0));
     float tmin = 0.001;
     float tmax = 1000.0;
 
 
     vec3 color=vec3(0.0, 0.0, 0.0);
-    int numSamples=1;
 
     float x = frame.index*PHI;
     x=mod(x, 1.0);
     x*=1000;
 
     primaryRayPayload.rng_state = uint(uint(gl_LaunchIDEXT.x) * uint(1973) + uint(gl_LaunchIDEXT.y) * uint(9277) + uint(floor(x)) * uint(26699)) | uint(1);
-    for (int i=0; i<numSamples; i++)
-    {
+    primaryRayPayload.bounce_count = 0;
+    primaryRayPayload.color = vec3(0.0, 0.0, 0.0);
+    primaryRayPayload.hit_sky = false;
+    primaryRayPayload.hit_t = 0.0;
+    primaryRayPayload.noise_sample_count = 0;
+    traceRayEXT(topLevelAS, //topLevelacceleationStructure
+    gl_RayFlagsOpaqueEXT, //rayFlags
+    0xff, //cullMask
+    0, //sbtRecordOffset
+    1, //sbtRecordStride
+    0, //missIndex
+    origin.xyz, //origin
+    tmin, //Tmin
+    direction_jittered.xyz, //direction
+    tmax, //Tmax
+    0);//payload location
+    color += primaryRayPayload.color;
 
-        primaryRayPayload.bounce_count = 0;
-        primaryRayPayload.color = vec3(0.0, 0.0, 0.0);
-        primaryRayPayload.hit_sky = false;
-        primaryRayPayload.hit_t = 0.0;
-        traceRayEXT(topLevelAS, //topLevelacceleationStructure
-        gl_RayFlagsOpaqueEXT, //rayFlags
-        0xff, //cullMask
-        0, //sbtRecordOffset
-        1, //sbtRecordStride
-        0, //missIndex
-        origin.xyz, //origin
-        tmin, //Tmin
-        direction.xyz, //direction
-        tmax, //Tmax
-        0);//payload location
-        color += primaryRayPayload.color;
-    }
-    imageStore(history[0], ivec2(gl_LaunchIDEXT.xy), vec4(color, 0.0));
+    vec2 velocity = calculateVelocity(direction.xyz, origin.xyz);
+    imageStore(historyAlbedo[0], ivec2(gl_LaunchIDEXT.xy), vec4(color, 0.0));
+    imageStore(historyNormalDepth[0], ivec2(gl_LaunchIDEXT.xy), vec4(abs(primaryRayPayload.hit_normal), 1-(primaryRayPayload.hit_t/tmax)));
+    imageStore(historyMotion[0], ivec2(gl_LaunchIDEXT.xy), vec4(velocity, 0.0, 0.0));
+
+    ivec2 adjusted_coord = ivec2(gl_LaunchIDEXT.xy);
+
+    vec2 uv =( (vec2(gl_LaunchIDEXT.xy)+vec2(0.5)) / vec2(gl_LaunchSizeEXT.xy));
+    uint historySampleCount = 1;
 
     for (int i=1; i<HISTORY_COUNT; i++)
     {
-        color += imageLoad(history[i], ivec2(gl_LaunchIDEXT.xy)).rgb;
-    }
+        adjusted_coord= ivec2(floor(uv * vec2(gl_LaunchSizeEXT.xy)));
+        uv -= imageLoad(historyMotion[i-1], adjusted_coord).xy;
+        adjusted_coord= ivec2(floor(uv* vec2(gl_LaunchSizeEXT.xy)));
+        if(max(uv.x,uv.y)>1.0||min(uv.x,uv.y)<0.0)
+        {
+            continue;
+        }
+        color += imageLoad(historyAlbedo[i], adjusted_coord).rgb;
+        historySampleCount++;
+   }
 
-    color /= float(HISTORY_COUNT);
+    color /= float(historySampleCount);
     const float gamma = 2.0;
     float exposure = 0.5;
     //tone mapping
@@ -116,5 +153,5 @@ void main()
 
     //mapped = vertices[nonuniformEXT(gl_LaunchIDEXT.x)].vertices[gl_LaunchIDEXT.y].pos.rgb;
 
-    imageStore(outputImage, ivec2(gl_LaunchIDEXT.xy), vec4(color, 0.0));
+    imageStore(outputAlbedo, ivec2(gl_LaunchIDEXT.xy), vec4(color, 0.0));
 }

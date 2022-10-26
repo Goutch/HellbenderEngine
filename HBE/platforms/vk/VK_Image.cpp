@@ -55,15 +55,15 @@ namespace HBE {
 				byte_per_pixel = 1;
 				break;
 			case IMAGE_FORMAT_RG8:
-				vk_format = VK_FORMAT_R8G8_SRGB;
+				vk_format = VK_FORMAT_R8G8_UINT;
 				byte_per_pixel = 2;
 				break;
 			case IMAGE_FORMAT_RGB8:
-				vk_format = VK_FORMAT_R8G8B8_SRGB;
+				vk_format = VK_FORMAT_R8G8B8_UINT;
 				byte_per_pixel = 3;
 				break;
 			case IMAGE_FORMAT_RGBA8:
-				vk_format = VK_FORMAT_R8G8B8A8_SRGB;
+				vk_format = VK_FORMAT_R8G8B8A8_UINT;
 				byte_per_pixel = 4;
 				break;
 			case IMAGE_FORMAT_R32F:
