@@ -9,34 +9,35 @@
 - **FAST**
 
 # Why?
-- **I like graphics**
-- **I like vulkan**
-- **I like to code in c++.**
-- **I want to do procedural generation and raytracing.**
+- **I like vulkan and graphics**
+- **I want to do procedural generation and ray tracing.**
 
 # Features
 #### HB Graphics library:
-- 3D rendering with Vulkan
+- 3D rendering
+- 2D rendering
 - Instancing
 - Resource loading:
 	 - Textures
 	 - Shaders
 	 - GLTF models
-
+- Compute shaders
+- Ray tracing pipeline shaders
+	- miss 
+	- closest hit
+	- any hit
+	- intersection
 #### Other
 - ECS
 	- Camera (perspective)
 	- Camera2D (orthographic)
 	- CameraController 
 	- MeshRenderer 
-	- InstanceRenderer
 - Job System
 - Event system
 - keyboard and mouse input handling
 
 #### planned for Alpha 1.0:
-- Compute shaders
-- Ray tracing pipelines
 - Model loading and animations
 - Font rendering
 
