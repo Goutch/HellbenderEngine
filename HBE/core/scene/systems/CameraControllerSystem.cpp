@@ -72,6 +72,38 @@ namespace HBE {
 
 			transform.translate(translation * delta_t * controller.speed * boost);
 		}
+		auto group2D = scene->group<Transform, Camera2D, CameraController>();
+		for (auto[handle, transform, camera, controller]:group2D) {
+			float boost = 1.0f;
+			vec3 translation = vec3(0);
+			if (Input::getKey(KEY::LEFT_SHIFT)) {
+				boost = 10.0f;
+			}
+			if (Input::getKey(KEY::EQUAL)) {
+				camera.zoom_ratio += delta_t*boost;
+				camera.calculateProjection();
+			}
+			if (Input::getKey(KEY::MINUS)) {
+				camera.zoom_ratio -= delta_t*boost;
+				camera.calculateProjection();
+			}
+			if (Input::getKey(KEY::D)) {
+				translation.x += 1;
+			}
+			if (Input::getKey(KEY::A)) {
+				translation.x = -1;
+			}
+			if (Input::getKey(KEY::W)) {
+				translation.y += 1;
+			}
+			if (Input::getKey(KEY::S)) {
+				translation.y = -1;
+			}
+
+
+			transform.translate(translation * delta_t * controller.speed * boost);
+
+		}
 		Profiler::end();
 
 	}

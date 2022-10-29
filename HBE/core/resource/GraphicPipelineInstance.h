@@ -7,13 +7,13 @@
 namespace HBE {
 	class GraphicPipeline;
 
-	typedef uint32_t MATERIAL_FLAGS;
-	enum MATERIAL_FLAG {
-		MATERIAL_FLAG_NONE = 0,
+	typedef uint32_t GRAPHIC_PIPELINE_INSTANCE_FLAGS;
+	enum GRAPHIC_PIPELINE_INSTANCE_FLAG {
+		GRAPHIC_PIPELINE_INSTANCE_FLAG_NONE = 0,
 	};
-	struct MaterialInfo {
+	struct GraphicPipelineInstanceInfo {
 		GraphicPipeline *graphic_pipeline;
-		MATERIAL_FLAGS flags = MATERIAL_FLAG_NONE;
+		GRAPHIC_PIPELINE_INSTANCE_FLAGS flags = GRAPHIC_PIPELINE_INSTANCE_FLAG_NONE;
 	};
 
 	/**

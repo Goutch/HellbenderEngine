@@ -210,6 +210,7 @@ namespace HBE {
 		if (zoom_ratio < 0.1)
 			zoom_ratio = 0.1;
 		projection = glm::ortho(zoom_ratio * -0.5f * aspect_ratio, zoom_ratio * 0.5f * aspect_ratio, zoom_ratio * 0.5f, zoom_ratio * -.5f, -1000.0f, 1000.0f);
+		projection[1] = -projection[1];
 	}
 
 	float Camera2D::aspectRatio() {

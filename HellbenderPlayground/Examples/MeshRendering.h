@@ -12,12 +12,12 @@ public:
 		std::vector<VertexAttributeInfo> attribute_infos;
 		//vertex binding
 		attribute_infos.emplace_back();
-		attribute_infos[0].binding = 0;
+		attribute_infos[0].location = 0;
 		attribute_infos[0].size = sizeof(vec3);
 		attribute_infos[0].flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 
 		attribute_infos.emplace_back();
-		attribute_infos[1].binding = 1;
+		attribute_infos[1].location = 1;
 		attribute_infos[1].size = sizeof(vec4);
 		attribute_infos[1].flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 
@@ -30,9 +30,9 @@ public:
 
 		auto pipeline = Resources::createGraphicPipeline(pipeline_info, "pipeline");
 
-		MaterialInfo material_info{};
+		GraphicPipelineInstanceInfo material_info{};
 		material_info.graphic_pipeline = pipeline;
-		auto material = Resources::createMaterial(material_info, "material");
+		auto material = Resources::createGraphicPipelineInstance(material_info, "material");
 
 
 		MeshInfo mesh_info{};
@@ -46,7 +46,7 @@ public:
 		vec3 positions[3] = {vec3(-1, -0.5, 0), vec3(0, 1, 0), vec3(1, -0.5, 0)};
 		vec4 colors[3] = {vec4(1, 0, 0, 1), vec4(0, 1, 0, 1), vec4(0, 0, 1, 1)};
 		mesh->setBuffer(0, positions, 3);
-		mesh->setBuffer(1, colors, 3 * sizeof(vec4));
+		mesh->setBuffer(1, colors, 3);
 
 		//-------------------SCENE CREATION--------------------------------------
 		Scene *scene = new Scene();
@@ -62,11 +62,11 @@ public:
 		MeshRenderer &renderer = cube_entity.attach<MeshRenderer>();
 		cube_entity.get<Transform>().translate(vec3(0, 0, -5));
 		renderer.mesh = mesh;
-		renderer.material = material;
+		renderer.pipelineInstance = material;
 		auto cube_entity2 = scene->createEntity("Cube2");
 		MeshRenderer &renderer2 = cube_entity2.attach<MeshRenderer>();
 		cube_entity2.get<Transform>().translate(vec3(0, 0, 5));
 		renderer2.mesh = mesh;
-		renderer2.material = material;
+		renderer2.pipelineInstance = material;
 	}
 };

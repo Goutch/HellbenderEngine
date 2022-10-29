@@ -12,7 +12,7 @@ public:
 		std::vector<VertexAttributeInfo> attribute_infos;
 		//vertex binding
 		attribute_infos.emplace_back();
-		attribute_infos[0].binding = 0;
+		attribute_infos[0].location = 0;
 		attribute_infos[0].size = sizeof(vec3);
 		attribute_infos[0].flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 		/*binding_infos.emplace_back();
@@ -20,14 +20,14 @@ public:
 		binding_infos[2].size = sizeof(vec3);
 		binding_infos[2].flags = VERTEX_BINDING_FLAG_NONE;*/
 		attribute_infos.emplace_back();
-		attribute_infos[1].binding = 1;
+		attribute_infos[1].location = 1;
 		attribute_infos[1].size = sizeof(vec3);
 		attribute_infos[1].flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 
 		std::vector<VertexAttributeInfo> ground_binding_infos;
 		//vertex binding
 		ground_binding_infos.emplace_back();
-		ground_binding_infos[0].binding = 0;
+		ground_binding_infos[0].location = 0;
 		ground_binding_infos[0].size = sizeof(vec3) * 2;
 		ground_binding_infos[0].flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 
@@ -40,18 +40,18 @@ public:
 
 		auto model_pipeline = Resources::createGraphicPipeline(pipeline_info, "DEFAULT_MODEL_PIPELINE");
 
-		MaterialInfo model_material_info{};
+		GraphicPipelineInstanceInfo model_material_info{};
 		model_material_info.graphic_pipeline = model_pipeline;
-		Resources::createMaterial(model_material_info, "DEFAULT_MODEL_MATERIAL");
+		Resources::createGraphicPipelineInstance(model_material_info, "DEFAULT_MODEL_MATERIAL");
 
 		pipeline_info.attribute_infos = ground_binding_infos.data();
 		pipeline_info.attribute_info_count = ground_binding_infos.size();
 
 		auto ground_pipeline = Resources::createGraphicPipeline(pipeline_info, "GROUND_PIPELINE");
 
-		MaterialInfo ground_material_info{};
+		GraphicPipelineInstanceInfo ground_material_info{};
 		ground_material_info.graphic_pipeline = ground_pipeline;
-		auto ground_material = Resources::createMaterial(ground_material_info, "GROUND_MATERIAL");
+		auto ground_material = Resources::createGraphicPipelineInstance(ground_material_info, "GROUND_MATERIAL");
 
 
 		vec4 ground_material_color = vec4(0.2, 0.7, 0., 1.);
@@ -87,7 +87,7 @@ public:
 		auto ground_entity = scene->createEntity("ground");
 		MeshRenderer &ground_renderer = ground_entity.attach<MeshRenderer>();
 		ground_renderer.mesh = ground_mesh;
-		ground_renderer.material = ground_material;
+		ground_renderer.pipelineInstance = ground_material;
 		ground_entity.get<Transform>().rotate(vec3(- M_PI / 2, 0, 0));
 		ground_entity.get<Transform>().translate(vec3(0, -0.7, 0));
 

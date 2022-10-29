@@ -92,13 +92,13 @@ namespace HBE {
 		return rt;
 	}
 
-	GraphicPipelineInstance *Resources::createMaterial(const MaterialInfo &info, const std::string &name) {
+	GraphicPipelineInstance *Resources::createGraphicPipelineInstance(const GraphicPipelineInstanceInfo &info, const std::string &name) {
 		GraphicPipelineInstance *m = factory->createMaterial(info);
 		add(name, m);
 		return m;
 	}
 
-	GraphicPipelineInstance *Resources::createMaterial(const MaterialInfo &info) {
+	GraphicPipelineInstance *Resources::createGraphicPipelineInstance(const GraphicPipelineInstanceInfo &info) {
 		return factory->createMaterial(info);
 	}
 

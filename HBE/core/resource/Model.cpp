@@ -119,7 +119,7 @@ namespace HBE {
 			//first one add buffer
 			if (accessor.byteOffset == 0) {
 				VertexAttributeInfo attribute_info{};
-				attribute_info.binding = buffers.size();
+				attribute_info.location = buffers.size();
 				attribute_info.size = stride;
 				attribute_info.flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 				attribute_infos.emplace_back(attribute_info);
@@ -136,7 +136,7 @@ namespace HBE {
 				//not inside a stride so it is its own buffer
 			else if (accessor.byteOffset > stride) {
 				VertexAttributeInfo binding_info{};
-				binding_info.binding = buffers.size();
+				binding_info.location = buffers.size();
 				binding_info.size = stride;
 				binding_info.flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 				attribute_infos.emplace_back(binding_info);
@@ -191,10 +191,10 @@ namespace HBE {
 	void createMaterials(ModelData &data, tinygltf::Model &model) {
 		for (size_t i = 0; i < model.materials.size(); i++) {
 			const tinygltf::Material &gltf_material = model.materials[i];
-			MaterialInfo material_info{};
-			material_info.flags = MATERIAL_FLAG_NONE;
+			GraphicPipelineInstanceInfo material_info{};
+			material_info.flags = GRAPHIC_PIPELINE_INSTANCE_FLAG_NONE;
 			material_info.graphic_pipeline = Resources::get<GraphicPipeline>("DEFAULT_MODEL_PIPELINE");
-			data.materials.emplace_back(Resources::createMaterial(material_info));
+			data.materials.emplace_back(Resources::createGraphicPipelineInstance(material_info));
 
 
 			ModelMaterialProperties material_properties{};

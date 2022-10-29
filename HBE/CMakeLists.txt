@@ -12,117 +12,58 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_COMPILE_FLAGS}")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 endif ()
+
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
+#------------------------------------VULKAN------------------------------------
 find_package(Vulkan REQUIRED)
 if (VULKAN_FOUND)
-    message("Found vulkan at ${Vulkan_INCLUDE_DIRS}!")
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/)
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/)
-    include_directories(${Vulkan_INCLUDE_DIRS})
-    set(VK_FILES
-            platforms/vk/VK_Renderer.cpp
-            platforms/vk/VK_Instance.cpp
-            platforms/vk/VK_Instance.h
-            platforms/vk/VK_Window.cpp
-            platforms/vk/VK_Window.h
-            platforms/vk/VK_ValidationLayers.cpp
-            platforms/vk/VK_ValidationLayers.h
-            platforms/vk/VK_PhysicalDevice.cpp
-            platforms/vk/VK_PhysicalDevice.h
-            platforms/vk/VK_Device.cpp
-            platforms/vk/VK_Device.h
-            platforms/vk/VK_Swapchain.cpp
-            platforms/vk/VK_Swapchain.h
-            platforms/vk/VK_Surface.cpp
-            platforms/vk/VK_Surface.h
-            platforms/vk/VK_GraphicPipeline.cpp
-            platforms/vk/VK_GraphicPipeline.h
-            platforms/vk/VK_Shader.cpp
-            platforms/vk/VK_Shader.h
-            platforms/vk/VK_ResourceFactory.cpp
-            platforms/vk/VK_ResourceFactory.h
-            platforms/vk/VK_Image.cpp
-            platforms/vk/VK_Image.h
-            platforms/vk/VK_Mesh.h
-            platforms/vk/VK_Mesh.cpp
-            platforms/vk/VK_RenderPass.cpp
-            platforms/vk/VK_RenderPass.h
-            platforms/vk/ShaderCompiler.cpp
-            platforms/vk/ShaderCompiler.h
-            platforms/vk/VK_Semaphore.cpp
-            platforms/vk/VK_Semaphore.h
-            platforms/vk/VK_Fence.cpp
-            platforms/vk/VK_Fence.h
-            platforms/vk/VK_CommandPool.cpp
-            platforms/vk/VK_CommandPool.h
-            platforms/vk/VK_Buffer.cpp
-            platforms/vk/VK_Buffer.h
-            platforms/vk/VK_Memory.cpp
-            platforms/vk/VK_Memory.h
-            platforms/vk/VK_Allocator.cpp
-            platforms/vk/VK_Allocator.h
-            platforms/vk/VK_CONSTANTS.h
-            platforms/vk/VK_Queue.cpp
-            platforms/vk/VK_Queue.h
-            platforms/vk/VK_ComputePipeline.cpp
-            platforms/vk/VK_ComputePipeline.h
-            platforms/vk/VK_PipelineLayout.cpp
-            platforms/vk/VK_PipelineLayout.h
-            platforms/vk/VK_PipelineDescriptors.cpp
-            platforms/vk/VK_PipelineDescriptors.h
-            platforms/vk/VK_GraphicPipelineInstance.cpp
-            platforms/vk/VK_GraphicPipelineInstance.h
-            platforms/vk/VK_ComputeInstance.cpp
-            platforms/vk/VK_ComputeInstance.h
-            platforms/vk/raytracing/VK_TopLevelAccelerationStructure.cpp
-            platforms/vk/raytracing/VK_TopLevelAccelerationStructure.h
-            platforms/vk/raytracing/VK_MeshBottomLevelAccelerationStructure.cpp
-            platforms/vk/raytracing/VK_MeshBottomLevelAccelerationStructure.h
-            platforms/vk/raytracing/VK_AABBBottomLevelAccelerationStructure.cpp
-            platforms/vk/raytracing/VK_MeshBottomLevelAccelerationStructure.cpp
-            platforms/vk/raytracing/VK_RaytracingPipeline.cpp
-            platforms/vk/raytracing/VK_RaytracingPipeline.h
-            platforms/vk/raytracing/VK_RaytracingPipelineInstance.cpp
-            platforms/vk/raytracing/VK_RaytracingPipelineInstance.h platforms/vk/VK_StorageBuffer.cpp platforms/vk/VK_StorageBuffer.h)
-
     add_compile_definitions(VULKAN_RENDERER)
-
-
-    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/")
-    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/")
-#    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/RayTracingDenoiser/")
-    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/RayTracingDenoiser/Include")
+    message("Found vulkan at ${Vulkan_INCLUDE_DIRS}")
 else ()
-    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/")
-    add_compile_definitions(OPENGL_RENDERER)
-    set(GL_FILES
-            platforms/gl/GL_Renderer.cpp
-            platforms/gl/GL_Texture.cpp
-            platforms/gl/GL_GraphicPipeline.cpp
-            platforms/gl/GL_Mesh.cpp
-            platforms/gl/GL_Framebuffer.cpp
-            platforms/gl/GL_Framebuffer.h
-            platforms/gl/GL_Debug.cpp
-            platforms/gl/GL_Debug.h
-            platforms/gl/GL_MultisamplingFramebuffer.cpp
-            platforms/gl/GL_MultisamplingFramebuffer.h
-            platforms/gl/GL_Shader.cpp
-            platforms/gl/GL_Shader.h
-            platforms/gl/GL_Window.cpp
-            platforms/gl/GL_Window.h
-            platforms/gl/GL_ResourceFactory.cpp
-            platforms/gl/GL_ResourceFactory.h)
+    message(FATAL_ERROR "Vulkan not found")
 endif ()
 
 
+#------------------------------------GLM-----------------------------------
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm/)
+#------------------------------------GLFW------------------------------------
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/include")
 
+#-----------------------------------glslang------------------------------------------------------
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/")
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/)
+#-----------------------------------spirv-cross------------------------------------------------------
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/)
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/")
+
+include_directories(${Vulkan_INCLUDE_DIRS})
+#-----------------------------------NvidiaRayTracingDenoiser-----------------------------------------------
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/RayTracingDenoiser/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/RayTracingDenoiser/")
+
+#------------------------------TINYGLTF--------------------------------
 set(TINYGLTF_HEADER_ONLY ON CACHE INTERNAL "" FORCE)
 set(TINYGLTF_INSTALL OFF CACHE INTERNAL "" FORCE)
 set(TINYGLTF_NO_INCLUDE_STB_IMAGE ON CACHE INTERNAL "" FORCE)
+
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf)
+
+#------------------------------------FREE_TYPE------------------------------------
+set(FREETYPE_LIBRARY "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/freetype/win64/freetype.lib")
+set(FREETYPE_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/freetype/include")
+Find_Package(Freetype REQUIRED)
+
+#------------------------------------MSDFGEN_ATLAS_GEN-------------------
+option(MSDFGEN_USE_CPP11 "Build with C++11 enabled" OFF)
+option(MSDFGEN_BUILD_STANDALONE "Build the msdfgen standalone executable" OFF)
+option(MSDFGEN_INSTALL "Install the msdfgen library" OFF)
+option(MSDFGEN_CORE_ONLY "Build only the msdfgen-core library" OFF)
+option(MSDF_ATLAS_GEN_BUILD_STANDALONE "Build the msdf-atlas-gen standalone executable" OFF)
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/msdf-atlas-gen/")
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/msdf-atlas-gen/include)
 
 include_directories(.)
 set(CORE_FILES
@@ -155,6 +96,7 @@ set(CORE_FILES
         core/resource/RenderTarget.h
         core/resource/raytracing/RaytracingPipeline.h
         core/resource/raytracing/RaytracingPipelineInstance.h
+        core/resource/TexelBuffer.h
 
         core/graphics/Window.h
         core/graphics/Renderer.h
@@ -195,49 +137,116 @@ set(CORE_FILES
         core/threading/JobManager.cpp
         core/threading/JobManager.h
         core/resource/StorageBuffer.h
+        )
+set(VK_FILES
+        platforms/vk/VK_Renderer.cpp
+        platforms/vk/VK_Instance.cpp
+        platforms/vk/VK_Instance.h
+        platforms/vk/VK_Window.cpp
+        platforms/vk/VK_Window.h
+        platforms/vk/VK_ValidationLayers.cpp
+        platforms/vk/VK_ValidationLayers.h
+        platforms/vk/VK_PhysicalDevice.cpp
+        platforms/vk/VK_PhysicalDevice.h
+        platforms/vk/VK_Device.cpp
+        platforms/vk/VK_Device.h
+        platforms/vk/VK_Swapchain.cpp
+        platforms/vk/VK_Swapchain.h
+        platforms/vk/VK_Surface.cpp
+        platforms/vk/VK_Surface.h
+        platforms/vk/VK_GraphicPipeline.cpp
+        platforms/vk/VK_GraphicPipeline.h
+        platforms/vk/VK_Shader.cpp
+        platforms/vk/VK_Shader.h
+        platforms/vk/VK_ResourceFactory.cpp
+        platforms/vk/VK_ResourceFactory.h
+        platforms/vk/VK_Image.cpp
+        platforms/vk/VK_Image.h
+        platforms/vk/VK_Mesh.h
+        platforms/vk/VK_Mesh.cpp
+        platforms/vk/VK_RenderPass.cpp
+        platforms/vk/VK_RenderPass.h
+        platforms/vk/ShaderCompiler.cpp
+        platforms/vk/ShaderCompiler.h
+        platforms/vk/VK_Semaphore.cpp
+        platforms/vk/VK_Semaphore.h
+        platforms/vk/VK_Fence.cpp
+        platforms/vk/VK_Fence.h
+        platforms/vk/VK_CommandPool.cpp
+        platforms/vk/VK_CommandPool.h
+        platforms/vk/VK_Buffer.cpp
+        platforms/vk/VK_Buffer.h
+        platforms/vk/VK_Memory.cpp
+        platforms/vk/VK_Memory.h
+        platforms/vk/VK_Allocator.cpp
+        platforms/vk/VK_Allocator.h
+        platforms/vk/VK_CONSTANTS.h
+        platforms/vk/VK_Queue.cpp
+        platforms/vk/VK_Queue.h
+        platforms/vk/VK_ComputePipeline.cpp
+        platforms/vk/VK_ComputePipeline.h
+        platforms/vk/VK_PipelineLayout.cpp
+        platforms/vk/VK_PipelineLayout.h
+        platforms/vk/VK_PipelineDescriptors.cpp
+        platforms/vk/VK_PipelineDescriptors.h
+        platforms/vk/VK_GraphicPipelineInstance.cpp
+        platforms/vk/VK_GraphicPipelineInstance.h
+        platforms/vk/VK_ComputeInstance.cpp
+        platforms/vk/VK_ComputeInstance.h
+        platforms/vk/raytracing/VK_TopLevelAccelerationStructure.cpp
+        platforms/vk/raytracing/VK_TopLevelAccelerationStructure.h
+        platforms/vk/raytracing/VK_MeshBottomLevelAccelerationStructure.cpp
+        platforms/vk/raytracing/VK_MeshBottomLevelAccelerationStructure.h
+        platforms/vk/raytracing/VK_AABBBottomLevelAccelerationStructure.cpp
+        platforms/vk/raytracing/VK_MeshBottomLevelAccelerationStructure.cpp
+        platforms/vk/raytracing/VK_RaytracingPipeline.cpp
+        platforms/vk/raytracing/VK_RaytracingPipeline.h
+        platforms/vk/raytracing/VK_RaytracingPipelineInstance.cpp
+        platforms/vk/raytracing/VK_RaytracingPipelineInstance.h
+        platforms/vk/VK_StorageBuffer.cpp
+        platforms/vk/VK_StorageBuffer.h
         platforms/vk/VK_DescriptorAllocator.cpp
-        platforms/vk/VK_DescriptorAllocator.h platforms/vk/VK_TexelBuffer.cpp platforms/vk/VK_TexelBuffer.h core/resource/TexelBuffer.h dependencies/stb/stb_image_write.h)
+        platforms/vk/VK_DescriptorAllocator.h
+        platforms/vk/VK_TexelBuffer.cpp
+        platforms/vk/VK_TexelBuffer.h)
+
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}
-        ${IMGUI_FILES}
-        ${GL_FILES}
-        ${VK_FILES}
-        )
+        ${VK_FILES})
+
 target_compile_definitions(${PROJECT_NAME} PRIVATE HB_BUILD)
 
 target_include_directories(${PROJECT_NAME}
-        PUBLIC "${${CMAKE_CURRENT_SOURCE_DIR}}"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/contrib/zlib/"
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm/"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp/include/"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/include"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/include/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb/"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/RayTracingDenoiser/")
 
-if (VULKAN_FOUND)
-    set(GLSLANG_LIBS
-            OSDependent
-            OGLCompiler
-            SPIRV
-            glslang
-            )
-    target_link_libraries(${PROJECT_NAME} PUBLIC ${Vulkan_LIBRARY})
-    target_link_libraries(${PROJECT_NAME}
-            PUBLIC spirv-cross-glsl
-            PUBLIC spirv-cross-cpp
-            PUBLIC spirv-cross-c-shared
-            PUBLIC spirv-cross-reflect
-            PUBLIC spirv-cross-msl
-            PUBLIC spirv-cross-util
-            PUBLIC spirv-cross-core
-            #PUBLIC NRD
-            )
-else ()
-    target_link_libraries(${PROJECT_NAME} PUBLIC glad)
-endif ()
-target_link_libraries(${PROJECT_NAME} PUBLIC glfw ${GLSLANG_LIBS})
+
+set(GLSLANG_LIBS
+        OSDependent
+        OGLCompiler
+        SPIRV
+        glslang
+        )
+set(SPIRV_CROSS_LIBS
+        spirv-cross-glsl
+        spirv-cross-cpp
+        spirv-cross-c-shared
+        spirv-cross-reflect
+        spirv-cross-msl
+        spirv-cross-util
+        spirv-cross-core)
+
+target_link_libraries(${PROJECT_NAME}
+         ${Vulkan_LIBRARY}
+         glfw
+         NRD
+        ${SPIRV_CROSS_LIBS}
+        ${GLSLANG_LIBS}
+        ${FREETYPE_LIBRARY}
+        msdf-atlas-gen
+
+        )
 

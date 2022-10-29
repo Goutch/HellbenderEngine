@@ -43,7 +43,7 @@ namespace HBE {
 	struct ComputePipelineInfo;
 	struct TextureInfo;
 	struct RenderTargetInfo;
-	struct MaterialInfo;
+	struct GraphicPipelineInstanceInfo;
 	struct ComputeInstanceInfo;
 	struct RootAccelerationStructureInfo;
 	struct AABBAccelerationStructureInfo;
@@ -122,8 +122,8 @@ namespace HBE {
 		static Texture *createTexture(const TextureInfo &info);
 		static RenderTarget *createRenderTarget(const RenderTargetInfo &info);
 		static RenderTarget *createRenderTarget(const RenderTargetInfo &info, const std::string &name);
-		static GraphicPipelineInstance *createMaterial(const MaterialInfo &info, const std::string &name);
-		static GraphicPipelineInstance *createMaterial(const MaterialInfo &info);
+		static GraphicPipelineInstance *createGraphicPipelineInstance(const GraphicPipelineInstanceInfo &info, const std::string &name);
+		static GraphicPipelineInstance *createGraphicPipelineInstance(const GraphicPipelineInstanceInfo &info);
 		static ComputeInstance *createComputeInstance(const ComputeInstanceInfo &info, const std::string &name);
 		static ComputeInstance *createComputeInstance(const ComputeInstanceInfo &info);
 		static RootAccelerationStructure *createRootAccelerationStructure(const RootAccelerationStructureInfo &info, const std::string &name);

@@ -50,7 +50,7 @@ namespace HBE {
 		std::vector<VkVertexInputBindingDescription> binding_descriptions;
 		binding_descriptions.resize(info.attribute_info_count);
 		for (size_t i = 0; i < info.attribute_info_count; ++i) {
-			binding_descriptions[i].binding = info.attribute_infos[i].binding;
+			binding_descriptions[i].binding = info.attribute_infos[i].location;
 			binding_descriptions[i].inputRate =
 					(info.attribute_infos[i].flags & VERTEX_ATTRIBUTE_FLAG_PER_INSTANCE) == VERTEX_ATTRIBUTE_FLAG_PER_INSTANCE ?
 					VK_VERTEX_INPUT_RATE_INSTANCE :

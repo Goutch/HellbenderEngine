@@ -3,6 +3,7 @@
 #include "HBE.h"
 #include "vector"
 #include "array"
+#include "NRD.h"
 
 using namespace HBE;
 
@@ -24,7 +25,7 @@ struct Frame {
 	float density_falloff = 10.0f;
 	int use_blue_noise = 0;
 };
-#define HYSTORY_COUNT 16
+#define HYSTORY_COUNT 8
 
 struct MaterialData {
 	vec4 albedo;
@@ -412,6 +413,20 @@ public:
 		scene->setCameraEntity(camera_entity);
 
 		Graphics::getDefaultRenderTarget()->onResolutionChange.subscribe(this, &RaytracingScene::onResolutionChange);
+
+
+		/*nrd::MemoryAllocatorInterface *allocator;
+		nrd::DenoiserCreationDesc denoiserCreationDesc{};
+		denoiserCreationDesc.enableValidation = true;
+		denoiserCreationDesc.memoryAllocatorInterface = *allocator;
+
+		nrd::Denoiser *denoiser;
+
+		nrd::CreateDenoiser(denoiserCreationDesc, denoiser);
+		nrd::DestroyDenoiser(denoiser);
+
+		nrd::*/
+
 	}
 };
 

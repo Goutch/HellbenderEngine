@@ -453,7 +453,7 @@ namespace HBE {
 		screen_pipeline = new VK_GraphicPipeline(device, this, pipeline_info, swapchain->getRenderPass());
 		Resources::add("DEFAULT_SCREEN_PIPELINE", screen_pipeline);
 
-		MaterialInfo screen_material_info{};
+		GraphicPipelineInstanceInfo screen_material_info{};
 		screen_material_info.graphic_pipeline = screen_pipeline;
 		screen_material = new VK_GraphicPipelineInstance(this, screen_material_info);
 		Resources::add("DEFAULT_SCREEN_MATERIAL", screen_material);

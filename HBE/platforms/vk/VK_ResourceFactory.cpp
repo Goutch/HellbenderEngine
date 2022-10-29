@@ -47,7 +47,7 @@ namespace HBE {
 		return new VK_RenderPass(renderer, info);
 	}
 
-	GraphicPipelineInstance *VK_ResourceFactory::createMaterial(const MaterialInfo &info) const {
+	GraphicPipelineInstance *VK_ResourceFactory::createMaterial(const GraphicPipelineInstanceInfo &info) const {
 		return new VK_GraphicPipelineInstance(renderer, info);
 	}
 

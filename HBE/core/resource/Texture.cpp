@@ -31,6 +31,9 @@ namespace HBE {
 	Texture *Texture::load(const std::string &path, IMAGE_FORMAT format, IMAGE_FLAGS flags) {
 		FILE *file = fopen((RESOURCE_PATH + path).c_str(), "rb");
 
+		if (file == nullptr) {
+			Log::error("Failed to open file: " + path);
+		}
 		TextureInfo info{};
 		Texture *texture;
 		int32_t width, height;
@@ -52,7 +55,7 @@ namespace HBE {
 		info.format = format;
 		info.flags = flags;
 		info.data = buffer;
-		texture = Resources::createTexture(info);
+		texture = Resources::createTexture(info,path);
 		stbi_image_free(buffer);
 		stbi_set_flip_vertically_on_load(true);
 		fclose(file);

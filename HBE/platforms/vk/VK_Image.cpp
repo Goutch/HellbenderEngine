@@ -51,19 +51,33 @@ namespace HBE {
 		switch (format) {
 
 			case IMAGE_FORMAT_R8:
-				vk_format = VK_FORMAT_R8_UINT;
+				if (flags & IMAGE_FLAG_NO_SAMPLER)
+					//interpret in shader as unsiged integer
+					vk_format = VK_FORMAT_R8_UINT;
+				else
+					//interpret in shader as float
+					vk_format = VK_FORMAT_R8_SRGB;
 				byte_per_pixel = 1;
 				break;
 			case IMAGE_FORMAT_RG8:
-				vk_format = VK_FORMAT_R8G8_UINT;
+				if (flags & IMAGE_FLAG_NO_SAMPLER)
+					vk_format = VK_FORMAT_R8G8_UINT;
+				else
+					vk_format = VK_FORMAT_R8G8_SRGB;
 				byte_per_pixel = 2;
 				break;
 			case IMAGE_FORMAT_RGB8:
-				vk_format = VK_FORMAT_R8G8B8_UINT;
+				if (flags & IMAGE_FLAG_NO_SAMPLER)
+					vk_format = VK_FORMAT_R8G8B8_UINT;
+				else
+					vk_format = VK_FORMAT_R8G8B8_SRGB;
 				byte_per_pixel = 3;
 				break;
 			case IMAGE_FORMAT_RGBA8:
-				vk_format = VK_FORMAT_R8G8B8A8_UINT;
+				if (flags & IMAGE_FLAG_NO_SAMPLER)
+					vk_format = VK_FORMAT_R8G8B8A8_UINT;
+				else
+					vk_format = VK_FORMAT_R8G8B8A8_SRGB;
 				byte_per_pixel = 4;
 				break;
 			case IMAGE_FORMAT_R32F:

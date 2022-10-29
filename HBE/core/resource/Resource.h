@@ -14,7 +14,7 @@ namespace HBE {
 		VERTEX_TOPOLOGY_LINE,
 	};
 	struct VertexAttributeInfo {
-		uint32_t binding = 0;
+		uint32_t location = 0;
 		uint32_t size = 0;
 		VERTEX_ATTRIBUTE_FLAGS flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 	};

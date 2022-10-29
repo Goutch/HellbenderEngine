@@ -32,7 +32,7 @@ namespace HBE {
 
 	class GraphicPipelineInstance;
 
-	struct MaterialInfo;
+	struct GraphicPipelineInstanceInfo;
 
 	class ComputeInstance;
 
@@ -82,7 +82,7 @@ namespace HBE {
 
 		virtual RenderTarget *createRenderTarget(const RenderTargetInfo &info) const = 0;
 
-		virtual GraphicPipelineInstance *createMaterial(const MaterialInfo &info) const = 0;
+		virtual GraphicPipelineInstance *createMaterial(const GraphicPipelineInstanceInfo &info) const = 0;
 
 		virtual ComputeInstance *createComputeInstance(const ComputeInstanceInfo &info) const = 0;
 

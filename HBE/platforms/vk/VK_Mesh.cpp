@@ -22,8 +22,8 @@ namespace HBE {
 		for (size_t i = 0; i < info.attribute_info_count; ++i) {
 			size_t number_of_buffers = (info.attribute_infos[i].flags & VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) != 0 ?
 									   MAX_FRAMES_IN_FLIGHT : 1;
-			buffers.emplace(info.attribute_infos[i].binding, std::vector<VK_Buffer *>(number_of_buffers, nullptr));
-			bindings.emplace(info.attribute_infos[i].binding, info.attribute_infos[i]);
+			buffers.emplace(info.attribute_infos[i].location, std::vector<VK_Buffer *>(number_of_buffers, nullptr));
+			bindings.emplace(info.attribute_infos[i].location, info.attribute_infos[i]);
 		}
 	}
 

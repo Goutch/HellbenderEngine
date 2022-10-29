@@ -4,7 +4,7 @@
 #include "VK_GraphicPipeline.h"
 
 namespace HBE {
-	VK_GraphicPipelineInstance::VK_GraphicPipelineInstance(VK_Renderer *renderer, const MaterialInfo &info) {
+	VK_GraphicPipelineInstance::VK_GraphicPipelineInstance(VK_Renderer *renderer, const GraphicPipelineInstanceInfo &info) {
 		VK_GraphicPipeline *graphic_pipeline = dynamic_cast<VK_GraphicPipeline *>(info.graphic_pipeline);
 		const VK_PipelineLayout *layout = graphic_pipeline->getPipelineLayout();
 		descriptors = new VK_PipelineDescriptors(renderer, *layout);

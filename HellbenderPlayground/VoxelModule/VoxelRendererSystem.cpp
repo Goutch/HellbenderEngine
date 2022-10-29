@@ -26,9 +26,9 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 
 	VertexAttributeInfo binding_infos[2];
 	binding_infos[0].flags = VERTEX_ATTRIBUTE_FLAG_NONE;
-	binding_infos[0].binding = 0;
+	binding_infos[0].location = 0;
 	binding_infos[0].size = sizeof(vec3);
-	binding_infos[1].binding = 1;
+	binding_infos[1].location = 1;
 	binding_infos[1].flags = VERTEX_ATTRIBUTE_FLAG_PER_INSTANCE;
 	binding_infos[1].size = sizeof(mat4);
 	MeshInfo mesh_info{};
@@ -54,10 +54,10 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 	pipeline_info.flags = GRAPHIC_PIPELINE_FLAG_CULL_FRONT;
 	pipeline = Resources::createGraphicPipeline(pipeline_info);
 
-	MaterialInfo material_info{};
+	GraphicPipelineInstanceInfo material_info{};
 	material_info.graphic_pipeline = pipeline;
-	material_info.flags = MATERIAL_FLAG_NONE;
-	material = Resources::createMaterial(material_info);
+	material_info.flags = GRAPHIC_PIPELINE_INSTANCE_FLAG_NONE;
+	material = Resources::createGraphicPipelineInstance(material_info);
 
 	Geometry::createCube(*mesh, 1, 1, 1, 0);
 

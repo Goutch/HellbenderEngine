@@ -17,8 +17,8 @@ namespace HBE {
 		Profiler::end();
 		for (auto[handle, transform, mesh_renderer]:group) {
 			if (mesh_renderer.active) {
-				if (mesh_renderer.mesh && mesh_renderer.material)
-					Graphics::draw(transform.world(), *mesh_renderer.mesh, *mesh_renderer.material);
+				if (mesh_renderer.mesh && mesh_renderer.pipelineInstance)
+					Graphics::draw(transform.world(), *mesh_renderer.mesh, *mesh_renderer.pipelineInstance);
 				else
 					Log::warning("Mesh renderer does not have a material and/or a mesh assigned");
 			}

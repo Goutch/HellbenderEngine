@@ -81,7 +81,7 @@ namespace HBE {
 	struct HB_API Camera {
 		mat4 projection = mat4(1.0f);
 		float fov = 70.0f;
-		float render_distance = 100.0f;
+		float render_distance = 1000.0f;
 		float near = 0.001f;
 		bool active = true;
 		RenderTarget *render_target = nullptr;
@@ -91,7 +91,7 @@ namespace HBE {
 
 	struct HB_API MeshRenderer {
 		Mesh *mesh = nullptr;
-		GraphicPipelineInstance *material = nullptr;
+		GraphicPipelineInstance *pipelineInstance = nullptr;
 		bool active = true;
 	};
 

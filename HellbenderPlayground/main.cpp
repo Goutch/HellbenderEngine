@@ -1,10 +1,11 @@
+#include <Examples/FontRendering.h>
 #include "HBE.h"
 #include "VoxelModule/VoxelModule.h"
 #include "Pathfinder/Pathfinder.h"
 #include "Examples/LoadModel.h"
 #include "Examples/MeshRendering.h"
 #include "Examples/Raytracing.h"
-
+#include "Examples/FontRendering.h"
 using namespace HBE;
 bool fullscreen = false;
 
@@ -79,7 +80,8 @@ int main() {
 		//Pathfinder pathfinder;
 		//MeshRendering::init();
 		//LoadModelExemple::init();
-		RaytracingScene rts = RaytracingScene();
+		FontRenderingScene font_rendering_scene = FontRenderingScene();
+		//RaytracingScene rts = RaytracingScene();
 		//-----------------------EVENTS------------------
 		Application::onUpdate.subscribe(&onAppUpdate);
 		//-----------------------LOOP--------------------

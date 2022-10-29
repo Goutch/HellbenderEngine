@@ -24,7 +24,7 @@ namespace HBE {
 	private:
 		VK_GraphicPipeline *vk_pipeline;
 	public:
-		VK_GraphicPipelineInstance(VK_Renderer *renderer, const MaterialInfo &info);
+		VK_GraphicPipelineInstance(VK_Renderer *renderer, const GraphicPipelineInstanceInfo &info);
 		~VK_GraphicPipelineInstance() override;
 		void bind() const override;
 		void unbind() const override;
