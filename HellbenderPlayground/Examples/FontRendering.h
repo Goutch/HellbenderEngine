@@ -1,11 +1,12 @@
 #pragma once
 
 #include "HBE.h"
-#include "msdf-atlas-gen/msdf-atlas-gen.h"
-using namespace msdf_atlas;
+//#include "msdf-atlas-gen/msdf-atlas-gen.h"
+//using namespace msdf_atlas;
 using namespace HBE;
 bool generateAtlas(const char *fontFilename) {
 	bool success = false;
+	/*
 	// Initialize instance of FreeType library
 	if (msdfgen::FreetypeHandle *ft = msdfgen::initializeFreetype()) {
 		// Load font file
@@ -60,7 +61,7 @@ bool generateAtlas(const char *fontFilename) {
 			msdfgen::destroyFont(font);
 		}
 		msdfgen::deinitializeFreetype(ft);
-	}
+	}*/
 	return success;
 }
 class FontRenderingScene {

@@ -30,14 +30,12 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm/)
 #------------------------------------GLFW------------------------------------
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/include")
-
 #-----------------------------------glslang------------------------------------------------------
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/)
 #-----------------------------------spirv-cross------------------------------------------------------
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/)
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/")
-
 include_directories(${Vulkan_INCLUDE_DIRS})
 #-----------------------------------NvidiaRayTracingDenoiser-----------------------------------------------
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/RayTracingDenoiser/")
@@ -52,16 +50,23 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf)
 
 #------------------------------------FREE_TYPE------------------------------------
-set(FREETYPE_LIBRARY "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/freetype/win64/freetype.lib")
+set(SKIP_INSTALL_ALL TRUE)
+set(FT_DISABLE_HARFBUZZ ON)
+set(FT_DISABLE_ZLIB ON)
+set(FT_DISABLE_BZIP2 ON)
+set(FT_DISABLE_PNG ON)
+set(FT_DISABLE_HARFBUZZ ON)
+set(FT_DISABLE_BROTLI ON)
+set(FREETYPE_LIBRARY "freetype")
 set(FREETYPE_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/freetype/include")
-Find_Package(Freetype REQUIRED)
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/freetype")
 
 #------------------------------------MSDFGEN_ATLAS_GEN-------------------
-option(MSDFGEN_USE_CPP11 "Build with C++11 enabled" OFF)
-option(MSDFGEN_BUILD_STANDALONE "Build the msdfgen standalone executable" OFF)
-option(MSDFGEN_INSTALL "Install the msdfgen library" OFF)
-option(MSDFGEN_CORE_ONLY "Build only the msdfgen-core library" OFF)
-option(MSDF_ATLAS_GEN_BUILD_STANDALONE "Build the msdf-atlas-gen standalone executable" OFF)
+set(MSDFGEN_USE_CPP11 OFF)
+set(MSDFGEN_BUILD_STANDALONE OFF)
+set(MSDFGEN_INSTALL OFF)
+set(MSDFGEN_CORE_ONLY OFF)
+set(MSDF_ATLAS_GEN_BUILD_STANDALONE OFF)
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/msdf-atlas-gen/")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/msdf-atlas-gen/include)
 
@@ -246,7 +251,7 @@ target_link_libraries(${PROJECT_NAME}
         ${SPIRV_CROSS_LIBS}
         ${GLSLANG_LIBS}
         ${FREETYPE_LIBRARY}
+        msdfgen
         msdf-atlas-gen
-
         )
 
