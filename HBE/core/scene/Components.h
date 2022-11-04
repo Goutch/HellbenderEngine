@@ -4,6 +4,7 @@
 #include "Core.h"
 #include "HBETypes.h"
 #include <glm/detail/type_quat.hpp>
+#include <core/resource/Font.h>
 #include "string"
 
 namespace HBE {
@@ -106,6 +107,17 @@ namespace HBE {
 		float current_pitch = 0.0f;
 		float max_pitch = 90.0f;
 		bool active = true;
+	};
+
+	struct HB_API TextRenderer {
+		bool active = true;
+		std::string text="";
+		float line_height = 1.0f;
+		float space_width = 1.0f;
+		Font *font = nullptr;
+		Mesh* mesh = nullptr;
+		GraphicPipelineInstance *pipeline_instance = nullptr;
+		void buildMesh();
 	};
 
 }

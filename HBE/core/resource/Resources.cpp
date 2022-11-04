@@ -171,4 +171,14 @@ namespace HBE {
 	StorageBuffer *Resources::createStorageBuffer(const StorageBufferInfo &info) {
 		return factory->createStorageBuffer(info);
 	}
+
+	Font *Resources::createFont(const FontInfo& info) {
+		return new Font(info);
+	}
+
+	Font *Resources::createFont(const FontInfo& info, const std::string &name) {
+		Font *f = new Font(info);
+		add(name, f);
+		return f;
+	}
 }

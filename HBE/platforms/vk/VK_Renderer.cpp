@@ -69,7 +69,7 @@ namespace HBE {
 	}
 
 	void VK_Renderer::reCreateSwapchain() {
-		if(window->isMinimized()){
+		if (window->isMinimized()) {
 			return;
 		}
 		uint32_t width, height;
@@ -169,6 +169,7 @@ namespace HBE {
 							 const mat4 &projection_matrix,
 							 const mat4 &view_matrix) {
 		Profiler::begin("RenderPass");
+		command_pool->begin();
 		const VK_RenderPass *render_pass = dynamic_cast<const VK_RenderPass *>(render_target);
 
 		vec2i resolution = render_target->getResolution();
@@ -242,10 +243,8 @@ namespace HBE {
 	}
 
 	void VK_Renderer::beginFrame() {
-		//frames[current_frame].in_flight_fence->wait();
-		//wait for last frame i to isEnd
 		Profiler::begin("CommandPoolWait");
-		command_pool->begin();
+		command_pool->getCurrentFence().wait();
 		Profiler::end();
 	}
 

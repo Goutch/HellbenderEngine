@@ -6,6 +6,8 @@
 #include "Resource.h"
 #include "unordered_map"
 #include "core/utility/Log.h"
+#include "Font.h"
+
 
 namespace HBE {
 	class Renderer;
@@ -138,7 +140,7 @@ namespace HBE {
 		static RaytracingPipelineInstance *createRaytracingPipelineInstance(const RaytracingPipelineInstanceInfo &info);
 		static StorageBuffer *createStorageBuffer(const StorageBufferInfo &info, const std::string &name);
 		static StorageBuffer *createStorageBuffer(const StorageBufferInfo &info);
+		static Font *createFont(const FontInfo& info, const std::string &name);
+		static Font *createFont(const FontInfo& info);
 	};
-
-
 }

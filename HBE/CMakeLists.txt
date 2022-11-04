@@ -5,72 +5,17 @@ project(HBE CXX)
 add_compile_definitions(HB_BUILD)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    message(Detected Compiler: MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --std=c++17 -O3 -fPIC")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3 -fPIC")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    message(Detected Compiler: MSVC)
     set(MSVC_COMPILE_FLAGS "/MP /Ot")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_COMPILE_FLAGS}")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
+
 endif ()
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
-
-#------------------------------------VULKAN------------------------------------
-find_package(Vulkan REQUIRED)
-if (VULKAN_FOUND)
-    add_compile_definitions(VULKAN_RENDERER)
-    message("Found vulkan at ${Vulkan_INCLUDE_DIRS}")
-else ()
-    message(FATAL_ERROR "Vulkan not found")
-endif ()
-
-
-#------------------------------------GLM-----------------------------------
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm/)
-#------------------------------------GLFW------------------------------------
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/include")
-#-----------------------------------glslang------------------------------------------------------
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/")
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/)
-#-----------------------------------spirv-cross------------------------------------------------------
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/)
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/")
-include_directories(${Vulkan_INCLUDE_DIRS})
-#-----------------------------------NvidiaRayTracingDenoiser-----------------------------------------------
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/RayTracingDenoiser/")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/RayTracingDenoiser/")
-
-#------------------------------TINYGLTF--------------------------------
-set(TINYGLTF_HEADER_ONLY ON CACHE INTERNAL "" FORCE)
-set(TINYGLTF_INSTALL OFF CACHE INTERNAL "" FORCE)
-set(TINYGLTF_NO_INCLUDE_STB_IMAGE ON CACHE INTERNAL "" FORCE)
-
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf")
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf)
-
-#------------------------------------FREE_TYPE------------------------------------
-set(SKIP_INSTALL_ALL TRUE)
-set(FT_DISABLE_HARFBUZZ ON)
-set(FT_DISABLE_ZLIB ON)
-set(FT_DISABLE_BZIP2 ON)
-set(FT_DISABLE_PNG ON)
-set(FT_DISABLE_HARFBUZZ ON)
-set(FT_DISABLE_BROTLI ON)
-set(FREETYPE_LIBRARY "freetype")
-set(FREETYPE_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/freetype/include")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/freetype")
-
-#------------------------------------MSDFGEN_ATLAS_GEN-------------------
-set(MSDFGEN_USE_CPP11 OFF)
-set(MSDFGEN_BUILD_STANDALONE OFF)
-set(MSDFGEN_INSTALL OFF)
-set(MSDFGEN_CORE_ONLY OFF)
-set(MSDF_ATLAS_GEN_BUILD_STANDALONE OFF)
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/msdf-atlas-gen/")
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/msdf-atlas-gen/include)
-
-include_directories(.)
 set(CORE_FILES
         HBE.h
         Application.cpp
@@ -142,7 +87,7 @@ set(CORE_FILES
         core/threading/JobManager.cpp
         core/threading/JobManager.h
         core/resource/StorageBuffer.h
-        )
+        core/scene/systems/TextRendererSystem.cpp core/scene/systems/TextRendererSystem.h)
 set(VK_FILES
         platforms/vk/VK_Renderer.cpp
         platforms/vk/VK_Instance.cpp
@@ -213,12 +158,129 @@ set(VK_FILES
         platforms/vk/VK_DescriptorAllocator.cpp
         platforms/vk/VK_DescriptorAllocator.h
         platforms/vk/VK_TexelBuffer.cpp
-        platforms/vk/VK_TexelBuffer.h)
+        platforms/vk/VK_TexelBuffer.h core/resource/Font.cpp core/resource/Font.h)
+
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
+
+#------------------------------------VULKAN------------------------------------
+find_package(Vulkan REQUIRED)
+if (VULKAN_FOUND)
+    add_compile_definitions(VULKAN_RENDERER)
+    message("Found vulkan at ${Vulkan_INCLUDE_DIRS}")
+else ()
+    message(FATAL_ERROR "Vulkan not found")
+endif ()
+
+#------------------------------------GLM-----------------------------------
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm/)
+#------------------------------------GLFW------------------------------------
+set(BUILD_SHARED_LIBS FALSE)
+set(GLFW_BUILD_EXAMPLES FALSE)
+set(GLFW_BUILD_TESTS FALSE)
+set(GLFW_BUILD_DOCS FALSE)
+set(GLFW_INSTALL FALSE)
+set(GLFW_VULKAN_STATIC FALSE)
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/include")
+#set_property(TARGET glfw PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+#-----------------------------------glslang------------------------------------------------------
+set(BUILD_SHARED_LIBS FALSE)
+set(BUILD_EXTERNAL TRUE)
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/")
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/)
+#set_property(TARGET glslang PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+#-----------------------------------spirv-cross------------------------------------------------------
+#set(SPIRV_CROSS_EXCEPTIONS_TO_ASSERTIONS "Instead of throwing exceptions assert" FALSE)
+#set(SPIRV_CROSS_SHARED "Build the C API as a single shared library." TRUE)
+#set(SPIRV_CROSS_STATIC "Build the C and C++ API as static libraries." TRUE)
+#set(SPIRV_CROSS_CLI "Build the CLI binary. Requires SPIRV_CROSS_STATIC." FALSE)
+#set(SPIRV_CROSS_ENABLE_TESTS "Enable SPIRV-Cross tests." FALSE)
+#
+#set(SPIRV_CROSS_ENABLE_GLSL "Enable GLSL support." TRUE)
+#set(SPIRV_CROSS_ENABLE_HLSL "Enable HLSL target support." TRUE)
+#set(SPIRV_CROSS_ENABLE_MSL "Enable MSL target support." TRUE)
+#set(SPIRV_CROSS_ENABLE_CPP "Enable C++ target support." TRUE)
+#set(SPIRV_CROSS_ENABLE_REFLECT "Enable JSON reflection target support." TRUE)
+#set(SPIRV_CROSS_ENABLE_C_API "Enable C API wrapper support in static library." TRUE)
+#set(SPIRV_CROSS_ENABLE_UTIL "Enable util module support." TRUE)
+#
+#set(SPIRV_CROSS_FORCE_STL_TYPES "Force use of STL types instead of STL replacements in certain places. Might reduce performance." FALSE)
+#
+#set(SPIRV_CROSS_SKIP_INSTALL "Skips installation targets." TRUE)
+#
+#set(SPIRV_CROSS_FORCE_PIC "Force position-independent code for all targets." FALSE)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/)
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/")
+include_directories(${Vulkan_INCLUDE_DIRS})
+#set_property(TARGET spirv-cross-glsl PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+#set_property(TARGET spirv-cross-glsl spirv-cross-cpp PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+#set_property(TARGET spirv-cross-c-shared PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+#set_property(TARGET spirv-cross-reflect PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+#set_property(TARGET spirv-cross-msl PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+#set_property(TARGET spirv-cross-util PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+#set_property(TARGET spirv-cross-core PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+#set_property(TARGET SPIRV PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+#set_property(TARGET MachineIndependent PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+#set_property(TARGET GenericCodeGen PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+#set_property(TARGET OGLCompiler PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+#-----------------------------------NvidiaRayTracingDenoiser-----------------------------------------------
+#add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/RayTracingDenoiser/")
+#include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/RayTracingDenoiser/")
+
+#------------------------------TINYGLTF--------------------------------
+set(TINYGLTF_HEADER_ONLY ON CACHE INTERNAL "" FORCE)
+set(TINYGLTF_INSTALL OFF CACHE INTERNAL "" FORCE)
+set(TINYGLTF_NO_INCLUDE_STB_IMAGE ON CACHE INTERNAL "" FORCE)
+
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf")
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf)
+set_property(TARGET tinygltf PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+#------------------------------------FREE_TYPE------------------------------------
+#set(SKIP_INSTALL_ALL TRUE)
+set(FT_DISABLE_ZLIB TRUE)
+set(FT_DISABLE_BZIP2 TRUE)
+set(FT_DISABLE_PNG TRUE)
+set(FT_DISABLE_HARFBUZZ TRUE)
+set(FT_DISABLE_BROTLI TRUE)
+
+set(FREETYPE_LIBRARY freetype)
+set(FREETYPE_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/freetype/include")
+set(FREETYPE_INCLUDE_DIR_ft2build "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/freetype")
+set(FREETYPE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/freetype")
+
+
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/freetype")
+add_library(Freetype::Freetype ALIAS freetype)
+#------------------------------------MSDFGEN-----------------------------------
+set(MSDFGEN_USE_CPP11 TRUE)
+set(MSDFGEN_BUILD_STANDALONE FALSE)
+set(MSDFGEN_INSTALL FALSE)
+set(MSDFGEN_CORE_ONLY FALSE)
+set(MSDFGEN_USE_SKIA FALSE)
+
+#------------------------------------MSDFGEN_ATLAS_GEN-------------------
+set(MSDF_ATLAS_GEN_BUILD_STANDALONE FALSE)
+set(MSDF_ATLAS_GEN_MSDFGEN_EXTERNAL FALSE)
+
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/msdf-atlas-gen/")
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/msdf-atlas-gen/include)
+set_property(TARGET msdf-atlas-gen PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+set_property(TARGET msdfgen-core PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+set_property(TARGET msdfgen-ext PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+
+include_directories(.)
 
 
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}
         ${VK_FILES})
+
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    set_property(TARGET ${PROJECT_NAME} PROPERTY
+            MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+endif ()
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE HB_BUILD)
 
@@ -226,7 +288,9 @@ target_include_directories(${PROJECT_NAME}
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb/"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/RayTracingDenoiser/")
+        #PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/RayTracingDenoiser/"
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf/"
+        PUBLIC "${FREETYPE_INCLUDE_DIRS}")
 
 
 set(GLSLANG_LIBS
@@ -247,11 +311,12 @@ set(SPIRV_CROSS_LIBS
 target_link_libraries(${PROJECT_NAME}
          ${Vulkan_LIBRARY}
          glfw
-         NRD
+         #NRD
         ${SPIRV_CROSS_LIBS}
         ${GLSLANG_LIBS}
         ${FREETYPE_LIBRARY}
-        msdfgen
+        msdfgen-all
         msdf-atlas-gen
         )
 
+#set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")

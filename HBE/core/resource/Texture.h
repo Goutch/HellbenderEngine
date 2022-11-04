@@ -36,7 +36,7 @@ namespace HBE {
 	 * @param min_lod must be greater than 0
 	 */
 	struct TextureInfo {
-		void *data = nullptr;
+		const void *data = nullptr;
 		uint32_t width = 1;
 		uint32_t height = 1;
 		uint32_t depth = 1;

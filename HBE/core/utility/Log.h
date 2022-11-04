@@ -35,8 +35,3 @@ namespace HBE {
 		static uint32_t getFlags();
 	};
 }
-#ifdef NDEBUG
-#define HB_ASSERT(x,y)
-#else
-#define HB_ASSERT(x,y) if(!(x))Log::error(y)
-#endif

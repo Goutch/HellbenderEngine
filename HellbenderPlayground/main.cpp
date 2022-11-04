@@ -78,9 +78,9 @@ int main() {
 	{
 		//RaytracingExemple raytracer;
 		//Pathfinder pathfinder;
-		MeshRendering::init();
+		//MeshRendering::init();
 		//LoadModelExemple::init();
-		//FontRenderingScene font_rendering_scene = FontRenderingScene();
+		FontRenderingScene font_rendering_scene = FontRenderingScene();
 		//RaytracingScene rts = RaytracingScene();
 		//-----------------------EVENTS------------------
 		Application::onUpdate.subscribe(&onAppUpdate);

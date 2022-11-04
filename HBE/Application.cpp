@@ -65,6 +65,7 @@ namespace HBE {
 		while (!window->shouldClose() && current_scene != nullptr) {
 
 			window->swapBuffers();
+			Graphics::beginFrame();
 			Input::pollEvents();
 			Profiler::begin("TOTAL_FRAME");
 			JobManager::updateJobsStatus();
@@ -81,6 +82,7 @@ namespace HBE {
 					if (!window->isMinimized() &&
 						(camera_entity.has<Camera>() ||
 						 camera_entity.has<Camera2D>())) {
+
 						Profiler::begin("DRAW");
 						onDraw.invoke();
 						current_scene->draw();
@@ -88,12 +90,12 @@ namespace HBE {
 
 
 						Profiler::begin("RENDER");
-						Graphics::beginFrame();
+
 
 						onRender.invoke();
 						current_scene->render();
 
-						Graphics::endFrame();
+
 						Profiler::end();
 					}
 				} else {
@@ -102,7 +104,7 @@ namespace HBE {
 			} else {
 				//Log::warning("No scene set");
 			}
-
+			Graphics::endFrame();
 			Profiler::end();
 			delta_t = update_clock.ns() * NANOSECONDS_TO_SECONDS;
 			update_clock.reset();

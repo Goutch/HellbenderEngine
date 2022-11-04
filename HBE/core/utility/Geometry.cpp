@@ -2,6 +2,7 @@
 #include <algorithm>
 
 namespace HBE {
+
 	void Geometry::createQuad(Mesh &mesh, float size_x, float size_y, VERTEX_FLAGS flags) {
 		switch (flags) {
 			case 0://VERTEX_FLAG_NONE
@@ -49,6 +50,9 @@ namespace HBE {
 				break;
 			}
 		}
+		//1---2
+		//| / |
+		//0---3
 		std::vector<unsigned int> indices = {
 				0, 1, 2,
 				2, 3, 0,

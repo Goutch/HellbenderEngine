@@ -6,6 +6,8 @@
 #include <core/resource/Mesh.h>
 #include <core/resource/GraphicPipelineInstance.h>
 #include <core/resource/RenderTarget.h>
+#include <core/resource/Resources.h>
+#include <vector>
 
 namespace HBE {
 	void Transform::translate(vec3 translation) {
@@ -216,5 +218,100 @@ namespace HBE {
 	float Camera2D::aspectRatio() {
 		vec2i res = render_target->getResolution();
 		return static_cast<float>(res.x) / static_cast<float>(res.y);
+	}
+
+	void TextRenderer::buildMesh() {
+		if (mesh != nullptr)
+			delete mesh;
+		uint32_t vertex_size = 3 + 2;
+		uint32_t quad_size = 4 * vertex_size;
+		std::vector<float> vertex_buffer;
+		vertex_buffer.reserve(quad_size * text.size());
+		std::vector<uint32_t> index_buffer;
+		index_buffer.reserve(6 * text.size());
+
+		int line = 0;
+		float horizontal_offset = 0;
+		int vertex_count = 0;
+		for (int i = 0; i < text.size(); ++i) {
+			if (text[i] == '\n') {
+				line++;
+				horizontal_offset = 0;
+				continue;
+			} else if (text[i] == ' ') {
+				horizontal_offset += space_width;
+				continue;
+			}
+			Glyph glyph = font->getCharacterGlyph(text[i]);
+
+			size_t vertices_index = vertex_buffer.size();
+			vertex_buffer.resize(vertex_buffer.size() + quad_size);
+
+			//1---2
+			//| / |
+			//0---3
+
+			//v0 bottom left
+			//position
+			vertex_buffer[vertices_index] = horizontal_offset;
+			vertex_buffer[vertices_index + 1] = line * -line_height;
+			vertex_buffer[vertices_index + 2] = 0;
+
+			//uv
+			vertex_buffer[vertices_index + 3] = glyph.uv_min.x;
+			vertex_buffer[vertices_index + 4] = glyph.uv_min.y;
+
+			//v1 top left
+			//position
+			vertex_buffer[vertices_index + 5] = horizontal_offset;
+			vertex_buffer[vertices_index + 6] = (line * -line_height) + glyph.size.y;
+			vertex_buffer[vertices_index + 7] = 0;
+
+			//uv
+			vertex_buffer[vertices_index + 8] = glyph.uv_min.x;
+			vertex_buffer[vertices_index + 9] = glyph.uv_max.y;
+
+			//v2 top right
+			//position
+			vertex_buffer[vertices_index + 10] = horizontal_offset + glyph.size.x;
+			vertex_buffer[vertices_index + 11] = (line * -line_height) + glyph.size.y;
+			vertex_buffer[vertices_index + 12] = 0;
+			//uv
+			vertex_buffer[vertices_index + 13] = glyph.uv_max.x;
+			vertex_buffer[vertices_index + 14] = glyph.uv_max.y;
+
+			//v3 bottom right
+			//position
+			vertex_buffer[vertices_index + 15] = horizontal_offset + glyph.size.x;
+			vertex_buffer[vertices_index + 16] = line * -line_height;
+			vertex_buffer[vertices_index + 17] = 0;
+			//uv
+			vertex_buffer[vertices_index + 18] = glyph.uv_max.x;
+			vertex_buffer[vertices_index + 19] = glyph.uv_min.y;
+
+			size_t indecies_index = index_buffer.size();
+			index_buffer.resize(index_buffer.size() + 6);
+			index_buffer[indecies_index] = vertex_count;
+			index_buffer[indecies_index + 1] = vertex_count + 1;
+			index_buffer[indecies_index + 2] = vertex_count + 2;
+			index_buffer[indecies_index + 3] = vertex_count + 2;
+			index_buffer[indecies_index + 4] = vertex_count + 3;
+			index_buffer[indecies_index + 5] = vertex_count;
+			horizontal_offset += glyph.size.x;
+			vertex_count += 4;
+		}
+		VertexAttributeInfo vertex_attribute_info{};
+		vertex_attribute_info.size = sizeof(float) * 5;
+		vertex_attribute_info.location = 0;
+		vertex_attribute_info.flags = VERTEX_ATTRIBUTE_FLAG_NONE;
+
+		MeshInfo mesh_info{};
+		mesh_info.flags = MESH_FLAG_NONE;
+		mesh_info.attribute_infos = &vertex_attribute_info;
+		mesh_info.attribute_info_count = 1;
+
+		mesh = Resources::createMesh(mesh_info);
+		mesh->setBuffer(0, vertex_buffer.data(), vertex_buffer.size());
+		mesh->setVertexIndices(index_buffer.data(), index_buffer.size());
 	}
 }

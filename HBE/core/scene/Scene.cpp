@@ -1,8 +1,10 @@
-#include <core/scene/systems/ModelRendererSystem.h>
+#include "core/scene/systems/ModelRendererSystem.h"
+#include "core/scene/systems/TextRendererSystem.h"
 #include "Scene.h"
 #include "core/graphics/Graphics.h"
 #include "core/resource/Resources.h"
 #include "core/resource/RenderTarget.h"
+
 namespace HBE {
 
 	bool Entity::valid() {
@@ -28,6 +30,7 @@ namespace HBE {
 		systems.push_back(new ModelRendererSystem(this));
 		systems.push_back(new CameraSystem(this));
 		systems.push_back(new CameraControllerSystem(this));
+		systems.push_back(new TextRendererSystem(this));
 		Graphics::getDefaultRenderTarget()->onResolutionChange.subscribe(this, &Scene::calculateCameraProjection);
 	}
 
