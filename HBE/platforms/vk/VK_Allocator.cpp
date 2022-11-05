@@ -130,8 +130,8 @@ namespace HBE {
 		vkBindBufferMemory(device->getHandle(), buffer, staging_alloc.block->memory, staging_alloc.offset);
 		StagingBuffer staging_buffer = StagingBuffer{staging_alloc, buffer};
 		void *staging_buffer_data;
-		vkMapMemory(device->getHandle(), staging_buffer.allocation.block->memory, staging_buffer.allocation.offset, staging_buffer.allocation.size, 0, &staging_buffer_data);
-		memcpy(staging_buffer_data, data, static_cast<size_t>(size));
+		vkMapMemory(device->getHandle(), staging_buffer.allocation.block->memory, staging_buffer.allocation.offset,staging_buffer.allocation.size, 0, &staging_buffer_data);
+        memcpy(staging_buffer_data, data, size);
 		vkUnmapMemory(device->getHandle(), staging_buffer.allocation.block->memory);
 		return staging_buffer;
 	}

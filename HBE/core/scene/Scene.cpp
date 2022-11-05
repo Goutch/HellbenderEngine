@@ -72,6 +72,13 @@ namespace HBE {
 
 	Scene::~Scene() {
 		Graphics::getDefaultRenderTarget()->onResolutionChange.unsubscribe(this);
+        for (auto event:detach_events) {
+            std::vector<entity_handle> entities;
+            registry.group(entities,event.first);
+            for (int i = 0; i < entities.size(); ++i) {
+                event.second.invoke(Entity(entities[i],this));
+            }
+        }
 		for (System *system:systems) {
 			delete system;
 		}
@@ -100,4 +107,8 @@ namespace HBE {
 		attach<Transform>(e.getHandle());
 		return e;
 	}
+
+    bool Scene::has(entity_handle handle, size_t component_hash) {
+        return registry.has(handle,component_hash);
+    }
 }

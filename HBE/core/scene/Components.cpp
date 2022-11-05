@@ -10,308 +10,308 @@
 #include <vector>
 
 namespace HBE {
-	void Transform::translate(vec3 translation) {
-		local = glm::translate(local, translation);
-	}
+    void Transform::translate(vec3 translation) {
+        local = glm::translate(local, translation);
+    }
 
-	vec3 Transform::position() const {
-		return local[3];
-	}
+    vec3 Transform::position() const {
+        return local[3];
+    }
 
-	vec3 Transform::worldPosition() const {
-		mat4 mat_world = world();
-		return vec3(mat_world[3].x, mat_world[3].y, mat_world[3].z);
-	}
+    vec3 Transform::worldPosition() const {
+        mat4 mat_world = world();
+        return vec3(mat_world[3].x, mat_world[3].y, mat_world[3].z);
+    }
 
-	vec3 Transform::front() const {
-		return glm::normalize(world()[2]);
-	}
+    vec3 Transform::front() const {
+        return glm::normalize(world()[2]);
+    }
 
-	vec3 Transform::back() const {
-		return -glm::normalize(world()[2]);
-	}
+    vec3 Transform::back() const {
+        return -glm::normalize(world()[2]);
+    }
 
-	vec3 Transform::right() const {
-		return glm::normalize(world()[0]);
-	}
+    vec3 Transform::right() const {
+        return glm::normalize(world()[0]);
+    }
 
-	vec3 Transform::left() const {
-		return -glm::normalize(world()[0]);
-	}
+    vec3 Transform::left() const {
+        return -glm::normalize(world()[0]);
+    }
 
-	vec3 Transform::up() const {
-		return glm::normalize(world()[1]);
-	}
+    vec3 Transform::up() const {
+        return glm::normalize(world()[1]);
+    }
 
-	vec3 Transform::down() const {
-		return -glm::normalize(world()[1]);
-	}
+    vec3 Transform::down() const {
+        return -glm::normalize(world()[1]);
+    }
 
-	vec3 Transform::worldForward() const {
-		return glm::normalize(world()[2]);
-	}
+    vec3 Transform::worldForward() const {
+        return glm::normalize(world()[2]);
+    }
 
-	vec3 Transform::worldBackward() const {
-		return -glm::normalize(world()[2]);
-	}
+    vec3 Transform::worldBackward() const {
+        return -glm::normalize(world()[2]);
+    }
 
-	vec3 Transform::worldRight() const {
-		return glm::normalize(world()[0]);
-	}
+    vec3 Transform::worldRight() const {
+        return glm::normalize(world()[0]);
+    }
 
-	vec3 Transform::worldLeft() const {
-		return -glm::normalize(world()[0]);
-	}
+    vec3 Transform::worldLeft() const {
+        return -glm::normalize(world()[0]);
+    }
 
-	vec3 Transform::worldUp() const {
-		return glm::normalize(world()[1]);
-	}
+    vec3 Transform::worldUp() const {
+        return glm::normalize(world()[1]);
+    }
 
-	vec3 Transform::worldDown() const {
-		return -glm::normalize(world()[1]);
+    vec3 Transform::worldDown() const {
+        return -glm::normalize(world()[1]);
 
-	}
+    }
 
-	void Transform::setRotation(quat rot) {
-		vec3 s = scale();
-		vec3 pos = position();
-		local = mat4(1.0f);
-		rotate(rot);
-		setPosition(pos);
-		setScale(s);
-	}
+    void Transform::setRotation(quat rot) {
+        vec3 s = scale();
+        vec3 pos = position();
+        local = mat4(1.0f);
+        rotate(rot);
+        setPosition(pos);
+        setScale(s);
+    }
 
-	void Transform::setRotation(vec3 rot) {
-		vec3 s = scale();
-		vec3 pos = position();
-		local = mat4(1.0f);
-		rotate(rot);
-		setPosition(pos);
-		setScale(s);
-	}
+    void Transform::setRotation(vec3 rot) {
+        vec3 s = scale();
+        vec3 pos = position();
+        local = mat4(1.0f);
+        rotate(rot);
+        setPosition(pos);
+        setScale(s);
+    }
 
-	void Transform::rotate(quat rot) {
-		local *= glm::mat4_cast(rot);
-	}
+    void Transform::rotate(quat rot) {
+        local *= glm::mat4_cast(rot);
+    }
 
-	void Transform::rotate(vec3 rot) {
-		rotate(quat(rot));
-	}
+    void Transform::rotate(vec3 rot) {
+        rotate(quat(rot));
+    }
 
-	void Transform::setPosition(vec3 pos) {
-		local[3].x = pos.x;
-		local[3].y = pos.y;
-		local[3].z = pos.z;
-	}
+    void Transform::setPosition(vec3 pos) {
+        local[3].x = pos.x;
+        local[3].y = pos.y;
+        local[3].z = pos.z;
+    }
 
-	mat4 Transform::world() const {
-		return parent == nullptr ? local : parent->world() * local;
-	}
+    mat4 Transform::world() const {
+        return parent == nullptr ? local : parent->world() * local;
+    }
 
-	quat Transform::rotation() const {
-		return glm::quat_cast(local);
-	}
+    quat Transform::rotation() const {
+        return glm::quat_cast(local);
+    }
 
-	quat Transform::worldRotation() const {
-		return parent == nullptr ? rotation() : rotation() * parent->worldRotation();
-	}
+    quat Transform::worldRotation() const {
+        return parent == nullptr ? rotation() : rotation() * parent->worldRotation();
+    }
 
-	vec3 Transform::eulerRotation() const {
-		return glm::eulerAngles(rotation());
-	}
+    vec3 Transform::eulerRotation() const {
+        return glm::eulerAngles(rotation());
+    }
 
-	vec3 Transform::worldEulerRotation() const {
-		return parent == nullptr ? glm::eulerAngles(rotation()) : glm::eulerAngles(glm::quat_cast(local) * parent->worldRotation());
-	}
+    vec3 Transform::worldEulerRotation() const {
+        return parent == nullptr ? glm::eulerAngles(rotation()) : glm::eulerAngles(glm::quat_cast(local) * parent->worldRotation());
+    }
 
-	void Transform::setScale(vec3 s) {
-		local = glm::scale(local, vec3(1, 1, 1) / scale());
-		local = glm::scale(local, s);
-	}
+    void Transform::setScale(vec3 s) {
+        local = glm::scale(local, vec3(1, 1, 1) / scale());
+        local = glm::scale(local, s);
+    }
 
-	vec3 Transform::scale() const {
+    vec3 Transform::scale() const {
 
-		return vec3(glm::length(local[0]),
-					glm::length(local[1]),
-					glm::length(local[2]));
+        return vec3(glm::length(local[0]),
+                    glm::length(local[1]),
+                    glm::length(local[2]));
 
-	}
+    }
 
 
 //---------------------------------------CAMERA---------------------------------------
-	void Camera::calculateProjection() {
-		projection = glm::perspective<float>(glm::radians(fov), aspectRatio(), near, render_distance);
-		projection[1] = -projection[1];
-	}
+    void Camera::calculateProjection() {
+        projection = glm::perspective<float>(glm::radians(fov), aspectRatio(), near, render_distance);
+        projection[1] = -projection[1];
+    }
 
-	float Camera::aspectRatio() {
-		vec2i res = render_target->getResolution();
-		return static_cast<float>(res.x) / static_cast<float>(res.y);
-	}
+    float Camera::aspectRatio() {
+        vec2i res = render_target->getResolution();
+        return static_cast<float>(res.x) / static_cast<float>(res.y);
+    }
 
 
 //------------------------------------TRANSFORM2D------------------------------------------------------
-	mat3 Transform2D::world() const {
-		return parent == nullptr ? local : parent->world() * local;
-	}
+    mat3 Transform2D::world() const {
+        return parent == nullptr ? local : parent->world() * local;
+    }
 
-	void Transform2D::translate(vec2 translation) {
-		local[2] += vec3(translation, 1.0f);
-	}
+    void Transform2D::translate(vec2 translation) {
+        local[2] += vec3(translation, 1.0f);
+    }
 
-	vec2 Transform2D::position() {
-		return local[2];
-	}
+    vec2 Transform2D::position() {
+        return local[2];
+    }
 
-	float Transform2D::rotation() const {
-		return atan2(local[0].x, local[0].y);
-	}
+    float Transform2D::rotation() const {
+        return atan2(local[0].x, local[0].y);
+    }
 
-	vec2 Transform2D::worldPosition() const {
-		return local[2];
-	}
+    vec2 Transform2D::worldPosition() const {
+        return local[2];
+    }
 
-	void Transform2D::setPosition(vec2 pos) {
-		local[2].x = pos.x;
-		local[2].y = pos.y;
-	}
+    void Transform2D::setPosition(vec2 pos) {
+        local[2].x = pos.x;
+        local[2].y = pos.y;
+    }
 
-	void Transform2D::rotate(float rot) {
-		mat3 rotation_mat = mat3(1.0f);
-		rotation_mat[0].x = cos(rot);
-		rotation_mat[0].y = sin(rot);
-		rotation_mat[1].x = -rotation_mat[0].y;
-		rotation_mat[1].y = rotation_mat[0].x;
-		local *= rotation_mat;
-	}
+    void Transform2D::rotate(float rot) {
+        mat3 rotation_mat = mat3(1.0f);
+        rotation_mat[0].x = cos(rot);
+        rotation_mat[0].y = sin(rot);
+        rotation_mat[1].x = -rotation_mat[0].y;
+        rotation_mat[1].y = rotation_mat[0].x;
+        local *= rotation_mat;
+    }
 
-	void Transform2D::setRotaton(float rot) {
-		local[0].x = cos(rot);
-		local[0].y = sin(rot);
-		local[1].x = -local[0].y;
-		local[1].y = local[0].x;
-	}
+    void Transform2D::setRotaton(float rot) {
+        local[0].x = cos(rot);
+        local[0].y = sin(rot);
+        local[1].x = -local[0].y;
+        local[1].y = local[0].x;
+    }
 
-	float Transform2D::worldRotation() const {
-		mat3 world_mat = world();
-		return atan2(world_mat[0].x, world_mat[0].y);
-	}
+    float Transform2D::worldRotation() const {
+        mat3 world_mat = world();
+        return atan2(world_mat[0].x, world_mat[0].y);
+    }
 
-	void Transform2D::setScale(vec2 s) {
-		local[0] *= s.y;
-		local[1] *= s.x;
-	}
+    void Transform2D::setScale(vec2 s) {
+        local[0] *= s.y;
+        local[1] *= s.x;
+    }
 
-	vec2 Transform2D::scale() const {
-		return vec2(glm::length(local[0]),
-					glm::length(local[1]));
-	}
+    vec2 Transform2D::scale() const {
+        return vec2(glm::length(local[0]),
+                    glm::length(local[1]));
+    }
 
-	void Camera2D::calculateProjection() {
-		float aspect_ratio = aspectRatio();
-		if (zoom_ratio < 0.1)
-			zoom_ratio = 0.1;
-		projection = glm::ortho(zoom_ratio * -0.5f * aspect_ratio, zoom_ratio * 0.5f * aspect_ratio, zoom_ratio * 0.5f, zoom_ratio * -.5f, -1000.0f, 1000.0f);
-		projection[1] = -projection[1];
-	}
+    void Camera2D::calculateProjection() {
+        float aspect_ratio = aspectRatio();
+        if (zoom_ratio < 0.1)
+            zoom_ratio = 0.1;
+        projection = glm::ortho(zoom_ratio * -0.5f * aspect_ratio, zoom_ratio * 0.5f * aspect_ratio, zoom_ratio * 0.5f, zoom_ratio * -.5f, -1000.0f, 1000.0f);
+        projection[1] = -projection[1];
+    }
 
-	float Camera2D::aspectRatio() {
-		vec2i res = render_target->getResolution();
-		return static_cast<float>(res.x) / static_cast<float>(res.y);
-	}
+    float Camera2D::aspectRatio() {
+        vec2i res = render_target->getResolution();
+        return static_cast<float>(res.x) / static_cast<float>(res.y);
+    }
 
-	void TextRenderer::buildMesh() {
-		if (mesh != nullptr)
-			delete mesh;
-		uint32_t vertex_size = 3 + 2;
-		uint32_t quad_size = 4 * vertex_size;
-		std::vector<float> vertex_buffer;
-		vertex_buffer.reserve(quad_size * text.size());
-		std::vector<uint32_t> index_buffer;
-		index_buffer.reserve(6 * text.size());
+    void TextRenderer::buildMesh() {
+        if (mesh != nullptr)
+            delete mesh;
+        uint32_t vertex_size = 3 + 2;
+        uint32_t quad_size = 4 * vertex_size;
+        std::vector<float> vertex_buffer;
+        vertex_buffer.reserve(quad_size * text_length);
+        std::vector<uint32_t> index_buffer;
+        index_buffer.reserve(6 * text_length);
 
-		int line = 0;
-		float horizontal_offset = 0;
-		int vertex_count = 0;
-		for (int i = 0; i < text.size(); ++i) {
-			if (text[i] == '\n') {
-				line++;
-				horizontal_offset = 0;
-				continue;
-			} else if (text[i] == ' ') {
-				horizontal_offset += space_width;
-				continue;
-			}
-			Glyph glyph = font->getCharacterGlyph(text[i]);
+        int line = 0;
+        float horizontal_offset = 0;
+        int vertex_count = 0;
+        for (int i = 0; i < text_length; ++i) {
+            if (text[i] == '\n') {
+                line++;
+                horizontal_offset = 0;
+                continue;
+            } else if (text[i] == ' ') {
+                horizontal_offset += space_width;
+                continue;
+            }
+            Glyph glyph = font->getCharacterGlyph(text[i]);
 
-			size_t vertices_index = vertex_buffer.size();
-			vertex_buffer.resize(vertex_buffer.size() + quad_size);
+            size_t vertices_index = vertex_buffer.size();
+            vertex_buffer.resize(vertex_buffer.size() + quad_size);
 
-			//1---2
-			//| / |
-			//0---3
+            //1---2
+            //| / |
+            //0---3
 
-			//v0 bottom left
-			//position
-			vertex_buffer[vertices_index] = horizontal_offset;
-			vertex_buffer[vertices_index + 1] = line * -line_height;
-			vertex_buffer[vertices_index + 2] = 0;
+            //v0 bottom left
+            //position
+            vertex_buffer[vertices_index] = horizontal_offset;
+            vertex_buffer[vertices_index + 1] = (line * -line_height) - glyph.offset.y;
+            vertex_buffer[vertices_index + 2] = 0;
 
-			//uv
-			vertex_buffer[vertices_index + 3] = glyph.uv_min.x;
-			vertex_buffer[vertices_index + 4] = glyph.uv_min.y;
+            //uv
+            vertex_buffer[vertices_index + 3] = glyph.uv_min.x;
+            vertex_buffer[vertices_index + 4] = glyph.uv_min.y;
 
-			//v1 top left
-			//position
-			vertex_buffer[vertices_index + 5] = horizontal_offset;
-			vertex_buffer[vertices_index + 6] = (line * -line_height) + glyph.size.y;
-			vertex_buffer[vertices_index + 7] = 0;
+            //v1 top left
+            //position
+            vertex_buffer[vertices_index + 5] = horizontal_offset;
+            vertex_buffer[vertices_index + 6] = (line * -line_height) + glyph.size.y - glyph.offset.y;
+            vertex_buffer[vertices_index + 7] = 0;
 
-			//uv
-			vertex_buffer[vertices_index + 8] = glyph.uv_min.x;
-			vertex_buffer[vertices_index + 9] = glyph.uv_max.y;
+            //uv
+            vertex_buffer[vertices_index + 8] = glyph.uv_min.x;
+            vertex_buffer[vertices_index + 9] = glyph.uv_max.y;
 
-			//v2 top right
-			//position
-			vertex_buffer[vertices_index + 10] = horizontal_offset + glyph.size.x;
-			vertex_buffer[vertices_index + 11] = (line * -line_height) + glyph.size.y;
-			vertex_buffer[vertices_index + 12] = 0;
-			//uv
-			vertex_buffer[vertices_index + 13] = glyph.uv_max.x;
-			vertex_buffer[vertices_index + 14] = glyph.uv_max.y;
+            //v2 top right
+            //position
+            vertex_buffer[vertices_index + 10] = horizontal_offset + glyph.size.x;
+            vertex_buffer[vertices_index + 11] = (line * -line_height) + glyph.size.y - glyph.offset.y;
+            vertex_buffer[vertices_index + 12] = 0;
+            //uv
+            vertex_buffer[vertices_index + 13] = glyph.uv_max.x;
+            vertex_buffer[vertices_index + 14] = glyph.uv_max.y;
 
-			//v3 bottom right
-			//position
-			vertex_buffer[vertices_index + 15] = horizontal_offset + glyph.size.x;
-			vertex_buffer[vertices_index + 16] = line * -line_height;
-			vertex_buffer[vertices_index + 17] = 0;
-			//uv
-			vertex_buffer[vertices_index + 18] = glyph.uv_max.x;
-			vertex_buffer[vertices_index + 19] = glyph.uv_min.y;
+            //v3 bottom right
+            //position
+            vertex_buffer[vertices_index + 15] = horizontal_offset + glyph.size.x;
+            vertex_buffer[vertices_index + 16] = (line * -line_height) - glyph.offset.y;
+            vertex_buffer[vertices_index + 17] = 0;
+            //uv
+            vertex_buffer[vertices_index + 18] = glyph.uv_max.x;
+            vertex_buffer[vertices_index + 19] = glyph.uv_min.y;
 
-			size_t indecies_index = index_buffer.size();
-			index_buffer.resize(index_buffer.size() + 6);
-			index_buffer[indecies_index] = vertex_count;
-			index_buffer[indecies_index + 1] = vertex_count + 1;
-			index_buffer[indecies_index + 2] = vertex_count + 2;
-			index_buffer[indecies_index + 3] = vertex_count + 2;
-			index_buffer[indecies_index + 4] = vertex_count + 3;
-			index_buffer[indecies_index + 5] = vertex_count;
-			horizontal_offset += glyph.size.x;
-			vertex_count += 4;
-		}
-		VertexAttributeInfo vertex_attribute_info{};
-		vertex_attribute_info.size = sizeof(float) * 5;
-		vertex_attribute_info.location = 0;
-		vertex_attribute_info.flags = VERTEX_ATTRIBUTE_FLAG_NONE;
+            size_t indecies_index = index_buffer.size();
+            index_buffer.resize(index_buffer.size() + 6);
+            index_buffer[indecies_index] = vertex_count;
+            index_buffer[indecies_index + 1] = vertex_count + 1;
+            index_buffer[indecies_index + 2] = vertex_count + 2;
+            index_buffer[indecies_index + 3] = vertex_count + 2;
+            index_buffer[indecies_index + 4] = vertex_count + 3;
+            index_buffer[indecies_index + 5] = vertex_count;
+            horizontal_offset += glyph.size.x;
+            vertex_count += 4;
+        }
+        VertexAttributeInfo vertex_attribute_info{};
+        vertex_attribute_info.size = sizeof(float) * 5;
+        vertex_attribute_info.location = 0;
+        vertex_attribute_info.flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 
-		MeshInfo mesh_info{};
-		mesh_info.flags = MESH_FLAG_NONE;
-		mesh_info.attribute_infos = &vertex_attribute_info;
-		mesh_info.attribute_info_count = 1;
+        MeshInfo mesh_info{};
+        mesh_info.flags = MESH_FLAG_NONE;
+        mesh_info.attribute_infos = &vertex_attribute_info;
+        mesh_info.attribute_info_count = 1;
 
-		mesh = Resources::createMesh(mesh_info);
-		mesh->setBuffer(0, vertex_buffer.data(), vertex_buffer.size());
-		mesh->setVertexIndices(index_buffer.data(), index_buffer.size());
-	}
+        mesh = Resources::createMesh(mesh_info);
+        mesh->setBuffer(0, vertex_buffer.data(), vertex_count);
+        mesh->setVertexIndices(index_buffer.data(), index_buffer.size());
+    }
 }

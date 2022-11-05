@@ -91,6 +91,7 @@ namespace HBE {
 		template<typename Component>
 		bool has(entity_handle handle);
 
+        bool has(entity_handle handle,size_t component_hash);
 		template<typename Component>
 		void detach(entity_handle handle);
 

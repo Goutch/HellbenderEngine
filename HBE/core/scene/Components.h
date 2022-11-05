@@ -111,12 +111,13 @@ namespace HBE {
 
 	struct HB_API TextRenderer {
 		bool active = true;
-		std::string text="";
 		float line_height = 1.0f;
 		float space_width = 1.0f;
 		Font *font = nullptr;
 		Mesh* mesh = nullptr;
 		GraphicPipelineInstance *pipeline_instance = nullptr;
+        char* text;
+        uint32_t text_length;
 		void buildMesh();
 	};
 

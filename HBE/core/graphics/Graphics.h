@@ -60,6 +60,7 @@ namespace HBE {
 
 		static void terminate();
 
+        static void waitCurrentFrame();
 		static void beginFrame();
 
 		static void present(const Texture *texture);
