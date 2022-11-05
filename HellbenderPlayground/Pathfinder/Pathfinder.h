@@ -32,11 +32,11 @@ public:
 		scene.addSystem(new SimTransformSystem(&scene));
 
 
-		Entity e = scene.createEntity();
+		Entity e = scene.createEntity3D();
 		Agent agent = e.attach<Agent>();
 		e.attach<SimTransform>();
 
-		camera = scene.createEntity();
+		camera = scene.createEntity3D();
 		SimCamera2D &simCameraComponent = camera.attach<SimCamera2D>();
 		Camera2D &cameraComponent = camera.attach<Camera2D>();
 		camera.attach<SimTransform>();

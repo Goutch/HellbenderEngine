@@ -70,7 +70,7 @@ namespace HBE {
 		void draw();
 		void render();
 		Entity createEntity(const std::string &name);
-		Entity createEntity();
+		Entity createEntity3D();
 		void destroyEntity(Entity entity);
 		Entity getCameraEntity();
 		void setCameraEntity(Entity camera);
@@ -103,7 +103,11 @@ namespace HBE {
 		Event<Entity> &onDetach();
 
 		void calculateCameraProjection(RenderTarget *renderTarget);
-	};
+
+        Entity createEntity2D();
+
+        Entity createEntity();
+    };
 
 	template<typename Component>
 	Component &Entity::attach(Component &component) {

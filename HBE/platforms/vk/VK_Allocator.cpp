@@ -4,22 +4,8 @@
 #include "platforms/vk/VK_Image.h"
 #include "platforms/vk/VK_Buffer.h"
 #include "cstring"
+#include "VK_Renderer.h"
 
-/*
- *
-todo: use somne kind of ring buffer for staging and wait and free only when ring buffer is full
-
-You wait for the fence for the previous upload after you have already written the data to the staging buffer. That's too late; the fence is there to prevent you from writing data to memory that's being read.
-
-But really, your problem is that your design is wrong. Your design is such that sequential updates all use the same memory. They shouldn't. Instead, sequential updates should use different regions of the same memory, so that they cannot overlap. That way, you can perform the transfers and not have to wait on fences at all (or at least, not until next frame).
-
-Basically, you should treat your staging buffer like a ring buffer. Every operation that wants to do some staged transfer work should "allocate" X bytes of memory from the staging ring buffer. The staging buffer system allocates memory sequentially, wrapping around if there is insufficient space. But it also remembers where the last memory region is that it synchronized with. If you try to stage too much work, then it has to synchronize.
-
-Also, one of the purposes behind mapping memory is that you can write directly to that memory, rather than writing to some other CPU memory and copying it in. So instead of passing in a VULKAN_BUFFER (whatever that is), the process that generated that data should have fetched a pointer to a region of the active staging buffer and written its data into that.
-
-Oh, and one more thing: never, ever create a command buffer and immediately submit it. Just don't do it. There's a reason why vkQueueSubmit can take multiple command buffers, and multiple batches of command buffers. For any one queue, you should never be submitting more than once (or maybe twice) per frame.
-
- */
 namespace HBE {
 	VkMemoryPropertyFlags choseProperties(ALLOC_FLAGS flags) {
 		VkMemoryPropertyFlags properties = 0;
@@ -32,14 +18,16 @@ namespace HBE {
 		return properties;
 	}
 
-	VK_Allocator::VK_Allocator(VK_Device *device) {
-		this->device = device;
+    VK_Allocator::VK_Allocator(VK_Device *device) {
+		this->device =device;
 		this->command_pool = new VK_CommandPool(*device, 1,device->getQueue(QUEUE_FAMILY_GRAPHICS));
+
 		memory_propeties = &device->getPhysicalDevice().getMemoryProperties();
 		for (size_t i = 0; i < memory_propeties->memoryTypeCount; ++i) {
 			blocks.emplace(i, std::vector<Block *>());
 		}
 	}
+
 
 	VK_Allocator::~VK_Allocator() {
 		freeStagingBuffers();
@@ -264,7 +252,6 @@ namespace HBE {
 	}
 
 	void VK_Allocator::copy(VkBuffer src, VkBuffer dest, VkDeviceSize size) {
-		freeStagingBuffers();
 		command_pool->begin();
 		VkBufferMemoryBarrier barriers[2];
 		barriers[0] = {};
@@ -509,7 +496,6 @@ namespace HBE {
 	}
 
 	void VK_Allocator::copy(VkBuffer src, VK_Image *dest, VkImageLayout dst_end_layout) {
-		freeStagingBuffers();
 		command_pool->begin();
 		barrierTransitionImageLayout(dest, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 		VkBufferImageCopy region{};
@@ -551,7 +537,6 @@ namespace HBE {
 	void VK_Allocator::copy(VK_Image *src, VkImageLayout src_end_layout, VK_Image *dest, VkImageLayout dst_end_layout) {
 		VkImageAspectFlagBits src_aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT;//todo change for depth if image is depth or stencil
 		VkImageAspectFlagBits dst_aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT;
-		freeStagingBuffers();
 		command_pool->begin();
 		barrierTransitionImageLayout(dest, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 		barrierTransitionImageLayout(src, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
@@ -614,12 +599,12 @@ namespace HBE {
 
 
 	void VK_Allocator::setImageLayout(VK_Image *image, VkImageLayout newLayout) {
-		freeStagingBuffers();
 		command_pool->begin();
 		barrierTransitionImageLayout(image, newLayout);
 		command_pool->end();
 		command_pool->submit(QUEUE_FAMILY_GRAPHICS);
 	}
+
 
 
 }

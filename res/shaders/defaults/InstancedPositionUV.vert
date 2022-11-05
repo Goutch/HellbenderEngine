@@ -1,11 +1,15 @@
 #version 450
-//binding=0 vertices
+//-----------------------------inputs---------------------------------
+//vertices
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec2 inTexCoord;
 
-//binding=1 instanced
-layout(location = 1) out vec2 fragTexCoord;
+//instanced
 layout(location = 2) in mat4 inInstanceTransforms;
+
+//----------------------------------outputs--------------------------
+layout(location = 1) out vec2 fragTexCoord;
+
 
 layout(binding = 0) uniform UniformBufferObject {
     mat4 view;

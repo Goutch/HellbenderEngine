@@ -349,8 +349,10 @@ namespace HBE {
         frame_presented = false;
         current_frame = (current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
         onFrameChange.invoke(current_frame);
+        device->getAllocator()->freeStagingBuffers();
         render_cache.clear();
         command_pool->getCurrentFence().wait();
+
         Profiler::end();
 
     }
@@ -450,6 +452,7 @@ namespace HBE {
         GraphicPipelineInfo pipeline_info{};
         pipeline_info.vertex_shader = vert;
         pipeline_info.fragement_shader = frag;
+        pipeline_info.attribute_info_count=0;
         screen_pipeline = new VK_GraphicPipeline(device, this, pipeline_info, swapchain->getRenderPass());
         Resources::add("DEFAULT_SCREEN_PIPELINE", screen_pipeline);
 

@@ -211,7 +211,7 @@ namespace HBE {
         float aspect_ratio = aspectRatio();
         if (zoom_ratio < 0.1)
             zoom_ratio = 0.1;
-        projection = glm::ortho(zoom_ratio * -0.5f * aspect_ratio, zoom_ratio * 0.5f * aspect_ratio, zoom_ratio * 0.5f, zoom_ratio * -.5f, -1000.0f, 1000.0f);
+        projection = glm::ortho(zoom_ratio * -0.5f * aspect_ratio, zoom_ratio * 0.5f * aspect_ratio, zoom_ratio * 0.5f, zoom_ratio * -.5f, near, far);
         projection[1] = -projection[1];
     }
 
@@ -302,7 +302,7 @@ namespace HBE {
         }
         VertexAttributeInfo vertex_attribute_info{};
         vertex_attribute_info.size = sizeof(float) * 5;
-        vertex_attribute_info.location = 0;
+        vertex_attribute_info.binding = 0;
         vertex_attribute_info.flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 
         MeshInfo mesh_info{};

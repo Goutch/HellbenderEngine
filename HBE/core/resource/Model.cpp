@@ -119,7 +119,7 @@ namespace HBE {
 			//first one add buffer
 			if (accessor.byteOffset == 0) {
 				VertexAttributeInfo attribute_info{};
-				attribute_info.location = buffers.size();
+				attribute_info.binding = buffers.size();
 				attribute_info.size = stride;
 				attribute_info.flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 				attribute_infos.emplace_back(attribute_info);
@@ -136,7 +136,7 @@ namespace HBE {
 				//not inside a stride so it is its own buffer
 			else if (accessor.byteOffset > stride) {
 				VertexAttributeInfo binding_info{};
-				binding_info.location = buffers.size();
+				binding_info.binding = buffers.size();
 				binding_info.size = stride;
 				binding_info.flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 				attribute_infos.emplace_back(binding_info);

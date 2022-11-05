@@ -73,6 +73,8 @@ namespace HBE {
 	struct HB_API Camera2D {
 		bool active = true;
 		mat4 projection = mat3(1.0f);
+        float near = -1000;
+        float far = 1000;
 		float zoom_ratio = 10;
 		RenderTarget *render_target = nullptr;
 		void calculateProjection();

@@ -51,11 +51,11 @@ AgentSystem::AgentSystem(Scene *scene) : System(scene) {
 	std::vector<VertexAttributeInfo> attribute_infos;
 	//vertex binding
 	attribute_infos.emplace_back();
-	attribute_infos[0].location = 0;
+	attribute_infos[0].binding = 0;
 	attribute_infos[0].size = sizeof(vec3) + sizeof(vec2);
 	//instance binding
 	attribute_infos.emplace_back();
-	attribute_infos[1].location = 1;
+	attribute_infos[1].binding = 1;
 	attribute_infos[1].size = sizeof(mat4);
 	attribute_infos[1].flags = VERTEX_ATTRIBUTE_FLAG_PER_INSTANCE |
 							   VERTEX_ATTRIBUTE_FLAG_FAST_WRITE | //Use host visible memory.

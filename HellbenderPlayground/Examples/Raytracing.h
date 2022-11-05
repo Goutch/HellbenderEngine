@@ -405,7 +405,7 @@ public:
 
 		scene->onRender.subscribe(this, &RaytracingScene::onRender);
 		scene->onUpdate.subscribe(this, &RaytracingScene::onUpdate);
-		Entity camera_entity = scene->createEntity();
+		Entity camera_entity = scene->createEntity3D();
 		camera_entity.attach<Camera>();
 		camera_entity.get<Camera>().render_target = Graphics::getDefaultRenderTarget();
 		camera_entity.get<Camera>().calculateProjection();

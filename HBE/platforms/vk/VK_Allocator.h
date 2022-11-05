@@ -93,7 +93,7 @@ namespace HBE {
 		std::queue<StagingBuffer> staging_buffers_queue;
 	public:
 
-		VK_Allocator(VK_Device *device);
+        VK_Allocator(VK_Device *device);
 		~VK_Allocator();
 		virtual Allocation alloc(VkMemoryRequirements memory_requirement, ALLOC_FLAGS flags = ALLOC_FLAG_NONE);
 		void free(const Allocation &allocation);
@@ -103,17 +103,21 @@ namespace HBE {
 		void setImageLayout(VK_Image *image, VkImageLayout newLayout);
 		void update(const VK_Buffer &buffer, const void *data, size_t size);
 		void update(VK_Image &image, const void *data, size_t width, size_t height = 1, size_t depth = 1);
-	private:
+
+        void freeStagingBuffers();
+
+    private:
 		void barrierTransitionImageLayout(VK_Image *image, VkImageLayout new_layout);
 
 		uint32_t findMemoryTypeIndex(VkMemoryRequirements memory_requirement, ALLOC_FLAGS flags);
 		std::string memoryTypeToString(const uint32_t mem_type);
 		std::string allocToString(const Allocation &alloc);
 
-		void freeStagingBuffers();
-		StagingBuffer createTempStagingBuffer(const void *data, size_t size);
+        StagingBuffer createTempStagingBuffer(const void *data, size_t size);
 
 		void generateMipmaps(VK_Image& image);
-	};
+
+        void onRendererFrameChange(uint32_t frame);
+    };
 }
 

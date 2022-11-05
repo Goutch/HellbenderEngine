@@ -12,7 +12,7 @@ public:
 		std::vector<VertexAttributeInfo> attribute_infos;
 		//vertex binding
 		attribute_infos.emplace_back();
-		attribute_infos[0].location = 0;
+		attribute_infos[0].binding = 0;
 		attribute_infos[0].size = sizeof(vec3);
 		attribute_infos[0].flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 		/*binding_infos.emplace_back();
@@ -20,14 +20,14 @@ public:
 		binding_infos[2].size = sizeof(vec3);
 		binding_infos[2].flags = VERTEX_BINDING_FLAG_NONE;*/
 		attribute_infos.emplace_back();
-		attribute_infos[1].location = 1;
+		attribute_infos[1].binding = 1;
 		attribute_infos[1].size = sizeof(vec3);
 		attribute_infos[1].flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 
 		std::vector<VertexAttributeInfo> ground_binding_infos;
 		//vertex binding
 		ground_binding_infos.emplace_back();
-		ground_binding_infos[0].location = 0;
+		ground_binding_infos[0].binding = 0;
 		ground_binding_infos[0].size = sizeof(vec3) * 2;
 		ground_binding_infos[0].flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 

@@ -46,7 +46,7 @@ namespace HBE {
                 // setDimensions or setDimensionsConstraint to find the best value
                 packer.setDimensionsConstraint(TightAtlasPacker::DimensionsConstraint::SQUARE);
                 // setScale for a fixed size or setMinimumScale to use the largest that fits
-                packer.setMinimumScale(info.glyph_size);
+                packer.setMinimumScale(info.glyph_resolution);
                 //packer.setDimensions(info.glyph_size,info.glyph_size);
                 // setPixelRange or setUnitRange
                 packer.setPixelRange(2.0);
@@ -93,8 +93,8 @@ namespace HBE {
                     hbe_glyph.uv_max = vec2((box_rect.x + box_rect.w) / static_cast<float>(width), (box_rect.y + box_rect.h) / static_cast<float>(height));
 
 
-                    hbe_glyph.size = vec2(box_rect.w / static_cast<float>(info.glyph_size), box_rect.h / static_cast<float>(info.glyph_size));
-                    hbe_glyph.offset = vec2(glyph.getBoxTranslate().x / static_cast<float>(info.glyph_size), glyph.getBoxTranslate().y / static_cast<float>(info.glyph_size));
+                    hbe_glyph.size = vec2(box_rect.w / static_cast<float>(info.glyph_resolution), box_rect.h / static_cast<float>(info.glyph_resolution));
+                    hbe_glyph.offset = vec2(glyph.getBoxTranslate().x / static_cast<float>(info.glyph_resolution), glyph.getBoxTranslate().y / static_cast<float>(info.glyph_resolution));
 
                     double scale = glyph.getBoxScale();
                     hbe_glyph.size/=scale;

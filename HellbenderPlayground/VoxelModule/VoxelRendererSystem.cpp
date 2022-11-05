@@ -26,9 +26,9 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 
 	VertexAttributeInfo binding_infos[2];
 	binding_infos[0].flags = VERTEX_ATTRIBUTE_FLAG_NONE;
-	binding_infos[0].location = 0;
+	binding_infos[0].binding = 0;
 	binding_infos[0].size = sizeof(vec3);
-	binding_infos[1].location = 1;
+	binding_infos[1].binding = 1;
 	binding_infos[1].flags = VERTEX_ATTRIBUTE_FLAG_PER_INSTANCE;
 	binding_infos[1].size = sizeof(mat4);
 	MeshInfo mesh_info{};

@@ -40,7 +40,7 @@ Navmesh::Navmesh(const bool *map, uint32_t size_x, uint32_t size_y, f32 cell_siz
 
 	VertexAttributeInfo binding_info{};
 	binding_info.size = sizeof(vec2);
-	binding_info.location = 0;
+	binding_info.binding = 0;
 	binding_info.flags = VERTEX_ATTRIBUTE_FLAG_FAST_WRITE | VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS;
 	MeshInfo mesh_info{};
 	mesh_info.attribute_info_count = 1;

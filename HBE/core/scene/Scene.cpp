@@ -93,20 +93,29 @@ namespace HBE {
 		return registry.valid(handle);
 	}
 
+    Entity Scene::createEntity(){
+        return Entity(registry.create(), this);
+    }
 
 	Entity Scene::createEntity(const std::string &name) {
-		Entity e = createEntity();
+		Entity e = createEntity3D();
 		Identity &identity = e.attach<Identity>();
 		identity.name = name;
 		return e;
 	}
 
 
-	Entity Scene::createEntity() {
+	Entity Scene::createEntity3D() {
 		Entity e(registry.create(), this);
 		attach<Transform>(e.getHandle());
 		return e;
 	}
+
+    Entity Scene::createEntity2D() {
+        Entity e(registry.create(), this);
+        attach<Transform2D>(e.getHandle());
+        return e;
+    }
 
     bool Scene::has(entity_handle handle, size_t component_hash) {
         return registry.has(handle,component_hash);

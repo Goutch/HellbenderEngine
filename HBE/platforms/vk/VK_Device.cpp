@@ -87,8 +87,8 @@ namespace HBE {
 	}
 
 	VK_Device::~VK_Device() {
-		queues.clear();
 		delete allocator;
+        queues.clear();
 		vkDestroyDevice(handle, nullptr);
 	}
 

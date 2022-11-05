@@ -80,7 +80,7 @@ int main() {
 		//Pathfinder pathfinder;
 		//MeshRendering::init();
 		//LoadModelExemple::init();
-		FontRenderingScene font_rendering_scene = FontRenderingScene();
+		TextRenderingScene font_rendering_scene = TextRenderingScene();
 		//RaytracingScene rts = RaytracingScene();
 		//-----------------------EVENTS------------------
 		Application::onUpdate.subscribe(&onAppUpdate);

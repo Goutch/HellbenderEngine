@@ -12,12 +12,12 @@ public:
 		std::vector<VertexAttributeInfo> attribute_infos;
 		//vertex binding
 		attribute_infos.emplace_back();
-		attribute_infos[0].location = 0;
+		attribute_infos[0].binding = 0;
 		attribute_infos[0].size = sizeof(vec3);
 		attribute_infos[0].flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 
 		attribute_infos.emplace_back();
-		attribute_infos[1].location = 1;
+		attribute_infos[1].binding = 1;
 		attribute_infos[1].size = sizeof(vec4);
 		attribute_infos[1].flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 

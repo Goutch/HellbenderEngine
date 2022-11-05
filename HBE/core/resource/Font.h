@@ -12,7 +12,7 @@ namespace HBE {
         std::string path;
         char *characters;
         uint32_t characters_count;
-        uint32_t glyph_size = 32;
+        uint32_t glyph_resolution = 32;
     };
 
     struct Glyph {
