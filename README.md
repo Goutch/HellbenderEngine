@@ -1,61 +1,61 @@
 # HellbenderEngine
+## My personnal toy Rendering engine/framework.
 
 # Goals 
-- **Simple and easy to read for programmers**
+- **Simple API**
 - **Cross platforms**
-- **Easy to use and modular API.**
+- **Easy to use**
 - **Minimal dependencies and lightweight.**
+- **FAST**
 
 # Why?
-- **I want to Learn graphics and engines.**
-- **I like to code in c++.**
-- **I want to do procedural generation and raytracing.**
+- **I like vulkan and graphics**
+- **I want to do procedural generation and ray tracing.**
 
 # Features
-#### HB Graphic Engine library:
-- Entity and components
-	- Camera
-	- CameraController
-	- MeshRenderer
-	- ModelRenderer
-	- MeshInstancesRenderer
-- 3D mesh rendering with OpenGL
+#### HB Graphics library:
+- 3D rendering
+- 2D rendering
 - Instancing
-- keyboard and mouse input handling
-- Resource loading
-	 - Model
-	 - Texture
+- Resource loading:
+	 - Textures
 	 - Shaders
-- Material system
+	 - GLTF models
+- Compute shaders
+- Ray tracing pipeline shaders
+	- miss 
+	- closest hit
+	- any hit
+	- intersection
+#### Other
+- ECS
+	- Camera (perspective)
+	- Camera2D (orthographic)
+	- CameraController 
+	- MeshRenderer 
 - Job System
 - Event system
+- keyboard and mouse input handling
 
-## Planned features
-
- - Pure ECS
- - Scene serialization
- - Vulkan support
- - Deffered rendering
- - PBR
- - Physics
- - Particules system
+#### planned for Alpha 1.0:
+- Model loading and animations
+- Font rendering
 
 ## Getting started
 
 ### Compiling
-These are 3 tested compilers : 
+These are 2 tested compilers : 
 - GCC
 - VC
-- MINGW
 
 ### Wiki
 - [Home](https://github.com/Goutch/HellbenderEngine/wiki) 
-- [Hello Triangle](https://github.com/Goutch/HellbenderEngine/wiki/Hello-triangle)
-- [Custom Component](https://github.com/Goutch/HellbenderEngine/wiki/Custom-component)
-- [Loading Model](https://github.com/Goutch/HellbenderEngine/wiki/Loading-model)
 ## Qestions and Answers
 Q: Why should I use this engine instead of unity/unreal?  
-A: You shouldn't this is a toy engine for me.  
+A: You shouldn't this is a toy engine made for me.  
+
+### Notes:
+HBE used to support Opengl but it is deprecated as of now I am not sure if I will support it in the future. Checkout the opengl branch if you want a "working" Opengl version.
 
 ![Path Tracing Screenshot](https://github.com/Goutch/HellbenderEngine/blob/develop/Screenshots/pathtracing.PNG)
 
