@@ -128,7 +128,7 @@ namespace HBE {
 		render_pass_info.subpassCount = 1;
 		render_pass_info.pSubpasses = &subpass;
 
-		VkSubpassDependency dependency{};
+		/*VkSubpassDependency dependency{};
 		dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
 		dependency.dstSubpass = 0;
 
@@ -143,7 +143,7 @@ namespace HBE {
 		dependency.dstAccessMask |= (flags & RENDER_TARGET_FLAG_DEPTH_TEST) ? VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT : 0;
 
 		render_pass_info.dependencyCount = 1;
-		render_pass_info.pDependencies = &dependency;
+		render_pass_info.pDependencies = &dependency;*/
 
 		if (vkCreateRenderPass(device->getHandle(), &render_pass_info, nullptr, &handle) != VK_SUCCESS) {
 			Log::error("failed to create render pass!");
@@ -204,7 +204,18 @@ namespace HBE {
 
 	void VK_RenderPass::end(const VkCommandBuffer &command_buffer) const {
 		vkCmdEndRenderPass(command_buffer);
-		vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_DEPENDENCY_BY_REGION_BIT, 0, nullptr, 0, nullptr, 0, nullptr);
+
+        /*VkImageMemoryBarrier image_barrier{};
+		vkCmdPipelineBarrier(command_buffer,
+                             VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
+                             VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+                             VK_DEPENDENCY_BY_REGION_BIT,
+                             0,
+                             nullptr,
+                             0,
+                             nullptr,
+                             0,
+                             nullptr);*/
 	}
 
 	void VK_RenderPass::createFramebuffers() {

@@ -56,6 +56,7 @@ namespace HBE {
 		VkPhysicalDeviceAccelerationStructureFeaturesKHR acceleration_structure_features{};
 		VkPhysicalDeviceRayTracingPipelineFeaturesKHR ray_tracing_pipeline_features{};
 		VkPhysicalDeviceDescriptorIndexingFeatures descriptor_indexing_features{};
+        VkPhysicalDeviceSynchronization2Features synchronization2_features{};
 
 		std::vector<const char *> enabled_extensions;
 		std::multimap<uint32_t, VkPhysicalDevice> device_score;

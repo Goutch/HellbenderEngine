@@ -197,7 +197,7 @@ namespace HBE {
             pipeline->bind();
             for (const auto &material_kv: pipeline_kv.second) {
                 GraphicPipelineInstance *material = material_kv.first;
-                material->setUniform("ubo", &ubo, -1);
+                material->setUniform("ubo", &ubo, current_frame);
                 material->bind();
                 for (const auto &mesh_kv: material_kv.second) {
                     const Mesh *mesh = mesh_kv.first;
@@ -222,7 +222,7 @@ namespace HBE {
             pipeline->bind();
             for (const auto &material_kv: pipeline_kv.second) {
                 GraphicPipelineInstance *material = material_kv.first;
-                material->setUniform("ubo", &ubo, -1);
+                material->setUniform("ubo", &ubo, current_frame);
                 material->bind();
 
                 std::vector<const Mesh *> meshes = material_kv.second;
@@ -252,6 +252,7 @@ namespace HBE {
         HB_ASSERT(frame_presented == false, "Frame already presented, call beginFrame() before present() and endFrame() after present()");
         Profiler::begin("AquireImage");
 
+        const VK_Image *vk_image = dynamic_cast<const VK_Image *>(image);
         VkResult result = vkAcquireNextImageKHR(device->getHandle(),
                                                 swapchain->getHandle(),
                                                 UINT64_MAX,
@@ -292,11 +293,41 @@ namespace HBE {
         vkCmdSetViewport(command_pool->getCurrentBuffer(), 0, 1, &viewport);
         vkCmdSetScissor(command_pool->getCurrentBuffer(), 0, 1, &scissor);
 
+        VkMemoryBarrier2 image_barrier{};
+        image_barrier.sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER_2;
+        image_barrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_SHADER_WRITE_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
+        image_barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+        image_barrier.srcStageMask = VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT|VK_PIPELINE_STAGE_TRANSFER_BIT;
+        image_barrier.dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+
+        VkDependencyInfo dependency_info{};
+        dependency_info.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO_KHR;
+        dependency_info.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+        dependency_info.pImageMemoryBarriers = nullptr;
+        dependency_info.imageMemoryBarrierCount = 0;
+        dependency_info.pBufferMemoryBarriers = nullptr;
+        dependency_info.bufferMemoryBarrierCount = 0;
+        dependency_info.pMemoryBarriers = &image_barrier;
+        dependency_info.memoryBarrierCount = 1;
+        device->vkCmdPipelineBarrier2(command_pool->getCurrentBuffer(), &dependency_info);
+        /* vkCmdPipelineBarrier2(command_pool->getCurrentBuffer(),
+
+                              VK_DEPENDENCY_BY_REGION_BIT,
+                              0,
+                              nullptr,
+                              0,
+                              nullptr,
+                              0,
+                              nullptr);*/
+
         screen_material->setTexture("texture0", image, current_frame, 0);
         swapchain->beginRenderPass(current_image, command_pool->getCurrentBuffer());
 
         screen_pipeline->bind();
         screen_material->bind();
+
+
         vkCmdDraw(command_pool->getCurrentBuffer(), 3, 1, 0, 0);
         screen_material->unbind();
         screen_pipeline->unbind();
@@ -452,7 +483,7 @@ namespace HBE {
         GraphicPipelineInfo pipeline_info{};
         pipeline_info.vertex_shader = vert;
         pipeline_info.fragement_shader = frag;
-        pipeline_info.attribute_info_count=0;
+        pipeline_info.attribute_info_count = 0;
         screen_pipeline = new VK_GraphicPipeline(device, this, pipeline_info, swapchain->getRenderPass());
         Resources::add("DEFAULT_SCREEN_PIPELINE", screen_pipeline);
 

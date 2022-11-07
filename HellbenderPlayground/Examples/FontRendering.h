@@ -5,7 +5,7 @@
 using namespace HBE;
 
 class TextRenderingScene {
-    std::string TEXT = "Hello world!\nThis is a test of the text rendering system";
+    std::string TEXT = "Hello world!\nThis is a test of the text rendering system\nabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{};':\",./<>?\\|`~";
 public:
     TextRenderingScene() {
         Shader *text_vertex_shader;
@@ -68,6 +68,7 @@ public:
         font_info.characters = characters.data();
         font_info.characters_count = characters.size();
         font_info.glyph_resolution = 64;
+
         Font *font = Resources::createFont(font_info, "font");
         text_pipeline_instance->setTexture("mtsdf", font->getTextureAtlas());
 
@@ -79,7 +80,7 @@ public:
         text_renderer.text = TEXT.data();
         text_renderer.text_length = TEXT.length();
         text_renderer.font = font;
-        text_renderer.space_width = 0.2f;
+        text_renderer.space_width = 0.4f;
         text_renderer.line_height = 1.0f;
         text_renderer.buildMesh();
 
