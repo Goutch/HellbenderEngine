@@ -18,12 +18,27 @@ namespace HBE {
 	}
 
 	void TextRendererSystem::draw() {
+
+		DrawCmdInfo draw_cmd{};
+		PushConstantInfo push_constant_info{};
+		push_constant_info.size = sizeof(mat4);
+		push_constant_info.name = "constants";
+		draw_cmd.push_constants_count = 1;
+		draw_cmd.push_constants = &push_constant_info;
+
 		auto group = scene->group<Transform, TextRenderer>();
 		for (auto[handle, transform, text_renderer]:group) {
 			if (text_renderer.active) {
 				if (text_renderer.font && text_renderer.mesh && text_renderer.pipeline_instance) {
 					text_renderer.pipeline_instance->setTexture("mtsdf", text_renderer.font->getTextureAtlas(), Graphics::getCurrentFrame());
-					Graphics::draw(transform.world(), *text_renderer.mesh, *text_renderer.pipeline_instance);
+
+					draw_cmd.mesh = text_renderer.mesh;
+					draw_cmd.pipeline_instance = text_renderer.pipeline_instance;
+
+					mat4 world_matrix = transform.world();
+					push_constant_info.data = &world_matrix;
+
+					Graphics::draw(draw_cmd);
 				} else
 					Log::warning("Text renderer does not have a pipeline and/or a font assigned and/or a mesh assigned");
 			}

@@ -11,15 +11,27 @@ namespace HBE {
 
 	void HBE::MeshRendererSystem::draw() {
 		Profiler::begin("MeshRendererUpdate");
+		DrawCmdInfo draw_cmd{};
+		PushConstantInfo push_constant_info{};
+		push_constant_info.size = sizeof(mat4);
+		push_constant_info.name = "constants";
+		draw_cmd.push_constants_count = 1;
+		draw_cmd.push_constants = &push_constant_info;
+
 		Profiler::begin("MeshRendererUpdateGroup");
 		auto group = scene->group<Transform, MeshRenderer>();
-
 		Profiler::end();
 		for (auto[handle, transform, mesh_renderer]:group) {
 			if (mesh_renderer.active) {
-				if (mesh_renderer.mesh && mesh_renderer.pipelineInstance)
-					Graphics::draw(transform.world(), *mesh_renderer.mesh, *mesh_renderer.pipelineInstance);
-				else
+				if (mesh_renderer.mesh && mesh_renderer.pipelineInstance) {
+
+					draw_cmd.mesh = mesh_renderer.mesh;
+					draw_cmd.pipeline_instance = mesh_renderer.pipelineInstance;
+
+					mat4 world_matrix = transform.world();
+					push_constant_info.data = &world_matrix;
+					Graphics::draw(draw_cmd);
+				} else
 					Log::warning("Mesh renderer does not have a material and/or a mesh assigned");
 			}
 

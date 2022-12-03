@@ -22,7 +22,8 @@ layout(push_constant) uniform Constants
 
 void main() {
     vec4 pos = constants.transform * vec4(inPosition, 1.0);
-    gl_Position = ubo.projection * ubo.view * pos;
-    fragmentPos = pos;
+    vec4 frag_pos =  ubo.projection * ubo.view * pos;
+    gl_Position = frag_pos;
+    fragmentPos = frag_pos;
     fragmentNormal = inNormal;
 }

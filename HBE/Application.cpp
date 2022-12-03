@@ -96,6 +96,9 @@ namespace HBE {
 
                         Profiler::end();
                     }
+                    else if (window->isMinimized()) {
+
+					}
                 } else {
                     //Log::warning("No camera in current scene");
                 }

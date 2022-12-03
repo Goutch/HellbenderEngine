@@ -20,7 +20,10 @@ void Navmesh::draw() {
 	}
 
 	if (mesh->getVertexCount() > 0) {
-		Graphics::drawInstanced(*mesh, *material);
+		DrawCmdInfo draw_cmd{};
+		draw_cmd.mesh = mesh;
+		draw_cmd.pipeline_instance = material;
+		Graphics::draw(draw_cmd);
 	}
 }
 

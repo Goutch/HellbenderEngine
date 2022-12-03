@@ -73,8 +73,8 @@ namespace HBE {
 	struct HB_API Camera2D {
 		bool active = true;
 		mat4 projection = mat3(1.0f);
-        float near = -1000;
-        float far = 1000;
+		float near = -1000;
+		float far = 1000;
 		float zoom_ratio = 10;
 		RenderTarget *render_target = nullptr;
 		void calculateProjection();
@@ -116,10 +116,14 @@ namespace HBE {
 		float line_height = 1.0f;
 		float space_width = 1.0f;
 		Font *font = nullptr;
-		Mesh* mesh = nullptr;
+		Mesh *mesh = nullptr;
+		TEXT_ALIGNMENT alignment = TEXT_ALIGNMENT_LEFT;
+		PIVOT pivot = PIVOT_TOP_LEFT;
+		float total_width;
+		float total_height;
 		GraphicPipelineInstance *pipeline_instance = nullptr;
-        char* text;
-        uint32_t text_length;
+		char *text;
+		uint32_t text_length;
 		void buildMesh();
 	};
 

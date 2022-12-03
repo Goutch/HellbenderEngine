@@ -14,6 +14,8 @@ namespace HBE {
 	bool Input::down[348];
 	float Input::wheel_offset = 0.0f;
 	std::queue<short> Input::reset_queue;
+	Event<KEY> Input::onKeyDown = Event<KEY>();
+	Event<char> Input::onCharDown = Event<char>();
 
 	bool Input::getKey(KEY code) {
 		return pressed[code];
@@ -41,6 +43,7 @@ namespace HBE {
 		Input::window = static_cast<GLFWwindow *>(Graphics::getWindow()->getHandle());
 		glfwSetScrollCallback(window, scrollCallback);
 		glfwSetKeyCallback(window, keyCallback);
+		glfwSetCharCallback(window, charCallback);
 		glfwSetMouseButtonCallback(window, mouseButtonCallback);
 		for (int i = 0; i < 348; ++i) {
 			down[i] = false;
@@ -74,6 +77,7 @@ namespace HBE {
 		if (action == GLFW_PRESS) {
 			down[key] = true;
 			pressed[key] = true;
+			onKeyDown.invoke(static_cast<KEY>(key));
 			reset_queue.emplace(key);
 		}
 		if (action == GLFW_REPEAT) {
@@ -115,6 +119,10 @@ namespace HBE {
 		}
 		wheel_offset = 0;
 		glfwPollEvents();
+	}
+
+	void Input::charCallback(GLFWwindow *window, unsigned int codepoint) {
+		onCharDown.invoke(static_cast<char>(codepoint));
 	}
 
 

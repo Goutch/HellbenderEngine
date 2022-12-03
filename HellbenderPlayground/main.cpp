@@ -6,6 +6,7 @@
 #include "Examples/MeshRendering.h"
 #include "Examples/Raytracing.h"
 #include "Examples/FontRendering.h"
+#include "Examples/CubeRendering.h"
 using namespace HBE;
 bool fullscreen = false;
 
@@ -76,12 +77,12 @@ int main() {
 	//Pathfinder *pathfinder = new Pathfinder();
 
 	{
-		//RaytracingExemple raytracer;
 		//Pathfinder pathfinder;
 		//MeshRendering::init();
+		//CubeRendering::init();
 		//LoadModelExemple::init();
-		TextRenderingScene font_rendering_scene = TextRenderingScene();
-		//RaytracingScene rts = RaytracingScene();
+		//TextRenderingScene font_rendering_scene = TextRenderingScene();
+		RaytracingScene rts = RaytracingScene();
 		//-----------------------EVENTS------------------
 		Application::onUpdate.subscribe(&onAppUpdate);
 		//-----------------------LOOP--------------------

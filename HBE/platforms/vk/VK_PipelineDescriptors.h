@@ -59,7 +59,9 @@ namespace HBE {
 		std::map<std::string, size_t> uniform_name_to_index;
 		std::map<uint32_t, size_t> uniform_binding_to_index;
 
-		std::queue<std::pair<uint32_t,VkDescriptorPool>> old_descriptor_pools;
+		std::queue<std::pair<uint32_t, VkDescriptorPool>> old_descriptor_pools;
+
+		mutable bool bound = false;
 	public:
 		VK_PipelineDescriptors(VK_Renderer *renderer, const VK_PipelineLayout &layout);
 		~VK_PipelineDescriptors();

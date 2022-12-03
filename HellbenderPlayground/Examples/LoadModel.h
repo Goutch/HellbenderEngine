@@ -1,7 +1,18 @@
 #pragma once
+
 #include "HBE.h"
-class LoadModelExemple {
+
+class LoadModelExemple : System {
+private :
+	static Entity entitites[2];
 public:
+
+	static void update(float delta) {
+		for (int i = 0; i < 2; i++) {
+			entitites[i].get<Transform>().rotate(glm::vec3(0, delta, 0));
+		}
+	}
+
 	static void init() {
 		//-------------------RESOURCES CREATION--------------------------------------
 		ShaderInfo frag_info{SHADER_STAGE_FRAGMENT, "/shaders/defaults/PositionNormal.frag"};
@@ -15,28 +26,17 @@ public:
 		attribute_infos[0].binding = 0;
 		attribute_infos[0].size = sizeof(vec3);
 		attribute_infos[0].flags = VERTEX_ATTRIBUTE_FLAG_NONE;
-		/*binding_infos.emplace_back();
-		binding_infos[2].binding = 2;
-		binding_infos[2].size = sizeof(vec3);
-		binding_infos[2].flags = VERTEX_BINDING_FLAG_NONE;*/
 		attribute_infos.emplace_back();
 		attribute_infos[1].binding = 1;
 		attribute_infos[1].size = sizeof(vec3);
 		attribute_infos[1].flags = VERTEX_ATTRIBUTE_FLAG_NONE;
-
-		std::vector<VertexAttributeInfo> ground_binding_infos;
-		//vertex binding
-		ground_binding_infos.emplace_back();
-		ground_binding_infos[0].binding = 0;
-		ground_binding_infos[0].size = sizeof(vec3) * 2;
-		ground_binding_infos[0].flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 
 		GraphicPipelineInfo pipeline_info{};
 		pipeline_info.attribute_infos = attribute_infos.data();
 		pipeline_info.attribute_info_count = attribute_infos.size();
 		pipeline_info.fragement_shader = frag;
 		pipeline_info.vertex_shader = vert;
-		pipeline_info.flags = GRAPHIC_PIPELINE_FLAG_CULL_BACK;
+		pipeline_info.flags = GRAPHIC_PIPELINE_FLAG_FRONT_COUNTER_CLOCKWISE | GRAPHIC_PIPELINE_FLAG_CULL_BACK; //gltf primitives are counter clockwise
 
 		auto model_pipeline = Resources::createGraphicPipeline(pipeline_info, "DEFAULT_MODEL_PIPELINE");
 
@@ -44,19 +44,8 @@ public:
 		model_material_info.graphic_pipeline = model_pipeline;
 		Resources::createGraphicPipelineInstance(model_material_info, "DEFAULT_MODEL_MATERIAL");
 
-		pipeline_info.attribute_infos = ground_binding_infos.data();
-		pipeline_info.attribute_info_count = ground_binding_infos.size();
-
-		auto ground_pipeline = Resources::createGraphicPipeline(pipeline_info, "GROUND_PIPELINE");
-
-		GraphicPipelineInstanceInfo ground_material_info{};
-		ground_material_info.graphic_pipeline = ground_pipeline;
-		auto ground_material = Resources::createGraphicPipelineInstance(ground_material_info, "GROUND_MATERIAL");
-
-
-		vec4 ground_material_color = vec4(0.2, 0.7, 0., 1.);
-		ground_material->setUniform("material", &ground_material_color, -1);
-
+		pipeline_info.attribute_infos = &VERTEX_ATTRIBUTE_INFO_POSITION3D_NORMAL_INTERLEAVED;
+		pipeline_info.attribute_info_count = 1;
 
 		ModelInfo model_info{};
 		model_info.path = "/models/teapot.gltf";
@@ -67,14 +56,6 @@ public:
 		model_info.path = "/models/dragon.gltf";
 		Model *dragon_model = Resources::createModel(model_info, "dragon");
 
-
-		MeshInfo mesh_info{};
-		mesh_info.attribute_infos = ground_binding_infos.data();
-		mesh_info.attribute_info_count = ground_binding_infos.size();
-		mesh_info.flags = MESH_FLAG_NONE;
-		Mesh *ground_mesh = Resources::createMesh(mesh_info, "ground");
-		Geometry::createQuad(*ground_mesh, 20, 20, VERTEX_FLAG_NORMAL);
-
 		//-------------------SCENE CREATION--------------------------------------
 		Scene *scene = new Scene();
 		Application::setScene(scene, true);
@@ -84,24 +65,24 @@ public:
 		camera.render_target = Graphics::getDefaultRenderTarget();
 		scene->setCameraEntity(camera_entity);
 
-		auto ground_entity = scene->createEntity("ground");
-		MeshRenderer &ground_renderer = ground_entity.attach<MeshRenderer>();
-		ground_renderer.mesh = ground_mesh;
-		ground_renderer.pipelineInstance = ground_material;
-		ground_entity.get<Transform>().rotate(vec3(- M_PI / 2, 0, 0));
-		ground_entity.get<Transform>().translate(vec3(0, -0.7, 0));
-
-
 		auto teapot = scene->createEntity("teapot");
 		ModelRenderer &teapot_renderer = teapot.attach<ModelRenderer>();
-		teapot.get<Transform>().translate(vec3(0, 0, -5));
+		teapot.get<Transform>().translate(vec3(2.5, 0, -5));
+		teapot.get<Transform>().setScale(vec3(0.1));
 		teapot_renderer.model = teapot_model;
-		teapot.get<Transform>().setScale(vec3(0.01f));
 
 
 		auto dragon = scene->createEntity("Dragon");
 		ModelRenderer &dragon_renderer = dragon.attach<ModelRenderer>();
-		dragon.get<Transform>().translate(vec3(0, 0, 5));
+		dragon.get<Transform>().translate(vec3(-2.5, 0, -5));
 		dragon_renderer.model = dragon_model;
+
+
+		entitites[0] = teapot;
+		entitites[1] = dragon;
+
+		Application::onUpdate.subscribe(LoadModelExemple::update);
 	}
 };
+
+Entity LoadModelExemple::entitites[2];

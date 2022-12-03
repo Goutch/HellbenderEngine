@@ -61,7 +61,7 @@ namespace HBE {
 		vertexInputInfo.pVertexBindingDescriptions = binding_descriptions.data();
 
 		std::vector<VkVertexInputAttributeDescription> attribute_descriptions;
-		std::vector<VertexInputInfo> vertex_inputs = vk_vertex->getVertexInputs();
+		std::vector<VK_VertexInputInfo> vertex_inputs = vk_vertex->getVertexInputs();
 		attribute_descriptions.resize(vertex_inputs.size());
 		uint32_t offset = 0;
 		uint32_t binding = 0;
@@ -127,7 +127,7 @@ namespace HBE {
 		rasterizer.rasterizerDiscardEnable = VK_FALSE;
 		rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
 		rasterizer.lineWidth = 1.0f;
-		rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+		rasterizer.frontFace = (info.flags & GRAPHIC_PIPELINE_FLAG_FRONT_COUNTER_CLOCKWISE) ? VK_FRONT_FACE_COUNTER_CLOCKWISE : VK_FRONT_FACE_CLOCKWISE;
 		rasterizer.cullMode = VK_CULL_MODE_NONE;
 		rasterizer.cullMode |= (info.flags & GRAPHIC_PIPELINE_FLAG_CULL_BACK) == GRAPHIC_PIPELINE_FLAG_CULL_BACK
 							   ? VK_CULL_MODE_BACK_BIT : VK_CULL_MODE_NONE;
@@ -234,13 +234,13 @@ namespace HBE {
 	}
 
 	void VK_GraphicPipeline::bind() const {
-		if(is_bound) return;
+		if (is_bound) return;
 		vkCmdBindPipeline(renderer->getCommandPool()->getCurrentBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, handle);
 		is_bound = true;
 	}
 
 	void VK_GraphicPipeline::unbind() const {
-		vkCmdBindPipeline(renderer->getCommandPool()->getCurrentBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, handle);
+		//vkCmdBindPipeline(renderer->getCommandPool()->getCurrentBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, handle);
 		is_bound = false;
 	}
 
@@ -256,7 +256,7 @@ namespace HBE {
 		return is_bound;
 	}
 
-	const VK_PipelineLayout *VK_GraphicPipeline::getPipelineLayout() const{
+	const VK_PipelineLayout *VK_GraphicPipeline::getPipelineLayout() const {
 		return layout;
 	}
 

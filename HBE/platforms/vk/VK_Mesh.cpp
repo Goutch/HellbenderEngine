@@ -143,6 +143,10 @@ namespace HBE {
 	}
 
 	void VK_Mesh::bind() const {
+
+		if(bound)
+			return;
+		bound = true;
 		//todo: cleanup this
 		VkBuffer *flat_buffers = new VkBuffer[buffers.size()];
 		VkDeviceSize *offsets = new VkDeviceSize[buffers.size()];
@@ -175,7 +179,7 @@ namespace HBE {
 	}
 
 	void VK_Mesh::unbind() const {
-
+		bound = false;
 	}
 
 	const VK_Buffer *VK_Mesh::getBuffer(uint32_t binding, uint32_t frame) const {

@@ -8,10 +8,10 @@ namespace HBE {
 			case 0://VERTEX_FLAG_NONE
 			{
 				std::vector<float> vertex_positions = {
-						0.5f * size_x, -0.5f * size_y,0,
-						0.5f * size_x, 0.5f * size_y,0,
-						-0.5f * size_x, 0.5f * size_y,0,
-						-0.5f * size_x, -0.5f * size_y,0,
+						0.5f * size_x, -0.5f * size_y, 0,
+						0.5f * size_x, 0.5f * size_y, 0,
+						-0.5f * size_x, 0.5f * size_y, 0,
+						-0.5f * size_x, -0.5f * size_y, 0,
 				};
 				mesh.setBuffer(0, vertex_positions.data(), 4);
 				break;
@@ -19,10 +19,10 @@ namespace HBE {
 			case 1://VERTEX_FLAG_UV
 			{
 				std::vector<float> vertex_positions = {
-						0.5f * size_x, -0.5f * size_y,0, 1.0f, 0.0f,
-						0.5f * size_x, 0.5f * size_y,0, 1.0f, 1.0f,
-						-0.5f * size_x, 0.5f * size_y,0, 0.0f, 1.0f,
-						-0.5f * size_x, -0.5f * size_y,0, .0f, 0.0f,
+						0.5f * size_x, -0.5f * size_y, 0, 1.0f, 0.0f,
+						0.5f * size_x, 0.5f * size_y, 0, 1.0f, 1.0f,
+						-0.5f * size_x, 0.5f * size_y, 0, 0.0f, 1.0f,
+						-0.5f * size_x, -0.5f * size_y, 0, .0f, 0.0f,
 				};
 				mesh.setBuffer(0, vertex_positions.data(), 4);
 				break;
@@ -30,10 +30,10 @@ namespace HBE {
 			case 2://VERTEX_FLAG_NORMAL
 			{
 				std::vector<float> vertex_positions = {
-						0.5f * size_x, -0.5f * size_y,0, 0.0f, 0, 0, -1.0f,
-						0.5f * size_x, 0.5f * size_y,0, 1.0f, 0, 0, -1.0f,
-						-0.5f * size_x, 0.5f * size_y,0, 1.0f, 0, 0, -1.0f,
-						-0.5f * size_x, -0.5f * size_y,0, 0.0f, 0, 0, -1.0
+						0.5f * size_x, -0.5f * size_y, 0, 0, -1.0f,
+						0.5f * size_x, 0.5f * size_y, 0, 0, -1.0f,
+						-0.5f * size_x, 0.5f * size_y, 0, 1.0f, 0, 0, -1.0f,
+						-0.5f * size_x, -0.5f * size_y, 0, 0.0f, 0, 0, -1.0
 				};
 				mesh.setBuffer(0, vertex_positions.data(), 4);
 				break;
