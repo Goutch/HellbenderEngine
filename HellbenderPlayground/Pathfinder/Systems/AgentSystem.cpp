@@ -38,7 +38,10 @@ void AgentSystem::onDraw() {
 	}
 
 	mesh->setInstanceBuffer(1, transforms.data(), count);
-	Graphics::drawInstanced(*mesh, *material);
+	DrawCmdInfo draw_cmd{};
+	draw_cmd.mesh = mesh;
+	draw_cmd.pipeline_instance = material;
+	Graphics::draw(draw_cmd);
 }
 
 AgentSystem::AgentSystem(Scene *scene) : System(scene) {
@@ -59,7 +62,7 @@ AgentSystem::AgentSystem(Scene *scene) : System(scene) {
 	attribute_infos[1].size = sizeof(mat4);
 	attribute_infos[1].flags = VERTEX_ATTRIBUTE_FLAG_PER_INSTANCE |
 							   VERTEX_ATTRIBUTE_FLAG_FAST_WRITE | //Use host visible memory.
-							 VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS;//We are updating this binding every frame so having multiple buffers is nice.
+							   VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS;//We are updating this binding every frame so having multiple buffers is nice.
 
 	GraphicPipelineInfo pipeline_info{};
 	pipeline_info.attribute_infos = attribute_infos.data();

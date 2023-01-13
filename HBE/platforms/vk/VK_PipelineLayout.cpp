@@ -12,8 +12,8 @@ namespace HBE {
 										 size_t count) {
 
 		this->device = device;
-		std::vector<UniformInfo> merged_unfiorms;
-		std::vector<PushConstantInfo> merged_push_constants;
+		std::vector<VK_UniformInfo> merged_unfiorms;
+		std::vector<VK_PushConstantInfo> merged_push_constants;
 		if (shaders[0]->getVkStage() == VK_SHADER_STAGE_COMPUTE_BIT) {
 			bind_point = VK_PIPELINE_BIND_POINT_COMPUTE;
 		}
@@ -25,7 +25,7 @@ namespace HBE {
 		//merge the shaders inputs into one.
 		for (size_t i = 0; i < count; ++i) {
 			//merge uniforms
-			std::vector<UniformInfo> uniforms = shaders[i]->getUniforms();
+			std::vector<VK_UniformInfo> uniforms = shaders[i]->getUniforms();
 			for (size_t j = 0; j < uniforms.size(); ++j) {
 				auto it = uniform_binding_to_index.find(uniforms[j].layout_binding.binding);
 
@@ -49,7 +49,7 @@ namespace HBE {
 			}
 
 			//merge push_constants
-			std::vector<PushConstantInfo> push_constants = shaders[i]->getPushConstants();
+			std::vector<VK_PushConstantInfo> push_constants = shaders[i]->getPushConstants();
 			for (int j = 0; j < push_constants.size(); ++j) {
 				merged_push_constants.emplace_back(push_constants[j]);
 				push_constants_ranges.emplace_back(push_constants[j].push_constant_range);
@@ -75,7 +75,7 @@ namespace HBE {
 		}
 		if (variable_size_binding != -1) {
 			uint32_t binding_index = uniform_binding_to_index[variable_size_binding];
-			UniformInfo &uniform_info = merged_unfiorms[binding_index];
+			VK_UniformInfo &uniform_info = merged_unfiorms[binding_index];
 			for (int i = 0; i < merged_unfiorms.size(); ++i) {
 				HB_ASSERT(variable_size_binding >= merged_unfiorms[i].layout_binding.binding, "Variable size binding must be the last binding of the set");
 				if (variable_size_binding != merged_unfiorms[i].layout_binding.binding &&

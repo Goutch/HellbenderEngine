@@ -25,7 +25,5 @@ void main() {
     float diff = max(dot(fragmentNormal, lightDir), 0.0);
     vec3 diffuse = diff * lightColor;
     vec3 result = (ambient + diffuse) * material.color.rgb;
-    outColor =vec4(result, 1.0);
-
-    //outColor = material.color;
+    outColor =vec4(fragmentNormal, 1.0);
 }

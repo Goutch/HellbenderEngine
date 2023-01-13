@@ -252,7 +252,7 @@ public:
 		history_normal_depth.clear();
 		history_motion.clear();
 		delete pathtracing_resources.raygen_shader;
-		delete blue_noise;
+		//delete blue_noise;
 		delete material_buffer;
 		//delete mesh_acceleration_structure;
 		delete aabb_acceleration_structure;

@@ -34,15 +34,19 @@ namespace HBE {
 	class VK_Renderer : public Renderer {
 #define MAP(T1, T2) std::unordered_map<T1,T2>
 	private:
-
 		struct FrameState {
 			VK_Semaphore *finished_semaphore;
 			VK_Semaphore *image_available_semaphore;
 		};
 
-		MAP(const GraphicPipeline*, MAP(GraphicPipelineInstance * , MAP(const Mesh*, std::vector<mat4>))) render_cache;
-		MAP(const GraphicPipeline*, MAP(GraphicPipelineInstance * , MAP(const Mesh*, std::vector<mat3>))) render_cache_2D;
-		MAP(const GraphicPipeline*, MAP(GraphicPipelineInstance * , std::vector<const Mesh *>)) instanced_cache;
+		MAP(const GraphicPipeline*, MAP(GraphicPipelineInstance * , MAP(const Mesh*, std::vector<std::vector<PushConstantInfo>>))) render_cache;
+
+		std::vector<DrawCmdInfo> ordered_render_cache;
+
+		const size_t PUSH_CONSTANT_BLOCK_SIZE = 1024 * 16; //16kb
+		size_t current_pc_block = 0;
+		size_t current_pc_block_offset = 0;
+		std::vector<char *> push_constant_blocks;
 
 		VK_Window *window;
 		VK_Instance *instance;
@@ -90,9 +94,7 @@ namespace HBE {
 
 		void endFrame() override;
 
-		void draw(mat4 transform_matrix, const Mesh &mesh, GraphicPipelineInstance &material) override;
-
-		void drawInstanced(const Mesh &mesh, GraphicPipelineInstance &material) override;
+		void draw(DrawCmdInfo &draw_cmd_info) override;
 
 		VK_Renderer();
 

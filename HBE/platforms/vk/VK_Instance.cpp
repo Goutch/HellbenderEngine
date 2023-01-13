@@ -40,7 +40,7 @@ namespace HBE {
         create_info.ppEnabledExtensionNames = extensions.data();
 
         std::vector<VkValidationFeatureEnableEXT> enabled_validation_features{
-                //VK_VALIDATION_FEATURE_ENABLE_SYNCHRONIZATION_VALIDATION_EXT,
+                VK_VALIDATION_FEATURE_ENABLE_SYNCHRONIZATION_VALIDATION_EXT,
                 //VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT,
         };
 

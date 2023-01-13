@@ -110,7 +110,7 @@ namespace HBE {
 			//uint32_t binding = spvc_compiler_get_decoration(compiler_glsl, push_constant_list[i].id, SpvDecorationBinding);
 			std::string name = spvc_compiler_get_name(compiler_glsl, push_constant_list[i].id);
 
-			PushConstantInfo push_constant_info{};
+			VK_PushConstantInfo push_constant_info{};
 			push_constant_info.name = name;
 
 			VkPushConstantRange push_constant_range{};
@@ -123,7 +123,7 @@ namespace HBE {
 		}
 
 		std::sort(push_constants.begin(), push_constants.end(),
-				  [](const PushConstantInfo &a, const PushConstantInfo &b) -> bool {
+				  [](const VK_PushConstantInfo &a, const VK_PushConstantInfo &b) -> bool {
 					  return a.push_constant_range.offset < b.push_constant_range.offset;
 				  });
 
@@ -136,7 +136,7 @@ namespace HBE {
 			spvc_type type = spvc_compiler_get_type_handle(compiler_glsl, uniform_list[i].type_id);
 			spvc_compiler_get_declared_struct_size(compiler_glsl, type, &size);
 
-			UniformInfo uniform_info{};
+			VK_UniformInfo uniform_info{};
 			HB_ASSERT(size <= limits.maxUniformBufferRange, "Uniform buffer size is too big!");
 
 			VkDescriptorSetLayoutBinding layout_binding = {};
@@ -172,7 +172,7 @@ namespace HBE {
 
 				descriptor_count = spvc_type_get_array_dimension(type, 0);
 			}
-			UniformInfo uniform_info{};
+			VK_UniformInfo uniform_info{};
 			if (descriptor_count == 0) {
 				uniform_info.variable_size = true;
 				descriptor_count = limits.maxPerStageDescriptorSamplers;
@@ -207,7 +207,7 @@ namespace HBE {
 
 				descriptor_count = spvc_type_get_array_dimension(type, 0);
 			}
-			UniformInfo uniform_info{};
+			VK_UniformInfo uniform_info{};
 			if (descriptor_count == 0) {
 				uniform_info.variable_size = true;
 				descriptor_count = limits.maxPerStageDescriptorSampledImages;
@@ -244,7 +244,7 @@ namespace HBE {
 			if (array_dimension == 1) {
 				descriptor_count = spvc_type_get_array_dimension(type, 0);
 			}
-			UniformInfo uniform_info{};
+			VK_UniformInfo uniform_info{};
 			if (descriptor_count == 0) {
 				uniform_info.variable_size = true;
 				descriptor_count = limits.maxPerStageDescriptorStorageImages;
@@ -275,7 +275,7 @@ namespace HBE {
 
 			std::string name = spvc_compiler_get_name(compiler_glsl, acceleration_structure_list[i].id);
 
-			UniformInfo uniform_info{};
+			VK_UniformInfo uniform_info{};
 
 			VkDescriptorSetLayoutBinding layout_binding = {};
 			layout_binding.binding = spvc_compiler_get_decoration(compiler_glsl, acceleration_structure_list[i].id, SpvDecorationBinding);
@@ -311,7 +311,7 @@ namespace HBE {
 
 			std::string name = spvc_compiler_get_name(compiler_glsl, buffer_list[i].id);
 
-			UniformInfo uniform_info{};
+			VK_UniformInfo uniform_info{};
 			if (descriptor_count == 0) {
 				uniform_info.variable_size = true;
 				descriptor_count = limits.maxPerStageDescriptorStorageBuffers;
@@ -352,7 +352,7 @@ namespace HBE {
 
 			std::string name = spvc_compiler_get_name(compiler_glsl, texel_buffer_list[i].id);
 
-			UniformInfo uniform_info{};
+			VK_UniformInfo uniform_info{};
 			if (descriptor_count == 0) {
 				uniform_info.variable_size = true;
 				descriptor_count = limits.maxPerStageDescriptorStorageBuffers;
@@ -388,7 +388,7 @@ namespace HBE {
 			size_t num_col = spvc_type_get_columns(type);
 			uint32_t location = spvc_compiler_get_decoration(compiler_glsl, vertex_input_list[i].id, SpvDecorationLocation);
 			for (size_t j = 0; j < num_col; ++j) {
-				VertexInputInfo attribute_description{};
+				VK_VertexInputInfo attribute_description{};
 				attribute_description.location = location;
 				attribute_description.size = size * 4;
 
@@ -426,11 +426,11 @@ namespace HBE {
 
 
 		std::sort(uniforms.begin(), uniforms.end(),
-				  [](const UniformInfo &a, const UniformInfo &b) -> bool {
+				  [](const VK_UniformInfo &a, const VK_UniformInfo &b) -> bool {
 					  return a.layout_binding.binding < b.layout_binding.binding;
 				  });
 		std::sort(vertex_inputs.begin(), vertex_inputs.end(),
-				  [](const VertexInputInfo &a, const VertexInputInfo &b) -> bool {
+				  [](const VK_VertexInputInfo &a, const VK_VertexInputInfo &b) -> bool {
 					  return a.location < b.location;
 				  });
 
@@ -444,15 +444,15 @@ namespace HBE {
 		return vk_stage;
 	}
 
-	const std::vector<PushConstantInfo> &VK_Shader::getPushConstants() const {
+	const std::vector<VK_PushConstantInfo> &VK_Shader::getPushConstants() const {
 		return push_constants;
 	}
 
-	const std::vector<UniformInfo> &VK_Shader::getUniforms() const {
+	const std::vector<VK_UniformInfo> &VK_Shader::getUniforms() const {
 		return uniforms;
 	}
 
-	const std::vector<VertexInputInfo> &VK_Shader::getVertexInputs() const {
+	const std::vector<VK_VertexInputInfo> &VK_Shader::getVertexInputs() const {
 		return vertex_inputs;
 	}
 }

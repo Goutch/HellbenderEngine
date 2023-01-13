@@ -3,9 +3,12 @@
 #include "Core.h"
 #include "queue"
 
+
 struct GLFWwindow;
 
 namespace HBE {
+	template<typename... Args>
+	class Event;
 	enum KEY {
 
 		UNKNOWN = -1,
@@ -147,9 +150,17 @@ namespace HBE {
 		static bool repeat[348];
 		static bool released[348];
 		static bool down[348];
-		static void scrollCallback(GLFWwindow *window, double x_offset, double y_offset);
+
 		static std::queue<short> reset_queue;
+
+		static void scrollCallback(GLFWwindow *window, double x_offset, double y_offset);
+		static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
+		static void charCallback(GLFWwindow *window, unsigned int codepoint);
+		static void mouseButtonCallback(GLFWwindow *window, int key, int action, int mods);
 	public:
+		static Event<KEY> onKeyDown;
+		static Event<char> onCharDown;
+
 		static void init();
 
 		static vec2 getMousePosition();
@@ -163,11 +174,9 @@ namespace HBE {
 		static void setCursorVisible(bool visible);
 
 		static void setCursorPosition(float x, float y);
-		static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
-		static void mouseButtonCallback(GLFWwindow *window, int key, int action, int mods);
+
 		static bool getKeyUp(KEY code);
 		static bool getKeyRepeat(KEY code);
-
 	};
 
 }

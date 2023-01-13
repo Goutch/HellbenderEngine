@@ -218,12 +218,12 @@ namespace HBE {
 			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 			poolSizes[poolSizes.size() - 1].descriptorCount = storage_buffer_count * MAX_FRAMES_IN_FLIGHT;
 		}
-		if(storage_texel_buffer_count > 0) {
+		if (storage_texel_buffer_count > 0) {
 			poolSizes.emplace_back();
 			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
 			poolSizes[poolSizes.size() - 1].descriptorCount = storage_texel_buffer_count * MAX_FRAMES_IN_FLIGHT;
 		}
-		if(uniform_texel_buffer_count > 0) {
+		if (uniform_texel_buffer_count > 0) {
 			poolSizes.emplace_back();
 			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
 			poolSizes[poolSizes.size() - 1].descriptorCount = uniform_texel_buffer_count * MAX_FRAMES_IN_FLIGHT;
@@ -269,6 +269,7 @@ namespace HBE {
 	}
 
 	void VK_PipelineDescriptors::bind() const {
+		if (bound) return;
 		VkCommandBuffer command_buffer = renderer->getCommandPool()->getCurrentBuffer();
 		int frame = renderer->getCurrentFrame();
 		vkCmdBindDescriptorSets(command_buffer,
@@ -282,7 +283,7 @@ namespace HBE {
 	}
 
 	void VK_PipelineDescriptors::bind(VkCommandBuffer command_buffer, uint32_t frame) const {
-
+		if (bound) return;
 		vkCmdBindDescriptorSets(command_buffer,
 								pipeline_layout->getBindPoint(),
 								pipeline_layout->getHandle(),
@@ -294,7 +295,7 @@ namespace HBE {
 	}
 
 	void VK_PipelineDescriptors::unbind() const {
-
+		bound = false;
 	}
 
 	uint32_t VK_PipelineDescriptors::getBinding(const std::string &name) const {

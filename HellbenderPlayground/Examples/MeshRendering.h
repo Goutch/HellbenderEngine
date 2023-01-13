@@ -61,6 +61,7 @@ public:
 		auto cube_entity = scene->createEntity("Cube");
 		MeshRenderer &renderer = cube_entity.attach<MeshRenderer>();
 		cube_entity.get<Transform>().translate(vec3(0, 0, -5));
+		cube_entity.get<Transform>().rotate(vec3(0, glm::half_pi<float>(), 0));
 		renderer.mesh = mesh;
 		renderer.pipelineInstance = material;
 		auto cube_entity2 = scene->createEntity("Cube2");

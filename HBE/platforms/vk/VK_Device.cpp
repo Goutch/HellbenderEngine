@@ -69,11 +69,16 @@ namespace HBE {
 		descriptor_indexing_features.descriptorBindingPartiallyBound = true;
 		descriptor_indexing_features.descriptorBindingVariableDescriptorCount = true;
 
+        VkPhysicalDeviceSynchronization2Features synchronization2_features{};
+        synchronization2_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES;
+        synchronization2_features.synchronization2 = true;
+
 		device_create_info.pNext = &buffer_device_address_features;
 		buffer_device_address_features.pNext = &ray_tracing_features;
 		ray_tracing_features.pNext = &acceleration_structure_features;
 		acceleration_structure_features.pNext = &robustness_features;
 		robustness_features.pNext = &descriptor_indexing_features;
+        descriptor_indexing_features.pNext = &synchronization2_features;
 		if (vkCreateDevice(physical_device.getHandle(), &device_create_info, nullptr, &handle) != VK_SUCCESS) {
 			Log::error("Failed to create logical device");
 		}
@@ -125,6 +130,7 @@ namespace HBE {
 		vkCmdTraceRaysKHR = reinterpret_cast<PFN_vkCmdTraceRaysKHR>(vkGetDeviceProcAddr(handle, "vkCmdTraceRaysKHR"));
 		vkGetRayTracingShaderGroupHandlesKHR = reinterpret_cast<PFN_vkGetRayTracingShaderGroupHandlesKHR>(vkGetDeviceProcAddr(handle, "vkGetRayTracingShaderGroupHandlesKHR"));
 		vkCreateRayTracingPipelinesKHR = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(vkGetDeviceProcAddr(handle, "vkCreateRayTracingPipelinesKHR"));
+        vkCmdPipelineBarrier2 = reinterpret_cast<PFN_vkCmdPipelineBarrier2>(vkGetDeviceProcAddr(handle, "vkCmdPipelineBarrier2"));
 	}
 
 }

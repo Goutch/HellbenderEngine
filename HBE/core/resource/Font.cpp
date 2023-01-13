@@ -89,15 +89,17 @@ namespace HBE {
 
                     auto box_rect = glyph.getBoxRect();
                     auto bounds = glyph.getShape().getBounds();
-                    hbe_glyph.uv_min = vec2(box_rect.x / static_cast<float>( width), box_rect.y / static_cast<float>(height));
-                    hbe_glyph.uv_max = vec2((box_rect.x + box_rect.w) / static_cast<float>(width), (box_rect.y + box_rect.h) / static_cast<float>(height));
-
-
-                    hbe_glyph.size = vec2(box_rect.w / static_cast<float>(info.glyph_resolution), box_rect.h / static_cast<float>(info.glyph_resolution));
-                    hbe_glyph.offset = vec2(glyph.getBoxTranslate().x / static_cast<float>(info.glyph_resolution), glyph.getBoxTranslate().y / static_cast<float>(info.glyph_resolution));
+                    hbe_glyph.uv_min = vec2(box_rect.x / static_cast<float>( width),
+                                            box_rect.y / static_cast<float>(height));
+                    hbe_glyph.uv_max = vec2((box_rect.x + box_rect.w) / static_cast<float>(width),
+                                            (box_rect.y + box_rect.h) / static_cast<float>(height));
+                    hbe_glyph.size = vec2(box_rect.w / static_cast<float>(info.glyph_resolution),
+                                          box_rect.h / static_cast<float>(info.glyph_resolution));
+                    hbe_glyph.offset = vec2(glyph.getBoxTranslate().x / static_cast<float>(info.glyph_resolution),
+                                            glyph.getBoxTranslate().y / static_cast<float>(info.glyph_resolution));
 
                     double scale = glyph.getBoxScale();
-                    hbe_glyph.size/=scale;
+                    hbe_glyph.offset*=scale;
                     characters_glyphs.emplace(unicode, hbe_glyph);
                 }
 

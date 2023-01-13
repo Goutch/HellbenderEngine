@@ -128,7 +128,11 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 void VoxelRendererSystem::draw() {
 	Profiler::begin("CubeRendererUpdate");
 
-	Graphics::drawInstanced(*mesh, *material);
+	DrawCmdInfo draw_cmd{};
+	draw_cmd.pipeline_instance = material;
+	draw_cmd.mesh = mesh;
+
+	Graphics::draw(draw_cmd);
 
 	Profiler::end();
 }
