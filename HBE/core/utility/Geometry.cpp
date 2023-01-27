@@ -3,15 +3,45 @@
 
 namespace HBE {
 
-	void Geometry::createQuad(Mesh &mesh, float size_x, float size_y, VERTEX_FLAGS flags) {
+	void Geometry::createQuad(Mesh &mesh, float size_x, float size_y, VERTEX_FLAGS flags, PIVOT pivot) {
+		vec2 pivot_offset = vec2(0, 0);
+		switch (pivot) {
+			case PIVOT_CENTER:
+				pivot_offset = vec2(0, 0);
+				break;
+			case PIVOT_TOP_LEFT:
+				pivot_offset = vec2(-size_x / 2, size_y / 2);
+				break;
+			case PIVOT_TOP_RIGHT:
+				pivot_offset = vec2(size_x / 2, size_y / 2);
+				break;
+			case PIVOT_BOTTOM_LEFT:
+				pivot_offset = vec2(-size_x / 2, -size_y / 2);
+				break;
+			case PIVOT_BOTTOM_RIGHT:
+				pivot_offset = vec2(size_x / 2, -size_y / 2);
+				break;
+			case PIVOT_CENTER_LEFT:
+				pivot_offset = vec2(-size_x / 2, 0);
+				break;
+			case PIVOT_CENTER_RIGHT:
+				pivot_offset = vec2(size_x / 2, 0);
+				break;
+			case PIVOT_TOP_CENTER:
+				pivot_offset = vec2(0, size_y / 2);
+				break;
+			case PIVOT_BOTTOM_CENTER:
+				pivot_offset = vec2(0, -size_y / 2);
+				break;
+		}
 		switch (flags) {
 			case 0://VERTEX_FLAG_NONE
 			{
 				std::vector<float> vertex_positions = {
-						0.5f * size_x, -0.5f * size_y, 0,
-						0.5f * size_x, 0.5f * size_y, 0,
-						-0.5f * size_x, 0.5f * size_y, 0,
-						-0.5f * size_x, -0.5f * size_y, 0,
+						(0.5f * size_x) + pivot_offset.x, (-0.5f * size_y) + pivot_offset.y, 0,
+						(0.5f * size_x) + pivot_offset.x, (0.5f * size_y) + pivot_offset.y, 0,
+						(-0.5f * size_x) + pivot_offset.x, (0.5f * size_y) + pivot_offset.y, 0,
+						(-0.5f * size_x) + pivot_offset.x, (-0.5f * size_y + pivot_offset.y), 0,
 				};
 				mesh.setBuffer(0, vertex_positions.data(), 4);
 				break;
@@ -19,10 +49,10 @@ namespace HBE {
 			case 1://VERTEX_FLAG_UV
 			{
 				std::vector<float> vertex_positions = {
-						0.5f * size_x, -0.5f * size_y, 0, 1.0f, 0.0f,
-						0.5f * size_x, 0.5f * size_y, 0, 1.0f, 1.0f,
-						-0.5f * size_x, 0.5f * size_y, 0, 0.0f, 1.0f,
-						-0.5f * size_x, -0.5f * size_y, 0, .0f, 0.0f,
+						(0.5f * size_x) + pivot_offset.x, (-0.5f * size_y) + pivot_offset.y, 0, 1.0f, 0.0f,
+						(0.5f * size_x) + pivot_offset.x, (0.5f * size_y) + pivot_offset.y, 0, 1.0f, 1.0f,
+						(-0.5f * size_x) + pivot_offset.x, (0.5f * size_y) + pivot_offset.y, 0, 0.0f, 1.0f,
+						(-0.5f * size_x) + pivot_offset.x, (-0.5f * size_y + pivot_offset.y), 0, .0f, 0.0f,
 				};
 				mesh.setBuffer(0, vertex_positions.data(), 4);
 				break;
@@ -30,10 +60,10 @@ namespace HBE {
 			case 2://VERTEX_FLAG_NORMAL
 			{
 				std::vector<float> vertex_positions = {
-						0.5f * size_x, -0.5f * size_y, 0, 0, -1.0f,
-						0.5f * size_x, 0.5f * size_y, 0, 0, -1.0f,
-						-0.5f * size_x, 0.5f * size_y, 0, 1.0f, 0, 0, -1.0f,
-						-0.5f * size_x, -0.5f * size_y, 0, 0.0f, 0, 0, -1.0
+						(0.5f * size_x) + pivot_offset.x, (-0.5f * size_y) + pivot_offset.y, 0, 0, -1.0f,
+						(0.5f * size_x) + pivot_offset.x, (0.5f * size_y) + pivot_offset.y, 0, 0, -1.0f,
+						(-0.5f * size_x) + pivot_offset.x, (0.5f * size_y) + pivot_offset.y, 0, 1.0f, 0, 0, -1.0f,
+						(-0.5f * size_x) + pivot_offset.x, (-0.5f * size_y + pivot_offset.y), 0, 0.0f, 0, 0, -1.0
 				};
 				mesh.setBuffer(0, vertex_positions.data(), 4);
 				break;
@@ -41,10 +71,10 @@ namespace HBE {
 			case 3://VERTEX_FLAG_NORMAL&VERTEX_FLAG_UV
 			{
 				std::vector<float> vertex_positions = {
-						0.5f * size_x, -0.5f * size_y, .0f, 1.0f, 0.0f, 0, 0, -1.0f,
-						0.5f * size_x, 0.5f * size_y, .0f, 1.0f, 1.0f, 0, 0, -1.0f,
-						-0.5f * size_x, 0.5f * size_y, .0f, 0.0f, 1.0f, 0, 0, -1.0f,
-						-0.5f * size_x, -0.5f * size_y, .0f, 0.0f, 0.0f, 0, 0, -1.0
+						(0.5f * size_x) + pivot_offset.x, (-0.5f * size_y) + pivot_offset.y, 0, -1.0f,
+						(0.5f * size_x) + pivot_offset.x, (0.5f * size_y) + pivot_offset.y, 0, -1.0f,
+						(-0.5f * size_x) + pivot_offset.x, (0.5f * size_y) + pivot_offset.y, 0, -1.0f,
+						(-0.5f * size_x) + pivot_offset.x, (-0.5f * size_y + pivot_offset.y), 0, -1.0
 				};
 				mesh.setBuffer(0, vertex_positions.data(), 4);
 				break;
@@ -58,7 +88,6 @@ namespace HBE {
 				2, 1, 0,
 		};
 		mesh.setVertexIndices(indices.data(), indices.size());
-
 	}
 
 	void Geometry::createCube(Mesh &mesh, float size_x, float size_y, float size_z, VERTEX_FLAGS flags) {

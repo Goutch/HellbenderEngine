@@ -71,7 +71,7 @@ public:
 		pipeline_info.attribute_infos = &VERTEX_ATTRIBUTE_INFO_POSITION3D_UV_INTERLEAVED;
 		pipeline_info.vertex_shader = text_vertex_shader;
 		pipeline_info.fragement_shader = text_fragment_shader;
-		pipeline_info.flags = GRAPHIC_PIPELINE_FLAG_CULL_BACK;
+		pipeline_info.flags = 0;
 		text_pipeline = Resources::createGraphicPipeline(pipeline_info, "text_pipeline");
 
 		pipeline_info.attribute_infos = &VERTEX_ATTRIBUTE_INFO_POSITION3D;
@@ -80,7 +80,6 @@ public:
 		background_pipeline = Resources::createGraphicPipeline(pipeline_info, "background_pipeline");
 
 		GraphicPipelineInstance *text_pipeline_instance;
-		GraphicPipelineInstance *background_pipeline_instance;
 		GraphicPipelineInstanceInfo pipeline_instance_info{};
 		pipeline_instance_info.flags = GRAPHIC_PIPELINE_INSTANCE_FLAG_NONE;
 
@@ -88,7 +87,6 @@ public:
 		text_pipeline_instance = Resources::createGraphicPipelineInstance(pipeline_instance_info, "text_pipeline_instance");
 
 		pipeline_instance_info.graphic_pipeline = background_pipeline;
-		background_pipeline_instance = Resources::createGraphicPipelineInstance(pipeline_instance_info, "background_pipeline_instance");
 
 		Scene *scene = Application::getScene();
 
@@ -147,23 +145,6 @@ public:
 			}
 			text_renderer.buildMesh();
 		}
-
-
-		MeshInfo quad_mesh_info{};
-		quad_mesh_info.attribute_infos = &VERTEX_ATTRIBUTE_INFO_POSITION3D;
-		quad_mesh_info.attribute_info_count = 1;
-		quad_mesh_info.flags = MESH_FLAG_NONE;
-		Mesh *quad_mesh = Resources::createMesh(quad_mesh_info, "quad");
-		Entity square = scene->createEntity3D();
-		MeshRenderer &square_renderer = square.attach<MeshRenderer>();
-		square_renderer.mesh = quad_mesh;
-		square_renderer.pipelineInstance = background_pipeline_instance;
-		//square.get<Transform>().translate(vec3(-0.5, 0.5, -0.1));
-		vec4 background_color = vec4(1, 0, 0, 1);
-		background_pipeline_instance->setUniform("material", &background_color);
-		Geometry::createQuad(*square_renderer.mesh, 1, 1, VERTEX_FLAG_NONE);
-
-
 		Input::onCharDown.subscribe(this, &TextRenderingScene::onCharacterInput);
 		Application::onUpdate.subscribe(this, &TextRenderingScene::onUpdate);
 	}

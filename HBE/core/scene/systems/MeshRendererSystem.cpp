@@ -23,10 +23,10 @@ namespace HBE {
 		Profiler::end();
 		for (auto[handle, transform, mesh_renderer]:group) {
 			if (mesh_renderer.active) {
-				if (mesh_renderer.mesh && mesh_renderer.pipelineInstance) {
+				if (mesh_renderer.mesh && mesh_renderer.pipeline_instance) {
 
 					draw_cmd.mesh = mesh_renderer.mesh;
-					draw_cmd.pipeline_instance = mesh_renderer.pipelineInstance;
+					draw_cmd.pipeline_instance = mesh_renderer.pipeline_instance;
 
 					mat4 world_matrix = transform.world();
 					push_constant_info.data = &world_matrix;

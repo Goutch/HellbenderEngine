@@ -23,12 +23,12 @@ namespace HBE {
 		renderer->createDefaultResources();
 	}
 
-	void Graphics::draw(DrawCmdInfo &DrawCmdInfo) {
-		renderer->draw(DrawCmdInfo);
+	void Graphics::draw(DrawCmdInfo &draw_cmd_info) {
+		renderer->draw(draw_cmd_info);
 	}
 
-	void Graphics::render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix) {
-		renderer->render(render_target, projection_matrix, view_matrix);
+	void Graphics::render(RenderCmdInfo &render_cmd_info) {
+		renderer->render(render_cmd_info);
 	}
 
 	void Graphics::terminate() {
@@ -58,12 +58,8 @@ namespace HBE {
 		renderer->beginFrame();
 	}
 
-	void Graphics::raytrace(const RootAccelerationStructure &root_acceleration_structure,
-							RaytracingPipelineInstance &pipeline,
-							const mat4 &projection_matrix,
-							const mat4 &view_matrix,
-							vec2u resolution) {
-		renderer->raytrace(root_acceleration_structure, pipeline, projection_matrix, view_matrix, resolution);
+	void Graphics::traceRays(TraceRaysCmdInfo &trace_rays_cmd_info) {
+		renderer->traceRays(trace_rays_cmd_info);
 	}
 
 
@@ -75,9 +71,11 @@ namespace HBE {
 		return renderer->getFrameCount();
 	}
 
-	void Graphics::present(const Texture *texture) {
-		renderer->present(texture);
+	void Graphics::present(PresentCmdInfo &present_cmd_info) {
+		renderer->present(present_cmd_info);
 	}
+
+
 }
 
 

@@ -137,8 +137,8 @@ namespace HBE {
 
 	}
 
-	
-//---------------------------------------CAMERA---------------------------------------
+
+	//---------------------------------------CAMERA---------------------------------------
 	void Camera::calculateProjection() {
 		projection = glm::perspective<float>(glm::radians(fov), aspectRatio(), near, render_distance);
 		projection[1] = -projection[1];
@@ -207,12 +207,13 @@ namespace HBE {
 					glm::length(local[1]));
 	}
 
+
 	void Camera2D::calculateProjection() {
 		float aspect_ratio = aspectRatio();
 		if (zoom_ratio < 0.1)
 			zoom_ratio = 0.1;
 		projection = glm::ortho(zoom_ratio * -0.5f * aspect_ratio, zoom_ratio * 0.5f * aspect_ratio, zoom_ratio * 0.5f, zoom_ratio * -.5f, near, far);
-		projection[1] = -projection[1];
+		//projection[1] = -projection[1];
 	}
 
 	float Camera2D::aspectRatio() {
@@ -220,6 +221,7 @@ namespace HBE {
 		return static_cast<float>(res.x) / static_cast<float>(res.y);
 	}
 
+//------------------------------------TEXT RENDERER------------------------------------------------------
 	void TextRenderer::buildMesh() {
 
 		uint32_t vertex_size = 3 + 2;
@@ -379,7 +381,18 @@ namespace HBE {
 
 		if (mesh == nullptr)
 			mesh = Resources::createMesh(mesh_info);
-		mesh->setBuffer(0, vertex_buffer.data(), vertex_count);
-		mesh->setVertexIndices(index_buffer.data(), index_buffer.size());
+		if (vertex_buffer.size() > 0) {
+			mesh->setBuffer(0, vertex_buffer.data(), vertex_count);
+			mesh->setVertexIndices(index_buffer.data(), index_buffer.size());
+		}
+
+	}
+
+//------------------------------------CAMERA UI------------------------------------------------------
+	void CameraUI::calculateProjection() {
+		projection = glm::ortho(0.0f,
+								static_cast<float>(render_target->getResolution().x),
+								static_cast<float>(render_target->getResolution().y),
+								0.0f, -1.0f, 1.0f);
 	}
 }

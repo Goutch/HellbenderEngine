@@ -1,4 +1,4 @@
-
+#pragma once
 /*
  * ideas
  * When grouping check registry if type exist then create an empty group if not
@@ -406,7 +406,7 @@ namespace HBE {
                     }
 
                 }
-                if (entities.size() != 0) {
+                if (!entities.empty()) {
                     fillPages(std::index_sequence_for<Components...>());
                     std::sort(entities.begin(), entities.end());
                 }

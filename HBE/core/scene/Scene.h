@@ -4,7 +4,7 @@
 
 
 #include "core/scene/ecs/Registry.h"
-
+#include "core/scene/Entity.h"
 
 #include "Components.h"
 #include "System.h"
@@ -17,34 +17,11 @@
 
 namespace HBE {
 
-	class Scene;
+	struct SceneNode {
+		Entity entity;
+		SceneNode *parent = nullptr;
+		std::vector<SceneNode> children;
 
-	class HB_API Entity {
-		entity_handle handle;
-		Scene *scene = nullptr;
-	public:
-
-		Entity() = default;
-		Entity(entity_handle handle, Scene *scene);
-
-		Entity(const Entity &other);
-
-		template<typename Component>
-		Component &attach();
-
-		template<typename Component>
-		Component &attach(Component &component);
-		template<typename Component>
-		Component &get();
-
-		template<typename Component>
-		void detach();
-		template<typename Component>
-		bool has();
-
-		bool valid();
-
-		entity_handle getHandle();
 	};
 
 	class HB_API Scene {
@@ -54,30 +31,44 @@ namespace HBE {
 		Event<float> onUpdate;
 	private:
 		Registry registry;
+		std::vector<SceneNode> root_nodes;
+		std::unordered_map<entity_handle, SceneNode *> node_map;
+
 		Scene(const Scene &scene) = delete;
+
 		Scene(Scene &scene) = delete;
 
 		std::vector<System *> systems;
 		Entity main_camera_entity;
-
 		std::unordered_map<size_t, Event<Entity>> attach_events;
 		std::unordered_map<size_t, Event<Entity>> detach_events;
 
 	public:
 		Scene();
+
 		~Scene();
+
 		void update(float deltaTime);
+
 		void draw();
+
 		void render();
+
 		Entity createEntity(const std::string &name);
+
 		Entity createEntity3D();
+
 		void destroyEntity(Entity entity);
+
 		Entity getCameraEntity();
+
 		void setCameraEntity(Entity camera);
+
 		void addSystem(System *system);
 
 		template<typename ... Components>
 		auto group();
+
 		template<typename Component>
 		Component &get(entity_handle handle);
 
@@ -91,7 +82,8 @@ namespace HBE {
 		template<typename Component>
 		bool has(entity_handle handle);
 
-        bool has(entity_handle handle,size_t component_hash);
+		bool has(entity_handle handle, size_t component_hash);
+
 		template<typename Component>
 		void detach(entity_handle handle);
 
@@ -99,15 +91,35 @@ namespace HBE {
 
 		template<typename Component>
 		Event<Entity> &onAttach();
+
 		template<typename Component>
 		Event<Entity> &onDetach();
 
 		void calculateCameraProjection(RenderTarget *renderTarget);
 
-        Entity createEntity2D();
+		Entity createEntity2D();
 
-        Entity createEntity();
-    };
+		Entity createEntity();
+
+		//sceneHierachy
+
+		void setParent(Entity entity, Entity parent = {});
+
+		void setParent(SceneNode *entity_node, SceneNode *parent_node = nullptr);
+
+		SceneNode *getParent(Entity entity);
+
+		const std::vector<SceneNode> &getChildren(Entity entity);
+
+		void print();
+
+	private:
+		SceneNode *getNode(Entity entity);
+
+		void printNode(SceneNode &node, int level);
+
+		void removeFromTree(SceneNode *node);
+	};
 
 	template<typename Component>
 	Component &Entity::attach(Component &component) {

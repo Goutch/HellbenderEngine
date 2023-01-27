@@ -25,6 +25,7 @@ namespace HBE {
 		push_constant_info.name = "constants";
 		draw_cmd.push_constants_count = 1;
 		draw_cmd.push_constants = &push_constant_info;
+		//draw_cmd.flags = DRAW_CMD_FLAG_ORDERED;
 
 		auto group = scene->group<Transform, TextRenderer>();
 		for (auto[handle, transform, text_renderer]:group) {
@@ -43,6 +44,7 @@ namespace HBE {
 					Log::warning("Text renderer does not have a pipeline and/or a font assigned and/or a mesh assigned");
 			}
 		}
+
 	}
 
 	void TextRendererSystem::onDetachTextRenderer(Entity entity) {

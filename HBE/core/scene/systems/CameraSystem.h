@@ -17,6 +17,7 @@ namespace HBE {
 		void onCameraAttached(Entity entity);
 
 		void onCamera2DAttached(Entity entity);
+		void onCameraUIAttached(Entity entity);
 	};
 
 }

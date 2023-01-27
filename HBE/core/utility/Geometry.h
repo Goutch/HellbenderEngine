@@ -15,7 +15,7 @@ namespace HBE {
 
 
 	public:
-		static void createQuad(Mesh &mesh, float size_x, float size_y, VERTEX_FLAGS flags);
+		static void createQuad(Mesh &mesh, float size_x, float size_y, VERTEX_FLAGS flags, PIVOT pivot = PIVOT_CENTER);
 
 		static void createCube(Mesh &mesh, float size_x, float size_y, float size_z, VERTEX_FLAGS flags);
 	};

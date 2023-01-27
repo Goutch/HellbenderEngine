@@ -61,7 +61,7 @@ private:
 	std::vector<Texture *> history_normal_depth;
 	std::vector<Texture *> history_motion;
 	Texture *blue_noise;
-	Texture *output_texture = nullptr;
+	const Texture *output_texture = nullptr;
 	Frame frame{};
 	bool paused = false;
 	RENDER_MODE render_mode = DENOISED;
@@ -69,13 +69,13 @@ private:
 	mat4 last_camera_matrices[2] = {mat4(1.0), mat4(1.0)};
 public:
 	void createFrameBuffers(uint32_t width, uint32_t height) {
-		for (Texture *albedo : history_albedo) {
+		for (Texture *albedo: history_albedo) {
 			delete albedo;
 		}
-		for (Texture *normal_depth : history_normal_depth) {
+		for (Texture *normal_depth: history_normal_depth) {
 			delete normal_depth;
 		}
-		for (Texture *motion : history_motion) {
+		for (Texture *motion: history_motion) {
 			delete motion;
 		}
 		if (output_texture != nullptr) {
@@ -131,7 +131,7 @@ public:
 		}
 
 		mat4 camera_projection = camera_entity.get<Camera>().projection;
-		mat4 camera_view = glm::inverse(camera_entity.get<Transform>().world());
+		mat4 camera_view = camera_entity.get<Transform>().world();
 
 		resources.pipeline_instance->setUniform("frame", &frame, Graphics::getCurrentFrame());
 		resources.pipeline_instance->setTexture("outputAlbedo", output_texture, Graphics::getCurrentFrame(), 0);
@@ -139,31 +139,38 @@ public:
 		resources.pipeline_instance->setTextureArray("historyNormalDepth", normal_depth_history_buffer, HYSTORY_COUNT, Graphics::getCurrentFrame(), 0);
 		resources.pipeline_instance->setTextureArray("historyMotion", motion_history_buffer, HYSTORY_COUNT, Graphics::getCurrentFrame(), 0);
 		resources.pipeline_instance->setTexture("blueNoise", blue_noise, Graphics::getCurrentFrame(), 0);
-
 		resources.pipeline_instance->setUniform("last_cam", &last_camera_matrices, Graphics::getCurrentFrame());
-		Graphics::raytrace(*root_acceleration_structure,
-						   *resources.pipeline_instance,
-						   camera_projection,
-						   camera_view,
-						   output_texture->getSize());
+		mat4 camera_ubo[2] = {camera_view, glm::inverse(camera_projection)};
+		resources.pipeline_instance->setUniform("cam", &camera_ubo, Graphics::getCurrentFrame());
 
-		last_camera_matrices[0] = camera_view;
+
+		TraceRaysCmdInfo trace_rays_cmd_info{};
+		trace_rays_cmd_info.pipeline_instance = resources.pipeline_instance;
+		trace_rays_cmd_info.root_acceleration_structure = root_acceleration_structure;
+		trace_rays_cmd_info.resolution = output_texture->getSize();
+		Graphics::traceRays(trace_rays_cmd_info);
+
+		last_camera_matrices[0] = glm::inverse(camera_view);
 		last_camera_matrices[1] = camera_projection;
+
+		PresentCmdInfo present_cmd_info{};
+		present_cmd_info.image_count = 1;
+		present_cmd_info.flags = PRESENT_CMD_FLAG_NONE;
 		switch (render_mode) {
 			case DENOISED:
-				Graphics::present(output_texture);
+				present_cmd_info.images = &output_texture;
 				break;
 			case ALBEDO:
-				Graphics::present(albedo_history_buffer[0]);
+				present_cmd_info.images = &albedo_history_buffer[0];
 				break;
 			case NORMAL:
-				Graphics::present(normal_depth_history_buffer[0]);
+				present_cmd_info.images = &normal_depth_history_buffer[0];
 				break;
 			case MOTION:
-				Graphics::present(motion_history_buffer[0]);
+				present_cmd_info.images = &motion_history_buffer[0];
 				break;
 		}
-
+		Graphics::present(present_cmd_info);
 		frame.index++;
 	}
 
@@ -230,19 +237,19 @@ public:
 
 	~RaytracingScene() {
 
-		for (Shader *shader : pathtracing_resources.miss_shaders) {
+		for (Shader *shader: pathtracing_resources.miss_shaders) {
 			delete shader;
 		}
-		for (Shader *shader : pathtracing_resources.hit_shaders) {
+		for (Shader *shader: pathtracing_resources.hit_shaders) {
 			delete shader;
 		}
-		for (Texture *albedo : history_albedo) {
+		for (Texture *albedo: history_albedo) {
 			delete albedo;
 		}
-		for (Texture *normal_depth : history_normal_depth) {
+		for (Texture *normal_depth: history_normal_depth) {
 			delete normal_depth;
 		}
-		for (Texture *motion : history_motion) {
+		for (Texture *motion: history_motion) {
 			delete motion;
 		}
 		if (output_texture != nullptr) {

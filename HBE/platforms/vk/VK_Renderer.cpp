@@ -91,8 +91,6 @@ namespace HBE {
 		command_pool->createCommandBuffers(MAX_FRAMES_IN_FLIGHT);
 
 		main_render_target->setResolution(width, height);
-
-		screen_material->setTexture("texture0", main_render_target->getFramebufferTexture(current_frame), current_frame, 0);
 	}
 
 	void VK_Renderer::onWindowClosed() {
@@ -127,63 +125,30 @@ namespace HBE {
 		return factory;
 	}
 
-	void VK_Renderer::raytrace(const RootAccelerationStructure &root_acceleration_structure,
-							   RaytracingPipelineInstance &pipeline,
-							   const mat4 &projection_matrix,
-							   const mat4 &view_matrix,
-							   const vec2i resolution) {
-		/*vec2i resolution = render_target.getResolution();
-		VkViewport viewport{};
-		viewport.x = 0.0f;
-		viewport.y = static_cast<float>(resolution.y);
-		viewport.width = static_cast<float>(resolution.x);
-		viewport.height = -static_cast<float>(resolution.y);
-		viewport.minDepth = 0.0f;
-		viewport.maxDepth = 1.0f;
-
-		VkRect2D scissor{};
-		scissor.offset = {0, 0};
-		scissor.extent = VkExtent2D{(uint32_t) resolution.x, (uint32_t) resolution.y};
-
-		vkCmdSetViewport(command_pool->getCurrentBuffer(), 0, 1, &viewport);
-		vkCmdSetScissor(command_pool->getCurrentBuffer(), 0, 1, &scissor);*/
-
-		VK_RaytracingPipelineInstance *vk_pipeline_instance = dynamic_cast<VK_RaytracingPipelineInstance *>(&pipeline);
-		const VK_RaytracingPipeline *vk_pipeline = vk_pipeline_instance->getPipeline();
-		UniformBufferObject ubo = {glm::inverse(view_matrix), glm::inverse(projection_matrix)};
-		vk_pipeline_instance->setUniform("cam", &ubo, current_frame);
-		vk_pipeline->bind();
-		vk_pipeline_instance->bind();
-
-		device->vkCmdTraceRaysKHR(command_pool->getCurrentBuffer(),
-								  &vk_pipeline->getRaygenShaderBindingTable(),
-								  &vk_pipeline->getMissShaderBindingTable(),
-								  &vk_pipeline->getHitShaderBindingTable(),
-								  &vk_pipeline->getCallableShaderBindingTable(),
-								  resolution.x,
-								  resolution.y,
-								  1);
-		//vkCmdPipelineBarrier(command_pool->getCurrentBuffer(), VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_DEPENDENCY_BY_REGION_BIT, 0, nullptr, 0, nullptr, 0, nullptr);
-
-		vk_pipeline_instance->unbind();
-		vk_pipeline->unbind();
-	}
-
-	void VK_Renderer::render(const RenderTarget *render_target,
-							 const mat4 &projection_matrix,
-							 const mat4 &view_matrix) {
+	void VK_Renderer::render(RenderCmdInfo &render_cmd_info) {
 		Profiler::begin("RenderPass");
 
-		const VK_RenderPass *render_pass = dynamic_cast<const VK_RenderPass *>(render_target);
+		const VK_RenderPass *render_pass = dynamic_cast<const VK_RenderPass *>(render_cmd_info.render_target);
 
-		vec2i resolution = render_target->getResolution();
+		vec2i resolution = render_pass->getResolution();
 		VkViewport viewport{};
-		viewport.x = 0.0f;
-		viewport.y = 0;
-		viewport.width = static_cast<float>(resolution.x);
-		viewport.height = static_cast<float>(resolution.y);
-		viewport.minDepth = 0.0f;
-		viewport.maxDepth = 1.0f;
+
+		if (RENDER_CMD_FLAG_INVERSE_Y & render_cmd_info.flags) {
+			viewport.x = 0.0f;
+			viewport.y = static_cast<float>(resolution.y);
+			viewport.width = static_cast<float>(resolution.x);
+			viewport.height = -static_cast<float>(resolution.y);
+			viewport.minDepth = 0.0f;
+			viewport.maxDepth = 1.0f;
+		} else {
+			viewport.x = 0.0f;
+			viewport.y = 0;
+			viewport.width = static_cast<float>(resolution.x);
+			viewport.height = static_cast<float>(resolution.y);
+			viewport.minDepth = 0.0f;
+			viewport.maxDepth = 1.0f;
+		}
+
 
 		VkRect2D scissor{};
 		scissor.offset = {0, 0};
@@ -193,8 +158,8 @@ namespace HBE {
 		vkCmdSetViewport(command_pool->getCurrentBuffer(), 0, 1, &viewport);
 		vkCmdSetScissor(command_pool->getCurrentBuffer(), 0, 1, &scissor);
 		UniformBufferObject ubo{};
-		ubo.view = view_matrix;
-		ubo.projection = projection_matrix;
+		ubo.view = render_cmd_info.view;
+		ubo.projection = render_cmd_info.projection;
 		render_pass->begin(command_pool->getCurrentBuffer(), current_frame);
 		for (const auto &pipeline_kv: render_cache) {
 			const GraphicPipeline *pipeline = pipeline_kv.first;
@@ -207,7 +172,7 @@ namespace HBE {
 					const Mesh *mesh = mesh_kv.first;
 					mesh->bind();
 					for (const std::vector<PushConstantInfo> &push_constant_infos: mesh_kv.second) {
-						for (const PushConstantInfo &pc:push_constant_infos) {
+						for (const PushConstantInfo &pc: push_constant_infos) {
 							pipeline->pushConstant(pc.name, pc.data);
 						}
 
@@ -260,17 +225,39 @@ namespace HBE {
 		Profiler::end();
 	}
 
+	void VK_Renderer::traceRays(TraceRaysCmdInfo &trace_rays_cmd_info) {
+		const VK_RaytracingPipelineInstance *vk_pipeline_instance = dynamic_cast<const VK_RaytracingPipelineInstance *>(trace_rays_cmd_info.pipeline_instance);
+		const VK_RaytracingPipeline *vk_pipeline = vk_pipeline_instance->getPipeline();
+		vk_pipeline->bind();
+		vk_pipeline_instance->bind();
+
+		device->vkCmdTraceRaysKHR(command_pool->getCurrentBuffer(),
+								  &vk_pipeline->getRaygenShaderBindingTable(),
+								  &vk_pipeline->getMissShaderBindingTable(),
+								  &vk_pipeline->getHitShaderBindingTable(),
+								  &vk_pipeline->getCallableShaderBindingTable(),
+								  trace_rays_cmd_info.resolution.x,
+								  trace_rays_cmd_info.resolution.y,
+								  1);
+		//vkCmdPipelineBarrier(command_pool->getCurrentBuffer(), VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_DEPENDENCY_BY_REGION_BIT, 0, nullptr, 0, nullptr, 0, nullptr);
+
+		vk_pipeline_instance->unbind();
+		vk_pipeline->unbind();
+	}
+
 	void VK_Renderer::beginFrame() {
 		Profiler::begin("CommandPoolWait");
 		command_pool->begin();
 		Profiler::end();
 	}
 
-	void VK_Renderer::present(const Texture *image) {
+	void VK_Renderer::present(PresentCmdInfo &present_cmd_info) {
+		if (frame_presented) return;
 		HB_ASSERT(frame_presented == false, "Frame already presented, call beginFrame() before present() and endFrame() after present()");
+		HB_ASSERT(present_cmd_info.image_count <= 4 && present_cmd_info.image_count > 0, "layers should be from 1 to 4");
 		Profiler::begin("AquireImage");
-
-		const VK_Image *vk_image = dynamic_cast<const VK_Image *>(image);
+		frame_presented = true;
+		const VK_Image **vk_images = reinterpret_cast<const VK_Image **>(present_cmd_info.images);
 		VkResult result = vkAcquireNextImageKHR(device->getHandle(),
 												swapchain->getHandle(),
 												UINT64_MAX,
@@ -311,35 +298,43 @@ namespace HBE {
 		vkCmdSetViewport(command_pool->getCurrentBuffer(), 0, 1, &viewport);
 		vkCmdSetScissor(command_pool->getCurrentBuffer(), 0, 1, &scissor);
 
-		VkMemoryBarrier2 image_barrier{};
-		image_barrier.sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER_2;
-		image_barrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_SHADER_WRITE_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
-		image_barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 
-		image_barrier.srcStageMask = VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT | VK_PIPELINE_STAGE_TRANSFER_BIT;
-		image_barrier.dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		for (int i = 0; i < present_cmd_info.image_count; ++i) {
+			const VK_Image *vk_image = dynamic_cast<const VK_Image *>(vk_images[i]);
+			VkImageMemoryBarrier2 image_barrier{};
+			image_barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
+			image_barrier.srcAccessMask = 0;
+			image_barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 
-		VkDependencyInfo dependency_info{};
-		dependency_info.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO_KHR;
-		dependency_info.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
-		dependency_info.pImageMemoryBarriers = nullptr;
-		dependency_info.imageMemoryBarrierCount = 0;
-		dependency_info.pBufferMemoryBarriers = nullptr;
-		dependency_info.bufferMemoryBarrierCount = 0;
-		dependency_info.pMemoryBarriers = &image_barrier;
-		dependency_info.memoryBarrierCount = 1;
-		device->vkCmdPipelineBarrier2(command_pool->getCurrentBuffer(), &dependency_info);
-		/* vkCmdPipelineBarrier2(command_pool->getCurrentBuffer(),
+			image_barrier.srcStageMask = VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT | VK_PIPELINE_STAGE_TRANSFER_BIT;
+			image_barrier.dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 
-							  VK_DEPENDENCY_BY_REGION_BIT,
-							  0,
-							  nullptr,
-							  0,
-							  nullptr,
-							  0,
-							  nullptr);*/
+			image_barrier.oldLayout = vk_image->getImageLayout();
+			image_barrier.newLayout = vk_image->getImageLayout();
 
-		screen_material->setTexture("texture0", image, current_frame, 0);
+			image_barrier.image = vk_images[i]->getHandle();
+
+			image_barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			image_barrier.subresourceRange.baseMipLevel = 0;
+			image_barrier.subresourceRange.levelCount = 1;
+			image_barrier.subresourceRange.baseArrayLayer = 0;
+			image_barrier.subresourceRange.layerCount = 1;
+
+			VkDependencyInfo dependency_info{};
+			dependency_info.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO_KHR;
+			dependency_info.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+			dependency_info.pImageMemoryBarriers = &image_barrier;
+			dependency_info.imageMemoryBarrierCount = 1;
+			dependency_info.pBufferMemoryBarriers = nullptr;
+			dependency_info.bufferMemoryBarrierCount = 0;
+			dependency_info.pMemoryBarriers = nullptr;
+			dependency_info.memoryBarrierCount = 0;
+			device->vkCmdPipelineBarrier2(command_pool->getCurrentBuffer(), &dependency_info);
+		}
+
+		screen_material->setTextureArray("layers", &present_cmd_info.images[0], present_cmd_info.image_count, current_frame, 0);
+		screen_material->setUniform("ubo", &present_cmd_info.image_count);
+
 		swapchain->beginRenderPass(current_image, command_pool->getCurrentBuffer());
 
 		screen_pipeline->bind();
@@ -384,15 +379,22 @@ namespace HBE {
 		} else if (result != VK_SUCCESS) {
 			Log::error("failed to present swap chain image!");
 		}
-		frame_presented = true;
+
 	}
 
 
 	void VK_Renderer::endFrame() {
 		Profiler::begin("endFrame");
 
+
 		if (!frame_presented) {
-			present(main_render_target->getFramebufferTexture(current_frame));
+			const Texture *render_textures[1] = {
+					main_render_target->getFramebufferTexture(current_frame)
+			};
+			PresentCmdInfo present_cmd_info{};
+			present_cmd_info.images = render_textures;
+			present_cmd_info.image_count = 1;
+			present(present_cmd_info);
 		}
 
 		frame_presented = false;
@@ -406,7 +408,6 @@ namespace HBE {
 		command_pool->getCurrentFence().wait();
 
 		Profiler::end();
-
 	}
 
 	void VK_Renderer::draw(DrawCmdInfo &draw_cmd_info) {
@@ -432,7 +433,8 @@ namespace HBE {
 		} else {
 			auto pipeline_it = render_cache.find(draw_cmd_info.pipeline_instance->getGraphicPipeline());
 			if (pipeline_it == render_cache.end())
-				pipeline_it = render_cache.emplace(draw_cmd_info.pipeline_instance->getGraphicPipeline(), MAP(GraphicPipelineInstance*, MAP(const Mesh*, std::vector<std::vector<PushConstantInfo>>))()).first;
+				pipeline_it = render_cache.emplace(draw_cmd_info.pipeline_instance->getGraphicPipeline(),
+												   MAP(GraphicPipelineInstance*, MAP(const Mesh*, std::vector<std::vector<PushConstantInfo>>))()).first;
 			auto material_it = pipeline_it->second.find(draw_cmd_info.pipeline_instance);
 			if (material_it == pipeline_it->second.end())
 				material_it = pipeline_it->second.emplace(draw_cmd_info.pipeline_instance, MAP(const Mesh*, std::vector<std::vector<PushConstantInfo>>)()).first;
@@ -460,6 +462,10 @@ namespace HBE {
 
 	uint32_t VK_Renderer::getCurrentFrame() const {
 		return current_frame;
+	}
+
+	RenderTarget *VK_Renderer::getUIRenderTarget() {
+		return ui_render_target;
 	}
 
 	RenderTarget *VK_Renderer::getDefaultRenderTarget() {
@@ -499,8 +505,12 @@ namespace HBE {
 		render_target_info.height = swapchain->getExtent().height;
 		render_target_info.clear_color = vec4(0.f, 0.f, 0.f, 1.f);
 		render_target_info.format = IMAGE_FORMAT_RGBA32F;
-		render_target_info.flags = RENDER_TARGET_FLAG_DEPTH_TEST;
+		render_target_info.flags = RENDER_TARGET_FLAG_COLOR_ATTACHMENT | RENDER_TARGET_FLAG_DEPTH_ATTACHMENT;
+
 		main_render_target = Resources::createRenderTarget(render_target_info, "DEFAULT_RENDER_TARGET");
+
+		render_target_info.flags = RENDER_TARGET_FLAG_COLOR_ATTACHMENT;
+		ui_render_target = Resources::createRenderTarget(render_target_info, "UI_RENDER_TARGET");
 
 		ShaderInfo shader_info{};
 		shader_info.stage = SHADER_STAGE_VERTEX;

@@ -3,10 +3,11 @@
 #include "VoxelModule/VoxelModule.h"
 #include "Pathfinder/Pathfinder.h"
 #include "Examples/LoadModel.h"
-#include "Examples/MeshRendering.h"
 #include "Examples/Raytracing.h"
 #include "Examples/FontRendering.h"
-#include "Examples/CubeRendering.h"
+#include "Examples/CubeScene.h"
+#include "Examples/TriangleScene.h"
+
 using namespace HBE;
 bool fullscreen = false;
 
@@ -17,7 +18,6 @@ void onAppUpdate(float delta) {
 	if (Input::getKeyDown(KEY::F11)) {
 		fullscreen = !fullscreen;
 		Graphics::getWindow()->setFullscreen(fullscreen);
-
 	}
 	if (Input::getKeyDown(KEY::V)) {
 		Configs::setVerticalSync(!Configs::getVerticalSync());
@@ -35,7 +35,6 @@ void onAppUpdate(float delta) {
 			}
 		}
 	}
-
 }
 
 /*#define STB_IMAGE_IMPLEMENTATION
@@ -77,12 +76,15 @@ int main() {
 	//Pathfinder *pathfinder = new Pathfinder();
 
 	{
-		//Pathfinder pathfinder;
-		//MeshRendering::init();
-		//CubeRendering::init();
-		//LoadModelExemple::init();
+		//-----------------------tests-------------------
+		//TriangleScene triangleScene = TriangleScene();
+		//CubeScene cubeScene = CubeScene();
+		//LoadModelScene load_model_scene = LoadModelScene();
 		//TextRenderingScene font_rendering_scene = TextRenderingScene();
-		RaytracingScene rts = RaytracingScene();
+
+		//-----------------------projects-----------------
+		//RaytracingScene rts = RaytracingScene();
+		//Pathfinder pathfinder;
 		//-----------------------EVENTS------------------
 		Application::onUpdate.subscribe(&onAppUpdate);
 		//-----------------------LOOP--------------------

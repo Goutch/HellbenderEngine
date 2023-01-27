@@ -47,6 +47,8 @@ set(CORE_FILES
         core/resource/raytracing/RaytracingPipeline.h
         core/resource/raytracing/RaytracingPipelineInstance.h
         core/resource/TexelBuffer.h
+        core/resource/Font.cpp
+        core/resource/Font.h
 
         core/graphics/Window.h
         core/graphics/Renderer.h
@@ -59,6 +61,8 @@ set(CORE_FILES
         core/input/Input.cpp
 
         core/scene/ecs/Registry.h
+        core/scene/Entity.cpp
+        core/scene/Entity.h
         core/scene/Scene.cpp
         core/scene/System.h
         core/scene/Components.h
@@ -158,7 +162,7 @@ set(VK_FILES
         platforms/vk/VK_DescriptorAllocator.cpp
         platforms/vk/VK_DescriptorAllocator.h
         platforms/vk/VK_TexelBuffer.cpp
-        platforms/vk/VK_TexelBuffer.h core/resource/Font.cpp core/resource/Font.h)
+        platforms/vk/VK_TexelBuffer.h core/scene/systems/UIRendererSystem.cpp core/scene/systems/UIRendererSystem.h core/scene/systems/UIRendererSystem.cpp core/scene/systems/UIRendererSystem.h)
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
@@ -180,6 +184,7 @@ set(GLFW_BUILD_TESTS FALSE)
 set(GLFW_BUILD_DOCS FALSE)
 set(GLFW_INSTALL FALSE)
 set(GLFW_VULKAN_STATIC FALSE)
+
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/include")
 #set_property(TARGET glfw PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -237,7 +242,7 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf)
 set_property(TARGET tinygltf PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 #------------------------------------FREE_TYPE------------------------------------
-#set(SKIP_INSTALL_ALL TRUE)
+set(SKIP_INSTALL_ALL TRUE)
 set(FT_DISABLE_ZLIB TRUE)
 set(FT_DISABLE_BZIP2 TRUE)
 set(FT_DISABLE_PNG TRUE)
@@ -309,9 +314,9 @@ set(SPIRV_CROSS_LIBS
         spirv-cross-core)
 
 target_link_libraries(${PROJECT_NAME}
-         ${Vulkan_LIBRARY}
-         glfw
-         #NRD
+        ${Vulkan_LIBRARY}
+        glfw
+        #NRD
         ${SPIRV_CROSS_LIBS}
         ${GLSLANG_LIBS}
         ${FREETYPE_LIBRARY}

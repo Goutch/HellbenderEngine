@@ -10,139 +10,150 @@
 #include <core/resource/Resources.h>
 #include "core/utility/Profiler.h"
 #include "core/scene/Scene.h"
+#include "core/resource/RenderTarget.h"
 
 namespace HBE {
-    Scene *Application::current_scene = nullptr;
-    Window *Application::window = nullptr;
-    Clock *Application::time = nullptr;
-    int Application::fps_counter = 0;
-    float Application::fps_timer = 0;
-    Event<> Application::onInit = Event<>();
-    Event<Scene *> Application::onSceneChange = Event<Scene *>();
-    Event<> Application::onWindowClosed = Event<>();
-    Event<> Application::onQuit = Event<>();
+	Scene *Application::current_scene = nullptr;
+	Window *Application::window = nullptr;
+	Clock *Application::time = nullptr;
+	int Application::fps_counter = 0;
+	float Application::fps_timer = 0;
+	Event<> Application::onInit = Event<>();
+	Event<Scene *> Application::onSceneChange = Event<Scene *>();
+	Event<> Application::onWindowClosed = Event<>();
+	Event<> Application::onQuit = Event<>();
 
-    Event<float> Application::onUpdate;
-    Event<> Application::onDraw;
-    Event<> Application::onRender;
+	Event<float> Application::onUpdate;
+	Event<> Application::onDraw;
+	Event<> Application::onRender;
 
-    void Application::setScene(Scene *scene, bool delete_previous_scene) {
-        if (delete_previous_scene && scene != nullptr) {
-            delete current_scene;
-            current_scene = nullptr;
-        }
-        Application::current_scene = scene;
-        if (scene != nullptr) {
-            onSceneChange.invoke(scene);
-        }
+	void Application::setScene(Scene *scene, bool delete_previous_scene) {
+		if (delete_previous_scene && scene != nullptr) {
+			delete current_scene;
+			current_scene = nullptr;
+		}
+		Application::current_scene = scene;
+		if (scene != nullptr) {
+			onSceneChange.invoke(scene);
+		}
 
-    }
+	}
 
-    Scene *Application::getScene() {
-        if (current_scene == nullptr) {
-            setScene(new Scene(), false);
-        }
-        return current_scene;
-    }
+	Scene *Application::getScene() {
+		if (current_scene == nullptr) {
+			setScene(new Scene(), false);
+		}
+		return current_scene;
+	}
 
-    void Application::init() {
-        Graphics::init();
-        window = Graphics::getWindow();
-        Input::init();
-        if (!current_scene)
-            setScene(new Scene());
-        onInit.invoke();
-    }
+	void Application::init() {
+		Graphics::init();
+		window = Graphics::getWindow();
+		Input::init();
+		if (!current_scene)
+			setScene(new Scene());
+		onInit.invoke();
+	}
 
-    void Application::run() {
+	void Application::run() {
 
-        time = new Clock();
-        Clock update_clock = Clock();
-        float delta_t = 0.0f;
-        if (current_scene == nullptr) {
-            setScene(new Scene());
-        }
-        while (!window->shouldClose() && current_scene != nullptr) {
+		time = new Clock();
+		Clock update_clock = Clock();
+		float delta_t = 0.0f;
+		if (current_scene == nullptr) {
+			setScene(new Scene());
+		}
+		while (!window->shouldClose() && current_scene != nullptr) {
 
-            window->swapBuffers();
-            Input::pollEvents();
-            Profiler::begin("TOTAL_FRAME");
-            JobManager::updateJobsStatus();
-            Profiler::begin("UPDATE");
+			window->swapBuffers();
+			Input::pollEvents();
+			Profiler::begin("TOTAL_FRAME");
+			JobManager::updateJobsStatus();
+			Profiler::begin("UPDATE");
 
-            onUpdate.invoke(delta_t);
-            current_scene->update(delta_t);
-            Profiler::end();
-            if (current_scene != nullptr) {
-                Entity camera_entity = current_scene->getCameraEntity();
+			onUpdate.invoke(delta_t);
+			current_scene->update(delta_t);
+			Profiler::end();
+			if (current_scene != nullptr) {
+				Entity camera_entity = current_scene->getCameraEntity();
 
-                if (camera_entity.valid()) {
-
-                    if (!window->isMinimized() &&
-                        (camera_entity.has<Camera>() ||
-                         camera_entity.has<Camera2D>())) {
-
-                        Profiler::begin("DRAW");
-                        onDraw.invoke();
-                        current_scene->draw();
-                        Profiler::end();
+				if (!window->isMinimized()) {
 
 
-                        Profiler::begin("RENDER");
-                        Graphics::beginFrame();
-                        onRender.invoke();
-                        current_scene->render();
-                        Graphics::endFrame();
+					Profiler::begin("DRAW");
+					onDraw.invoke();
+					current_scene->draw();
+					Profiler::end();
 
-                        Profiler::end();
-                    }
-                    else if (window->isMinimized()) {
+
+					Profiler::begin("RENDER");
+					Graphics::beginFrame();
+					current_scene->render();
+					onRender.invoke();
+					if (camera_entity.valid() && (camera_entity.has<Camera>() || camera_entity.has<Camera2D>())) {
+						uint32_t image_count = 0;
+						const Texture *images[] = {nullptr, nullptr, nullptr};
+
+						if (camera_entity.valid() && (camera_entity.has<Camera>())) {
+							images[image_count++] = camera_entity.get<Camera>().render_target->getFramebufferTexture(Graphics::getCurrentFrame());
+						}
+						if (camera_entity.valid() && (camera_entity.has<Camera2D>())) {
+							images[image_count++] = camera_entity.get<Camera2D>().render_target->getFramebufferTexture(Graphics::getCurrentFrame());
+						}
+
+						PresentCmdInfo present_info;
+						present_info.image_count = image_count;
+						present_info.images = images;
+						Graphics::present(present_info);
 
 					}
-                } else {
-                    //Log::warning("No camera in current scene");
-                }
-            } else {
-                //Log::warning("No scene set");
-            }
+					Graphics::endFrame();
+					Profiler::end();
+				} else if (window->isMinimized()) {
 
-            Profiler::end();
-            delta_t = update_clock.ns() * NANOSECONDS_TO_SECONDS;
-            update_clock.reset();
-            printFPS(delta_t);
-        }
+				}
+			} else {
+				//Log::warning("No scene set");
+			}
 
-        onWindowClosed.invoke();
-        onQuit.invoke();
-        delete time;
-    }
+			Profiler::end();
+			delta_t = update_clock.ns() * NANOSECONDS_TO_SECONDS;
+			update_clock.reset();
+			printFPS(delta_t);
+		}
 
-    void Application::terminate() {
-        delete current_scene;
-        Graphics::terminate();
-        Profiler::printAverange();
-    }
+		onWindowClosed.invoke();
+		onQuit.invoke();
+		delete time;
+	}
 
-    void Application::quit() {
-        window->requestClose();
-    }
+	void Application::terminate() {
+		delete current_scene;
+		Graphics::terminate();
+		Profiler::printAverange();
+	}
 
-    float Application::getTime() {
-        if (time) {
-            return time->ns() * NANOSECONDS_TO_SECONDS;
-        }
-        return 0;
-    }
+	void Application::quit() {
+		window->requestClose();
+	}
 
-    void Application::printFPS(float delta) {
-        fps_counter++;
-        fps_timer += delta;
-        if (fps_timer >= 1.0) {
-            Log::debug("fps:" + std::to_string(fps_counter));
-            fps_counter = 0;
-            fps_timer = 0;
-        }
-    }
+	float Application::getTime() {
+		if (time) {
+			return time->ns() * NANOSECONDS_TO_SECONDS;
+		}
+		return 0;
+	}
+
+	void Application::printFPS(float delta) {
+		fps_counter++;
+		fps_timer += delta;
+		if (fps_timer >= 1.0) {
+			Log::debug("fps:" + std::to_string(fps_counter));
+			fps_counter = 0;
+			fps_timer = 0;
+		}
+	}
+
 }
 
 

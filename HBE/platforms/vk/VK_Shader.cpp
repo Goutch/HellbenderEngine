@@ -166,10 +166,12 @@ namespace HBE {
 
 
 			spvc_type type = spvc_compiler_get_type_handle(compiler_glsl, texture_sampler_list[i].type_id);
+			spvc_basetype base_type = spvc_type_get_basetype(type);
 
 			uint32_t descriptor_count = 1;
-			if (spvc_type_get_image_arrayed(type)) {
 
+			uint32_t num_array_dims = spvc_type_get_num_array_dimensions(type);
+			if (num_array_dims==1) {
 				descriptor_count = spvc_type_get_array_dimension(type, 0);
 			}
 			VK_UniformInfo uniform_info{};

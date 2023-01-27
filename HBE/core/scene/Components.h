@@ -92,9 +92,17 @@ namespace HBE {
 		float aspectRatio();
 	};
 
+	struct HB_API CameraUI {
+		bool clear_render_target = false;
+		bool active = true;
+		RenderTarget *render_target = nullptr;
+		mat4 projection = mat4(1.0f);
+		void calculateProjection();
+	};
+
 	struct HB_API MeshRenderer {
 		Mesh *mesh = nullptr;
-		GraphicPipelineInstance *pipelineInstance = nullptr;
+		GraphicPipelineInstance *pipeline_instance = nullptr;
 		bool active = true;
 	};
 
@@ -122,9 +130,15 @@ namespace HBE {
 		float total_width;
 		float total_height;
 		GraphicPipelineInstance *pipeline_instance = nullptr;
-		char *text;
+		const char *text;
 		uint32_t text_length;
 		void buildMesh();
+	};
+
+	struct HB_API UIRenderer {
+		bool active = true;
+		Mesh *mesh = nullptr;
+		GraphicPipelineInstance *pipeline_instance = nullptr;
 	};
 
 }

@@ -24,8 +24,7 @@ set(VOXEL_MODULE_FILES
 set(EXEMPLES_FILES
         VoxelModule/VoxTree.h
         Examples/LoadModel.h
-        Examples/MeshRendering.h
-        Examples/Raytracing.h Examples/FontRendering.h Examples/CubeRendering.h)
+        Examples/Raytracing.h Examples/FontRendering.h Examples/CubeScene.h Examples/FPSCounter.h Examples/TriangleScene.h)
 
 add_executable(${PROJECT_NAME}
         main.cpp

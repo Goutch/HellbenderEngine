@@ -1,19 +1,20 @@
 #pragma once
 
 #include "HBE.h"
+#include "FPSCounter.h"
 
-class LoadModelExemple : System {
+class LoadModelScene {
 private :
-	static Entity entitites[2];
+	Entity entitites[2];
 public:
 
-	static void update(float delta) {
+	void update(float delta) {
 		for (int i = 0; i < 2; i++) {
 			entitites[i].get<Transform>().rotate(glm::vec3(0, delta, 0));
 		}
 	}
 
-	static void init() {
+	LoadModelScene() {
 		//-------------------RESOURCES CREATION--------------------------------------
 		ShaderInfo frag_info{SHADER_STAGE_FRAGMENT, "/shaders/defaults/PositionNormal.frag"};
 		ShaderInfo vert_info{SHADER_STAGE_VERTEX, "/shaders/defaults/PositionNormal.vert"};
@@ -77,12 +78,10 @@ public:
 		dragon.get<Transform>().translate(vec3(-2.5, 0, -5));
 		dragon_renderer.model = dragon_model;
 
-
 		entitites[0] = teapot;
 		entitites[1] = dragon;
 
-		Application::onUpdate.subscribe(LoadModelExemple::update);
+		Application::onUpdate.subscribe(this,&LoadModelScene::update);
 	}
 };
 
-Entity LoadModelExemple::entitites[2];

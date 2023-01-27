@@ -44,27 +44,21 @@ namespace HBE {
 
 		static Window *getWindow();
 
-		static void draw(DrawCmdInfo& DrawCmdInfo);
+		static void draw(DrawCmdInfo &draw_cmd_info);
 
-		static void drawInstanced(const Mesh &mesh, GraphicPipelineInstance &material);
+		static void render(RenderCmdInfo &render_cmd_info);
 
-		static void raytrace(const RootAccelerationStructure &root_acceleration_structure,
-							 RaytracingPipelineInstance &pipeline,
-							 const mat4 &projection_matrix,
-							 const mat4 &view_matrix,
-							 vec2u resolution);
-		/// <summary>
-		/// Render the drawn geometry to the render_target
-		static void render(const RenderTarget *render_target, const mat4 &projection_matrix, const mat4 &view_matrix);
+		static void traceRays(TraceRaysCmdInfo &trace_rays_cmd_info);
+
+		static void present(PresentCmdInfo &present_cmd_info);
 
 		static RenderTarget *getDefaultRenderTarget();
 
 		static void terminate();
 
-        static void waitCurrentFrame();
-		static void beginFrame();
+		static void waitCurrentFrame();
 
-		static void present(const Texture *texture);
+		static void beginFrame();
 
 		static void endFrame();
 
