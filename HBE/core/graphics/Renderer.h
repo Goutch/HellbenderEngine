@@ -53,8 +53,8 @@ namespace HBE {
 	};
 
 	struct DrawCmdInfo {
-		const Mesh *mesh;
-		GraphicPipelineInstance *pipeline_instance;
+		const Mesh *mesh= nullptr;
+		GraphicPipelineInstance *pipeline_instance= nullptr;
 		uint32_t layer = 0;
 		uint32_t push_constants_count = 0;
 		PushConstantInfo *push_constants = nullptr;

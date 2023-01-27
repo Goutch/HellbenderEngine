@@ -9,7 +9,6 @@ namespace HBE {
 		scene->onRender.subscribe(this, &CameraSystem::render);
 		scene->onAttach<Camera>().subscribe(this, &CameraSystem::onCameraAttached);
 		scene->onAttach<Camera2D>().subscribe(this, &CameraSystem::onCamera2DAttached);
-		scene->onAttach<CameraUI>().subscribe(this, &CameraSystem::onCameraUIAttached);
 	}
 
 	void CameraSystem::onCameraAttached(Entity entity) {
@@ -18,8 +17,7 @@ namespace HBE {
 			camera.render_target = Graphics::getDefaultRenderTarget();
 		camera.calculateProjection();
 
-		if(!scene->getCameraEntity().valid())
-		{
+		if (!scene->getCameraEntity().valid()) {
 			scene->setCameraEntity(entity);
 		}
 	}
@@ -30,17 +28,9 @@ namespace HBE {
 			camera.render_target = Graphics::getDefaultRenderTarget();
 		camera.calculateProjection();
 
-		if(!scene->getCameraEntity().valid())
-		{
+		if (!scene->getCameraEntity().valid()) {
 			scene->setCameraEntity(entity);
 		}
-	}
-
-	void CameraSystem::onCameraUIAttached(Entity entity) {
-		//CameraUI &camera = entity.get<CameraUI>();
-		//if (camera.render_target == nullptr)
-		//	camera.render_target = Graphics::getUIRenderTarget();
-		//camera.calculateProjection();
 	}
 
 	void CameraSystem::render() {
@@ -48,7 +38,6 @@ namespace HBE {
 		Profiler::begin("CameraRenderGroup");
 		auto group = scene->group<Transform, Camera>();
 		auto group2D = scene->group<Transform, Camera2D>();
-		auto groupUI = scene->group<Transform, CameraUI>();
 
 		RenderCmdInfo render_cmd_info{};
 		Profiler::end();
@@ -61,14 +50,6 @@ namespace HBE {
 			}
 		}
 		for (auto [handle, transform, camera]: group2D) {
-			if (camera.active) {
-				render_cmd_info.render_target = camera.render_target;
-				render_cmd_info.projection = camera.projection;
-				render_cmd_info.view = glm::inverse(transform.world());
-				Graphics::render(render_cmd_info);
-			}
-		}
-		for (auto [handle, transform, camera]: groupUI) {
 			if (camera.active) {
 				render_cmd_info.render_target = camera.render_target;
 				render_cmd_info.projection = camera.projection;

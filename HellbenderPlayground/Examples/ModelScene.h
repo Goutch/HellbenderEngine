@@ -3,7 +3,7 @@
 #include "HBE.h"
 #include "FPSCounter.h"
 
-class LoadModelScene {
+class ModelScene {
 private :
 	Entity entitites[2];
 public:
@@ -14,7 +14,8 @@ public:
 		}
 	}
 
-	LoadModelScene() {
+	ModelScene() {
+
 		//-------------------RESOURCES CREATION--------------------------------------
 		ShaderInfo frag_info{SHADER_STAGE_FRAGMENT, "/shaders/defaults/PositionNormal.frag"};
 		ShaderInfo vert_info{SHADER_STAGE_VERTEX, "/shaders/defaults/PositionNormal.vert"};
@@ -39,10 +40,12 @@ public:
 		pipeline_info.vertex_shader = vert;
 		pipeline_info.flags = GRAPHIC_PIPELINE_FLAG_FRONT_COUNTER_CLOCKWISE | GRAPHIC_PIPELINE_FLAG_CULL_BACK; //gltf primitives are counter clockwise
 
+
 		auto model_pipeline = Resources::createGraphicPipeline(pipeline_info, "DEFAULT_MODEL_PIPELINE");
 
 		GraphicPipelineInstanceInfo model_material_info{};
 		model_material_info.graphic_pipeline = model_pipeline;
+		//THIS IS A WORKAROUND :( setting pipeline to DEFAULT_MODEL_MATERIAL to get it when creating the model
 		Resources::createGraphicPipelineInstance(model_material_info, "DEFAULT_MODEL_MATERIAL");
 
 		pipeline_info.attribute_infos = &VERTEX_ATTRIBUTE_INFO_POSITION3D_NORMAL_INTERLEAVED;
@@ -61,19 +64,19 @@ public:
 		Scene *scene = new Scene();
 		Application::setScene(scene, true);
 
-		Entity camera_entity = scene->createEntity("camera");
+		Entity camera_entity = scene->createEntity3D();
 		Camera &camera = camera_entity.attach<Camera>();
 		camera.render_target = Graphics::getDefaultRenderTarget();
 		scene->setCameraEntity(camera_entity);
 
-		auto teapot = scene->createEntity("teapot");
+		auto teapot = scene->createEntity3D();
 		ModelRenderer &teapot_renderer = teapot.attach<ModelRenderer>();
 		teapot.get<Transform>().translate(vec3(2.5, 0, -5));
 		teapot.get<Transform>().setScale(vec3(0.1));
 		teapot_renderer.model = teapot_model;
 
 
-		auto dragon = scene->createEntity("Dragon");
+		auto dragon = scene->createEntity3D();
 		ModelRenderer &dragon_renderer = dragon.attach<ModelRenderer>();
 		dragon.get<Transform>().translate(vec3(-2.5, 0, -5));
 		dragon_renderer.model = dragon_model;
@@ -81,7 +84,7 @@ public:
 		entitites[0] = teapot;
 		entitites[1] = dragon;
 
-		Application::onUpdate.subscribe(this,&LoadModelScene::update);
+		Application::onUpdate.subscribe(this,&ModelScene::update);
 	}
 };
 

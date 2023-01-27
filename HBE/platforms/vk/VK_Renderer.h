@@ -40,7 +40,8 @@ namespace HBE {
         };
 
         MAP(const GraphicPipeline*,
-            MAP(GraphicPipelineInstance * , MAP(const Mesh*, std::vector<std::vector<PushConstantInfo>>))) render_cache;
+            MAP(GraphicPipelineInstance * ,
+				MAP(const Mesh*, std::vector<DrawCmdInfo>))) render_cache;
 
         std::vector<DrawCmdInfo> ordered_render_cache;
 

@@ -17,11 +17,15 @@
 
 namespace HBE {
 
+	class RenderTarget;
+
+	struct Transform;
+
 	struct SceneNode {
 		Entity entity;
-		SceneNode *parent = nullptr;
-		std::vector<SceneNode> children;
-
+		bool has_parent = false;
+		std::list<SceneNode>::iterator parent = std::list<SceneNode>::iterator();
+		std::list<SceneNode> children;
 	};
 
 	class HB_API Scene {
@@ -31,8 +35,8 @@ namespace HBE {
 		Event<float> onUpdate;
 	private:
 		Registry registry;
-		std::vector<SceneNode> root_nodes;
-		std::unordered_map<entity_handle, SceneNode *> node_map;
+		std::list<SceneNode> root_nodes;
+		std::unordered_map<entity_handle, std::list<SceneNode>::iterator> node_map;
 
 		Scene(const Scene &scene) = delete;
 
@@ -54,13 +58,16 @@ namespace HBE {
 
 		void render();
 
-		Entity createEntity(const std::string &name);
-
 		Entity createEntity3D();
+
+		Entity createEntity2D();
+
+		Entity createEntity();
 
 		void destroyEntity(Entity entity);
 
 		Entity getCameraEntity();
+
 
 		void setCameraEntity(Entity camera);
 
@@ -97,19 +104,14 @@ namespace HBE {
 
 		void calculateCameraProjection(RenderTarget *renderTarget);
 
-		Entity createEntity2D();
-
-		Entity createEntity();
 
 		//sceneHierachy
 
 		void setParent(Entity entity, Entity parent = {});
 
-		void setParent(SceneNode *entity_node, SceneNode *parent_node = nullptr);
+		Entity getParent(Entity entity);
 
-		SceneNode *getParent(Entity entity);
-
-		const std::vector<SceneNode> &getChildren(Entity entity);
+		const std::list<SceneNode> &getChildren(Entity entity);
 
 		void print();
 
@@ -118,7 +120,9 @@ namespace HBE {
 
 		void printNode(SceneNode &node, int level);
 
-		void removeFromTree(SceneNode *node);
+		void removeFromTree(Entity entity);
+
+		void onAttachTransform(Entity entity);
 	};
 
 	template<typename Component>

@@ -91,7 +91,7 @@ set(CORE_FILES
         core/threading/JobManager.cpp
         core/threading/JobManager.h
         core/resource/StorageBuffer.h
-        core/scene/systems/TextRendererSystem.cpp core/scene/systems/TextRendererSystem.h)
+        )
 set(VK_FILES
         platforms/vk/VK_Renderer.cpp
         platforms/vk/VK_Instance.cpp
@@ -162,7 +162,7 @@ set(VK_FILES
         platforms/vk/VK_DescriptorAllocator.cpp
         platforms/vk/VK_DescriptorAllocator.h
         platforms/vk/VK_TexelBuffer.cpp
-        platforms/vk/VK_TexelBuffer.h core/scene/systems/UIRendererSystem.cpp core/scene/systems/UIRendererSystem.h core/scene/systems/UIRendererSystem.cpp core/scene/systems/UIRendererSystem.h)
+        platforms/vk/VK_TexelBuffer.h)
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 

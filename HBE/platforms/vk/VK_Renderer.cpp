@@ -171,9 +171,13 @@ namespace HBE {
 				for (const auto &mesh_kv: material_kv.second) {
 					const Mesh *mesh = mesh_kv.first;
 					mesh->bind();
-					for (const std::vector<PushConstantInfo> &push_constant_infos: mesh_kv.second) {
-						for (const PushConstantInfo &pc: push_constant_infos) {
-							pipeline->pushConstant(pc.name, pc.data);
+					for (const DrawCmdInfo &draw_cmd_info: mesh_kv.second) {
+						
+						if ((draw_cmd_info.layer & render_cmd_info.layer_mask) != draw_cmd_info.layer) {
+							continue;
+						}
+						for (int i = 0; i < draw_cmd_info.push_constants_count; ++i) {
+							pipeline->pushConstant(draw_cmd_info.push_constants[i].name, draw_cmd_info.push_constants[i].data);
 						}
 
 						if (mesh->hasIndexBuffer()) {
@@ -192,6 +196,9 @@ namespace HBE {
 
 		for (int i = 0; i < ordered_render_cache.size(); ++i) {
 			DrawCmdInfo &cmd = ordered_render_cache[i];
+			if ((cmd.layer & render_cmd_info.layer_mask) != cmd.layer) {
+				continue;
+			}
 			cmd.pipeline_instance->getGraphicPipeline()->bind();
 			cmd.pipeline_instance->bind();
 			cmd.mesh->bind();
@@ -434,16 +441,15 @@ namespace HBE {
 			auto pipeline_it = render_cache.find(draw_cmd_info.pipeline_instance->getGraphicPipeline());
 			if (pipeline_it == render_cache.end())
 				pipeline_it = render_cache.emplace(draw_cmd_info.pipeline_instance->getGraphicPipeline(),
-												   MAP(GraphicPipelineInstance*, MAP(const Mesh*, std::vector<std::vector<PushConstantInfo>>))()).first;
+												   MAP(GraphicPipelineInstance*, MAP(const Mesh*, std::vector<DrawCmdInfo>))()).first;
 			auto material_it = pipeline_it->second.find(draw_cmd_info.pipeline_instance);
 			if (material_it == pipeline_it->second.end())
-				material_it = pipeline_it->second.emplace(draw_cmd_info.pipeline_instance, MAP(const Mesh*, std::vector<std::vector<PushConstantInfo>>)()).first;
+				material_it = pipeline_it->second.emplace(draw_cmd_info.pipeline_instance, MAP(const Mesh*, std::vector<DrawCmdInfo>)()).first;
 			auto mesh_it = material_it->second.find(draw_cmd_info.mesh);
 			if (mesh_it == material_it->second.end())
-				mesh_it = material_it->second.emplace(draw_cmd_info.mesh, std::vector<std::vector<PushConstantInfo>>()).first;
+				mesh_it = material_it->second.emplace(draw_cmd_info.mesh, std::vector<DrawCmdInfo>()).first;
 
-			mesh_it->second.emplace_back(std::vector<PushConstantInfo>(draw_cmd_info.push_constants,
-																	   draw_cmd_info.push_constants + draw_cmd_info.push_constants_count));
+			mesh_it->second.emplace_back(draw_cmd_info);
 
 		}
 	}

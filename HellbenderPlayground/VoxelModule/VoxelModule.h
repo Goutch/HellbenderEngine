@@ -13,7 +13,7 @@ public :
 		scene.addSystem(new VoxelRendererSystem(&scene));
 		Application::setScene(&scene, true);
 
-		Entity camera_entity = scene.createEntity("camera");
+		Entity camera_entity = scene.createEntity3D();
 		Camera &camera = camera_entity.attach<Camera>();
 		camera.render_target = Graphics::getDefaultRenderTarget();
 

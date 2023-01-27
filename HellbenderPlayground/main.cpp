@@ -1,10 +1,10 @@
-#include <Examples/FontRendering.h>
+#include <Examples/TextScene.h>
 #include "HBE.h"
 #include "VoxelModule/VoxelModule.h"
 #include "Pathfinder/Pathfinder.h"
-#include "Examples/LoadModel.h"
-#include "Examples/Raytracing.h"
-#include "Examples/FontRendering.h"
+#include "Examples/ModelScene.h"
+#include "Examples/RaytracingScene.h"
+#include "Examples/TextScene.h"
 #include "Examples/CubeScene.h"
 #include "Examples/TriangleScene.h"
 
@@ -77,9 +77,9 @@ int main() {
 
 	{
 		//-----------------------tests-------------------
-		//TriangleScene triangleScene = TriangleScene();
+		TriangleScene triangleScene = TriangleScene();
 		//CubeScene cubeScene = CubeScene();
-		//LoadModelScene load_model_scene = LoadModelScene();
+		//ModelScene load_model_scene = ModelScene();
 		//TextRenderingScene font_rendering_scene = TextRenderingScene();
 
 		//-----------------------projects-----------------
