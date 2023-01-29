@@ -77,8 +77,8 @@ int main() {
 
 	{
 		//-----------------------tests-------------------
-		TriangleScene triangleScene = TriangleScene();
-		//CubeScene cubeScene = CubeScene();
+		//TriangleScene triangleScene = TriangleScene();
+		CubeScene cubeScene = CubeScene();
 		//ModelScene load_model_scene = ModelScene();
 		//TextRenderingScene font_rendering_scene = TextRenderingScene();
 

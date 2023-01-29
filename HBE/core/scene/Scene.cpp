@@ -86,7 +86,7 @@ namespace HBE {
 	Entity Scene::createEntity() {
 		Entity e = Entity(registry.create(), this);
 		root_nodes.push_back(SceneNode{e});
-		node_map.emplace(e.getHandle(), root_nodes.end());
+		node_map.emplace(e.getHandle(),&root_nodes.back());
 		return e;
 	}
 
@@ -94,7 +94,7 @@ namespace HBE {
 	Entity Scene::createEntity3D() {
 		Entity e(registry.create(), this);
 		root_nodes.emplace_back(SceneNode{e});
-		node_map.emplace(e.getHandle(), root_nodes.end());
+		node_map.emplace(e.getHandle(), &root_nodes.back());
 		attach<Transform>(e.getHandle());
 		return e;
 	}
@@ -102,7 +102,7 @@ namespace HBE {
 	Entity Scene::createEntity2D() {
 		Entity e(registry.create(), this);
 		root_nodes.emplace_back(SceneNode{e});
-		node_map.emplace(e.getHandle(), root_nodes.end());
+		node_map.emplace(e.getHandle(), &root_nodes.back());
 		attach<Transform2D>(e.getHandle());
 		return e;
 	}
@@ -112,12 +112,12 @@ namespace HBE {
 	}
 
 	void Scene::removeFromTree(Entity entity) {
-		const std::list<SceneNode>::iterator node = node_map[entity.getHandle()];
+		const SceneNode* node = node_map[entity.getHandle()];
 		if (node->has_parent) {
 			node->parent->has_parent = false;
-			node->parent->children.erase(node);
+			node->parent->children.remove(*node);
 		} else {
-			root_nodes.erase(node);
+			root_nodes.remove(*node);
 		}
 		node_map.erase(node->entity.getHandle());
 	}
@@ -125,19 +125,19 @@ namespace HBE {
 	void Scene::setParent(Entity entity, Entity parent) {
 		removeFromTree(entity);
 		if (parent.valid()) {
-			std::list<SceneNode>::iterator parent_node = node_map[parent.getHandle()];
+			SceneNode* parent_node = node_map[parent.getHandle()];
 			SceneNode node = SceneNode{entity, true, parent_node};
 			parent_node->children.push_back(node);
-			node_map.emplace(entity.getHandle(), parent_node->children.end());
+			node_map.emplace(entity.getHandle(),&*parent_node->children.end());
 		} else {
 			SceneNode node = SceneNode{entity, false};
 			root_nodes.push_back(node);
-			node_map.emplace(entity.getHandle(), root_nodes.end());
+			node_map.emplace(entity.getHandle(), &root_nodes.back());
 		}
 	}
 
 	Entity Scene::getParent(Entity entity) {
-		const std::list<SceneNode>::iterator node = node_map[entity.getHandle()];
+		SceneNode* node = node_map[entity.getHandle()];
 		if (node->has_parent) {
 			return node->parent->entity;
 		}

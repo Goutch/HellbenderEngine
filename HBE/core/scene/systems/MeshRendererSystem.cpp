@@ -12,11 +12,7 @@ namespace HBE {
 	void HBE::MeshRendererSystem::draw() {
 		Profiler::begin("MeshRendererUpdate");
 		DrawCmdInfo draw_cmd{};
-		PushConstantInfo push_constant_info{};
-		push_constant_info.size = sizeof(mat4);
-		push_constant_info.name = "constants";
-		draw_cmd.push_constants_count = 1;
-		draw_cmd.push_constants = &push_constant_info;
+
 
 		Profiler::begin("MeshRendererUpdateGroup");
 		auto group = scene->group<Transform, MeshRenderer>();
@@ -24,6 +20,11 @@ namespace HBE {
 		for (auto [handle, transform, mesh_renderer]: group) {
 			if (mesh_renderer.active) {
 				if (mesh_renderer.mesh && mesh_renderer.pipeline_instance) {
+                    PushConstantInfo push_constant_info{};
+                    push_constant_info.size = sizeof(mat4);
+                    push_constant_info.name = "constants";
+                    draw_cmd.push_constants_count = 1;
+                    draw_cmd.push_constants = &push_constant_info;
 
 					draw_cmd.mesh = mesh_renderer.mesh;
 					draw_cmd.pipeline_instance = mesh_renderer.pipeline_instance;
