@@ -90,8 +90,7 @@ set(CORE_FILES
 
         core/threading/JobManager.cpp
         core/threading/JobManager.h
-        core/resource/StorageBuffer.h
-        core/scene/SceneTree.cpp core/scene/SceneTree.h)
+        core/resource/StorageBuffer.h)
 set(VK_FILES
         platforms/vk/VK_Renderer.cpp
         platforms/vk/VK_Instance.cpp

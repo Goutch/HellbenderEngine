@@ -172,7 +172,7 @@ namespace HBE {
 					const Mesh *mesh = mesh_kv.first;
 					mesh->bind();
 					for (const DrawCmdInfo &draw_cmd_info: mesh_kv.second) {
-						
+
 						if ((draw_cmd_info.layer & render_cmd_info.layer_mask) != draw_cmd_info.layer) {
 							continue;
 						}
@@ -199,7 +199,9 @@ namespace HBE {
 			if ((cmd.layer & render_cmd_info.layer_mask) != cmd.layer) {
 				continue;
 			}
+
 			cmd.pipeline_instance->getGraphicPipeline()->bind();
+			cmd.pipeline_instance->setUniform("ubo", &ubo, current_frame);
 			cmd.pipeline_instance->bind();
 			cmd.mesh->bind();
 
@@ -417,8 +419,10 @@ namespace HBE {
 		Profiler::end();
 	}
 
+
 	void VK_Renderer::draw(DrawCmdInfo &draw_cmd_info) {
-		//copy push constants to cache
+
+		//copy push constants data to cache
 		for (int i = 0; i < draw_cmd_info.push_constants_count; ++i) {
 			if (draw_cmd_info.push_constants[i].size + current_pc_block_offset > PUSH_CONSTANT_BLOCK_SIZE) {
 				current_pc_block_offset = 0;
@@ -427,13 +431,28 @@ namespace HBE {
 					push_constant_blocks.emplace_back(static_cast<char *>(malloc(PUSH_CONSTANT_BLOCK_SIZE)));
 				}
 			}
-			void *cache_address = (void *) (&push_constant_blocks[current_pc_block][current_pc_block_offset]);
+			void* cache_address = (void *) (&push_constant_blocks[current_pc_block][current_pc_block_offset]);
 			memcpy(cache_address,
 				   draw_cmd_info.push_constants[i].data,
 				   draw_cmd_info.push_constants[i].size);
 			current_pc_block_offset += draw_cmd_info.push_constants[i].size;
 			draw_cmd_info.push_constants[i].data = cache_address;
 		}
+
+		//copy push constants to cache
+		if ((sizeof(PushConstantInfo) * draw_cmd_info.push_constants_count) + current_pc_block_offset > PUSH_CONSTANT_BLOCK_SIZE) {
+			current_pc_block_offset = 0;
+			current_pc_block++;
+			if (current_pc_block >= push_constant_blocks.size()) {
+				push_constant_blocks.emplace_back(static_cast<char *>(malloc(PUSH_CONSTANT_BLOCK_SIZE)));
+			}
+		}
+		void *cache_address = (void *) (&push_constant_blocks[current_pc_block][current_pc_block_offset]);
+		memcpy(cache_address,
+			   draw_cmd_info.push_constants,
+			   sizeof(PushConstantInfo) * draw_cmd_info.push_constants_count);
+		draw_cmd_info.push_constants = (PushConstantInfo *) cache_address;
+		current_pc_block_offset += sizeof(PushConstantInfo) * draw_cmd_info.push_constants_count;
 
 		if (draw_cmd_info.flags & DRAW_CMD_FLAG_ORDERED) {
 			ordered_render_cache.push_back(draw_cmd_info);

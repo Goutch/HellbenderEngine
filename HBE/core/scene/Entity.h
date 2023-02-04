@@ -27,13 +27,19 @@ namespace HBE {
 		Component &get();
 
 		template<typename Component>
+		Component &get(component_type_id id);
+
+		template<typename Component>
 		void detach();
 
 		template<typename Component>
 		bool has();
 
+		bool has(component_type_id id);
+
 		bool valid();
 
 		entity_handle getHandle() const;
+
 	};
 }

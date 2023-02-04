@@ -27,7 +27,7 @@
 #endif
 namespace HBE {
 	typedef uint32_t entity_handle;
-
+	typedef size_t component_type_id;
 
 	//https://stackoverflow.com/questions/922442/unique-class-type-id-that-is-safe-and-holds-across-library-boundaries
 #if __SIZEOF_POINTER__ == 8
@@ -529,10 +529,10 @@ namespace HBE {
 				return false;
 		}
 
-		bool has(entity_handle handle, size_t component_hash) {
+		bool has(entity_handle handle, component_type_id component_id) {
 			HB_ASSERT(valid(handle), "Entity does not exist");
 			auto page = pages[getPage(handle)];
-			auto comp_page_it = page->component_pages.find(component_hash);
+			auto comp_page_it = page->component_pages.find(component_id);
 
 			if (comp_page_it != page->component_pages.end())
 				return comp_page_it->second->has(handle);
@@ -548,6 +548,15 @@ namespace HBE {
 					  ") = false");
 
 			return pages[getPage(handle)]->component_pages[typeHash<Component>()]->template getAs<Component>(handle);
+		}
+		template<typename Component>
+		Component &get(entity_handle handle, component_type_id component_id) {
+
+			HB_ASSERT(has(handle,component_id),
+					  std::string("tried to get ") + typeName<Component>() + " in entity#" + std::to_string(handle) + std::string(" but has<") + typeName<Component>() + ">(" + std::to_string(handle) +
+					  ") = false");
+
+			return pages[getPage(handle)]->component_pages[component_id]->template getAs<Component>(handle);
 		}
 
 
@@ -584,6 +593,12 @@ namespace HBE {
 			ComponentTypeInfo &type = types[hash];
 			size_t page = getPage(handle);
 			pages[page]->detach(handle, types[hash]);
+		}
+
+		template<typename Component>
+		component_type_id getComponentTypeID() {
+			const component_type_id hash = typeHash<Component>();
+			return hash;
 		}
 	};
 }

@@ -13,63 +13,64 @@
 
 namespace HBE {
 	void Transform::translate(vec3 translation) {
-		local = glm::translate(local, translation);
+		is_dirty = true;
+		local_mat = glm::translate(local_mat, translation);
 	}
 
 	vec3 Transform::position() const {
-		return local[3];
+		return local_mat[3];
 	}
 
-	vec3 Transform::worldPosition() const {
+	vec3 Transform::worldPosition() {
 		mat4 mat_world = world();
 		return vec3(mat_world[3].x, mat_world[3].y, mat_world[3].z);
 	}
 
 	vec3 Transform::front() const {
-		return glm::normalize(world()[2]);
+		return glm::normalize(local_mat[2]);
 	}
 
 	vec3 Transform::back() const {
-		return -glm::normalize(world()[2]);
+		return -glm::normalize(local_mat[2]);
 	}
 
 	vec3 Transform::right() const {
-		return glm::normalize(world()[0]);
+		return glm::normalize(local_mat[0]);
 	}
 
 	vec3 Transform::left() const {
-		return -glm::normalize(world()[0]);
+		return -glm::normalize(local_mat[0]);
 	}
 
 	vec3 Transform::up() const {
-		return glm::normalize(world()[1]);
+		return glm::normalize(local_mat[1]);
 	}
 
 	vec3 Transform::down() const {
-		return -glm::normalize(world()[1]);
+		return -glm::normalize(local_mat[1]);
 	}
 
-	vec3 Transform::worldForward() const {
+	vec3 Transform::worldForward() {
 		return glm::normalize(world()[2]);
 	}
 
-	vec3 Transform::worldBackward() const {
+	vec3 Transform::worldBackward() {
 		return -glm::normalize(world()[2]);
 	}
 
-	vec3 Transform::worldRight() const {
+	vec3 Transform::worldRight() {
 		return glm::normalize(world()[0]);
 	}
 
-	vec3 Transform::worldLeft() const {
+	vec3 Transform::worldLeft() {
 		return -glm::normalize(world()[0]);
 	}
 
-	vec3 Transform::worldUp() const {
+	vec3 Transform::worldUp() {
 		return glm::normalize(world()[1]);
 	}
 
-	vec3 Transform::worldDown() const {
+	vec3 Transform::worldDown() {
 		return -glm::normalize(world()[1]);
 
 	}
@@ -77,7 +78,7 @@ namespace HBE {
 	void Transform::setRotation(quat rot) {
 		vec3 s = scale();
 		vec3 pos = position();
-		local = mat4(1.0f);
+		local_mat = mat4(1.0f);
 		rotate(rot);
 		setPosition(pos);
 		setScale(s);
@@ -86,14 +87,15 @@ namespace HBE {
 	void Transform::setRotation(vec3 rot) {
 		vec3 s = scale();
 		vec3 pos = position();
-		local = mat4(1.0f);
+		local_mat = mat4(1.0f);
 		rotate(rot);
 		setPosition(pos);
 		setScale(s);
 	}
 
 	void Transform::rotate(quat rot) {
-		local *= glm::mat4_cast(rot);
+		is_dirty = true;
+		local_mat *= glm::mat4_cast(rot);
 	}
 
 	void Transform::rotate(vec3 rot) {
@@ -101,25 +103,29 @@ namespace HBE {
 	}
 
 	void Transform::setPosition(vec3 pos) {
-		local[3].x = pos.x;
-		local[3].y = pos.y;
-		local[3].z = pos.z;
+		is_dirty = true;
+		local_mat[3].x = pos.x;
+		local_mat[3].y = pos.y;
+		local_mat[3].z = pos.z;
 	}
 
-	mat4 Transform::world() const {
-
+	const mat4& Transform::world() {
 		Entity parent = Application::getScene()->getParent(entity);
 		if (parent.valid() && parent.has<Transform>()) {
-			return parent.get<Transform>().world() * local;
+			if (is_dirty) {
+				is_dirty = false;
+				world_mat = parent.get<Transform>().world() * local_mat;
+			}
+			return world_mat;
 		}
-		return local;
+		return local_mat;
 	}
 
 	quat Transform::rotation() const {
-		return glm::quat_cast(local);
+		return glm::quat_cast(local_mat);
 	}
 
-	quat Transform::worldRotation() const {
+	quat Transform::worldRotation() {
 		Entity parent = Application::getScene()->getParent(entity);
 		if (parent.valid() && parent.has<Transform>()) {
 
@@ -132,21 +138,31 @@ namespace HBE {
 		return glm::eulerAngles(rotation());
 	}
 
-	vec3 Transform::worldEulerRotation() const {
+	vec3 Transform::worldEulerRotation() {
 		return glm::eulerAngles(worldRotation());
 	}
 
 	void Transform::setScale(vec3 s) {
-		local = glm::scale(local, vec3(1, 1, 1) / scale());
-		local = glm::scale(local, s);
+		is_dirty = true;
+		local_mat = glm::scale(local_mat, vec3(1, 1, 1) / scale());
+		local_mat = glm::scale(local_mat, s);
 	}
 
 	vec3 Transform::scale() const {
 
-		return vec3(glm::length(local[0]),
-					glm::length(local[1]),
-					glm::length(local[2]));
+		return vec3(glm::length(local_mat[0]),
+					glm::length(local_mat[1]),
+					glm::length(local_mat[2]));
 
+	}
+
+	void Transform::setLocal(const mat4 &local) {
+		is_dirty = true;
+		local_mat = local;
+	}
+
+	const mat4& Transform::local() const {
+		return local_mat;
 	}
 
 

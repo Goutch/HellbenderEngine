@@ -7,6 +7,7 @@
 #include "Examples/TextScene.h"
 #include "Examples/CubeScene.h"
 #include "Examples/TriangleScene.h"
+#include "Examples/OrderedRenderingScene.h"
 
 using namespace HBE;
 bool fullscreen = false;
@@ -78,9 +79,10 @@ int main() {
 	{
 		//-----------------------tests-------------------
 		//TriangleScene triangleScene = TriangleScene();
-		CubeScene cubeScene = CubeScene();
+		//CubeScene cubeScene = CubeScene();
 		//ModelScene load_model_scene = ModelScene();
 		//TextRenderingScene font_rendering_scene = TextRenderingScene();
+		OrderedRenderingScene ordered_rendering_scene = OrderedRenderingScene();
 
 		//-----------------------projects-----------------
 		//RaytracingScene rts = RaytracingScene();

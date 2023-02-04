@@ -53,16 +53,25 @@ namespace HBE {
 	};
 
 	struct HB_API Transform {
+	private:
+		mat4 world_mat = mat4(1.0f);
+		mat4 local_mat = mat4(1.0f);
+	public:
 		Entity entity;
-		mat4 local = mat4(1.0f);
 
-		mat4 world() const;
+		bool is_dirty = false;
+
+		const mat4 &local() const;
+
+		void setLocal(const mat4 &local);
+
+		const mat4 &world();
 
 		void translate(vec3 translation);
 
 		vec3 position() const;
 
-		vec3 worldPosition() const;
+		vec3 worldPosition();
 
 		void setPosition(vec3 pos);
 
@@ -82,21 +91,21 @@ namespace HBE {
 
 		vec3 eulerRotation() const;
 
-		quat worldRotation() const;
+		quat worldRotation();
 
-		vec3 worldEulerRotation() const;
+		vec3 worldEulerRotation();
 
-		vec3 worldDown() const;
+		vec3 worldDown();
 
-		vec3 worldUp() const;
+		vec3 worldUp();
 
-		vec3 worldLeft() const;
+		vec3 worldLeft();
 
-		vec3 worldRight() const;
+		vec3 worldRight();
 
-		vec3 worldBackward() const;
+		vec3 worldBackward();
 
-		vec3 worldForward() const;
+		vec3 worldForward();
 
 		vec3 down() const;
 
@@ -141,13 +150,7 @@ namespace HBE {
 		Mesh *mesh = nullptr;
 		GraphicPipelineInstance *pipeline_instance = nullptr;
 		uint32_t layer = 0;
-		bool active = true;
-	};
-
-	struct HB_API OrderedMeshRenderer {
-		Mesh *mesh = nullptr;
-		GraphicPipelineInstance *pipeline_instance = nullptr;
-		uint32_t layer = 0;
+		bool ordered = false;
 		bool active = true;
 	};
 

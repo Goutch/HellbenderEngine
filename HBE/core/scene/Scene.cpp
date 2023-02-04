@@ -3,6 +3,8 @@
 #include "core/graphics/Graphics.h"
 #include "core/resource/Resources.h"
 #include "core/resource/RenderTarget.h"
+#include "Entity.h"
+#include "list"
 
 namespace HBE {
 
@@ -24,6 +26,10 @@ namespace HBE {
 		this->scene = scene;
 	}
 
+	bool Entity::has(component_type_id id) {
+		return scene->has(handle, id);
+	}
+
 
 	Scene::Scene() {
 		systems.push_back(new MeshRendererSystem(this));
@@ -39,7 +45,13 @@ namespace HBE {
 	}
 
 	void Scene::destroyEntity(Entity entity) {
-		removeFromTree(entity);
+		SceneNode *node = node_map[entity.getHandle()];
+		node_map.erase(entity.getHandle());
+		if (node->has_parent) {
+			node->parent->children.remove(*node);
+		} else {
+			root_nodes.remove(*node);
+		}
 		registry.destroy(entity.getHandle());
 	}
 
@@ -86,14 +98,14 @@ namespace HBE {
 	Entity Scene::createEntity() {
 		Entity e = Entity(registry.create(), this);
 		root_nodes.push_back(SceneNode{e});
-		node_map.emplace(e.getHandle(),&root_nodes.back());
+		node_map.emplace(e.getHandle(), &root_nodes.back());
 		return e;
 	}
 
 
 	Entity Scene::createEntity3D() {
 		Entity e(registry.create(), this);
-		root_nodes.emplace_back(SceneNode{e});
+		root_nodes.emplace_back(SceneNode{e, false});
 		node_map.emplace(e.getHandle(), &root_nodes.back());
 		attach<Transform>(e.getHandle());
 		return e;
@@ -101,7 +113,7 @@ namespace HBE {
 
 	Entity Scene::createEntity2D() {
 		Entity e(registry.create(), this);
-		root_nodes.emplace_back(SceneNode{e});
+		root_nodes.emplace_back(SceneNode{e, false});
 		node_map.emplace(e.getHandle(), &root_nodes.back());
 		attach<Transform2D>(e.getHandle());
 		return e;
@@ -111,33 +123,24 @@ namespace HBE {
 		return registry.has(handle, component_hash);
 	}
 
-	void Scene::removeFromTree(Entity entity) {
-		const SceneNode* node = node_map[entity.getHandle()];
-		if (node->has_parent) {
-			node->parent->has_parent = false;
-			node->parent->children.remove(*node);
-		} else {
-			root_nodes.remove(*node);
-		}
-		node_map.erase(node->entity.getHandle());
-	}
-
 	void Scene::setParent(Entity entity, Entity parent) {
-		removeFromTree(entity);
-		if (parent.valid()) {
-			SceneNode* parent_node = node_map[parent.getHandle()];
-			SceneNode node = SceneNode{entity, true, parent_node};
-			parent_node->children.push_back(node);
-			node_map.emplace(entity.getHandle(),&*parent_node->children.end());
-		} else {
-			SceneNode node = SceneNode{entity, false};
-			root_nodes.push_back(node);
-			node_map.emplace(entity.getHandle(), &root_nodes.back());
-		}
+		SceneNode *node = node_map[entity.getHandle()];
+		std::list<SceneNode> source = node->has_parent ? node->parent->children : root_nodes;
+		std::list<SceneNode> destination = parent.valid() ? node_map[parent.getHandle()]->children : root_nodes;
+		auto iterator = std::find(source.begin(), source.end(), *node);
+		destination.splice(destination.end(), source, iterator, std::next(iterator));
+		node->has_parent = parent.valid();
+		if (node->has_parent)
+			node->parent = node_map[parent.getHandle()];
+		else
+			node->parent = nullptr;
+
+		if (entity.has<Transform>())
+			entity.get<Transform>().is_dirty = true;
 	}
 
 	Entity Scene::getParent(Entity entity) {
-		SceneNode* node = node_map[entity.getHandle()];
+		SceneNode *node = node_map[entity.getHandle()];
 		if (node->has_parent) {
 			return node->parent->entity;
 		}
@@ -176,13 +179,16 @@ namespace HBE {
 
 	void Scene::calculateCameraProjection(RenderTarget *renderTarget) {
 		if (!main_camera_entity.valid()) return;
-
-		if (main_camera_entity.has<Camera>()) {
+		const component_type_id id = registry.getComponentTypeID<Camera>();
+		if (main_camera_entity.has(id)) {
 			main_camera_entity.get<Camera>().calculateProjection();
 		}
 		if (main_camera_entity.has<Camera2D>()) {
 			main_camera_entity.get<Camera2D>().calculateProjection();
 		}
+	}
 
+	std::list<SceneNode> Scene::getSceneNodes() {
+		return root_nodes;
 	}
 }
