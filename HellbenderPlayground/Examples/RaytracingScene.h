@@ -33,7 +33,7 @@ struct MaterialData {
 	alignas(16) float roughness;
 };
 
-class RaytracingScene {
+class RaytracingScene : public Scene {
 
 private:
 	enum RENDER_MODE {
@@ -60,14 +60,21 @@ private:
 	std::vector<Texture *> history_albedo;
 	std::vector<Texture *> history_normal_depth;
 	std::vector<Texture *> history_motion;
+
+	Texture *last_albedo;
+	Texture *last_normal_depth;
+	Texture *last_motion;
+
 	Texture *blue_noise;
-	const Texture *output_texture = nullptr;
+	Texture *output_texture = nullptr;
 	Frame frame{};
 	bool paused = false;
 	RENDER_MODE render_mode = DENOISED;
 
 	mat4 last_camera_matrices[2] = {mat4(1.0), mat4(1.0)};
 public:
+
+
 	void createFrameBuffers(uint32_t width, uint32_t height) {
 		for (Texture *albedo: history_albedo) {
 			delete albedo;
@@ -104,24 +111,22 @@ public:
 	void onResolutionChange(RenderTarget *rt) {
 		createFrameBuffers(rt->getResolution().x, rt->getResolution().y);
 
-		Scene *scene = Application::getScene();
-		Camera &camera = scene->getCameraEntity().get<Camera>();
-		camera.render_target = rt;
-		camera.calculateProjection();
+		Camera &camera = getCameraEntity().get<Camera>();
+		camera.setRenderTarget(rt) ;
 	}
 
 
-	void onRender() {
-		Entity camera_entity = Application::getScene()->getCameraEntity();
+	void render() {
+		Entity camera_entity = getCameraEntity();
 		if (!paused)
 			frame.time = Application::getTime() * 0.05;
 
 		RaytracingPipelineResources resources = pathtracing_resources;
 
 
-		const Texture *albedo_history_buffer[HYSTORY_COUNT];
-		const Texture *normal_depth_history_buffer[HYSTORY_COUNT];
-		const Texture *motion_history_buffer[HYSTORY_COUNT];
+		Texture *albedo_history_buffer[HYSTORY_COUNT];
+		Texture *normal_depth_history_buffer[HYSTORY_COUNT];
+		Texture *motion_history_buffer[HYSTORY_COUNT];
 
 		for (uint32_t i = 0; i < HYSTORY_COUNT; i++) {
 			uint32_t f = (frame.index - i) % HYSTORY_COUNT;
@@ -153,28 +158,33 @@ public:
 		last_camera_matrices[0] = glm::inverse(camera_view);
 		last_camera_matrices[1] = camera_projection;
 
-		PresentCmdInfo present_cmd_info{};
-		present_cmd_info.image_count = 1;
-		present_cmd_info.flags = PRESENT_CMD_FLAG_NONE;
-		switch (render_mode) {
-			case DENOISED:
-				present_cmd_info.images = &output_texture;
-				break;
-			case ALBEDO:
-				present_cmd_info.images = &albedo_history_buffer[0];
-				break;
-			case NORMAL:
-				present_cmd_info.images = &normal_depth_history_buffer[0];
-				break;
-			case MOTION:
-				present_cmd_info.images = &motion_history_buffer[0];
-				break;
-		}
-		Graphics::present(present_cmd_info);
+
+		last_albedo = albedo_history_buffer[0];
+		last_normal_depth = normal_depth_history_buffer[0];
+		last_motion = motion_history_buffer[0];
+
 		frame.index++;
 	}
 
-	void onUpdate(float delta) {
+	Texture *getMainCameraTexture() override {
+		switch (render_mode) {
+			case DENOISED:
+				return output_texture;
+				break;
+			case ALBEDO:
+				return last_albedo;
+				break;
+			case NORMAL:
+				return last_normal_depth;
+				break;
+			case MOTION:
+				return last_motion;
+				break;
+		}
+
+	}
+
+	void update(float delta) {
 		if (Input::getKeyDown(KEY::NUMBER_0)) {
 			frame.use_blue_noise = !bool(frame.use_blue_noise);
 		}
@@ -408,20 +418,17 @@ public:
 		//StorageBuffer **pbuffers = storage_buffer_array.data();
 		//pathtracing_resources.pipeline_instance->setStorageBufferArray("vertices", pbuffers, storage_buffer_array.size());
 
-		Scene *scene = Application::getScene();
-
-		scene->onRender.subscribe(this, &RaytracingScene::onRender);
-		scene->onUpdate.subscribe(this, &RaytracingScene::onUpdate);
-		Entity camera_entity = scene->createEntity3D();
+		onRender.subscribe(this, &RaytracingScene::render);
+		onUpdate.subscribe(this, &RaytracingScene::update);
+		Entity camera_entity = createEntity3D();
 		camera_entity.attach<Camera>();
-		camera_entity.get<Camera>().render_target = Graphics::getDefaultRenderTarget();
-		camera_entity.get<Camera>().calculateProjection();
+		camera_entity.get<Camera>().setRenderTarget(Graphics::getDefaultRenderTarget());
 		camera_entity.get<Camera>().active = false;
-		scene->setCameraEntity(camera_entity);
+		setCameraEntity(camera_entity);
 
 		Graphics::getDefaultRenderTarget()->onResolutionChange.subscribe(this, &RaytracingScene::onResolutionChange);
 
-
+		Camera2D camera{};
 		/*nrd::MemoryAllocatorInterface *allocator;
 		nrd::DenoiserCreationDesc denoiserCreationDesc{};
 		denoiserCreationDesc.enableValidation = true;

@@ -63,7 +63,7 @@ namespace HBE {
 
 	struct RenderCmdInfo {
 		const RenderTarget *render_target;
-		const uint32_t layer_mask;
+		uint32_t layer_mask;
 		RENDER_CMD_FLAGS flags;
 		mat4 view;
 		mat4 projection;
@@ -77,7 +77,7 @@ namespace HBE {
 	};
 
 	struct PresentCmdInfo {
-		const Texture **images;
+		Texture **images;
 		uint32_t image_count;
 		PRESENT_CMD_FLAGS flags;
 	};

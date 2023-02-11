@@ -4,7 +4,7 @@
 
 using namespace HBE;
 
-class TriangleScene {
+class TriangleScene : public Scene {
 	Mesh *triangle_mesh;
 
 	Shader *vertex_shader;
@@ -28,12 +28,13 @@ public:
 	}
 
 	void setupScene() {
-		Entity camera_entity = Application::getScene()->createEntity3D();
-		camera_entity.attach<Camera2D>();
+		Entity camera_entity = createEntity3D();
+		camera_entity.attach<Camera2D>().layer_mask = 2;
 
-		Entity triangle_entity = Application::getScene()->createEntity3D();
+		Entity triangle_entity = createEntity3D();
 		MeshRenderer &triangle_renderer = triangle_entity.attach<MeshRenderer>();
 		triangle_renderer.mesh = triangle_mesh;
+		triangle_renderer.layer = 2;
 		triangle_renderer.pipeline_instance = pipeline_instance;
 	}
 

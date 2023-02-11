@@ -38,7 +38,11 @@ namespace HBE {
 		Event<> onRender;
 		Event<> onDraw;
 		Event<float> onUpdate;
+		Event<Scene *> onSceneActivate;
+		Event<Scene *> onSceneDeactivate;
+		component_type_id transform_component_id;
 	private:
+		bool is_active = true;
 		Registry registry;
 		std::list<SceneNode> root_nodes;
 
@@ -52,11 +56,17 @@ namespace HBE {
 		Entity main_camera_entity;
 		std::unordered_map<size_t, Event<Entity>> attach_events;
 		std::unordered_map<size_t, Event<Entity>> detach_events;
-
 	public:
+
+		void setActive(bool active);
+
+		bool isActive();
+
+		virtual Texture *getMainCameraTexture();
+
 		Scene();
 
-		~Scene();
+		virtual ~Scene();
 
 		void update(float deltaTime);
 
@@ -101,7 +111,7 @@ namespace HBE {
 		template<typename Component>
 		bool has(entity_handle handle);
 
-		bool has(entity_handle handle, size_t component_hash);
+		bool has(entity_handle handle, component_type_id component_id);
 
 		template<typename Component>
 		void detach(entity_handle handle);
@@ -114,9 +124,6 @@ namespace HBE {
 		template<typename Component>
 		Event<Entity> &onDetach();
 
-		void calculateCameraProjection(RenderTarget *renderTarget);
-
-
 		//sceneHierachy
 
 		void setParent(Entity entity, Entity parent = {});
@@ -125,7 +132,7 @@ namespace HBE {
 
 		const std::list<SceneNode> &getChildren(Entity entity);
 
-		void print();
+		void printSceneHierarchy();
 
 	private:
 		SceneNode *getNode(Entity entity);
@@ -133,8 +140,9 @@ namespace HBE {
 		void printNode(SceneNode &node, int level);
 
 
-
 		void onAttachTransform(Entity entity);
+
+		void SetChildrenDirty(SceneNode *node);
 	};
 
 	template<typename Component>

@@ -121,29 +121,107 @@ namespace HBE {
 	};
 
 	struct HB_API Camera2D {
-		bool active = true;
-		mat4 projection = mat3(1.0f);
-		float near = -1000;
-		float far = 1000;
-		float zoom_ratio = 10;
-		RenderTarget *render_target = nullptr;
+		Camera2D() {};
 
-		void calculateProjection();
+		Camera2D(const Camera2D &other);
+
+		bool active = true;
+		mat4 projection = mat4(1.0f);
+
+		uint32_t layer_mask = UINT32_MAX;
+
+		void setNearPlane(float near);
+
+		void setFarPlane(float far);
+
+		float getNearPlane();
+
+		float getFarPlane();
+
+		float getZoomRatio();
+
+		void setZoomRatio(float ratio);
 
 		float aspectRatio();
+
+		void setRenderTarget(RenderTarget *render_target);
+
+		RenderTarget *getRenderTarget();
+
+	private:
+		RenderTarget *render_target = nullptr;
+		float zoom_ratio = 10.0f;
+		float near = -1000;
+		float far = 1000;
+
+		void calculateProjection(RenderTarget *render_target);
+	};
+
+	struct HB_API PixelCamera {
+		PixelCamera() {};
+
+		PixelCamera(const PixelCamera &other);
+
+		bool active = true;
+		mat4 projection = mat4(1.0f);
+		uint32_t layer_mask = UINT32_MAX;
+
+		float aspectRatio();
+
+		void setRenderTarget(RenderTarget *render_target);
+
+		RenderTarget *getRenderTarget();
+
+		void setNearPlane(float near);
+
+		void setFarPlane(float far);
+
+		float getNearPlane();
+
+		float getFarPlane();
+
+	private:
+		RenderTarget *render_target = nullptr;
+		float near = -1000;
+		float far = 1000;
+
+		void calculateProjection(RenderTarget *render_target);
 	};
 
 	struct HB_API Camera {
+		Camera() {};
+
+		Camera(const Camera &other);
+
 		mat4 projection = mat4(1.0f);
 		float fov = 70.0f;
-		float render_distance = 1000.0f;
+		float far = 1000.0f;
 		float near = 0.001f;
 		bool active = true;
-		RenderTarget *render_target = nullptr;
+		uint32_t layer_mask = UINT32_MAX;
 
-		void calculateProjection();
+		void setRenderTarget(RenderTarget *render_target);
+
+		RenderTarget *getRenderTarget();
 
 		float aspectRatio();
+
+		void setFOV(float fov);
+
+		float getFOV();
+
+		void setNearPlane(float near);
+
+		void setFarPlane(float far);
+
+		float getNearPlane();
+
+		float getFarPlane();
+
+	private:
+		RenderTarget *render_target = nullptr;
+
+		void calculateProjection(RenderTarget *render_target);
 	};
 
 	struct HB_API MeshRenderer {

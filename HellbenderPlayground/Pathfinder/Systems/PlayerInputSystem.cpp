@@ -22,7 +22,7 @@ void PlayerInputSystem::update(float delta) {
 	SimCamera2D &sim_camera = scene->getCameraEntity().get<SimCamera2D>();
 	Camera2D &camera = scene->getCameraEntity().get<Camera2D>();
 	SimTransform &camera_transform = scene->getCameraEntity().get<SimTransform>();
-	f32 zoom_ratio = f32(camera.zoom_ratio);
+	f32 zoom_ratio = f32(camera.getZoomRatio());
 	bool right_button = Input::getKey(KEY::MOUSE_BUTTON_RIGHT);
 	bool left_button = Input::getKey(KEY::MOUSE_BUTTON_LEFT);
 	if (right_button || left_button) {

@@ -94,11 +94,11 @@ namespace HBE {
 		fence->wait();
 	}
 
-	void VK_ComputeInstance::setTextureArray(uint32_t binding, const Texture **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) {
+	void VK_ComputeInstance::setTextureArray(uint32_t binding,  Texture **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) {
 		descriptors->setTextureArray(binding, texture, texture_count, frame, mip_level);
 	}
 
-	void VK_ComputeInstance::setTextureArray(const std::string &name, const Texture **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) {
+	void VK_ComputeInstance::setTextureArray(const std::string &name,Texture **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) {
 		descriptors->setTextureArray(descriptors->getBinding(name), texture, texture_count, frame, mip_level);
 	}
 

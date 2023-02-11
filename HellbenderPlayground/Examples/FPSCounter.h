@@ -36,6 +36,8 @@ namespace HBE {
 		RenderTarget *render_target;
 
 		Texture *background_texture;
+
+		Scene* scene;
 	public:
 		void update(float delta) {
 			int fps = (int) std::floor(1 / delta);
@@ -72,8 +74,9 @@ namespace HBE {
 					0.0f));
 		}
 
-		FPSCounter(RenderTarget *render_target) {
-			Application::getScene()->onUpdate.subscribe(this, &FPSCounter::update);
+		FPSCounter(Scene& scene) {
+			this->scene = &scene;
+			scene.onUpdate.subscribe(this, &FPSCounter::update);
 			render_target->onResolutionChange.subscribe(this, &FPSCounter::onResolutionChange);
 			this->render_target = render_target;
 			createResources();
@@ -81,7 +84,7 @@ namespace HBE {
 		}
 
 		~FPSCounter() {
-			Application::getScene()->onUpdate.unsubscribe(this);
+			scene->onUpdate.unsubscribe(this);
 			delete text_vertex_shader;
 			delete text_fragment_shader;
 			delete background_vertex_shader;
@@ -97,7 +100,6 @@ namespace HBE {
 
 
 		void setupScene() {
-			Scene *scene = Application::getScene();
 			text_entity = scene->createEntity3D();
 			MeshRenderer &text_renderer = text_entity.attach<MeshRenderer>();
 

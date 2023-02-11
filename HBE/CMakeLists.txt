@@ -90,7 +90,7 @@ set(CORE_FILES
 
         core/threading/JobManager.cpp
         core/threading/JobManager.h
-        core/resource/StorageBuffer.h)
+        core/resource/StorageBuffer.h core/graphics/RenderGraph.cpp core/graphics/RenderGraph.h)
 set(VK_FILES
         platforms/vk/VK_Renderer.cpp
         platforms/vk/VK_Instance.cpp

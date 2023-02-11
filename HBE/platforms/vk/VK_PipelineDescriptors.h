@@ -75,7 +75,7 @@ namespace HBE {
 		void setUniform(uint32_t binding, const void *data, int32_t frame);
 
 		void setTexture(uint32_t binding, const Texture *texture, int32_t frame, uint32_t mip_level);
-		void setTextureArray(uint32_t binding, const Texture **textures, uint32_t texture_count, uint32_t frame, int32_t mip_level);
+		void setTextureArray(uint32_t binding, Texture **textures, uint32_t texture_count, uint32_t frame, int32_t mip_level);
 
 		void setAccelerationStructure(uint32_t binding, const VK_TopLevelAccelerationStructure *acceleration_structure, int32_t frame);
 

@@ -11,12 +11,18 @@
 #include "VK_Fence.h"
 
 namespace HBE {
-	VK_GraphicPipeline::VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const GraphicPipelineInfo &info) :
-			VK_GraphicPipeline(device, renderer, info,
-							   dynamic_cast<VK_RenderPass *>(renderer->getDefaultRenderTarget())->getHandle()) {}
 
-	VK_GraphicPipeline::VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const GraphicPipelineInfo &info,
-										   const VkRenderPass &render_pass) {
+	VK_GraphicPipeline::VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const GraphicPipelineInfo &info, VkRenderPass render_pass) {
+		this->render_pass = render_pass;
+		createRenderPass(device, renderer, info);
+	}
+
+
+	VK_GraphicPipeline::VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const GraphicPipelineInfo &info) {
+		createRenderPass(device, renderer, info);
+	}
+
+	void VK_GraphicPipeline::createRenderPass(VK_Device *device, VK_Renderer *renderer, const GraphicPipelineInfo &info) {
 		this->device = device;
 		this->renderer = renderer;
 
@@ -214,7 +220,14 @@ namespace HBE {
 
 		pipelineInfo.pDepthStencilState = &depthStencil;
 
-		pipelineInfo.renderPass = render_pass;
+		if (render_pass == VK_NULL_HANDLE) {
+			const VK_RenderPass *render_pass = info.render_target == nullptr ?
+											   dynamic_cast<const VK_RenderPass *>(Graphics::getDefaultRenderTarget()) :
+											   dynamic_cast<const VK_RenderPass *>(info.render_target);
+			pipelineInfo.renderPass = render_pass->getHandle();
+		} else {
+			pipelineInfo.renderPass = render_pass;
+		}
 		pipelineInfo.subpass = 0;
 
 		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
@@ -225,6 +238,7 @@ namespace HBE {
 			Log::error("failed to create graphics pipeline!");
 		}
 	}
+
 
 	VK_GraphicPipeline::~VK_GraphicPipeline() {
 		if (handle != VK_NULL_HANDLE)
@@ -240,7 +254,6 @@ namespace HBE {
 	}
 
 	void VK_GraphicPipeline::unbind() const {
-		//vkCmdBindPipeline(renderer->getCommandPool()->getCurrentBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, handle);
 		is_bound = false;
 	}
 

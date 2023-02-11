@@ -12,6 +12,7 @@ class Pathfinder {
 private:
 	Entity camera;
 	Map *map;
+	Scene* scene;
 public:
 	void onUpdate(float delta) {
 
@@ -21,10 +22,8 @@ public:
 		cam.zoom_ratio -= cam.zoom_ratio * f32(wheel) * f32(delta) * 100;
 	}
 
-	Pathfinder() {
-		Application::setScene(new Scene(), true);
+	Pathfinder(Scene& scene) {
 		map = new Map(100, 100);
-		Scene &scene = *Application::getScene();
 		scene.onDraw.subscribe(map->navmesh, &Navmesh::draw);
 		scene.addSystem(new PlayerInputSystem(*map, &scene));
 		scene.addSystem(new AgentSystem(&scene));
@@ -41,13 +40,14 @@ public:
 		Camera2D &cameraComponent = camera.attach<Camera2D>();
 		camera.attach<SimTransform>();
 		simCameraComponent.zoom_ratio = 10;
-		cameraComponent.calculateProjection();
+		cameraComponent.setZoomRatio(10);
 		scene.setCameraEntity(camera);
 		scene.onUpdate.subscribe(this, &Pathfinder::onUpdate);
+		this->scene= &scene;
 	}
 
 	~Pathfinder() {
-		Application::getScene()->onDraw.unsubscribe(map->navmesh);
+		scene->onDraw.unsubscribe(map->navmesh);
 		delete map;
 	}
 };

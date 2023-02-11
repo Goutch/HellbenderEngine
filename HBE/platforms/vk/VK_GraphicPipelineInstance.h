@@ -30,8 +30,8 @@ namespace HBE {
 
 		void setTexture(uint32_t binding, const Texture *texture, int32_t frame, uint32_t mip_level) override;
 		void setTexture(const std::string &name, const Texture *texture, int32_t frame, uint32_t mip_level) override;
-		void setTextureArray(const std::string &name, const Texture **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) override;
-		void setTextureArray(uint32_t binding, const Texture **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) override;
+		void setTextureArray(const std::string &name, Texture **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) override;
+		void setTextureArray(uint32_t binding, Texture **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) override;
 
 		void setStorageBuffer(uint32_t binding, StorageBuffer *buffer, int32_t frame) override;
 		void setStorageBufferArray(uint32_t binding, StorageBuffer **buffer, uint32_t count, int32_t frame) override;

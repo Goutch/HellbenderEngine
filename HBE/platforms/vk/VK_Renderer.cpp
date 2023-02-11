@@ -64,7 +64,7 @@ namespace HBE {
 	}
 
 
-	void VK_Renderer::onWindowSizeChange(uint32_t width, uint32_t height) {
+	void VK_Renderer::onWindowSizeChange(Window *window) {
 		windowResized = true;
 	}
 
@@ -126,6 +126,7 @@ namespace HBE {
 	}
 
 	void VK_Renderer::render(RenderCmdInfo &render_cmd_info) {
+		//todo: create scene specific render graph
 		Profiler::begin("RenderPass");
 
 		const VK_RenderPass *render_pass = dynamic_cast<const VK_RenderPass *>(render_cmd_info.render_target);
@@ -160,6 +161,8 @@ namespace HBE {
 		UniformBufferObject ubo{};
 		ubo.view = render_cmd_info.view;
 		ubo.projection = render_cmd_info.projection;
+
+		Log::debug(std::to_string(render_cmd_info.view[3].x));
 		render_pass->begin(command_pool->getCurrentBuffer(), current_frame);
 		for (const auto &pipeline_kv: render_cache) {
 			const GraphicPipeline *pipeline = pipeline_kv.first;
@@ -266,7 +269,7 @@ namespace HBE {
 		HB_ASSERT(present_cmd_info.image_count <= 4 && present_cmd_info.image_count > 0, "layers should be from 1 to 4");
 		Profiler::begin("AquireImage");
 		frame_presented = true;
-		const VK_Image **vk_images = reinterpret_cast<const VK_Image **>(present_cmd_info.images);
+		VK_Image **vk_images = reinterpret_cast< VK_Image **>(present_cmd_info.images);
 		VkResult result = vkAcquireNextImageKHR(device->getHandle(),
 												swapchain->getHandle(),
 												UINT64_MAX,
@@ -341,17 +344,17 @@ namespace HBE {
 			device->vkCmdPipelineBarrier2(command_pool->getCurrentBuffer(), &dependency_info);
 		}
 
-		screen_material->setTextureArray("layers", &present_cmd_info.images[0], present_cmd_info.image_count, current_frame, 0);
-		screen_material->setUniform("ubo", &present_cmd_info.image_count);
+		screen_pipeline_instance->setTextureArray("layers", &present_cmd_info.images[0], present_cmd_info.image_count, current_frame, 0);
+		screen_pipeline_instance->setUniform("ubo", &present_cmd_info.image_count);
 
 		swapchain->beginRenderPass(current_image, command_pool->getCurrentBuffer());
 
 		screen_pipeline->bind();
-		screen_material->bind();
+		screen_pipeline_instance->bind();
 
 
 		vkCmdDraw(command_pool->getCurrentBuffer(), 3, 1, 0, 0);
-		screen_material->unbind();
+		screen_pipeline_instance->unbind();
 		screen_pipeline->unbind();
 
 		swapchain->endRenderPass(command_pool->getCurrentBuffer());
@@ -397,7 +400,7 @@ namespace HBE {
 
 
 		if (!frame_presented) {
-			const Texture *render_textures[1] = {
+			Texture *render_textures[1] = {
 					main_render_target->getFramebufferTexture(current_frame)
 			};
 			PresentCmdInfo present_cmd_info{};
@@ -422,55 +425,7 @@ namespace HBE {
 
 	void VK_Renderer::draw(DrawCmdInfo &draw_cmd_info) {
 
-		//copy push constants data to cache
-		for (int i = 0; i < draw_cmd_info.push_constants_count; ++i) {
-			if (draw_cmd_info.push_constants[i].size + current_pc_block_offset > PUSH_CONSTANT_BLOCK_SIZE) {
-				current_pc_block_offset = 0;
-				current_pc_block++;
-				if (current_pc_block >= push_constant_blocks.size()) {
-					push_constant_blocks.emplace_back(static_cast<char *>(malloc(PUSH_CONSTANT_BLOCK_SIZE)));
-				}
-			}
-			void* cache_address = (void *) (&push_constant_blocks[current_pc_block][current_pc_block_offset]);
-			memcpy(cache_address,
-				   draw_cmd_info.push_constants[i].data,
-				   draw_cmd_info.push_constants[i].size);
-			current_pc_block_offset += draw_cmd_info.push_constants[i].size;
-			draw_cmd_info.push_constants[i].data = cache_address;
-		}
 
-		//copy push constants to cache
-		if ((sizeof(PushConstantInfo) * draw_cmd_info.push_constants_count) + current_pc_block_offset > PUSH_CONSTANT_BLOCK_SIZE) {
-			current_pc_block_offset = 0;
-			current_pc_block++;
-			if (current_pc_block >= push_constant_blocks.size()) {
-				push_constant_blocks.emplace_back(static_cast<char *>(malloc(PUSH_CONSTANT_BLOCK_SIZE)));
-			}
-		}
-		void *cache_address = (void *) (&push_constant_blocks[current_pc_block][current_pc_block_offset]);
-		memcpy(cache_address,
-			   draw_cmd_info.push_constants,
-			   sizeof(PushConstantInfo) * draw_cmd_info.push_constants_count);
-		draw_cmd_info.push_constants = (PushConstantInfo *) cache_address;
-		current_pc_block_offset += sizeof(PushConstantInfo) * draw_cmd_info.push_constants_count;
-
-		if (draw_cmd_info.flags & DRAW_CMD_FLAG_ORDERED) {
-			ordered_render_cache.push_back(draw_cmd_info);
-		} else {
-			auto pipeline_it = render_cache.find(draw_cmd_info.pipeline_instance->getGraphicPipeline());
-			if (pipeline_it == render_cache.end())
-				pipeline_it = render_cache.emplace(draw_cmd_info.pipeline_instance->getGraphicPipeline(),
-												   MAP(GraphicPipelineInstance*, MAP(const Mesh*, std::vector<DrawCmdInfo>))()).first;
-			auto material_it = pipeline_it->second.find(draw_cmd_info.pipeline_instance);
-			if (material_it == pipeline_it->second.end())
-				material_it = pipeline_it->second.emplace(draw_cmd_info.pipeline_instance, MAP(const Mesh*, std::vector<DrawCmdInfo>)()).first;
-			auto mesh_it = material_it->second.find(draw_cmd_info.mesh);
-			if (mesh_it == material_it->second.end())
-				mesh_it = material_it->second.emplace(draw_cmd_info.mesh, std::vector<DrawCmdInfo>()).first;
-
-			mesh_it->second.emplace_back(draw_cmd_info);
-
-		}
 	}
 
 	const VK_Swapchain &VK_Renderer::getSwapchain() const {
@@ -555,10 +510,10 @@ namespace HBE {
 		screen_pipeline = new VK_GraphicPipeline(device, this, pipeline_info, swapchain->getRenderPass());
 		Resources::add("DEFAULT_SCREEN_PIPELINE", screen_pipeline);
 
-		GraphicPipelineInstanceInfo screen_material_info{};
-		screen_material_info.graphic_pipeline = screen_pipeline;
-		screen_material = new VK_GraphicPipelineInstance(this, screen_material_info);
-		Resources::add("DEFAULT_SCREEN_MATERIAL", screen_material);
+		GraphicPipelineInstanceInfo screen_pipeline_instance_info{};
+		screen_pipeline_instance_info.graphic_pipeline = screen_pipeline;
+		screen_pipeline_instance = new VK_GraphicPipelineInstance(this, screen_pipeline_instance_info);
+		Resources::add("DEFAULT_SCREEN_PIPELINE_INSTANCE", screen_pipeline_instance);
 
 		push_constant_blocks.emplace_back((char *) (malloc(PUSH_CONSTANT_BLOCK_SIZE)));
 	}

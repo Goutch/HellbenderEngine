@@ -11,9 +11,10 @@
 #include "core/utility/Profiler.h"
 #include "core/scene/Scene.h"
 #include "core/resource/RenderTarget.h"
+#include <chrono>
+#include <thread>
 
 namespace HBE {
-	Scene *Application::current_scene = nullptr;
 	Window *Application::window = nullptr;
 	Clock *Application::time = nullptr;
 	int Application::fps_counter = 0;
@@ -26,32 +27,12 @@ namespace HBE {
 	Event<float> Application::onUpdate;
 	Event<> Application::onDraw;
 	Event<> Application::onRender;
-
-	void Application::setScene(Scene *scene, bool delete_previous_scene) {
-		if (delete_previous_scene && scene != nullptr) {
-			delete current_scene;
-			current_scene = nullptr;
-		}
-		Application::current_scene = scene;
-		if (scene != nullptr) {
-			onSceneChange.invoke(scene);
-		}
-
-	}
-
-	Scene *Application::getScene() {
-		if (current_scene == nullptr) {
-			setScene(new Scene(), false);
-		}
-		return current_scene;
-	}
+	Event<> Application::onPresent;
 
 	void Application::init() {
 		Graphics::init();
 		window = Graphics::getWindow();
 		Input::init();
-		if (!current_scene)
-			setScene(new Scene());
 		onInit.invoke();
 	}
 
@@ -60,11 +41,7 @@ namespace HBE {
 		time = new Clock();
 		Clock update_clock = Clock();
 		float delta_t = 0.0f;
-		if (current_scene == nullptr) {
-			setScene(new Scene());
-		}
-		while (!window->shouldClose() && current_scene != nullptr) {
-
+		while (!window->shouldClose()) {
 			window->swapBuffers();
 			Input::pollEvents();
 			Profiler::begin("TOTAL_FRAME");
@@ -72,48 +49,22 @@ namespace HBE {
 			Profiler::begin("UPDATE");
 
 			onUpdate.invoke(delta_t);
-			current_scene->update(delta_t);
 			Profiler::end();
-			if (current_scene != nullptr) {
-				Entity camera_entity = current_scene->getCameraEntity();
 
-				if (!window->isMinimized()) {
-
-
-					Profiler::begin("DRAW");
-					onDraw.invoke();
-					current_scene->draw();
-					Profiler::end();
+			if (!window->isMinimized()) {
+				Profiler::begin("DRAW");
+				onDraw.invoke();
+				Profiler::end();
 
 
-					Profiler::begin("RENDER");
-					Graphics::beginFrame();
-					current_scene->render();
-					onRender.invoke();
-					if (camera_entity.valid() && (camera_entity.has<Camera>() || camera_entity.has<Camera2D>())) {
-						uint32_t image_count = 0;
-						const Texture *images[] = {nullptr, nullptr, nullptr};
-
-						if (camera_entity.valid() && (camera_entity.has<Camera>())) {
-							images[image_count++] = camera_entity.get<Camera>().render_target->getFramebufferTexture(Graphics::getCurrentFrame());
-						}
-						if (camera_entity.valid() && (camera_entity.has<Camera2D>())) {
-							images[image_count++] = camera_entity.get<Camera2D>().render_target->getFramebufferTexture(Graphics::getCurrentFrame());
-						}
-
-						PresentCmdInfo present_info;
-						present_info.image_count = image_count;
-						present_info.images = images;
-						Graphics::present(present_info);
-
-					}
-					Graphics::endFrame();
-					Profiler::end();
-				} else if (window->isMinimized()) {
-
-				}
-			} else {
-				//Log::warning("No scene set");
+				Profiler::begin("RENDER");
+				Graphics::beginFrame();
+				onRender.invoke();
+				onPresent.invoke();
+				Graphics::endFrame();
+				Profiler::end();
+			} else if (window->isMinimized()) {
+				std::this_thread::sleep_for(std::chrono::milliseconds(33));
 			}
 
 			Profiler::end();
@@ -128,7 +79,6 @@ namespace HBE {
 	}
 
 	void Application::terminate() {
-		delete current_scene;
 		Graphics::terminate();
 		Profiler::printAverange();
 	}

@@ -3,7 +3,7 @@
 #include "HBE.h"
 #include "FPSCounter.h"
 
-class ModelScene {
+class ModelScene: public Scene {
 private :
 	Entity entitites[2];
 public:
@@ -61,22 +61,20 @@ public:
 		Model *dragon_model = Resources::createModel(model_info, "dragon");
 
 		//-------------------SCENE CREATION--------------------------------------
-		Scene *scene = new Scene();
-		Application::setScene(scene, true);
 
-		Entity camera_entity = scene->createEntity3D();
+		Entity camera_entity = createEntity3D();
 		Camera &camera = camera_entity.attach<Camera>();
-		camera.render_target = Graphics::getDefaultRenderTarget();
-		scene->setCameraEntity(camera_entity);
+		camera.setRenderTarget(Graphics::getDefaultRenderTarget());
+		setCameraEntity(camera_entity);
 
-		auto teapot = scene->createEntity3D();
+		auto teapot = createEntity3D();
 		ModelRenderer &teapot_renderer = teapot.attach<ModelRenderer>();
 		teapot.get<Transform>().translate(vec3(2.5, 0, -5));
 		teapot.get<Transform>().setScale(vec3(0.1));
 		teapot_renderer.model = teapot_model;
 
 
-		auto dragon = scene->createEntity3D();
+		auto dragon = createEntity3D();
 		ModelRenderer &dragon_renderer = dragon.attach<ModelRenderer>();
 		dragon.get<Transform>().translate(vec3(-2.5, 0, -5));
 		dragon_renderer.model = dragon_model;

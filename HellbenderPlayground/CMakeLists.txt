@@ -22,7 +22,6 @@ set(VOXEL_MODULE_FILES
 
 
 set(EXEMPLES_FILES
-        VoxelModule/VoxTree.h
         Examples/ModelScene.h
         Examples/RaytracingScene.h
         Examples/TextScene.h

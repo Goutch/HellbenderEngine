@@ -304,7 +304,7 @@ namespace HBE {
 		return descriptor_set_layout_bindings[it->second].binding;
 	}
 
-	void VK_PipelineDescriptors::setTextureArray(uint32_t binding, const Texture **textures, uint32_t texture_count, uint32_t frame, int32_t mip_level) {
+	void VK_PipelineDescriptors::setTextureArray(uint32_t binding, Texture **textures, uint32_t texture_count, uint32_t frame, int32_t mip_level) {
 
 		HB_ASSERT(frame < int32_t(MAX_FRAMES_IN_FLIGHT), "Frame index out of range");
 		uint32_t binding_index = uniform_binding_to_index[binding];
@@ -314,7 +314,7 @@ namespace HBE {
 				  binding_info.descriptorType == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, "binding#" + std::to_string(binding) + " is not a texture");
 
 
-		const VK_Image **vk_texture = reinterpret_cast<const VK_Image **>(textures);
+		VK_Image **vk_texture = reinterpret_cast<VK_Image **>(textures);
 		std::vector<VkDescriptorImageInfo> image_infos;
 
 		VkWriteDescriptorSet write_descriptor_set = descriptor_pool.writes[frame][binding_index];

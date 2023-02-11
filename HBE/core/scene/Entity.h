@@ -9,6 +9,7 @@ namespace HBE {
 	class HB_API Entity {
 		entity_handle handle = std::numeric_limits<entity_handle>::max();
 		Scene *scene = nullptr;
+
 	public:
 
 		Entity() = default;
@@ -17,6 +18,7 @@ namespace HBE {
 
 		Entity(const Entity &other);
 
+		Scene* getScene();
 		template<typename Component>
 		Component &attach();
 
@@ -41,5 +43,6 @@ namespace HBE {
 
 		entity_handle getHandle() const;
 
+		Entity getParent() const;
 	};
 }

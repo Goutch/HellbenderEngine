@@ -9,15 +9,18 @@ namespace HBE {
 
 	class HB_API CameraSystem : public System {
 		Scene *scene;
-
 	public:
 		CameraSystem(Scene *scene);
+
 		~CameraSystem();
+
 		void render();
+
 		void onCameraAttached(Entity entity);
 
 		void onCamera2DAttached(Entity entity);
-		void onCameraUIAttached(Entity entity);
+
+		void onPixelCameraAttached(Entity entity);
 	};
 
 }

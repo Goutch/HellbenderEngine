@@ -29,6 +29,7 @@ namespace HBE {
 		const Shader *fragement_shader = nullptr;
 		const Shader *geometry_shader = nullptr;
 		const VertexAttributeInfo *attribute_infos = nullptr;
+		const RenderTarget *render_target = nullptr;
 		uint32_t attribute_info_count = 0;
 		VERTEX_TOPOLOGY topology = VERTEX_TOPOLOGY_TRIANGLE;
 		GRAPHIC_PIPELINE_FLAGS flags = GRAPHIC_PIPELINE_FLAG_NONE;

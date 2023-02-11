@@ -4,7 +4,7 @@
 
 using namespace HBE;
 
-class TextScene {
+class TextScene : public Scene {
 	std::string text_str = "Hello world!\nThis is a test of the text rendering system\nabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{};':\",./<>?\\|`~";
 
 	Shader *text_vertex_shader;
@@ -15,7 +15,7 @@ class TextScene {
 	Font *font;
 
 	void onCharacterInput(char codepoint) {
-		if (Application::getScene()->getCameraEntity().has<CameraController>())
+		if (getCameraEntity().has<CameraController>())
 			return;
 		if (codepoint == 'c')
 			return;
@@ -35,7 +35,7 @@ class TextScene {
 	}
 
 	void onUpdate(float delta) {
-		if (Application::getScene()->getCameraEntity().has<CameraController>())
+		if (getCameraEntity().has<CameraController>())
 			return;
 		if (Input::getKeyDown(KEY::ENTER)) {
 			onCharacterInput(static_cast<char>('\n'));
@@ -86,9 +86,7 @@ private:
 	}
 
 	void setupScene() {
-		Scene *scene = Application::getScene();
-
-		Entity camera_entity = scene->createEntity3D();
+		Entity camera_entity = createEntity3D();
 
 		Camera2D camera2D = camera_entity.attach<Camera2D>();
 
@@ -102,7 +100,7 @@ private:
 		font = Resources::createFont(font_info);
 		text_pipeline_instance->setTexture("mtsdf", font->getTextureAtlas());
 
-		Entity text_entity = scene->createEntity3D();
+		Entity text_entity = createEntity3D();
 		MeshRenderer &text_renderer = text_entity.attach<MeshRenderer>();
 
 		text_renderer.pipeline_instance = text_pipeline_instance;
