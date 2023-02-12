@@ -10,7 +10,7 @@
 #include "VK_CommandPool.h"
 #include "raytracing/VK_TopLevelAccelerationStructure.h"
 #include "VK_StorageBuffer.h"
-
+#include "core/graphics/Graphics.h"
 namespace HBE {
 
 	VK_PipelineDescriptors::VK_PipelineDescriptors(VK_Renderer *renderer, const VK_PipelineLayout &layout) {
@@ -36,7 +36,7 @@ namespace HBE {
 
 		createDescriptorPool(descriptor_pool);
 		createDescriptorWrites(descriptor_pool);
-		renderer->onFrameChange.subscribe(this, &VK_PipelineDescriptors::onFrameChange);
+		Graphics::onFrameChange.subscribe(this, &VK_PipelineDescriptors::onFrameChange);
 	}
 
 

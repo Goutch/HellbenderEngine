@@ -20,7 +20,7 @@ class AgentSystem : public System {
 public:
 	void onUpdate(float delta);
 
-	void onDraw();
+	void onDraw(RenderGraph* render_graph);
 
 	AgentSystem(Scene *scene);
 

@@ -116,7 +116,7 @@ public:
 	}
 
 
-	void render() {
+	void render(RenderGraph* render_graph) {
 		Entity camera_entity = getCameraEntity();
 		if (!paused)
 			frame.time = Application::getTime() * 0.05;
@@ -401,7 +401,6 @@ public:
 		root_acceleration_structure_info.instance_count = acceleration_structure_instances.size();
 
 		root_acceleration_structure = Resources::createRootAccelerationStructure(root_acceleration_structure_info);
-
 
 		StorageBufferInfo storage_buffer_info{};
 		storage_buffer_info.stride = sizeof(MaterialData);

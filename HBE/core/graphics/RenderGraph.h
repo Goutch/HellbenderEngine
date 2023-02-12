@@ -3,6 +3,7 @@
 #include "Core.h"
 #include "Renderer.h"
 #include "unordered_map"
+#include "vector"
 namespace HBE {
 	class GraphicPipeline;
 
@@ -25,17 +26,17 @@ namespace HBE {
 	public:
 		RenderGraph();
 
-		virtual ~RenderGraph();
+		~RenderGraph();
 
 		void draw(DrawCmdInfo draw_cmd_info);
 
 		void clear();
 
-		MAP(const GraphicPipeline*,
+		const MAP(const GraphicPipeline*,
 			MAP(GraphicPipelineInstance * ,
 				MAP(const Mesh*, std::vector<DrawCmdInfo>))) &getRenderCache();
 
-		std::vector<DrawCmdInfo> &getOrderedRenderCache();
+		const std::vector<DrawCmdInfo> &getOrderedRenderCache();
 
 
 

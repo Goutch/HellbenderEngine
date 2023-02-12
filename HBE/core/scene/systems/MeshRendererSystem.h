@@ -7,10 +7,13 @@
 #include "core/scene/System.h"
 #include "core/scene/Scene.h"
 
+
 namespace HBE {
 	class Scene;
 
 	class SceneNode;
+
+    class RenderGraph;
 
 	class HB_API MeshRendererSystem : public System {
 		component_type_id mesh_renderer_component_id;
@@ -21,10 +24,10 @@ namespace HBE {
 
 		~MeshRendererSystem();
 
-		void draw();
+		void draw(RenderGraph *render_graph);
 
 	private :
-		void drawNode(SceneNode &node);
+		void drawNode(SceneNode &node,RenderGraph* render_graph);
 
 	};
 }

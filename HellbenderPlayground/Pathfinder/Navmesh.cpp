@@ -1,6 +1,6 @@
 #include "Navmesh.h"
 
-void Navmesh::draw() {
+void Navmesh::draw(RenderGraph* render_graph) {
 
 	if (!vertices.empty()) {
 		std::vector<vec2> mesh_vertices;
@@ -23,7 +23,7 @@ void Navmesh::draw() {
 		DrawCmdInfo draw_cmd{};
 		draw_cmd.mesh = mesh;
 		draw_cmd.pipeline_instance = material;
-		Graphics::draw(draw_cmd);
+        render_graph->draw(draw_cmd);
 	}
 }
 

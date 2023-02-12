@@ -36,15 +36,16 @@ namespace HBE {
 	class HB_API Graphics {
 		static Renderer *renderer;
 		static Window *window;
+
 	public:
+        static Event<uint32_t> onFrameChange;
+
 		static const Mesh *DEFAULT_QUAD;
 		static const Mesh *DEFAULT_CUBE;
 
 		static void init();
 
 		static Window *getWindow();
-
-		static void draw(DrawCmdInfo &draw_cmd_info);
 
 		static void render(RenderCmdInfo &render_cmd_info);
 

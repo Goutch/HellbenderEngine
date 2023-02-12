@@ -65,7 +65,6 @@ public:
 
 	void setupScene() {
 		createCube();
-		createCube();
 
 		Entity camera_entity = createEntity3D();
 		camera_entity.attach<Camera>().layer_mask = 2;

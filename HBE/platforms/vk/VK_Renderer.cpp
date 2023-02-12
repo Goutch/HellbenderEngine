@@ -26,6 +26,7 @@
 #include "VK_PipelineDescriptors.h"
 #include "VK_GraphicPipelineInstance.h"
 #include "raytracing/VK_RaytracingPipelineInstance.h"
+#include "core/graphics/RenderGraph.h"
 
 namespace HBE {
 	struct UniformBufferObject {
@@ -98,10 +99,6 @@ namespace HBE {
 	}
 
 	VK_Renderer::~VK_Renderer() {
-
-		for (int i = 0; i < push_constant_blocks.size(); ++i) {
-			free(push_constant_blocks[i]);
-		}
 		window->onSizeChange.unsubscribe(this);
 		Application::onWindowClosed.unsubscribe(this);
 		Configs::onVerticalSyncChange.unsubscribe(this);
@@ -164,7 +161,7 @@ namespace HBE {
 
 		Log::debug(std::to_string(render_cmd_info.view[3].x));
 		render_pass->begin(command_pool->getCurrentBuffer(), current_frame);
-		for (const auto &pipeline_kv: render_cache) {
+		for (const auto &pipeline_kv: render_cmd_info.render_graph->getRenderCache()) {
 			const GraphicPipeline *pipeline = pipeline_kv.first;
 			pipeline->bind();
 			for (const auto &material_kv: pipeline_kv.second) {
@@ -197,6 +194,7 @@ namespace HBE {
 			pipeline->unbind();
 		}
 
+        std::vector<DrawCmdInfo> ordered_render_cache = render_cmd_info.render_graph->getOrderedRenderCache();
 		for (int i = 0; i < ordered_render_cache.size(); ++i) {
 			DrawCmdInfo &cmd = ordered_render_cache[i];
 			if ((cmd.layer & render_cmd_info.layer_mask) != cmd.layer) {
@@ -411,21 +409,11 @@ namespace HBE {
 
 		frame_presented = false;
 		current_frame = (current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
-		onFrameChange.invoke(current_frame);
 		device->getAllocator()->freeStagingBuffers();
-
-		render_cache.clear();
-		ordered_render_cache.clear();
 
 		command_pool->getCurrentFence().wait();
 
 		Profiler::end();
-	}
-
-
-	void VK_Renderer::draw(DrawCmdInfo &draw_cmd_info) {
-
-
 	}
 
 	const VK_Swapchain &VK_Renderer::getSwapchain() const {
@@ -514,8 +502,6 @@ namespace HBE {
 		screen_pipeline_instance_info.graphic_pipeline = screen_pipeline;
 		screen_pipeline_instance = new VK_GraphicPipelineInstance(this, screen_pipeline_instance_info);
 		Resources::add("DEFAULT_SCREEN_PIPELINE_INSTANCE", screen_pipeline_instance);
-
-		push_constant_blocks.emplace_back((char *) (malloc(PUSH_CONSTANT_BLOCK_SIZE)));
 	}
 
 	void VK_Renderer::waitCurrentFrame() {

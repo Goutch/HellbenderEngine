@@ -7,6 +7,7 @@
 namespace HBE {
 	class Entity;
 
+    class RenderGraph;
 	class HB_API CameraSystem : public System {
 		Scene *scene;
 	public:
@@ -14,7 +15,7 @@ namespace HBE {
 
 		~CameraSystem();
 
-		void render();
+		void render(RenderGraph* render_graph);
 
 		void onCameraAttached(Entity entity);
 

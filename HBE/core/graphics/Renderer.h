@@ -27,6 +27,8 @@ namespace HBE {
 
 	class RaytracingPipelineInstance;
 
+    class RenderGraph;
+
 	typedef uint32_t DRAW_CMD_FLAGS;
 	enum DRAW_CMD_FLAG {
 		DRAW_CMD_FLAG_NONE = 0,
@@ -63,6 +65,7 @@ namespace HBE {
 
 	struct RenderCmdInfo {
 		const RenderTarget *render_target;
+        RenderGraph* render_graph;
 		uint32_t layer_mask;
 		RENDER_CMD_FLAGS flags;
 		mat4 view;
@@ -87,8 +90,6 @@ namespace HBE {
 		static Renderer *create();
 
 		virtual ~Renderer() = default;
-
-		virtual void draw(DrawCmdInfo &draw_cmd_info) = 0;
 
 		virtual void render(RenderCmdInfo &render_cmd_info) = 0;
 

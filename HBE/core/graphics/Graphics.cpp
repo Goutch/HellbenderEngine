@@ -12,7 +12,7 @@
 namespace HBE {
 	const Mesh *Graphics::DEFAULT_CUBE = nullptr;
 	const Mesh *Graphics::DEFAULT_QUAD = nullptr;
-
+    Event<uint32_t> Graphics::onFrameChange;
 	Renderer *Graphics::renderer = nullptr;
 	Window *Graphics::window = nullptr;
 
@@ -21,10 +21,6 @@ namespace HBE {
 		renderer = Renderer::create();
 		Resources::init(*renderer->getResourceFactory());
 		renderer->createDefaultResources();
-	}
-
-	void Graphics::draw(DrawCmdInfo &draw_cmd_info) {
-		renderer->draw(draw_cmd_info);
 	}
 
 	void Graphics::render(RenderCmdInfo &render_cmd_info) {
@@ -48,6 +44,7 @@ namespace HBE {
 
 	void Graphics::endFrame() {
 		renderer->endFrame();
+        onFrameChange.invoke(renderer->getCurrentFrame());
 	}
 
 	Renderer *Graphics::getRenderer() {

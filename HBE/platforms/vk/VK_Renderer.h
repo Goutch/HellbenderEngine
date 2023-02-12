@@ -64,11 +64,6 @@ namespace HBE {
 
 
 	public:
-		Event<uint32_t> onFrameChange;
-
-
-		void draw(DrawCmdInfo &draw_cmd_info) override;
-
 		void render(RenderCmdInfo &render_cmd_info) override;
 
 		void traceRays(TraceRaysCmdInfo &trace_rays_cmd_info) override;

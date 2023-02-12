@@ -57,7 +57,7 @@ public:
 	Navmesh(const bool *map, uint32_t size_x, uint32_t size_y, f32 cell_size);
 	~Navmesh();
 	void update();
-	void draw();
+	void draw(RenderGraph* render_graph);
 private:
 	void createOutline();
 	std::vector<Triangle> triangulate();

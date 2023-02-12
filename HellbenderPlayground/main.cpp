@@ -69,12 +69,12 @@ int main() {
 
 	{
 		//-----------------------tests-------------------
-		main_scene = new TriangleScene();
-		//main_scene = new CubeScene();
+		//main_scene = new TriangleScene();
+		main_scene = new CubeScene();
 		//ModelScene load_model_scene = ModelScene();
 		//ui_scene= new TextScene();
 		ui_scene = new OrderedRenderingScene();
-		ui_scene->setActive(false);
+
 		//-----------------------projects-----------------
 		//RaytracingScene rts = RaytracingScene();
 		//Pathfinder pathfinder;
