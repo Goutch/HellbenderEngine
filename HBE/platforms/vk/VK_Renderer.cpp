@@ -159,7 +159,6 @@ namespace HBE {
 		ubo.view = render_cmd_info.view;
 		ubo.projection = render_cmd_info.projection;
 
-		Log::debug(std::to_string(render_cmd_info.view[3].x));
 		render_pass->begin(command_pool->getCurrentBuffer(), current_frame);
 		for (const auto &pipeline_kv: render_cmd_info.render_graph->getRenderCache()) {
 			const GraphicPipeline *pipeline = pipeline_kv.first;
