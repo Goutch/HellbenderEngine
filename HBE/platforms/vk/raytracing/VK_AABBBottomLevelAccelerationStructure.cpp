@@ -8,7 +8,7 @@
 namespace HBE {
 	VK_AABBBottomLevelAccelerationStructure::VK_AABBBottomLevelAccelerationStructure(VK_Device *device, AABBAccelerationStructureInfo info) {
 		this->device = device;
-		Profiler::begin("Build AABB Acceleration Structure");
+		HB_PROFILE_BEGIN("Build AABB Acceleration Structure");
 
 
 		VkAabbPositionsKHR aabb_positions{};
@@ -112,7 +112,7 @@ namespace HBE {
 
 		address.deviceAddress = device->vkGetAccelerationStructureDeviceAddressKHR(device->getHandle(), &accelerationDeviceAddressInfo);
 
-		Profiler::end();
+		HB_PROFILE_END();
 	}
 
 	VK_AABBBottomLevelAccelerationStructure::~VK_AABBBottomLevelAccelerationStructure() {

@@ -22,7 +22,7 @@ class TextScene : public Scene {
 		text_str += codepoint;
 		float total_width;
 		float total_height;
-		Geometry::createText(*text_mesh,
+		Geometry::updateText(*text_mesh,
 							 text_str,
 							 *font,
 							 1.0,
@@ -44,7 +44,7 @@ class TextScene : public Scene {
 			text_str.pop_back();
 			float total_width;
 			float total_height;
-			Geometry::createText(*text_mesh,
+			Geometry::updateText(*text_mesh,
 								 text_str,
 								 *font,
 								 1.0,

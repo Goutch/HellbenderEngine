@@ -44,30 +44,32 @@ namespace HBE {
 		while (!window->shouldClose()) {
 			window->swapBuffers();
 			Input::pollEvents();
-			Profiler::begin("TOTAL_FRAME");
+			HB_PROFILE_BEGIN("TOTAL_FRAME");
 			JobManager::updateJobsStatus();
-			Profiler::begin("UPDATE");
+			HB_PROFILE_BEGIN("UPDATE");
 
 			onUpdate.invoke(delta_t);
-			Profiler::end();
+			HB_PROFILE_END();
 
 			if (!window->isMinimized()) {
-				Profiler::begin("DRAW");
+				HB_PROFILE_BEGIN("DRAW");
 				onDraw.invoke();
-				Profiler::end();
+				HB_PROFILE_END();
 
 
-				Profiler::begin("RENDER");
+				HB_PROFILE_BEGIN("RENDER");
 				Graphics::beginFrame();
 				onRender.invoke();
+				HB_PROFILE_END();
+				HB_PROFILE_BEGIN("PRESENT");
 				onPresent.invoke();
 				Graphics::endFrame();
-				Profiler::end();
+				HB_PROFILE_END();
 			} else if (window->isMinimized()) {
 				std::this_thread::sleep_for(std::chrono::milliseconds(33));
 			}
 
-			Profiler::end();
+			HB_PROFILE_END();
 			delta_t = update_clock.ns() * NANOSECONDS_TO_SECONDS;
 			update_clock.reset();
 			printFPS(delta_t);

@@ -70,7 +70,7 @@ public:
 		auto teapot = createEntity3D();
 		ModelRenderer &teapot_renderer = teapot.attach<ModelRenderer>();
 		teapot.get<Transform>().translate(vec3(2.5, 0, -5));
-		teapot.get<Transform>().setScale(vec3(0.1));
+		teapot.get<Transform>().setLocalScale(vec3(0.1));
 		teapot_renderer.model = teapot_model;
 
 

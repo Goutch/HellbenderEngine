@@ -14,15 +14,15 @@ namespace HBE {
 			paralelize = !paralelize;
 		}
 
-		Profiler::begin("RotatorUpdate");
-		Profiler::begin("RotatorUpdateGroup");
+		HB_PROFILE_BEGIN("RotatorUpdate");
+		HB_PROFILE_BEGIN("RotatorUpdateGroup");
 		auto group = scene->group<Transform, Rotator>();
 
-		Profiler::end();
+		HB_PROFILE_END();
 		for (auto [handle,transform,rotator]:group) {
 			transform.rotate(rotator.rotate_speed * delta_t * rotator.angle);
 		}
-		Profiler::end();
+		HB_PROFILE_END();
 	}
 }
 

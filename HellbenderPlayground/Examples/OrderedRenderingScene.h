@@ -13,14 +13,18 @@ class OrderedRenderingScene : public Scene {
 	std::vector<GraphicPipelineInstance *> pipeline_instances;
 
 	RenderTarget *render_target;
+
+	FPSCounter *fps_counter;
 public:
 
 	OrderedRenderingScene() {
 		createResources();
 		setupScene();
+		fps_counter = new FPSCounter(*this, render_target);
 	}
 
 	~OrderedRenderingScene() {
+		delete fps_counter;
 		delete triangle_mesh;
 		delete vertex_shader;
 		delete fragment_shader;
@@ -29,6 +33,7 @@ public:
 			delete pipeline_instance;
 		}
 		delete render_target;
+
 	}
 
 	Entity createTriangle(vec3 position, vec4 color) {
@@ -48,6 +53,7 @@ public:
 		triangle_renderer.ordered = true;
 		triangle_renderer.layer = 1;
 		triangle_entity.get<Transform>().setPosition(position);
+
 		return triangle_entity;
 
 	}
@@ -55,24 +61,23 @@ public:
 
 	void setupScene() {
 		Entity camera_entity = createEntity3D();
-		Camera2D &camera = camera_entity.attach<Camera2D>();
+		PixelCamera &camera = camera_entity.attach<PixelCamera>();
 		camera.setRenderTarget(render_target);
 		camera.layer_mask = 1;
 
 		std::vector<Entity> entitities;
-		int n = 20;
+		int n = 10000;
 		for (int i = 0; i < n; ++i) {
-			Entity triangle = createTriangle(vec3(0.1, 0, 0),
+			Entity triangle = createTriangle(vec3(Random::floatRange(0, render_target->getResolution().x), Random::floatRange(0, render_target->getResolution().y),0),
 											 vec4(Random::floatRange(0, 1),
 												  Random::floatRange(0, 1),
 												  Random::floatRange(0, 1),
-												  0.1));
-			entitities.push_back(triangle);
-		}
-		for (int i = n - 2; i >= 0; --i) {
-			setParent(entitities[i], entitities[i + 1]);
+												  1));
 
+			entitities.push_back(triangle);
+			triangle.get<Transform>().setWorldScale(vec3(Random::floatRange(10, 300), Random::floatRange(10, 300), 1));
 		}
+
 		printSceneHierarchy();
 	}
 

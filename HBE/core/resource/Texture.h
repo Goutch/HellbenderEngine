@@ -18,6 +18,11 @@ namespace HBE {
 		IMAGE_FORMAT_DEPTH32F = 9,
 		IMAGE_FORMAT_DEPTH32f_STENCIL8U = 10,
 		IMAGE_FORMAT_DEPTH24f_STENCIL8U = 11,
+		IMAGE_FORMAT_SBGRA8_NON_LINEAR = 12,
+		IMAGE_FORMAT_SR8_NON_LINEAR = 13,
+		IMAGE_FORMAT_SRG8_NON_LINEAR = 14,
+		IMAGE_FORMAT_SRGB8_NON_LINEAR = 15,
+		IMAGE_FORMAT_SRGBA8_NON_LINEAR = 16,
 	};
 	typedef uint32_t IMAGE_FLAGS;
 	enum IMAGE_FLAG {
@@ -62,7 +67,7 @@ namespace HBE {
 
 		virtual void update(const void *data) = 0;
 
-		static Texture *load(const std::string& path, IMAGE_FORMAT format, IMAGE_FLAGS flags);
+		static Texture *load(const std::string &path, IMAGE_FORMAT format, IMAGE_FLAGS flags);
 	};
 
 }

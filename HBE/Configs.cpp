@@ -9,7 +9,7 @@ namespace HBE {
     bool Configs::antialiasing = true;
     Event<bool> Configs::onAntialiasingChange;
 
-    bool Configs::vertical_sync = true;
+    bool Configs::vertical_sync = false;
     Event<> Configs::onVerticalSyncChange;
 
     Configs::CAMERA_MODE Configs::default_camera_mode = Configs::CAMERA_MODE::PERSPECTIVE;

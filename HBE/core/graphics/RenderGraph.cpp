@@ -7,6 +7,7 @@
 #include "core/resource/GraphicPipelineInstance.h"
 #include "core/resource/GraphicPipeline.h"
 #include "core/graphics/Renderer.h"
+#include "core/utility/Profiler.h"
 
 namespace HBE {
     RenderGraph::RenderGraph() {
@@ -26,6 +27,7 @@ namespace HBE {
                 current_pc_block_offset = 0;
                 current_pc_block++;
                 if (current_pc_block >= push_constant_blocks.size()) {
+					Log::debug("New Push Constant Block");
                     push_constant_blocks.emplace_back(static_cast<char *>(malloc(PUSH_CONSTANT_BLOCK_SIZE)));
                 }
             }
@@ -51,7 +53,6 @@ namespace HBE {
                sizeof(PushConstantInfo) * draw_cmd_info.push_constants_count);
         draw_cmd_info.push_constants = (PushConstantInfo *) cache_address;
         current_pc_block_offset += sizeof(PushConstantInfo) * draw_cmd_info.push_constants_count;
-
         if (draw_cmd_info.flags & DRAW_CMD_FLAG_ORDERED) {
             ordered_render_cache.push_back(draw_cmd_info);
         } else {

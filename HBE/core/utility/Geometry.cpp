@@ -1,6 +1,7 @@
 #include "Geometry.h"
 #include "core/resource/Font.h"
 #include <algorithm>
+#include "core/resource/Resources.h"
 
 namespace HBE {
 
@@ -250,7 +251,8 @@ namespace HBE {
 		mesh.setVertexIndices(indices.data(), indices.size());
 	}
 
-	void Geometry::createText(Mesh &mesh, const std::string &text, Font &font, float line_height, float space_width, TEXT_ALIGNMENT alignment, PIVOT pivot, float &total_width, float &total_height) {
+
+	void Geometry::updateText(Mesh &mesh, const std::string &text, Font &font, float line_height, float space_width, TEXT_ALIGNMENT alignment, PIVOT pivot, float &total_width, float &total_height) {
 		uint32_t vertex_size = 3 + 2;
 		uint32_t quad_size = 4 * vertex_size;
 		int text_length = text.size();
@@ -398,20 +400,33 @@ namespace HBE {
 		}
 
 
+		if (vertex_buffer.size() > 0) {
+			mesh.setBuffer(0, vertex_buffer.data(), vertex_count);
+			mesh.setVertexIndices(index_buffer.data(), index_buffer.size());
+		}
+	}
+
+	Mesh *Geometry::createText(const std::string &text,
+							   Font &font,
+							   float line_height,
+							   float space_width,
+							   TEXT_ALIGNMENT alignment,
+							   PIVOT pivot,
+							   float &total_width,
+							   float &total_height) {
 		VertexAttributeInfo vertex_attribute_info{};
 		vertex_attribute_info.size = sizeof(float) * 5;
 		vertex_attribute_info.binding = 0;
-		vertex_attribute_info.flags = VERTEX_ATTRIBUTE_FLAG_NONE;
+		vertex_attribute_info.flags = 0;
 
 		MeshInfo mesh_info{};
 		mesh_info.flags = MESH_FLAG_NONE;
 		mesh_info.attribute_infos = &vertex_attribute_info;
 		mesh_info.attribute_info_count = 1;
 
-		if (vertex_buffer.size() > 0) {
-			mesh.setBuffer(0, vertex_buffer.data(), vertex_count);
-			mesh.setVertexIndices(index_buffer.data(), index_buffer.size());
-		}
+		Mesh *mesh = Resources::createMesh(mesh_info);
+		updateText(*mesh, text, font, line_height, space_width, alignment, pivot, total_width, total_height);
+		return mesh;
 	}
 
 }

@@ -43,14 +43,14 @@ namespace HBE {
     }
 
     void CameraSystem::render(RenderGraph *render_graph) {
-        Profiler::begin("CameraRender");
-        Profiler::begin("CameraRenderGroup");
+        HB_PROFILE_BEGIN("CameraRender");
+        HB_PROFILE_BEGIN("CameraRenderGroup");
         auto group = scene->group<Transform, Camera>();
         auto group_2D = scene->group<Transform, Camera2D>();
         auto group_pixel = scene->group<Transform, PixelCamera>();
         RenderCmdInfo render_cmd_info{};
         render_cmd_info.render_graph = render_graph;
-        Profiler::end();
+        HB_PROFILE_END();
         for (auto[handle, transform, camera]: group) {
             if (camera.active) {
                 render_cmd_info.render_target = camera.getRenderTarget();
@@ -78,7 +78,7 @@ namespace HBE {
                 Graphics::render(render_cmd_info);
             }
         }
-        Profiler::end();
+        HB_PROFILE_END();
     }
 
     CameraSystem::~CameraSystem() {

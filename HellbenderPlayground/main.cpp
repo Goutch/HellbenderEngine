@@ -8,7 +8,7 @@
 #include "Examples/CubeScene.h"
 #include "Examples/TriangleScene.h"
 #include "Examples/OrderedRenderingScene.h"
-
+#include "Games/Pong/PongGame.h"
 using namespace HBE;
 bool fullscreen = false;
 Scene *main_scene;
@@ -58,7 +58,6 @@ void onAppPresent() {
 	present_info.image_count = present_images.size();
 	present_info.images = present_images.data();
 	Graphics::present(present_info);
-
 }
 
 int main() {
@@ -70,22 +69,26 @@ int main() {
 	{
 		//-----------------------tests-------------------
 		//main_scene = new TriangleScene();
-		main_scene = new CubeScene();
+		//main_scene = new CubeScene();
 		//ModelScene load_model_scene = ModelScene();
 		//ui_scene= new TextScene();
-		ui_scene = new OrderedRenderingScene();
+		//ui_scene = new OrderedRenderingScene();
 
 		//-----------------------projects-----------------
 		//RaytracingScene rts = RaytracingScene();
 		//Pathfinder pathfinder;
+
+		//-----------------------Games--------------------
+		Pong::PongGame pong = Pong::PongGame();
+
 		//-----------------------EVENTS------------------
 		Application::onUpdate.subscribe(&onAppUpdate);
-		Application::onPresent.subscribe(&onAppPresent);
+		//Application::onPresent.subscribe(&onAppPresent);
 		//-----------------------LOOP--------------------
 		Application::run();
 		//-----------------------CLEANUP------------------
 		Application::onUpdate.unsubscribe(&onAppUpdate);
-		Application::onPresent.unsubscribe(&onAppPresent);
+		//Application::onPresent.unsubscribe(&onAppPresent);
 		//-----------------------TERMINATE------------------
 
 		if (ui_scene != nullptr)

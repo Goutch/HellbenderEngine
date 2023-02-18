@@ -8,58 +8,19 @@
 
 namespace HBE {
 
-	VkFormat getVkFormat(IMAGE_FORMAT format) {
-		switch (format) {
-
-			case IMAGE_FORMAT_R8:
-				return VK_FORMAT_R8_SRGB;
-				break;
-			case IMAGE_FORMAT_RG8:
-				return VK_FORMAT_R8G8_SRGB;
-				break;
-			case IMAGE_FORMAT_RGB8:
-				return VK_FORMAT_R8G8B8_SRGB;
-				break;
-			case IMAGE_FORMAT_RGBA8:
-				return VK_FORMAT_R8G8B8A8_SRGB;
-				break;
-			case IMAGE_FORMAT_R32F:
-				return VK_FORMAT_R32_SFLOAT;
-				break;
-			case IMAGE_FORMAT_RG32F:
-				return VK_FORMAT_R32G32_SFLOAT;
-				break;
-			case IMAGE_FORMAT_RGB32F:
-				return VK_FORMAT_R32G32B32_SFLOAT;
-				break;
-			case IMAGE_FORMAT_RGBA32F:
-				return VK_FORMAT_R32G32B32A32_SFLOAT;
-				break;
-			case IMAGE_FORMAT_DEPTH32F:
-				return VK_FORMAT_D32_SFLOAT;
-				break;
-			case IMAGE_FORMAT_DEPTH32f_STENCIL8U:
-				return VK_FORMAT_D32_SFLOAT_S8_UINT;
-				break;
-			case IMAGE_FORMAT_DEPTH24f_STENCIL8U:
-				return VK_FORMAT_D24_UNORM_S8_UINT;
-				break;
-		}
-		return VK_FORMAT_R32_SFLOAT;
-	}
-
 	VK_RenderPass::VK_RenderPass(VK_Renderer *renderer, const RenderTargetInfo &info) {
 		this->renderer = renderer;
 		this->device = renderer->getDevice();
 		this->width = info.width;
 		this->height = info.height;
 		this->clear_color = info.clear_color;
-		this->vk_format = getVkFormat(info.format);
+		this->vk_format = VK_Image::getVkFormat(info.format);
 		this->format = info.format;
 		this->has_color_attachment = info.flags & RENDER_TARGET_FLAG_COLOR_ATTACHMENT;
 		this->has_depth_attachment = info.flags & RENDER_TARGET_FLAG_DEPTH_ATTACHMENT;
 		this->clear_color_enabled = info.flags & RENDER_TARGET_FLAG_CLEAR_COLOR;
 		this->clear_depth_enabled = info.flags & RENDER_TARGET_FLAG_CLEAR_DEPTH;
+		this->flags = info.flags;
 		recreate();
 	}
 
@@ -107,7 +68,7 @@ namespace HBE {
 		}
 		if (has_depth_attachment) {
 			VkAttachmentDescription depthAttachment{};
-			depthAttachment.format = getVkFormat(IMAGE_FORMAT_DEPTH32F);
+			depthAttachment.format = VK_Image::getVkFormat(IMAGE_FORMAT_DEPTH32F);
 			depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 			depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 			depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;

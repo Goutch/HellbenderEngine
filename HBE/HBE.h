@@ -27,6 +27,7 @@
 
 #include "core/graphics/Graphics.h"
 #include "core/graphics/Window.h"
+#include "core/graphics/RenderGraph.h"
 #include "HBE/core/resource/RenderTarget.h"
 
 #include "core/input/Input.h"

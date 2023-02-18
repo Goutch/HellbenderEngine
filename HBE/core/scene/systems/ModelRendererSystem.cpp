@@ -37,11 +37,11 @@ namespace HBE {
 
     void ModelRendererSystem::draw(RenderGraph *render_graph) {
 
-        Profiler::begin("ModelRendererUpdate");
-        Profiler::begin("ModelRendererUpdateGroup");
+        HB_PROFILE_BEGIN("ModelRendererUpdate");
+        HB_PROFILE_BEGIN("ModelRendererUpdateGroup");
         auto group = scene->group<Transform, ModelRenderer>();
 
-        Profiler::end();
+        HB_PROFILE_END();
         for (auto[handle, transform, model_renderer]: group) {
             if (model_renderer.active) {
                 for (const ModelNode &node: model_renderer.model->getNodes()) {
@@ -49,7 +49,7 @@ namespace HBE {
                 }
             }
         }
-        Profiler::end();
+        HB_PROFILE_END();
     }
 
     ModelRendererSystem::~ModelRendererSystem() {

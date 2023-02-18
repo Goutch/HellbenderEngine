@@ -24,7 +24,7 @@ namespace HBE {
 		uint32_t width = 0;
 		uint32_t height = 0;
 
-		IMAGE_FORMAT format = IMAGE_FORMAT_RGBA32F;
+		IMAGE_FORMAT format = IMAGE_FORMAT_SRGBA8_NON_LINEAR;
 		vec4 clear_color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
 		RENDER_TARGET_FLAGS flags = RENDER_TARGET_FLAG_NONE;

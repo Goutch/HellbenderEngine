@@ -42,6 +42,7 @@ namespace HBE {
 		VkDeviceSize buffer_size = binding_info.size * count;
 
 		if ((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) == VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) {
+			//todo: add to delete queue instead of waiting and deleting immediately
 			renderer->waitCurrentFrame();
 			if (buffers[location][renderer->getCurrentFrame()]) {
 				delete buffers[location][renderer->getCurrentFrame()];
@@ -55,6 +56,7 @@ namespace HBE {
 																		  ALLOC_FLAG_NONE);
 
 		} else {
+			//todo: add to delete queue instead of waiting and deleting immediately
 			device->getQueue(QUEUE_FAMILY_GRAPHICS).wait();
 			if (buffers[location][0]) {
 				delete buffers[location][0];

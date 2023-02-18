@@ -13,5 +13,6 @@ void main() {
     for (int i = ubo.layer_count-1; i >= 0; i--) {
         c += texture(layers[i], uv)*(1.0-c.a);
     }
-    outColor =c;
+    //outColor = c;
+    outColor =  vec4(pow(c.rgb,vec3(2.2)), 1);
 }

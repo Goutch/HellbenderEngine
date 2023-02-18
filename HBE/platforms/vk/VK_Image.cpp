@@ -23,6 +23,106 @@ namespace HBE {
 		device->getAllocator()->update(*this, data, width, height, depth);
 	}
 
+	uint32_t VK_Image::getBytePerPixel(IMAGE_FORMAT format) {
+		uint32_t byte_per_pixel = 0;
+		switch (format) {
+			case IMAGE_FORMAT_R8:
+			case IMAGE_FORMAT_SR8_NON_LINEAR:
+				return 1;
+				break;
+			case IMAGE_FORMAT_RG8:
+			case IMAGE_FORMAT_SRG8_NON_LINEAR:
+
+				return 2;
+				break;
+			case IMAGE_FORMAT_RGB8:
+			case IMAGE_FORMAT_SRGB8_NON_LINEAR:
+				return 3;
+
+			case IMAGE_FORMAT_RGBA8:
+			case IMAGE_FORMAT_SRGBA8_NON_LINEAR:
+			case IMAGE_FORMAT_SBGRA8_NON_LINEAR:
+			case IMAGE_FORMAT_R32F:
+				return 4;
+
+
+			case IMAGE_FORMAT_RG32F:
+				return 8;
+				break;
+			case IMAGE_FORMAT_RGB32F:
+				return 12;
+				break;
+			case IMAGE_FORMAT_RGBA32F:
+				return 16;
+			case IMAGE_FORMAT_DEPTH32F:
+				return 4;
+				break;
+			case IMAGE_FORMAT_DEPTH32f_STENCIL8U:
+				return 5;
+				break;
+			case IMAGE_FORMAT_DEPTH24f_STENCIL8U:
+				return 4;
+				break;
+
+		}
+	}
+
+	VkFormat VK_Image::getVkFormat(IMAGE_FORMAT format) {
+		VkFormat vk_format = VK_FORMAT_UNDEFINED;
+		switch (format) {
+			case IMAGE_FORMAT_R8:
+				vk_format = VK_FORMAT_R8_UINT;
+				break;
+			case IMAGE_FORMAT_RG8:
+				vk_format = VK_FORMAT_R8G8_UINT;
+				break;
+			case IMAGE_FORMAT_RGB8:
+				vk_format = VK_FORMAT_R8G8B8_UINT;
+				break;
+			case IMAGE_FORMAT_RGBA8:
+				vk_format = VK_FORMAT_R8G8B8A8_UINT;
+				break;
+			case IMAGE_FORMAT_R32F:
+				vk_format = VK_FORMAT_R32_SFLOAT;
+				break;
+			case IMAGE_FORMAT_RG32F:
+				vk_format = VK_FORMAT_R32G32_SFLOAT;
+				break;
+			case IMAGE_FORMAT_RGB32F:
+				vk_format = VK_FORMAT_R32G32B32_SFLOAT;
+				break;
+			case IMAGE_FORMAT_RGBA32F:
+				vk_format = VK_FORMAT_R32G32B32A32_SFLOAT;
+				break;
+			case IMAGE_FORMAT_DEPTH32F:
+				// look into choosing depth with device format properties: https://vulkan-tutorial.com/Depth_buffering
+				vk_format = VK_FORMAT_D32_SFLOAT;
+				break;
+			case IMAGE_FORMAT_DEPTH32f_STENCIL8U:
+				vk_format = VK_FORMAT_D32_SFLOAT_S8_UINT;
+				break;
+			case IMAGE_FORMAT_DEPTH24f_STENCIL8U:
+				vk_format = VK_FORMAT_D24_UNORM_S8_UINT;
+				break;
+			case IMAGE_FORMAT_SBGRA8_NON_LINEAR:
+				vk_format = VK_FORMAT_B8G8R8A8_SRGB;
+				break;
+			case IMAGE_FORMAT_SR8_NON_LINEAR:
+				vk_format = VK_FORMAT_R8_SRGB;
+				break;
+			case IMAGE_FORMAT_SRG8_NON_LINEAR:
+				vk_format = VK_FORMAT_R8G8_SRGB;
+				break;
+			case IMAGE_FORMAT_SRGB8_NON_LINEAR:
+				vk_format = VK_FORMAT_R8G8B8_SRGB;
+				break;
+			case IMAGE_FORMAT_SRGBA8_NON_LINEAR:
+				vk_format = VK_FORMAT_R8G8B8A8_SRGB;
+				break;
+		}
+		return vk_format;
+	}
+
 	VK_Image::VK_Image(VK_Device *device, const TextureInfo &info) {
 		this->device = device;
 		this->width = info.width;
@@ -48,69 +148,8 @@ namespace HBE {
 			type = VK_IMAGE_TYPE_3D;
 			view_type = VK_IMAGE_VIEW_TYPE_3D;
 		}
-		switch (format) {
-
-			case IMAGE_FORMAT_R8:
-				if (flags & IMAGE_FLAG_NO_SAMPLER)
-					//interpret in shader as unsiged integer
-					vk_format = VK_FORMAT_R8_UINT;
-				else
-					//interpret in shader as float
-					vk_format = VK_FORMAT_R8_SRGB;
-				byte_per_pixel = 1;
-				break;
-			case IMAGE_FORMAT_RG8:
-				if (flags & IMAGE_FLAG_NO_SAMPLER)
-					vk_format = VK_FORMAT_R8G8_UINT;
-				else
-					vk_format = VK_FORMAT_R8G8_SRGB;
-				byte_per_pixel = 2;
-				break;
-			case IMAGE_FORMAT_RGB8:
-				if (flags & IMAGE_FLAG_NO_SAMPLER)
-					vk_format = VK_FORMAT_R8G8B8_UINT;
-				else
-					vk_format = VK_FORMAT_R8G8B8_SRGB;
-				byte_per_pixel = 3;
-				break;
-			case IMAGE_FORMAT_RGBA8:
-				if (flags & IMAGE_FLAG_NO_SAMPLER)
-					vk_format = VK_FORMAT_R8G8B8A8_UINT;
-				else
-					vk_format = VK_FORMAT_R8G8B8A8_SRGB;
-				byte_per_pixel = 4;
-				break;
-			case IMAGE_FORMAT_R32F:
-				vk_format = VK_FORMAT_R32_SFLOAT;
-				byte_per_pixel = 4;
-				break;
-			case IMAGE_FORMAT_RG32F:
-				vk_format = VK_FORMAT_R32G32_SFLOAT;
-				byte_per_pixel = 4 * 2;
-				break;
-			case IMAGE_FORMAT_RGB32F:
-				vk_format = VK_FORMAT_R32G32B32_SFLOAT;
-				byte_per_pixel = 4 * 3;
-				break;
-			case IMAGE_FORMAT_RGBA32F:
-				vk_format = VK_FORMAT_R32G32B32A32_SFLOAT;
-				byte_per_pixel = 4 * 4;
-				break;
-
-				// look choosing depth with device format properties: https://vulkan-tutorial.com/Depth_buffering
-			case IMAGE_FORMAT_DEPTH32F:
-				vk_format = VK_FORMAT_D32_SFLOAT;
-				byte_per_pixel = 4;
-				break;
-			case IMAGE_FORMAT_DEPTH32f_STENCIL8U:
-				vk_format = VK_FORMAT_D32_SFLOAT_S8_UINT;
-				byte_per_pixel = 4 + 1;
-				break;
-			case IMAGE_FORMAT_DEPTH24f_STENCIL8U:
-				vk_format = VK_FORMAT_D24_UNORM_S8_UINT;
-				byte_per_pixel = 4;
-				break;
-		}
+		vk_format = getVkFormat(format);
+		byte_per_pixel = getBytePerPixel(format);
 
 		layout = VK_IMAGE_LAYOUT_UNDEFINED;
 
@@ -277,6 +316,7 @@ namespace HBE {
 	uint32_t VK_Image::getMipLevelCount() const {
 		return mip_levels;
 	}
+
 
 }
 

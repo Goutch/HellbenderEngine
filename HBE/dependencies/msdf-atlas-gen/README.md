@@ -177,7 +177,7 @@ bool generateAtlas(const char *fontFilename) {
             // Set atlas parameters:
             // setDimensions or setDimensionsConstraint to find the best value
             packer.setDimensionsConstraint(TightAtlasPacker::DimensionsConstraint::SQUARE);
-            // setScale for a fixed size or setMinimumScale to use the largest that fits
+            // setLocalScale for a fixed size or setMinimumScale to use the largest that fits
             packer.setMinimumScale(24.0);
             // setPixelRange or setUnitRange
             packer.setPixelRange(2.0);

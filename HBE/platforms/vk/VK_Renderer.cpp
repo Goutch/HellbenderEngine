@@ -124,7 +124,7 @@ namespace HBE {
 
 	void VK_Renderer::render(RenderCmdInfo &render_cmd_info) {
 		//todo: create scene specific render graph
-		Profiler::begin("RenderPass");
+		HB_PROFILE_BEGIN("RenderPass");
 
 		const VK_RenderPass *render_pass = dynamic_cast<const VK_RenderPass *>(render_cmd_info.render_target);
 
@@ -231,7 +231,7 @@ namespace HBE {
 
 		}
 		render_pass->end(command_pool->getCurrentBuffer());
-		Profiler::end();
+		HB_PROFILE_END();
 	}
 
 	void VK_Renderer::traceRays(TraceRaysCmdInfo &trace_rays_cmd_info) {
@@ -255,16 +255,16 @@ namespace HBE {
 	}
 
 	void VK_Renderer::beginFrame() {
-		Profiler::begin("CommandPoolWait");
+		HB_PROFILE_BEGIN("CommandPoolWait");
 		command_pool->begin();
-		Profiler::end();
+		HB_PROFILE_END();
 	}
 
 	void VK_Renderer::present(PresentCmdInfo &present_cmd_info) {
 		if (frame_presented) return;
 		HB_ASSERT(frame_presented == false, "Frame already presented, call beginFrame() before present() and endFrame() after present()");
 		HB_ASSERT(present_cmd_info.image_count <= 4 && present_cmd_info.image_count > 0, "layers should be from 1 to 4");
-		Profiler::begin("AquireImage");
+		HB_PROFILE_BEGIN("AquireImage");
 		frame_presented = true;
 		VK_Image **vk_images = reinterpret_cast< VK_Image **>(present_cmd_info.images);
 		VkResult result = vkAcquireNextImageKHR(device->getHandle(),
@@ -280,12 +280,12 @@ namespace HBE {
 		} else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
 			Log::error("failed to acquire swap chain image!");
 		}
-		Profiler::end();
-		Profiler::begin("WaitImageInflight");
+		HB_PROFILE_END();
+		HB_PROFILE_BEGIN("WaitImageInflight");
 		if (images_in_flight_fences[current_image] != nullptr) {
 			images_in_flight_fences[current_image]->wait();
 		}
-		Profiler::end();
+		HB_PROFILE_END();
 		images_in_flight_fences[current_image] = &command_pool->getCurrentFence();
 		command_pool->getCurrentFence().reset();
 
@@ -379,9 +379,9 @@ namespace HBE {
 		presentInfo.pImageIndices = &current_image;
 		presentInfo.pResults = nullptr; // Optional
 
-		Profiler::begin("Present");
+		HB_PROFILE_BEGIN("vkQueuePresentKHR");
 		result = vkQueuePresentKHR(device->getQueue(QUEUE_FAMILY_PRESENT).getHandle(), &presentInfo);
-		Profiler::end();
+		HB_PROFILE_END();
 		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || windowResized) {
 			windowResized = false;
 			reCreateSwapchain();
@@ -393,7 +393,7 @@ namespace HBE {
 
 
 	void VK_Renderer::endFrame() {
-		Profiler::begin("endFrame");
+		HB_PROFILE_BEGIN("endFrame");
 
 
 		if (!frame_presented) {
@@ -412,7 +412,7 @@ namespace HBE {
 
 		command_pool->getCurrentFence().wait();
 
-		Profiler::end();
+		HB_PROFILE_END();
 	}
 
 	const VK_Swapchain &VK_Renderer::getSwapchain() const {
@@ -471,7 +471,7 @@ namespace HBE {
 		render_target_info.width = swapchain->getExtent().width;
 		render_target_info.height = swapchain->getExtent().height;
 		render_target_info.clear_color = vec4(0.f, 0.f, 0.f, 1.f);
-		render_target_info.format = IMAGE_FORMAT_RGBA32F;
+		render_target_info.format = IMAGE_FORMAT_SRGBA8_NON_LINEAR;
 		render_target_info.flags = RENDER_TARGET_FLAG_COLOR_ATTACHMENT | RENDER_TARGET_FLAG_DEPTH_ATTACHMENT;
 
 		main_render_target = Resources::createRenderTarget(render_target_info, "DEFAULT_RENDER_TARGET");

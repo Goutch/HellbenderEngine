@@ -25,9 +25,11 @@ namespace HBE {
 		if (vkCreateBuffer(device->getHandle(), &bufferInfo, nullptr, &handle) != VK_SUCCESS) {
 			Log::error("failed to create buffer!");
 		}
+
+#ifdef PRINT_BUFFER_CREATION
 		void* handle_ptr = handle;
 		printf("create buffer:%p\n",handle_ptr);
-
+#endif
 		VkMemoryRequirements requirements;
 		vkGetBufferMemoryRequirements(device->getHandle(), handle, &requirements);
 

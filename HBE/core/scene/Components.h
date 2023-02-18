@@ -85,9 +85,13 @@ namespace HBE {
 
 		void setRotation(vec3 rot);
 
-		void setScale(vec3 s);
+		void setLocalScale(vec3 s);
 
-		vec3 scale() const;
+		vec3 localScale() const;
+
+		void setWorldScale(vec3 s);
+
+		vec3 worldScale();
 
 		vec3 eulerRotation() const;
 

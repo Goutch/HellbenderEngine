@@ -76,21 +76,21 @@ namespace HBE {
 	}
 
 	void Transform::setRotation(quat rot) {
-		vec3 s = scale();
+		vec3 s = localScale();
 		vec3 pos = position();
 		local_mat = mat4(1.0f);
 		rotate(rot);
 		setPosition(pos);
-		setScale(s);
+		setLocalScale(s);
 	}
 
 	void Transform::setRotation(vec3 rot) {
-		vec3 s = scale();
+		vec3 s = localScale();
 		vec3 pos = position();
 		local_mat = mat4(1.0f);
 		rotate(rot);
 		setPosition(pos);
-		setScale(s);
+		setLocalScale(s);
 	}
 
 	void Transform::rotate(quat rot) {
@@ -142,14 +142,13 @@ namespace HBE {
 		return glm::eulerAngles(worldRotation());
 	}
 
-	void Transform::setScale(vec3 s) {
+	void Transform::setLocalScale(vec3 s) {
 		is_dirty = true;
-		local_mat = glm::scale(local_mat, vec3(1, 1, 1) / scale());
+		local_mat = glm::scale(local_mat, vec3(1, 1, 1) / localScale());
 		local_mat = glm::scale(local_mat, s);
 	}
 
-	vec3 Transform::scale() const {
-
+	vec3 Transform::localScale() const {
 		return vec3(glm::length(local_mat[0]),
 					glm::length(local_mat[1]),
 					glm::length(local_mat[2]));
@@ -163,6 +162,17 @@ namespace HBE {
 
 	const mat4 &Transform::local() const {
 		return local_mat;
+	}
+
+	void Transform::setWorldScale(vec3 s) {
+		setLocalScale(s / worldScale());
+	}
+
+	vec3 Transform::worldScale() {
+		const mat4 &world_mat = world();
+		return vec3(glm::length(world_mat[0]),
+					glm::length(world_mat[1]),
+					glm::length(world_mat[2]));
 	}
 
 
@@ -363,8 +373,8 @@ namespace HBE {
 	void PixelCamera::calculateProjection(RenderTarget *render_target) {
 		projection = glm::ortho(0.0f,
 								static_cast<float>(render_target->getResolution().x),
-								0.0f,
 								static_cast<float>(render_target->getResolution().y),
+								0.0f,
 								near, far);
 	}
 

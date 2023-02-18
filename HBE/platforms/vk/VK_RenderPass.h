@@ -29,6 +29,7 @@ namespace HBE {
 		uint32_t current_frame = 0;
 		VkFormat vk_format;
 		IMAGE_FORMAT format;
+		RENDER_TARGET_FLAGS flags;
 		bool has_color_attachment = false;
 		bool has_depth_attachment = false;
 		bool clear_color_enabled = false;

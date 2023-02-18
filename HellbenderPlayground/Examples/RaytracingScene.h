@@ -374,10 +374,10 @@ public:
 		transform_aabb_cube.translate(vec3(0, 0, -5));
 		Transform transform_aabb_floor{};
 		transform_aabb_floor.translate(vec3(0, -1, 0));
-		transform_aabb_floor.setScale(vec3(100, 1, 100));
+		transform_aabb_floor.setLocalScale(vec3(100, 1, 100));
 
 		acceleration_structure_instances.push_back(AccelerationStructureInstance{0, 0, transform_aabb_floor.world(), ACCELERATION_STRUCTURE_TYPE_AABB, 0});
-		transform_aabb_floor.setScale(vec3(50, 1, 50));
+		transform_aabb_floor.setLocalScale(vec3(50, 1, 50));
 
 		for (uint32_t i = 0; i < 7; ++i) {
 			Transform t{};

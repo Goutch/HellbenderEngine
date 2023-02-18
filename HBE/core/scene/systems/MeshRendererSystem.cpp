@@ -43,13 +43,12 @@ namespace HBE {
     }
 
     void HBE::MeshRendererSystem::draw(RenderGraph *render_graph) {
-        Profiler::begin("MeshRendererUpdate");
+        HB_PROFILE_BEGIN("MeshRendererDraw");
+		HB_PROFILE_BEGIN("MeshRendererUpdateUnordered");
         DrawCmdInfo draw_cmd{};
 
-
-        Profiler::begin("MeshRendererUpdateGroup");
         auto group = scene->group<Transform, MeshRenderer>();
-        Profiler::end();
+
         for (auto[handle, transform, mesh_renderer]: group) {
             if (mesh_renderer.active && !mesh_renderer.ordered) {
                 if (mesh_renderer.mesh && mesh_renderer.pipeline_instance) {
@@ -70,15 +69,15 @@ namespace HBE {
                     Log::warning("Mesh renderer does not have a material and/or a mesh assigned");
             }
         }
-        Profiler::end();
+        HB_PROFILE_END();
 
-        Profiler::begin("MeshRendererUpdateOrdered");
+        HB_PROFILE_BEGIN("MeshRendererUpdateOrdered");
         std::list<SceneNode> nodes = scene->getSceneNodes();
 
         for (SceneNode node: nodes) {
             drawNode(node,render_graph);
         }
-        Profiler::end();
+        HB_PROFILE_END();
     }
 
     MeshRendererSystem::~MeshRendererSystem() {

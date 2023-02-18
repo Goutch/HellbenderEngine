@@ -18,10 +18,10 @@ namespace HBE {
 	}
 
 	void CameraControllerSystem::update(float delta_t) {
-		Profiler::begin("CameraControllerUpdate");
-		Profiler::begin("CameraControllerUpdateGroup");
+		HB_PROFILE_BEGIN("CameraControllerUpdate");
+		HB_PROFILE_BEGIN("CameraControllerUpdateGroup");
 		auto group = scene->group<Transform, Camera, CameraController>();
-		Profiler::end();
+		HB_PROFILE_END();
 		for (auto [handle, transform, camera, controller]: group) {
 			float max_pitch_radian = glm::radians(controller.max_pitch);
 
@@ -124,7 +124,7 @@ namespace HBE {
 			}
 			transform.translate(translation * delta_t * controller.speed * boost);
 		}
-		Profiler::end();
+		HB_PROFILE_END();
 
 	}
 
