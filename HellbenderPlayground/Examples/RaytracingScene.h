@@ -185,59 +185,59 @@ public:
 	}
 
 	void update(float delta) {
-		if (Input::getKeyDown(KEY::NUMBER_0)) {
+		if (Input::getKeyDown(KEY_NUMBER_0)) {
 			frame.use_blue_noise = !bool(frame.use_blue_noise);
 		}
-		if (Input::getKeyDown(KEY::NUMBER_1)) {
+		if (Input::getKeyDown(KEY_NUMBER_1)) {
 			render_mode = DENOISED;
 		}
-		if (Input::getKeyDown(KEY::NUMBER_2)) {
+		if (Input::getKeyDown(KEY_NUMBER_2)) {
 			render_mode = ALBEDO;
 		}
-		if (Input::getKeyDown(KEY::NUMBER_3)) {
+		if (Input::getKeyDown(KEY_NUMBER_3)) {
 			render_mode = NORMAL;
 		}
-		if (Input::getKeyDown(KEY::NUMBER_4)) {
+		if (Input::getKeyDown(KEY_NUMBER_4)) {
 			render_mode = MOTION;
 		}
-		if (Input::getKeyDown(KEY::P)) {
+		if (Input::getKeyDown(KEY_P)) {
 			paused = !paused;
 		}
-		if (Input::getKey(KEY::MINUS)) {
+		if (Input::getKey(KEY_MINUS)) {
 			frame.scattering_multiplier -= 5.0f * delta;
 			Log::message("Scattering multiplier:" + std::to_string(frame.scattering_multiplier));
 		}
-		if (Input::getKey(KEY::EQUAL)) {
+		if (Input::getKey(KEY_EQUAL)) {
 			frame.scattering_multiplier += 5.0f * delta;
 
 			Log::message("Scattering multiplier:" + std::to_string(frame.scattering_multiplier));
 		}
-		if (Input::getKey(KEY::LEFT_BRACKET)) {
+		if (Input::getKey(KEY_LEFT_BRACKET)) {
 			frame.density_falloff -= 5.0f * delta;
 			Log::message("Density falloff:" + std::to_string(frame.density_falloff));
 		}
-		if (Input::getKey(KEY::RIGHT_BRACKET)) {
+		if (Input::getKey(KEY_RIGHT_BRACKET)) {
 			frame.density_falloff += 5.0f * delta;
 			Log::message("Density falloff:" + std::to_string(frame.density_falloff));
 		}
-		if (Input::getKeyDown(KEY::R)) {
+		if (Input::getKeyDown(KEY_R)) {
 			frame.sample_count = 1;
 		}
-		if (Input::getKeyDown(KEY::UP)) {
+		if (Input::getKeyDown(KEY_UP)) {
 			frame.sample_count++;
 			Log::message("Sample count:" + std::to_string(frame.sample_count));
 		}
-		if (Input::getKeyDown(KEY::DOWN)) {
+		if (Input::getKeyDown(KEY_DOWN)) {
 			if (frame.sample_count > 0) {
 				frame.sample_count--;
 			}
 			Log::message("Sample count:" + std::to_string(frame.sample_count));
 		}
-		if (Input::getKeyDown(KEY::RIGHT)) {
+		if (Input::getKeyDown(KEY_RIGHT)) {
 			frame.max_bounces++;
 			Log::message("Max bounces:" + std::to_string(frame.max_bounces));
 		}
-		if (Input::getKeyDown(KEY::LEFT)) {
+		if (Input::getKeyDown(KEY_LEFT)) {
 			if (frame.max_bounces > 0) {
 				frame.max_bounces--;
 			}

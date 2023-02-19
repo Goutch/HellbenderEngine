@@ -5,11 +5,6 @@
 #define N_DELTA 100
 namespace HBE {
 	class FPSCounter {
-		struct BackgroundMaterial {
-			alignas(16)vec4 color;
-			alignas(4) bool has_texture;
-		};
-		BackgroundMaterial material;
 		Shader *text_vertex_shader;
 		Shader *text_fragment_shader;
 
@@ -31,9 +26,9 @@ namespace HBE {
 		RenderTarget *render_target;
 		Scene *scene;
 
-		vec4 red = vec4(251.0f/255.0f,73.0f/255.0f,52.0f/255.0f,1);
-		vec4 yellow = vec4(250.0f/255.0f, 189.0f/255.0f, 47.0f/255.0f, 1);
-		vec4 green = vec4(184.0f/255.0f, 250.0f/255.0f, 38.0f/255.0f, 1);
+		vec4 red = vec4(251.0f / 255.0f, 73.0f / 255.0f, 52.0f / 255.0f, 1);
+		vec4 yellow = vec4(250.0f / 255.0f, 189.0f / 255.0f, 47.0f / 255.0f, 1);
+		vec4 green = vec4(184.0f / 255.0f, 250.0f / 255.0f, 38.0f / 255.0f, 1);
 
 		float time_since_last_fps_update = 0.0f;
 	public:
@@ -94,6 +89,7 @@ namespace HBE {
 		}
 
 		~FPSCounter() {
+			scene->destroyEntity(text_entity);
 			scene->onUpdate.unsubscribe(this);
 			render_target->onResolutionChange.unsubscribe(this);
 			delete text_vertex_shader;
@@ -169,10 +165,6 @@ namespace HBE {
 
 			font = Resources::createFont(font_info);
 
-			material = {
-					.color = vec4(1.0f, 1.0f, 1.0f, 1.0f),
-					.has_texture=true,
-			};
 
 			text_pipeline_instance->setTexture("mtsdf", font->getTextureAtlas());
 			text = std::string("fps\n") + "ms";
@@ -186,5 +178,22 @@ namespace HBE {
 											 total_height);
 
 		}
+
+		GraphicPipeline *getPipeline() {
+			return text_pipeline;
+		}
+
+		Font *getFont() {
+			return font;
+		}
+
+		Shader *getVertexShader() {
+			return text_vertex_shader;
+		}
+
+		Shader *getFragmentShader() {
+			return text_fragment_shader;
+		}
+
 	};
 }

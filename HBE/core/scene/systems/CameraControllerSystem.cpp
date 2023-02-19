@@ -49,25 +49,25 @@ namespace HBE {
 
 			float boost = 1.0f;
 			vec3 translation = vec3(0);
-			if (Input::getKey(KEY::S)) {
+			if (Input::getKey(KEY_S)) {
 				translation.z += 1;
 			}
-			if (Input::getKey(KEY::W)) {
+			if (Input::getKey(KEY_W)) {
 				translation.z = -1;
 			}
-			if (Input::getKey(KEY::D)) {
+			if (Input::getKey(KEY_D)) {
 				translation.x += 1;
 			}
-			if (Input::getKey(KEY::A)) {
+			if (Input::getKey(KEY_A)) {
 				translation.x = -1;
 			}
-			if (Input::getKey(KEY::SPACE)) {
+			if (Input::getKey(KEY_SPACE)) {
 				translation.y += 1;
 			}
-			if (Input::getKey(KEY::LEFT_CONTROL)) {
+			if (Input::getKey(KEY_LEFT_CONTROL)) {
 				translation.y = -1;
 			}
-			if (Input::getKey(KEY::LEFT_SHIFT)) {
+			if (Input::getKey(KEY_LEFT_SHIFT)) {
 				boost = 10.0f;
 			}
 
@@ -77,25 +77,25 @@ namespace HBE {
 		for (auto [handle, transform, camera, controller]: group2D) {
 			float boost = 1.0f;
 			vec3 translation = vec3(0);
-			if (Input::getKey(KEY::LEFT_SHIFT)) {
+			if (Input::getKey(KEY_LEFT_SHIFT)) {
 				boost = 10.0f;
 			}
-			if (Input::getKey(KEY::EQUAL)) {
+			if (Input::getKey(KEY_EQUAL)) {
 				camera.setZoomRatio(camera.getZoomRatio() + (delta_t * boost));
 			}
-			if (Input::getKey(KEY::MINUS)) {
+			if (Input::getKey(KEY_MINUS)) {
 				camera.setZoomRatio(camera.getZoomRatio() - (delta_t * boost));
 			}
-			if (Input::getKey(KEY::D)) {
+			if (Input::getKey(KEY_D)) {
 				translation.x += 1;
 			}
-			if (Input::getKey(KEY::A)) {
+			if (Input::getKey(KEY_A)) {
 				translation.x = -1;
 			}
-			if (Input::getKey(KEY::W)) {
+			if (Input::getKey(KEY_W)) {
 				translation.y += 1;
 			}
-			if (Input::getKey(KEY::S)) {
+			if (Input::getKey(KEY_S)) {
 				translation.y = -1;
 			}
 
@@ -107,19 +107,19 @@ namespace HBE {
 		for (auto [handle, transform, camera, controller]: group_pixel) {
 			float boost = 1.0f;
 			vec3 translation = vec3(0);
-			if (Input::getKey(KEY::LEFT_SHIFT)) {
+			if (Input::getKey(KEY_LEFT_SHIFT)) {
 				boost = 10.0f;
 			}
-			if (Input::getKey(KEY::D)) {
+			if (Input::getKey(KEY_D)) {
 				translation.x += 1;
 			}
-			if (Input::getKey(KEY::A)) {
+			if (Input::getKey(KEY_A)) {
 				translation.x = -1;
 			}
-			if (Input::getKey(KEY::W)) {
+			if (Input::getKey(KEY_W)) {
 				translation.y += 1;
 			}
-			if (Input::getKey(KEY::S)) {
+			if (Input::getKey(KEY_S)) {
 				translation.y = -1;
 			}
 			transform.translate(translation * delta_t * controller.speed * boost);

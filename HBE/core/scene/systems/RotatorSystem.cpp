@@ -10,7 +10,7 @@ namespace HBE {
 	}
 
 	void RotatorSystem::update(float delta_t) {
-		if (Input::getKeyDown(KEY::P)) {
+		if (Input::getKeyDown(KEY_P)) {
 			paralelize = !paralelize;
 		}
 

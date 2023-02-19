@@ -15,23 +15,23 @@ Scene *main_scene;
 Scene *ui_scene;
 
 void onAppUpdate(float delta) {
-	if (Input::getKeyDown(KEY::ESCAPE)) {
+	if (Input::getKeyDown(KEY_ESCAPE)) {
 		Application::quit();
 	}
-	if (Input::getKeyDown(KEY::F11)) {
+	if (Input::getKeyDown(KEY_F11)) {
 		fullscreen = !fullscreen;
 		Graphics::getWindow()->setFullscreen(fullscreen);
 	}
-	if (Input::getKeyDown(KEY::V)) {
+	if (Input::getKeyDown(KEY_V)) {
 		Configs::setVerticalSync(!Configs::getVerticalSync());
 	}
 
-	if (Input::getKeyDown(KEY::B)) {
+	if (Input::getKeyDown(KEY_B)) {
 		if (ui_scene != nullptr) {
 			ui_scene->setActive(!ui_scene->isActive());
 		}
 	}
-	if (Input::getKeyDown(KEY::C)) {
+	if (Input::getKeyDown(KEY_C)) {
 		Entity cam = main_scene->getCameraEntity();
 		if (cam.valid()) {
 			if (cam.has<CameraController>()) {

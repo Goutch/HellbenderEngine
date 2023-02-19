@@ -11,10 +11,13 @@ namespace Pong {
 		float radius;
 	};
 
+	struct PongGameState;
+
 	class BallSystem : public System {
 		PongGameScene *game_scene;
+		PongGameState *game_state;
 	public:
-		BallSystem(PongGameScene *scene);
+		BallSystem(PongGameScene *scene, PongGameState &game_state);
 
 		void update(float delta);
 	};

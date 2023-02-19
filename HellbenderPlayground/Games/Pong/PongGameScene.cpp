@@ -1,6 +1,8 @@
 
 #include "PongGameScene.h"
 #include "Games/Pong/Systems/BallSystem.h"
+#include "Games/Pong/Systems/PaddleSystem.h"
+#include "PongGame.h"
 
 namespace Pong {
 
@@ -8,12 +10,13 @@ namespace Pong {
 		return game_area;
 	}
 
-	PongGameScene::PongGameScene() {
+	PongGameScene::PongGameScene(PongGameState &game_state) {
 		createResources();
 		setupScene();
 		Graphics::getWindow()->onSizeChange.subscribe(this, &PongGameScene::OnWindowSizeChange);
 
-		addSystem(new BallSystem(this));
+		addSystem(new BallSystem(this, game_state));
+		addSystem(new PaddleSystem(this));
 	}
 
 	PongGameScene::~PongGameScene() {
@@ -22,8 +25,45 @@ namespace Pong {
 		delete vertex_shader;
 		delete fragment_shader;
 		delete pipeline;
-		delete pipeline_instance;
+		delete ball_pipeline_instance;
+		delete paddle_left_pipeline_instance;
+		delete paddle_right_pipeline_instance;
 		delete render_target;
+	}
+
+	Entity PongGameScene::createBall() {
+		Entity ball = createEntity3D();
+		MeshRenderer &ball_renderer = ball.attach<MeshRenderer>();
+		ball_renderer.mesh = quad_mesh;
+		ball_renderer.layer = 0;
+		ball_renderer.pipeline_instance = ball_pipeline_instance;
+
+		BallComponent &ballComponent = ball.attach<BallComponent>();
+		ballComponent.velocity = vec2{10, 10};
+		ballComponent.radius = 0.2;
+
+		ball.get<Transform>().setLocalScale(vec3(ballComponent.radius));
+
+		return ball;
+	}
+
+	Entity PongGameScene::createPaddle(vec3 position, KEY up_key, KEY down_key, GraphicPipelineInstance *paddle_pipeline_instance) {
+		Entity paddle = createEntity3D();
+		MeshRenderer &paddle_renderer = paddle.attach<MeshRenderer>();
+		paddle_renderer.mesh = quad_mesh;
+		paddle_renderer.layer = 0;
+		paddle_renderer.pipeline_instance = paddle_pipeline_instance;
+
+		PaddleComponent &paddleComponent = paddle.attach<PaddleComponent>();
+		paddleComponent.speed = 10;
+		paddleComponent.size_x = 0.3;
+		paddleComponent.size_y = 2.0;
+		paddleComponent.down_key = down_key;
+		paddleComponent.up_key = up_key;
+
+		paddle.get<Transform>().setPosition(position);
+
+		return paddle;
 	}
 
 	void PongGameScene::setupScene() {
@@ -31,16 +71,15 @@ namespace Pong {
 		Camera2D &camera = camera_entity.attach<Camera2D>();
 		camera.setRenderTarget(render_target);
 
-		Entity ball = createEntity3D();
-		MeshRenderer &ball_renderer = ball.attach<MeshRenderer>();
-		ball_renderer.mesh = quad_mesh;
-		ball_renderer.layer = 0;
-		ball_renderer.pipeline_instance = pipeline_instance;
-
-		BallComponent &ballComponent = ball.attach<BallComponent>();
-		ballComponent.velocity = vec2{10, 10};
-		ballComponent.radius = 0.5;
-
+		ball_entity = createBall();
+		paddle_left_entity = createPaddle(vec3{-game_area.size.x / 2 + 1, 0, 0},
+										  KEY_W,
+										  KEY_S,
+										  paddle_left_pipeline_instance);
+		paddle_right_entity = createPaddle(vec3{game_area.size.x / 2 - 1, 0, 0},
+										   KEY_UP,
+										   KEY_DOWN,
+										   paddle_right_pipeline_instance);
 		render_target->onResolutionChange.subscribe(this, &PongGameScene::onRenderTargetResolutionChange);
 		onRenderTargetResolutionChange(render_target);
 	}
@@ -83,10 +122,16 @@ namespace Pong {
 		pipeline_instance_info.graphic_pipeline = pipeline;
 		pipeline_instance_info.flags = GRAPHIC_PIPELINE_INSTANCE_FLAG_NONE;
 
-		pipeline_instance = Resources::createGraphicPipelineInstance(pipeline_instance_info);
+		ball_pipeline_instance = Resources::createGraphicPipelineInstance(pipeline_instance_info);
+		paddle_left_pipeline_instance = Resources::createGraphicPipelineInstance(pipeline_instance_info);
+		paddle_right_pipeline_instance = Resources::createGraphicPipelineInstance(pipeline_instance_info);
 
-		vec4 color = {1, 0, 0, 1};
-		pipeline_instance->setUniform("material", &color);
+		vec4 color = {1, 1, 1, 1};
+		ball_pipeline_instance->setUniform("material", &color);
+		color = PongGame::LEFT_COLOR;
+		paddle_left_pipeline_instance->setUniform("material", &color);
+		color =  PongGame::RIGHT_COLOR;
+		paddle_right_pipeline_instance->setUniform("material", &color);
 	}
 
 	void PongGameScene::OnWindowSizeChange(Window *window) {
@@ -102,5 +147,12 @@ namespace Pong {
 
 		game_area = Area{{-width / 2.0f, -height / 2.0f},
 						 {width,         height}};
+
+		vec3 paddle_left_position = paddle_left_entity.get<Transform>().position();
+		vec3 paddle_right_position = paddle_right_entity.get<Transform>().position();
+		paddle_left_position.x = -game_area.size.x / 2 + 1;
+		paddle_right_position.x = game_area.size.x / 2 - 1;
+		paddle_left_entity.get<Transform>().setPosition(paddle_left_position);
+		paddle_right_entity.get<Transform>().setPosition(paddle_right_position);
 	}
 }

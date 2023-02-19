@@ -9,6 +9,7 @@ namespace Pong {
 		vec2 size;
 	};
 
+	struct PongGameState;
 	class PongGameScene : public Scene {
 		Area game_area;
 
@@ -16,10 +17,15 @@ namespace Pong {
 		Shader *vertex_shader;
 		Shader *fragment_shader;
 		GraphicPipeline *pipeline;
-		GraphicPipelineInstance *pipeline_instance;
+		GraphicPipelineInstance *ball_pipeline_instance;
+		GraphicPipelineInstance *paddle_left_pipeline_instance;
+		GraphicPipelineInstance *paddle_right_pipeline_instance;
+		Entity ball_entity;
+		Entity paddle_left_entity;
+		Entity paddle_right_entity;
 		RenderTarget *render_target;
 	public:
-		PongGameScene();
+		PongGameScene(PongGameState& game_state);
 
 		~PongGameScene() override;
 
@@ -32,5 +38,9 @@ namespace Pong {
 		Area &getArea();
 
 		void onRenderTargetResolutionChange(RenderTarget* render_target);
+
+		Entity createBall();
+
+		Entity createPaddle(vec3 position, KEY up_key, KEY down_key, GraphicPipelineInstance *paddle_pipeline_instance);
 	};
 }

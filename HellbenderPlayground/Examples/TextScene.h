@@ -37,10 +37,10 @@ class TextScene : public Scene {
 	void onUpdate(float delta) {
 		if (getCameraEntity().has<CameraController>())
 			return;
-		if (Input::getKeyDown(KEY::ENTER)) {
+		if (Input::getKeyDown(KEY_ENTER)) {
 			onCharacterInput(static_cast<char>('\n'));
 		}
-		if (Input::getKeyDown(KEY::BACKSPACE)) {
+		if (Input::getKeyDown(KEY_BACKSPACE)) {
 			text_str.pop_back();
 			float total_width;
 			float total_height;
