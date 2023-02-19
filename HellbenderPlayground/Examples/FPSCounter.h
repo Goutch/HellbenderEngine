@@ -89,7 +89,7 @@ namespace HBE {
 		}
 
 		~FPSCounter() {
-			scene->destroyEntity(text_entity);
+			text_entity.destroy();
 			scene->onUpdate.unsubscribe(this);
 			render_target->onResolutionChange.unsubscribe(this);
 			delete text_vertex_shader;

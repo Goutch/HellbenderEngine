@@ -38,6 +38,10 @@ namespace HBE {
 		return scene->getParent(*this);
 	}
 
+	void Entity::destroy() {
+		scene->destroyEntity(handle);
+	}
+
 
 	Scene::Scene() {
 		systems.push_back(new MeshRendererSystem(this));
@@ -59,15 +63,15 @@ namespace HBE {
 		return main_camera_entity;
 	}
 
-	void Scene::destroyEntity(Entity entity) {
-		SceneNode *node = node_map[entity.getHandle()];
-		node_map.erase(entity.getHandle());
+	void Scene::destroyEntity(entity_handle entity) {
+		SceneNode *node = node_map[entity];
+		node_map.erase(entity);
 		if (node->has_parent) {
 			node->parent->children.remove(*node);
 		} else {
 			root_nodes.remove(*node);
 		}
-		registry.destroy(entity.getHandle());
+		registry.destroy(entity);
 	}
 
 	void Scene::setCameraEntity(Entity camera) {
@@ -250,4 +254,6 @@ namespace HBE {
 	void Scene::onFrameChange(uint32_t frame) {
 		render_graph.clear();
 	}
+
+
 }

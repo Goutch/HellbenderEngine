@@ -18,6 +18,8 @@ namespace HBE {
 
 		Entity(const Entity &other);
 
+		void destroy();
+
 		Scene* getScene();
 		template<typename Component>
 		Component &attach();

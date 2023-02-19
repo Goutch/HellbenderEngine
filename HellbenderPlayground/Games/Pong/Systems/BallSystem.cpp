@@ -5,6 +5,7 @@
 #include "BallSystem.h"
 #include "PaddleSystem.h"
 #include "Games/Pong/PongGame.h"
+
 namespace Pong {
 
 	BallSystem::BallSystem(PongGameScene *scene, PongGameState &game_state) : System(scene) {
@@ -40,7 +41,7 @@ namespace Pong {
 				if (ball_pos.x < paddle_pos.x) {
 					ball->velocity.x = -abs(ball->velocity.x);
 				} else {
-					ball->velocity.x = abs(ball->velocity.y);
+					ball->velocity.x = abs(ball->velocity.x);
 				}
 				return true;
 			}
@@ -48,15 +49,48 @@ namespace Pong {
 		return false;
 	}
 
-	void BallSystem::update(float delta) {
-		auto paddle_group = scene->group<Transform, PaddleComponent>();
 
+	void BallSystem::update(float delta) {
+		bool delete_ball = false;
+		vec2 delete_pos = vec2(0, 0);
+		float delete_radius = 1;
+		if (Input::getKey(KEY_MOUSE_BUTTON_LEFT)) {
+			vec2 create_pos = Input::getNormalizedMousePosition();
+			create_pos -= vec2(0.5f, 0.5f);
+			create_pos.y *= -1;
+			Camera2D &camera = game_scene->getCameraEntity().get<Camera2D>();
+			create_pos.x *= camera.aspectRatio();
+			create_pos.x *= camera.getZoomRatio();
+			create_pos.y *= camera.getZoomRatio();
+			game_scene->createBall(create_pos, vec2(Random::floatRange(-10, 10), Random::floatRange(-10, 10)));
+		}
+		if (Input::getKey(KEY_MOUSE_BUTTON_RIGHT)) {
+			delete_ball = true;
+			delete_pos = Input::getNormalizedMousePosition();
+			delete_pos -= vec2(0.5f, 0.5f);
+			delete_pos.y *= -1;
+			Camera2D &camera = game_scene->getCameraEntity().get<Camera2D>();
+			delete_pos.x *= camera.aspectRatio();
+			delete_pos.x *= camera.getZoomRatio();
+			delete_pos.y *= camera.getZoomRatio();
+		}
+
+
+		auto paddle_group = scene->group<Transform, PaddleComponent>();
 		std::vector<PaddleData> paddles;
 		for (auto [entity, transform, paddle]: paddle_group) {
 			paddles.push_back({&transform, &paddle});
 		}
+		uint32_t n = 0;
 		auto group = scene->group<Transform, BallComponent>();
 		for (auto [entity, transform, ball]: group) {
+
+			if (delete_ball) {
+				if (glm::distance(vec2(transform.worldPosition()), delete_pos) < delete_radius) {
+					scene->destroyEntity(entity);
+					continue;
+				}
+			}
 
 			//check for collision with walls
 			Area area = game_scene->getArea();
@@ -86,6 +120,14 @@ namespace Pong {
 
 
 			collideBallWithPaddles(paddles, &transform, &ball);
+			n++;
+		}
+
+
+		t += delta;
+		if (t >= 1) {
+			t = 0;
+			Log::debug("#balls:" + std::to_string(n));
 		}
 	}
 

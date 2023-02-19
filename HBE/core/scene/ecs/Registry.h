@@ -241,7 +241,7 @@ namespace HBE {
 			std::list<size_t> obsolete_types_hash;
 			for (auto component_page_it: component_pages) {
 				RawComponentPool &component_page = *component_page_it.second;
-				component_page.detach(i);
+				component_page.detach(handle);
 				if (component_page.handles.size() == 0) {
 					obsolete_types_hash.emplace_back(component_page_it.first);
 				}

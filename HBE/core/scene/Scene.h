@@ -82,7 +82,7 @@ namespace HBE {
 
         Entity createEntity();
 
-        void destroyEntity(Entity entity);
+        void destroyEntity(entity_handle entity);
 
         Entity getCameraEntity();
 

@@ -126,7 +126,7 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 }
 
 void VoxelRendererSystem::draw(RenderGraph* render_graph) {
-	Profiler::begin("CubeRendererUpdate");
+	HB_PROFILE_BEGIN("CubeRendererUpdate");
 
 	DrawCmdInfo draw_cmd{};
 	draw_cmd.pipeline_instance = material;

@@ -17,6 +17,7 @@ namespace Pong {
 
 		addSystem(new BallSystem(this, game_state));
 		addSystem(new PaddleSystem(this));
+
 	}
 
 	PongGameScene::~PongGameScene() {
@@ -31,7 +32,7 @@ namespace Pong {
 		delete render_target;
 	}
 
-	Entity PongGameScene::createBall() {
+	Entity PongGameScene::createBall(vec2 position, vec2 velocity) {
 		Entity ball = createEntity3D();
 		MeshRenderer &ball_renderer = ball.attach<MeshRenderer>();
 		ball_renderer.mesh = quad_mesh;
@@ -39,9 +40,10 @@ namespace Pong {
 		ball_renderer.pipeline_instance = ball_pipeline_instance;
 
 		BallComponent &ballComponent = ball.attach<BallComponent>();
-		ballComponent.velocity = vec2{10, 10};
+		ballComponent.velocity = velocity;
 		ballComponent.radius = 0.2;
 
+		ball.get<Transform>().setPosition(vec3(position, 0));
 		ball.get<Transform>().setLocalScale(vec3(ballComponent.radius));
 
 		return ball;
@@ -71,7 +73,7 @@ namespace Pong {
 		Camera2D &camera = camera_entity.attach<Camera2D>();
 		camera.setRenderTarget(render_target);
 
-		ball_entity = createBall();
+		createBall(vec2(0, 0), vec2(10, 10));
 		paddle_left_entity = createPaddle(vec3{-game_area.size.x / 2 + 1, 0, 0},
 										  KEY_W,
 										  KEY_S,
@@ -130,7 +132,7 @@ namespace Pong {
 		ball_pipeline_instance->setUniform("material", &color);
 		color = PongGame::LEFT_COLOR;
 		paddle_left_pipeline_instance->setUniform("material", &color);
-		color =  PongGame::RIGHT_COLOR;
+		color = PongGame::RIGHT_COLOR;
 		paddle_right_pipeline_instance->setUniform("material", &color);
 	}
 

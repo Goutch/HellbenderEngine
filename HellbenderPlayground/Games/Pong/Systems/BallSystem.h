@@ -14,6 +14,7 @@ namespace Pong {
 	struct PongGameState;
 
 	class BallSystem : public System {
+		float t=0;
 		PongGameScene *game_scene;
 		PongGameState *game_state;
 	public:

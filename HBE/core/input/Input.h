@@ -163,7 +163,7 @@ namespace HBE {
 		static void init();
 
 		static vec2 getMousePosition();
-
+		static vec2 getNormalizedMousePosition();
 		static void pollEvents();
 
 		static bool getKey(KEY code);

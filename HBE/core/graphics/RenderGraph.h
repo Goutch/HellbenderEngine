@@ -19,7 +19,7 @@ namespace HBE {
 
 		std::vector<DrawCmdInfo> ordered_render_cache;
 
-		const size_t PUSH_CONSTANT_BLOCK_SIZE = 1024 * 16; //16kb
+		const size_t PUSH_CONSTANT_BLOCK_SIZE = 1024 * 64;
 		size_t current_pc_block = 0;
 		size_t current_pc_block_offset = 0;
 		std::vector<char *> push_constant_blocks;

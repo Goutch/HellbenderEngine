@@ -39,8 +39,8 @@
 #endif
 #endif
 
-#define PROFILE_MODE
-#ifdef PROFILE_MODE
+//#define PROFILE_MODE
+#ifndef PROFILE_MODE
 #define HB_PROFILE_BEGIN(x)
 #define HB_PROFILE_END(x)
 #else
