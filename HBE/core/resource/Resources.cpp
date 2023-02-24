@@ -13,6 +13,7 @@
 #include "core/resource/raytracing/RaytracingPipeline.h"
 #include "core/resource/raytracing/RaytracingPipelineInstance.h"
 #include "core/resource/StorageBuffer.h"
+#include "AudioClipInstance.h"
 
 namespace HBE {
 	const ResourceFactory *Resources::factory = nullptr;
@@ -180,5 +181,25 @@ namespace HBE {
 		Font *f = new Font(info);
 		add(name, f);
 		return f;
+	}
+
+	AudioClip *Resources::createAudioClip(const AudioClipInfo &info) {
+		return new AudioClip(info);
+	}
+
+	AudioClip *Resources::createAudioClip(const AudioClipInfo &info, const std::string &name) {
+		AudioClip *ac = new AudioClip(info);
+		add(name, ac);
+		return ac;
+	}
+
+	AudioClipInstance *Resources::createAudioClipInstance(const AudioClipInstanceInfo &info) {
+		return new AudioClipInstance(info);
+	}
+
+	AudioClipInstance *Resources::createAudioClipInstance(const AudioClipInstanceInfo &info, const std::string &name) {
+		AudioClipInstance *ac = new AudioClipInstance(info);
+		add(name, ac);
+		return ac;
 	}
 }

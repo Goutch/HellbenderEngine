@@ -7,10 +7,10 @@
 #include "Games/Pong/PongGame.h"
 
 namespace Pong {
-
-	BallSystem::BallSystem(PongGameScene *scene, PongGameState &game_state) : System(scene) {
+	BallSystem::BallSystem(PongGameScene *scene, PongGameState &game_state, AudioClipInstance *bounce_sound) : System(scene) {
 		this->game_scene = scene;
 		this->game_state = &game_state;
+		this->bounce_sound = bounce_sound;
 		scene->onUpdate.subscribe(this, &BallSystem::update);
 	}
 
@@ -85,6 +85,7 @@ namespace Pong {
 		auto group = scene->group<Transform, BallComponent>();
 		for (auto [entity, transform, ball]: group) {
 
+			bool colide = false;
 			if (delete_ball) {
 				if (glm::distance(vec2(transform.worldPosition()), delete_pos) < delete_radius) {
 					scene->destroyEntity(entity);
@@ -103,33 +104,47 @@ namespace Pong {
 				ball.velocity.x = -ball.velocity.x;
 				new_pos.x = area.position.x + area.size.x - ball.radius;
 				game_state->score_left++;
+				colide = true;
 			} else if (new_pos.x - ball.radius < area.position.x) {
 				//collide with wall left
 				ball.velocity.x = -ball.velocity.x;
 				new_pos.x = area.position.x + ball.radius;
 				game_state->score_right++;
+				colide = true;
 			}
 			if (new_pos.y - ball.radius < area.position.y) {
 				ball.velocity.y = -ball.velocity.y;
 				new_pos.y = area.position.y + ball.radius;
+				colide = true;
 			} else if (new_pos.y + ball.radius > area.position.y + area.size.y) {
 				ball.velocity.y = -ball.velocity.y;
 				new_pos.y = area.position.y + area.size.y - ball.radius;
+				colide = true;
 			}
 			transform.setPosition(vec3(new_pos, 0.0f));
 
 
-			collideBallWithPaddles(paddles, &transform, &ball);
+			colide = colide | collideBallWithPaddles(paddles, &transform, &ball);
 			n++;
+
+			if (colide && bounce_sound->getState() != AUDIO_CLIP_INSTANCE_STATE_PLAYING) {
+				bounce_sound->setVolume(glm::clamp(t_since_last_bounce, 0.002f, 1.0f));
+				bounce_sound->updatePostion(transform.worldPosition(), vec3(0, 0, 0));
+				bounce_sound->play();
+
+				t_since_last_bounce = 0;
+			}
 		}
 
 
 		t += delta;
+		t_since_last_bounce += delta;
 		if (t >= 1) {
 			t = 0;
 			Log::debug("#balls:" + std::to_string(n));
 		}
 	}
+
 
 }
 

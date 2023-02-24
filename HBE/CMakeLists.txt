@@ -90,7 +90,7 @@ set(CORE_FILES
 
         core/threading/JobManager.cpp
         core/threading/JobManager.h
-        core/resource/StorageBuffer.h core/graphics/RenderGraph.cpp core/graphics/RenderGraph.h)
+        core/resource/StorageBuffer.h core/graphics/RenderGraph.cpp core/graphics/RenderGraph.h core/audio/Audio.cpp core/audio/Audio.h)
 set(VK_FILES
         platforms/vk/VK_Renderer.cpp
         platforms/vk/VK_Instance.cpp
@@ -161,7 +161,7 @@ set(VK_FILES
         platforms/vk/VK_DescriptorAllocator.cpp
         platforms/vk/VK_DescriptorAllocator.h
         platforms/vk/VK_TexelBuffer.cpp
-        platforms/vk/VK_TexelBuffer.h)
+        platforms/vk/VK_TexelBuffer.h core/resource/AudioClip.cpp core/resource/AudioClip.h core/resource/AudioClipInstance.cpp core/resource/AudioClipInstance.h)
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
@@ -273,6 +273,16 @@ set_property(TARGET msdf-atlas-gen PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$
 set_property(TARGET msdfgen-core PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 set_property(TARGET msdfgen-ext PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
+#------------------------------------OPENAL SOFT -----------------------------------
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/openal-soft/")
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/openal-soft/include)
+
+#------------------------------------LIBSNDFILE------------------------------------
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libsndfile/")
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libsndfile/include)
+
+
+
 include_directories(.)
 
 
@@ -321,6 +331,8 @@ target_link_libraries(${PROJECT_NAME}
         ${FREETYPE_LIBRARY}
         msdfgen-all
         msdf-atlas-gen
+        OpenAL
+        SndFile::sndfile
         )
 
 #set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")

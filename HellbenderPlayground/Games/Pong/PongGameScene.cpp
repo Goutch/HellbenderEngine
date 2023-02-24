@@ -4,6 +4,7 @@
 #include "Games/Pong/Systems/PaddleSystem.h"
 #include "PongGame.h"
 
+
 namespace Pong {
 
 	Area &PongGameScene::getArea() {
@@ -15,12 +16,13 @@ namespace Pong {
 		setupScene();
 		Graphics::getWindow()->onSizeChange.subscribe(this, &PongGameScene::OnWindowSizeChange);
 
-		addSystem(new BallSystem(this, game_state));
+		addSystem(new BallSystem(this, game_state,bounce_sound_instance));
 		addSystem(new PaddleSystem(this));
 
 	}
 
 	PongGameScene::~PongGameScene() {
+
 		render_target->onResolutionChange.unsubscribe(this);
 		delete quad_mesh;
 		delete vertex_shader;
@@ -30,6 +32,8 @@ namespace Pong {
 		delete paddle_left_pipeline_instance;
 		delete paddle_right_pipeline_instance;
 		delete render_target;
+		delete bounce_sound_instance;
+		delete bounce_sound;
 	}
 
 	Entity PongGameScene::createBall(vec2 position, vec2 velocity) {
@@ -134,6 +138,17 @@ namespace Pong {
 		paddle_left_pipeline_instance->setUniform("material", &color);
 		color = PongGame::RIGHT_COLOR;
 		paddle_right_pipeline_instance->setUniform("material", &color);
+
+
+		AudioClipInfo audio_clip_info{};
+		audio_clip_info.path = "sounds/8BitHit.wav";
+		AudioClipInstanceInfo audio_clip_instance_info{};
+		bounce_sound = Resources::createAudioClip(audio_clip_info);
+
+		audio_clip_instance_info.clip = bounce_sound;
+		audio_clip_instance_info.volume = 0.1;
+		audio_clip_instance_info.pitch = 1.0f;
+		bounce_sound_instance = Resources::createAudioClipInstance(audio_clip_instance_info);
 	}
 
 	void PongGameScene::OnWindowSizeChange(Window *window) {

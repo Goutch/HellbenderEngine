@@ -11,6 +11,7 @@
 #include "core/utility/Profiler.h"
 #include "core/scene/Scene.h"
 #include "core/resource/RenderTarget.h"
+#include "core/audio/Audio.h"
 #include <chrono>
 #include <thread>
 
@@ -31,8 +32,9 @@ namespace HBE {
 
 	void Application::init() {
 		Graphics::init();
-		window = Graphics::getWindow();
+		Audio::init();
 		Input::init();
+		window = Graphics::getWindow();
 		onInit.invoke();
 	}
 
@@ -81,6 +83,7 @@ namespace HBE {
 	}
 
 	void Application::terminate() {
+		Audio::terminate();
 		Graphics::terminate();
 		Profiler::printAverange();
 	}

@@ -24,6 +24,8 @@ namespace Pong {
 		Entity paddle_left_entity;
 		Entity paddle_right_entity;
 		RenderTarget *render_target;
+		AudioClip *bounce_sound;
+		AudioClipInstance *bounce_sound_instance;
 	public:
 		PongGameScene(PongGameState &game_state);
 

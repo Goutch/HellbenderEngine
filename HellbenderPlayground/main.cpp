@@ -75,7 +75,7 @@ int main() {
 		//ui_scene = new OrderedRenderingScene();
 
 		//-----------------------projects-----------------
-		//RaytracingScene rts = RaytracingScene();
+		//main_scene = new RaytracingScene();
 		//Pathfinder pathfinder;
 
 		//-----------------------Games--------------------

@@ -20,7 +20,7 @@
 #include "string"
 
 #ifndef REGISTRY_PAGE_SIZE
-#define REGISTRY_PAGE_SIZE 128
+#define REGISTRY_PAGE_SIZE 1024
 #endif
 #ifndef REGISTRY_MAX_COMPONENT_TYPES
 #define REGISTRY_MAX_COMPONENT_TYPES 128
@@ -102,6 +102,7 @@ namespace HBE {
 		RawComponentPool(ComponentTypeInfo info, size_t offset) : info(info) {
 			data = static_cast<char *>(malloc(info.size * REGISTRY_PAGE_SIZE));
 
+			Log::debug("new Component page");
 			memset(data, 0, info.size * REGISTRY_PAGE_SIZE);
 			memset(&valid, 0, sizeof(bool) * REGISTRY_PAGE_SIZE);
 

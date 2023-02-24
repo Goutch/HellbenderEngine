@@ -362,34 +362,23 @@ public:
 
 		std::vector<AccelerationStructureInstance> acceleration_structure_instances{};
 
-		Transform transform_mesh{};
-		transform_mesh.translate(vec3(0, 0, 5));
+		mat4 transform_aabb_floor(1.0f);
+		transform_aabb_floor=glm::translate(transform_aabb_floor,vec3(0, -1, 0));
+		transform_aabb_floor=glm::scale(transform_aabb_floor,vec3(100, 1, 100));
+		acceleration_structure_instances.push_back(AccelerationStructureInstance{0, 0, transform_aabb_floor, ACCELERATION_STRUCTURE_TYPE_AABB, 0});
 
-		Transform transform_aabb_sphere{};
-		transform_aabb_sphere.translate(vec3(0, 0, -4));
-		Transform transform_aabb_sphere2{};
-		transform_aabb_sphere2.translate(vec3(0, 0, -6));
-
-		Transform transform_aabb_cube{};
-		transform_aabb_cube.translate(vec3(0, 0, -5));
-		Transform transform_aabb_floor{};
-		transform_aabb_floor.translate(vec3(0, -1, 0));
-		transform_aabb_floor.setLocalScale(vec3(100, 1, 100));
-
-		acceleration_structure_instances.push_back(AccelerationStructureInstance{0, 0, transform_aabb_floor.world(), ACCELERATION_STRUCTURE_TYPE_AABB, 0});
-		transform_aabb_floor.setLocalScale(vec3(50, 1, 50));
 
 		for (uint32_t i = 0; i < 7; ++i) {
-			Transform t{};
-			t.translate(vec3(2 * (i + 1), 0, 0));
+			mat4 t(1.0f);
+			t = glm::translate(t,vec3(2 * (i + 1), 0, 0));
 			acceleration_structure_instances.push_back(
-					AccelerationStructureInstance{0, 0, t.world(), ACCELERATION_STRUCTURE_TYPE_AABB, i});
+					AccelerationStructureInstance{0, 0, t, ACCELERATION_STRUCTURE_TYPE_AABB, i});
 		}
 		for (uint32_t i = 0; i < 7; ++i) {
-			Transform t{};
-			t.translate(vec3(0, 0, 2 * (i + 1)));
+			mat4 t(1.0f);
+			t=glm::translate(t,vec3(0, 0, 2 * (i + 1)));
 			acceleration_structure_instances.push_back(
-					AccelerationStructureInstance{0, 1, t.world(), ACCELERATION_STRUCTURE_TYPE_AABB, i % 7});
+					AccelerationStructureInstance{0, 1, t, ACCELERATION_STRUCTURE_TYPE_AABB, i % 7});
 		}
 
 		RootAccelerationStructureInfo root_acceleration_structure_info{};
@@ -427,7 +416,6 @@ public:
 
 		Graphics::getDefaultRenderTarget()->onResolutionChange.subscribe(this, &RaytracingScene::onResolutionChange);
 
-		Camera2D camera{};
 		/*nrd::MemoryAllocatorInterface *allocator;
 		nrd::DenoiserCreationDesc denoiserCreationDesc{};
 		denoiserCreationDesc.enableValidation = true;

@@ -66,7 +66,7 @@ public:
 		camera.layer_mask = 1;
 
 		std::vector<Entity> entitities;
-		int n = 10000;
+		int n = 0;
 		for (int i = 0; i < n; ++i) {
 			Entity triangle = createTriangle(vec3(Random::floatRange(0, render_target->getResolution().x), Random::floatRange(0, render_target->getResolution().y),0),
 											 vec4(Random::floatRange(0, 1),

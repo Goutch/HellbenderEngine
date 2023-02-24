@@ -21,6 +21,8 @@ namespace HBE {
 
 	class SceneNode;
 
+	class AudioClipInstance;
+
 	struct HB_API Identity {
 		std::string name = "Default";
 	};
