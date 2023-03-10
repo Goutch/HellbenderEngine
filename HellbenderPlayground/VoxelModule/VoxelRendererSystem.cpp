@@ -125,16 +125,16 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 	//pipeline->setTexture("voxels3", raw_voxels, 3);
 }
 
-void VoxelRendererSystem::draw() {
-	Profiler::begin("CubeRendererUpdate");
+void VoxelRendererSystem::draw(RenderGraph* render_graph) {
+	HB_PROFILE_BEGIN("CubeRendererUpdate");
 
 	DrawCmdInfo draw_cmd{};
 	draw_cmd.pipeline_instance = material;
 	draw_cmd.mesh = mesh;
 
-	Graphics::draw(draw_cmd);
+	render_graph->draw(draw_cmd);
 
-	Profiler::end();
+	HB_PROFILE_END();
 }
 
 

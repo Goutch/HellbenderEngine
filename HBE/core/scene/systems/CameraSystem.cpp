@@ -4,50 +4,87 @@
 #include "core/utility/Profiler.h"
 
 namespace HBE {
-	CameraSystem::CameraSystem(Scene *scene) : System(scene) {
-		this->scene = scene;
-		scene->onRender.subscribe(this, &CameraSystem::render);
-		scene->onAttach<Camera>().subscribe(this, &CameraSystem::onCameraAttached);
-		scene->onAttach<Camera2D>().subscribe(this, &CameraSystem::onCamera2DAttached);
-	}
+    CameraSystem::CameraSystem(Scene *scene) : System(scene) {
+        this->scene = scene;
+        scene->onRender.subscribe(this, &CameraSystem::render);
+        scene->onAttach<Camera>().subscribe(this, &CameraSystem::onCameraAttached);
+        scene->onAttach<Camera2D>().subscribe(this, &CameraSystem::onCamera2DAttached);
+        scene->onAttach<PixelCamera>().subscribe(this, &CameraSystem::onPixelCameraAttached);
+    }
 
-	void CameraSystem::onCameraAttached(Entity entity) {
-		Camera &camera = entity.get<Camera>();
-		if (camera.render_target == nullptr)
-			camera.render_target = Graphics::getDefaultRenderTarget();
-		camera.calculateProjection();
-	}
-	void CameraSystem::onCamera2DAttached(Entity entity)
-	{
-		Camera2D &camera = entity.get<Camera2D>();
-		if (camera.render_target == nullptr)
-			camera.render_target = Graphics::getDefaultRenderTarget();
-		camera.calculateProjection();
-	}
+    void CameraSystem::onCameraAttached(Entity entity) {
+        Camera &camera = entity.get<Camera>();
+        if (camera.getRenderTarget() == nullptr)
+            camera.setRenderTarget(Graphics::getDefaultRenderTarget());
 
-	void CameraSystem::render() {
-		Profiler::begin("CameraRender");
-		Profiler::begin("CameraRenderGroup");
-		auto group = scene->group<Transform, Camera>();
-		auto group2D = scene->group<Transform, Camera2D>();
-		Profiler::end();
-		for (auto[handle, transform, camera]:group) {
-			if (camera.active) {
-				Graphics::render(camera.render_target, camera.projection, glm::inverse(transform.world()));
-			}
-		}
-		for (auto[handle, transform, camera]:group2D) {
-			if (camera.active) {
-				Graphics::render(camera.render_target, camera.projection, glm::inverse(transform.world()));
-			}
-		}
-		Profiler::end();
-	}
+        if (!scene->getCameraEntity().valid()) {
+            scene->setCameraEntity(entity);
+        }
+    }
 
-	CameraSystem::~CameraSystem() {
-		scene->onRender.unsubscribe(this);
-		scene->onAttach<Camera>().unsubscribe(this);
-	}
+    void CameraSystem::onCamera2DAttached(Entity entity) {
+        Camera2D &camera = entity.get<Camera2D>();
+        if (camera.getRenderTarget() == nullptr)
+            camera.setRenderTarget(Graphics::getDefaultRenderTarget());
+
+        if (!scene->getCameraEntity().valid()) {
+            scene->setCameraEntity(entity);
+        }
+    }
+
+    void CameraSystem::onPixelCameraAttached(Entity entity) {
+        PixelCamera &camera = entity.get<PixelCamera>();
+        if (camera.getRenderTarget() == nullptr)
+            camera.setRenderTarget(Graphics::getDefaultRenderTarget());
+
+        if (!scene->getCameraEntity().valid()) {
+            scene->setCameraEntity(entity);
+        }
+    }
+
+    void CameraSystem::render(RenderGraph *render_graph) {
+        HB_PROFILE_BEGIN("CameraRender");
+        HB_PROFILE_BEGIN("CameraRenderGroup");
+        auto group = scene->group<Transform, Camera>();
+        auto group_2D = scene->group<Transform, Camera2D>();
+        auto group_pixel = scene->group<Transform, PixelCamera>();
+        RenderCmdInfo render_cmd_info{};
+        render_cmd_info.render_graph = render_graph;
+        HB_PROFILE_END();
+        for (auto[handle, transform, camera]: group) {
+            if (camera.active) {
+                render_cmd_info.render_target = camera.getRenderTarget();
+                render_cmd_info.projection = camera.projection;
+                render_cmd_info.view = glm::inverse(transform.world());
+                render_cmd_info.layer_mask = camera.layer_mask;
+                Graphics::render(render_cmd_info);
+            }
+        }
+        for (auto[handle, transform, camera]: group_2D) {
+            if (camera.active) {
+                render_cmd_info.render_target = camera.getRenderTarget();
+                render_cmd_info.projection = camera.projection;
+                render_cmd_info.view = glm::inverse(transform.world());
+                render_cmd_info.layer_mask = camera.layer_mask;
+                Graphics::render(render_cmd_info);
+            }
+        }
+        for (auto[handle, transform, camera]: group_pixel) {
+            if (camera.active) {
+                render_cmd_info.render_target = camera.getRenderTarget();
+                render_cmd_info.projection = camera.projection;
+                render_cmd_info.view = glm::inverse(transform.world());
+                render_cmd_info.layer_mask = camera.layer_mask;
+                Graphics::render(render_cmd_info);
+            }
+        }
+        HB_PROFILE_END();
+    }
+
+    CameraSystem::~CameraSystem() {
+        scene->onRender.unsubscribe(this);
+        scene->onAttach<Camera>().unsubscribe(this);
+    }
 
 
 }

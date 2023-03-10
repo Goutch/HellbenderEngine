@@ -12,7 +12,7 @@ namespace HBE {
 
 	VK_TopLevelAccelerationStructure::VK_TopLevelAccelerationStructure(VK_Device *device, const RootAccelerationStructureInfo &info) {
 		this->device = device;
-		Profiler::begin("Build root Acceleration Structure");
+		HB_PROFILE_BEGIN("Build root Acceleration Structure");
 		std::vector<VkAccelerationStructureInstanceKHR> instances;
 		instances.resize(info.instance_count);
 		for (int i = 0; i < info.instance_count; ++i) {
@@ -126,7 +126,7 @@ namespace HBE {
 
 
 		address.deviceAddress = device->vkGetAccelerationStructureDeviceAddressKHR(device->getHandle(), &accelerationDeviceAddressInfo);
-		Profiler::end();
+		HB_PROFILE_END();
 	}
 
 	VkDeviceOrHostAddressConstKHR VK_TopLevelAccelerationStructure::getDeviceAddress() const {

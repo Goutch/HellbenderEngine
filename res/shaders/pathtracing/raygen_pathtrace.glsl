@@ -19,8 +19,8 @@ layout(binding = 6, set = 0, rgba32f) uniform image2D historyMotion[HISTORY_COUN
 
 layout(binding = 7, set = 0) uniform CameraProperties
 {
-    mat4 viewInverse;
-    mat4 projInverse;
+    mat4 view_inverse;
+    mat4 projection_inverse;
 } cam;
 
 layout(binding = 11, set = 0) uniform LastCameraProperties
@@ -66,7 +66,7 @@ vec2(0.031250, 0.592593),
 };
 vec2 calculateVelocity(vec3 ray_dir, vec3 ray_origin)
 {
-    mat4 viewProj = inverse(cam.projInverse)*inverse(cam.viewInverse);
+    mat4 viewProj = inverse(cam.projection_inverse)*inverse(cam.view_inverse);
     mat4 lastViewProj =  last_cam.projection*last_cam.view;
     vec4 prev_screen_space = lastViewProj * vec4((primaryRayPayload.hit_t*ray_dir) + ray_origin, 1.0);
     vec2 prev_uv = 0.5 * (prev_screen_space.xy / prev_screen_space.w) + 0.5;
@@ -85,12 +85,12 @@ void main()
     offset.x = ((offset.x-0.5f) / gl_LaunchSizeEXT.x) *2;
     offset.y = ((offset.y-0.5f) / gl_LaunchSizeEXT.y) *2;
 
-    vec4 origin = cam.viewInverse* vec4(0, 0, 0, 1);
-    vec4 target_jittered = cam.projInverse * vec4(d + offset, 1, 1);
-    vec4 target = cam.projInverse * vec4(d.x, d.y, 1, 1);
+    vec4 origin = cam.view_inverse* vec4(0, 0, 0, 1);
+    vec4 target_jittered = cam.projection_inverse * vec4(d + offset, 1, 1);
+    vec4 target = cam.projection_inverse * vec4(d.x, d.y, 1, 1);
 
-    vec4 direction = normalize(cam.viewInverse*vec4(normalize(target.xyz), 0));
-    vec4 direction_jittered = normalize(cam.viewInverse*vec4(normalize(target_jittered.xyz), 0));
+    vec4 direction = normalize(cam.view_inverse*vec4(normalize(target.xyz), 0));
+    vec4 direction_jittered = normalize(cam.view_inverse*vec4(normalize(target_jittered.xyz), 0));
     float tmin = 0.001;
     float tmax = 1000.0;
 
@@ -121,13 +121,13 @@ void main()
     color += primaryRayPayload.color;
 
     vec2 velocity = calculateVelocity(direction.xyz, origin.xyz);
-    imageStore(historyAlbedo[0], ivec2(gl_LaunchIDEXT.xy), vec4(color, 0.0));
+    imageStore(historyAlbedo[0], ivec2(gl_LaunchIDEXT.xy), vec4(color, 1.0));
     imageStore(historyNormalDepth[0], ivec2(gl_LaunchIDEXT.xy), vec4(abs(primaryRayPayload.hit_normal), 1-(primaryRayPayload.hit_t/tmax)));
-    imageStore(historyMotion[0], ivec2(gl_LaunchIDEXT.xy), vec4(velocity, 0.0, 0.0));
+    imageStore(historyMotion[0], ivec2(gl_LaunchIDEXT.xy), vec4(velocity, 0.0, 1.0));
 
     ivec2 adjusted_coord = ivec2(gl_LaunchIDEXT.xy);
 
-    vec2 uv =( (vec2(gl_LaunchIDEXT.xy)+vec2(0.5)) / vec2(gl_LaunchSizeEXT.xy));
+    vec2 uv =((vec2(gl_LaunchIDEXT.xy)+vec2(0.5)) / vec2(gl_LaunchSizeEXT.xy));
     uint historySampleCount = 1;
 
     for (int i=1; i<HISTORY_COUNT; i++)
@@ -135,13 +135,13 @@ void main()
         adjusted_coord= ivec2(floor(uv * vec2(gl_LaunchSizeEXT.xy)));
         uv -= imageLoad(historyMotion[i-1], adjusted_coord).xy;
         adjusted_coord= ivec2(floor(uv* vec2(gl_LaunchSizeEXT.xy)));
-        if(max(uv.x,uv.y)>1.0||min(uv.x,uv.y)<0.0)
+        if (max(uv.x, uv.y)>1.0||min(uv.x, uv.y)<0.0)
         {
             continue;
         }
         color += imageLoad(historyAlbedo[i], adjusted_coord).rgb;
         historySampleCount++;
-   }
+    }
 
     color /= float(historySampleCount);
     const float gamma = 2.0;
@@ -153,5 +153,5 @@ void main()
 
     //mapped = vertices[nonuniformEXT(gl_LaunchIDEXT.x)].vertices[gl_LaunchIDEXT.y].pos.rgb;
 
-    imageStore(outputAlbedo, ivec2(gl_LaunchIDEXT.xy), vec4(color, 0.0));
+    imageStore(outputAlbedo, ivec2(gl_LaunchIDEXT.xy), vec4(color, 1.0));
 }

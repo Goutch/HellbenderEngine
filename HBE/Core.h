@@ -39,6 +39,15 @@
 #endif
 #endif
 
+//#define PROFILE_MODE
+#ifndef PROFILE_MODE
+#define HB_PROFILE_BEGIN(x)
+#define HB_PROFILE_END(x)
+#else
+#define HB_PROFILE_BEGIN(x) Profiler::begin(x)
+#define HB_PROFILE_END() Profiler::end()
+#endif
+
 #ifdef NDEBUG
 #define HB_ASSERT(x,y)
 #else

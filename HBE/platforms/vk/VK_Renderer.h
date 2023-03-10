@@ -32,21 +32,12 @@ namespace HBE {
 
 
 	class VK_Renderer : public Renderer {
-#define MAP(T1, T2) std::unordered_map<T1,T2>
+
 	private:
 		struct FrameState {
 			VK_Semaphore *finished_semaphore;
 			VK_Semaphore *image_available_semaphore;
 		};
-
-		MAP(const GraphicPipeline*, MAP(GraphicPipelineInstance * , MAP(const Mesh*, std::vector<std::vector<PushConstantInfo>>))) render_cache;
-
-		std::vector<DrawCmdInfo> ordered_render_cache;
-
-		const size_t PUSH_CONSTANT_BLOCK_SIZE = 1024 * 16; //16kb
-		size_t current_pc_block = 0;
-		size_t current_pc_block_offset = 0;
-		std::vector<char *> push_constant_blocks;
 
 		VK_Window *window;
 		VK_Instance *instance;
@@ -65,36 +56,29 @@ namespace HBE {
 		std::vector<VK_Fence *> images_in_flight_fences;
 
 		RenderTarget *main_render_target = nullptr;
+		RenderTarget *ui_render_target = nullptr;
 		GraphicPipeline *screen_pipeline = nullptr;
-		GraphicPipelineInstance *screen_material = nullptr;
+		GraphicPipelineInstance *screen_pipeline_instance = nullptr;
 		bool windowResized = false;
 		bool frame_presented = false;
 
 
 	public:
-		Event<uint32_t> onFrameChange;
+		void render(RenderCmdInfo &render_cmd_info) override;
 
-		void render(const RenderTarget *render_target,
-					const mat4 &projection_matrix,
-					const mat4 &view_matrix) override;
+		void traceRays(TraceRaysCmdInfo &trace_rays_cmd_info) override;
 
-		void raytrace(const RootAccelerationStructure &root_acceleration_structure,
-					  RaytracingPipelineInstance &pipeline,
-					  const mat4 &projection_matrix,
-					  const mat4 &view_matrix,
-					  const vec2i resolution) override;
-
+		void present(PresentCmdInfo &present_cmd_info) override;
 
 		void waitCurrentFrame();
+
 		RenderTarget *getDefaultRenderTarget() override;
+
+		RenderTarget *getUIRenderTarget() override;
 
 		void beginFrame() override;
 
-		void present(const Texture *image) override;
-
 		void endFrame() override;
-
-		void draw(DrawCmdInfo &draw_cmd_info) override;
 
 		VK_Renderer();
 
@@ -105,11 +89,12 @@ namespace HBE {
 		VK_CommandPool *getCommandPool();
 
 		VK_Device *getDevice();
+
 		uint32_t getFrameCount() const override;
 
 		void onWindowClosed();
 
-		void onWindowSizeChange(uint32_t width, uint32_t height);
+		void onWindowSizeChange(Window *window);
 
 		void reCreateSwapchain();
 
@@ -117,11 +102,16 @@ namespace HBE {
 
 		uint32_t getCurrentFrame() const override;
 
-		void createDefaultResources() override;
 
 		const VK_Instance *getInstance() const;
+
 		void waitAll();
+
 		VkSampler getDefaultSampler();
+
+	private:
+
+		void createDefaultResources() override;
 	};
 }
 

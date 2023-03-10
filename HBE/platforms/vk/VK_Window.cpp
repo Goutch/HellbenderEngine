@@ -10,7 +10,8 @@ namespace HBE {
 	void VK_Window::windowSizeCallback(GLFWwindow *handle, int width, int height) {
 		Window *window = (Window *) glfwGetWindowUserPointer(handle);
 		VK_Window *instance = reinterpret_cast<VK_Window *>(glfwGetWindowUserPointer(handle));
-		Log::status("Window size changed from (" + std::to_string(instance->last_width) + " x " + std::to_string(instance->last_height) + ") to (" + std::to_string(width) + " x " + std::to_string(height) + ")");
+		Log::status("Window size changed from (" + std::to_string(instance->last_width) + " x " + std::to_string(instance->last_height) + ") to (" + std::to_string(width) + " x " +
+					std::to_string(height) + ")");
 		instance->last_width = instance->width;
 		instance->last_height = instance->height;
 		instance->width = width;
@@ -20,7 +21,7 @@ namespace HBE {
 		} else {
 			instance->minimized = false;
 		}
-		window->onSizeChange.invoke(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
+		window->onSizeChange.invoke(window);
 	}
 
 	void VK_Window::onTitleChange(std::string title) {
@@ -101,6 +102,14 @@ namespace HBE {
 
 	bool VK_Window::isMinimized() {
 		return minimized;
+	}
+
+	uint32_t VK_Window::getWidth() {
+		return width;
+	}
+
+	uint32_t VK_Window::getHeight() {
+		return height;
 	}
 
 }

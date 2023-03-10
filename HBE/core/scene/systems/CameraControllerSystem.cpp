@@ -18,15 +18,16 @@ namespace HBE {
 	}
 
 	void CameraControllerSystem::update(float delta_t) {
-		Profiler::begin("CameraControllerUpdate");
-		Profiler::begin("CameraControllerUpdateGroup");
+		HB_PROFILE_BEGIN("CameraControllerUpdate");
+		HB_PROFILE_BEGIN("CameraControllerUpdateGroup");
 		auto group = scene->group<Transform, Camera, CameraController>();
-		Profiler::end();
-		for (auto[handle, transform, camera, controller]:group) {
+		HB_PROFILE_END();
+		for (auto [handle, transform, camera, controller]: group) {
 			float max_pitch_radian = glm::radians(controller.max_pitch);
 
-			vec2i resolution = camera.render_target->getResolution();
-			float width = static_cast<float>(resolution.x), height = static_cast<float>(resolution.y);
+			vec2i resolution = camera.getRenderTarget()->getResolution();
+			float width = static_cast<float>(resolution.x);
+			float height = static_cast<float>(resolution.y);
 
 			vec2 mouse_pos = Input::getMousePosition();
 			Input::setCursorPosition(resolution.x / 2.0, resolution.y / 2.0f);
@@ -48,55 +49,53 @@ namespace HBE {
 
 			float boost = 1.0f;
 			vec3 translation = vec3(0);
-			if (Input::getKey(KEY::S)) {
+			if (Input::getKey(KEY_S)) {
 				translation.z += 1;
 			}
-			if (Input::getKey(KEY::W)) {
+			if (Input::getKey(KEY_W)) {
 				translation.z = -1;
 			}
-			if (Input::getKey(KEY::D)) {
+			if (Input::getKey(KEY_D)) {
 				translation.x += 1;
 			}
-			if (Input::getKey(KEY::A)) {
+			if (Input::getKey(KEY_A)) {
 				translation.x = -1;
 			}
-			if (Input::getKey(KEY::SPACE)) {
+			if (Input::getKey(KEY_SPACE)) {
 				translation.y += 1;
 			}
-			if (Input::getKey(KEY::LEFT_CONTROL)) {
+			if (Input::getKey(KEY_LEFT_CONTROL)) {
 				translation.y = -1;
 			}
-			if (Input::getKey(KEY::LEFT_SHIFT)) {
+			if (Input::getKey(KEY_LEFT_SHIFT)) {
 				boost = 10.0f;
 			}
 
 			transform.translate(translation * delta_t * controller.speed * boost);
 		}
 		auto group2D = scene->group<Transform, Camera2D, CameraController>();
-		for (auto[handle, transform, camera, controller]:group2D) {
+		for (auto [handle, transform, camera, controller]: group2D) {
 			float boost = 1.0f;
 			vec3 translation = vec3(0);
-			if (Input::getKey(KEY::LEFT_SHIFT)) {
+			if (Input::getKey(KEY_LEFT_SHIFT)) {
 				boost = 10.0f;
 			}
-			if (Input::getKey(KEY::EQUAL)) {
-				camera.zoom_ratio += delta_t*boost;
-				camera.calculateProjection();
+			if (Input::getKey(KEY_EQUAL)) {
+				camera.setZoomRatio(camera.getZoomRatio() + (delta_t * boost));
 			}
-			if (Input::getKey(KEY::MINUS)) {
-				camera.zoom_ratio -= delta_t*boost;
-				camera.calculateProjection();
+			if (Input::getKey(KEY_MINUS)) {
+				camera.setZoomRatio(camera.getZoomRatio() - (delta_t * boost));
 			}
-			if (Input::getKey(KEY::D)) {
+			if (Input::getKey(KEY_D)) {
 				translation.x += 1;
 			}
-			if (Input::getKey(KEY::A)) {
+			if (Input::getKey(KEY_A)) {
 				translation.x = -1;
 			}
-			if (Input::getKey(KEY::W)) {
+			if (Input::getKey(KEY_W)) {
 				translation.y += 1;
 			}
-			if (Input::getKey(KEY::S)) {
+			if (Input::getKey(KEY_S)) {
 				translation.y = -1;
 			}
 
@@ -104,7 +103,28 @@ namespace HBE {
 			transform.translate(translation * delta_t * controller.speed * boost);
 
 		}
-		Profiler::end();
+		auto group_pixel = scene->group<Transform, PixelCamera, CameraController>();
+		for (auto [handle, transform, camera, controller]: group_pixel) {
+			float boost = 1.0f;
+			vec3 translation = vec3(0);
+			if (Input::getKey(KEY_LEFT_SHIFT)) {
+				boost = 10.0f;
+			}
+			if (Input::getKey(KEY_D)) {
+				translation.x += 1;
+			}
+			if (Input::getKey(KEY_A)) {
+				translation.x = -1;
+			}
+			if (Input::getKey(KEY_W)) {
+				translation.y += 1;
+			}
+			if (Input::getKey(KEY_S)) {
+				translation.y = -1;
+			}
+			transform.translate(translation * delta_t * controller.speed * boost);
+		}
+		HB_PROFILE_END();
 
 	}
 

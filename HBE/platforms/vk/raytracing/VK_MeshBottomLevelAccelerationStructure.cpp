@@ -7,7 +7,7 @@
 namespace HBE {
 	VK_MeshBottomLevelAccelerationStructure::VK_MeshBottomLevelAccelerationStructure(VK_Device *device, MeshAccelerationStructureInfo info) {
 		this->device = device;
-		Profiler::begin("Build Mesh Acceleration Structure");
+		HB_PROFILE_BEGIN("Build Mesh Acceleration Structure");
 
 		//todo:initialize this
 		VK_Mesh *mesh = dynamic_cast<VK_Mesh *>(info.mesh);
@@ -101,7 +101,7 @@ namespace HBE {
 
 		address.deviceAddress = device->vkGetAccelerationStructureDeviceAddressKHR(device->getHandle(), &accelerationDeviceAddressInfo);
 
-		Profiler::end();
+		HB_PROFILE_END();
 	}
 
 	VK_MeshBottomLevelAccelerationStructure::~VK_MeshBottomLevelAccelerationStructure() {

@@ -28,7 +28,7 @@ void AgentSystem::onUpdate(float delta) {
 	}
 }
 
-void AgentSystem::onDraw() {
+void AgentSystem::onDraw(RenderGraph* render_graph) {
 	std::vector<mat4> transforms;
 	uint32_t count = 0;
 	auto group = scene->group<Agent, Transform>();
@@ -41,7 +41,7 @@ void AgentSystem::onDraw() {
 	DrawCmdInfo draw_cmd{};
 	draw_cmd.mesh = mesh;
 	draw_cmd.pipeline_instance = material;
-	Graphics::draw(draw_cmd);
+    render_graph->draw(draw_cmd);
 }
 
 AgentSystem::AgentSystem(Scene *scene) : System(scene) {

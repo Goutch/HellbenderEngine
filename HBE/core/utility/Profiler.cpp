@@ -4,7 +4,7 @@ namespace HBE {
 	std::stack<Profiler::Profile> Profiler::stack;
 	std::unordered_map<std::string, std::pair<uint32_t, double>> Profiler::averange;
 
-	void HBE::Profiler::begin(std::string message) {
+	void Profiler::begin(std::string message) {
 		stack.emplace(Profile{message, Clock()});
 		std::string messaage = "";
 		for (size_t i = 0; i < stack.size() - 1; ++i) {

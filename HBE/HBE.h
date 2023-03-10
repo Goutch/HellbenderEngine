@@ -23,10 +23,13 @@
 #include "core/resource/raytracing/AccelerationStructure.h"
 #include "core/resource/raytracing/RaytracingPipeline.h"
 #include "core/resource/raytracing/RaytracingPipelineInstance.h"
+#include "core/resource/AudioClip.h"
+#include "core/resource/AudioClipInstance.h"
 
 
 #include "core/graphics/Graphics.h"
 #include "core/graphics/Window.h"
+#include "core/graphics/RenderGraph.h"
 #include "HBE/core/resource/RenderTarget.h"
 
 #include "core/input/Input.h"

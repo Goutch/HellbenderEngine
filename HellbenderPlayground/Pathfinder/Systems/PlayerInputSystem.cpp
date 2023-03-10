@@ -22,9 +22,9 @@ void PlayerInputSystem::update(float delta) {
 	SimCamera2D &sim_camera = scene->getCameraEntity().get<SimCamera2D>();
 	Camera2D &camera = scene->getCameraEntity().get<Camera2D>();
 	SimTransform &camera_transform = scene->getCameraEntity().get<SimTransform>();
-	f32 zoom_ratio = f32(camera.zoom_ratio);
-	bool right_button = Input::getKey(KEY::MOUSE_BUTTON_RIGHT);
-	bool left_button = Input::getKey(KEY::MOUSE_BUTTON_LEFT);
+	f32 zoom_ratio = f32(camera.getZoomRatio());
+	bool right_button = Input::getKey(KEY_MOUSE_BUTTON_RIGHT);
+	bool left_button = Input::getKey(KEY_MOUSE_BUTTON_LEFT);
 	if (right_button || left_button) {
 		vec2i mouse_pos = Input::getMousePosition();
 
@@ -51,16 +51,16 @@ void PlayerInputSystem::update(float delta) {
 			map.set(click_position.x.round(), click_position.y.round(), true);
 		}
 	}
-	if (Input::getKey(KEY::W)) {
+	if (Input::getKey(KEY_W)) {
 		camera_transform.position.y += sim_camera.zoom_ratio * step;
 	}
-	if (Input::getKey(KEY::A)) {
+	if (Input::getKey(KEY_A)) {
 		camera_transform.position.x -= sim_camera.zoom_ratio * step;
 	}
-	if (Input::getKey(KEY::D)) {
+	if (Input::getKey(KEY_D)) {
 		camera_transform.position.x += sim_camera.zoom_ratio * step;
 	}
-	if (Input::getKey(KEY::S)) {
+	if (Input::getKey(KEY_S)) {
 		camera_transform.position.y -= sim_camera.zoom_ratio * step;
 	}
 }

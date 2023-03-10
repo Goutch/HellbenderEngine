@@ -45,7 +45,7 @@ namespace HBE {
                 // Set atlas parameters:
                 // setDimensions or setDimensionsConstraint to find the best value
                 packer.setDimensionsConstraint(TightAtlasPacker::DimensionsConstraint::SQUARE);
-                // setScale for a fixed size or setMinimumScale to use the largest that fits
+                // setLocalScale for a fixed size or setMinimumScale to use the largest that fits
                 packer.setMinimumScale(info.glyph_resolution);
                 //packer.setDimensions(info.glyph_size,info.glyph_size);
                 // setPixelRange or setUnitRange

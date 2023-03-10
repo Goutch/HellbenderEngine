@@ -26,6 +26,7 @@
 #include "VK_PipelineDescriptors.h"
 #include "VK_GraphicPipelineInstance.h"
 #include "raytracing/VK_RaytracingPipelineInstance.h"
+#include "core/graphics/RenderGraph.h"
 
 namespace HBE {
 	struct UniformBufferObject {
@@ -64,7 +65,7 @@ namespace HBE {
 	}
 
 
-	void VK_Renderer::onWindowSizeChange(uint32_t width, uint32_t height) {
+	void VK_Renderer::onWindowSizeChange(Window *window) {
 		windowResized = true;
 	}
 
@@ -91,8 +92,6 @@ namespace HBE {
 		command_pool->createCommandBuffers(MAX_FRAMES_IN_FLIGHT);
 
 		main_render_target->setResolution(width, height);
-
-		screen_material->setTexture("texture0", main_render_target->getFramebufferTexture(current_frame), current_frame, 0);
 	}
 
 	void VK_Renderer::onWindowClosed() {
@@ -100,10 +99,6 @@ namespace HBE {
 	}
 
 	VK_Renderer::~VK_Renderer() {
-
-		for (int i = 0; i < push_constant_blocks.size(); ++i) {
-			free(push_constant_blocks[i]);
-		}
 		window->onSizeChange.unsubscribe(this);
 		Application::onWindowClosed.unsubscribe(this);
 		Configs::onVerticalSyncChange.unsubscribe(this);
@@ -127,63 +122,31 @@ namespace HBE {
 		return factory;
 	}
 
-	void VK_Renderer::raytrace(const RootAccelerationStructure &root_acceleration_structure,
-							   RaytracingPipelineInstance &pipeline,
-							   const mat4 &projection_matrix,
-							   const mat4 &view_matrix,
-							   const vec2i resolution) {
-		/*vec2i resolution = render_target.getResolution();
+	void VK_Renderer::render(RenderCmdInfo &render_cmd_info) {
+		//todo: create scene specific render graph
+		HB_PROFILE_BEGIN("RenderPass");
+
+		const VK_RenderPass *render_pass = dynamic_cast<const VK_RenderPass *>(render_cmd_info.render_target);
+
+		vec2i resolution = render_pass->getResolution();
 		VkViewport viewport{};
-		viewport.x = 0.0f;
-		viewport.y = static_cast<float>(resolution.y);
-		viewport.width = static_cast<float>(resolution.x);
-		viewport.height = -static_cast<float>(resolution.y);
-		viewport.minDepth = 0.0f;
-		viewport.maxDepth = 1.0f;
 
-		VkRect2D scissor{};
-		scissor.offset = {0, 0};
-		scissor.extent = VkExtent2D{(uint32_t) resolution.x, (uint32_t) resolution.y};
+		if (RENDER_CMD_FLAG_INVERSE_Y & render_cmd_info.flags) {
+			viewport.x = 0.0f;
+			viewport.y = static_cast<float>(resolution.y);
+			viewport.width = static_cast<float>(resolution.x);
+			viewport.height = -static_cast<float>(resolution.y);
+			viewport.minDepth = 0.0f;
+			viewport.maxDepth = 1.0f;
+		} else {
+			viewport.x = 0.0f;
+			viewport.y = 0;
+			viewport.width = static_cast<float>(resolution.x);
+			viewport.height = static_cast<float>(resolution.y);
+			viewport.minDepth = 0.0f;
+			viewport.maxDepth = 1.0f;
+		}
 
-		vkCmdSetViewport(command_pool->getCurrentBuffer(), 0, 1, &viewport);
-		vkCmdSetScissor(command_pool->getCurrentBuffer(), 0, 1, &scissor);*/
-
-		VK_RaytracingPipelineInstance *vk_pipeline_instance = dynamic_cast<VK_RaytracingPipelineInstance *>(&pipeline);
-		const VK_RaytracingPipeline *vk_pipeline = vk_pipeline_instance->getPipeline();
-		UniformBufferObject ubo = {glm::inverse(view_matrix), glm::inverse(projection_matrix)};
-		vk_pipeline_instance->setUniform("cam", &ubo, current_frame);
-		vk_pipeline->bind();
-		vk_pipeline_instance->bind();
-
-		device->vkCmdTraceRaysKHR(command_pool->getCurrentBuffer(),
-								  &vk_pipeline->getRaygenShaderBindingTable(),
-								  &vk_pipeline->getMissShaderBindingTable(),
-								  &vk_pipeline->getHitShaderBindingTable(),
-								  &vk_pipeline->getCallableShaderBindingTable(),
-								  resolution.x,
-								  resolution.y,
-								  1);
-		//vkCmdPipelineBarrier(command_pool->getCurrentBuffer(), VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_DEPENDENCY_BY_REGION_BIT, 0, nullptr, 0, nullptr, 0, nullptr);
-
-		vk_pipeline_instance->unbind();
-		vk_pipeline->unbind();
-	}
-
-	void VK_Renderer::render(const RenderTarget *render_target,
-							 const mat4 &projection_matrix,
-							 const mat4 &view_matrix) {
-		Profiler::begin("RenderPass");
-
-		const VK_RenderPass *render_pass = dynamic_cast<const VK_RenderPass *>(render_target);
-
-		vec2i resolution = render_target->getResolution();
-		VkViewport viewport{};
-		viewport.x = 0.0f;
-		viewport.y = 0;
-		viewport.width = static_cast<float>(resolution.x);
-		viewport.height = static_cast<float>(resolution.y);
-		viewport.minDepth = 0.0f;
-		viewport.maxDepth = 1.0f;
 
 		VkRect2D scissor{};
 		scissor.offset = {0, 0};
@@ -193,10 +156,11 @@ namespace HBE {
 		vkCmdSetViewport(command_pool->getCurrentBuffer(), 0, 1, &viewport);
 		vkCmdSetScissor(command_pool->getCurrentBuffer(), 0, 1, &scissor);
 		UniformBufferObject ubo{};
-		ubo.view = view_matrix;
-		ubo.projection = projection_matrix;
+		ubo.view = render_cmd_info.view;
+		ubo.projection = render_cmd_info.projection;
+
 		render_pass->begin(command_pool->getCurrentBuffer(), current_frame);
-		for (const auto &pipeline_kv: render_cache) {
+		for (const auto &pipeline_kv: render_cmd_info.render_graph->getRenderCache()) {
 			const GraphicPipeline *pipeline = pipeline_kv.first;
 			pipeline->bind();
 			for (const auto &material_kv: pipeline_kv.second) {
@@ -206,9 +170,13 @@ namespace HBE {
 				for (const auto &mesh_kv: material_kv.second) {
 					const Mesh *mesh = mesh_kv.first;
 					mesh->bind();
-					for (const std::vector<PushConstantInfo> &push_constant_infos: mesh_kv.second) {
-						for (const PushConstantInfo &pc:push_constant_infos) {
-							pipeline->pushConstant(pc.name, pc.data);
+					for (const DrawCmdInfo &draw_cmd_info: mesh_kv.second) {
+
+						if ((draw_cmd_info.layer & render_cmd_info.layer_mask) != draw_cmd_info.layer) {
+							continue;
+						}
+						for (int i = 0; i < draw_cmd_info.push_constants_count; ++i) {
+							pipeline->pushConstant(draw_cmd_info.push_constants[i].name, draw_cmd_info.push_constants[i].data);
 						}
 
 						if (mesh->hasIndexBuffer()) {
@@ -225,9 +193,15 @@ namespace HBE {
 			pipeline->unbind();
 		}
 
+        std::vector<DrawCmdInfo> ordered_render_cache = render_cmd_info.render_graph->getOrderedRenderCache();
 		for (int i = 0; i < ordered_render_cache.size(); ++i) {
 			DrawCmdInfo &cmd = ordered_render_cache[i];
+			if ((cmd.layer & render_cmd_info.layer_mask) != cmd.layer) {
+				continue;
+			}
+
 			cmd.pipeline_instance->getGraphicPipeline()->bind();
+			cmd.pipeline_instance->setUniform("ubo", &ubo, current_frame);
 			cmd.pipeline_instance->bind();
 			cmd.mesh->bind();
 
@@ -257,20 +231,42 @@ namespace HBE {
 
 		}
 		render_pass->end(command_pool->getCurrentBuffer());
-		Profiler::end();
+		HB_PROFILE_END();
+	}
+
+	void VK_Renderer::traceRays(TraceRaysCmdInfo &trace_rays_cmd_info) {
+		const VK_RaytracingPipelineInstance *vk_pipeline_instance = dynamic_cast<const VK_RaytracingPipelineInstance *>(trace_rays_cmd_info.pipeline_instance);
+		const VK_RaytracingPipeline *vk_pipeline = vk_pipeline_instance->getPipeline();
+		vk_pipeline->bind();
+		vk_pipeline_instance->bind();
+
+		device->vkCmdTraceRaysKHR(command_pool->getCurrentBuffer(),
+								  &vk_pipeline->getRaygenShaderBindingTable(),
+								  &vk_pipeline->getMissShaderBindingTable(),
+								  &vk_pipeline->getHitShaderBindingTable(),
+								  &vk_pipeline->getCallableShaderBindingTable(),
+								  trace_rays_cmd_info.resolution.x,
+								  trace_rays_cmd_info.resolution.y,
+								  1);
+		//vkCmdPipelineBarrier(command_pool->getCurrentBuffer(), VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_DEPENDENCY_BY_REGION_BIT, 0, nullptr, 0, nullptr, 0, nullptr);
+
+		vk_pipeline_instance->unbind();
+		vk_pipeline->unbind();
 	}
 
 	void VK_Renderer::beginFrame() {
-		Profiler::begin("CommandPoolWait");
+		HB_PROFILE_BEGIN("CommandPoolWait");
 		command_pool->begin();
-		Profiler::end();
+		HB_PROFILE_END();
 	}
 
-	void VK_Renderer::present(const Texture *image) {
+	void VK_Renderer::present(PresentCmdInfo &present_cmd_info) {
+		if (frame_presented) return;
 		HB_ASSERT(frame_presented == false, "Frame already presented, call beginFrame() before present() and endFrame() after present()");
-		Profiler::begin("AquireImage");
-
-		const VK_Image *vk_image = dynamic_cast<const VK_Image *>(image);
+		HB_ASSERT(present_cmd_info.image_count <= 4 && present_cmd_info.image_count > 0, "layers should be from 1 to 4");
+		HB_PROFILE_BEGIN("AquireImage");
+		frame_presented = true;
+		VK_Image **vk_images = reinterpret_cast< VK_Image **>(present_cmd_info.images);
 		VkResult result = vkAcquireNextImageKHR(device->getHandle(),
 												swapchain->getHandle(),
 												UINT64_MAX,
@@ -284,12 +280,12 @@ namespace HBE {
 		} else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
 			Log::error("failed to acquire swap chain image!");
 		}
-		Profiler::end();
-		Profiler::begin("WaitImageInflight");
+		HB_PROFILE_END();
+		HB_PROFILE_BEGIN("WaitImageInflight");
 		if (images_in_flight_fences[current_image] != nullptr) {
 			images_in_flight_fences[current_image]->wait();
 		}
-		Profiler::end();
+		HB_PROFILE_END();
 		images_in_flight_fences[current_image] = &command_pool->getCurrentFence();
 		command_pool->getCurrentFence().reset();
 
@@ -311,43 +307,51 @@ namespace HBE {
 		vkCmdSetViewport(command_pool->getCurrentBuffer(), 0, 1, &viewport);
 		vkCmdSetScissor(command_pool->getCurrentBuffer(), 0, 1, &scissor);
 
-		VkMemoryBarrier2 image_barrier{};
-		image_barrier.sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER_2;
-		image_barrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_SHADER_WRITE_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
-		image_barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 
-		image_barrier.srcStageMask = VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT | VK_PIPELINE_STAGE_TRANSFER_BIT;
-		image_barrier.dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		for (int i = 0; i < present_cmd_info.image_count; ++i) {
+			const VK_Image *vk_image = dynamic_cast<const VK_Image *>(vk_images[i]);
+			VkImageMemoryBarrier2 image_barrier{};
+			image_barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
+			image_barrier.srcAccessMask = 0;
+			image_barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 
-		VkDependencyInfo dependency_info{};
-		dependency_info.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO_KHR;
-		dependency_info.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
-		dependency_info.pImageMemoryBarriers = nullptr;
-		dependency_info.imageMemoryBarrierCount = 0;
-		dependency_info.pBufferMemoryBarriers = nullptr;
-		dependency_info.bufferMemoryBarrierCount = 0;
-		dependency_info.pMemoryBarriers = &image_barrier;
-		dependency_info.memoryBarrierCount = 1;
-		device->vkCmdPipelineBarrier2(command_pool->getCurrentBuffer(), &dependency_info);
-		/* vkCmdPipelineBarrier2(command_pool->getCurrentBuffer(),
+			image_barrier.srcStageMask = VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT | VK_PIPELINE_STAGE_TRANSFER_BIT;
+			image_barrier.dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 
-							  VK_DEPENDENCY_BY_REGION_BIT,
-							  0,
-							  nullptr,
-							  0,
-							  nullptr,
-							  0,
-							  nullptr);*/
+			image_barrier.oldLayout = vk_image->getImageLayout();
+			image_barrier.newLayout = vk_image->getImageLayout();
 
-		screen_material->setTexture("texture0", image, current_frame, 0);
+			image_barrier.image = vk_images[i]->getHandle();
+
+			image_barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			image_barrier.subresourceRange.baseMipLevel = 0;
+			image_barrier.subresourceRange.levelCount = 1;
+			image_barrier.subresourceRange.baseArrayLayer = 0;
+			image_barrier.subresourceRange.layerCount = 1;
+
+			VkDependencyInfo dependency_info{};
+			dependency_info.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO_KHR;
+			dependency_info.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+			dependency_info.pImageMemoryBarriers = &image_barrier;
+			dependency_info.imageMemoryBarrierCount = 1;
+			dependency_info.pBufferMemoryBarriers = nullptr;
+			dependency_info.bufferMemoryBarrierCount = 0;
+			dependency_info.pMemoryBarriers = nullptr;
+			dependency_info.memoryBarrierCount = 0;
+			device->vkCmdPipelineBarrier2(command_pool->getCurrentBuffer(), &dependency_info);
+		}
+
+		screen_pipeline_instance->setTextureArray("layers", &present_cmd_info.images[0], present_cmd_info.image_count, current_frame, 0);
+		screen_pipeline_instance->setUniform("ubo", &present_cmd_info.image_count);
+
 		swapchain->beginRenderPass(current_image, command_pool->getCurrentBuffer());
 
 		screen_pipeline->bind();
-		screen_material->bind();
+		screen_pipeline_instance->bind();
 
 
 		vkCmdDraw(command_pool->getCurrentBuffer(), 3, 1, 0, 0);
-		screen_material->unbind();
+		screen_pipeline_instance->unbind();
 		screen_pipeline->unbind();
 
 		swapchain->endRenderPass(command_pool->getCurrentBuffer());
@@ -375,75 +379,40 @@ namespace HBE {
 		presentInfo.pImageIndices = &current_image;
 		presentInfo.pResults = nullptr; // Optional
 
-		Profiler::begin("Present");
+		HB_PROFILE_BEGIN("vkQueuePresentKHR");
 		result = vkQueuePresentKHR(device->getQueue(QUEUE_FAMILY_PRESENT).getHandle(), &presentInfo);
-		Profiler::end();
+		HB_PROFILE_END();
 		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || windowResized) {
 			windowResized = false;
 			reCreateSwapchain();
 		} else if (result != VK_SUCCESS) {
 			Log::error("failed to present swap chain image!");
 		}
-		frame_presented = true;
+
 	}
 
 
 	void VK_Renderer::endFrame() {
-		Profiler::begin("endFrame");
+		HB_PROFILE_BEGIN("endFrame");
+
 
 		if (!frame_presented) {
-			present(main_render_target->getFramebufferTexture(current_frame));
+			Texture *render_textures[1] = {
+					main_render_target->getFramebufferTexture(current_frame)
+			};
+			PresentCmdInfo present_cmd_info{};
+			present_cmd_info.images = render_textures;
+			present_cmd_info.image_count = 1;
+			present(present_cmd_info);
 		}
 
 		frame_presented = false;
 		current_frame = (current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
-		onFrameChange.invoke(current_frame);
 		device->getAllocator()->freeStagingBuffers();
-
-		render_cache.clear();
-		ordered_render_cache.clear();
 
 		command_pool->getCurrentFence().wait();
 
-		Profiler::end();
-
-	}
-
-	void VK_Renderer::draw(DrawCmdInfo &draw_cmd_info) {
-		//copy push constants to cache
-		for (int i = 0; i < draw_cmd_info.push_constants_count; ++i) {
-			if (draw_cmd_info.push_constants[i].size + current_pc_block_offset > PUSH_CONSTANT_BLOCK_SIZE) {
-				current_pc_block_offset = 0;
-				current_pc_block++;
-				if (current_pc_block >= push_constant_blocks.size()) {
-					push_constant_blocks.emplace_back(static_cast<char *>(malloc(PUSH_CONSTANT_BLOCK_SIZE)));
-				}
-			}
-			void *cache_address = (void *) (&push_constant_blocks[current_pc_block][current_pc_block_offset]);
-			memcpy(cache_address,
-				   draw_cmd_info.push_constants[i].data,
-				   draw_cmd_info.push_constants[i].size);
-			current_pc_block_offset += draw_cmd_info.push_constants[i].size;
-			draw_cmd_info.push_constants[i].data = cache_address;
-		}
-
-		if (draw_cmd_info.flags & DRAW_CMD_FLAG_ORDERED) {
-			ordered_render_cache.push_back(draw_cmd_info);
-		} else {
-			auto pipeline_it = render_cache.find(draw_cmd_info.pipeline_instance->getGraphicPipeline());
-			if (pipeline_it == render_cache.end())
-				pipeline_it = render_cache.emplace(draw_cmd_info.pipeline_instance->getGraphicPipeline(), MAP(GraphicPipelineInstance*, MAP(const Mesh*, std::vector<std::vector<PushConstantInfo>>))()).first;
-			auto material_it = pipeline_it->second.find(draw_cmd_info.pipeline_instance);
-			if (material_it == pipeline_it->second.end())
-				material_it = pipeline_it->second.emplace(draw_cmd_info.pipeline_instance, MAP(const Mesh*, std::vector<std::vector<PushConstantInfo>>)()).first;
-			auto mesh_it = material_it->second.find(draw_cmd_info.mesh);
-			if (mesh_it == material_it->second.end())
-				mesh_it = material_it->second.emplace(draw_cmd_info.mesh, std::vector<std::vector<PushConstantInfo>>()).first;
-
-			mesh_it->second.emplace_back(std::vector<PushConstantInfo>(draw_cmd_info.push_constants,
-																	   draw_cmd_info.push_constants + draw_cmd_info.push_constants_count));
-
-		}
+		HB_PROFILE_END();
 	}
 
 	const VK_Swapchain &VK_Renderer::getSwapchain() const {
@@ -460,6 +429,10 @@ namespace HBE {
 
 	uint32_t VK_Renderer::getCurrentFrame() const {
 		return current_frame;
+	}
+
+	RenderTarget *VK_Renderer::getUIRenderTarget() {
+		return ui_render_target;
 	}
 
 	RenderTarget *VK_Renderer::getDefaultRenderTarget() {
@@ -498,9 +471,13 @@ namespace HBE {
 		render_target_info.width = swapchain->getExtent().width;
 		render_target_info.height = swapchain->getExtent().height;
 		render_target_info.clear_color = vec4(0.f, 0.f, 0.f, 1.f);
-		render_target_info.format = IMAGE_FORMAT_RGBA32F;
-		render_target_info.flags = RENDER_TARGET_FLAG_DEPTH_TEST;
+		render_target_info.format = IMAGE_FORMAT_SRGBA8_NON_LINEAR;
+		render_target_info.flags = RENDER_TARGET_FLAG_COLOR_ATTACHMENT | RENDER_TARGET_FLAG_DEPTH_ATTACHMENT;
+
 		main_render_target = Resources::createRenderTarget(render_target_info, "DEFAULT_RENDER_TARGET");
+
+		render_target_info.flags = RENDER_TARGET_FLAG_COLOR_ATTACHMENT;
+		ui_render_target = Resources::createRenderTarget(render_target_info, "UI_RENDER_TARGET");
 
 		ShaderInfo shader_info{};
 		shader_info.stage = SHADER_STAGE_VERTEX;
@@ -520,12 +497,10 @@ namespace HBE {
 		screen_pipeline = new VK_GraphicPipeline(device, this, pipeline_info, swapchain->getRenderPass());
 		Resources::add("DEFAULT_SCREEN_PIPELINE", screen_pipeline);
 
-		GraphicPipelineInstanceInfo screen_material_info{};
-		screen_material_info.graphic_pipeline = screen_pipeline;
-		screen_material = new VK_GraphicPipelineInstance(this, screen_material_info);
-		Resources::add("DEFAULT_SCREEN_MATERIAL", screen_material);
-
-		push_constant_blocks.emplace_back((char *) (malloc(PUSH_CONSTANT_BLOCK_SIZE)));
+		GraphicPipelineInstanceInfo screen_pipeline_instance_info{};
+		screen_pipeline_instance_info.graphic_pipeline = screen_pipeline;
+		screen_pipeline_instance = new VK_GraphicPipelineInstance(this, screen_pipeline_instance_info);
+		Resources::add("DEFAULT_SCREEN_PIPELINE_INSTANCE", screen_pipeline_instance);
 	}
 
 	void VK_Renderer::waitCurrentFrame() {

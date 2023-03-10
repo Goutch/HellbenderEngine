@@ -10,7 +10,7 @@
 #include "VK_CommandPool.h"
 #include "raytracing/VK_TopLevelAccelerationStructure.h"
 #include "VK_StorageBuffer.h"
-
+#include "core/graphics/Graphics.h"
 namespace HBE {
 
 	VK_PipelineDescriptors::VK_PipelineDescriptors(VK_Renderer *renderer, const VK_PipelineLayout &layout) {
@@ -36,7 +36,7 @@ namespace HBE {
 
 		createDescriptorPool(descriptor_pool);
 		createDescriptorWrites(descriptor_pool);
-		renderer->onFrameChange.subscribe(this, &VK_PipelineDescriptors::onFrameChange);
+		Graphics::onFrameChange.subscribe(this, &VK_PipelineDescriptors::onFrameChange);
 	}
 
 
@@ -304,7 +304,7 @@ namespace HBE {
 		return descriptor_set_layout_bindings[it->second].binding;
 	}
 
-	void VK_PipelineDescriptors::setTextureArray(uint32_t binding, const Texture **textures, uint32_t texture_count, uint32_t frame, int32_t mip_level) {
+	void VK_PipelineDescriptors::setTextureArray(uint32_t binding, Texture **textures, uint32_t texture_count, uint32_t frame, int32_t mip_level) {
 
 		HB_ASSERT(frame < int32_t(MAX_FRAMES_IN_FLIGHT), "Frame index out of range");
 		uint32_t binding_index = uniform_binding_to_index[binding];
@@ -312,30 +312,37 @@ namespace HBE {
 		HB_ASSERT(binding_info.descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ||
 				  binding_info.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_IMAGE ||
 				  binding_info.descriptorType == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, "binding#" + std::to_string(binding) + " is not a texture");
-		const VK_Image **vk_texture = reinterpret_cast<const VK_Image **>(textures);
-		std::vector<VkDescriptorImageInfo> image_infos;
-		image_infos.resize(texture_count);
 
-		for (uint32_t i = 0; i < texture_count; ++i) {
-			image_infos[i].imageLayout = vk_texture[i]->getImageLayout();
-			image_infos[i].imageView = vk_texture[i]->getImageView(mip_level);
-			image_infos[i].sampler = vk_texture[i]->getSampler();
+
+		VK_Image **vk_texture = reinterpret_cast<VK_Image **>(textures);
+		std::vector<VkDescriptorImageInfo> image_infos;
+
+		VkWriteDescriptorSet write_descriptor_set = descriptor_pool.writes[frame][binding_index];
+		image_infos.resize(write_descriptor_set.descriptorCount);
+		for (uint32_t i = 0; i < write_descriptor_set.descriptorCount; ++i) {
+			int index = i >= texture_count ? texture_count - 1 : i;
+
+			image_infos[i].imageLayout = vk_texture[index]->getImageLayout();
+			image_infos[i].imageView = vk_texture[index]->getImageView(mip_level);
+			image_infos[i].sampler = vk_texture[index]->getSampler();
+
+
 		}
 
 		if (frame < 0) {
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-				descriptor_pool.writes[i][binding_index].pImageInfo = image_infos.data();
+				write_descriptor_set.pImageInfo = image_infos.data();
 				vkUpdateDescriptorSets(device->getHandle(),
 									   1,
-									   &descriptor_pool.writes[i][binding_index],
+									   &write_descriptor_set,
 									   0,
 									   nullptr);
 			}
 		} else {
-			descriptor_pool.writes[frame][binding_index].pImageInfo = image_infos.data();
+			write_descriptor_set.pImageInfo = image_infos.data();
 			vkUpdateDescriptorSets(device->getHandle(),
 								   1,
-								   &descriptor_pool.writes[frame][binding_index],
+								   &write_descriptor_set,
 								   0,
 								   nullptr);
 		}

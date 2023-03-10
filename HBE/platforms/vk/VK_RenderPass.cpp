@@ -8,60 +8,23 @@
 
 namespace HBE {
 
-	VkFormat getVkFormat(IMAGE_FORMAT format) {
-		switch (format) {
-
-			case IMAGE_FORMAT_R8:
-				return VK_FORMAT_R8_SRGB;
-				break;
-			case IMAGE_FORMAT_RG8:
-				return VK_FORMAT_R8G8_SRGB;
-				break;
-			case IMAGE_FORMAT_RGB8:
-				return VK_FORMAT_R8G8B8_SRGB;
-				break;
-			case IMAGE_FORMAT_RGBA8:
-				return VK_FORMAT_R8G8B8A8_SRGB;
-				break;
-			case IMAGE_FORMAT_R32F:
-				return VK_FORMAT_R32_SFLOAT;
-				break;
-			case IMAGE_FORMAT_RG32F:
-				return VK_FORMAT_R32G32_SFLOAT;
-				break;
-			case IMAGE_FORMAT_RGB32F:
-				return VK_FORMAT_R32G32B32_SFLOAT;
-				break;
-			case IMAGE_FORMAT_RGBA32F:
-				return VK_FORMAT_R32G32B32A32_SFLOAT;
-				break;
-			case IMAGE_FORMAT_DEPTH32F:
-				return VK_FORMAT_D32_SFLOAT;
-				break;
-			case IMAGE_FORMAT_DEPTH32f_STENCIL8U:
-				return VK_FORMAT_D32_SFLOAT_S8_UINT;
-				break;
-			case IMAGE_FORMAT_DEPTH24f_STENCIL8U:
-				return VK_FORMAT_D24_UNORM_S8_UINT;
-				break;
-		}
-		return VK_FORMAT_R32_SFLOAT;
-	}
-
 	VK_RenderPass::VK_RenderPass(VK_Renderer *renderer, const RenderTargetInfo &info) {
 		this->renderer = renderer;
 		this->device = renderer->getDevice();
 		this->width = info.width;
 		this->height = info.height;
 		this->clear_color = info.clear_color;
-		this->vk_format = getVkFormat(info.format);
+		this->vk_format = VK_Image::getVkFormat(info.format);
 		this->format = info.format;
+		this->has_color_attachment = info.flags & RENDER_TARGET_FLAG_COLOR_ATTACHMENT;
+		this->has_depth_attachment = info.flags & RENDER_TARGET_FLAG_DEPTH_ATTACHMENT;
+		this->clear_color_enabled = info.flags & RENDER_TARGET_FLAG_CLEAR_COLOR;
+		this->clear_depth_enabled = info.flags & RENDER_TARGET_FLAG_CLEAR_DEPTH;
 		this->flags = info.flags;
 		recreate();
 	}
 
 	void VK_RenderPass::recreate() {
-
 		if (handle != VK_NULL_HANDLE) {
 			renderer->waitAll();
 			vkDestroyRenderPass(device->getHandle(), handle, nullptr);
@@ -69,36 +32,43 @@ namespace HBE {
 				vkDestroyFramebuffer(device->getHandle(), framebuffer, nullptr);
 			}
 			for (size_t i = 0; i < images.size(); ++i) {
-				delete images[i];
-				if (flags & RENDER_TARGET_FLAG_DEPTH_TEST)
+				if (has_color_attachment)
+					delete images[i];
+				if (has_depth_attachment)
 					delete depth_images[i];
 			}
-			images.clear();
-			if (flags & RENDER_TARGET_FLAG_DEPTH_TEST)
-				depth_images.clear();
-			frame_buffers.clear();
 
+			images.clear();
+			depth_images.clear();
+			frame_buffers.clear();
 		}
 
-		VkAttachmentDescription colorAttachment{};
-		colorAttachment.format = vk_format;
-		colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-		colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-		colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-		colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		colorAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
+		VkRenderPassCreateInfo render_pass_info{};
+		std::vector<VkSubpassDescription> subpass_descriptions;
+		std::vector<VkSubpassDependency> subpass_dependencies;
+		std::vector<VkAttachmentDescription> attachments;
 		VkAttachmentReference color_attachment_ref{};
-		color_attachment_ref.attachment = 0;
-		color_attachment_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		VkAttachmentReference depth_attachment_ref{};
 
-		VkAttachmentDescription depthAttachment{};
-		VkAttachmentReference depthAttachmentRef{};
+		if (has_color_attachment) {
 
-		if (flags & RENDER_TARGET_FLAG_DEPTH_TEST) {
-			depthAttachment.format = getVkFormat(IMAGE_FORMAT_DEPTH32F);
+			VkAttachmentDescription colorAttachment{};
+			colorAttachment.format = vk_format;
+			colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+			colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+			colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+			colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+			colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+			colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+			colorAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			attachments.push_back(colorAttachment);
+
+			color_attachment_ref.attachment = attachments.size() - 1;
+			color_attachment_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		}
+		if (has_depth_attachment) {
+			VkAttachmentDescription depthAttachment{};
+			depthAttachment.format = VK_Image::getVkFormat(IMAGE_FORMAT_DEPTH32F);
 			depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 			depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 			depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
@@ -106,27 +76,29 @@ namespace HBE {
 			depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 			depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 			depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+			attachments.push_back(depthAttachment);
 
-			depthAttachmentRef.attachment = 1;
-			depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+			depth_attachment_ref.attachment = attachments.size() - 1;
+			depth_attachment_ref.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 		}
-
 
 		VkSubpassDescription subpass{};
 		subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+		subpass.pColorAttachments = has_color_attachment ? &color_attachment_ref : nullptr;
+		subpass.pDepthStencilAttachment = has_depth_attachment ? &depth_attachment_ref : nullptr;
 		subpass.colorAttachmentCount = 1;
-		subpass.pColorAttachments = &color_attachment_ref;
-		if (flags & RENDER_TARGET_FLAG_DEPTH_TEST)
-			subpass.pDepthStencilAttachment = &depthAttachmentRef;
+		subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+		subpass_descriptions.push_back(subpass);
 
-		std::array<VkAttachmentDescription, 2> attachments = {colorAttachment, depthAttachment};
 
-		VkRenderPassCreateInfo render_pass_info{};
 		render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-		render_pass_info.attachmentCount = (flags & RENDER_TARGET_FLAG_DEPTH_TEST) ? 2 : 1;
+		render_pass_info.attachmentCount = attachments.size();
 		render_pass_info.pAttachments = attachments.data();
-		render_pass_info.subpassCount = 1;
-		render_pass_info.pSubpasses = &subpass;
+		render_pass_info.subpassCount = subpass_descriptions.size();
+		render_pass_info.pSubpasses = subpass_descriptions.data();
+		render_pass_info.dependencyCount = subpass_dependencies.size();
+		render_pass_info.pDependencies = subpass_dependencies.data();
+
 
 		/*VkSubpassDependency dependency{};
 		dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
@@ -145,7 +117,11 @@ namespace HBE {
 		render_pass_info.dependencyCount = 1;
 		render_pass_info.pDependencies = &dependency;*/
 
-		if (vkCreateRenderPass(device->getHandle(), &render_pass_info, nullptr, &handle) != VK_SUCCESS) {
+		if (
+				vkCreateRenderPass(device
+										   ->
+												   getHandle(), &render_pass_info,
+								   nullptr, &handle) != VK_SUCCESS) {
 			Log::error("failed to create render pass!");
 		}
 		createFramebuffers();
@@ -162,8 +138,10 @@ namespace HBE {
 	VK_RenderPass::~VK_RenderPass() {
 
 		for (size_t i = 0; i < images.size(); ++i) {
-			delete images[i];
-			if (flags & RENDER_TARGET_FLAG_DEPTH_TEST) delete depth_images[i];
+			if (has_color_attachment)
+				delete images[i];
+			if (has_depth_attachment)
+				delete depth_images[i];
 		}
 		for (auto framebuffer: frame_buffers) {
 			vkDestroyFramebuffer(device->getHandle(), framebuffer, nullptr);
@@ -180,22 +158,21 @@ namespace HBE {
 		renderPassInfo.renderArea.offset = {0, 0};
 		renderPassInfo.renderArea.extent = {width, height};
 
-		if (flags & RENDER_TARGET_FLAG_DEPTH_TEST) {
-			std::array<VkClearValue, 2> clearValues{};
-			clearValues[0].color = {clear_color.r, clear_color.g, clear_color.b, clear_color.a};
-			clearValues[1].depthStencil = {1.0f, 0};
-			renderPassInfo.clearValueCount = 2;
-			renderPassInfo.pClearValues = clearValues.data();
+		renderPassInfo.clearValueCount = has_color_attachment + has_depth_attachment;
 
-			vkCmdBeginRenderPass(command_buffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-		} else {
-			VkClearValue clearColor = {clear_color.r, clear_color.g, clear_color.b, clear_color.a,};
-			renderPassInfo.clearValueCount = 1;
-			renderPassInfo.pClearValues = &clearColor;
-
-			vkCmdBeginRenderPass(command_buffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+		std::array<VkClearValue, 2> clear_values{};
+		uint32_t clear_value_count = 0;
+		if (has_color_attachment) {
+			clear_values[clear_value_count].color = {clear_color.x, clear_color.y, clear_color.z, clear_color.w};
+			clear_value_count++;
 		}
-
+		if (has_depth_attachment) {
+			clear_values[clear_value_count].depthStencil = {1.0f, 0};
+			clear_value_count++;
+		}
+		renderPassInfo.pClearValues = clear_values.data();
+		renderPassInfo.clearValueCount = clear_value_count;
+		vkCmdBeginRenderPass(command_buffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 	}
 
 	const VkRenderPass &VK_RenderPass::getHandle() const {
@@ -205,17 +182,24 @@ namespace HBE {
 	void VK_RenderPass::end(const VkCommandBuffer &command_buffer) const {
 		vkCmdEndRenderPass(command_buffer);
 
-        /*VkImageMemoryBarrier image_barrier{};
-		vkCmdPipelineBarrier(command_buffer,
-                             VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
-                             VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-                             VK_DEPENDENCY_BY_REGION_BIT,
-                             0,
-                             nullptr,
-                             0,
-                             nullptr,
-                             0,
-                             nullptr);*/
+		/*VkMemoryBarrier2 image_barrier{};
+		image_barrier.sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER_2;
+		image_barrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_SHADER_WRITE_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
+		image_barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+		image_barrier.srcStageMask = VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT | VK_PIPELINE_STAGE_TRANSFER_BIT;
+		image_barrier.dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+
+		VkDependencyInfo dependency_info{};
+		dependency_info.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO_KHR;
+		dependency_info.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+		dependency_info.pImageMemoryBarriers = nullptr;
+		dependency_info.imageMemoryBarrierCount = 0;
+		dependency_info.pBufferMemoryBarriers = nullptr;
+		dependency_info.bufferMemoryBarrierCount = 0;
+		dependency_info.pMemoryBarriers = &image_barrier;
+		dependency_info.memoryBarrierCount = 1;
+		device->vkCmdPipelineBarrier2(command_buffer, &dependency_info);*/
 	}
 
 	void VK_RenderPass::createFramebuffers() {
@@ -224,18 +208,22 @@ namespace HBE {
 		std::vector<VkImageView> depth_image_views;
 		images.resize(MAX_FRAMES_IN_FLIGHT);
 		image_views.resize(MAX_FRAMES_IN_FLIGHT);
-		for (size_t i = 0; i < images.size(); ++i) {
-			TextureInfo info{};
-			info.format = format;
-			info.width = width;
-			info.height = height;
-			info.generate_mip_maps = false;
-			info.flags = IMAGE_FLAG_RENDER_TARGET;
-			images[i] = new VK_Image(renderer->getDevice(), info);
-			image_views[i] = images[i]->getImageView();
+
+		if (has_color_attachment) {
+			for (size_t i = 0; i < images.size(); ++i) {
+				TextureInfo info{};
+				info.format = format;
+				info.width = width;
+				info.height = height;
+				info.generate_mip_maps = false;
+				info.flags = IMAGE_FLAG_RENDER_TARGET;
+				images[i] = new VK_Image(renderer->getDevice(), info);
+				image_views[i] = images[i]->getImageView();
+			}
 		}
 
-		if ((flags & RENDER_TARGET_FLAG_DEPTH_TEST) == RENDER_TARGET_FLAG_DEPTH_TEST) {
+
+		if (has_depth_attachment) {
 			depth_images.resize(MAX_FRAMES_IN_FLIGHT);
 			depth_image_views.resize(MAX_FRAMES_IN_FLIGHT);
 			for (size_t i = 0; i < depth_images.size(); ++i) {
@@ -249,44 +237,29 @@ namespace HBE {
 			}
 		}
 
-		frame_buffers.resize(image_views.size());
-		for (size_t i = 0; i < image_views.size(); ++i) {
-			if (flags & RENDER_TARGET_FLAG_DEPTH_TEST) {
-				std::array<VkImageView, 2> attachments = {
-						image_views[i],
-						depth_image_views[i]
-				};
+		frame_buffers.resize(MAX_FRAMES_IN_FLIGHT);
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+			std::vector<VkImageView> attachments;
 
-				VkFramebufferCreateInfo framebuffer_create_info{};
-				framebuffer_create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-				framebuffer_create_info.renderPass = handle;
-				framebuffer_create_info.attachmentCount = attachments.size();
-				framebuffer_create_info.pAttachments = attachments.data();
-				framebuffer_create_info.width = width;
-				framebuffer_create_info.height = height;
-				framebuffer_create_info.layers = 1;
-				if (vkCreateFramebuffer(device->getHandle(), &framebuffer_create_info, nullptr, &frame_buffers[i]) !=
-					VK_SUCCESS) {
-					Log::error("Failed to create framebuffer!");
-				}
-
-			} else {
-
-				VkFramebufferCreateInfo framebuffer_create_info{};
-				framebuffer_create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-				framebuffer_create_info.renderPass = handle;
-				framebuffer_create_info.attachmentCount = 1;
-				framebuffer_create_info.pAttachments = &image_views[i];
-				framebuffer_create_info.width = width;
-				framebuffer_create_info.height = height;
-				framebuffer_create_info.layers = 1;
-				if (vkCreateFramebuffer(device->getHandle(), &framebuffer_create_info, nullptr, &frame_buffers[i]) !=
-					VK_SUCCESS) {
-					Log::error("Failed to create framebuffer!");
-				}
+			if (has_color_attachment) {
+				attachments.push_back(image_views[i]);
+			}
+			if (has_depth_attachment) {
+				attachments.push_back(depth_image_views[i]);
 			}
 
-
+			VkFramebufferCreateInfo framebuffer_create_info{};
+			framebuffer_create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+			framebuffer_create_info.renderPass = handle;
+			framebuffer_create_info.attachmentCount = has_color_attachment + has_depth_attachment;
+			framebuffer_create_info.pAttachments = attachments.data();
+			framebuffer_create_info.width = width;
+			framebuffer_create_info.height = height;
+			framebuffer_create_info.layers = 1;
+			if (vkCreateFramebuffer(device->getHandle(), &framebuffer_create_info, nullptr, &frame_buffers[i]) !=
+				VK_SUCCESS) {
+				Log::error("Failed to create framebuffer!");
+			}
 		}
 	}
 
@@ -313,6 +286,7 @@ namespace HBE {
 		HB_ASSERT(frame < images.size(), "Frame index out of bounds");
 		return images[frame];
 	}
+
 }
 
 

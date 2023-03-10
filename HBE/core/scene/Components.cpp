@@ -8,90 +8,94 @@
 #include <core/resource/RenderTarget.h>
 #include <core/resource/Resources.h>
 #include <vector>
+#include "Application.h"
+#include "core/scene/Scene.h"
 
 namespace HBE {
 	void Transform::translate(vec3 translation) {
-		local = glm::translate(local, translation);
+		is_dirty = true;
+		local_mat = glm::translate(local_mat, translation);
 	}
 
 	vec3 Transform::position() const {
-		return local[3];
+		return local_mat[3];
 	}
 
-	vec3 Transform::worldPosition() const {
+	vec3 Transform::worldPosition() {
 		mat4 mat_world = world();
 		return vec3(mat_world[3].x, mat_world[3].y, mat_world[3].z);
 	}
 
 	vec3 Transform::front() const {
-		return glm::normalize(world()[2]);
+		return glm::normalize(local_mat[2]);
 	}
 
 	vec3 Transform::back() const {
-		return -glm::normalize(world()[2]);
+		return -glm::normalize(local_mat[2]);
 	}
 
 	vec3 Transform::right() const {
-		return glm::normalize(world()[0]);
+		return glm::normalize(local_mat[0]);
 	}
 
 	vec3 Transform::left() const {
-		return -glm::normalize(world()[0]);
+		return -glm::normalize(local_mat[0]);
 	}
 
 	vec3 Transform::up() const {
-		return glm::normalize(world()[1]);
+		return glm::normalize(local_mat[1]);
 	}
 
 	vec3 Transform::down() const {
-		return -glm::normalize(world()[1]);
+		return -glm::normalize(local_mat[1]);
 	}
 
-	vec3 Transform::worldForward() const {
+	vec3 Transform::worldForward() {
 		return glm::normalize(world()[2]);
 	}
 
-	vec3 Transform::worldBackward() const {
+	vec3 Transform::worldBackward() {
 		return -glm::normalize(world()[2]);
 	}
 
-	vec3 Transform::worldRight() const {
+	vec3 Transform::worldRight() {
 		return glm::normalize(world()[0]);
 	}
 
-	vec3 Transform::worldLeft() const {
+	vec3 Transform::worldLeft() {
 		return -glm::normalize(world()[0]);
 	}
 
-	vec3 Transform::worldUp() const {
+	vec3 Transform::worldUp() {
 		return glm::normalize(world()[1]);
 	}
 
-	vec3 Transform::worldDown() const {
+	vec3 Transform::worldDown() {
 		return -glm::normalize(world()[1]);
 
 	}
 
 	void Transform::setRotation(quat rot) {
-		vec3 s = scale();
+		vec3 s = localScale();
 		vec3 pos = position();
-		local = mat4(1.0f);
+		local_mat = mat4(1.0f);
 		rotate(rot);
 		setPosition(pos);
-		setScale(s);
+		setLocalScale(s);
 	}
 
 	void Transform::setRotation(vec3 rot) {
-		vec3 s = scale();
+		vec3 s = localScale();
 		vec3 pos = position();
-		local = mat4(1.0f);
+		local_mat = mat4(1.0f);
 		rotate(rot);
 		setPosition(pos);
-		setScale(s);
+		setLocalScale(s);
 	}
 
 	void Transform::rotate(quat rot) {
-		local *= glm::mat4_cast(rot);
+		is_dirty = true;
+		local_mat *= glm::mat4_cast(rot);
 	}
 
 	void Transform::rotate(vec3 rot) {
@@ -99,54 +103,76 @@ namespace HBE {
 	}
 
 	void Transform::setPosition(vec3 pos) {
-		local[3].x = pos.x;
-		local[3].y = pos.y;
-		local[3].z = pos.z;
+		is_dirty = true;
+		local_mat[3].x = pos.x;
+		local_mat[3].y = pos.y;
+		local_mat[3].z = pos.z;
 	}
 
-	mat4 Transform::world() const {
-		return parent == nullptr ? local : parent->world() * local;
+	const mat4 &Transform::world() {
+		Entity parent = entity.getScene()->getParent(entity);
+		if (parent.valid() && parent.has<Transform>()) {
+			if (is_dirty) {
+				is_dirty = false;
+				world_mat = parent.get<Transform>().world() * local_mat;
+			}
+			return world_mat;
+		}
+		return local_mat;
 	}
 
 	quat Transform::rotation() const {
-		return glm::quat_cast(local);
+		return glm::quat_cast(local_mat);
 	}
 
-	quat Transform::worldRotation() const {
-		return parent == nullptr ? rotation() : rotation() * parent->worldRotation();
+	quat Transform::worldRotation() {
+		Entity parent = entity.getParent();
+		if (parent.valid() && parent.has<Transform>()) {
+
+			return rotation() * parent.get<Transform>().worldRotation();
+		}
+		return rotation();
 	}
 
 	vec3 Transform::eulerRotation() const {
 		return glm::eulerAngles(rotation());
 	}
 
-	vec3 Transform::worldEulerRotation() const {
-		return parent == nullptr ? glm::eulerAngles(rotation()) : glm::eulerAngles(glm::quat_cast(local) * parent->worldRotation());
+	vec3 Transform::worldEulerRotation() {
+		return glm::eulerAngles(worldRotation());
 	}
 
-	void Transform::setScale(vec3 s) {
-		local = glm::scale(local, vec3(1, 1, 1) / scale());
-		local = glm::scale(local, s);
+	void Transform::setLocalScale(vec3 s) {
+		is_dirty = true;
+		local_mat = glm::scale(local_mat, vec3(1, 1, 1) / localScale());
+		local_mat = glm::scale(local_mat, s);
 	}
 
-	vec3 Transform::scale() const {
-
-		return vec3(glm::length(local[0]),
-					glm::length(local[1]),
-					glm::length(local[2]));
+	vec3 Transform::localScale() const {
+		return vec3(glm::length(local_mat[0]),
+					glm::length(local_mat[1]),
+					glm::length(local_mat[2]));
 
 	}
 
-	
-//---------------------------------------CAMERA---------------------------------------
-	void Camera::calculateProjection() {
-		projection = glm::perspective<float>(glm::radians(fov), aspectRatio(), near, render_distance);
-		projection[1] = -projection[1];
+	void Transform::setLocal(const mat4 &local) {
+		is_dirty = true;
+		local_mat = local;
 	}
 
-	float Camera::aspectRatio() {
-		vec2i res = render_target->getResolution();
-		return static_cast<float>(res.x) / static_cast<float>(res.y);
+	const mat4 &Transform::local() const {
+		return local_mat;
+	}
+
+	void Transform::setWorldScale(vec3 s) {
+		setLocalScale(s / worldScale());
+	}
+
+	vec3 Transform::worldScale() {
+		const mat4 &world_mat = world();
+		return vec3(glm::length(world_mat[0]),
+					glm::length(world_mat[1]),
+					glm::length(world_mat[2]));
 	}
 
 
@@ -206,13 +232,69 @@ namespace HBE {
 		return vec2(glm::length(local[0]),
 					glm::length(local[1]));
 	}
+//---------------------------------------CAMERA---------------------------------------
 
-	void Camera2D::calculateProjection() {
+	float Camera::aspectRatio() {
+		vec2i res = render_target->getResolution();
+		return static_cast<float>(res.x) / static_cast<float>(res.y);
+	}
+
+	void Camera::calculateProjection(RenderTarget *render_target) {
+		projection = glm::perspective<float>(glm::radians(fov), aspectRatio(), near, far);
+		projection[1] = -projection[1];
+	}
+
+	void Camera::setRenderTarget(RenderTarget *render_target) {
+		if (render_target != nullptr)
+			render_target->onResolutionChange.unsubscribe(this);
+		this->render_target = render_target;
+
+		render_target->onResolutionChange.subscribe(this, &Camera::calculateProjection);
+		calculateProjection(render_target);
+	}
+
+	RenderTarget *Camera::getRenderTarget() {
+		return render_target;
+	}
+
+	Camera::Camera(const Camera &other) {
+		setRenderTarget(other.render_target);
+	}
+
+	void Camera::setFOV(float fov) {
+		this->fov = fov;
+		calculateProjection(render_target);
+	}
+
+	float Camera::getFOV() {
+		return fov;
+	}
+
+	void Camera::setNearPlane(float near) {
+		this->near = near;
+		calculateProjection(render_target);
+	}
+
+	void Camera::setFarPlane(float far) {
+		this->far = far;
+		calculateProjection(render_target);
+	}
+
+	float Camera::getNearPlane() {
+		return near;
+	}
+
+	float Camera::getFarPlane() {
+		return far;
+	}
+	//---------------------------------------CAMERA2D---------------------------------------
+
+	void Camera2D::calculateProjection(RenderTarget *render_target) {
 		float aspect_ratio = aspectRatio();
 		if (zoom_ratio < 0.1)
 			zoom_ratio = 0.1;
 		projection = glm::ortho(zoom_ratio * -0.5f * aspect_ratio, zoom_ratio * 0.5f * aspect_ratio, zoom_ratio * 0.5f, zoom_ratio * -.5f, near, far);
-		projection[1] = -projection[1];
+		//projection[1] = -projection[1];
 	}
 
 	float Camera2D::aspectRatio() {
@@ -220,166 +302,97 @@ namespace HBE {
 		return static_cast<float>(res.x) / static_cast<float>(res.y);
 	}
 
-	void TextRenderer::buildMesh() {
+	Camera2D::Camera2D(const Camera2D &other) {
+		setRenderTarget(other.render_target);
+	}
 
-		uint32_t vertex_size = 3 + 2;
-		uint32_t quad_size = 4 * vertex_size;
-		std::vector<float> vertex_buffer;
-		vertex_buffer.reserve(quad_size * text_length);
-		std::vector<uint32_t> index_buffer;
-		index_buffer.reserve(6 * text_length);
-		std::vector<float> line_widths;
-		std::vector<uint32_t> line_character_counts;
-		line_character_counts.push_back(0);
-		int line = 1;
-		float horizontal_offset = 0;
-		total_width = 0;
-		int vertex_count = 0;
-		for (int i = 0; i < text_length; ++i) {
-			if (text[i] == '\n') {
-				line++;
-				line_widths.push_back(horizontal_offset);
-				line_character_counts.push_back(0);
-				total_width = std::max(total_width, horizontal_offset);
-				horizontal_offset = 0;
-				continue;
-			} else if (text[i] == ' ') {
-				horizontal_offset += space_width;
-				continue;
-			}
-			line_character_counts.back()++;
-			Glyph glyph = font->getCharacterGlyph(text[i]);
+	void Camera2D::setRenderTarget(RenderTarget *render_target) {
+		if (render_target != nullptr)
+			render_target->onResolutionChange.unsubscribe(this);
+		this->render_target = render_target;
 
-			size_t vertices_index = vertex_buffer.size();
-			vertex_buffer.resize(vertex_buffer.size() + quad_size);
+		render_target->onResolutionChange.subscribe(this, &Camera2D::calculateProjection);
+		calculateProjection(render_target);
+	}
 
-			//1---2
-			//| / |
-			//0---3
+	RenderTarget *Camera2D::getRenderTarget() {
+		return render_target;
+	}
 
-			//v0 bottom left
-			//position
-			vertex_buffer[vertices_index] = horizontal_offset;
-			vertex_buffer[vertices_index + 1] = (line * -line_height) - glyph.offset.y;
-			vertex_buffer[vertices_index + 2] = 0;
+	void Camera2D::setNearPlane(float near) {
+		this->near = near;
+		calculateProjection(render_target);
+	}
 
-			//uv
-			vertex_buffer[vertices_index + 3] = glyph.uv_min.x;
-			vertex_buffer[vertices_index + 4] = glyph.uv_min.y;
+	void Camera2D::setFarPlane(float far) {
+		this->far = far;
+		calculateProjection(render_target);
+	}
 
-			//v1 top left
-			//position
-			vertex_buffer[vertices_index + 5] = horizontal_offset;
-			vertex_buffer[vertices_index + 6] = (line * -line_height) + glyph.size.y - glyph.offset.y;
-			vertex_buffer[vertices_index + 7] = 0;
+	float Camera2D::getNearPlane() {
+		return near;
+	}
 
-			//uv
-			vertex_buffer[vertices_index + 8] = glyph.uv_min.x;
-			vertex_buffer[vertices_index + 9] = glyph.uv_max.y;
+	float Camera2D::getFarPlane() {
+		return far;
+	}
 
-			//v2 top right
-			//position
-			vertex_buffer[vertices_index + 10] = horizontal_offset + glyph.size.x;
-			vertex_buffer[vertices_index + 11] = (line * -line_height) + glyph.size.y - glyph.offset.y;
-			vertex_buffer[vertices_index + 12] = 0;
-			//uv
-			vertex_buffer[vertices_index + 13] = glyph.uv_max.x;
-			vertex_buffer[vertices_index + 14] = glyph.uv_max.y;
+	float Camera2D::getZoomRatio() {
+		return zoom_ratio;
+	}
 
-			//v3 bottom right
-			//position
-			vertex_buffer[vertices_index + 15] = horizontal_offset + glyph.size.x;
-			vertex_buffer[vertices_index + 16] = (line * -line_height) - glyph.offset.y;
-			vertex_buffer[vertices_index + 17] = 0;
-			//uv
-			vertex_buffer[vertices_index + 18] = glyph.uv_max.x;
-			vertex_buffer[vertices_index + 19] = glyph.uv_min.y;
+	void Camera2D::setZoomRatio(float ratio) {
+		zoom_ratio = ratio;
+		calculateProjection(render_target);
+	}
 
-			size_t indecies_index = index_buffer.size();
-			index_buffer.resize(index_buffer.size() + 6);
-			index_buffer[indecies_index] = vertex_count;
-			index_buffer[indecies_index + 1] = vertex_count + 1;
-			index_buffer[indecies_index + 2] = vertex_count + 2;
-			index_buffer[indecies_index + 3] = vertex_count + 2;
-			index_buffer[indecies_index + 4] = vertex_count + 3;
-			index_buffer[indecies_index + 5] = vertex_count;
-			horizontal_offset += glyph.size.x;
-			vertex_count += 4;
-		}
-		line_widths.push_back(horizontal_offset);
-		line_character_counts.push_back(0);
-		total_width = std::max(total_width, horizontal_offset);
-		total_height = static_cast<float>(line) * line_height;
+	//---------------------------------------PIXELCAMERA---------------------------------------
+	float PixelCamera::aspectRatio() {
+		vec2i res = render_target->getResolution();
+		return static_cast<float>(res.x) / static_cast<float>(res.y);
+	}
 
+	PixelCamera::PixelCamera(const PixelCamera &other) {
+		setRenderTarget(other.render_target);
+	}
 
-		int current_line = 0;
-		int vertex_index = 0;
-		for (int i = 0; i < vertex_buffer.size() / 5; ++i) {
-			if (line_character_counts[current_line] * 4 == vertex_index) {
-				current_line++;
-				vertex_index = 0;
-			}
+	void PixelCamera::setRenderTarget(RenderTarget *render_target) {
+		if (render_target != nullptr)
+			render_target->onResolutionChange.unsubscribe(this);
+		this->render_target = render_target;
 
-			switch (alignment) {
-				case TEXT_ALIGNMENT_LEFT:
+		render_target->onResolutionChange.subscribe(this, &PixelCamera::calculateProjection);
+		calculateProjection(render_target);
 
-					break;
-				case TEXT_ALIGNMENT_RIGHT:
-					vertex_buffer[i * 5] += total_width - line_widths[current_line];
-					break;
-				case TEXT_ALIGNMENT_CENTER:
-					vertex_buffer[i * 5] += (total_width - line_widths[current_line]) * 0.5f;
-					break;
-			}
-			switch (pivot) {
-				case PIVOT_TOP_LEFT:
-					break;
-				case PIVOT_TOP_CENTER:
-					vertex_buffer[i * 5] -= total_width * 0.5f;
-					break;
-				case PIVOT_TOP_RIGHT:
-					vertex_buffer[i * 5] -= total_width;
-					break;
-				case PIVOT_CENTER_LEFT:
-					vertex_buffer[i * 5 + 1] += total_height * 0.5f;
-					break;
-				case PIVOT_CENTER:
-					vertex_buffer[i * 5] -= total_width * 0.5f;
-					vertex_buffer[i * 5 + 1] += total_height * 0.5f;
-					break;
-				case PIVOT_CENTER_RIGHT:
-					vertex_buffer[i * 5] -= total_width;
-					vertex_buffer[i * 5 + 1] += total_height * 0.5f;
-					break;
-				case PIVOT_BOTTOM_LEFT:
-					vertex_buffer[i * 5 + 1] += total_height;
-					break;
-				case PIVOT_BOTTOM_CENTER:
-					vertex_buffer[i * 5] -= total_width * 0.5f;
-					vertex_buffer[i * 5 + 1] -= total_height;
-					break;
-				case PIVOT_BOTTOM_RIGHT:
-					vertex_buffer[i * 5] -= total_width;
-					vertex_buffer[i * 5 + 1] += total_height;
-					break;
-			}
-			vertex_index++;
-		}
+	}
 
+	RenderTarget *PixelCamera::getRenderTarget() {
+		return render_target;
+	}
 
-		VertexAttributeInfo vertex_attribute_info{};
-		vertex_attribute_info.size = sizeof(float) * 5;
-		vertex_attribute_info.binding = 0;
-		vertex_attribute_info.flags = VERTEX_ATTRIBUTE_FLAG_NONE;
+	void PixelCamera::calculateProjection(RenderTarget *render_target) {
+		projection = glm::ortho(0.0f,
+								static_cast<float>(render_target->getResolution().x),
+								static_cast<float>(render_target->getResolution().y),
+								0.0f,
+								near, far);
+	}
 
-		MeshInfo mesh_info{};
-		mesh_info.flags = MESH_FLAG_NONE;
-		mesh_info.attribute_infos = &vertex_attribute_info;
-		mesh_info.attribute_info_count = 1;
+	void PixelCamera::setNearPlane(float near) {
+		this->near = near;
+		calculateProjection(render_target);
+	}
 
-		if (mesh == nullptr)
-			mesh = Resources::createMesh(mesh_info);
-		mesh->setBuffer(0, vertex_buffer.data(), vertex_count);
-		mesh->setVertexIndices(index_buffer.data(), index_buffer.size());
+	void PixelCamera::setFarPlane(float far) {
+		this->far = far;
+		calculateProjection(render_target);
+	}
+
+	float PixelCamera::getNearPlane() {
+		return near;
+	}
+
+	float PixelCamera::getFarPlane() {
+		return far;
 	}
 }

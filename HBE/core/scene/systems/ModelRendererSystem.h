@@ -10,7 +10,7 @@ namespace HBE {
 	public:
 		ModelRendererSystem(Scene* scene);
 		~ModelRendererSystem();
-		void draw();
+		void draw(RenderGraph* render_graph);
 	};
 
 }

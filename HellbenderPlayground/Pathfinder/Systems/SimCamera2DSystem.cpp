@@ -20,8 +20,7 @@ void SimCamera2DSystem::onAttachSimCamera(Entity entity) {
 }
 
 void SimCamera2DSystem::update(float delta) {
-	for (auto[entity, camera, sim_camera]:scene->group<Camera2D, SimCamera2D>()) {
-		camera.zoom_ratio = sim_camera.zoom_ratio.toFloat();
-		camera.calculateProjection();
+	for (auto [entity, camera, sim_camera]: scene->group<Camera2D, SimCamera2D>()) {
+		camera.setZoomRatio(sim_camera.zoom_ratio.toFloat());
 	}
 }

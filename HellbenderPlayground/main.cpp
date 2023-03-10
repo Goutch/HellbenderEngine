@@ -1,30 +1,38 @@
-#include <Examples/FontRendering.h>
+#include <Examples/TextScene.h>
 #include "HBE.h"
 #include "VoxelModule/VoxelModule.h"
 #include "Pathfinder/Pathfinder.h"
-#include "Examples/LoadModel.h"
-#include "Examples/MeshRendering.h"
-#include "Examples/Raytracing.h"
-#include "Examples/FontRendering.h"
-#include "Examples/CubeRendering.h"
+#include "Examples/ModelScene.h"
+#include "Examples/RaytracingScene.h"
+#include "Examples/TextScene.h"
+#include "Examples/CubeScene.h"
+#include "Examples/TriangleScene.h"
+#include "Examples/OrderedRenderingScene.h"
+#include "Games/Pong/PongGame.h"
 using namespace HBE;
 bool fullscreen = false;
+Scene *main_scene;
+Scene *ui_scene;
 
 void onAppUpdate(float delta) {
-	if (Input::getKeyDown(KEY::ESCAPE)) {
+	if (Input::getKeyDown(KEY_ESCAPE)) {
 		Application::quit();
 	}
-	if (Input::getKeyDown(KEY::F11)) {
+	if (Input::getKeyDown(KEY_F11)) {
 		fullscreen = !fullscreen;
 		Graphics::getWindow()->setFullscreen(fullscreen);
-
 	}
-	if (Input::getKeyDown(KEY::V)) {
+	if (Input::getKeyDown(KEY_V)) {
 		Configs::setVerticalSync(!Configs::getVerticalSync());
 	}
 
-	if (Input::getKeyDown(KEY::C)) {
-		Entity cam = Application::getScene()->getCameraEntity();
+	if (Input::getKeyDown(KEY_B)) {
+		if (ui_scene != nullptr) {
+			ui_scene->setActive(!ui_scene->isActive());
+		}
+	}
+	if (Input::getKeyDown(KEY_C)) {
+		Entity cam = main_scene->getCameraEntity();
 		if (cam.valid()) {
 			if (cam.has<CameraController>()) {
 				Input::setCursorVisible(true);
@@ -38,37 +46,19 @@ void onAppUpdate(float delta) {
 
 }
 
-/*#define STB_IMAGE_IMPLEMENTATION
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-
-#include "stb_image.h"
-#include "stb_image_write.h"
-
-void generateBlueNoiseRGB() {
-	FILE *file = fopen((RESOURCE_PATH + std::string("textures/BlueNoise.png")).c_str(), "rb");
-	int width, height, nb_channels;
-	unsigned char *data = stbi_load_from_file(file, &width, &height, &nb_channels, 0);
-	unsigned char *out = new unsigned char[width * height * 4];
-	for (int y = 0; y < height; ++y) {
-		for (int x = 0; x < width; ++x) {
-			int i = ((y * width) + x);
-			int index = i * 4;
-
-			out[index] = data[(i * nb_channels)];
-
-			int i2 = (i + (width * 1) + 1) % (width * height);
-			out[index + 1] = data[(i2 * nb_channels)];
-
-			int i3 = (i + (width * 2) + 2) % (width * height);
-			out[index + 2] = data[(i3 * nb_channels)];
-
-			out[index + 3] = 255;
-		}
+void onAppPresent() {
+	std::vector<Texture *> present_images;
+	if (main_scene != nullptr && main_scene->isActive() && main_scene->getMainCameraTexture() != nullptr) {
+		present_images.push_back(main_scene->getMainCameraTexture());
 	}
-	stbi_write_png((RESOURCE_PATH + std::string("textures/BlueNoise8.png")).c_str(), width, height, 4, out, width * 4);
-	stbi_image_free(data);
-	delete out;
-}*/
+	if (ui_scene != nullptr && ui_scene->isActive() && ui_scene->getMainCameraTexture() != nullptr) {
+		present_images.push_back(ui_scene->getMainCameraTexture());
+	}
+	PresentCmdInfo present_info;
+	present_info.image_count = present_images.size();
+	present_info.images = present_images.data();
+	Graphics::present(present_info);
+}
 
 int main() {
 	Application::init();
@@ -77,19 +67,31 @@ int main() {
 	//Pathfinder *pathfinder = new Pathfinder();
 
 	{
+		//-----------------------tests-------------------
+		main_scene = new TriangleScene();
+		//main_scene = new CubeScene();
+		//ModelScene load_model_scene = ModelScene();
+		//ui_scene= new TextScene();
+		//ui_scene = new OrderedRenderingScene();
+
+		//-----------------------projects-----------------
+		//main_scene = new RaytracingScene();
 		//Pathfinder pathfinder;
-		//MeshRendering::init();
-		//CubeRendering::init();
-		//LoadModelExemple::init();
-		//TextRenderingScene font_rendering_scene = TextRenderingScene();
-		RaytracingScene rts = RaytracingScene();
+
 		//-----------------------EVENTS------------------
 		Application::onUpdate.subscribe(&onAppUpdate);
+		//Application::onPresent.subscribe(&onAppPresent);
 		//-----------------------LOOP--------------------
 		Application::run();
 		//-----------------------CLEANUP------------------
 		Application::onUpdate.unsubscribe(&onAppUpdate);
+		//Application::onPresent.unsubscribe(&onAppPresent);
 		//-----------------------TERMINATE------------------
+
+		if (ui_scene != nullptr)
+			delete ui_scene;
+		if (main_scene != nullptr)
+			delete main_scene;
 	}
 	//delete pathfinder;
 	Application::terminate();

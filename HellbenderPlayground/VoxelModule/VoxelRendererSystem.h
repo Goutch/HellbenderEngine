@@ -18,6 +18,6 @@ class VoxelRendererSystem : public System {
 	std::vector<mat4> transforms;
 	~VoxelRendererSystem();
 public:
-	void draw();
+	void draw(RenderGraph* render_graph);
 	VoxelRendererSystem(Scene *scene);
 };
