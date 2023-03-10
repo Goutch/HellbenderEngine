@@ -16,6 +16,7 @@
 #### HB Graphics library:
 - 3D rendering
 - 2D rendering
+- Text/Font rendering
 - Instancing
 - Resource loading:
 	 - Textures
@@ -33,13 +34,13 @@
 	- Camera2D (orthographic)
 	- CameraController 
 	- MeshRenderer 
+- Sounds
 - Job System
 - Event system
 - keyboard and mouse input handling
 
 #### planned for Alpha 1.0:
 - Model loading and animations
-- Font rendering
 
 ## Getting started
 
