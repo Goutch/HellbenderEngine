@@ -29,11 +29,7 @@ set(EXEMPLES_FILES
         Examples/FPSCounter.h
         Examples/TriangleScene.h
         Examples/OrderedRenderingScene.h
-        Games/Pong/PongGame.h
-        Games/Pong/PongUIScene.cpp
-        Games/Pong/PongUIScene.h
-        Games/Pong/PongGameScene.cpp
-        Games/Pong/PongGameScene.h Games/Pong/PongGame.cpp Games/Pong/Systems/BallSystem.cpp Games/Pong/Systems/BallSystem.h Games/Pong/PongConstants.h Games/Pong/Systems/PaddleSystem.cpp Games/Pong/Systems/PaddleSystem.h)
+        )
 
 add_executable(${PROJECT_NAME}
         main.cpp

@@ -68,7 +68,7 @@ int main() {
 
 	{
 		//-----------------------tests-------------------
-		//main_scene = new TriangleScene();
+		main_scene = new TriangleScene();
 		//main_scene = new CubeScene();
 		//ModelScene load_model_scene = ModelScene();
 		//ui_scene= new TextScene();
@@ -77,9 +77,6 @@ int main() {
 		//-----------------------projects-----------------
 		//main_scene = new RaytracingScene();
 		//Pathfinder pathfinder;
-
-		//-----------------------Games--------------------
-		Pong::PongGame pong = Pong::PongGame();
 
 		//-----------------------EVENTS------------------
 		Application::onUpdate.subscribe(&onAppUpdate);

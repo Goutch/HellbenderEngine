@@ -1,10 +1,10 @@
 #pragma once
 
 #include "HBE.h"
-#include "Examples/FPSCounter.h"
+#include "FPSCounter.h"
 
 using namespace HBE;
-namespace Pong {
+namespace PongLockstep {
 	struct PongGameState;
 
 	class PongUIScene : public Scene {

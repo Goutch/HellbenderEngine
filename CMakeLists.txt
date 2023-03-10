@@ -11,5 +11,7 @@ if(CMAKE_BUILD_TYPE EQUAL "RELEASE")
 endif(CMAKE_BUILD_TYPE EQUAL "RELEASE")
 add_subdirectory("HBE/")
 add_subdirectory("HellbenderPlayground/")
+add_subdirectory("Games/Pong/")
+add_subdirectory("Games/PongLockstep/")
 
 
