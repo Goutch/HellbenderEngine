@@ -1,12 +1,14 @@
 #pragma once
 
 #include "HBE.h"
+#include "simulation/fixed.h"
 
 using namespace HBE;
+using namespace locknet;
 namespace PongLockstep {
 	struct Area {
-		vec2 position;
-		vec2 size;
+		vec2fix16 position;
+		vec2fix16 size;
 	};
 
 	struct PongGameState;
@@ -41,10 +43,10 @@ namespace PongLockstep {
 
 		void onRenderTargetResolutionChange(RenderTarget *render_target);
 
-		Entity createPaddle(vec3 position, KEY up_key, KEY down_key, GraphicPipelineInstance *paddle_pipeline_instance);
+		Entity createPaddle(vec3 position, KEY up_key, KEY down_key, GraphicPipelineInstance *paddle_pipeline_instance, uint32_t client_id);
 
 
 	public:
-		Entity createBall(vec2 position,vec2 velocity);
+		Entity createBall(vec2fix16 position, vec2fix16 velocity);
 	};
 }

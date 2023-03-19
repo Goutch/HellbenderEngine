@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core.h"
+#include "HBETypes.h"
 #include "vector"
 #include "glm/glm.hpp"
 #include <string>

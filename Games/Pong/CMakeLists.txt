@@ -13,7 +13,8 @@ add_executable(${PROJECT_NAME}
         Systems/BallSystem.cpp
         Systems/BallSystem.h
         Systems/PaddleSystem.cpp
-        Systems/PaddleSystem.h)
+        Systems/PaddleSystem.h
+        FPSCounter.h)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC HBE)
 target_include_directories(${PROJECT_NAME}

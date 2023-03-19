@@ -2,9 +2,9 @@
 
 #include "HBE.h"
 
-#define N_DELTA 100
-namespace HBE {
-	class FPSCounter {
+using namespace HBE;
+namespace Pong {
+	class FPSCounter{
 		Shader *text_vertex_shader;
 		Shader *text_fragment_shader;
 
@@ -194,6 +194,5 @@ namespace HBE {
 		Shader *getFragmentShader() {
 			return text_fragment_shader;
 		}
-
 	};
 }

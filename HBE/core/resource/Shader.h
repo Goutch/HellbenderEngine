@@ -6,7 +6,6 @@
 #include "map"
 #include "memory"
 #include "vector"
-#include "GLSL_TYPE.h"
 
 namespace HBE {
 	enum SHADER_STAGE {

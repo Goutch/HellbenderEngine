@@ -1,7 +1,11 @@
 
+#include <iostream>
 #include "HBE.h"
 #include "PongGame.h"
+#include "Simulation/PongServer.h"
+
 using namespace HBE;
+using namespace PongLockstep;
 bool fullscreen = false;
 
 void onAppUpdate(float delta) {
@@ -17,14 +21,33 @@ void onAppUpdate(float delta) {
 	}
 }
 
+void startServer() {
+	ServerInfo server_info{};
+	server_info.port = 25565;
+	server_info.max_clients = 2;
+	server_info.max_channels = 2;
+	PongServer server = PongServer(server_info);
+	server.start();
+
+	while (true) {
+		server.pollEvents();
+	}
+}
 
 int main() {
+	std::string input = "";
+	std::cin >> input;
+	if (input == "server") {
+		startServer();
+		return 0;
+	}
+
 	Application::init();
 	//-----------------------SETUP--------------------
 	Configs::setWindowTitle("Pong");
 	{
 		//-----------------------Games--------------------
-		PongLockstep::PongGame pong = PongLockstep::PongGame();
+		PongLockstep::PongGame pong = PongLockstep::PongGame(input);
 		//-----------------------EVENTS------------------
 		Application::onUpdate.subscribe(&onAppUpdate);
 		//-----------------------LOOP--------------------

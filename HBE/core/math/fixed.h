@@ -642,5 +642,4 @@ namespace HBE {
 			return x != other.x || y != other.y || z != other.z;
 		}
 	};
-
 }

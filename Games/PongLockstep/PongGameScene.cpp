@@ -16,8 +16,8 @@ namespace PongLockstep {
 		setupScene();
 		Graphics::getWindow()->onSizeChange.subscribe(this, &PongGameScene::OnWindowSizeChange);
 
-		addSystem(new BallSystem(this, game_state,bounce_sound_instance));
-		addSystem(new PaddleSystem(this));
+		addSystem(new BallSystem(this, game_state, bounce_sound_instance));
+		addSystem(new PaddleSystem(this, game_state));
 
 	}
 
@@ -36,7 +36,7 @@ namespace PongLockstep {
 		delete bounce_sound;
 	}
 
-	Entity PongGameScene::createBall(vec2 position, vec2 velocity) {
+	Entity PongGameScene::createBall(vec2fix16 position, vec2fix16 velocity) {
 		Entity ball = createEntity3D();
 		MeshRenderer &ball_renderer = ball.attach<MeshRenderer>();
 		ball_renderer.mesh = quad_mesh;
@@ -45,15 +45,17 @@ namespace PongLockstep {
 
 		BallComponent &ballComponent = ball.attach<BallComponent>();
 		ballComponent.velocity = velocity;
-		ballComponent.radius = 0.2;
+		ballComponent.radius = fix16(2) / fix16(10);
 
-		ball.get<Transform>().setPosition(vec3(position, 0));
-		ball.get<Transform>().setLocalScale(vec3(ballComponent.radius));
+		ballComponent.position = position;
+		ball.get<Transform>().setLocalScale(vec3(static_cast<float>(ballComponent.radius),
+												 static_cast<float>(ballComponent.radius),
+												 1));
 
 		return ball;
 	}
 
-	Entity PongGameScene::createPaddle(vec3 position, KEY up_key, KEY down_key, GraphicPipelineInstance *paddle_pipeline_instance) {
+	Entity PongGameScene::createPaddle(vec3 position, KEY up_key, KEY down_key, GraphicPipelineInstance *paddle_pipeline_instance, uint32_t client_id) {
 		Entity paddle = createEntity3D();
 		MeshRenderer &paddle_renderer = paddle.attach<MeshRenderer>();
 		paddle_renderer.mesh = quad_mesh;
@@ -61,11 +63,12 @@ namespace PongLockstep {
 		paddle_renderer.pipeline_instance = paddle_pipeline_instance;
 
 		PaddleComponent &paddleComponent = paddle.attach<PaddleComponent>();
-		paddleComponent.speed = 10;
-		paddleComponent.size_x = 0.3;
-		paddleComponent.size_y = 2.0;
+		paddleComponent.speed = fix16(10);
+		paddleComponent.size_x = fix16(3) / 10;
+		paddleComponent.size_y = fix16(2);
 		paddleComponent.down_key = down_key;
 		paddleComponent.up_key = up_key;
+		paddleComponent.client_id = client_id;
 
 		paddle.get<Transform>().setPosition(position);
 
@@ -77,15 +80,17 @@ namespace PongLockstep {
 		Camera2D &camera = camera_entity.attach<Camera2D>();
 		camera.setRenderTarget(render_target);
 
-		createBall(vec2(0, 0), vec2(10, 10));
+		createBall(vec2fix16(0, 0), vec2fix16(10, 10));
 		paddle_left_entity = createPaddle(vec3{-game_area.size.x / 2 + 1, 0, 0},
 										  KEY_W,
 										  KEY_S,
-										  paddle_left_pipeline_instance);
+										  paddle_left_pipeline_instance,
+										  0);
 		paddle_right_entity = createPaddle(vec3{game_area.size.x / 2 - 1, 0, 0},
-										   KEY_UP,
-										   KEY_DOWN,
-										   paddle_right_pipeline_instance);
+										   KEY_W,
+										   KEY_S,
+										   paddle_right_pipeline_instance,
+										   1);
 		render_target->onResolutionChange.subscribe(this, &PongGameScene::onRenderTargetResolutionChange);
 		onRenderTargetResolutionChange(render_target);
 	}
@@ -159,17 +164,13 @@ namespace PongLockstep {
 		Entity camera_entity = getCameraEntity();
 		Camera2D &camera = camera_entity.get<Camera2D>();
 
-		float height = camera.getZoomRatio();
-		float width = height * camera.aspectRatio();
+		fix16 height = fix16(camera.getZoomRatio());
+		fix16 width = height * fix16(camera.aspectRatio());
 
-		game_area = Area{{-width / 2.0f, -height / 2.0f},
-						 {width,         height}};
+		game_area = Area{{-width / 2, -height / 2},
+						 {width,      height}};
 
-		vec3 paddle_left_position = paddle_left_entity.get<Transform>().position();
-		vec3 paddle_right_position = paddle_right_entity.get<Transform>().position();
-		paddle_left_position.x = -game_area.size.x / 2 + 1;
-		paddle_right_position.x = game_area.size.x / 2 - 1;
-		paddle_left_entity.get<Transform>().setPosition(paddle_left_position);
-		paddle_right_entity.get<Transform>().setPosition(paddle_right_position);
+		paddle_left_entity.get<PaddleComponent>().position.x = -game_area.size.x / 2 + 1;
+		paddle_right_entity.get<PaddleComponent>().position.x = game_area.size.x / 2 - 1;
 	}
 }

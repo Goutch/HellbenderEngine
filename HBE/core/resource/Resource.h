@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core.h"
-
+#include "HBETypes.h"
 namespace HBE {
 
     typedef uint32_t VERTEX_ATTRIBUTE_FLAGS;

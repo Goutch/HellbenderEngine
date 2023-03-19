@@ -19,9 +19,17 @@ add_executable(${PROJECT_NAME}
         Systems/BallSystem.cpp
         Systems/BallSystem.h
         Systems/PaddleSystem.cpp
-        Systems/PaddleSystem.h)
+        Systems/PaddleSystem.h
+        Simulation/fixed.h
+        Simulation/Commands.h
+        Simulation/PongServer.cpp
+        Simulation/PongServer.h
+        Simulation/Server.cpp
+        Simulation/Server.h
+        Simulation/Server.h
+        Simulation/Client.cpp)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC HBE)
+target_link_libraries(${PROJECT_NAME} PUBLIC HBE enet winmm ws2_32)
 target_include_directories(${PROJECT_NAME}
         PUBLIC "${${CMAKE_CURRENT_SOURCE_DIR}}")
 

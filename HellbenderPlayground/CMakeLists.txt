@@ -16,9 +16,7 @@ set(PATHFINDER_FILES
         Pathfinder/Systems/SimCamera2DSystem.cpp
         Pathfinder/Systems/SimCamera2DSystem.h)
 
-set(VOXEL_MODULE_FILES
-        VoxelModule/VoxelRendererSystem.cpp
-        )
+set(VOXEL_MODULE_FILES VoxelModule/VoxelRendererSystem.cpp)
 
 
 set(EXEMPLES_FILES
@@ -34,7 +32,6 @@ set(EXEMPLES_FILES
 add_executable(${PROJECT_NAME}
         main.cpp
         ${EXEMPLES_FILES}
-        ${PATHFINDER_FILES}
         ${VOXEL_MODULE_FILES})
 
 target_link_libraries(${PROJECT_NAME} PUBLIC HBE)

@@ -2,8 +2,7 @@
 
 #include "Core.h"
 #include "queue"
-
-
+#include "HBETypes.h"
 struct GLFWwindow;
 
 namespace HBE {

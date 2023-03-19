@@ -1,7 +1,6 @@
 #include <core/resource/Resources.h>
 #include <platforms/vk/raytracing/VK_RaytracingPipeline.h>
 #include "VK_Renderer.h"
-#include "VK_Fence.h"
 
 #define GLFW_INCLUDE_VULKAN
 

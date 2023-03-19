@@ -1,7 +1,7 @@
 #pragma once
 
 #include "HBE.h"
-#include "FPSCounter.h"
+#include "Games/PongLockstep/FPSCounter.h"
 
 using namespace HBE;
 namespace PongLockstep {

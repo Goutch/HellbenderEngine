@@ -2,14 +2,12 @@
 
 #include "Core.h"
 #include "string"
-
 namespace HBE {
 #define error(s, ...) error_(s, __LINE__,__FILE__,__func__)
 
 	class HB_API Log {
 	public:
-		enum LOG_FLAGS : uint32_t {
-			ALL = std::numeric_limits<uint32_t>::max(),
+		enum LOG_FLAGS{
 			PROFILE = 32,
 			DEBUG = 16,
 			MESSAGE = 8,
@@ -17,6 +15,7 @@ namespace HBE {
 			WARNING = 2,
 			ERROR = 1,
 			NONE = 0,
+			ALL = 99999,
 		};
 	private:
 		static uint32_t log_flags;

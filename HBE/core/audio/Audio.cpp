@@ -8,7 +8,7 @@
 #include "AL/alc.h"
 #include "sndfile.h"
 #include "core/utility/Log.h"
-
+#include "string.h"
 namespace HBE {
 	ALCdevice *Audio::device = nullptr;
 	ALCcontext *Audio::context = nullptr;
@@ -32,7 +32,7 @@ namespace HBE {
 		while (*device_names != '\0') {
 			devices.emplace_back(device_names+15);
 			Log::status(" - " + devices.back());
-			device_names += std::strlen(device_names) + 1;
+			device_names += strlen(device_names) + 1;
 		}
 
 		return devices;

@@ -2,7 +2,6 @@
 
 
 #include "Core.h"
-#include "GLSL_TYPE.h"
 #include "AudioClip.h"
 
 namespace HBE {

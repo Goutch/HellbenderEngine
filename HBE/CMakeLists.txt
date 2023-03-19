@@ -36,7 +36,6 @@ set(CORE_FILES
         core/resource/Resource.h
         core/resource/GraphicPipeline.h
         core/resource/ComputePipeline.h
-        core/resource/GLSL_TYPE.h
         core/resource/Resources.h
         core/resource/Resources.cpp
         core/resource/Texture.cpp

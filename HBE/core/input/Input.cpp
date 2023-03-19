@@ -37,8 +37,8 @@ namespace HBE {
 		double mouse_x, mouse_y;
 
 		glfwGetCursorPos(window, &mouse_x, &mouse_y);
-		mouse_x / Graphics::getWindow()->getWidth();
-		mouse_y / Graphics::getWindow()->getHeight();
+		//mouse_x / Graphics::getWindow()->getWidth();
+		//mouse_y / Graphics::getWindow()->getHeight();
 		return vec2(static_cast<float>(mouse_x), static_cast<float>(mouse_y));
 	}
 

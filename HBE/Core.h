@@ -36,13 +36,14 @@
 #define RESOURCE_PATH "res/"
 #else
 #define RESOURCE_PATH "../../res/"
+#define RESOURCE_PATH "res/"
 #endif
 #endif
 
 //#define PROFILE_MODE
 #ifndef PROFILE_MODE
 #define HB_PROFILE_BEGIN(x)
-#define HB_PROFILE_END(x)
+#define HB_PROFILE_END()
 #else
 #define HB_PROFILE_BEGIN(x) Profiler::begin(x)
 #define HB_PROFILE_END() Profiler::end()
@@ -53,5 +54,3 @@
 #else
 #define HB_ASSERT(x,y) if(!(x))Log::error(y)
 #endif
-
-#include "HBETypes.h"

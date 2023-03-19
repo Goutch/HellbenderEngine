@@ -2,7 +2,7 @@
 
 #include "Core.h"
 #include "core/utility/Event.h"
-
+#include "HBETypes.h"
 struct GLFWwindow;
 namespace HBE {
 	class HB_API Window {

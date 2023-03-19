@@ -7,6 +7,7 @@
 #include "core/scene/Scene.h"
 #include "Application.h"
 #include "Core.h"
+#include "HBETypes.h"
 
 #include "core/resource/Resources.h"
 #include "core/resource/Shader.h"

@@ -65,6 +65,7 @@ namespace HBE {
 				break;
 
 		}
+		return 0;
 	}
 
 	VkFormat VK_Image::getVkFormat(IMAGE_FORMAT format) {

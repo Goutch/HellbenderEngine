@@ -2,14 +2,9 @@
 #include "Components.h"
 #include "glm/gtc/quaternion.hpp"
 
-#include <core/resource/Model.h>
 #include <core/resource/Mesh.h>
 #include <core/resource/GraphicPipelineInstance.h>
 #include <core/resource/RenderTarget.h>
-#include <core/resource/Resources.h>
-#include <vector>
-#include "Application.h"
-#include "core/scene/Scene.h"
 
 namespace HBE {
 	void Transform::translate(vec3 translation) {

@@ -3,36 +3,40 @@
 #include "PongGame.h"
 
 namespace PongLockstep {
+
+	struct PaddleData {
+		PaddleComponent *paddle;
+	};
+
 	BallSystem::BallSystem(PongGameScene *scene, PongGameState &game_state, AudioClipInstance *bounce_sound) : System(scene) {
 		this->game_scene = scene;
 		this->game_state = &game_state;
 		this->bounce_sound = bounce_sound;
 		scene->onUpdate.subscribe(this, &BallSystem::update);
+		game_state.onStep.subscribe(this, &BallSystem::step);
 	}
 
-	struct PaddleData {
-		Transform *transform;
-		PaddleComponent *paddle;
-	};
 
-	float sdBox(vec2 point, vec2 box_pos, vec2 box_half_size) {
-		vec2 p = point - box_pos;
-		vec2 q = abs(p) - box_half_size;
-		return glm::length(glm::max(q, vec2(0.0f))) + glm::min(glm::max(q.x, q.y), 0.0f);
+	BallSystem::~BallSystem() {
+		game_scene->onUpdate.unsubscribe(this);
+		game_state->onStep.unsubscribe(this);
 	}
 
-	bool collideBallWithPaddles(std::vector<PaddleData> &paddles, Transform *transform, BallComponent *ball) {
-		for (PaddleData &paddle_data: paddles) {
-			Transform *paddle_transform = paddle_data.transform;
-			PaddleComponent *paddle = paddle_data.paddle;
+	fix16 sdBox(vec2fix16 point, vec2fix16 box_pos, vec2fix16 box_half_size) {
+		vec2fix16 p = point - box_pos;
+		vec2fix16 q = vec2fix16(abs(p.x), abs(p.y)) - box_half_size;
 
-			vec2 ball_pos = transform->worldPosition();
-			vec2 paddle_pos = paddle_transform->worldPosition();
+		return maxVec2Fix(q, vec2fix16(0, 0)).magnitude() + min(max(q.x, q.y), fix16(0));
+	}
+
+	bool collideBallWithPaddles(std::vector<PaddleComponent *> &paddles, vec2fix16 ball_pos, BallComponent *ball) {
+		for (PaddleComponent *paddle: paddles) {
+			vec2fix16 paddle_pos = paddle->position;
 
 
-			float distance = sdBox(ball_pos, paddle_pos, vec2(paddle->size_x / 2.0f, paddle->size_y / 2.0f));
+			fix16 distance = sdBox(ball_pos, paddle_pos, vec2fix16(paddle->size_x / fix16(2), paddle->size_y / fix16(2)));
 			distance -= ball->radius;
-			if (distance < 0) {
+			if (distance < fix16(0)) {
 				if (ball_pos.x < paddle_pos.x) {
 					ball->velocity.x = -abs(ball->velocity.x);
 				} else {
@@ -43,56 +47,20 @@ namespace PongLockstep {
 		}
 		return false;
 	}
-
-
-	void BallSystem::update(float delta) {
-		bool delete_ball = false;
-		vec2 delete_pos = vec2(0, 0);
-		float delete_radius = 1;
-		if (Input::getKey(KEY_MOUSE_BUTTON_LEFT)) {
-			vec2 create_pos = Input::getNormalizedMousePosition();
-			create_pos -= vec2(0.5f, 0.5f);
-			create_pos.y *= -1;
-			Camera2D &camera = game_scene->getCameraEntity().get<Camera2D>();
-			create_pos.x *= camera.aspectRatio();
-			create_pos.x *= camera.getZoomRatio();
-			create_pos.y *= camera.getZoomRatio();
-			game_scene->createBall(create_pos, vec2(Random::floatRange(-10, 10), Random::floatRange(-10, 10)));
-		}
-		if (Input::getKey(KEY_MOUSE_BUTTON_RIGHT)) {
-			delete_ball = true;
-			delete_pos = Input::getNormalizedMousePosition();
-			delete_pos -= vec2(0.5f, 0.5f);
-			delete_pos.y *= -1;
-			Camera2D &camera = game_scene->getCameraEntity().get<Camera2D>();
-			delete_pos.x *= camera.aspectRatio();
-			delete_pos.x *= camera.getZoomRatio();
-			delete_pos.y *= camera.getZoomRatio();
-		}
-
-
+	void BallSystem::step(StepData step, StepInputsData *inputs) {
 		auto paddle_group = scene->group<Transform, PaddleComponent>();
-		std::vector<PaddleData> paddles;
+		std::vector<PaddleComponent *> paddles;
 		for (auto [entity, transform, paddle]: paddle_group) {
-			paddles.push_back({&transform, &paddle});
+			paddles.push_back({&paddle});
 		}
 		uint32_t n = 0;
-		auto group = scene->group<Transform, BallComponent>();
-		for (auto [entity, transform, ball]: group) {
-
+		auto group = scene->group<BallComponent>();
+		for (auto [entity, ball]: group) {
 			bool colide = false;
-			if (delete_ball) {
-				if (glm::distance(vec2(transform.worldPosition()), delete_pos) < delete_radius) {
-					scene->destroyEntity(entity);
-					continue;
-				}
-			}
 
 			//check for collision with walls
 			Area area = game_scene->getArea();
-			vec2 pos = transform.worldPosition();
-			vec2 new_pos = pos + (ball.velocity * delta);
-
+			vec2fix16 new_pos = ball.position + (ball.velocity * step.delta);
 
 			if (new_pos.x + ball.radius > area.position.x + area.size.x) {
 				//collide with wall right
@@ -116,15 +84,15 @@ namespace PongLockstep {
 				new_pos.y = area.position.y + area.size.y - ball.radius;
 				colide = true;
 			}
-			transform.setPosition(vec3(new_pos, 0.0f));
 
+			ball.position = new_pos;
 
-			colide = colide | collideBallWithPaddles(paddles, &transform, &ball);
+			colide = colide | collideBallWithPaddles(paddles, ball.position, &ball);
 			n++;
 
 			if (colide && bounce_sound->getState() != AUDIO_CLIP_INSTANCE_STATE_PLAYING) {
 				bounce_sound->setVolume(glm::clamp(t_since_last_bounce, 0.002f, 1.0f));
-				bounce_sound->updatePostion(transform.worldPosition(), vec3(0, 0, 0));
+				bounce_sound->updatePostion(vec3(ball.position.toVec2(), 0), vec3(0, 0, 0));
 				bounce_sound->play();
 
 				t_since_last_bounce = 0;
@@ -132,14 +100,21 @@ namespace PongLockstep {
 		}
 
 
-		t += delta;
-		t_since_last_bounce += delta;
-		if (t >= 1) {
-			t = 0;
+		t += step.delta;
+		t_since_last_bounce += static_cast<float>(step.delta);
+		if (t >= fix16(1)) {
+			t = fix16(0);
 			Log::debug("#balls:" + std::to_string(n));
 		}
 	}
 
+
+	void BallSystem::update(float delta) {
+		auto group = scene->group<BallComponent, Transform>();
+		for (auto [entity, ball, transform]: group) {
+			transform.setPosition(vec3(static_cast<float>(ball.position.x), static_cast<float>(ball.position.y), 0.0f));
+		}
+	}
 
 }
 

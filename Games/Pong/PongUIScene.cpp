@@ -1,6 +1,3 @@
-//
-// Created by User on 2/12/2023.
-//
 
 #include "PongUIScene.h"
 #include "PongGame.h"

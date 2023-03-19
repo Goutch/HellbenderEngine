@@ -2,8 +2,8 @@
 
 #include "HBE.h"
 
-#define N_DELTA 100
-namespace HBE {
+using namespace HBE;
+namespace PongLockstep {
 	class FPSCounter {
 		Shader *text_vertex_shader;
 		Shader *text_fragment_shader;
