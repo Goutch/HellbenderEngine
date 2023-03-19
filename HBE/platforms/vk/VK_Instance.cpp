@@ -6,25 +6,31 @@
 #include "Configs.h"
 #include "GLFW/glfw3.h"
 #include "VK_ValidationLayers.h"
-
+#include "Application.h"
 namespace HBE {
 
     VK_Instance::VK_Instance() {
-        VkApplicationInfo app_info{};
-        app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-        app_info.pApplicationName = Configs::getWindowTitle().c_str();
-        app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-        app_info.pEngineName = "Hellbender";
-        app_info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-        app_info.apiVersion = VK_API_VERSION_1_3;
+		ApplicationInfo app_info;
+        VkApplicationInfo vk_app_info{};
+        vk_app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+        vk_app_info.pApplicationName = Configs::getWindowTitle().c_str();
+        vk_app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+        vk_app_info.pEngineName = "Hellbender";
+        vk_app_info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+		vk_app_info.apiVersion = VK_API_VERSION_1_1;
+		if(app_info.hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_VULKAN_1_3)
+			vk_app_info.apiVersion = VK_API_VERSION_1_3;
+		else if(app_info.hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_VULKAN_1_2)
+			vk_app_info.apiVersion = VK_API_VERSION_1_2;
+
+
 
         VkInstanceCreateInfo create_info{};
         create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-        create_info.pApplicationInfo = &app_info;
+        create_info.pApplicationInfo = &vk_app_info;
         std::vector<const char *> required_extensions;
 
         getRequiredExtensions(required_extensions);
-
 
         std::vector<const char *> extensions{};
 
@@ -41,10 +47,11 @@ namespace HBE {
 
         std::vector<VkValidationFeatureEnableEXT> enabled_validation_features{
                 VK_VALIDATION_FEATURE_ENABLE_SYNCHRONIZATION_VALIDATION_EXT,
-                //VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT,
+                VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT,
         };
 
         VkValidationFeaturesEXT validationFeaturesExt{};
+
         if (ENABLE_VALIDATION_LAYERS) {
             validation_layers = new VK_ValidationLayers();
             if (!validation_layers->checkValidationLayerSupport())

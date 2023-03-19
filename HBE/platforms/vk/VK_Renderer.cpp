@@ -337,7 +337,7 @@ namespace HBE {
 			dependency_info.bufferMemoryBarrierCount = 0;
 			dependency_info.pMemoryBarriers = nullptr;
 			dependency_info.memoryBarrierCount = 0;
-			device->vkCmdPipelineBarrier2(command_pool->getCurrentBuffer(), &dependency_info);
+			device->vkCmdPipelineBarrier2KHR(command_pool->getCurrentBuffer(), &dependency_info);
 		}
 
 		screen_pipeline_instance->setTextureArray("layers", &present_cmd_info.images[0], present_cmd_info.image_count, current_frame, 0);

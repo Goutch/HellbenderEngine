@@ -32,7 +32,7 @@ namespace HBE {
 		bufferDeviceAddressInfo.buffer = aabb_positions_buffer->getHandle();
 
 		VkDeviceOrHostAddressConstKHR aabb_position_buffer_address{};
-		aabb_position_buffer_address.deviceAddress = vkGetBufferDeviceAddress(device->getHandle(), &bufferDeviceAddressInfo);
+		aabb_position_buffer_address.deviceAddress = device->vkGetBufferDeviceAddressKHR(device->getHandle(), &bufferDeviceAddressInfo);
 
 		VkAccelerationStructureGeometryKHR accelerationStructureGeometry{};
 		accelerationStructureGeometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;

@@ -36,7 +36,6 @@
 #define RESOURCE_PATH "res/"
 #else
 #define RESOURCE_PATH "../../res/"
-#define RESOURCE_PATH "res/"
 #endif
 #endif
 

@@ -19,7 +19,8 @@ void onAppUpdate(float delta) {
 
 
 int main() {
-	Application::init();
+	ApplicationInfo app_info{};
+	Application::init(app_info);
 	//-----------------------SETUP--------------------
 	Configs::setWindowTitle("Pong");
 	{

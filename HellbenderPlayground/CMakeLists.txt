@@ -21,7 +21,6 @@ set(VOXEL_MODULE_FILES VoxelModule/VoxelRendererSystem.cpp)
 
 set(EXEMPLES_FILES
         Examples/ModelScene.h
-        Examples/RaytracingScene.h
         Examples/TextScene.h
         Examples/CubeScene.h
         Examples/FPSCounter.h

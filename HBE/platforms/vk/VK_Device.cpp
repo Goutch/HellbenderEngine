@@ -18,7 +18,7 @@ namespace HBE {
 												  indices.transfer_family.value()};
 
 		float priority = 1.0f;//between 0 and 1.
-		for (uint32_t queue_family:uniqueQueueFamilies) {
+		for (uint32_t queue_family: uniqueQueueFamilies) {
 			VkDeviceQueueCreateInfo queue_create_info{};
 			queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
 			queue_create_info.queueFamilyIndex = queue_family;
@@ -38,47 +38,48 @@ namespace HBE {
 		device_create_info.enabledExtensionCount = enabled_extensions.size();
 		device_create_info.ppEnabledExtensionNames = enabled_extensions.data();
 
-		VkPhysicalDeviceBufferDeviceAddressFeatures buffer_device_address_features{};
-		buffer_device_address_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
-		buffer_device_address_features.bufferDeviceAddress = true;
-
-		VkPhysicalDeviceRayTracingPipelineFeaturesKHR ray_tracing_features{};
-		ray_tracing_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
-		ray_tracing_features.rayTracingPipeline = true;
-
-		VkPhysicalDeviceAccelerationStructureFeaturesKHR acceleration_structure_features{};
-		acceleration_structure_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
-		acceleration_structure_features.accelerationStructure = true;
-
 		VkPhysicalDeviceRobustness2FeaturesEXT robustness_features{};
 		robustness_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT;
 		robustness_features.nullDescriptor = true;
 
+		VkPhysicalDeviceSynchronization2Features synchronization2_features{};
+		synchronization2_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES;
+		synchronization2_features.synchronization2 = true;
+
+		VkPhysicalDeviceBufferDeviceAddressFeatures buffer_device_address_features{};
+		buffer_device_address_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
+		buffer_device_address_features.bufferDeviceAddress = physical_device.getBufferDeviceAddressFeatures().bufferDeviceAddress;
+
+		VkPhysicalDeviceRayTracingPipelineFeaturesKHR ray_tracing_features{};
+		ray_tracing_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
+		ray_tracing_features.rayTracingPipeline = physical_device.getRayTracingPipelineFeatures().rayTracingPipeline;
+
+		VkPhysicalDeviceAccelerationStructureFeaturesKHR acceleration_structure_features{};
+		acceleration_structure_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
+		acceleration_structure_features.accelerationStructure = physical_device.getAccelerationStructureFeatures().accelerationStructure;
+
 		VkPhysicalDeviceDescriptorIndexingFeatures descriptor_indexing_features{};
 		descriptor_indexing_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
-		descriptor_indexing_features.runtimeDescriptorArray = true;
-		descriptor_indexing_features.descriptorBindingPartiallyBound = true;
-		descriptor_indexing_features.descriptorBindingVariableDescriptorCount = true;
-		descriptor_indexing_features.shaderSampledImageArrayNonUniformIndexing = true;
-		descriptor_indexing_features.shaderStorageBufferArrayNonUniformIndexing = true;
-		descriptor_indexing_features.shaderStorageImageArrayNonUniformIndexing = true;
-		descriptor_indexing_features.shaderUniformBufferArrayNonUniformIndexing = true;
-		descriptor_indexing_features.shaderUniformTexelBufferArrayNonUniformIndexing = true;
-		descriptor_indexing_features.shaderStorageTexelBufferArrayNonUniformIndexing = true;
-		descriptor_indexing_features.descriptorBindingUpdateUnusedWhilePending = true;
-		descriptor_indexing_features.descriptorBindingPartiallyBound = true;
-		descriptor_indexing_features.descriptorBindingVariableDescriptorCount = true;
+		descriptor_indexing_features.runtimeDescriptorArray = physical_device.getDescriptorIndexingFeatures().runtimeDescriptorArray;
+		descriptor_indexing_features.descriptorBindingPartiallyBound = physical_device.getDescriptorIndexingFeatures().descriptorBindingPartiallyBound;
+		descriptor_indexing_features.descriptorBindingVariableDescriptorCount = physical_device.getDescriptorIndexingFeatures().descriptorBindingVariableDescriptorCount;
+		descriptor_indexing_features.shaderSampledImageArrayNonUniformIndexing = physical_device.getDescriptorIndexingFeatures().shaderSampledImageArrayNonUniformIndexing;
+		descriptor_indexing_features.shaderStorageBufferArrayNonUniformIndexing = physical_device.getDescriptorIndexingFeatures().shaderStorageBufferArrayNonUniformIndexing;
+		descriptor_indexing_features.shaderStorageImageArrayNonUniformIndexing = physical_device.getDescriptorIndexingFeatures().shaderStorageImageArrayNonUniformIndexing;
+		descriptor_indexing_features.shaderUniformBufferArrayNonUniformIndexing = physical_device.getDescriptorIndexingFeatures().shaderUniformBufferArrayNonUniformIndexing;
+		descriptor_indexing_features.shaderUniformTexelBufferArrayNonUniformIndexing = physical_device.getDescriptorIndexingFeatures().shaderUniformTexelBufferArrayNonUniformIndexing;
+		descriptor_indexing_features.shaderStorageTexelBufferArrayNonUniformIndexing = physical_device.getDescriptorIndexingFeatures().shaderStorageTexelBufferArrayNonUniformIndexing;
+		descriptor_indexing_features.descriptorBindingUpdateUnusedWhilePending = physical_device.getDescriptorIndexingFeatures().descriptorBindingUpdateUnusedWhilePending;
+		descriptor_indexing_features.descriptorBindingPartiallyBound = physical_device.getDescriptorIndexingFeatures().descriptorBindingPartiallyBound;
+		descriptor_indexing_features.descriptorBindingVariableDescriptorCount = physical_device.getDescriptorIndexingFeatures().descriptorBindingVariableDescriptorCount;
 
-        VkPhysicalDeviceSynchronization2Features synchronization2_features{};
-        synchronization2_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES;
-        synchronization2_features.synchronization2 = true;
-
-		device_create_info.pNext = &buffer_device_address_features;
+		device_create_info.pNext = &synchronization2_features;
+		synchronization2_features.pNext = &buffer_device_address_features;
 		buffer_device_address_features.pNext = &ray_tracing_features;
 		ray_tracing_features.pNext = &acceleration_structure_features;
 		acceleration_structure_features.pNext = &robustness_features;
 		robustness_features.pNext = &descriptor_indexing_features;
-        descriptor_indexing_features.pNext = &synchronization2_features;
+
 		if (vkCreateDevice(physical_device.getHandle(), &device_create_info, nullptr, &handle) != VK_SUCCESS) {
 			Log::error("Failed to create logical device");
 		}
@@ -93,7 +94,7 @@ namespace HBE {
 
 	VK_Device::~VK_Device() {
 		delete allocator;
-        queues.clear();
+		queues.clear();
 		vkDestroyDevice(handle, nullptr);
 	}
 
@@ -130,7 +131,7 @@ namespace HBE {
 		vkCmdTraceRaysKHR = reinterpret_cast<PFN_vkCmdTraceRaysKHR>(vkGetDeviceProcAddr(handle, "vkCmdTraceRaysKHR"));
 		vkGetRayTracingShaderGroupHandlesKHR = reinterpret_cast<PFN_vkGetRayTracingShaderGroupHandlesKHR>(vkGetDeviceProcAddr(handle, "vkGetRayTracingShaderGroupHandlesKHR"));
 		vkCreateRayTracingPipelinesKHR = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(vkGetDeviceProcAddr(handle, "vkCreateRayTracingPipelinesKHR"));
-        vkCmdPipelineBarrier2 = reinterpret_cast<PFN_vkCmdPipelineBarrier2>(vkGetDeviceProcAddr(handle, "vkCmdPipelineBarrier2"));
+		vkCmdPipelineBarrier2KHR = reinterpret_cast<PFN_vkCmdPipelineBarrier2KHR>(vkGetDeviceProcAddr(handle, "vkCmdPipelineBarrier2KHR"));
 	}
 
 }

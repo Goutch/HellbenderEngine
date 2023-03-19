@@ -13,5 +13,6 @@ add_subdirectory("HBE/")
 add_subdirectory("HellbenderPlayground/")
 add_subdirectory("Games/Pong/")
 add_subdirectory("Games/PongLockstep/")
+add_subdirectory("Games/Raytracer/")
 
 

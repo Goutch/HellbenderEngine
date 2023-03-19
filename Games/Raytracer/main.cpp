@@ -1,13 +1,6 @@
-#include <Examples/TextScene.h>
+#include "RaytracingScene.h"
+
 #include "HBE.h"
-#include "VoxelModule/VoxelModule.h"
-#include "Pathfinder/Pathfinder.h"
-#include "Examples/ModelScene.h"
-#include "Examples/TextScene.h"
-#include "Examples/CubeScene.h"
-#include "Examples/TriangleScene.h"
-#include "Examples/OrderedRenderingScene.h"
-#include "Games/Pong/PongGame.h"
 
 using namespace HBE;
 bool fullscreen = false;
@@ -62,20 +55,24 @@ void onAppPresent() {
 
 int main() {
 	ApplicationInfo app_info{};
-	app_info.hardware_flags = HARDWARE_FLAG_NONE;
+	app_info.hardware_flags = HARDWARE_FLAG_GPU_REQUIRE_VULKAN_1_3 |
+							  HARDWARE_FLAG_GPU_REQUIRE_RTX_CAPABILITIES |
+							  HARDWARE_FLAG_GPU_REQUIRE_DESCRIPTOR_INDEXING_CAPABILITIES;
 
 	Application::init(app_info);
 	//-----------------------SETUP--------------------
-	Configs::setWindowTitle("Hellbender");
-	//Pathfinder *pathfinder = new Pathfinder();
+	Configs::setWindowTitle("Raytracer");
 	{
 		//-----------------------tests-------------------
-		main_scene = new TriangleScene();
+		//main_scene = new TriangleScene();
 		//main_scene = new CubeScene();
-		//main_scene = load_model_scene = ModelScene();
-
-		//ui_scene = new TextScene();
+		//ModelScene load_model_scene = ModelScene();
+		//ui_scene= new TextScene();
 		//ui_scene = new OrderedRenderingScene();
+
+		//-----------------------projects-----------------
+		main_scene = new RaytracingScene();
+		//Pathfinder pathfinder;
 
 		//-----------------------EVENTS------------------
 		Application::onUpdate.subscribe(&onAppUpdate);

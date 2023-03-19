@@ -16,6 +16,7 @@
 #include <thread>
 
 namespace HBE {
+	ApplicationInfo Application::info = {};
 	Window *Application::window = nullptr;
 	Clock *Application::time = nullptr;
 	int Application::fps_counter = 0;
@@ -30,7 +31,8 @@ namespace HBE {
 	Event<> Application::onRender;
 	Event<> Application::onPresent;
 
-	void Application::init() {
+	void Application::init(const ApplicationInfo &info) {
+		Application::info = info;
 		Graphics::init();
 		Audio::init();
 		Input::init();
@@ -109,6 +111,9 @@ namespace HBE {
 		}
 	}
 
+	const ApplicationInfo &Application::getInfo() {
+		return info;
+	}
 }
 
 

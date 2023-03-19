@@ -73,7 +73,7 @@ namespace HBE {
 		bufferDeviceAddressInfo.buffer = handle;
 
 		VkDeviceOrHostAddressConstKHR buffer_address{};
-		buffer_address.deviceAddress = vkGetBufferDeviceAddress(device->getHandle(), &bufferDeviceAddressInfo);
+		buffer_address.deviceAddress = device->vkGetBufferDeviceAddressKHR(device->getHandle(), &bufferDeviceAddressInfo);
 		return buffer_address;
 	}
 

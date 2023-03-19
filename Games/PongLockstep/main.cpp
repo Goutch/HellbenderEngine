@@ -41,8 +41,8 @@ int main() {
 		startServer();
 		return 0;
 	}
-
-	Application::init();
+	ApplicationInfo app_info{};
+	Application::init(app_info);
 	//-----------------------SETUP--------------------
 	Configs::setWindowTitle("Pong");
 	{

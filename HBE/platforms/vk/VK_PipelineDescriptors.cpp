@@ -325,8 +325,6 @@ namespace HBE {
 			image_infos[i].imageLayout = vk_texture[index]->getImageLayout();
 			image_infos[i].imageView = vk_texture[index]->getImageView(mip_level);
 			image_infos[i].sampler = vk_texture[index]->getSampler();
-
-
 		}
 
 		if (frame < 0) {

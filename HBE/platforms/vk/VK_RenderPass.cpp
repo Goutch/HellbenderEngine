@@ -199,7 +199,7 @@ namespace HBE {
 		dependency_info.bufferMemoryBarrierCount = 0;
 		dependency_info.pMemoryBarriers = &image_barrier;
 		dependency_info.memoryBarrierCount = 1;
-		device->vkCmdPipelineBarrier2(command_buffer, &dependency_info);*/
+		device->vkCmdPipelineBarrier2KHR(command_buffer, &dependency_info);*/
 	}
 
 	void VK_RenderPass::createFramebuffers() {
