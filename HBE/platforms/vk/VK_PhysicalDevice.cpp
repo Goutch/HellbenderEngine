@@ -16,17 +16,26 @@ namespace HBE {
 		support_details = querySwapchainSupportDetails(handle);
 		vkGetPhysicalDeviceMemoryProperties(handle, &memory_properties);
 
+
+		ApplicationInfo app_info = Application::getInfo();
 		VkPhysicalDeviceFeatures2 features2{};
 		features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-		acceleration_structure_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
-		ray_tracing_pipeline_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
-		descriptor_indexing_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
-		buffer_device_address_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
+		void **ppNext = &features2.pNext;
 
-		features2.pNext = &acceleration_structure_features;
-		acceleration_structure_features.pNext = &ray_tracing_pipeline_features;
-		ray_tracing_pipeline_features.pNext = &descriptor_indexing_features;
-		descriptor_indexing_features.pNext =  &buffer_device_address_features;
+		if (app_info.hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_DESCRIPTOR_INDEXING_CAPABILITIES) {
+			descriptor_indexing_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
+			*ppNext = &descriptor_indexing_features;
+		}
+		if (app_info.hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_RTX_CAPABILITIES) {
+			buffer_device_address_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
+			acceleration_structure_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
+			ray_tracing_pipeline_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
+
+			*ppNext = &buffer_device_address_features;
+			buffer_device_address_features.pNext = &acceleration_structure_features;
+			acceleration_structure_features.pNext = &ray_tracing_pipeline_features;
+			ppNext = &ray_tracing_pipeline_features.pNext;
+		}
 
 		vkGetPhysicalDeviceFeatures2(handle, &features2);
 
@@ -67,8 +76,10 @@ namespace HBE {
 		if (!device_score.empty()) {
 			handle = device_score.rbegin()->second;
 			vkGetPhysicalDeviceProperties(handle, &properties);
+			vkGetPhysicalDeviceFeatures(handle, &features);
 			queue_family_indices = getSupportedQueueFamilies(handle);
 			enabled_extensions = device_enabled_extensions[handle];
+
 			Log::message(std::string("\t\t\tFound : ") + properties.deviceName);
 		} else {
 			Log::error("\tFailed to find a suitable GPU!");
@@ -144,11 +155,11 @@ namespace HBE {
 			if (supported_queue_families.at(i).queueFlags & VK_QUEUE_GRAPHICS_BIT) {
 				indices.graphics_family = i;
 			}
-			//compute
+				//compute
 			else if (supported_queue_families.at(i).queueFlags & VK_QUEUE_COMPUTE_BIT) {
 				indices.compute_family = i;
 			}
-			//transfer
+				//transfer
 			else if ((supported_queue_families.at(i).queueFlags & VK_QUEUE_TRANSFER_BIT)) {
 				indices.transfer_family = i;
 			}

@@ -12,10 +12,11 @@ namespace HBE {
 		QueueFamilyIndices indices = physical_device.getQueueFamilyIndices();
 
 		std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
-		std::set<uint32_t> uniqueQueueFamilies = {indices.graphics_family.value(),
-												  indices.present_family.value(),
-												  indices.compute_family.value(),
-												  indices.transfer_family.value()};
+		std::set<uint32_t> uniqueQueueFamilies;
+		uniqueQueueFamilies.emplace(indices.graphics_family.value());
+		uniqueQueueFamilies.emplace(indices.present_family.value());
+		if (indices.compute_family.has_value())uniqueQueueFamilies.emplace(indices.compute_family.value());
+		if (indices.transfer_family.has_value())uniqueQueueFamilies.emplace(indices.transfer_family.value());
 
 		float priority = 1.0f;//between 0 and 1.
 		for (uint32_t queue_family: uniqueQueueFamilies) {
