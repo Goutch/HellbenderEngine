@@ -22,13 +22,11 @@ namespace HBE {
 		ray_tracing_pipeline_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
 		descriptor_indexing_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
 		buffer_device_address_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
-		synchronization2_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES;
 
 		features2.pNext = &acceleration_structure_features;
 		acceleration_structure_features.pNext = &ray_tracing_pipeline_features;
 		ray_tracing_pipeline_features.pNext = &descriptor_indexing_features;
-		descriptor_indexing_features.pNext = &synchronization2_features;
-		synchronization2_features.pNext = &buffer_device_address_features;
+		descriptor_indexing_features.pNext =  &buffer_device_address_features;
 
 		vkGetPhysicalDeviceFeatures2(handle, &features2);
 

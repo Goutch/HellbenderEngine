@@ -35,7 +35,6 @@ namespace HBE {
 	class VK_PhysicalDevice {
 		const std::vector<const char *> REQUIRED_EXTENSIONS = {
 				VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-				VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME
 		};
 		const std::vector<const char *> RAYTRACING_EXTENSIONS = {
 				VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME,
@@ -68,7 +67,6 @@ namespace HBE {
 		VkPhysicalDeviceAccelerationStructureFeaturesKHR acceleration_structure_features{};
 		VkPhysicalDeviceRayTracingPipelineFeaturesKHR ray_tracing_pipeline_features{};
 		VkPhysicalDeviceDescriptorIndexingFeatures descriptor_indexing_features{};
-		VkPhysicalDeviceSynchronization2Features synchronization2_features{};
 		VkPhysicalDeviceBufferDeviceAddressFeatures buffer_device_address_features{};
 
 		std::vector<const char *> enabled_extensions;

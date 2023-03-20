@@ -53,7 +53,6 @@ namespace HBE {
 		PFN_vkCmdTraceRaysKHR vkCmdTraceRaysKHR = nullptr;
 		PFN_vkGetRayTracingShaderGroupHandlesKHR vkGetRayTracingShaderGroupHandlesKHR = nullptr;
 		PFN_vkCreateRayTracingPipelinesKHR vkCreateRayTracingPipelinesKHR = nullptr;
-        PFN_vkCmdPipelineBarrier2KHR vkCmdPipelineBarrier2KHR = nullptr;
 	private:
 		void initFunctionPointers();
 	};

@@ -192,7 +192,7 @@ namespace HBE {
 			pipeline->unbind();
 		}
 
-        std::vector<DrawCmdInfo> ordered_render_cache = render_cmd_info.render_graph->getOrderedRenderCache();
+		std::vector<DrawCmdInfo> ordered_render_cache = render_cmd_info.render_graph->getOrderedRenderCache();
 		for (int i = 0; i < ordered_render_cache.size(); ++i) {
 			DrawCmdInfo &cmd = ordered_render_cache[i];
 			if ((cmd.layer & render_cmd_info.layer_mask) != cmd.layer) {
@@ -309,13 +309,10 @@ namespace HBE {
 
 		for (int i = 0; i < present_cmd_info.image_count; ++i) {
 			const VK_Image *vk_image = dynamic_cast<const VK_Image *>(vk_images[i]);
-			VkImageMemoryBarrier2 image_barrier{};
-			image_barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
-			image_barrier.srcAccessMask = 0;
+			VkImageMemoryBarrier image_barrier{};
+			image_barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+			image_barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
 			image_barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-
-			image_barrier.srcStageMask = VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT | VK_PIPELINE_STAGE_TRANSFER_BIT;
-			image_barrier.dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 
 			image_barrier.oldLayout = vk_image->getImageLayout();
 			image_barrier.newLayout = vk_image->getImageLayout();
@@ -328,16 +325,16 @@ namespace HBE {
 			image_barrier.subresourceRange.baseArrayLayer = 0;
 			image_barrier.subresourceRange.layerCount = 1;
 
-			VkDependencyInfo dependency_info{};
-			dependency_info.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO_KHR;
-			dependency_info.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
-			dependency_info.pImageMemoryBarriers = &image_barrier;
-			dependency_info.imageMemoryBarrierCount = 1;
-			dependency_info.pBufferMemoryBarriers = nullptr;
-			dependency_info.bufferMemoryBarrierCount = 0;
-			dependency_info.pMemoryBarriers = nullptr;
-			dependency_info.memoryBarrierCount = 0;
-			device->vkCmdPipelineBarrier2KHR(command_pool->getCurrentBuffer(), &dependency_info);
+			vkCmdPipelineBarrier(command_pool->getCurrentBuffer(),
+								 VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT | VK_PIPELINE_STAGE_TRANSFER_BIT,
+								 VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+								 0,
+								 0,
+								 nullptr,
+								 0,
+								 nullptr,
+								 1,
+								 &image_barrier);
 		}
 
 		screen_pipeline_instance->setTextureArray("layers", &present_cmd_info.images[0], present_cmd_info.image_count, current_frame, 0);
