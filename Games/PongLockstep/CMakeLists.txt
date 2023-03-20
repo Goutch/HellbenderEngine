@@ -27,7 +27,7 @@ add_executable(${PROJECT_NAME}
         Simulation/Server.cpp
         Simulation/Server.h
         Simulation/Server.h
-        Simulation/Client.cpp ../Raytracer/main.cpp)
+        Simulation/Client.cpp)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC HBE enet winmm ws2_32)
 target_include_directories(${PROJECT_NAME}

@@ -314,7 +314,7 @@ namespace HBE {
 			image_barrier.srcAccessMask = 0;
 			image_barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 
-			image_barrier.srcStageMask = VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT | VK_PIPELINE_STAGE_TRANSFER_BIT;
+			image_barrier.srcStageMask = VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT | VK_PIPELINE_STAGE_TRANSFER_BIT;
 			image_barrier.dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 
 			image_barrier.oldLayout = vk_image->getImageLayout();

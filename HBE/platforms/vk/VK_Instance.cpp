@@ -11,7 +11,7 @@
 namespace HBE {
 
     VK_Instance::VK_Instance() {
-        ApplicationInfo app_info;
+        const ApplicationInfo& app_info = Application::getInfo();
         VkApplicationInfo vk_app_info{};
         vk_app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
         vk_app_info.pApplicationName = Configs::getWindowTitle().c_str();
@@ -45,10 +45,7 @@ namespace HBE {
         create_info.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
         create_info.ppEnabledExtensionNames = extensions.data();
 
-        std::vector<VkValidationFeatureEnableEXT> enabled_validation_features{
-                VK_VALIDATION_FEATURE_ENABLE_SYNCHRONIZATION_VALIDATION_EXT,
-                VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT,
-        };
+
 
         VkValidationFeaturesEXT validationFeaturesExt{};
         if (validation_enabled) {
@@ -65,8 +62,8 @@ namespace HBE {
 
 
             create_info.pNext = &validationFeaturesExt;
-            validationFeaturesExt.enabledValidationFeatureCount = enabled_validation_features.size();
-            validationFeaturesExt.pEnabledValidationFeatures = enabled_validation_features.data();
+            validationFeaturesExt.enabledValidationFeatureCount = ENABLED_VALIDATION_FEATURES.size();
+            validationFeaturesExt.pEnabledValidationFeatures = ENABLED_VALIDATION_FEATURES.data();
             validationFeaturesExt.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
             validationFeaturesExt.pNext = &validation_layers->getCreateInfo();
         } else {

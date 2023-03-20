@@ -92,10 +92,13 @@ namespace HBE {
 		layoutInfo.pBindings = uniform_descriptor_set_layout_bindings.data();
 
 		VkDescriptorSetLayoutBindingFlagsCreateInfoEXT flagsInfo{};
-		layoutInfo.pNext = &flagsInfo;
-		flagsInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO_EXT;
-		flagsInfo.bindingCount = uniform_descriptor_set_layout_bindings.size();
-		flagsInfo.pBindingFlags = binding_flags.data();
+		if(variable_size_binding != -1)
+		{
+			layoutInfo.pNext = &flagsInfo;
+			flagsInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO_EXT;
+			flagsInfo.bindingCount = uniform_descriptor_set_layout_bindings.size();
+			flagsInfo.pBindingFlags = binding_flags.data();
+		}
 
 		vkCreateDescriptorSetLayout(device->getHandle(), &layoutInfo, nullptr, &descriptor_set_layout_handle);
 

@@ -55,8 +55,7 @@ void onAppPresent() {
 
 int main() {
 	ApplicationInfo app_info{};
-	app_info.hardware_flags = HARDWARE_FLAG_GPU_REQUIRE_VULKAN_1_3 |
-							  HARDWARE_FLAG_GPU_REQUIRE_RTX_CAPABILITIES |
+	app_info.hardware_flags = HARDWARE_FLAG_GPU_REQUIRE_RTX_CAPABILITIES |
 							  HARDWARE_FLAG_GPU_REQUIRE_DESCRIPTOR_INDEXING_CAPABILITIES;
 
 	Application::init(app_info);
