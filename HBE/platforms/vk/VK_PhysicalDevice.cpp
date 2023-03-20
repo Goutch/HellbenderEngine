@@ -99,7 +99,7 @@ namespace HBE {
 	bool VK_PhysicalDevice::isDeviceSuitable(VkPhysicalDevice const &physical_device) {
 
 		QueueFamilyIndices queue_families_indices = getSupportedQueueFamilies(physical_device);
-		if (!queue_families_indices.isComplete())
+		if (!queue_families_indices.hasMinimumRequirements())
 			return false;
 
 		if (!checkExtensionsSupport(physical_device, REQUIRED_EXTENSIONS))
@@ -146,11 +146,11 @@ namespace HBE {
 			if (supported_queue_families.at(i).queueFlags & VK_QUEUE_GRAPHICS_BIT) {
 				indices.graphics_family = i;
 			}
-				//compute
+			//compute
 			else if (supported_queue_families.at(i).queueFlags & VK_QUEUE_COMPUTE_BIT) {
 				indices.compute_family = i;
 			}
-				//tranfer
+			//transfer
 			else if ((supported_queue_families.at(i).queueFlags & VK_QUEUE_TRANSFER_BIT)) {
 				indices.transfer_family = i;
 			}
@@ -158,6 +158,7 @@ namespace HBE {
 			//complete?
 			if (indices.isComplete())break;
 		}
+
 
 		return indices;
 	}

@@ -27,23 +27,22 @@ namespace PongLockstep {
 		game_scene->onUpdate.unsubscribe(this);
 	}
 
-	void PaddleSystem::step(StepData step,StepInputsData* step_input) {
+	void PaddleSystem::step(StepData step, StepInputsData *step_input) {
 		auto group = scene->group<PaddleComponent>();
 
 		for (auto [entity, paddle]: group) {
 			vec2fix16 position = paddle.position;
 			vec2fix16 new_position = position;
-			new_position.x += step.inputs[paddle.client_id].paddle_direction * paddle.speed * step.delta;
+			new_position.y += step.inputs[paddle.client_id].paddle_direction * paddle.speed * step.delta;
 
 			if (paddle.client_id == game_state->client->getID()) {
 				if (Input::getKey(paddle.up_key)) {
-					new_position.y += paddle.speed * step.delta;
+					step_input->paddle_direction = 1;
 				}
 				if (Input::getKey(paddle.down_key)) {
-					new_position.y -= paddle.speed * step.delta;
+					step_input->paddle_direction = -1;
 				}
 			}
-
 
 			Area game_area = this->game_scene->getArea();
 			if (new_position.y - (paddle.size_y / fix16(2)) < game_area.position.y) {

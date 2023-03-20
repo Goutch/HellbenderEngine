@@ -28,7 +28,9 @@ namespace HBE {
 		QUEUE_FAMILY queue_family;
 	public:
 		VK_Queue(VK_Device *device, QUEUE_FAMILY family, uint32_t family_index);
+
 		~VK_Queue();
+
 		const VkQueue &getHandle() const;
 
 		void wait() const;

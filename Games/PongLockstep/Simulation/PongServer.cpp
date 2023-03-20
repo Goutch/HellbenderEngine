@@ -39,8 +39,8 @@ namespace PongLockstep {
 				if (has_all_inputs) {
 					StepData step_data{};
 					step_data.frame_id = current_frame;
-					step_data.inputs[0] = inputs[0].front();
-					step_data.inputs[1] = inputs[1].front();
+					step_data.inputs[0] = inputs[0].back();
+					step_data.inputs[1] = inputs[1].back();
 					step_data.delta = fix16(1) / 144;
 					PacketInfo packet_info{};
 					packet_info.channel = 0;

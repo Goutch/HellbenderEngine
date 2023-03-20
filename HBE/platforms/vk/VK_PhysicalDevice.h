@@ -13,6 +13,11 @@ namespace HBE {
 		std::optional<uint32_t> compute_family;
 		std::optional<uint32_t> transfer_family;
 
+		bool hasMinimumRequirements() {
+			return graphics_family.has_value() &&
+				   present_family.has_value();
+		}
+
 		bool isComplete() {
 			return graphics_family.has_value() &&
 				   present_family.has_value() &&
