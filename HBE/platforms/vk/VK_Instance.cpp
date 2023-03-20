@@ -7,22 +7,22 @@
 #include "GLFW/glfw3.h"
 #include "VK_ValidationLayers.h"
 #include "Application.h"
+
 namespace HBE {
 
     VK_Instance::VK_Instance() {
-		ApplicationInfo app_info;
+        ApplicationInfo app_info;
         VkApplicationInfo vk_app_info{};
         vk_app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
         vk_app_info.pApplicationName = Configs::getWindowTitle().c_str();
         vk_app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
         vk_app_info.pEngineName = "Hellbender";
         vk_app_info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-		vk_app_info.apiVersion = VK_API_VERSION_1_1;
-		if(app_info.hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_VULKAN_1_3)
-			vk_app_info.apiVersion = VK_API_VERSION_1_3;
-		else if(app_info.hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_VULKAN_1_2)
-			vk_app_info.apiVersion = VK_API_VERSION_1_2;
-
+        vk_app_info.apiVersion = VK_API_VERSION_1_1;
+        if (app_info.hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_VULKAN_1_3)
+            vk_app_info.apiVersion = VK_API_VERSION_1_3;
+        else if (app_info.hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_VULKAN_1_2)
+            vk_app_info.apiVersion = VK_API_VERSION_1_2;
 
 
         VkInstanceCreateInfo create_info{};
@@ -51,11 +51,15 @@ namespace HBE {
         };
 
         VkValidationFeaturesEXT validationFeaturesExt{};
-
-        if (ENABLE_VALIDATION_LAYERS) {
+        if (validation_enabled) {
             validation_layers = new VK_ValidationLayers();
-            if (!validation_layers->checkValidationLayerSupport())
-                Log::error("Vulkan validation layers not supported");
+            if (!validation_layers->checkValidationLayerSupport()) {
+                Log::warning("Vulkan validation layers not supported");
+                validation_enabled = false;
+                delete validation_layers;
+            }
+        }
+        if(validation_enabled){
             create_info.enabledLayerCount = validation_layers->validation_layer_names.size();
             create_info.ppEnabledLayerNames = validation_layers->validation_layer_names.data();
 
@@ -72,7 +76,7 @@ namespace HBE {
 
         if (vkCreateInstance(&create_info, nullptr, &handle) != VK_SUCCESS)
             Log::error("Failed to create vulkan instance!");
-        if (ENABLE_VALIDATION_LAYERS)
+        if (validation_enabled)
             validation_layers->init(handle);
         Log::status("Created vulkan instance succesfully");
     }
@@ -122,7 +126,7 @@ namespace HBE {
     }
 
     VK_Instance::~VK_Instance() {
-        if (ENABLE_VALIDATION_LAYERS)
+        if (validation_enabled)
             delete validation_layers;
         vkDestroyInstance(handle, nullptr);
     }

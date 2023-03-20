@@ -52,7 +52,7 @@ namespace HBE {
         this->instance_handle = &instance_handle;
 
         if (createDebugUtilsMessengerEXT(instance_handle, &create_info, nullptr, &debugMessenger) != VK_SUCCESS) {
-            Log::error("failed to set up debug messenger!");
+            Log::warning("failed to set up debug messenger!");
         }
     }
 
