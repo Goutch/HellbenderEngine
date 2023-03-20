@@ -117,6 +117,7 @@ namespace HBE {
 	}
 
 	VK_Queue &VK_Device::getQueue(QUEUE_FAMILY family) {
+		HB_ASSERT(queues.contains(family), "Queue family " + std::to_string(family) + " not found");
 		return queues.at(family);
 	}
 
