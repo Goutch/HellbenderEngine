@@ -86,8 +86,10 @@ namespace HBE {
 		}
 		queues.try_emplace(QUEUE_FAMILY_GRAPHICS, this, QUEUE_FAMILY_GRAPHICS, indices.graphics_family.value());
 		queues.try_emplace(QUEUE_FAMILY_PRESENT, this, QUEUE_FAMILY_PRESENT, indices.present_family.value());
-		queues.try_emplace(QUEUE_FAMILY_COMPUTE, this, QUEUE_FAMILY_COMPUTE, indices.compute_family.value());
-		queues.try_emplace(QUEUE_FAMILY_TRANSFER, this, QUEUE_FAMILY_TRANSFER, indices.transfer_family.value());
+		queues.try_emplace(QUEUE_FAMILY_COMPUTE, this, QUEUE_FAMILY_COMPUTE, indices.compute_family.has_value() ?
+																			 indices.compute_family.value() : indices.graphics_family.value());
+		queues.try_emplace(QUEUE_FAMILY_TRANSFER, this, QUEUE_FAMILY_TRANSFER, indices.transfer_family.has_value() ?
+																			   indices.transfer_family.value() : indices.graphics_family.value());
 		allocator = new VK_Allocator(this);
 
 		initFunctionPointers();
