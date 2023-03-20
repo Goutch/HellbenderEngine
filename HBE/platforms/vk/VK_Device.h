@@ -34,7 +34,7 @@ namespace HBE {
 
 
 		VK_Queue &getQueue(QUEUE_FAMILY family);
-
+		bool hasQueue(QUEUE_FAMILY family);
 		VK_Allocator *getAllocator();
 
 		void wait();

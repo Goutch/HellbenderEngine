@@ -168,9 +168,10 @@ namespace HBE {
 		imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 		imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
-		std::array<uint32_t, 3> queues = {device->getQueue(QUEUE_FAMILY_GRAPHICS).getFamilyIndex(),
-										  device->getQueue(QUEUE_FAMILY_TRANSFER).getFamilyIndex(),
-										  device->getQueue(QUEUE_FAMILY_COMPUTE).getFamilyIndex()};
+		std::vector<uint32_t> queues = {device->getQueue(QUEUE_FAMILY_GRAPHICS).getFamilyIndex()};
+		if (device->hasQueue(QUEUE_FAMILY_TRANSFER))device->getQueue(QUEUE_FAMILY_TRANSFER).getFamilyIndex();
+		if (device->hasQueue(QUEUE_FAMILY_COMPUTE)) device->getQueue(QUEUE_FAMILY_COMPUTE).getFamilyIndex();
+
 		imageInfo.sharingMode = VK_SHARING_MODE_CONCURRENT;
 		imageInfo.pQueueFamilyIndices = queues.data();
 		imageInfo.queueFamilyIndexCount = queues.size();

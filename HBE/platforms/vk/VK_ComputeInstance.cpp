@@ -59,8 +59,9 @@ namespace HBE {
 									  uint32_t group_count_y,
 									  uint32_t group_count_z) {
 		fence->wait();
+		VK_Device* device = renderer->getDevice();
 
-		VK_Queue &queue = renderer->getDevice()->getQueue(QUEUE_FAMILY_COMPUTE);
+		VK_Queue &queue = device->hasQueue(QUEUE_FAMILY_TRANSFER) ? device->getQueue(QUEUE_FAMILY_COMPUTE) : device->getQueue(QUEUE_FAMILY_GRAPHICS);
 		queue.beginCommand();
 
 		const VkCommandBuffer &command_buffer = queue.getCommandPool()->getCurrentBuffer();
