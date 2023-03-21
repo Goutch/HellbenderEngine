@@ -69,7 +69,7 @@ namespace HBE {
                     Log::warning("Mesh renderer does not have a material and/or a mesh assigned");
             }
         }
-        HB_PROFILE_END();
+        HB_PROFILE_END("MeshRendererUpdateUnordered");
 
         HB_PROFILE_BEGIN("MeshRendererUpdateOrdered");
         std::list<SceneNode> nodes = scene->getSceneNodes();
@@ -77,7 +77,8 @@ namespace HBE {
         for (SceneNode node: nodes) {
             drawNode(node,render_graph);
         }
-        HB_PROFILE_END();
+        HB_PROFILE_END("MeshRendererUpdateOrdered");
+		HB_PROFILE_END("MeshRendererDraw");
     }
 
     MeshRendererSystem::~MeshRendererSystem() {

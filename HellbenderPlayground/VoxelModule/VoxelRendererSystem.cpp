@@ -134,7 +134,7 @@ void VoxelRendererSystem::draw(RenderGraph* render_graph) {
 
 	render_graph->draw(draw_cmd);
 
-	HB_PROFILE_END();
+	HB_PROFILE_END("CubeRendererUpdate");
 }
 
 

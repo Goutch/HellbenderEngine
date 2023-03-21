@@ -112,7 +112,7 @@ namespace HBE {
 
 		address.deviceAddress = device->vkGetAccelerationStructureDeviceAddressKHR(device->getHandle(), &accelerationDeviceAddressInfo);
 
-		HB_PROFILE_END();
+		HB_PROFILE_END("Build AABB Acceleration Structure");
 	}
 
 	VK_AABBBottomLevelAccelerationStructure::~VK_AABBBottomLevelAccelerationStructure() {

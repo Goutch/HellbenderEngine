@@ -53,27 +53,27 @@ namespace HBE {
 			HB_PROFILE_BEGIN("UPDATE");
 
 			onUpdate.invoke(delta_t);
-			HB_PROFILE_END();
+			HB_PROFILE_END("UPDATE");
 
 			if (!window->isMinimized()) {
 				HB_PROFILE_BEGIN("DRAW");
 				onDraw.invoke();
-				HB_PROFILE_END();
+				HB_PROFILE_END("DRAW");
 
 
 				HB_PROFILE_BEGIN("RENDER");
 				Graphics::beginFrame();
 				onRender.invoke();
-				HB_PROFILE_END();
+				HB_PROFILE_END("RENDER");
 				HB_PROFILE_BEGIN("PRESENT");
 				onPresent.invoke();
 				Graphics::endFrame();
-				HB_PROFILE_END();
+				HB_PROFILE_END("PRESENT");
 			} else if (window->isMinimized()) {
 				std::this_thread::sleep_for(std::chrono::milliseconds(33));
 			}
 
-			HB_PROFILE_END();
+			HB_PROFILE_END("TOTAL_FRAME");
 			delta_t = update_clock.ns() * NANOSECONDS_TO_SECONDS;
 			update_clock.reset();
 			printFPS(delta_t);

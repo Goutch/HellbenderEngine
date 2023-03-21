@@ -126,7 +126,7 @@ namespace HBE {
 
 
 		address.deviceAddress = device->vkGetAccelerationStructureDeviceAddressKHR(device->getHandle(), &accelerationDeviceAddressInfo);
-		HB_PROFILE_END();
+		HB_PROFILE_END("Build root Acceleration Structure");
 	}
 
 	VkDeviceOrHostAddressConstKHR VK_TopLevelAccelerationStructure::getDeviceAddress() const {

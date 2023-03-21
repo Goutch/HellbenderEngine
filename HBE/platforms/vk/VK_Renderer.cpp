@@ -230,7 +230,7 @@ namespace HBE {
 
 		}
 		render_pass->end(command_pool->getCurrentBuffer());
-		HB_PROFILE_END();
+		HB_PROFILE_END("RenderPass");
 	}
 
 	void VK_Renderer::traceRays(TraceRaysCmdInfo &trace_rays_cmd_info) {
@@ -256,7 +256,7 @@ namespace HBE {
 	void VK_Renderer::beginFrame() {
 		HB_PROFILE_BEGIN("CommandPoolWait");
 		command_pool->begin();
-		HB_PROFILE_END();
+		HB_PROFILE_END("CommandPoolWait");
 	}
 
 	void VK_Renderer::present(PresentCmdInfo &present_cmd_info) {
@@ -279,12 +279,12 @@ namespace HBE {
 		} else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
 			Log::error("failed to acquire swap chain image!");
 		}
-		HB_PROFILE_END();
+		HB_PROFILE_END("AquireImage");
 		HB_PROFILE_BEGIN("WaitImageInflight");
 		if (images_in_flight_fences[current_image] != nullptr) {
 			images_in_flight_fences[current_image]->wait();
 		}
-		HB_PROFILE_END();
+		HB_PROFILE_END("WaitImageInflight");
 		images_in_flight_fences[current_image] = &command_pool->getCurrentFence();
 		command_pool->getCurrentFence().reset();
 
@@ -377,7 +377,7 @@ namespace HBE {
 
 		HB_PROFILE_BEGIN("vkQueuePresentKHR");
 		result = vkQueuePresentKHR(device->getQueue(QUEUE_FAMILY_PRESENT).getHandle(), &presentInfo);
-		HB_PROFILE_END();
+		HB_PROFILE_END("vkQueuePresentKHR");
 		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || windowResized) {
 			windowResized = false;
 			reCreateSwapchain();
@@ -408,7 +408,7 @@ namespace HBE {
 
 		command_pool->getCurrentFence().wait();
 
-		HB_PROFILE_END();
+		HB_PROFILE_END("endFrame");
 	}
 
 	const VK_Swapchain &VK_Renderer::getSwapchain() const {

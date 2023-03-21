@@ -50,7 +50,7 @@ namespace HBE {
         auto group_pixel = scene->group<Transform, PixelCamera>();
         RenderCmdInfo render_cmd_info{};
         render_cmd_info.render_graph = render_graph;
-        HB_PROFILE_END();
+        HB_PROFILE_END("CameraRenderGroup");
         for (auto[handle, transform, camera]: group) {
             if (camera.active) {
                 render_cmd_info.render_target = camera.getRenderTarget();
@@ -78,7 +78,7 @@ namespace HBE {
                 Graphics::render(render_cmd_info);
             }
         }
-        HB_PROFILE_END();
+        HB_PROFILE_END("CameraRender");
     }
 
     CameraSystem::~CameraSystem() {

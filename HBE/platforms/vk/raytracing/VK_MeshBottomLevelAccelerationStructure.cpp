@@ -101,7 +101,7 @@ namespace HBE {
 
 		address.deviceAddress = device->vkGetAccelerationStructureDeviceAddressKHR(device->getHandle(), &accelerationDeviceAddressInfo);
 
-		HB_PROFILE_END();
+		HB_PROFILE_END("Build Mesh Acceleration Structure");
 	}
 
 	VK_MeshBottomLevelAccelerationStructure::~VK_MeshBottomLevelAccelerationStructure() {

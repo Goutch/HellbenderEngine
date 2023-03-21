@@ -18,11 +18,11 @@ namespace HBE {
 		HB_PROFILE_BEGIN("RotatorUpdateGroup");
 		auto group = scene->group<Transform, Rotator>();
 
-		HB_PROFILE_END();
+		HB_PROFILE_END("RotatorUpdateGroup");
 		for (auto [handle,transform,rotator]:group) {
 			transform.rotate(rotator.rotate_speed * delta_t * rotator.angle);
 		}
-		HB_PROFILE_END();
+		HB_PROFILE_END("RotatorUpdate");
 	}
 }
 

@@ -130,7 +130,6 @@ namespace HBE {
 									  capabilities.maxImageExtent.width);
 			extent.height = std::clamp(extent.height, capabilities.minImageExtent.height,
 									   capabilities.maxImageExtent.height);
-
 		}
 	}
 

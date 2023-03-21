@@ -41,7 +41,7 @@ namespace HBE {
         HB_PROFILE_BEGIN("ModelRendererUpdateGroup");
         auto group = scene->group<Transform, ModelRenderer>();
 
-        HB_PROFILE_END();
+        HB_PROFILE_END("ModelRendererUpdateGroup");
         for (auto[handle, transform, model_renderer]: group) {
             if (model_renderer.active) {
                 for (const ModelNode &node: model_renderer.model->getNodes()) {
@@ -49,7 +49,7 @@ namespace HBE {
                 }
             }
         }
-        HB_PROFILE_END();
+        HB_PROFILE_END("ModelRendererUpdate");
     }
 
     ModelRendererSystem::~ModelRendererSystem() {
