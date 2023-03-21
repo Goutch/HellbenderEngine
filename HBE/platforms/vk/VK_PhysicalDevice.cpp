@@ -16,17 +16,21 @@ namespace HBE {
 		support_details = querySwapchainSupportDetails(handle);
 		vkGetPhysicalDeviceMemoryProperties(handle, &memory_properties);
 
-
 		ApplicationInfo app_info = Application::getInfo();
 		VkPhysicalDeviceFeatures2 features2{};
 		features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
 		void **ppNext = &features2.pNext;
 
 		if (app_info.hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_DESCRIPTOR_INDEXING_CAPABILITIES) {
+			enabled_extension_flags |= EXTENSION_FLAG_DESCRIPTOR_INDEXING;
 			descriptor_indexing_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
 			*ppNext = &descriptor_indexing_features;
 		}
 		if (app_info.hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_RTX_CAPABILITIES) {
+			enabled_extension_flags |= EXTENSION_FLAG_RAY_TRACING_PIPELINE;
+			enabled_extension_flags |= EXTENSION_FLAG_ACCELERATION_STRUCTURE;
+			enabled_extension_flags |= EXTENSION_FLAG_BUFFER_DEVICE_ADDRESS;
+
 			buffer_device_address_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
 			acceleration_structure_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
 			ray_tracing_pipeline_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
@@ -285,6 +289,10 @@ namespace HBE {
 
 	const VkPhysicalDeviceDescriptorIndexingFeatures &VK_PhysicalDevice::getDescriptorIndexingFeatures() {
 		return descriptor_indexing_features;
+	}
+
+	const EXTENSION_FLAGS &VK_PhysicalDevice::getEnabledExtensionFlags() const {
+		return enabled_extension_flags;
 	}
 }
 

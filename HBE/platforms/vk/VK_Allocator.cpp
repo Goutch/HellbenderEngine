@@ -5,6 +5,7 @@
 #include "platforms/vk/VK_Buffer.h"
 #include "cstring"
 #include "VK_Renderer.h"
+#include "Application.h"
 
 namespace HBE {
 	VkMemoryPropertyFlags choseProperties(ALLOC_FLAGS flags) {
@@ -18,9 +19,9 @@ namespace HBE {
 		return properties;
 	}
 
-    VK_Allocator::VK_Allocator(VK_Device *device) {
-		this->device =device;
-		this->command_pool = new VK_CommandPool(*device, 1,device->getQueue(QUEUE_FAMILY_GRAPHICS));
+	VK_Allocator::VK_Allocator(VK_Device *device) {
+		this->device = device;
+		this->command_pool = new VK_CommandPool(*device, 1, device->getQueue(QUEUE_FAMILY_GRAPHICS));
 
 		memory_propeties = &device->getPhysicalDevice().getMemoryProperties();
 		for (size_t i = 0; i < memory_propeties->memoryTypeCount; ++i) {
@@ -118,8 +119,8 @@ namespace HBE {
 		vkBindBufferMemory(device->getHandle(), buffer, staging_alloc.block->memory, staging_alloc.offset);
 		StagingBuffer staging_buffer = StagingBuffer{staging_alloc, buffer};
 		void *staging_buffer_data;
-		vkMapMemory(device->getHandle(), staging_buffer.allocation.block->memory, staging_buffer.allocation.offset,staging_buffer.allocation.size, 0, &staging_buffer_data);
-        memcpy(staging_buffer_data, data, size);
+		vkMapMemory(device->getHandle(), staging_buffer.allocation.block->memory, staging_buffer.allocation.offset, staging_buffer.allocation.size, 0, &staging_buffer_data);
+		memcpy(staging_buffer_data, data, size);
 		vkUnmapMemory(device->getHandle(), staging_buffer.allocation.block->memory);
 		return staging_buffer;
 	}
@@ -153,13 +154,13 @@ namespace HBE {
 	Allocation VK_Allocator::alloc(VkMemoryRequirements mem_requirements, ALLOC_FLAGS flags) {
 		uint32_t memory_type = findMemoryTypeIndex(mem_requirements, flags);
 
-		for (Block *block:blocks[memory_type]) {
+		for (Block *block: blocks[memory_type]) {
 			if (block->remaining < mem_requirements.size) {
 				continue;
 			}
 			VkDeviceSize position = 0;
 
-			for (const Allocation &current_alloc:block->allocations) {
+			for (const Allocation &current_alloc: block->allocations) {
 				int32_t end_of_new_alloc = current_alloc.offset - (current_alloc.offset % mem_requirements.alignment);
 				int32_t available = end_of_new_alloc - position;
 
@@ -216,9 +217,12 @@ namespace HBE {
 			allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 			allocInfo.allocationSize = block->size;
 			allocInfo.memoryTypeIndex = memory_type;
+
+
+			ApplicationInfo applicationInfo = Application::getInfo();
 			VkMemoryAllocateFlagsInfo flagsInfo{};
 			flagsInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO;
-			flagsInfo.flags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT;
+			flagsInfo.flags = applicationInfo.hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_RTX_CAPABILITIES ? VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT : 0;
 			allocInfo.pNext = &flagsInfo;
 			if (vkAllocateMemory(device->getHandle(), &allocInfo, nullptr, &block->memory) != VK_SUCCESS) {
 				Log::error("failed to allocate buffer memory!");
@@ -604,7 +608,6 @@ namespace HBE {
 		command_pool->end();
 		command_pool->submit(QUEUE_FAMILY_GRAPHICS);
 	}
-
 
 
 }

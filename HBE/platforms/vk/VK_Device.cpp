@@ -39,25 +39,26 @@ namespace HBE {
 		device_create_info.enabledExtensionCount = enabled_extensions.size();
 		device_create_info.ppEnabledExtensionNames = enabled_extensions.data();
 
+
+
 		VkPhysicalDeviceRobustness2FeaturesEXT robustness_features{};
 		robustness_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT;
 		robustness_features.nullDescriptor = true;
 
-		VkPhysicalDeviceSynchronization2Features synchronization2_features{};
-		synchronization2_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES;
-		synchronization2_features.synchronization2 = true;
+
+		EXTENSION_FLAGS enabled_extensions_flags = physical_device.getEnabledExtensionFlags();
 
 		VkPhysicalDeviceBufferDeviceAddressFeatures buffer_device_address_features{};
 		buffer_device_address_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
-		buffer_device_address_features.bufferDeviceAddress = physical_device.getBufferDeviceAddressFeatures().bufferDeviceAddress;
+		buffer_device_address_features.bufferDeviceAddress = (enabled_extensions_flags & EXTENSION_FLAG_BUFFER_DEVICE_ADDRESS)>0;
 
 		VkPhysicalDeviceRayTracingPipelineFeaturesKHR ray_tracing_features{};
 		ray_tracing_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
-		ray_tracing_features.rayTracingPipeline = physical_device.getRayTracingPipelineFeatures().rayTracingPipeline;
+		ray_tracing_features.rayTracingPipeline = (enabled_extensions_flags & EXTENSION_FLAG_RAY_TRACING_PIPELINE)>0;
 
 		VkPhysicalDeviceAccelerationStructureFeaturesKHR acceleration_structure_features{};
 		acceleration_structure_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
-		acceleration_structure_features.accelerationStructure = physical_device.getAccelerationStructureFeatures().accelerationStructure;
+		acceleration_structure_features.accelerationStructure = (enabled_extensions_flags & EXTENSION_FLAG_ACCELERATION_STRUCTURE)>0;
 
 		VkPhysicalDeviceDescriptorIndexingFeatures descriptor_indexing_features{};
 		descriptor_indexing_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
@@ -74,12 +75,30 @@ namespace HBE {
 		descriptor_indexing_features.descriptorBindingPartiallyBound = physical_device.getDescriptorIndexingFeatures().descriptorBindingPartiallyBound;
 		descriptor_indexing_features.descriptorBindingVariableDescriptorCount = physical_device.getDescriptorIndexingFeatures().descriptorBindingVariableDescriptorCount;
 
-		device_create_info.pNext = &synchronization2_features;
-		synchronization2_features.pNext = &buffer_device_address_features;
-		buffer_device_address_features.pNext = &ray_tracing_features;
-		ray_tracing_features.pNext = &acceleration_structure_features;
-		acceleration_structure_features.pNext = &robustness_features;
-		robustness_features.pNext = &descriptor_indexing_features;
+
+
+		device_create_info.pNext=&robustness_features;
+		void** ppNext=&robustness_features.pNext;
+		if(enabled_extensions_flags & EXTENSION_FLAG_BUFFER_DEVICE_ADDRESS)
+		{
+			*ppNext = &buffer_device_address_features;
+			ppNext = &buffer_device_address_features.pNext;
+		}
+		if(enabled_extensions_flags & EXTENSION_FLAG_RAY_TRACING_PIPELINE)
+		{
+			*ppNext = &ray_tracing_features;
+			ppNext = &ray_tracing_features.pNext;
+		}
+		if(enabled_extensions_flags & EXTENSION_FLAG_ACCELERATION_STRUCTURE)
+		{
+			*ppNext = &acceleration_structure_features;
+			ppNext = &acceleration_structure_features.pNext;
+		}
+		if(enabled_extensions_flags & EXTENSION_FLAG_DESCRIPTOR_INDEXING)
+		{
+			*ppNext = &descriptor_indexing_features;
+			ppNext = &descriptor_indexing_features.pNext;
+		}
 
 		if (vkCreateDevice(physical_device.getHandle(), &device_create_info, nullptr, &handle) != VK_SUCCESS) {
 			Log::error("Failed to create logical device");
@@ -91,7 +110,6 @@ namespace HBE {
 		if (indices.transfer_family.has_value())
 			queues.try_emplace(QUEUE_FAMILY_TRANSFER, this, QUEUE_FAMILY_TRANSFER, indices.transfer_family.value());
 		allocator = new VK_Allocator(this);
-
 		initFunctionPointers();
 	}
 

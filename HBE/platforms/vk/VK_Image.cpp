@@ -172,7 +172,7 @@ namespace HBE {
 		if (device->hasQueue(QUEUE_FAMILY_TRANSFER))device->getQueue(QUEUE_FAMILY_TRANSFER).getFamilyIndex();
 		if (device->hasQueue(QUEUE_FAMILY_COMPUTE)) device->getQueue(QUEUE_FAMILY_COMPUTE).getFamilyIndex();
 
-		imageInfo.sharingMode = VK_SHARING_MODE_CONCURRENT;
+		imageInfo.sharingMode = queues.size()>1?VK_SHARING_MODE_CONCURRENT:VK_SHARING_MODE_EXCLUSIVE;
 		imageInfo.pQueueFamilyIndices = queues.data();
 		imageInfo.queueFamilyIndexCount = queues.size();
 		imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;

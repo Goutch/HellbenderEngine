@@ -11,14 +11,15 @@ namespace HBE {
 	VK_Buffer::VK_Buffer(VK_Device *device, VkDeviceSize size, VkBufferUsageFlags usage, ALLOC_FLAGS flags) {
 		this->device = device;
 		this->size = size;
-		std::array<uint32_t, 3> queues = {device->getQueue(QUEUE_FAMILY_GRAPHICS).getFamilyIndex(),
-										  device->getQueue(QUEUE_FAMILY_TRANSFER).getFamilyIndex(),
-										  device->getQueue(QUEUE_FAMILY_COMPUTE).getFamilyIndex()};
+		std::vector<uint32_t> queues = {device->getQueue(QUEUE_FAMILY_GRAPHICS).getFamilyIndex()};
+		if (device->hasQueue(QUEUE_FAMILY_TRANSFER))device->getQueue(QUEUE_FAMILY_TRANSFER).getFamilyIndex();
+		if (device->hasQueue(QUEUE_FAMILY_COMPUTE)) device->getQueue(QUEUE_FAMILY_COMPUTE).getFamilyIndex();
+
 		VkBufferCreateInfo bufferInfo{};
 		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 		bufferInfo.size = size;
 		bufferInfo.usage = flags & ALLOC_FLAG_MAPPABLE ? usage : usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-		bufferInfo.sharingMode = VK_SHARING_MODE_CONCURRENT;
+		bufferInfo.sharingMode = queues.size() > 1 ? VK_SHARING_MODE_CONCURRENT : VK_SHARING_MODE_EXCLUSIVE;
 		bufferInfo.queueFamilyIndexCount = queues.size();
 		bufferInfo.pQueueFamilyIndices = queues.data();
 
