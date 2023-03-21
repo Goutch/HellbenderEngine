@@ -253,6 +253,7 @@ namespace HBE {
 #ifndef GLSLANG_C
 		glslang::InitializeProcess();
 		EShLanguage stage;
+		auto spirv_target = glslang::EShTargetSpv_1_3;
 		switch (type) {
 			case SHADER_STAGE::SHADER_STAGE_COMPUTE:
 				stage = EShLangCompute;
@@ -268,18 +269,23 @@ namespace HBE {
 				break;
 			case SHADER_STAGE::SHADER_STAGE_RAY_GEN:
 				stage = EShLangRayGen;
+				spirv_target = glslang::EShTargetSpv_1_4;
 				break;
 			case SHADER_STAGE::SHADER_STAGE_RAY_MISS:
 				stage = EShLangMiss;
+				spirv_target = glslang::EShTargetSpv_1_4;
 				break;
 			case SHADER_STAGE::SHADER_STAGE_CLOSEST_HIT:
 				stage = EShLangClosestHit;
+				spirv_target = glslang::EShTargetSpv_1_4;
 				break;
 			case SHADER_STAGE::SHADER_STAGE_ANY_HIT:
 				stage = EShLangAnyHit;
+				spirv_target = glslang::EShTargetSpv_1_4;
 				break;
 			case SHADER_STAGE::SHADER_STAGE_INTERSECTION:
 				stage = EShLangIntersect;
+				spirv_target = glslang::EShTargetSpv_1_4;
 				break;
 
 			case SHADER_STAGE_NONE:
@@ -295,7 +301,7 @@ namespace HBE {
 			const char *const *source_ptr = &source_str_ptr;
 			int lenght = source_str.size();
 			shader.setEnvClient(glslang::EShClient::EShClientVulkan, glslang::EShTargetVulkan_1_3);
-			shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_4);
+			shader.setEnvTarget(glslang::EShTargetSpv, spirv_target);
 			shader.setStringsWithLengths(source_ptr, &lenght, 1);
 			shader.setSourceEntryPoint("main");
 			shader.setEntryPoint("main");
