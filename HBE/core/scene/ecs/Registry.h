@@ -18,6 +18,7 @@
 #include <cstring>
 #include "algorithm"
 #include "string"
+#include "core/utility/Profiler.h"
 
 #ifndef REGISTRY_PAGE_SIZE
 #define REGISTRY_PAGE_SIZE 1024
@@ -64,7 +65,10 @@ namespace HBE {
 
 	template<typename T>
 	static size_t typeHash() {
-		static const size_t hashed_type = hashStr(typeName<T>());
+		HB_PROFILE_BEGIN("HASH TYPE");
+		//static const size_t hashed_type = hashStr(typeName<T>());
+		static const size_t hashed_type = typeid(T).hash_code();
+		HB_PROFILE_END("HASH TYPE");
 		return hashed_type;
 	}
 
