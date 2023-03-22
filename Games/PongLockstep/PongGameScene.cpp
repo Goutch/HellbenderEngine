@@ -81,6 +81,10 @@ namespace PongLockstep {
 		camera.setRenderTarget(render_target);
 
 		createBall(vec2fix16(0, 0), vec2fix16(10, 10));
+		createBall(vec2fix16(0, 0), vec2fix16(5, 10));
+		createBall(vec2fix16(0, 0), vec2fix16(10, 5));
+		createBall(vec2fix16(0, 0), vec2fix16(5, 5));
+		createBall(vec2fix16(0, 0), vec2fix16(10, 10) / vec2fix16(3, 3));
 		paddle_left_entity = createPaddle(vec3{-game_area.size.x / 2 + 1, 0, 0},
 										  KEY_W,
 										  KEY_S,
