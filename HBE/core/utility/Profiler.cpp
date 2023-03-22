@@ -46,8 +46,18 @@ namespace HBE {
 		ProfileGraphNode *current_node = profile_stack.top().node;
 		current_node->count++;
 
+		if (profile_stack.top().node->max < ms) {
+			profile_stack.top().node->max = ms;
+			profile_stack.top().node->max_i = profile_stack.top().node->count;
+		} else if (profile_stack.top().node->min > ms) {
+			profile_stack.top().node->min = ms;
+			profile_stack.top().node->min_i = profile_stack.top().node->count;
+		}
+
 		current_node->min = current_node->count > 1 ? std::min(profile_stack.top().node->min, ms) : ms;
 		current_node->max = current_node->count > 1 ? std::max(profile_stack.top().node->max, ms) : ms;
+
+
 		double total = current_node->time * (current_node->count - 1);
 		current_node->time = (total + ms) / current_node->count;
 		std::string indent = "";
@@ -59,19 +69,14 @@ namespace HBE {
 	}
 
 	void printNodeAverange(ProfileGraphNode *node, int indent) {
-		std::string indent_str = "";
+		std::string indent_str_tabs = "";
 		for (int i = 0; i < indent; ++i) {
-			if (i == indent - 1) {
-				indent_str += "-";
-			} else {
-				indent_str += "-";
-			}
+			indent_str_tabs += "|    ";
 		}
-		Log::message(indent_str + "[" + node->message + "]" + "\n" +
-					 indent_str + "-avg: " + std::to_string(node->time) + "ms" + "\n" +
-					 indent_str + "-min: " + std::to_string(node->min) + "ms" + "\n" +
-					 indent_str + "-max: " + std::to_string(node->max) + "ms" + "\n" +
-					 indent_str + "-x" + std::to_string(node->count));
+		Log::message(indent_str_tabs + "[" + node->message + "]" + std::to_string(node->count) + "\n" +
+					 indent_str_tabs + "|avg: " + std::to_string(node->time) + "ms|" + "\n" +
+					 indent_str_tabs + "|min: " + std::to_string(node->min) + "ms|#" + std::to_string(node->min_i) + "\n" +
+					 indent_str_tabs + "|max: " + std::to_string(node->max) + "ms|#" + std::to_string(node->max_i) );
 		for (auto n: node->sub_nodes) {
 			printNodeAverange(n.second, indent + 1);
 		}
