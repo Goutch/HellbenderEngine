@@ -76,7 +76,11 @@ namespace Pong {
 		Camera2D &camera = camera_entity.attach<Camera2D>();
 		camera.setRenderTarget(render_target);
 
-		createBall(vec2(0, 0), vec2(10, 10));
+		for (int i = 0; i < 4000; ++i) {
+			createBall(vec2(0, 0),
+					   vec2(Random::floatRange(-10, 10), Random::floatRange(-10, 10)));
+		}
+		//createBall(vec2(0, 0), vec2(10, 10));
 		paddle_left_entity = createPaddle(vec3{-game_area.size.x / 2 + 1, 0, 0},
 										  KEY_W,
 										  KEY_S,
