@@ -11,12 +11,12 @@ namespace Pong {
 		return game_area;
 	}
 
-	PongGameScene::PongGameScene(PongGameState &game_state) {
+	PongGameScene::PongGameScene(PongGameState &game_state) : Scene() {
 		createResources();
 		setupScene();
 		Graphics::getWindow()->onSizeChange.subscribe(this, &PongGameScene::OnWindowSizeChange);
 
-		addSystem(new BallSystem(this, game_state,bounce_sound_instance));
+		addSystem(new BallSystem(this, game_state, bounce_sound_instance));
 		addSystem(new PaddleSystem(this));
 
 	}
@@ -46,7 +46,6 @@ namespace Pong {
 		BallComponent &ballComponent = ball.attach<BallComponent>();
 		ballComponent.velocity = velocity;
 		ballComponent.radius = 0.2;
-
 		ball.get<Transform>().setPosition(vec3(position, 0));
 		ball.get<Transform>().setLocalScale(vec3(ballComponent.radius));
 

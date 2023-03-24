@@ -28,7 +28,7 @@ namespace Pong {
 		if (game_scene->isActive() && game_scene->getMainCameraTexture() != nullptr) {
 			present_images.push_back(game_scene->getMainCameraTexture());
 		}
-		if (game_scene->isActive() && ui_scene->getMainCameraTexture() != nullptr) {
+		if (ui_scene != nullptr && ui_scene->isActive() && ui_scene->getMainCameraTexture() != nullptr) {
 			present_images.push_back(ui_scene->getMainCameraTexture());
 		}
 		PresentCmdInfo present_info{};

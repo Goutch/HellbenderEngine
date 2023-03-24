@@ -1,12 +1,11 @@
 #pragma once
 
 #include "core/scene/System.h"
+#include "core/scene/Scene.h"
 
 namespace HBE {
-	class Entity;
 	class CameraControllerSystem : public System {
 	public:
-
 		CameraControllerSystem(Scene *scene);
 		~CameraControllerSystem();
 		void onDetach(Entity entity);

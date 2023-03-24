@@ -1,14 +1,6 @@
-#include <Examples/TextScene.h>
-#include "HBE.h"
-#include "VoxelModule/VoxelModule.h"
-#include "Pathfinder/Pathfinder.h"
-#include "Examples/ModelScene.h"
-#include "Examples/TextScene.h"
-#include "Examples/CubeScene.h"
-#include "Examples/TriangleScene.h"
-#include "Examples/OrderedRenderingScene.h"
-#include "Games/Pong/PongGame.h"
 
+#include "HBE.h"
+#include "Examples/TriangleScene.h"
 using namespace HBE;
 bool fullscreen = false;
 Scene *main_scene;

@@ -3,7 +3,6 @@
 #include "Model.h"
 #include "Resources.h"
 #include "set"
-#include "core/scene/Components.h"
 #include <glm/ext/matrix_transform.hpp>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION

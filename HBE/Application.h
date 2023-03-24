@@ -6,11 +6,8 @@
 
 namespace HBE {
 	class Window;
-
 	class Clock;
-
 	class Scene;
-
 	typedef uint32_t HARDWARE_FLAGS;
 	enum HARDWARE_FLAG {
 		HARDWARE_FLAG_NONE = 0,
@@ -41,7 +38,7 @@ namespace HBE {
 		static Event<> onRender;
 		static Event<> onPresent;
 
-		static void init(const ApplicationInfo& info);
+		static void init(const ApplicationInfo &info);
 
 		static void run();
 
@@ -51,7 +48,8 @@ namespace HBE {
 
 		static float getTime();
 
-		static const ApplicationInfo& getInfo();
+		static const ApplicationInfo &getInfo();
+
 	private:
 		static void printFPS(float);
 

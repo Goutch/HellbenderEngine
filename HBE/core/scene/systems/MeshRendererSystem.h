@@ -3,21 +3,16 @@
 
 #include "Core.h"
 #include "HBETypes.h"
-#include "core/scene/Components.h"
 #include "core/scene/System.h"
-#include "core/scene/Scene.h"
-
 
 namespace HBE {
 	class Scene;
 
+	class RenderGraph;
+
 	class SceneNode;
 
-    class RenderGraph;
-
-	class HB_API MeshRendererSystem : public System {
-		component_type_id mesh_renderer_component_id;
-		component_type_id transform_component_id;
+	class MeshRendererSystem : public System {
 
 	public:
 		MeshRendererSystem(Scene *scene);
@@ -27,7 +22,7 @@ namespace HBE {
 		void draw(RenderGraph *render_graph);
 
 	private :
-		void drawNode(SceneNode &node,RenderGraph* render_graph);
+		void drawNode(SceneNode &node, RenderGraph *render_graph);
 
 	};
 }

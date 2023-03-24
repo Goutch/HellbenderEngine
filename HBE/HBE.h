@@ -3,8 +3,6 @@
 
 #include "Core.h"
 #include "Configs.h"
-#include "core/scene/Components.h"
-#include "core/scene/Scene.h"
 #include "Application.h"
 #include "Core.h"
 #include "HBETypes.h"
@@ -27,6 +25,17 @@
 #include "core/resource/AudioClip.h"
 #include "core/resource/AudioClipInstance.h"
 
+#include "core/scene/Entity.h"
+#include "core/scene/Scene.h"
+#include "core/scene/System.h"
+#include "core/scene/components/ModelRenderer.h"
+#include "core/scene/components/MeshRenderer.h"
+#include "core/scene/components/Camera.h"
+#include "core/scene/components/Camera2D.h"
+#include "core/scene/components/PixelCamera.h"
+#include "core/scene/components/CameraController.h"
+#include "core/scene/components/Transform2D.h"
+#include "core/scene/components/Transform.h"
 
 #include "core/graphics/Graphics.h"
 #include "core/graphics/Window.h"

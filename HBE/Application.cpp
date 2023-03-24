@@ -3,16 +3,11 @@
 #include "core/input/Input.h"
 #include "GLFW/glfw3.h"
 #include "core/utility/Clock.h"
-#include "Configs.h"
 #include "core/threading/JobManager.h"
 #include <core/graphics/Window.h>
-#include <core/graphics/Renderer.h>
-#include <core/resource/Resources.h>
 #include "core/utility/Profiler.h"
 #include "core/scene/Scene.h"
-#include "core/resource/RenderTarget.h"
 #include "core/audio/Audio.h"
-#include <chrono>
 #include <thread>
 
 namespace HBE {

@@ -14,8 +14,10 @@ class TriangleScene : public Scene {
 
 public:
 
-	TriangleScene() {
+	TriangleScene() :Scene() {
 		createResources();
+		Entity e = createEntity3D();
+		attach<Transform>(e.getHandle());
 		setupScene();
 	}
 
@@ -29,7 +31,9 @@ public:
 
 	void setupScene() {
 		Entity camera_entity = createEntity3D();
+		camera_entity.attach<Transform>();
 		camera_entity.attach<Camera2D>().layer_mask = 2;
+		setCameraEntity(camera_entity);
 
 		Entity triangle_entity = createEntity3D();
 		MeshRenderer &triangle_renderer = triangle_entity.attach<MeshRenderer>();

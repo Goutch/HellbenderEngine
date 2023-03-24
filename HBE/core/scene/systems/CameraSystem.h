@@ -1,21 +1,22 @@
 #pragma once
 
-
 #include "Core.h"
 #include "core/scene/System.h"
+#include "core/scene/Entity.h"
+
 
 namespace HBE {
-	class Entity;
+	class Scene;
 
-    class RenderGraph;
-	class HB_API CameraSystem : public System {
-		Scene *scene;
+	class RenderGraph;
+
+	class CameraSystem : public System {
 	public:
 		CameraSystem(Scene *scene);
 
 		~CameraSystem();
 
-		void render(RenderGraph* render_graph);
+		void render(RenderGraph *render_graph);
 
 		void onCameraAttached(Entity entity);
 
@@ -23,7 +24,6 @@ namespace HBE {
 
 		void onPixelCameraAttached(Entity entity);
 	};
-
 }
 
 

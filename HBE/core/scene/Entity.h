@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core.h"
-#include "ecs/Registry.h"
+#include "ecs/ComponentPool.h"
 
 namespace HBE {
 	class Scene;
@@ -11,7 +11,6 @@ namespace HBE {
 		Scene *scene = nullptr;
 
 	public:
-
 		Entity() = default;
 
 		Entity(entity_handle handle, Scene *scene);
@@ -20,7 +19,8 @@ namespace HBE {
 
 		void destroy();
 
-		Scene* getScene();
+		Scene *getScene();
+
 		template<typename Component>
 		Component &attach();
 
@@ -31,7 +31,7 @@ namespace HBE {
 		Component &get();
 
 		template<typename Component>
-		Component &get(component_type_id id);
+		Component &get(size_t signature_bit);
 
 		template<typename Component>
 		void detach();
@@ -39,7 +39,7 @@ namespace HBE {
 		template<typename Component>
 		bool has();
 
-		bool has(component_type_id id);
+		bool has(size_t signature_bit);
 
 		bool valid();
 

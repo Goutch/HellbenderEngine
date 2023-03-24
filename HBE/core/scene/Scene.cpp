@@ -1,63 +1,16 @@
-#include "core/scene/systems/ModelRendererSystem.h"
+#pragma once
+
 #include "Scene.h"
-#include "core/graphics/Graphics.h"
-#include "core/resource/Resources.h"
-#include "core/resource/RenderTarget.h"
 #include "Entity.h"
-#include "list"
-#include "Application.h"
+#include "vector"
+#include "core/scene/systems/CameraSystem.h"
+#include "core/scene/systems/CameraControllerSystem.h"
+#include "core/scene/systems/ModelRendererSystem.h"
+#include "core/scene/systems/MeshRendererSystem.h"
 
 namespace HBE {
-	bool Entity::valid() {
-		return scene != nullptr && scene->valid(handle);
-	}
-
-	entity_handle Entity::getHandle() const {
-		return handle;
-	}
-
-	Entity::Entity(const Entity &other) {
-		this->handle = other.handle;
-		this->scene = other.scene;
-	}
-
-	Entity::Entity(entity_handle handle, Scene *scene) {
-		this->handle = handle;
-		this->scene = scene;
-	}
-
-	bool Entity::has(component_type_id id) {
-		return scene->has(handle, id);
-	}
-
-	Scene *Entity::getScene() {
-		return scene;
-	}
-
-	Entity Entity::getParent() const {
-		return scene->getParent(*this);
-	}
-
-	void Entity::destroy() {
-		scene->destroyEntity(handle);
-	}
 
 
-	Scene::Scene() {
-		systems.push_back(new MeshRendererSystem(this));
-		systems.push_back(new ModelRendererSystem(this));
-		systems.push_back(new CameraSystem(this));
-		systems.push_back(new CameraControllerSystem(this));
-
-		onAttach<Transform>().subscribe(this, &Scene::onAttachTransform);
-
-		transform_component_id = registry.getComponentTypeID<Transform>();
-
-		Application::onDraw.subscribe(this, &Scene::draw);
-		Application::onRender.subscribe(this, &Scene::render);
-		Application::onUpdate.subscribe(this, &Scene::update);
-		Graphics::onFrameChange.subscribe(this, &Scene::onFrameChange);
-	}
 
 	Entity Scene::getCameraEntity() {
 		return main_camera_entity;
@@ -105,17 +58,13 @@ namespace HBE {
 				event.second.invoke(Entity(entitie, this));
 			}
 		}
-		for (System *system: systems) {
-			delete system;
-		}
 
+		for (int i = 0; i < systems.size(); ++i) {
+			delete systems[i];
+		}
 		Application::onDraw.unsubscribe(this);
 		Application::onRender.unsubscribe(this);
 		Application::onUpdate.unsubscribe(this);
-	}
-
-	void Scene::addSystem(System *system) {
-		systems.emplace_back(system);
 	}
 
 	bool Scene::valid(entity_handle handle) {
@@ -130,53 +79,8 @@ namespace HBE {
 		return e;
 	}
 
-
-	Entity Scene::createEntity3D() {
-		Entity e(registry.create(), this);
-		root_nodes.emplace_back(SceneNode{e, false});
-		node_map.emplace(e.getHandle(), &root_nodes.back());
-		attach<Transform>(e.getHandle());
-		return e;
-	}
-
-	Entity Scene::createEntity2D() {
-		Entity e(registry.create(), this);
-		root_nodes.emplace_back(SceneNode{e, false});
-		node_map.emplace(e.getHandle(), &root_nodes.back());
-		attach<Transform2D>(e.getHandle());
-		return e;
-	}
-
-	bool Scene::has(entity_handle handle, component_type_id component_id) {
-		return registry.has(handle, component_id);
-	}
-
-	void Scene::setChildrenDirty(SceneNode *node) {
-		for (SceneNode &child: node->children) {
-			if (child.entity.has(transform_component_id)) {
-				child.entity.get<Transform>(transform_component_id).is_dirty = true;
-				setChildrenDirty(&child);
-			}
-		}
-	}
-
-	void Scene::setParent(Entity entity, Entity parent) {
-		SceneNode *node = node_map[entity.getHandle()];
-		std::list<SceneNode> &source = node->has_parent ? node->parent->children : root_nodes;
-		std::list<SceneNode> &destination = parent.valid() ? node_map[parent.getHandle()]->children : root_nodes;
-		auto iterator = std::find(source.begin(), source.end(), *node);
-		destination.splice(destination.end(), source, iterator, std::next(iterator));
-		node->has_parent = parent.valid();
-		if (node->has_parent)
-			node->parent = node_map[parent.getHandle()];
-		else
-			node->parent = nullptr;
-
-		if (entity.has(transform_component_id)) {
-			entity.get<Transform>(transform_component_id).is_dirty = true;
-			setChildrenDirty(node);
-		}
-
+	bool Scene::has(entity_handle handle, size_t signature_bit) {
+		return registry.has(handle, signature_bit);
 	}
 
 	Entity Scene::getParent(Entity entity) {
@@ -208,11 +112,6 @@ namespace HBE {
 		}
 	}
 
-	void Scene::onAttachTransform(Entity entity) {
-		Transform &transform = entity.get<Transform>(transform_component_id);
-		transform.entity = entity;
-	}
-
 	SceneNode *Scene::getNode(Entity entity) {
 		return &*node_map[entity.getHandle()];
 	}
@@ -235,6 +134,104 @@ namespace HBE {
 		return is_active;
 	}
 
+	void Scene::onFrameChange(uint32_t frame) {
+		render_graph.clear();
+	}
+
+	bool Entity::valid() {
+		return scene != nullptr && scene->valid(handle);
+	}
+
+	entity_handle Entity::getHandle() const {
+		return handle;
+	}
+
+	Entity::Entity(const Entity &other) {
+		this->handle = other.handle;
+		this->scene = other.scene;
+	}
+
+	Entity::Entity(entity_handle handle, Scene *scene) {
+		this->handle = handle;
+		this->scene = scene;
+	}
+
+	bool Entity::has(size_t sigature_bit) {
+		return scene->has(handle, sigature_bit);
+	}
+
+	Scene *Entity::getScene() {
+		return scene;
+	}
+
+	Entity Entity::getParent() const {
+		return scene->getParent(*this);
+	}
+
+	void Entity::destroy() {
+		scene->destroyEntity(handle);
+	}
+
+	void Scene::addSystem(System *system) {
+		systems.push_back(system);
+	}
+
+	Scene::Scene() {
+		onAttach<Transform>().subscribe(this, &Scene::onAttachTransform);
+
+		systems.reserve(4);
+		systems.push_back(new CameraSystem(this));
+		systems.push_back(new CameraControllerSystem(this));
+		systems.push_back(new ModelRendererSystem(this));
+		systems.push_back(new MeshRendererSystem(this));
+
+		Application::onDraw.subscribe(this, &Scene::draw);
+		Application::onRender.subscribe(this, &Scene::render);
+		Application::onUpdate.subscribe(this, &Scene::update);
+		Graphics::onFrameChange.subscribe(this, &Scene::onFrameChange);
+
+	}
+
+	Entity Scene::createEntity3D() {
+		Entity e(registry.create(), this);
+		root_nodes.emplace_back(SceneNode{e, false});
+		node_map.emplace(e.getHandle(), &root_nodes.back());
+		attach<Transform>(e.getHandle());
+		return e;
+	}
+
+	Entity Scene::createEntity2D() {
+		Entity e(registry.create(), this);
+		root_nodes.emplace_back(SceneNode{e, false});
+		node_map.emplace(e.getHandle(), &root_nodes.back());
+		attach<Transform2D>(e.getHandle());
+		return e;
+	}
+
+	void Scene::setParent(Entity entity, Entity parent) {
+		SceneNode *node = node_map[entity.getHandle()];
+		std::list<SceneNode> &source = node->has_parent ? node->parent->children : root_nodes;
+		std::list<SceneNode> &destination = parent.valid() ? node_map[parent.getHandle()]->children : root_nodes;
+		auto iterator = std::find(source.begin(), source.end(), *node);
+		destination.splice(destination.end(), source, iterator, std::next(iterator));
+		node->has_parent = parent.valid();
+		if (node->has_parent)
+			node->parent = node_map[parent.getHandle()];
+		else
+			node->parent = nullptr;
+
+		if (entity.has<Transform>()) {
+			Transform &transform = entity.get<Transform>();
+			transform.is_dirty = true;
+			transform.parent = &parent.get<Transform>();
+			setChildrenDirty(node);
+		}
+	}
+
+	void Scene::onAttachTransform(Entity entity) {
+		Transform &transform = entity.get<Transform>();
+	}
+
 	Texture *Scene::getMainCameraTexture() {
 		if (main_camera_entity.valid() && (main_camera_entity.has<Camera>() || main_camera_entity.has<Camera2D>() || main_camera_entity.has<PixelCamera>())) {
 
@@ -251,9 +248,12 @@ namespace HBE {
 		return nullptr;
 	}
 
-	void Scene::onFrameChange(uint32_t frame) {
-		render_graph.clear();
+	void Scene::setChildrenDirty(SceneNode *node) {
+		for (SceneNode &child: node->children) {
+			if (child.entity.has<Transform>()) {
+				child.entity.get<Transform>().is_dirty = true;
+				setChildrenDirty(&child);
+			}
+		}
 	}
-
-
 }

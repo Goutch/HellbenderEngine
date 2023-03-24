@@ -1,16 +1,13 @@
-
-
 #include "CameraControllerSystem.h"
-#include "core/scene/Scene.h"
 #include "core/input/Input.h"
 #include "core/utility/Profiler.h"
-#include "core/resource/RenderTarget.h"
-#include "core/graphics/Graphics.h"
-#include "core/input/Input.h"
 #include "Application.h"
-
+#include "core/scene/components/CameraController.h"
+#include "core/scene/components/Camera.h"
+#include "core/scene/components/Camera2D.h"
+#include "core/scene/components/PixelCamera.h"
+#include "core/scene/components/Transform.h"
 namespace HBE {
-
 	CameraControllerSystem::CameraControllerSystem(Scene *scene) : System(scene) {
 		scene->onUpdate.subscribe(this, &CameraControllerSystem::update);
 		Event<Entity> &e = scene->onDetach<CameraController>();
@@ -139,4 +136,3 @@ namespace HBE {
 	}
 
 }
-
