@@ -765,6 +765,9 @@ void TScanContext::fillInKeywordMap()
     (*KeywordMap)["icoopmatNV"] =              ICOOPMATNV;
     (*KeywordMap)["ucoopmatNV"] =              UCOOPMATNV;
 
+    (*KeywordMap)["hitObjectNV"] =             HITOBJECTNV;
+    (*KeywordMap)["hitObjectAttributeNV"] =    HITOBJECTATTRNV;
+
     ReservedSet = new std::unordered_set<const char*, str_hash, str_eq>;
 
     ReservedSet->insert("common");
@@ -1219,10 +1222,10 @@ int TScanContext::tokenizeIdentifier()
             parseContext.extensionsTurnedOn(Num_AEP_texture_buffer, AEP_texture_buffer))
             return keyword;
         return firstGenerationImage(false);
-
+        
     case I64IMAGEBUFFER:
     case U64IMAGEBUFFER:
-        afterType = true;
+        afterType = true;        
         if (parseContext.symbolTable.atBuiltInLevel() ||
             parseContext.extensionTurnedOn(E_GL_EXT_shader_image_int64)) {
             if ((parseContext.isEsProfile() && parseContext.version >= 320) ||
@@ -1260,7 +1263,7 @@ int TScanContext::tokenizeIdentifier()
             parseContext.extensionTurnedOn(E_GL_EXT_shader_image_int64))
             return firstGenerationImage(true);
         return identifierOrType();
-
+        
     case IMAGECUBEARRAY:
     case IIMAGECUBEARRAY:
     case UIMAGECUBEARRAY:
@@ -1269,7 +1272,7 @@ int TScanContext::tokenizeIdentifier()
             parseContext.extensionsTurnedOn(Num_AEP_texture_cube_map_array, AEP_texture_cube_map_array))
             return keyword;
         return secondGenerationImage();
-
+        
     case I64IMAGECUBEARRAY:
     case U64IMAGECUBEARRAY:
         afterType = true;
@@ -1290,7 +1293,7 @@ int TScanContext::tokenizeIdentifier()
     case UIMAGE2DMSARRAY:
         afterType = true;
         return secondGenerationImage();
-
+        
     case I64IMAGE2DMS:
     case U64IMAGE2DMS:
     case I64IMAGE2DMSARRAY:
@@ -1787,6 +1790,20 @@ int TScanContext::tokenizeIdentifier()
     case SPIRV_LITERAL:
         if (parseContext.symbolTable.atBuiltInLevel() ||
             parseContext.extensionTurnedOn(E_GL_EXT_spirv_intrinsics))
+            return keyword;
+        return identifierOrType();
+
+    case HITOBJECTNV:
+        if (parseContext.symbolTable.atBuiltInLevel() ||
+            (!parseContext.isEsProfile() && parseContext.version >= 460
+                 && parseContext.extensionTurnedOn(E_GL_NV_shader_invocation_reorder)))
+            return keyword;
+        return identifierOrType();
+
+    case HITOBJECTATTRNV:
+        if (parseContext.symbolTable.atBuiltInLevel() ||
+            (!parseContext.isEsProfile() && parseContext.version >= 460
+                 && parseContext.extensionTurnedOn(E_GL_NV_shader_invocation_reorder)))
             return keyword;
         return identifierOrType();
 #endif

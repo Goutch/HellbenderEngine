@@ -76,6 +76,7 @@ set(CORE_FILES
         core/resource/AudioClip.h
         core/resource/AudioClipInstance.cpp
         core/resource/AudioClipInstance.h
+
         core/scene/components/Transform.h
         core/scene/components/Camera2D.h
         core/scene/components/Transform2D.h
@@ -84,7 +85,6 @@ set(CORE_FILES
         core/scene/components/MeshRenderer.h
         core/scene/components/ModelRenderer.h
         core/scene/components/CameraController.h
-
         core/scene/components/Transform2D.cpp
         core/scene/components/PixelCamera.cpp
         core/scene/components/MeshRenderer.cpp
@@ -93,6 +93,14 @@ set(CORE_FILES
         core/scene/components/Camera.cpp
         core/scene/components/Transform.cpp
         core/scene/components/CameraController.cpp
+        core/scene/ecs/Registry.cpp
+        core/scene/ecs/ComponentPool.cpp
+        core/scene/ecs/ComponentPool.h
+        core/scene/systems/CameraControllerSystem.cpp
+        core/scene/systems/CameraSystem.cpp
+        core/scene/systems/MeshRendererSystem.cpp
+        core/scene/systems/ModelRendererSystem.cpp
+        core/scene/ecs/ComponentTypeRegistry.h
 
         core/utility/Log.cpp
         core/utility/Geometry.cpp
@@ -180,8 +188,8 @@ set(VK_FILES
         platforms/vk/VK_DescriptorAllocator.cpp
         platforms/vk/VK_DescriptorAllocator.h
         platforms/vk/VK_TexelBuffer.cpp
-        platforms/vk/VK_TexelBuffer.h
-        core/scene/ecs/Registry.cpp core/scene/ecs/ComponentPool.cpp core/scene/ecs/ComponentPool.h core/scene/systems/CameraControllerSystem.cpp core/scene/systems/CameraSystem.cpp core/scene/systems/MeshRendererSystem.cpp core/scene/systems/ModelRendererSystem.cpp core/scene/ecs/ComponentTypeRegistry.h)
+        platforms/vk/VK_TexelBuffer.h)
+
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
@@ -190,7 +198,6 @@ find_package(Vulkan REQUIRED)
 if (VULKAN_FOUND)
     add_compile_definitions(VULKAN_RENDERER)
     message("Found vulkan at ${Vulkan_INCLUDE_DIRS}")
-    include_directories(${PROJECT_NAME} ${Vulkan_INCLUDE_DIRS})
 else ()
     message(FATAL_ERROR "Vulkan not found")
 endif ()
@@ -211,30 +218,35 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/include")
 #-----------------------------------glslang------------------------------------------------------
 set(BUILD_SHARED_LIBS FALSE)
 set(BUILD_EXTERNAL TRUE)
+set(ENABLE_GLSLANG_BINARIES FALSE)
+set(ENABLE_CTEST FALSE)
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/)
 #set_property(TARGET glslang PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 #-----------------------------------spirv-cross------------------------------------------------------
 #set(SPIRV_CROSS_EXCEPTIONS_TO_ASSERTIONS "Instead of throwing exceptions assert" FALSE)
-set(SPIRV_CROSS_SHARED "Build the C API as a single shared library." FALSE)
-set(SPIRV_CROSS_STATIC "Build the C and C++ API as static libraries." TRUE)
+#set(SPIRV_CROSS_SHARED "Build the C API as a single shared library." TRUE)
+#set(SPIRV_CROSS_STATIC "Build the C and C++ API as static libraries." TRUE)
 #set(SPIRV_CROSS_CLI "Build the CLI binary. Requires SPIRV_CROSS_STATIC." FALSE)
 #set(SPIRV_CROSS_ENABLE_TESTS "Enable SPIRV-Cross tests." FALSE)
 #
 #set(SPIRV_CROSS_ENABLE_GLSL "Enable GLSL support." TRUE)
-#set(SPIRV_CROSS_ENABLE_HLSL "Enable HLSL target support." FALSE)
-#set(SPIRV_CROSS_ENABLE_MSL "Enable MSL target support." FALSE)
+#set(SPIRV_CROSS_ENABLE_HLSL "Enable HLSL target support." TRUE)
+#set(SPIRV_CROSS_ENABLE_MSL "Enable MSL target support." TRUE)
 #set(SPIRV_CROSS_ENABLE_CPP "Enable C++ target support." TRUE)
-#set(SPIRV_CROSS_ENABLE_REFLECT "Enable JSON reflection target support." FALSE)
+#set(SPIRV_CROSS_ENABLE_REFLECT "Enable JSON reflection target support." TRUE)
 #set(SPIRV_CROSS_ENABLE_C_API "Enable C API wrapper support in static library." TRUE)
-#set(SPIRV_CROSS_ENABLE_UTIL "Enable util module support." FALSE)
-#set(SPIRV_CROSS_FORCE_STL_TYPES "Force use of STL types instead of STL replacements in certain places. Might reduce performance." TRUE)
+#set(SPIRV_CROSS_ENABLE_UTIL "Enable util module support." TRUE)
+#
+#set(SPIRV_CROSS_FORCE_STL_TYPES "Force use of STL types instead of STL replacements in certain places. Might reduce performance." FALSE)
+#
 #set(SPIRV_CROSS_SKIP_INSTALL "Skips installation targets." TRUE)
+#
 #set(SPIRV_CROSS_FORCE_PIC "Force position-independent code for all targets." FALSE)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/)
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/")
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross)
+include_directories(${Vulkan_INCLUDE_DIRS})
 #set_property(TARGET spirv-cross-glsl PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 #set_property(TARGET spirv-cross-glsl spirv-cross-cpp PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 #set_property(TARGET spirv-cross-c-shared PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -336,22 +348,21 @@ set(GLSLANG_LIBS
 set(SPIRV_CROSS_LIBS
         spirv-cross-glsl
         spirv-cross-cpp
-        spirv-cross-c
+        spirv-cross-c-shared
         spirv-cross-reflect
+        spirv-cross-msl
         spirv-cross-util
         spirv-cross-core)
 
 target_link_libraries(${PROJECT_NAME}
         ${Vulkan_LIBRARY}
+        glfw
+        #NRD
         ${SPIRV_CROSS_LIBS}
         ${GLSLANG_LIBS}
         ${FREETYPE_LIBRARY}
-        glfw
-        #NRD
         msdfgen-all
         msdf-atlas-gen
         OpenAL
         SndFile::sndfile
         )
-
-#set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
