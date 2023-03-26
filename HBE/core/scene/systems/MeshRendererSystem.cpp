@@ -45,7 +45,7 @@ namespace HBE
 
 	void HBE::MeshRendererSystem::draw(RenderGraph *render_graph) {
 		HB_PROFILE_BEGIN("MeshRendererDraw");
-		HB_PROFILE_BEGIN("MeshRendererUpdateUnordered");
+		HB_PROFILE_BEGIN("MeshRendererDrawUnordered");
 		DrawCmdInfo draw_cmd{};
 
 		auto group = scene->group<Transform, MeshRenderer>();
@@ -58,7 +58,6 @@ namespace HBE
 					push_constant_info.name = "constants";
 					draw_cmd.push_constants_count = 1;
 					draw_cmd.push_constants = &push_constant_info;
-
 					draw_cmd.mesh = mesh_renderer.mesh;
 					draw_cmd.pipeline_instance = mesh_renderer.pipeline_instance;
 					draw_cmd.layer = mesh_renderer.layer;
@@ -70,15 +69,15 @@ namespace HBE
 					Log::warning("Mesh renderer does not have a material and/or a mesh assigned");
 			}
 		}
-		HB_PROFILE_END("MeshRendererUpdateUnordered");
+		HB_PROFILE_END("MeshRendererDrawUnordered");
 
-		HB_PROFILE_BEGIN("MeshRendererUpdateOrdered");
+		HB_PROFILE_BEGIN("MeshRendererDrawOrdered");
 		std::list<SceneNode> nodes = scene->getSceneNodes();
 
 		for (SceneNode node: nodes) {
 			drawNode(node, render_graph);
 		}
-		HB_PROFILE_END("MeshRendererUpdateOrdered");
+		HB_PROFILE_END("MeshRendererDrawOrdered");
 		HB_PROFILE_END("MeshRendererDraw");
 	}
 

@@ -159,76 +159,65 @@ namespace HBE {
 		ubo.projection = render_cmd_info.projection;
 
 		render_pass->begin(command_pool->getCurrentBuffer(), current_frame);
-		for (const auto &pipeline_kv: render_cmd_info.render_graph->getRenderCache()) {
-			const GraphicPipeline *pipeline = pipeline_kv.first;
-			pipeline->bind();
-			for (const auto &material_kv: pipeline_kv.second) {
-				GraphicPipelineInstance *material = material_kv.first;
-				material->setUniform("ubo", &ubo, current_frame);
-				material->bind();
-				for (const auto &mesh_kv: material_kv.second) {
-					const Mesh *mesh = mesh_kv.first;
-					mesh->bind();
-					for (const DrawCmdInfo &draw_cmd_info: mesh_kv.second) {
 
-						if ((draw_cmd_info.layer & render_cmd_info.layer_mask) != draw_cmd_info.layer) {
-							continue;
-						}
-						for (int i = 0; i < draw_cmd_info.push_constants_count; ++i) {
-							pipeline->pushConstant(draw_cmd_info.push_constants[i].name, draw_cmd_info.push_constants[i].data);
-						}
-
-						if (mesh->hasIndexBuffer()) {
-							vkCmdDrawIndexed(command_pool->getCurrentBuffer(), mesh->getIndexCount(), mesh->getInstanceCount(), 0, 0, 0);
-						} else {
-							vkCmdDraw(command_pool->getCurrentBuffer(), mesh->getVertexCount(), mesh->getInstanceCount(), 0, 0);
-						}
-
+		const std::vector<DrawCmdInfo> *render_cache_sorted = &render_cmd_info.render_graph->getRenderCache();
+		const std::vector<DrawCmdInfo> *ordered_render_cache = &render_cmd_info.render_graph->getOrderedRenderCache();
+		const std::vector<DrawCmdInfo> *caches[2];
+		caches[0] = render_cache_sorted;
+		caches[1] = ordered_render_cache;
+		HB_PROFILE_BEGIN("RenderPassLoopDrawCmd");
+		const GraphicPipeline *last_pipeline = nullptr;
+		GraphicPipelineInstance *last_pipeline_instance = nullptr;
+		const Mesh *last_mesh = nullptr;
+		for (int cache_index = 0; cache_index < 2; ++cache_index) {
+			const std::vector<DrawCmdInfo> &cache = *caches[cache_index];
+			for (int i = 0; i < cache.size(); ++i) {
+				const DrawCmdInfo& current_cmd = cache[i];
+				if ((current_cmd.layer & render_cmd_info.layer_mask) != cache[i].layer) {
+					continue;
+				}
+				const GraphicPipeline *current_pipeline =current_cmd.pipeline_instance->getGraphicPipeline();
+				GraphicPipelineInstance *current_pipeline_instance = current_cmd.pipeline_instance;
+				const Mesh *current_mesh =current_cmd.mesh;
+				if (current_pipeline != last_pipeline) {
+					current_pipeline->bind();
+					last_pipeline = current_pipeline;
+				}
+				if (current_pipeline_instance != last_pipeline_instance) {
+					current_pipeline_instance->setUniform("ubo", &ubo, current_frame);
+					current_pipeline_instance->bind();
+					last_pipeline_instance = current_pipeline_instance;
+				}
+				if (current_mesh != last_mesh) {
+					current_mesh->bind();
+					last_mesh = current_mesh;
+				}
+				for (int j = 0; j < current_cmd.push_constants_count; ++j) {
+					current_cmd.pipeline_instance->getGraphicPipeline()->pushConstant(current_cmd.push_constants[j].name, current_cmd.push_constants[j].data);
+				}
+				if (current_cmd.mesh->hasIndexBuffer()) {
+					vkCmdDrawIndexed(command_pool->getCurrentBuffer(), current_cmd.mesh->getIndexCount(), current_cmd.mesh->getInstanceCount(), 0, 0, 0);
+				} else {
+					vkCmdDraw(command_pool->getCurrentBuffer(), current_cmd.mesh->getVertexCount(), current_cmd.mesh->getInstanceCount(), 0, 0);
+				}
+				if (i != cache.size() - 1) {
+					if (cache[i + 1].mesh != current_cmd.mesh) {
+						current_cmd.mesh->unbind();
 					}
-					mesh->unbind();
+					if (cache[i + 1].pipeline_instance !=current_cmd.pipeline_instance) {
+						current_cmd.pipeline_instance->unbind();
+					}
+					if (cache[i + 1].pipeline_instance->getGraphicPipeline() != current_cmd.pipeline_instance->getGraphicPipeline()) {
+						current_cmd.pipeline_instance->getGraphicPipeline()->unbind();
+					}
+				} else {
+					current_cmd.mesh->unbind();
+					current_cmd.pipeline_instance->unbind();
+					current_cmd.pipeline_instance->getGraphicPipeline()->unbind();
 				}
-				material->unbind();
 			}
-			pipeline->unbind();
 		}
-
-		std::vector<DrawCmdInfo> ordered_render_cache = render_cmd_info.render_graph->getOrderedRenderCache();
-		for (int i = 0; i < ordered_render_cache.size(); ++i) {
-			DrawCmdInfo &cmd = ordered_render_cache[i];
-			if ((cmd.layer & render_cmd_info.layer_mask) != cmd.layer) {
-				continue;
-			}
-
-			cmd.pipeline_instance->getGraphicPipeline()->bind();
-			cmd.pipeline_instance->setUniform("ubo", &ubo, current_frame);
-			cmd.pipeline_instance->bind();
-			cmd.mesh->bind();
-
-			for (int j = 0; j < cmd.push_constants_count; ++j) {
-				cmd.pipeline_instance->getGraphicPipeline()->pushConstant(cmd.push_constants[j].name, cmd.push_constants[j].data);
-			}
-			if (cmd.mesh->hasIndexBuffer()) {
-				vkCmdDrawIndexed(command_pool->getCurrentBuffer(), cmd.mesh->getIndexCount(), cmd.mesh->getInstanceCount(), 0, 0, 0);
-			} else {
-				vkCmdDraw(command_pool->getCurrentBuffer(), cmd.mesh->getVertexCount(), cmd.mesh->getInstanceCount(), 0, 0);
-			}
-			if (i != ordered_render_cache.size() - 1) {
-				if (ordered_render_cache[i + 1].mesh != cmd.mesh) {
-					cmd.mesh->unbind();
-				}
-				if (ordered_render_cache[i + 1].pipeline_instance != cmd.pipeline_instance) {
-					cmd.pipeline_instance->unbind();
-				}
-				if (ordered_render_cache[i + 1].pipeline_instance->getGraphicPipeline() != cmd.pipeline_instance->getGraphicPipeline()) {
-					cmd.pipeline_instance->getGraphicPipeline()->unbind();
-				}
-			} else {
-				cmd.mesh->unbind();
-				cmd.pipeline_instance->unbind();
-				cmd.pipeline_instance->getGraphicPipeline()->unbind();
-			}
-
-		}
+		HB_PROFILE_END("RenderPassLoopDrawCmd");
 		render_pass->end(command_pool->getCurrentBuffer());
 		HB_PROFILE_END("RenderPass");
 	}
