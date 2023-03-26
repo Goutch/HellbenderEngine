@@ -17,8 +17,8 @@ namespace Pong {
 		scene->onDetach<BallComponent>().subscribe(this, &BallSystem::onDetachBallComponent);
 
 		VertexAttributeInfo vertex_attribute_infos[2]{
-				VertexAttributeInfo{0, sizeof(vec3), VERTEX_ATTRIBUTE_FLAG_NONE},
-				VertexAttributeInfo{1, sizeof(mat4), VERTEX_ATTRIBUTE_FLAG_PER_INSTANCE | VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS | VERTEX_ATTRIBUTE_FLAG_FAST_WRITE}
+				VertexAttributeInfo{0, sizeof(vec3)+sizeof(vec2), VERTEX_ATTRIBUTE_FLAG_NONE},
+				VertexAttributeInfo{1, sizeof(mat4), VERTEX_ATTRIBUTE_FLAG_PER_INSTANCE}
 		};
 
 		MeshInfo mesh_info{};
@@ -27,14 +27,14 @@ namespace Pong {
 		mesh_info.attribute_info_count = 2;
 		ball_mesh = Resources::createMesh(mesh_info);
 
-		Geometry::createQuad(*ball_mesh, 1, 1, VERTEX_FLAG_NONE);
+		Geometry::createQuad(*ball_mesh, 1, 1, VERTEX_FLAG_UV);
 
 		ShaderInfo shader_info{};
-		shader_info.path = "shaders/defaults/InstancedPosition.vert";
+		shader_info.path = "shaders/defaults/InstancedPositionUV.vert";
 		shader_info.stage = SHADER_STAGE_VERTEX;
 		ball_vertex_shader = Resources::createShader(shader_info);
 
-		shader_info.path = "shaders/defaults/InstancedPosition.frag";
+		shader_info.path = "shaders/defaults/InstancedPositionUVCircle.frag";
 		shader_info.stage = SHADER_STAGE_FRAGMENT;
 		ball_fragment_shader = Resources::createShader(shader_info);
 
@@ -53,7 +53,7 @@ namespace Pong {
 		pipeline_info.flags = GRAPHIC_PIPELINE_INSTANCE_FLAG_NONE;
 		ball_pipeline_instance = Resources::createGraphicPipelineInstance(pipeline_instance_info);
 
-		vec4 color = {1, 1, 1, 1};
+		vec4 color = {0xfa/255.0f, 0xbd/255.0f, 0x2f/255.0f, 1};
 		ball_pipeline_instance->setUniform("material", &color);
 	}
 
@@ -93,6 +93,8 @@ namespace Pong {
 	}
 
 
+	bool paused = false;
+
 	void BallSystem::update(float delta) {
 		bool delete_ball = false;
 		vec2 delete_pos = vec2(0, 0);
@@ -118,7 +120,12 @@ namespace Pong {
 			delete_pos.y *= camera.getZoomRatio();
 		}
 
-
+		if (Input::getKeyDown(KEY_P)) {
+			paused = !paused;
+		}
+		if (paused) {
+			return;
+		}
 		auto paddle_group = scene->group<Transform, PaddleComponent>();
 		std::vector<PaddleData> paddles;
 		for (auto [entity, transform, paddle]: paddle_group) {
@@ -191,7 +198,8 @@ namespace Pong {
 	}
 
 	void BallSystem::draw(RenderGraph *render_graph) {
-		ball_mesh->setInstanceBuffer(1, ball_transforms.data(), ball_transforms.size());
+		if (!paused)
+			ball_mesh->setInstanceBuffer(1, ball_transforms.data(), ball_transforms.size());
 
 		DrawCmdInfo draw_cmd_info{};
 		draw_cmd_info.mesh = ball_mesh;

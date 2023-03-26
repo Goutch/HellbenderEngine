@@ -69,7 +69,7 @@ namespace Pong {
 		Camera2D &camera = camera_entity.attach<Camera2D>();
 		camera.setRenderTarget(render_target);
 
-		for (int i = 0; i < 50000; ++i) {
+		for (int i = 0; i < 1; ++i) {
 			createBall(vec2(0, 0),
 					   vec2(Random::floatRange(-10, 10), Random::floatRange(-10, 10)));
 		}

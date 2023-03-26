@@ -2,8 +2,8 @@
 #include "PongGame.h"
 
 namespace Pong {
-	const vec4 PongGame::LEFT_COLOR = {104.0f / 255.0f, 157.0f / 255.0f, 106.0f / 255.0f, 1};
-	const vec4 PongGame::RIGHT_COLOR = {204.0f / 255.0f, 36.0f / 255.0f, 29.0f / 255.0f, 1};
+	const vec4 PongGame::LEFT_COLOR = {0x83 / 255.0f, 0xa5 / 255.0f, 0x98 / 255.0f, 1};
+	const vec4 PongGame::RIGHT_COLOR = {0xfb / 255.0f, 0x49/ 255.0f, 0x34 / 255.0f, 1};
 
 	void reset(PongGameState &game_state) {
 		game_state.score_left = 0;
