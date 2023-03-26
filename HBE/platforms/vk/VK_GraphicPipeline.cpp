@@ -30,7 +30,7 @@ namespace HBE {
 		this->binding_infos = std::vector<VertexAttributeInfo>(info.attribute_infos, info.attribute_infos + info.attribute_info_count);
 
 		const VK_Shader *vk_vertex = (dynamic_cast<const VK_Shader *>(info.vertex_shader));
-		const VK_Shader *vk_frag = (dynamic_cast<const VK_Shader *>(info.fragement_shader));
+		const VK_Shader *vk_frag = (dynamic_cast<const VK_Shader *>(info.fragment_shader));
 		shaders.emplace_back(vk_vertex);
 		shaders.emplace_back(vk_frag);
 		VkPipelineShaderStageCreateInfo vertShaderStageInfo{};

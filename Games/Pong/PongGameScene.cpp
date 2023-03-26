@@ -13,12 +13,10 @@ namespace Pong {
 
 	PongGameScene::PongGameScene(PongGameState &game_state) : Scene() {
 		createResources();
+		addSystem(new BallSystem(this, game_state, bounce_sound_instance, render_target));
+		addSystem(new PaddleSystem(this));
 		setupScene();
 		Graphics::getWindow()->onSizeChange.subscribe(this, &PongGameScene::OnWindowSizeChange);
-
-		addSystem(new BallSystem(this, game_state, bounce_sound_instance));
-		addSystem(new PaddleSystem(this));
-
 	}
 
 	PongGameScene::~PongGameScene() {
@@ -28,7 +26,6 @@ namespace Pong {
 		delete vertex_shader;
 		delete fragment_shader;
 		delete pipeline;
-		delete ball_pipeline_instance;
 		delete paddle_left_pipeline_instance;
 		delete paddle_right_pipeline_instance;
 		delete render_target;
@@ -38,10 +35,6 @@ namespace Pong {
 
 	Entity PongGameScene::createBall(vec2 position, vec2 velocity) {
 		Entity ball = createEntity3D();
-		MeshRenderer &ball_renderer = ball.attach<MeshRenderer>();
-		ball_renderer.mesh = quad_mesh;
-		ball_renderer.layer = 0;
-		ball_renderer.pipeline_instance = ball_pipeline_instance;
 
 		BallComponent &ballComponent = ball.attach<BallComponent>();
 		ballComponent.velocity = velocity;
@@ -76,7 +69,7 @@ namespace Pong {
 		Camera2D &camera = camera_entity.attach<Camera2D>();
 		camera.setRenderTarget(render_target);
 
-		for (int i = 0; i < 40000; ++i) {
+		for (int i = 0; i < 50000; ++i) {
 			createBall(vec2(0, 0),
 					   vec2(Random::floatRange(-10, 10), Random::floatRange(-10, 10)));
 		}
@@ -122,7 +115,7 @@ namespace Pong {
 		pipeline_info.attribute_info_count = 1;
 		pipeline_info.attribute_infos = &VERTEX_ATTRIBUTE_INFO_POSITION3D;
 		pipeline_info.vertex_shader = vertex_shader;
-		pipeline_info.fragement_shader = fragment_shader;
+		pipeline_info.fragment_shader = fragment_shader;
 		pipeline_info.flags = GRAPHIC_PIPELINE_FLAG_NONE;
 		pipeline_info.render_target = render_target;
 		pipeline = Resources::createGraphicPipeline(pipeline_info);
@@ -131,12 +124,10 @@ namespace Pong {
 		pipeline_instance_info.graphic_pipeline = pipeline;
 		pipeline_instance_info.flags = GRAPHIC_PIPELINE_INSTANCE_FLAG_NONE;
 
-		ball_pipeline_instance = Resources::createGraphicPipelineInstance(pipeline_instance_info);
 		paddle_left_pipeline_instance = Resources::createGraphicPipelineInstance(pipeline_instance_info);
 		paddle_right_pipeline_instance = Resources::createGraphicPipelineInstance(pipeline_instance_info);
 
 		vec4 color = {1, 1, 1, 1};
-		ball_pipeline_instance->setUniform("material", &color);
 		color = PongGame::LEFT_COLOR;
 		paddle_left_pipeline_instance->setUniform("material", &color);
 		color = PongGame::RIGHT_COLOR;

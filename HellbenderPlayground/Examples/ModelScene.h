@@ -36,7 +36,7 @@ public:
 		GraphicPipelineInfo pipeline_info{};
 		pipeline_info.attribute_infos = attribute_infos.data();
 		pipeline_info.attribute_info_count = attribute_infos.size();
-		pipeline_info.fragement_shader = frag;
+		pipeline_info.fragment_shader = frag;
 		pipeline_info.vertex_shader = vert;
 		pipeline_info.flags = GRAPHIC_PIPELINE_FLAG_FRONT_COUNTER_CLOCKWISE | GRAPHIC_PIPELINE_FLAG_CULL_BACK; //gltf primitives are counter clockwise
 

@@ -18,7 +18,6 @@ namespace Pong {
 		Shader *vertex_shader;
 		Shader *fragment_shader;
 		GraphicPipeline *pipeline;
-		GraphicPipelineInstance *ball_pipeline_instance;
 		GraphicPipelineInstance *paddle_left_pipeline_instance;
 		GraphicPipelineInstance *paddle_right_pipeline_instance;
 		Entity paddle_left_entity;

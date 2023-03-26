@@ -8,12 +8,13 @@
 namespace HBE {
 	class HB_API RegistryPage {
 		std::vector<RawComponentPool *> component_pages;
+		std::bitset<REGISTRY_MAX_COMPONENT_TYPES> components_of_entity[REGISTRY_PAGE_SIZE];
 	public:
 		size_t offset;
 		uint32_t count = 0;
 
 		bool valid_entities[REGISTRY_PAGE_SIZE];
-		std::bitset<REGISTRY_MAX_COMPONENT_TYPES> components_of_entity[REGISTRY_PAGE_SIZE];
+
 
 		std::bitset<REGISTRY_MAX_COMPONENT_TYPES> components_signature = 0;
 
@@ -30,6 +31,10 @@ namespace HBE {
 
 		RawComponentPool *getRawPool(size_t bit) {
 			return bit < component_pages.size() ? component_pages[bit] : nullptr;
+		}
+
+		std::bitset<REGISTRY_MAX_COMPONENT_TYPES> &getSignature(entity_handle handle) {
+			return components_of_entity[handleToIndex(handle)];
 		}
 
 		template<typename Component>
@@ -63,8 +68,10 @@ namespace HBE {
 				raw_pool->detach(handle);
 				if (raw_pool->handles.size() == 0) {
 					components_signature.set(raw_pool->info.signature_bit, false);
-					delete component_pages[type.signature_bit];
+
 					component_pages[type.signature_bit] = nullptr;
+					delete raw_pool;
+
 				}
 			}
 		};
@@ -75,7 +82,6 @@ namespace HBE {
 
 		void setInvalid(entity_handle handle) {
 			size_t i = handleToIndex(handle);
-			valid_entities[i] = false;
 			std::list<size_t> obsolete_types_hash;
 			for (int bit = 0; bit < component_pages.size(); ++bit) {
 				RawComponentPool *raw_pool = component_pages[bit];

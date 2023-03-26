@@ -124,7 +124,7 @@ public:
 		pipeline_info.attribute_info_count = 1;
 		pipeline_info.attribute_infos = &VERTEX_ATTRIBUTE_INFO_POSITION3D;
 		pipeline_info.vertex_shader = vertex_shader;
-		pipeline_info.fragement_shader = fragment_shader;
+		pipeline_info.fragment_shader = fragment_shader;
 		pipeline_info.render_target = render_target;
 		pipeline_info.flags = GRAPHIC_PIPELINE_FLAG_IGNORE_DEPTH_TEST;
 

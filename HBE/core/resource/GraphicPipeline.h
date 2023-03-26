@@ -26,7 +26,7 @@ namespace HBE {
 
 	struct GraphicPipelineInfo {
 		const Shader *vertex_shader = nullptr;
-		const Shader *fragement_shader = nullptr;
+		const Shader *fragment_shader = nullptr;
 		const Shader *geometry_shader = nullptr;
 		const VertexAttributeInfo *attribute_infos = nullptr;
 		const RenderTarget *render_target = nullptr;

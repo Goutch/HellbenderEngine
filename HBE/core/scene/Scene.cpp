@@ -11,18 +11,25 @@
 namespace HBE {
 
 
-
 	Entity Scene::getCameraEntity() {
 		return main_camera_entity;
 	}
 
 	void Scene::destroyEntity(entity_handle entity) {
 		SceneNode *node = node_map[entity];
-		node_map.erase(entity);
+
 		if (node->has_parent) {
 			node->parent->children.remove(*node);
 		} else {
 			root_nodes.remove(*node);
+		}
+		node_map.erase(entity);
+		std::bitset<REGISTRY_MAX_COMPONENT_TYPES> signature = registry.getSignature(entity);
+
+		for (auto e: detach_events) {
+			if (signature.test(e.first)) {
+				e.second.invoke(Entity(entity, this));
+			}
 		}
 		registry.destroy(entity);
 	}

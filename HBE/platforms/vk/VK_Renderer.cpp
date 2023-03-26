@@ -477,7 +477,7 @@ namespace HBE {
 
 		GraphicPipelineInfo pipeline_info{};
 		pipeline_info.vertex_shader = vert;
-		pipeline_info.fragement_shader = frag;
+		pipeline_info.fragment_shader = frag;
 		pipeline_info.attribute_info_count = 0;
 		screen_pipeline = new VK_GraphicPipeline(device, this, pipeline_info, swapchain->getRenderPass());
 		Resources::add("DEFAULT_SCREEN_PIPELINE", screen_pipeline);

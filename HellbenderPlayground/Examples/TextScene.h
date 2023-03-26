@@ -73,7 +73,7 @@ private:
 
 		pipeline_info.attribute_infos = &VERTEX_ATTRIBUTE_INFO_POSITION3D_UV_INTERLEAVED;
 		pipeline_info.vertex_shader = text_vertex_shader;
-		pipeline_info.fragement_shader = text_fragment_shader;
+		pipeline_info.fragment_shader = text_fragment_shader;
 		pipeline_info.flags = 0;
 		text_pipeline = Resources::createGraphicPipeline(pipeline_info);
 

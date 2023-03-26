@@ -52,6 +52,10 @@ namespace HBE {
 			if (pool != nullptr)
 				entities.insert(entities.end(), pool->handles.begin(), pool->handles.end());
 		}
+	}
+
+	std::bitset<128> &Registry::getSignature(entity_handle handle) {
+		return pages[getPage(handle)]->getSignature(handle);
 	};
 }
 

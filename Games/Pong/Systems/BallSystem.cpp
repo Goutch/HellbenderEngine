@@ -7,11 +7,54 @@
 #include "Games/Pong/PongGame.h"
 
 namespace Pong {
-	BallSystem::BallSystem(PongGameScene *scene, PongGameState &game_state, AudioClipInstance *bounce_sound) : System(scene) {
+	BallSystem::BallSystem(PongGameScene *scene, PongGameState &game_state, AudioClipInstance *bounce_sound, RenderTarget *render_target) : System(scene) {
 		this->game_scene = scene;
 		this->game_state = &game_state;
 		this->bounce_sound = bounce_sound;
 		scene->onUpdate.subscribe(this, &BallSystem::update);
+		scene->onDraw.subscribe(this, &BallSystem::draw);
+		scene->onAttach<BallComponent>().subscribe(this, &BallSystem::onAttachBallComponent);
+		scene->onDetach<BallComponent>().subscribe(this, &BallSystem::onDetachBallComponent);
+
+		VertexAttributeInfo vertex_attribute_infos[2]{
+				VertexAttributeInfo{0, sizeof(vec3), VERTEX_ATTRIBUTE_FLAG_NONE},
+				VertexAttributeInfo{1, sizeof(mat4), VERTEX_ATTRIBUTE_FLAG_PER_INSTANCE | VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS | VERTEX_ATTRIBUTE_FLAG_FAST_WRITE}
+		};
+
+		MeshInfo mesh_info{};
+		mesh_info.flags = MESH_FLAG_NONE;
+		mesh_info.attribute_infos = vertex_attribute_infos;
+		mesh_info.attribute_info_count = 2;
+		ball_mesh = Resources::createMesh(mesh_info);
+
+		Geometry::createQuad(*ball_mesh, 1, 1, VERTEX_FLAG_NONE);
+
+		ShaderInfo shader_info{};
+		shader_info.path = "shaders/defaults/InstancedPosition.vert";
+		shader_info.stage = SHADER_STAGE_VERTEX;
+		ball_vertex_shader = Resources::createShader(shader_info);
+
+		shader_info.path = "shaders/defaults/InstancedPosition.frag";
+		shader_info.stage = SHADER_STAGE_FRAGMENT;
+		ball_fragment_shader = Resources::createShader(shader_info);
+
+		GraphicPipelineInfo pipeline_info{};
+		pipeline_info.flags = GRAPHIC_PIPELINE_FLAG_CULL_BACK;
+		pipeline_info.vertex_shader = ball_vertex_shader;
+		pipeline_info.fragment_shader = ball_fragment_shader;
+		pipeline_info.attribute_infos = vertex_attribute_infos;
+		pipeline_info.attribute_info_count = 2;
+		pipeline_info.render_target = render_target;
+
+		ball_pipeline = Resources::createGraphicPipeline(pipeline_info);
+
+		GraphicPipelineInstanceInfo pipeline_instance_info{};
+		pipeline_instance_info.graphic_pipeline = ball_pipeline;
+		pipeline_info.flags = GRAPHIC_PIPELINE_INSTANCE_FLAG_NONE;
+		ball_pipeline_instance = Resources::createGraphicPipelineInstance(pipeline_instance_info);
+
+		vec4 color = {1, 1, 1, 1};
+		ball_pipeline_instance->setUniform("material", &color);
 	}
 
 	struct PaddleData {
@@ -84,7 +127,6 @@ namespace Pong {
 		uint32_t n = 0;
 		auto group = scene->group<Transform, BallComponent>();
 		for (auto [entity, transform, ball]: group) {
-
 			bool colide = false;
 			if (delete_ball) {
 				if (glm::distance(vec2(transform.worldPosition()), delete_pos) < delete_radius) {
@@ -125,7 +167,7 @@ namespace Pong {
 
 
 			colide = colide | collideBallWithPaddles(paddles, &transform, &ball);
-			n++;
+
 
 			if (colide && bounce_sound->getState() != AUDIO_CLIP_INSTANCE_STATE_PLAYING) {
 				bounce_sound->setVolume(glm::clamp(t_since_last_bounce, 0.002f, 1.0f));
@@ -134,6 +176,9 @@ namespace Pong {
 
 				t_since_last_bounce = 0;
 			}
+
+			ball_transforms[n] = transform.world();
+			n++;
 		}
 
 
@@ -145,6 +190,31 @@ namespace Pong {
 		}
 	}
 
+	void BallSystem::draw(RenderGraph *render_graph) {
+		ball_mesh->setInstanceBuffer(1, ball_transforms.data(), ball_transforms.size());
 
+		DrawCmdInfo draw_cmd_info{};
+		draw_cmd_info.mesh = ball_mesh;
+		draw_cmd_info.pipeline_instance = ball_pipeline_instance;
+		draw_cmd_info.flags = DRAW_CMD_FLAG_NONE;
+
+		render_graph->draw(draw_cmd_info);
+	}
+
+	BallSystem::~BallSystem() {
+		delete ball_mesh;
+		delete ball_vertex_shader;
+		delete ball_fragment_shader;
+		delete ball_pipeline_instance;
+		delete ball_pipeline;
+	}
+
+	void BallSystem::onAttachBallComponent(Entity entity) {
+		ball_transforms.emplace_back(1.0f);
+	}
+
+	void BallSystem::onDetachBallComponent(Entity entity) {
+		ball_transforms.pop_back();
+	}
 }
 

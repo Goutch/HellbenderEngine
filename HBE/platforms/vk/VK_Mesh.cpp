@@ -29,6 +29,7 @@ namespace HBE {
 
 	void VK_Mesh::setBuffer(uint32_t location, const void *vertices, size_t count) {
 		this->vertex_count = count;
+		if (count == 0) return;
 		auto it = buffers.find(location);
 		if (it == buffers.end()) {
 			Log::warning("Trying to set a mesh buffer at binding#" + std::to_string(location) + " but no such binding exists");
@@ -50,10 +51,10 @@ namespace HBE {
 			buffers[location][renderer->getCurrentFrame()] = new VK_Buffer(device,
 																		   vertices,
 																		   buffer_size,
-																		  VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
-																		  ((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
-																		  ALLOC_FLAG_MAPPABLE :
-																		  ALLOC_FLAG_NONE);
+																		   VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
+																		   ((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
+																		   ALLOC_FLAG_MAPPABLE :
+																		   ALLOC_FLAG_NONE);
 
 		} else {
 			//todo: add to delete queue instead of waiting and deleting immediately
@@ -64,15 +65,16 @@ namespace HBE {
 			buffers[location][0] = new VK_Buffer(device,
 												 vertices,
 												 buffer_size,
-												VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
-												((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
-												ALLOC_FLAG_MAPPABLE :
-												ALLOC_FLAG_NONE);
+												 VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
+												 ((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
+												 ALLOC_FLAG_MAPPABLE :
+												 ALLOC_FLAG_NONE);
 		}
 	}
 
 	void VK_Mesh::setInstanceBuffer(uint32_t location, const void *data, size_t count) {
 		this->instance_count = count;
+		if (count == 0) return;
 		VertexAttributeInfo &binding_info = bindings[location];
 		VkDeviceSize buffer_size = binding_info.size * count;
 
@@ -84,10 +86,10 @@ namespace HBE {
 			buffers[location][renderer->getCurrentFrame()] = new VK_Buffer(device,
 																		   data,
 																		   buffer_size,
-																		  VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
-																		  ((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
-																		  ALLOC_FLAG_MAPPABLE :
-																		  ALLOC_FLAG_NONE);
+																		   VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
+																		   ((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
+																		   ALLOC_FLAG_MAPPABLE :
+																		   ALLOC_FLAG_NONE);
 
 		} else {
 			device->getQueue(QUEUE_FAMILY_GRAPHICS).wait();
@@ -98,10 +100,10 @@ namespace HBE {
 			buffers[location][0] = new VK_Buffer(device,
 												 data,
 												 buffer_size,
-												VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
-												((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
-												ALLOC_FLAG_MAPPABLE :
-												ALLOC_FLAG_NONE);
+												 VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
+												 ((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
+												 ALLOC_FLAG_MAPPABLE :
+												 ALLOC_FLAG_NONE);
 		}
 
 	}
@@ -119,6 +121,7 @@ namespace HBE {
 	}
 
 	void VK_Mesh::setVertexIndices(const void *data, size_t count, size_t element_size) {
+		//todo: remove wait here and delete in allocator
 		device->getQueue(QUEUE_FAMILY_GRAPHICS).wait();
 		if (indices_buffer) {
 			delete indices_buffer;
@@ -145,8 +148,7 @@ namespace HBE {
 	}
 
 	void VK_Mesh::bind() const {
-
-		if(bound)
+		if (bound)
 			return;
 		bound = true;
 		//todo: cleanup this

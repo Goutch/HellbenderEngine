@@ -7,8 +7,7 @@
 #include "core/scene/components/Transform.h"
 #include "core/scene/components/MeshRenderer.h"
 
-namespace HBE
-{
+namespace HBE {
 	MeshRendererSystem::MeshRendererSystem(Scene *scene) : System(scene) {
 		scene->onDraw.subscribe(this, &MeshRendererSystem::draw);
 	}
@@ -50,6 +49,7 @@ namespace HBE
 
 		auto group = scene->group<Transform, MeshRenderer>();
 
+		bool has_ordered = false;
 		for (auto [handle, transform, mesh_renderer]: group) {
 			if (mesh_renderer.active && !mesh_renderer.ordered) {
 				if (mesh_renderer.mesh && mesh_renderer.pipeline_instance) {
@@ -67,16 +67,22 @@ namespace HBE
 					render_graph->draw(draw_cmd);
 				} else
 					Log::warning("Mesh renderer does not have a material and/or a mesh assigned");
+			} else {
+				has_ordered = true;
 			}
 		}
 		HB_PROFILE_END("MeshRendererDrawUnordered");
 
 		HB_PROFILE_BEGIN("MeshRendererDrawOrdered");
-		std::list<SceneNode> nodes = scene->getSceneNodes();
 
-		for (SceneNode node: nodes) {
-			drawNode(node, render_graph);
+
+		if (has_ordered) {
+			std::list<SceneNode> nodes = scene->getSceneNodes();
+			for (SceneNode node: nodes) {
+				drawNode(node, render_graph);
+			}
 		}
+
 		HB_PROFILE_END("MeshRendererDrawOrdered");
 		HB_PROFILE_END("MeshRendererDraw");
 	}

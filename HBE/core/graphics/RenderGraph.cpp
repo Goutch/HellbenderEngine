@@ -21,6 +21,7 @@ namespace HBE {
 	}
 
 	void RenderGraph::draw(DrawCmdInfo draw_cmd_info) {
+		if (draw_cmd_info.mesh->getInstanceCount() == 0) return;
 		//copy push constants data to cache
 		for (int i = 0; i < draw_cmd_info.push_constants_count; ++i) {
 			if (draw_cmd_info.push_constants[i].size + current_pc_block_offset > PUSH_CONSTANT_BLOCK_SIZE) {

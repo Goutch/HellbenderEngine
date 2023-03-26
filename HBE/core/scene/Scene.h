@@ -149,9 +149,10 @@ namespace HBE {
 
 		void printSceneHierarchy();
 
+		SceneNode *getNode(Entity entity);
 
 	private:
-		SceneNode *getNode(Entity entity);
+
 
 		void printNode(SceneNode &node, int level);
 

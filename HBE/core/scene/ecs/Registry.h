@@ -42,7 +42,8 @@ namespace HBE {
 		void initType(size_t signature_bit) {
 			if (!initialized_types.test(signature_bit)) {
 				ComponentTypeInfo info = ComponentTypeInfo{signature_bit, sizeof(Component), typeName<Component>()};
-				types.resize(signature_bit + 1);
+				if (types.size() <= signature_bit)
+					types.resize(signature_bit + 1);
 				types[signature_bit] = info;
 				initialized_types.set(signature_bit);
 			}
@@ -51,6 +52,8 @@ namespace HBE {
 		entity_handle create();
 
 		void group(std::vector<entity_handle> &entities, size_t signature_bit);
+
+		std::bitset<REGISTRY_MAX_COMPONENT_TYPES>& getSignature(entity_handle handle);
 
 		template<typename ... Components>
 		Group<Components...> group() {
@@ -92,7 +95,8 @@ namespace HBE {
 			initType<Component>(signature_bit);
 			HB_ASSERT(initialized_types.test(signature_bit), "component" + typeName<Component>() + " is not initialized");
 			HB_ASSERT(has<Component>(handle),
-					  std::string("tried to get component ") + typeName<Component>() + "with signature bit " + std::to_string(type_registry.getSignatureBit<Component>()) + " in entity#" + std::to_string(handle) +
+					  std::string("tried to get component ") + typeName<Component>() + "with signature bit " + std::to_string(type_registry.getSignatureBit<Component>()) + " in entity#" +
+					  std::to_string(handle) +
 					  std::string(" but has<") + typeName<Component>() + ">(" + std::to_string(handle) +
 					  ") == false");
 
@@ -105,7 +109,8 @@ namespace HBE {
 			initType<Component>(signature_bit);
 			HB_ASSERT(initialized_types.test(signature_bit), "component " + typeName<Component>() + " is not initialized");
 			HB_ASSERT(has<Component>(handle),
-					  std::string("tried to get component ") + typeName<Component>() + "with signature bit " + std::to_string(type_registry.getSignatureBit<Component>()) + " in entity#" + std::to_string(handle) +
+					  std::string("tried to get component ") + typeName<Component>() + "with signature bit " + std::to_string(type_registry.getSignatureBit<Component>()) + " in entity#" +
+					  std::to_string(handle) +
 					  std::string(" but has<") + typeName<Component>() + ">(" + std::to_string(handle) +
 					  ") == false");
 

@@ -50,7 +50,7 @@ VoxelRendererSystem::VoxelRendererSystem(Scene *scene) : System(scene) {
 	pipeline_info.attribute_infos = binding_infos;
 	pipeline_info.attribute_info_count = 2;
 	pipeline_info.vertex_shader = vertex_shader;
-	pipeline_info.fragement_shader = fragment_shader;
+	pipeline_info.fragment_shader = fragment_shader;
 	pipeline_info.flags = GRAPHIC_PIPELINE_FLAG_CULL_FRONT;
 	pipeline = Resources::createGraphicPipeline(pipeline_info);
 
