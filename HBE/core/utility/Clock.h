@@ -12,7 +12,8 @@
 namespace HBE {
 	class HB_API Clock {
 		std::chrono::high_resolution_clock::time_point start_time;
-
+		std::chrono::duration<double> total;
+		bool stopped = false;
 	public:
 		Clock();
 
@@ -22,9 +23,9 @@ namespace HBE {
 
 		void stop();
 
-		float ms() const;
+		double ms() const;
 
-		float ns() const;
+		double ns() const;
 	};
 
 }
