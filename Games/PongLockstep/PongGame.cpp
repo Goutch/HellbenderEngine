@@ -5,7 +5,7 @@ namespace PongLockstep {
 	const vec4 PongGame::LEFT_COLOR = {104.0f / 255.0f, 157.0f / 255.0f, 106.0f / 255.0f, 1};
 	const vec4 PongGame::RIGHT_COLOR = {204.0f / 255.0f, 36.0f / 255.0f, 29.0f / 255.0f, 1};
 
-	void PongGame::reset(PongGameState &game_state, const std::string& ip) {
+	void PongGame::reset(PongGameState &game_state, const std::string &ip) {
 		game_state.score_left = 0;
 		game_state.score_right = 0;
 		if (game_state.client != nullptr) {
@@ -23,10 +23,10 @@ namespace PongLockstep {
 		}
 	}
 
-	PongGame::PongGame(const std::string& ip) {
+	PongGame::PongGame(const std::string &ip) {
 		Application::onPresent.subscribe(this, &PongGame::onPresent);
 		Application::onUpdate.subscribe(this, &PongGame::onUpdate);
-		reset(game_state,ip);
+		reset(game_state, ip);
 		ui_scene = new PongUIScene(game_state);
 		game_scene = new PongGameScene(game_state);
 	}
@@ -52,26 +52,41 @@ namespace PongLockstep {
 		Graphics::present(present_info);
 	}
 
+
 	void PongGame::onEventReceived(void *data) {
 		MESSAGE_TYPE type = *(MESSAGE_TYPE *) data;
 		switch (type) {
 			case MESSAGE_TYPE_STEP:
-				StepData step_data = *(StepData *) (data);
-				StepInputsData stepInputsData{};
-				game_state.onStep.invoke(step_data, &stepInputsData);
-				PacketInfo packet_info{};
-				packet_info.data = &stepInputsData;
-				packet_info.length = sizeof(StepInputsData);
-				packet_info.mode = PACKET_MODE_RELIABLE_ORDERED;
-				packet_info.channel = 0;
-
-				game_state.client->send(packet_info);
+				step_queue.push(*(StepData *) (data));
 				break;
 		}
 	}
 
+	void PongGame::step(StepData &step_data) {
+		//Log::message(std::to_string((Application::getTime() - last_step_time) * SECONDS_TO_MILISECONDS) + "ms");
+		StepInputsData stepInputsData{};
+		stepInputsData.frame_id = step_data.frame_id + STEP_OFFSET;
+		game_state.onStep.invoke(step_data, &stepInputsData);
+
+		PacketInfo packet_info{};
+		packet_info.data = &stepInputsData;
+		packet_info.length = sizeof(StepInputsData);
+		packet_info.mode = PACKET_MODE_RELIABLE_ORDERED;
+		packet_info.channel = 0;
+
+		game_state.client->send(packet_info);
+
+		last_step_time = Application::getTime();
+	}
+
 	void PongGame::onUpdate(float delta) {
 		game_state.client->pollEvents();
+		if (
+			Application::getTime() - last_step_time >= 1.0f / static_cast<float>(STEP_PER_SECONDS) &&
+			!step_queue.empty()) {
+			step(step_queue.front());
+			step_queue.pop();
+		}
 	}
 
 }

@@ -1,6 +1,8 @@
 
 #include "HBE.h"
 #include "Examples/TriangleScene.h"
+#include "Examples/CubeScene.h"
+
 using namespace HBE;
 bool fullscreen = false;
 Scene *main_scene;
@@ -62,8 +64,8 @@ int main() {
 	//Pathfinder *pathfinder = new Pathfinder();
 	{
 		//-----------------------tests-------------------
-		main_scene = new TriangleScene();
-		//main_scene = new CubeScene();
+		//main_scene = new TriangleScene();
+		main_scene = new CubeScene();
 		//main_scene = load_model_scene = ModelScene();
 
 		//ui_scene = new TextScene();

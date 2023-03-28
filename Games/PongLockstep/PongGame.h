@@ -13,8 +13,8 @@ namespace PongLockstep {
 	struct PongGameState {
 		uint32 score_left;
 		uint32 score_right;
-		Event<StepData,StepInputsData*> onStep;
-		Client *client=nullptr;
+		Event<StepData, StepInputsData *> onStep;
+		Client *client = nullptr;
 	};
 
 	class PongGame {
@@ -25,17 +25,23 @@ namespace PongLockstep {
 		PongUIScene *ui_scene;
 		PongGameScene *game_scene;
 		PongGameState game_state;
-
+		float last_step_time = 0;
+		std::queue<StepData> step_queue;
 	public :
-		PongGame(const std::string& ip);
+		PongGame(const std::string &ip);
 
 		~PongGame();
 
 	private:
 		void onPresent();
+
 		void onUpdate(float delta);
-		void onEventReceived(void* data);
-		void reset(PongGameState &game_state,const std::string& ip);
+
+		void step(StepData &step_data);
+
+		void onEventReceived(void *data);
+
+		void reset(PongGameState &game_state, const std::string &ip);
 	};
 }
 

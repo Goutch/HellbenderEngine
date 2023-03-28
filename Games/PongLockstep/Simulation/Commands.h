@@ -3,8 +3,11 @@
 #include "fixed.h"
 #include "enet/enet.h"
 
+
 using namespace locknet;
 namespace PongLockstep {
+	const int STEP_OFFSET = 6;
+	const int STEP_PER_SECONDS = 60;
 	enum PACKET_MODE {
 		PACKET_MODE_UNRELIABLE_UNORDERED = ENET_PACKET_FLAG_UNSEQUENCED,
 		PACKET_MODE_UNRELIABLE_ORDERED = 0,
@@ -17,7 +20,7 @@ namespace PongLockstep {
 		PACKET_MODE mode;
 	};
 
-	enum MESSAGE_TYPE{
+	enum MESSAGE_TYPE {
 		MESSAGE_TYPE_CONNECTION_RESPONSE,
 		MESSAGE_TYPE_STEP_INPUTS,
 		MESSAGE_TYPE_STEP,

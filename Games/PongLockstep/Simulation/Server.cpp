@@ -41,7 +41,7 @@ namespace PongLockstep {
 		frame_counter = std::to_string(i);
 
 
-		while (enet_host_service(enet_handle, &event, 10) > 0) {
+		while (enet_host_service(enet_handle, &event, 2) > 0) {
 
 			switch (event.type) {
 				case ENET_EVENT_TYPE_CONNECT: {

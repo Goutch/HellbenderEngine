@@ -5,7 +5,7 @@
 
 namespace PongLockstep {
 	class PongServer : public Server {
-		const int N_PLAYERS=2;
+		const int N_PLAYERS = 2;
 		int connected_clients = 0;
 		struct Step {
 			int step;
@@ -13,7 +13,7 @@ namespace PongLockstep {
 		};
 
 		uint32_t current_frame = 0;
-		std::vector<StepInputsData> inputs[2];
+		std::queue<StepInputsData> inputs[2];
 	public:
 		PongServer(const ServerInfo &info);
 
