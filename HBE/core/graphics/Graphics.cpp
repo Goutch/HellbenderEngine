@@ -2,7 +2,7 @@
 #include "Graphics.h"
 #include <core/utility/Log.h>
 #include <core/utility/Event.h>
-#include <HBE/core/resource/RenderTarget.h>
+#include <core/resource/RenderTarget.h>
 #include <Configs.h>
 #include <core/resource/Model.h>
 #include "Renderer.h"

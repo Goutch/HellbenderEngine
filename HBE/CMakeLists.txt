@@ -225,8 +225,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/)
 #set_property(TARGET glslang PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 #-----------------------------------spirv-cross------------------------------------------------------
 #set(SPIRV_CROSS_EXCEPTIONS_TO_ASSERTIONS "Instead of throwing exceptions assert" FALSE)
-#set(SPIRV_CROSS_SHARED "Build the C API as a single shared library." TRUE)
-#set(SPIRV_CROSS_STATIC "Build the C and C++ API as static libraries." TRUE)
+set(SPIRV_CROSS_SHARED FALSE)
+set(SPIRV_CROSS_STATIC TRUE)
 #set(SPIRV_CROSS_CLI "Build the CLI binary. Requires SPIRV_CROSS_STATIC." FALSE)
 #set(SPIRV_CROSS_ENABLE_TESTS "Enable SPIRV-Cross tests." FALSE)
 #
@@ -235,7 +235,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/)
 #set(SPIRV_CROSS_ENABLE_MSL "Enable MSL target support." TRUE)
 #set(SPIRV_CROSS_ENABLE_CPP "Enable C++ target support." TRUE)
 #set(SPIRV_CROSS_ENABLE_REFLECT "Enable JSON reflection target support." TRUE)
-#set(SPIRV_CROSS_ENABLE_C_API "Enable C API wrapper support in static library." TRUE)
+set(SPIRV_CROSS_ENABLE_C_API TRUE)
 #set(SPIRV_CROSS_ENABLE_UTIL "Enable util module support." TRUE)
 #
 #set(SPIRV_CROSS_FORCE_STL_TYPES "Force use of STL types instead of STL replacements in certain places. Might reduce performance." FALSE)
@@ -314,7 +314,6 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libsndfile/")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libsndfile/include)
 
 
-
 include_directories(.)
 
 
@@ -345,24 +344,44 @@ set(GLSLANG_LIBS
         SPIRV
         glslang
         )
+set(GLFW_LIBS
+        glfw)
+
 set(SPIRV_CROSS_LIBS
         spirv-cross-glsl
         spirv-cross-cpp
-        spirv-cross-c-shared
+        spirv-cross-c
         spirv-cross-reflect
         spirv-cross-msl
         spirv-cross-util
         spirv-cross-core)
 
-target_link_libraries(${PROJECT_NAME}
+set(MSDFGEN_LIBS
+        msdfgen-all
+        msdf-atlas-gen)
+set(OPENAL_LIBS
+        OpenAL)
+set(SNDFILE_LIBS
+        sndfile)
+
+set(HBE_LIBS
         ${Vulkan_LIBRARY}
-        glfw
-        #NRD
+        ${GLFW_LIBS}
         ${SPIRV_CROSS_LIBS}
         ${GLSLANG_LIBS}
         ${FREETYPE_LIBRARY}
-        msdfgen-all
-        msdf-atlas-gen
-        OpenAL
-        SndFile::sndfile
+        ${MSDFGEN_LIBS}
+        ${OPENAL_LIBS}
+        ${SNDFILE_LIBS})
+
+target_link_libraries(${PROJECT_NAME}
+        ${HBE_LIBS})
+
+if (NOT DEFINED HBE_OUTPUT_DIR)
+    set(HBE_OUTPUT_DIR ${CMAKE_BINARY_DIR})
+endif ()
+set_target_properties(${PROJECT_NAME}
+        PROPERTIES
+        LIBRARY_OUTPUT_DIRECTORY ${HBE_OUTPUT_DIR}
+        RUNTIME_OUTPUT_DIRECTORY ${HBE_OUTPUT_DIR}
         )

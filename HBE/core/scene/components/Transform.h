@@ -2,7 +2,7 @@
 #pragma once
 
 #include "Core.h"
-#include "HBE/dependencies/glm/glm/ext/matrix_transform.hpp"
+#include "glm/ext/matrix_transform.hpp"
 #include "glm/gtc/quaternion.hpp"
 #include "glm/glm.hpp"
 

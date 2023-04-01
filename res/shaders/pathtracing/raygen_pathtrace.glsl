@@ -28,10 +28,6 @@ layout(binding = 11, set = 0) uniform LastCameraProperties
     mat4 view;
     mat4 projection;
 } last_cam;
-//layout(binding = 6, set = 0) buffer VertexBuffer
-//{
-//    Vertex vertices[];
-//} vertices[];
 
 layout(location = 0) rayPayloadEXT PrimaryRayPayLoad
 {

@@ -25,7 +25,7 @@ namespace PongLockstep {
 		PongUIScene *ui_scene;
 		PongGameScene *game_scene;
 		PongGameState game_state;
-		float last_step_time = 0;
+		float first_step_time = 0;
 		std::queue<StepData> step_queue;
 	public :
 		PongGame(const std::string &ip);

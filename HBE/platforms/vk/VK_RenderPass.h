@@ -1,6 +1,6 @@
 #pragma once
 
-#include <HBE/core/resource/RenderTarget.h>
+#include <core/resource/RenderTarget.h>
 #include "vulkan/vulkan.h"
 #include "vector"
 #include "VK_Image.h"

@@ -36,3 +36,8 @@ target_include_directories(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME} PUBLIC dependencies/enet/include)
 target_include_directories(${PROJECT_NAME} PUBLIC dependencies/fpm/include)
 
+set_target_properties(${PROJECT_NAME}
+        PROPERTIES
+        LIBRARY_OUTPUT_DIRECTORY ${HBE_OUTPUT_DIR}
+        RUNTIME_OUTPUT_DIRECTORY ${HBE_OUTPUT_DIR}
+        )

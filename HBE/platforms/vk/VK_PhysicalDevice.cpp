@@ -20,12 +20,6 @@ namespace HBE {
 		VkPhysicalDeviceFeatures2 features2{};
 		features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
 		void **ppNext = &features2.pNext;
-
-		if (app_info.hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_DESCRIPTOR_INDEXING_CAPABILITIES) {
-			enabled_extension_flags |= EXTENSION_FLAG_DESCRIPTOR_INDEXING;
-			descriptor_indexing_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
-			*ppNext = &descriptor_indexing_features;
-		}
 		if (app_info.hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_RTX_CAPABILITIES) {
 			enabled_extension_flags |= EXTENSION_FLAG_RAY_TRACING_PIPELINE;
 			enabled_extension_flags |= EXTENSION_FLAG_ACCELERATION_STRUCTURE;
@@ -40,6 +34,13 @@ namespace HBE {
 			acceleration_structure_features.pNext = &ray_tracing_pipeline_features;
 			ppNext = &ray_tracing_pipeline_features.pNext;
 		}
+		if (app_info.hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_DESCRIPTOR_INDEXING_CAPABILITIES ||
+			app_info.hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_RTX_CAPABILITIES) {
+			enabled_extension_flags |= EXTENSION_FLAG_DESCRIPTOR_INDEXING;
+			descriptor_indexing_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
+			*ppNext = &descriptor_indexing_features;
+		}
+
 
 		vkGetPhysicalDeviceFeatures2(handle, &features2);
 

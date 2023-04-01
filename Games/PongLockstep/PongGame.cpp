@@ -55,9 +55,14 @@ namespace PongLockstep {
 
 	void PongGame::onEventReceived(void *data) {
 		MESSAGE_TYPE type = *(MESSAGE_TYPE *) data;
+
 		switch (type) {
 			case MESSAGE_TYPE_STEP:
-				step_queue.push(*(StepData *) (data));
+				StepData *step_data = (StepData *) (data);
+				step_queue.push(*(step_data));
+				if (step_data->frame_id == 0) {
+					first_step_time = Application::getTime();
+				}
 				break;
 		}
 	}
@@ -75,17 +80,18 @@ namespace PongLockstep {
 		packet_info.channel = 0;
 
 		game_state.client->send(packet_info);
-
-		last_step_time = Application::getTime();
 	}
 
 	void PongGame::onUpdate(float delta) {
 		game_state.client->pollEvents();
-		if (
-			Application::getTime() - last_step_time >= 1.0f / static_cast<float>(STEP_PER_SECONDS) &&
-			!step_queue.empty()) {
-			step(step_queue.front());
-			step_queue.pop();
+
+		if (!step_queue.empty()) {
+			float game_time = (Application::getTime() - first_step_time);
+			float step_time = step_queue.front().frame_id * (1.0f / static_cast<float>(STEP_PER_SECONDS));
+			if (game_time >= step_time) {
+				step(step_queue.front());
+				step_queue.pop();
+			}
 		}
 	}
 

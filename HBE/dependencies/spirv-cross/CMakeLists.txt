@@ -34,7 +34,7 @@ enable_testing()
 include(GNUInstallDirs)
 
 option(SPIRV_CROSS_EXCEPTIONS_TO_ASSERTIONS "Instead of throwing exceptions assert" OFF)
-option(SPIRV_CROSS_SHARED "Build the C API as a single shared library." ON)
+option(SPIRV_CROSS_SHARED "Build the C API as a single shared library." OFF)
 option(SPIRV_CROSS_STATIC "Build the C and C++ API as static libraries." ON)
 option(SPIRV_CROSS_CLI "Build the CLI binary. Requires SPIRV_CROSS_STATIC." OFF)
 option(SPIRV_CROSS_ENABLE_TESTS "Enable SPIRV-Cross tests." OFF)
