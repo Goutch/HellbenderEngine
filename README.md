@@ -16,6 +16,7 @@
 #### HB Graphics library:
 - 3D rendering
 - 2D rendering
+- Text rendering
 - Instancing
 - Resource loading:
 	 - Textures
@@ -28,18 +29,18 @@
 	- any hit
 	- intersection
 #### Other
-- ECS
+- Entity component System
 	- Camera (perspective)
 	- Camera2D (orthographic)
 	- CameraController 
 	- MeshRenderer 
-- Job System
 - Event system
 - keyboard and mouse input handling
 
 #### planned for Alpha 1.0:
-- Model loading and animations
-- Font rendering
+- [x] Model loading
+- [ ] Model animations
+- [x] Font rendering
 
 ## Getting started
 
