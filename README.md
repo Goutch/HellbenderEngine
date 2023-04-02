@@ -1,4 +1,4 @@
-# HellbenderEngine /!\ WIP /!\
+# HellbenderEngine
 ## My personnal toy Rendering engine/framework.
 
 # Goals 
@@ -16,7 +16,7 @@
 #### HB Graphics library:
 - 3D rendering
 - 2D rendering
-- Text/Font rendering
+- Text rendering
 - Instancing
 - Resource loading:
 	 - Textures
@@ -29,18 +29,18 @@
 	- any hit
 	- intersection
 #### Other
-- ECS
+- Entity component System
 	- Camera (perspective)
 	- Camera2D (orthographic)
 	- CameraController 
 	- MeshRenderer 
-- Sounds
-- Job System
 - Event system
 - keyboard and mouse input handling
 
 #### planned for Alpha 1.0:
-- Model loading and animations
+- [x] Model loading
+- [ ] Model animations
+- [x] Font rendering
 
 ## Getting started
 
