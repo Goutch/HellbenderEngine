@@ -1,7 +1,7 @@
-# HellbenderEngine
+# HellbenderEngine /!\ WIP /!\
 ## My personnal toy Rendering engine/framework.
 
-# Goals 
+# Goals
 - **Simple API**
 - **Cross platforms**
 - **Easy to use**
@@ -16,44 +16,44 @@
 #### HB Graphics library:
 - 3D rendering
 - 2D rendering
-- Text rendering
+- Text/Font rendering
 - Instancing
 - Resource loading:
-	 - Textures
-	 - Shaders
-	 - GLTF models
+	- Textures
+	- Shaders
+	- GLTF models
 - Compute shaders
 - Ray tracing pipeline shaders
-	- miss 
+	- miss
 	- closest hit
 	- any hit
 	- intersection
 #### Other
-- Entity component System
+- ECS
 	- Camera (perspective)
 	- Camera2D (orthographic)
-	- CameraController 
-	- MeshRenderer 
+	- CameraController
+	- MeshRenderer
+- Sounds
+- Job System
 - Event system
 - keyboard and mouse input handling
 
 #### planned for Alpha 1.0:
-- [x] Model loading
-- [ ] Model animations
-- [x] Font rendering
+- Model loading and animations
 
 ## Getting started
 
 ### Compiling
-These are 2 tested compilers : 
+These are 2 tested compilers :
 - GCC
 - VC
 
 ### Wiki
-- [Home](https://github.com/Goutch/HellbenderEngine/wiki) 
+- [Home](https://github.com/Goutch/HellbenderEngine/wiki)
 ## Qestions and Answers
 Q: Why should I use this engine instead of unity/unreal?  
-A: You shouldn't this is a toy engine made for me.  
+A: You shouldn't this is a toy engine made for me.
 
 ### Notes:
 HBE used to support Opengl but it is deprecated as of now I am not sure if I will support it in the future. Checkout the opengl branch if you want a "working" Opengl version.
