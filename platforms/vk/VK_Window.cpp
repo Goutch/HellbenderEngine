@@ -5,6 +5,7 @@
 #include "Configs.h"
 #include "core/graphics/Graphics.h"
 #include "VK_RenderPass.h"
+#include "Application.h"
 
 namespace HBE {
 	void VK_Window::windowSizeCallback(GLFWwindow *handle, int width, int height) {
@@ -37,16 +38,15 @@ namespace HBE {
 		if (!glfwVulkanSupported()) {
 			Log::error("Vulkan is not supported");
 		}
+		const ApplicationInfo &app_info = Application::getInfo();
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		//glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-		handle = glfwCreateWindow(width, height, Configs::getWindowTitle().c_str(), nullptr, nullptr);
+		handle = glfwCreateWindow(width, height, app_info.name.c_str(), nullptr, nullptr);
 		glfwSetWindowUserPointer(handle, (void *) this);
 		glfwSetWindowSizeCallback(handle, windowSizeCallback);
-		Configs::onWindowTitleChange.subscribe(this, &VK_Window::onTitleChange);
 	}
 
 	VK_Window::~VK_Window() {
-		Configs::onWindowTitleChange.unsubscribe(this);
 		glfwTerminate();
 	}
 

@@ -3,50 +3,29 @@
 #include "core/utility/Event.h"
 #include "Core.h"
 #include <string>
+
 namespace HBE {
-    class HB_API Configs {
-    public:
-        enum CAMERA_MODE {
-            PERSPECTIVE, ORTHOGRAPHIC
-        };
-    private:
-        static std::string icon_path;
-        static std::string window_title;
-        static bool antialiasing;
-        static bool vertical_sync;
-        static CAMERA_MODE default_camera_mode;
-        static bool present_automaticaly;
+	class HB_API Configs {
+	private:
+		static std::string icon_path;
+		static std::string window_title;
+		static bool antialiasing;
+		static bool vertical_sync;
+		static bool present_automaticaly;
 
-    public:
-        static Event<std::string> onWindowTitleChange;
+	public:
+		static Event<bool> onAntialiasingChange;
 
-        static void setWindowTitle(std::string title);
+		static void setAntialiasing(bool antialiasing);
 
-        static std::string getWindowTitle();
+		static bool getAntialiasing();
 
+		static Event<> onVerticalSyncChange;
 
-        static Event<bool> onAntialiasingChange;
+		static bool getVerticalSync();
 
-        static void setAntialiasing(bool antialiasing);
+		static std::string getWindowIconPath();
 
-        static bool getAntialiasing();
-
-        static Event<> onVerticalSyncChange;
-
-        static void setVerticalSync(bool v_sync);
-
-        static bool getVerticalSync();
-
-        static Event<CAMERA_MODE> onDefaultCameraModeChange;
-
-        static void setDefaultCameraMode(CAMERA_MODE mode);
-
-        static CAMERA_MODE getDefaultCameraMode();
-
-        static std::string getWindowIconPath();
-
-        static void setPresentAutomatic(bool is_automatic);
-
-        static bool isPresentAutomatic();
-    };
+		void setVerticalSync(bool v_sync);
+	};
 }

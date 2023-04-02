@@ -1,7 +1,6 @@
 #include "Configs.h"
 
 namespace HBE {
-    Event<std::string> Configs::onWindowTitleChange;
     std::string Configs::window_title = "CHANGE WITH Configs::setWindowTitle";
 
     std::string Configs::icon_path = "../wall.png";
@@ -11,8 +10,6 @@ namespace HBE {
 
     bool Configs::vertical_sync = false;
     Event<> Configs::onVerticalSyncChange;
-
-    Event<Configs::CAMERA_MODE> Configs::onDefaultCameraModeChange;
 
     bool Configs::present_automaticaly = false;
 
@@ -34,25 +31,8 @@ namespace HBE {
         onVerticalSyncChange.invoke();
     }
 
-    void Configs::setWindowTitle(std::string title) {
-        window_title = title;
-        onWindowTitleChange.invoke(title);
-    }
-
-    std::string Configs::getWindowTitle() {
-        return window_title;
-    }
-
     std::string Configs::getWindowIconPath() {
         return icon_path;
-    }
-
-    void Configs::setPresentAutomatic(bool is_automatic) {
-        present_automaticaly = is_automatic;
-    }
-
-    bool Configs::isPresentAutomatic() {
-        return present_automaticaly;
     }
 
 }

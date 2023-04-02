@@ -6,8 +6,11 @@
 
 namespace HBE {
 	class Window;
+
 	class Clock;
+
 	class Scene;
+
 	typedef uint32_t HARDWARE_FLAGS;
 	enum HARDWARE_FLAG {
 		HARDWARE_FLAG_NONE = 0,
@@ -17,6 +20,7 @@ namespace HBE {
 		HARDWARE_FLAG_GPU_REQUIRE_DESCRIPTOR_INDEXING_CAPABILITIES = 1 << 3,
 	};
 	struct ApplicationInfo {
+		std::string name = "Application";
 		HARDWARE_FLAGS hardware_flags = HARDWARE_FLAG_NONE;
 	};
 
