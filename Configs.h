@@ -26,6 +26,6 @@ namespace HBE {
 
 		static std::string getWindowIconPath();
 
-		void setVerticalSync(bool v_sync);
+		static void setVerticalSync(bool v_sync);
 	};
 }
