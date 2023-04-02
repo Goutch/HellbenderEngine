@@ -2,15 +2,14 @@
 ## My personnal toy Rendering engine/framework.
 
 # Goals
-- **Simple API**
+- **Common library for my Vulkan projects**
 - **Cross platforms**
-- **Easy to use**
-- **Minimal dependencies and lightweight.**
-- **FAST**
+- **Lightweight**
+- **Fast**
 
 # Why?
-- **I like vulkan and graphics**
-- **I want to do procedural generation and ray tracing.**
+- **I like Vulkan and graphics**
+- **I want to do ray tracing.**
 
 # Features
 #### HB Graphics library:
@@ -35,19 +34,15 @@
 	- CameraController
 	- MeshRenderer
 - Sounds
-- Job System
 - Event system
 - keyboard and mouse input handling
 
-#### planned for Alpha 1.0:
-- Model loading and animations
-
+#### TODO :
+- [x] Model loading 
+- [ ] Model animations
+- [ ] Support for Multiple descriptor sets
+- [ ] ECS multithreading support
 ## Getting started
-
-### Compiling
-These are 2 tested compilers :
-- GCC
-- VC
 
 ### Wiki
 - [Home](https://github.com/Goutch/HellbenderEngine/wiki)
@@ -55,8 +50,13 @@ These are 2 tested compilers :
 Q: Why should I use this engine instead of unity/unreal?  
 A: You shouldn't this is a toy engine made for me.
 
+### Compiling
+These are 2 tested compilers :
+- VC (always)
+- GCC (sometimes)
+
 ### Notes:
-HBE used to support Opengl but it is deprecated as of now I am not sure if I will support it in the future. Checkout the opengl branch if you want a "working" Opengl version.
+HBE used to support Opengl but it is deprecated as of now I am not sure if I will support it in the future. Checkout the opengl branch if you want a "working" Opengl version.(Warning the engine was nothing like it is today)
 
 ![Path Tracing Screenshot](https://github.com/Goutch/HellbenderEngine/blob/develop/screenshots/pathtracing.PNG)
 
