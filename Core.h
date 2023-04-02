@@ -32,11 +32,7 @@
 
 
 #ifndef RESOURCE_PATH
-#ifdef NDEBUG
 #define RESOURCE_PATH "res/"
-#else
-#define RESOURCE_PATH "../../res/"
-#endif
 #endif
 
 #define PROFILE_MODE
@@ -49,7 +45,7 @@
 #endif
 
 #ifdef NDEBUG
-#define HB_ASSERT(x,y)
+#define HB_ASSERT(x, y)
 #else
 #define HB_ASSERT(x,y) if(!(x))Log::error(y)
 #endif

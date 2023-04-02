@@ -83,7 +83,7 @@ namespace HBE {
 
 		virtual ~Scene();
 
-		void update(float delta_t);
+		virtual void update(float delta_t);
 
 		void draw();
 
