@@ -44,6 +44,7 @@
 
 #include "core/input/Input.h"
 #include "core/math/Plane.h"
+#include "core/math/SignedDistance.h"
 
 #include "core/threading/JobManager.h"
 

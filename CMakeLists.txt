@@ -117,7 +117,7 @@ set(CORE_FILES
         core/resource/StorageBuffer.h
         core/graphics/RenderGraph.cpp
         core/graphics/RenderGraph.h
-        core/scene/ecs/Group.cpp core/scene/ecs/Group.h core/scene/ecs/RegistryPage.cpp core/scene/ecs/RegistryPage.h)
+        core/scene/ecs/Group.cpp core/scene/ecs/Group.h core/scene/ecs/RegistryPage.cpp core/scene/ecs/RegistryPage.h core/math/SignedDistance.h)
 set(VK_FILES
         platforms/vk/VK_Renderer.cpp
         platforms/vk/VK_Instance.cpp
