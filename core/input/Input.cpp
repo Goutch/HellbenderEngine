@@ -16,6 +16,13 @@ namespace HBE {
 	std::queue<short> Input::reset_queue;
 	Event<KEY> Input::onKeyDown = Event<KEY>();
 	Event<char> Input::onCharDown = Event<char>();
+	Event<vec2> Input::onMouseRightClickDown = Event<vec2>();
+	Event<vec2> Input::onMouseRightClickUp = Event<vec2>();
+	Event<vec2> Input::onMouseRightClick = Event<vec2>();
+	Event<vec2> Input::onMouseLeftClickDown = Event<vec2>();
+	Event<vec2> Input::onMouseLeftClickUp = Event<vec2>();
+	Event<vec2> Input::onMouseLeftClick = Event<vec2>();
+	
 
 	bool Input::getKey(KEY code) {
 		return pressed[code];
@@ -102,15 +109,28 @@ namespace HBE {
 			down[key] = true;
 			pressed[key] = true;
 			reset_queue.emplace(key);
+			if (key == GLFW_MOUSE_BUTTON_LEFT)
+				onMouseLeftClickDown.invoke(Input::getMousePosition());
+			if (key == GLFW_MOUSE_BUTTON_RIGHT)
+				onMouseRightClickDown.invoke(Input::getMousePosition());
 		}
 		if (action == GLFW_REPEAT) {
 			repeat[key] = true;
+			if (key == GLFW_MOUSE_BUTTON_LEFT)
+				onMouseLeftClick.invoke(Input::getMousePosition());
+			if (key == GLFW_MOUSE_BUTTON_RIGHT)
+				onMouseRightClick.invoke(Input::getMousePosition());
 		}
 		if (action == GLFW_RELEASE) {
 			repeat[key] = false;
 			pressed[key] = false;
 			released[key] = true;
 			reset_queue.emplace(key);
+
+			if (key == GLFW_MOUSE_BUTTON_LEFT)
+				onMouseLeftClickUp.invoke(Input::getMousePosition());
+			if (key == GLFW_MOUSE_BUTTON_RIGHT)
+				onMouseRightClickUp.invoke(Input::getMousePosition());
 		}
 	}
 

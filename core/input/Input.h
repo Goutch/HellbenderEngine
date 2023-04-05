@@ -3,11 +3,13 @@
 #include "Core.h"
 #include "queue"
 #include "HBETypes.h"
+
 struct GLFWwindow;
 
 namespace HBE {
 	template<typename... Args>
 	class Event;
+
 	enum KEY {
 		KEY_UNKNOWN = -1,
 		KEY_MOUSE_BUTTON_LEFT = 0,
@@ -149,12 +151,23 @@ namespace HBE {
 		static bool released[348];
 		static bool down[348];
 
+		static Event<vec2> onMouseRightClickDown;
+		static Event<vec2> onMouseRightClickUp;
+		static Event<vec2> onMouseRightClick;
+		static Event<vec2> onMouseLeftClickDown;
+		static Event<vec2> onMouseLeftClickUp;
+		static Event<vec2> onMouseLeftClick;
+
 		static std::queue<short> reset_queue;
 
 		static void scrollCallback(GLFWwindow *window, double x_offset, double y_offset);
+
 		static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
+
 		static void charCallback(GLFWwindow *window, unsigned int codepoint);
+
 		static void mouseButtonCallback(GLFWwindow *window, int key, int action, int mods);
+
 	public:
 		static Event<KEY> onKeyDown;
 		static Event<char> onCharDown;
@@ -162,11 +175,15 @@ namespace HBE {
 		static void init();
 
 		static vec2 getMousePosition();
+
 		static vec2 getNormalizedMousePosition();
+
 		static void pollEvents();
 
 		static bool getKey(KEY code);
+
 		static bool getKeyDown(KEY code);
+
 		static float getMouseWheelInput();
 
 		static void setCursorVisible(bool visible);
@@ -174,6 +191,7 @@ namespace HBE {
 		static void setCursorPosition(float x, float y);
 
 		static bool getKeyUp(KEY code);
+
 		static bool getKeyRepeat(KEY code);
 	};
 
