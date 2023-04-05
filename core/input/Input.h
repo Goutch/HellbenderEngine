@@ -151,13 +151,6 @@ namespace HBE {
 		static bool released[348];
 		static bool down[348];
 
-		static Event<vec2> onMouseRightClickDown;
-		static Event<vec2> onMouseRightClickUp;
-		static Event<vec2> onMouseRightClick;
-		static Event<vec2> onMouseLeftClickDown;
-		static Event<vec2> onMouseLeftClickUp;
-		static Event<vec2> onMouseLeftClick;
-
 		static std::queue<short> reset_queue;
 
 		static void scrollCallback(GLFWwindow *window, double x_offset, double y_offset);
@@ -169,6 +162,12 @@ namespace HBE {
 		static void mouseButtonCallback(GLFWwindow *window, int key, int action, int mods);
 
 	public:
+		static Event<vec2> onMouseRightClickDown;
+		static Event<vec2> onMouseRightClickUp;
+		static Event<vec2> onMouseRightClick;
+		static Event<vec2> onMouseLeftClickDown;
+		static Event<vec2> onMouseLeftClickUp;
+		static Event<vec2> onMouseLeftClick;
 		static Event<KEY> onKeyDown;
 		static Event<char> onCharDown;
 
