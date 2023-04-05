@@ -328,14 +328,13 @@ namespace HBE {
 			vertex_buffer[vertices_index + 18] = glyph.uv_max.x;
 			vertex_buffer[vertices_index + 19] = glyph.uv_min.y;
 
-			size_t indecies_index = index_buffer.size();
-			index_buffer.resize(index_buffer.size() + 6);
-			index_buffer[indecies_index] = vertex_count;
-			index_buffer[indecies_index + 1] = vertex_count + 1;
-			index_buffer[indecies_index + 2] = vertex_count + 2;
-			index_buffer[indecies_index + 3] = vertex_count + 2;
-			index_buffer[indecies_index + 4] = vertex_count + 3;
-			index_buffer[indecies_index + 5] = vertex_count;
+			size_t indices_index = index_buffer.size();
+			index_buffer[indices_index] = vertex_count;
+			index_buffer[indices_index + 1] = vertex_count + 1;
+			index_buffer[indices_index + 2] = vertex_count + 2;
+			index_buffer[indices_index + 3] = vertex_count + 2;
+			index_buffer[indices_index + 4] = vertex_count + 3;
+			index_buffer[indices_index + 5] = vertex_count;
 			horizontal_offset += glyph.size.x;
 			vertex_count += 4;
 		}
