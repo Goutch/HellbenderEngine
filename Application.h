@@ -33,7 +33,6 @@ namespace HBE {
 	public:
 		static Event<> onRegisterComponents;
 		static Event<> onInit;
-		static Event<Scene *> onSceneChange;
 		static Event<> onWindowClosed;
 		static Event<> onQuit;
 

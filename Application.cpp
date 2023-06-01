@@ -17,7 +17,6 @@ namespace HBE {
 	int Application::fps_counter = 0;
 	float Application::fps_timer = 0;
 	Event<> Application::onInit = Event<>();
-	Event<Scene *> Application::onSceneChange = Event<Scene *>();
 	Event<> Application::onWindowClosed = Event<>();
 	Event<> Application::onQuit = Event<>();
 
