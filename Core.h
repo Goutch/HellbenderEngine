@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 #if defined(_MSC_VER)
 //  Microsoft
 #define EXPORT __declspec(dllexport)
@@ -49,3 +51,5 @@
 #else
 #define HB_ASSERT(x,y) if(!(x))Log::error(y)
 #endif
+
+const uint32_t MAX_FRAMES_IN_FLIGHT = 3;

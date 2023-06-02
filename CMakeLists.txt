@@ -160,7 +160,6 @@ set(VK_FILES
         platforms/vk/VK_Memory.h
         platforms/vk/VK_Allocator.cpp
         platforms/vk/VK_Allocator.h
-        platforms/vk/VK_CONSTANTS.h
         platforms/vk/VK_Queue.cpp
         platforms/vk/VK_Queue.h
         platforms/vk/VK_ComputePipeline.cpp
