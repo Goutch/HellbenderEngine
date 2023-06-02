@@ -85,9 +85,9 @@ namespace HBE {
 
 		virtual void update(float delta_t);
 
-		void draw();
+		virtual void draw();
 
-		void render();
+		virtual void render();
 
 		Entity createEntity3D();
 

@@ -4,7 +4,6 @@
 #include "vulkan/vulkan.h"
 #include "VK_Semaphore.h"
 #include "unordered_map"
-#include "VK_CONSTANTS.h"
 #include "list"
 #include "array"
 #include "core/utility/Event.h"
