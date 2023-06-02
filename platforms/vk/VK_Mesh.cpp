@@ -5,7 +5,6 @@
 
 #include "VK_Buffer.h"
 #include "VK_Allocator.h"
-#include "VK_CONSTANTS.h"
 #include "VK_Renderer.h"
 
 namespace HBE {

@@ -6,7 +6,6 @@
 #include "vulkan/vulkan.h"
 #include "VK_Allocator.h"
 #include "array"
-#include "VK_CONSTANTS.h"
 
 namespace HBE {
 	class VK_Buffer;

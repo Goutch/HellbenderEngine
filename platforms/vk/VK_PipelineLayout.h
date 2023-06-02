@@ -3,7 +3,6 @@
 #include <array>
 #include "vector"
 #include "vulkan/vulkan.h"
-#include "VK_CONSTANTS.h"
 #include "VK_Shader.h"
 
 namespace HBE {

@@ -4,7 +4,6 @@
 #include "vector"
 #include "set"
 #include "VK_Allocator.h"
-#include "VK_CONSTANTS.h"
 
 namespace HBE {
 	VK_Device::VK_Device(VK_PhysicalDevice &physical_device) {

@@ -5,7 +5,6 @@
 #include "vulkan/vulkan.h"
 #include "unordered_map"
 #include "VK_Image.h"
-#include "VK_CONSTANTS.h"
 #include "VK_Shader.h"
 #include "unordered_map"
 

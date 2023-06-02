@@ -4,7 +4,6 @@
 #include "vulkan/vulkan.h"
 #include "string"
 #include "VK_Buffer.h"
-#include "VK_CONSTANTS.h"
 
 namespace HBE {
 	class VK_Renderer;

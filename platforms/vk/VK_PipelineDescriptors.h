@@ -4,7 +4,6 @@
 #include <string>
 #include <core/resource/StorageBuffer.h>
 #include "vulkan/vulkan.h"
-#include "VK_CONSTANTS.h"
 #include "VK_Buffer.h"
 
 #include "array"
