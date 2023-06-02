@@ -69,7 +69,7 @@ namespace HBE {
 
 		void present(PresentCmdInfo &present_cmd_info) override;
 
-		void waitCurrentFrame();
+		void waitCurrentFrame() override;
 
 		RenderTarget *getDefaultRenderTarget() override;
 

@@ -12,7 +12,7 @@
 namespace HBE {
 	const Mesh *Graphics::DEFAULT_CUBE = nullptr;
 	const Mesh *Graphics::DEFAULT_QUAD = nullptr;
-    Event<uint32_t> Graphics::onFrameChange;
+	Event<uint32_t> Graphics::onFrameChange;
 	Renderer *Graphics::renderer = nullptr;
 	Window *Graphics::window = nullptr;
 
@@ -44,7 +44,7 @@ namespace HBE {
 
 	void Graphics::endFrame() {
 		renderer->endFrame();
-        onFrameChange.invoke(renderer->getCurrentFrame());
+		onFrameChange.invoke(renderer->getCurrentFrame());
 	}
 
 	Renderer *Graphics::getRenderer() {
@@ -72,7 +72,9 @@ namespace HBE {
 		renderer->present(present_cmd_info);
 	}
 
-
+	void Graphics::waitCurrentFrame() {
+		renderer->waitCurrentFrame();
+	}
 }
 
 
