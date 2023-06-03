@@ -91,6 +91,8 @@ namespace HBE {
 		command_pool->createCommandBuffers(MAX_FRAMES_IN_FLIGHT);
 
 		main_render_target->setResolution(width, height);
+		ui_render_target->setResolution(width, height);
+		Graphics::onSwapchainResized.invoke(width, height);
 	}
 
 	void VK_Renderer::onWindowClosed() {
@@ -172,13 +174,13 @@ namespace HBE {
 		for (int cache_index = 0; cache_index < 2; ++cache_index) {
 			const std::vector<DrawCmdInfo> &cache = *caches[cache_index];
 			for (int i = 0; i < cache.size(); ++i) {
-				const DrawCmdInfo& current_cmd = cache[i];
+				const DrawCmdInfo &current_cmd = cache[i];
 				if ((current_cmd.layer & render_cmd_info.layer_mask) != cache[i].layer) {
 					continue;
 				}
-				const GraphicPipeline *current_pipeline =current_cmd.pipeline_instance->getGraphicPipeline();
+				const GraphicPipeline *current_pipeline = current_cmd.pipeline_instance->getGraphicPipeline();
 				GraphicPipelineInstance *current_pipeline_instance = current_cmd.pipeline_instance;
-				const Mesh *current_mesh =current_cmd.mesh;
+				const Mesh *current_mesh = current_cmd.mesh;
 				if (current_pipeline != last_pipeline) {
 					current_pipeline->bind();
 					last_pipeline = current_pipeline;
@@ -204,7 +206,7 @@ namespace HBE {
 					if (cache[i + 1].mesh != current_cmd.mesh) {
 						current_cmd.mesh->unbind();
 					}
-					if (cache[i + 1].pipeline_instance !=current_cmd.pipeline_instance) {
+					if (cache[i + 1].pipeline_instance != current_cmd.pipeline_instance) {
 						current_cmd.pipeline_instance->unbind();
 					}
 					if (cache[i + 1].pipeline_instance->getGraphicPipeline() != current_cmd.pipeline_instance->getGraphicPipeline()) {

@@ -39,6 +39,7 @@ namespace HBE {
 
 	public:
 		static Event<uint32_t> onFrameChange;
+		static Event<uint32_t, uint32_t> onSwapchainResized;
 
 		static const Mesh *DEFAULT_QUAD;
 		static const Mesh *DEFAULT_CUBE;

@@ -10,6 +10,11 @@ namespace HBE {
 	protected:
 		bool is_fullscreen = false;
 	public:
+		/// <summary>
+		/// Called when the window is resized.
+		/// Do not use this to edit graphics resources because it is called before the current frame is finished rendering.
+		/// Use Graphics::onSwapchainResized instead, it is called after the current frame is finished rendering
+		/// </summary>
 		Event<Window *> onSizeChange;
 
 		virtual bool shouldClose() = 0;

@@ -4,6 +4,7 @@
 #include "HBETypes.h"
 #include "vector"
 #include "glm/glm.hpp"
+#include "core/utility/Event.h"
 #include <string>
 
 namespace HBE {
@@ -28,7 +29,7 @@ namespace HBE {
 
 	class RaytracingPipelineInstance;
 
-    class RenderGraph;
+	class RenderGraph;
 
 	typedef uint32_t DRAW_CMD_FLAGS;
 	enum DRAW_CMD_FLAG {
@@ -56,8 +57,8 @@ namespace HBE {
 	};
 
 	struct DrawCmdInfo {
-		const Mesh *mesh= nullptr;
-		GraphicPipelineInstance *pipeline_instance= nullptr;
+		const Mesh *mesh = nullptr;
+		GraphicPipelineInstance *pipeline_instance = nullptr;
 		uint32_t layer = 0;
 		uint32_t push_constants_count = 0;
 		PushConstantInfo *push_constants = nullptr;
@@ -66,7 +67,7 @@ namespace HBE {
 
 	struct RenderCmdInfo {
 		const RenderTarget *render_target;
-        RenderGraph* render_graph;
+		RenderGraph *render_graph;
 		uint32_t layer_mask;
 		RENDER_CMD_FLAGS flags;
 		mat4 view;
