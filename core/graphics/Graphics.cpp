@@ -16,10 +16,11 @@ namespace HBE {
 	Renderer *Graphics::renderer = nullptr;
 	Window *Graphics::window = nullptr;
 
-	void Graphics::init(const char* title,uint32_t width, uint32_t height, bool fullscreen) {
+	void Graphics::init(const char *title, uint32_t width, uint32_t height, bool fullscreen) {
 
-		window = Window::create(title,width, height);
-		window->setFullscreen(fullscreen);
+		window = Window::create(title, width, height);
+		if (fullscreen)
+			window->setFullscreen(fullscreen);
 		renderer = Renderer::create();
 		Resources::init(*renderer->getResourceFactory());
 		renderer->createDefaultResources();

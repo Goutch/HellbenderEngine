@@ -7,7 +7,8 @@
 struct GLFWwindow;
 namespace HBE {
 	class HB_API Window {
-
+	protected:
+		bool is_fullscreen = false;
 	public:
 		Event<Window *> onSizeChange;
 

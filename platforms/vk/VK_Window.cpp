@@ -72,31 +72,32 @@ namespace HBE {
 	}
 
 	void VK_Window::setFullscreen(bool fullscreen) {
-		if (fullscreen) {
-			last_width = width;
-			last_height = height;
-			// backup window position and window size
-			glfwGetWindowPos(handle, &last_x, &last_y);
+		if (is_fullscreen != fullscreen) {
+			if (fullscreen) {
+				last_width = width;
+				last_height = height;
+				// backup window position and window size
+				glfwGetWindowPos(handle, &last_x, &last_y);
 
-			// get resolution of monitor
-			const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+				// get resolution of monitor
+				const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
-			// switch to full screen
-			glfwSetWindowMonitor(handle, glfwGetPrimaryMonitor(), 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
-			width = mode->width;
-			height = mode->height;
-		} else {
-			// restore last window size and position
-			int temp_width = width;
-			int temp_height = height;
-			width = last_width;
-			height = last_height;
-			last_width = temp_width;
-			last_height = temp_height;
+				// switch to full screen
+				glfwSetWindowMonitor(handle, glfwGetPrimaryMonitor(), 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
+				width = mode->width;
+				height = mode->height;
+			} else {
+				// restore last window size and position
+				int temp_width = width;
+				int temp_height = height;
+				width = last_width;
+				height = last_height;
+				last_width = temp_width;
+				last_height = temp_height;
 
-			glfwSetWindowMonitor(handle, nullptr, last_x, last_y, width, height, GLFW_DONT_CARE);
+				glfwSetWindowMonitor(handle, nullptr, last_x, last_y, width, height, GLFW_DONT_CARE);
+			}
 		}
-
 	}
 
 	bool VK_Window::isMinimized() {
