@@ -97,6 +97,7 @@ namespace HBE {
 
 				glfwSetWindowMonitor(handle, nullptr, last_x, last_y, width, height, GLFW_DONT_CARE);
 			}
+			is_fullscreen = fullscreen;
 		}
 	}
 
