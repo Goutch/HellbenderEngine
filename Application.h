@@ -22,6 +22,8 @@ namespace HBE {
 	struct ApplicationInfo {
 		std::string name = "Application";
 		HARDWARE_FLAGS hardware_flags = HARDWARE_FLAG_NONE;
+		uint32_t start_width = 1920;
+		uint32_t start_height = 1080;
 	};
 
 	class HB_API Application {
