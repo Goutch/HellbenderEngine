@@ -1,19 +1,11 @@
 #include "Window.h"
-#ifdef OPENGL_RENDERER
-#include "platforms/gl/GL_Window.h"
-#else
 #ifdef VULKAN_RENDERER
 #include "platforms/vk/VK_Window.h"
 #endif
-#endif
 namespace HBE {
-    Window *Window::create(uint32_t width,uint32_t height) {
-#ifdef OPENGL_RENDERER
-        return new GL_Window(width,height);
-#else
+    Window *Window::create(const char* title,uint32_t width,uint32_t height) {
 #ifdef VULKAN_RENDERER
-        return new VK_Window(width,height);
-#endif
+        return new VK_Window(title,width,height);
 #endif
         return nullptr;
     }

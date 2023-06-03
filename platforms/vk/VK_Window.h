@@ -13,7 +13,7 @@ namespace HBE {
 		int last_x, last_y;
 		bool minimized = false;
 	public:
-		VK_Window(uint32_t width, uint32_t height);
+		VK_Window(const char* title,uint32_t width, uint32_t height);
 
 		~VK_Window();
 

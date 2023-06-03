@@ -27,7 +27,7 @@ namespace HBE {
 
 	void Application::init(const ApplicationInfo &info) {
 		Application::info = info;
-		Graphics::init();
+		Graphics::init(info.name.c_str(), info.start_width, info.start_height, info.start_fullscreen);
 		Audio::init();
 		Input::init();
 		window = Graphics::getWindow();

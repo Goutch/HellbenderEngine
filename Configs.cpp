@@ -1,7 +1,6 @@
 #include "Configs.h"
 
 namespace HBE {
-    std::string Configs::window_title = "CHANGE WITH Configs::setWindowTitle";
 
     std::string Configs::icon_path = "../wall.png";
 

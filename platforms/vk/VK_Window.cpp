@@ -29,7 +29,7 @@ namespace HBE {
 		glfwSetWindowTitle(handle, title.c_str());
 	}
 
-	VK_Window::VK_Window(uint32_t width, uint32_t height) {
+	VK_Window::VK_Window(const char *title, uint32_t width, uint32_t height) {
 		this->width = width;
 		this->height = height;
 		if (!glfwInit()) {
@@ -38,10 +38,9 @@ namespace HBE {
 		if (!glfwVulkanSupported()) {
 			Log::error("Vulkan is not supported");
 		}
-		const ApplicationInfo &app_info = Application::getInfo();
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		//glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-		handle = glfwCreateWindow(width, height, app_info.name.c_str(), nullptr, nullptr);
+		handle = glfwCreateWindow(width, height, title, nullptr, nullptr);
 		glfwSetWindowUserPointer(handle, (void *) this);
 		glfwSetWindowSizeCallback(handle, windowSizeCallback);
 	}

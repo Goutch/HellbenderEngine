@@ -3,6 +3,7 @@
 #include "Core.h"
 #include "core/utility/Event.h"
 #include "HBETypes.h"
+
 struct GLFWwindow;
 namespace HBE {
 	class HB_API Window {
@@ -18,7 +19,7 @@ namespace HBE {
 
 		virtual ~Window() {};
 
-		static Window *create(uint32_t width, uint32_t height);
+		static Window *create(const char *title, uint32_t width, uint32_t height);
 
 		//todo: fix this hack
 		virtual GLFWwindow *getHandle() = 0;

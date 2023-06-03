@@ -24,6 +24,7 @@ namespace HBE {
 		HARDWARE_FLAGS hardware_flags = HARDWARE_FLAG_NONE;
 		uint32_t start_width = 1920;
 		uint32_t start_height = 1080;
+		bool start_fullscreen = false;
 	};
 
 	class HB_API Application {

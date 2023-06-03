@@ -8,7 +8,6 @@ namespace HBE {
 	class HB_API Configs {
 	private:
 		static std::string icon_path;
-		static std::string window_title;
 		static bool antialiasing;
 		static bool vertical_sync;
 		static bool present_automaticaly;

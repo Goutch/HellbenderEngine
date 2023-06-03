@@ -38,12 +38,12 @@ namespace HBE {
 		static Window *window;
 
 	public:
-        static Event<uint32_t> onFrameChange;
+		static Event<uint32_t> onFrameChange;
 
 		static const Mesh *DEFAULT_QUAD;
 		static const Mesh *DEFAULT_CUBE;
 
-		static void init();
+		static void init(const char *title, uint32_t width, uint32_t height, bool fullscreen = false);
 
 		static Window *getWindow();
 
