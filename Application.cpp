@@ -72,7 +72,7 @@ namespace HBE {
 			update_clock.reset();
 			printFPS(delta_t);
 		}
-
+		Graphics::waitCurrentFrame();
 		onWindowClosed.invoke();
 		onQuit.invoke();
 		delete time;
