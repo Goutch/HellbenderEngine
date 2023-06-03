@@ -18,6 +18,8 @@ namespace HBE {
 
 		virtual void requestClose() = 0;
 
+		bool isFullscreen();
+
 		virtual ~Window() {};
 
 		static Window *create(const char *title, uint32_t width, uint32_t height);
