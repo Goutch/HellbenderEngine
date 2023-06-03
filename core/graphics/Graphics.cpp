@@ -13,7 +13,7 @@ namespace HBE {
 	const Mesh *Graphics::DEFAULT_CUBE = nullptr;
 	const Mesh *Graphics::DEFAULT_QUAD = nullptr;
 	Event<uint32_t> Graphics::onFrameChange;
-	Event<uint32_t, uint32_t> onSwapchainResized;
+	Event<uint32_t, uint32_t> Graphics::onSwapchainResized;
 	Renderer *Graphics::renderer = nullptr;
 	Window *Graphics::window = nullptr;
 
