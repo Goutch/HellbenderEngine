@@ -12,6 +12,7 @@
 #include "VK_StorageBuffer.h"
 #include "core/graphics/Graphics.h"
 #include "core/utility/Profiler.h"
+
 namespace HBE {
 
 	VK_PipelineDescriptors::VK_PipelineDescriptors(VK_Renderer *renderer, const VK_PipelineLayout &layout) {
@@ -257,8 +258,6 @@ namespace HBE {
 					sizes[i] += variable_descriptor.count;
 				}
 			}
-			Log::message("Variable descriptor created");
-
 			variable_count_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO;
 			variable_count_info.descriptorSetCount = MAX_FRAMES_IN_FLIGHT;
 			variable_count_info.pDescriptorCounts = sizes.data();
@@ -268,7 +267,6 @@ namespace HBE {
 		if (vkAllocateDescriptorSets(device->getHandle(), &allocInfo, pool.set_handles.data()) != VK_SUCCESS) {
 			Log::error("failed to allocate descriptor sets!");
 		}
-		Log::message("Variable descriptor created2");
 	}
 
 	void VK_PipelineDescriptors::bind() const {
