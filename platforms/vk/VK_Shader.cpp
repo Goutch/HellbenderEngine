@@ -6,6 +6,7 @@
 #include "spirv_cross_c.h"
 #include "VK_CommandPool.h"
 #include "spirv_cross.hpp"
+#include "spirv_glsl.hpp"
 
 namespace HBE {
 	VK_Shader::~VK_Shader() {
@@ -78,7 +79,172 @@ namespace HBE {
 		setSource(spirv);
 	}
 
+	VK_UniformInfo generateUniformInfo(VkShaderStageFlagBits stage, VkDescriptorType descriptor_type, spirv_cross::CompilerGLSL &glsl, spirv_cross::Resource &resource, VkPhysicalDeviceLimits limits) {
+
+		std::string name = glsl.get_name(resource.id);
+		spirv_cross::SPIRType type = glsl.get_type(resource.type_id);
+		size_t size = 0;
+		if (type.basetype == spirv_cross::SPIRType::Struct)
+			size = glsl.get_declared_struct_size(glsl.get_type(resource.base_type_id));
+		uint32_t descriptor_count = 1;
+
+		if (type.array.size() >= 1) {
+			descriptor_count = type.array[0];
+		}
+
+		bool variable_size = false;
+		if (descriptor_count == 0) {
+			variable_size = true;
+			switch (descriptor_type) {
+				case VK_DESCRIPTOR_TYPE_STORAGE_IMAGE:
+					descriptor_count = limits.maxPerStageDescriptorStorageImages;
+					break;
+				case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
+				case VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
+					descriptor_count = limits.maxPerStageDescriptorStorageBuffers;
+					break;
+				case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
+					descriptor_count = limits.maxPerStageDescriptorUniformBuffers;
+					break;
+
+			}
+		}
+		VkDescriptorSetLayoutBinding layout_binding = {};
+		layout_binding.binding = glsl.get_decoration(resource.id, spv::DecorationBinding);
+		layout_binding.descriptorType = descriptor_type;
+		layout_binding.stageFlags = stage;
+		layout_binding.descriptorCount = descriptor_count; //this is for array
+		layout_binding.pImmutableSamplers = nullptr;
+
+
+		VK_UniformInfo uniform_info{};
+		uniform_info.layout_binding = layout_binding;
+		uniform_info.name = name;
+		uniform_info.size = size;
+		uniform_info.variable_size = variable_size;
+		return uniform_info;
+	}
+
+	//does what the relect_c function does but with the c++ api
 	void VK_Shader::reflect(const std::vector<uint32_t> &spirv) {
+		VkPhysicalDeviceLimits limits = device->getPhysicalDevice().getProperties().limits;
+		spirv_cross::CompilerGLSL glsl(std::move(spirv));
+		spirv_cross::ShaderResources resources = glsl.get_shader_resources();
+
+		//----------------------------------------------PUSH CONSTANTS------------------------------------------------
+		for (auto &pc: resources.push_constant_buffers) {
+			size_t size = glsl.get_declared_struct_size(glsl.get_type(pc.base_type_id));
+			HB_ASSERT(size <= device->getPhysicalDevice().getProperties().limits.maxPushConstantsSize, "Push constant size is too big!");
+			std::string name = glsl.get_name(pc.id);
+
+			VK_PushConstantInfo push_constant_info{};
+			push_constant_info.name = name;
+
+			VkPushConstantRange push_constant_range{};
+			push_constant_range.size = size;
+			push_constant_range.offset = glsl.get_decoration(pc.base_type_id, spv::DecorationOffset);
+			push_constant_range.stageFlags = vk_stage;
+
+			push_constant_info.push_constant_range = push_constant_range;
+			push_constants.emplace_back(push_constant_info);
+		}
+		std::sort(push_constants.begin(), push_constants.end(),
+				  [](const VK_PushConstantInfo &a, const VK_PushConstantInfo &b) -> bool {
+					  return a.push_constant_range.offset < b.push_constant_range.offset;
+				  });
+		//----------------------------------------------UNIFORM BUFFERS------------------------------------------------
+		for (auto &ub: resources.uniform_buffers) {
+			size_t size = glsl.get_declared_struct_size(glsl.get_type(ub.base_type_id));
+			HB_ASSERT(size <= device->getPhysicalDevice().getProperties().limits.maxUniformBufferRange, "Uniform buffer size is too big!");
+
+			VK_UniformInfo uniform_info = generateUniformInfo(vk_stage, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, glsl, ub, limits);
+			uniforms.emplace_back(uniform_info);
+		}
+
+		//----------------------------------------------------------TEXTURE SAMPLERS----------------------------------------------------------
+		for (auto &sampler: resources.sampled_images) {
+			VK_UniformInfo uniform_info = generateUniformInfo(vk_stage, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, glsl, sampler, limits);
+			uniforms.emplace_back(uniform_info);
+		}
+
+		//----------------------------------------------STORAGE BUFFERS------------------------------------------------
+		//todo:Handle texel buffers
+		for (auto &sb: resources.storage_buffers) {
+			size_t size = glsl.get_declared_struct_size(glsl.get_type(sb.base_type_id));
+			HB_ASSERT(size <= device->getPhysicalDevice().getProperties().limits.maxStorageBufferRange, "Storage buffer size is too big!");
+			auto type = glsl.get_type(sb.type_id);
+			VK_UniformInfo uniform_info = generateUniformInfo(vk_stage, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, glsl, sb, limits);
+			uniforms.emplace_back(uniform_info);
+		}
+		//--------------------------------------------------------IMAGE----------------------------------------
+		for (auto &image: resources.separate_images) {
+			VK_UniformInfo uniform_info = generateUniformInfo(vk_stage, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, glsl, image, limits);
+			uniforms.emplace_back(uniform_info);
+		}
+		//--------------------------------------------------------STORAGE_IMAGES----------------------------------------
+		for (auto &image: resources.storage_images) {
+			VK_UniformInfo uniform_info = generateUniformInfo(vk_stage, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, glsl, image, limits);
+			uniforms.emplace_back(uniform_info);
+		}
+
+		//----------------------------------------------------------ACCELERATION_STRUCTURES----------------------------------------------------------
+		for (auto &as: resources.acceleration_structures) {
+			VK_UniformInfo uniform_info = generateUniformInfo(vk_stage, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, glsl, as, limits);
+			uniforms.emplace_back(uniform_info);
+		}
+
+		//----------------------------------------------------------VERTEX INPUTS-----------------------------
+		for (auto &stage_input: resources.stage_inputs) {
+			spirv_cross::SPIRType type = glsl.get_type(stage_input.base_type_id);
+
+			uint32_t location = glsl.get_decoration(stage_input.id, spv::DecorationLocation);
+			for (size_t j = 0; j < type.columns; ++j) {
+				VK_VertexInputInfo attribute_description{};
+				attribute_description.location = location;
+				attribute_description.size = type.vecsize * 4;
+
+				switch (type.vecsize) {
+					case 1:
+						if (type.basetype == spirv_cross::SPIRType::BaseType::Float)
+							attribute_description.format = VK_FORMAT_R32_SFLOAT;
+						else if (type.basetype == spirv_cross::SPIRType::BaseType::UInt)
+							attribute_description.format = VK_FORMAT_R32_UINT;
+						break;
+					case 2:
+						if (type.basetype == spirv_cross::SPIRType::BaseType::Float)
+							attribute_description.format = VK_FORMAT_R32G32_SFLOAT;
+						else if (type.basetype == spirv_cross::SPIRType::BaseType::UInt)
+							attribute_description.format = VK_FORMAT_R32G32_UINT;
+						break;
+					case 3:
+						if (type.basetype == spirv_cross::SPIRType::BaseType::Float)
+							attribute_description.format = VK_FORMAT_R32G32B32_SFLOAT;
+						else if (type.basetype == spirv_cross::SPIRType::BaseType::UInt)
+							attribute_description.format = VK_FORMAT_R32G32B32_UINT;
+						break;
+					case 4:
+						if (type.basetype == spirv_cross::SPIRType::BaseType::Float)
+							attribute_description.format = VK_FORMAT_R32G32B32A32_SFLOAT;
+						else if (type.basetype == spirv_cross::SPIRType::BaseType::UInt)
+							attribute_description.format = VK_FORMAT_R32G32B32A32_UINT;
+						break;
+				}
+				vertex_inputs.emplace_back(attribute_description);
+				location++;
+			}
+		}
+		std::sort(uniforms.begin(), uniforms.end(),
+				  [](const VK_UniformInfo &a, const VK_UniformInfo &b) -> bool {
+					  return a.layout_binding.binding < b.layout_binding.binding;
+				  });
+		std::sort(vertex_inputs.begin(), vertex_inputs.end(),
+				  [](const VK_VertexInputInfo &a, const VK_VertexInputInfo &b) -> bool {
+					  return a.location < b.location;
+				  });
+	}
+
+	/*void VK_Shader::reflect_c(const std::vector<uint32_t> &spirv) {
+
 
 		VkPhysicalDeviceLimits limits = device->getPhysicalDevice().getProperties().limits;
 		//spirv cross: https://github.com/KhronosGroup/SPIRV-Cross/wiki/Reflection-API-user-guide
@@ -439,7 +605,7 @@ namespace HBE {
 
 		spvc_context_release_allocations(context);
 		spvc_context_destroy(context);
-	}
+	}*/
 
 
 	VkShaderStageFlagBits VK_Shader::getVkStage() const {
