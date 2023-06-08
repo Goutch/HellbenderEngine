@@ -329,6 +329,7 @@ namespace HBE {
 			vertex_buffer[vertices_index + 19] = glyph.uv_min.y;
 
 			size_t indices_index = index_buffer.size();
+			index_buffer.resize(index_buffer.size() + 6);
 			index_buffer[indices_index] = vertex_count;
 			index_buffer[indices_index + 1] = vertex_count + 1;
 			index_buffer[indices_index + 2] = vertex_count + 2;
