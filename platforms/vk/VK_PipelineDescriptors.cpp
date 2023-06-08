@@ -247,7 +247,7 @@ namespace HBE {
 		allocInfo.descriptorPool = pool.handle;
 		allocInfo.descriptorSetCount = MAX_FRAMES_IN_FLIGHT;
 		allocInfo.pSetLayouts = layouts.data();
-
+		VkDescriptorSetVariableDescriptorCountAllocateInfo variable_count_info{};
 		if (pool.variable_descriptors.size() > 0) {
 			std::array<uint32_t, MAX_FRAMES_IN_FLIGHT> sizes;
 			for (uint32_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
@@ -257,8 +257,9 @@ namespace HBE {
 					sizes[i] += variable_descriptor.count;
 				}
 			}
-			VkDescriptorSetVariableDescriptorCountAllocateInfoEXT variable_count_info{};
-			variable_count_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO_EXT;
+			Log::message("Variable descriptor created");
+
+			variable_count_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO;
 			variable_count_info.descriptorSetCount = MAX_FRAMES_IN_FLIGHT;
 			variable_count_info.pDescriptorCounts = sizes.data();
 			allocInfo.pNext = &variable_count_info;
@@ -267,6 +268,7 @@ namespace HBE {
 		if (vkAllocateDescriptorSets(device->getHandle(), &allocInfo, pool.set_handles.data()) != VK_SUCCESS) {
 			Log::error("failed to allocate descriptor sets!");
 		}
+		Log::message("Variable descriptor created2");
 	}
 
 	void VK_PipelineDescriptors::bind() const {
