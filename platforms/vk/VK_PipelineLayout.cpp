@@ -7,6 +7,30 @@
 
 namespace HBE {
 
+	void mergeUniform(VK_UniformInfo &uniform_merged, VK_UniformInfo &old_uniform, VK_UniformInfo &new_uniform) {
+		HB_ASSERT(old_uniform.name == new_uniform.name, "Uniforms have different names:" + old_uniform.name + " and " + new_uniform.name);
+		HB_ASSERT(old_uniform.size == new_uniform.size, "Uniform \"" + old_uniform.name = "\" Binding#" + std::to_string(old_uniform.layout_binding.binding) + " has different sizes");
+		HB_ASSERT(old_uniform.layout_binding.descriptorType == new_uniform.layout_binding.descriptorType,
+				  "Uniform \"" + old_uniform.name = "\" Binding#" + std::to_string(old_uniform.layout_binding.binding) + " has different types");
+
+		uniform_merged.name = old_uniform.name;
+		uniform_merged.size = old_uniform.size;
+		uniform_merged.layout_binding.binding = old_uniform.layout_binding.binding;
+		uniform_merged.layout_binding.descriptorType = old_uniform.layout_binding.descriptorType;
+		uniform_merged.layout_binding.stageFlags = old_uniform.layout_binding.stageFlags | new_uniform.layout_binding.stageFlags;
+
+		if (old_uniform.variable_size == new_uniform.variable_size) {
+			uniform_merged.layout_binding.descriptorCount = old_uniform.layout_binding.descriptorCount;
+			uniform_merged.variable_size = old_uniform.variable_size;
+		} else if (old_uniform.variable_size && !new_uniform.variable_size) {
+			uniform_merged.layout_binding.descriptorCount = old_uniform.layout_binding.descriptorCount;
+			uniform_merged.variable_size = true;
+		} else if (!old_uniform.variable_size && new_uniform.variable_size) {
+			uniform_merged.layout_binding.descriptorCount = new_uniform.layout_binding.descriptorCount;
+			uniform_merged.variable_size = true;
+		}
+	}
+
 	VK_PipelineLayout::VK_PipelineLayout(VK_Device *device,
 										 const VK_Shader **shaders,
 										 size_t count) {
@@ -28,24 +52,21 @@ namespace HBE {
 			std::vector<VK_UniformInfo> uniforms = shaders[i]->getUniforms();
 			for (size_t j = 0; j < uniforms.size(); ++j) {
 				auto it = uniform_binding_to_index.find(uniforms[j].layout_binding.binding);
-
 				if (it != uniform_binding_to_index.end()) {
 					uint32_t merged_index = it->second;
-					HB_ASSERT(merged_unfiorms[it->second].name == uniforms[j].name, "Binding#" + std::to_string(uniforms[j].layout_binding.binding) + " has multiple name definitions");
-					HB_ASSERT(merged_unfiorms[it->second].size == uniforms[j].size, "Binding#" + std::to_string(uniforms[j].layout_binding.binding) + " has different sizes");
-					HB_ASSERT(merged_unfiorms[it->second].layout_binding.descriptorCount == uniforms[j].layout_binding.descriptorCount, "Binding#" + std::to_string(uniforms[j].layout_binding.binding) + " has different array counts");
-					//merge shader stages.
-					merged_unfiorms[merged_index].layout_binding.stageFlags |= uniforms[j].layout_binding.stageFlags;
-					uniform_descriptor_set_layout_bindings[merged_index].stageFlags |= uniforms[j].layout_binding.stageFlags;
+					mergeUniform(merged_unfiorms[merged_index], merged_unfiorms[merged_index], uniforms[j]);
+
+					uniform_descriptor_set_layout_bindings[merged_index].stageFlags |= merged_unfiorms[merged_index].layout_binding.stageFlags;
+					uniform_descriptor_set_layout_bindings[merged_index].descriptorCount = merged_unfiorms[merged_index].layout_binding.descriptorCount;
 				} else {
 					merged_unfiorms.emplace_back(uniforms[j]);
 					uniform_sizes.emplace_back(uniforms[j].size);
 					uniform_descriptor_set_layout_bindings.emplace_back(uniforms[j].layout_binding);
 
+
 					uniform_binding_to_index.emplace(uniforms[j].layout_binding.binding, merged_unfiorms.size() - 1);
 					uniform_name_to_index.emplace(uniforms[j].name, merged_unfiorms.size() - 1);
 				}
-
 			}
 
 			//merge push_constants
@@ -92,8 +113,7 @@ namespace HBE {
 		layoutInfo.pBindings = uniform_descriptor_set_layout_bindings.data();
 
 		VkDescriptorSetLayoutBindingFlagsCreateInfoEXT flagsInfo{};
-		if(variable_size_binding != -1)
-		{
+		if (variable_size_binding != -1) {
 			layoutInfo.pNext = &flagsInfo;
 			flagsInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO_EXT;
 			flagsInfo.bindingCount = uniform_descriptor_set_layout_bindings.size();

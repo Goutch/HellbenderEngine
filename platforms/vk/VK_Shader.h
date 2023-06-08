@@ -56,6 +56,7 @@ namespace HBE {
 		const std::vector<VK_VertexInputInfo> &getVertexInputs() const;
 
 		SHADER_STAGE getStage() const override;
+
 		VkShaderStageFlagBits getVkStage() const;
 
 	private:
@@ -64,6 +65,8 @@ namespace HBE {
 		void setSource(const std::vector<uint32_t> &spirv);
 
 		void reflect(const std::vector<uint32_t> &spirv);
+
+		void reflect_c(const std::vector<uint32_t> &spirv);
 	};
 }
 

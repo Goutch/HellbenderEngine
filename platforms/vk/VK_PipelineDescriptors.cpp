@@ -11,6 +11,7 @@
 #include "raytracing/VK_TopLevelAccelerationStructure.h"
 #include "VK_StorageBuffer.h"
 #include "core/graphics/Graphics.h"
+#include "core/utility/Profiler.h"
 namespace HBE {
 
 	VK_PipelineDescriptors::VK_PipelineDescriptors(VK_Renderer *renderer, const VK_PipelineLayout &layout) {
@@ -59,7 +60,7 @@ namespace HBE {
 		} else {
 			std::vector<VkCopyDescriptorSet> copyDescriptorSet;
 
-			for (auto it_write : from.writes[frame]) {
+			for (auto it_write: from.writes[frame]) {
 				uint32_t binding_index = uniform_binding_to_index[it_write.dstBinding];
 				VkWriteDescriptorSet &from_write = from.writes[frame][binding_index];
 				VkWriteDescriptorSet &to_write = to.writes[frame][binding_index];
@@ -166,7 +167,7 @@ namespace HBE {
 					break;
 			}
 		}
-		for (auto it :pool.variable_descriptors) {
+		for (auto it: pool.variable_descriptors) {
 			VariableDescriptor &variable_descriptor = it.second;
 			switch (variable_descriptor.type) {
 				case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
@@ -251,7 +252,7 @@ namespace HBE {
 			std::array<uint32_t, MAX_FRAMES_IN_FLIGHT> sizes;
 			for (uint32_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 				sizes[i] = 0;
-				for (auto it :pool.variable_descriptors) {
+				for (auto it: pool.variable_descriptors) {
 					VariableDescriptor &variable_descriptor = it.second;
 					sizes[i] += variable_descriptor.count;
 				}
@@ -304,7 +305,7 @@ namespace HBE {
 		return descriptor_set_layout_bindings[it->second].binding;
 	}
 
-	void VK_PipelineDescriptors::setTextureArray(uint32_t binding, Texture **textures, uint32_t texture_count, uint32_t frame, int32_t mip_level) {
+	void VK_PipelineDescriptors::setTextureArray(uint32_t binding, Texture **textures, uint32_t texture_count, int32_t frame, int32_t mip_level) {
 
 		HB_ASSERT(frame < int32_t(MAX_FRAMES_IN_FLIGHT), "Frame index out of range");
 		uint32_t binding_index = uniform_binding_to_index[binding];
@@ -316,8 +317,47 @@ namespace HBE {
 
 		VK_Image **vk_texture = reinterpret_cast<VK_Image **>(textures);
 		std::vector<VkDescriptorImageInfo> image_infos;
-
 		VkWriteDescriptorSet write_descriptor_set = descriptor_pool.writes[frame][binding_index];
+
+		//variable descriptor count
+		if (pipeline_layout->IsBindingVariableSize(binding)) {
+			Profiler::begin("Variable size array handling");
+			auto it_variable_descriptor = descriptor_pool.variable_descriptors.find(binding);
+			if (it_variable_descriptor == descriptor_pool.variable_descriptors.end()) {
+				VariableDescriptor variable_descriptor{};
+				variable_descriptor.binding = binding;
+				variable_descriptor.count = 0;
+				variable_descriptor.type = write_descriptor_set.descriptorType;
+				descriptor_pool.variable_descriptors.emplace(binding, variable_descriptor);
+			}
+
+			if (descriptor_pool.variable_descriptors[binding].count != texture_count) {
+				VariableDescriptor variable_descriptor{};
+				variable_descriptor.binding = binding;
+				variable_descriptor.count = texture_count;
+				variable_descriptor.type = write_descriptor_set.descriptorType;
+				auto it = temp_descriptor_pool.variable_descriptors.find(binding);
+				if (it == temp_descriptor_pool.variable_descriptors.end()) {
+					temp_descriptor_pool.variable_descriptors.emplace(binding, variable_descriptor);
+				} else {
+					temp_descriptor_pool.variable_descriptors[binding] = variable_descriptor;
+				}
+				createDescriptorPool(temp_descriptor_pool);
+				createDescriptorWrites(temp_descriptor_pool);
+				copyDescriptorSets(descriptor_pool, temp_descriptor_pool, frame);
+
+				old_descriptor_pools.push(std::make_pair(renderer->getCurrentFrame(), descriptor_pool.handle));
+
+				descriptor_pool.handle = temp_descriptor_pool.handle;
+				descriptor_pool.variable_descriptors = temp_descriptor_pool.variable_descriptors;
+				descriptor_pool.writes = temp_descriptor_pool.writes;
+				descriptor_pool.set_handles = temp_descriptor_pool.set_handles;
+			}
+			Profiler::end("Variable size array handling");
+		}
+
+		write_descriptor_set = descriptor_pool.writes[frame][binding_index];
+
 		image_infos.resize(write_descriptor_set.descriptorCount);
 		for (uint32_t i = 0; i < write_descriptor_set.descriptorCount; ++i) {
 			int index = i >= texture_count ? texture_count - 1 : i;
@@ -327,7 +367,8 @@ namespace HBE {
 			image_infos[i].sampler = vk_texture[index]->getSampler();
 		}
 
-		if (frame < 0) {
+
+		if (frame == -1) {
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
 				write_descriptor_set.pImageInfo = image_infos.data();
 				vkUpdateDescriptorSets(device->getHandle(),

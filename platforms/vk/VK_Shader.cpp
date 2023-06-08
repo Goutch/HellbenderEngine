@@ -5,7 +5,6 @@
 #include "spirv_cross.hpp"
 #include "spirv_cross_c.h"
 #include "VK_CommandPool.h"
-#include "spirv_cross.hpp"
 #include "spirv_glsl.hpp"
 
 namespace HBE {
@@ -88,13 +87,16 @@ namespace HBE {
 			size = glsl.get_declared_struct_size(glsl.get_type(resource.base_type_id));
 		uint32_t descriptor_count = 1;
 
+		bool variable_size = false;
 		if (type.array.size() >= 1) {
 			descriptor_count = type.array[0];
+
+			if (descriptor_count == 0) {
+				variable_size = true;
+			}
 		}
 
-		bool variable_size = false;
-		if (descriptor_count == 0) {
-			variable_size = true;
+		if (variable_size) {
 			switch (descriptor_type) {
 				case VK_DESCRIPTOR_TYPE_STORAGE_IMAGE:
 					descriptor_count = limits.maxPerStageDescriptorStorageImages;
@@ -243,8 +245,7 @@ namespace HBE {
 				  });
 	}
 
-	/*void VK_Shader::reflect_c(const std::vector<uint32_t> &spirv) {
-
+	void VK_Shader::reflect_c(const std::vector<uint32_t> &spirv) {
 
 		VkPhysicalDeviceLimits limits = device->getPhysicalDevice().getProperties().limits;
 		//spirv cross: https://github.com/KhronosGroup/SPIRV-Cross/wiki/Reflection-API-user-guide
@@ -337,7 +338,7 @@ namespace HBE {
 			uint32_t descriptor_count = 1;
 
 			uint32_t num_array_dims = spvc_type_get_num_array_dimensions(type);
-			if (num_array_dims==1) {
+			if (num_array_dims == 1) {
 				descriptor_count = spvc_type_get_array_dimension(type, 0);
 			}
 			VK_UniformInfo uniform_info{};
@@ -404,6 +405,7 @@ namespace HBE {
 		for (uint32_t i = 0; i < storage_image_count; ++i) {
 
 			std::string name = spvc_compiler_get_name(compiler_glsl, storage_image_list[i].id);
+
 
 			spvc_type type = spvc_compiler_get_type_handle(compiler_glsl, storage_image_list[i].type_id);
 
@@ -500,7 +502,9 @@ namespace HBE {
 
 			uniforms.emplace_back(uniform_info);
 		}
+		//----------------------------------------------------------STORAGE BUFFERS----------------------------------------------------------
 		//----------------------------------------------------------STORAGE TEXEL BUFFERS----------------------------------------------------------
+
 		const spvc_reflected_resource *texel_buffer_list = nullptr;
 		size_t texel_buffer_count = 0;
 		spvc_resources_get_resource_list_for_type(resources, SPVC_RESOURCE_TYPE_STORAGE_BUFFER, &texel_buffer_list, &buffer_count);
@@ -541,7 +545,8 @@ namespace HBE {
 
 			uniforms.emplace_back(uniform_info);
 		}
-
+		//----------------------------------------------------------STORAGE BUFFERS----------------------------------------------------------
+		//----------------------------------------------------------STORAGE TEXEL BUFFERS----------------------------------------------------------
 		//----------------------------------------------------------VERTEX INPUTS-----------------------------
 		const spvc_reflected_resource *vertex_input_list = nullptr;
 		size_t vertex_inputs_count;
@@ -605,7 +610,7 @@ namespace HBE {
 
 		spvc_context_release_allocations(context);
 		spvc_context_destroy(context);
-	}*/
+	}
 
 
 	VkShaderStageFlagBits VK_Shader::getVkStage() const {
