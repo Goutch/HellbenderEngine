@@ -334,13 +334,29 @@ namespace HBE {
 			barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 		}
 
-		VkPipelineStageFlags sourceStage;
-		VkPipelineStageFlags destinationStage;
+		VkPipelineStageFlags sourceStage; //producer stage
+		VkPipelineStageFlags destinationStage; // consumer stage
 
+		//    TOP_OF_PIPE_BIT start of pipeline
+		//    DRAW_INDIRECT_BIT
+		//    VERTEX_INPUT_BIT
+		//    VERTEX_SHADER_BIT
+		//    TESSELLATION_CONTROL_SHADER_BIT
+		//    TESSELLATION_EVALUATION_SHADER_BIT
+		//    GEOMETRY_SHADER_BIT
+		//    FRAGMENT_SHADER_BIT
+		//    EARLY_FRAGMENT_TESTS_BIT
+		//    LATE_FRAGMENT_TESTS_BIT
+		//    COLOR_ATTACHMENT_OUTPUT_BIT
+		//    TRANSFER_BIT
+		//    COMPUTE_SHADER_BIT
+		//    BOTTOM_OF_PIPE_BIT end of pipeline
 
 		//refer to https://www.khronos.org/registry/vulkan/specs/1.2-extensions/man/html/VkPipelineStageFlagBits.html for stages meanings
 		if (old_layout == VK_IMAGE_LAYOUT_UNDEFINED) {
+			//Don't wait for anything because image is not in use because it has layout undefined so start operation now
 			barrier.srcAccessMask = 0;
+			//
 			sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 			switch (new_layout) {
 
@@ -383,13 +399,33 @@ namespace HBE {
 					Log::error("unsupported layout transition!");
 					return;
 			}
+		} else if (old_layout == VK_IMAGE_LAYOUT_GENERAL) {
+			barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+			switch (new_layout) {
+				case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
+					barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT | VK_ACCESS_TRANSFER_READ_BIT;
+					destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+					break;
+				case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
+					barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+					destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+					break;
+				default:
+					Log::error("unsupported layout transition!");
+					return;
+			}
 		} else {
 			Log::error("unsupported layout transition!");
 			return;
 		}
+
+		//wait sourceStage with barrier.accessMask finish before destinationStage starts
+
 		vkCmdPipelineBarrier(
 				command_pool->getCurrentBuffer(),
-				sourceStage, destinationStage,
+				sourceStage,
+				destinationStage,
 				0,
 				0,
 				nullptr,
