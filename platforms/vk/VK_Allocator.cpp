@@ -306,6 +306,7 @@ namespace HBE {
 
 	void VK_Allocator::barrierTransitionImageLayout(VK_Image *image, VkImageLayout new_layout) {
 		VkImageLayout old_layout = image->getImageLayout();
+		if (old_layout == new_layout) return;
 
 		//block dstStage until srcStage is finished
 		VkImageMemoryBarrier barrier{};
@@ -374,8 +375,8 @@ namespace HBE {
 				destinationStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT | VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
 				break;
 			case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
-				barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-				destinationStage = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT;
+				barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_INPUT_ATTACHMENT_READ_BIT;
+				destinationStage = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 				break;
 
 			case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
@@ -386,6 +387,11 @@ namespace HBE {
 			case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
 				barrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 				destinationStage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+				break;
+
+			case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
+				barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+				destinationStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 				break;
 			default:
 				Log::error("unsupported layout transition!");

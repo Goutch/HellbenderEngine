@@ -14,6 +14,8 @@ namespace HBE {
 		if (flags & IMAGE_FLAG_DEPTH) {
 			return VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 		} else if (flags & IMAGE_FLAG_RENDER_TARGET && !(flags & IMAGE_FLAG_SHADER_WRITE)) {
+			return VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		} else if (!(flags & IMAGE_FLAG_SHADER_WRITE)) {
 			return VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 		}
 		return VK_IMAGE_LAYOUT_GENERAL;
@@ -172,7 +174,7 @@ namespace HBE {
 		if (device->hasQueue(QUEUE_FAMILY_TRANSFER))device->getQueue(QUEUE_FAMILY_TRANSFER).getFamilyIndex();
 		if (device->hasQueue(QUEUE_FAMILY_COMPUTE)) device->getQueue(QUEUE_FAMILY_COMPUTE).getFamilyIndex();
 
-		imageInfo.sharingMode = queues.size()>1?VK_SHARING_MODE_CONCURRENT:VK_SHARING_MODE_EXCLUSIVE;
+		imageInfo.sharingMode = queues.size() > 1 ? VK_SHARING_MODE_CONCURRENT : VK_SHARING_MODE_EXCLUSIVE;
 		imageInfo.pQueueFamilyIndices = queues.data();
 		imageInfo.queueFamilyIndexCount = queues.size();
 		imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -194,11 +196,17 @@ namespace HBE {
 
 
 		if (info.data != nullptr) {
+			//image data is set right now
 			update(info.data);
-		} else {
+		} else if (info.flags & IMAGE_FLAG_RENDER_TARGET ||
+				   info.flags & IMAGE_FLAG_DEPTH ||
+				   info.flags & IMAGE_FLAG_SHADER_WRITE) {
+			//image data will be set in the sahder
 			device->getAllocator()->setImageLayout(this, desired_layout);
+		} else {
+			//image data must be set from a user setTexture(void *data) call
+			device->getAllocator()->setImageLayout(this, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 		}
-
 
 		//image view
 		VkImageViewCreateInfo viewInfo{};
