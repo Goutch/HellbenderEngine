@@ -353,74 +353,44 @@ namespace HBE {
 		//    BOTTOM_OF_PIPE_BIT end of pipeline
 
 		//refer to https://www.khronos.org/registry/vulkan/specs/1.2-extensions/man/html/VkPipelineStageFlagBits.html for stages meanings
-		if (old_layout == VK_IMAGE_LAYOUT_UNDEFINED) {
-			//Don't wait for anything because image is not in use because it has layout undefined so start operation now
-			barrier.srcAccessMask = 0;
-			//
-			sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-			switch (new_layout) {
-
-				case VK_IMAGE_LAYOUT_GENERAL:
-					barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
-					destinationStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT | VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
-					break;
-				case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
-					barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-					destinationStage = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT;
-					break;
-
-				case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
-					barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-					destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-					break;
-
-				case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
-					barrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-					destinationStage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-					break;
-				default:
-					Log::error("unsupported layout transition!");
-					return;
-
-			}
-		} else if (old_layout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
-			barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-			sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-			switch (new_layout) {
-				case VK_IMAGE_LAYOUT_GENERAL:
-					barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
-					destinationStage = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT;
-					break;
-				case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
-					barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-					destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-					break;
-				default:
-					Log::error("unsupported layout transition!");
-					return;
-			}
-		} else if (old_layout == VK_IMAGE_LAYOUT_GENERAL) {
-			barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-			sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-			switch (new_layout) {
-				case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
-					barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT | VK_ACCESS_TRANSFER_READ_BIT;
-					destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-					break;
-				case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
-					barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-					destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-					break;
-				default:
-					Log::error("unsupported layout transition!");
-					return;
-			}
-		} else {
-			Log::error("unsupported layout transition!");
-			return;
+		switch (old_layout) {
+			case VK_IMAGE_LAYOUT_UNDEFINED:
+				//Don't wait for anything because image is not in use because it has layout undefined so start operation now
+				barrier.srcAccessMask = 0;
+				sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+				break;
+			case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
+				barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+				sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+				break;
+			case VK_IMAGE_LAYOUT_GENERAL:
+				barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+				sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+				break;
 		}
+		switch (new_layout) {
+			case VK_IMAGE_LAYOUT_GENERAL:
+				barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
+				destinationStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT | VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
+				break;
+			case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
+				barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+				destinationStage = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT;
+				break;
 
-		//wait sourceStage with barrier.accessMask finish before destinationStage starts
+			case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
+				barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+				destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+				break;
+
+			case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
+				barrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+				destinationStage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+				break;
+			default:
+				Log::error("unsupported layout transition!");
+				return;
+		}
 
 		vkCmdPipelineBarrier(
 				command_pool->getCurrentBuffer(),
