@@ -256,7 +256,6 @@ namespace HBE {
 		HB_ASSERT(present_cmd_info.image_count <= 4 && present_cmd_info.image_count > 0, "layers should be from 1 to 4");
 		HB_PROFILE_BEGIN("AquireImage");
 		frame_presented = true;
-		VK_Image **vk_images = reinterpret_cast< VK_Image **>(present_cmd_info.images);
 		VkResult result = vkAcquireNextImageKHR(device->getHandle(),
 												swapchain->getHandle(),
 												UINT64_MAX,
@@ -297,8 +296,8 @@ namespace HBE {
 		vkCmdSetViewport(command_pool->getCurrentBuffer(), 0, 1, &viewport);
 		vkCmdSetScissor(command_pool->getCurrentBuffer(), 0, 1, &scissor);
 
-
-		/*for (int i = 0; i < present_cmd_info.image_count; ++i) {
+		/*VK_Image **vk_images = reinterpret_cast< VK_Image **>(present_cmd_info.images);
+		for (int i = 0; i < present_cmd_info.image_count; ++i) {
 			const VK_Image *vk_image = dynamic_cast<const VK_Image *>(vk_images[i]);
 			VkImageMemoryBarrier image_barrier{};
 			image_barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
