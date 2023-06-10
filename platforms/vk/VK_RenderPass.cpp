@@ -100,27 +100,24 @@ namespace HBE {
 		render_pass_info.pDependencies = subpass_dependencies.data();
 
 
-		/*VkSubpassDependency dependency{};
+		VkSubpassDependency dependency{};
 		dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-		dependency.dstSubpass = 0;
+		dependency.dstSubpass = 0 ;
 
 		dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		dependency.srcStageMask |= (flags & RENDER_TARGET_FLAG_DEPTH_TEST) ? VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT : 0;
+		dependency.srcStageMask |= (flags & RENDER_TARGET_FLAG_DEPTH_ATTACHMENT) ? VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT : 0;
 		dependency.srcAccessMask = 0;
 
 		dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		dependency.dstStageMask |= (flags & RENDER_TARGET_FLAG_DEPTH_TEST) ? VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT : 0;
+		dependency.dstStageMask |= (flags & RENDER_TARGET_FLAG_DEPTH_ATTACHMENT) ? VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT : 0;
 
 		dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-		dependency.dstAccessMask |= (flags & RENDER_TARGET_FLAG_DEPTH_TEST) ? VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT : 0;
+		dependency.dstAccessMask |= (flags & RENDER_TARGET_FLAG_DEPTH_ATTACHMENT) ? VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT : 0;
 
 		render_pass_info.dependencyCount = 1;
-		render_pass_info.pDependencies = &dependency;*/
+		render_pass_info.pDependencies = &dependency;
 
-		if (
-				vkCreateRenderPass(device
-										   ->
-												   getHandle(), &render_pass_info,
+		if (vkCreateRenderPass(device->getHandle(), &render_pass_info,
 								   nullptr, &handle) != VK_SUCCESS) {
 			Log::error("failed to create render pass!");
 		}
