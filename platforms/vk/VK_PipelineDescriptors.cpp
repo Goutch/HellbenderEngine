@@ -470,8 +470,7 @@ namespace HBE {
 		HB_ASSERT(frame < int32_t(MAX_FRAMES_IN_FLIGHT), "Frame index out of range");
 		uint32_t binding_index = uniform_binding_to_index[binding];
 		VkDescriptorSetLayoutBinding &descriptorSetLayoutBinding = descriptor_set_layout_bindings[binding_index];
-		HB_ASSERT(descriptorSetLayoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER ||
-				  descriptorSetLayoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, "binding#" + std::to_string(binding) + " is not a storage buffer");
+		HB_ASSERT(descriptorSetLayoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, "binding#" + std::to_string(binding) + " is not a storage buffer");
 		HB_ASSERT(count <= descriptorSetLayoutBinding.descriptorCount || descriptorSetLayoutBinding.descriptorCount == 0, "descriptor count mismatch");
 
 		VK_StorageBuffer **vk_buffers = reinterpret_cast<VK_StorageBuffer **>(buffers);
@@ -548,8 +547,7 @@ namespace HBE {
 		HB_ASSERT(frame < int32_t(MAX_FRAMES_IN_FLIGHT), "Frame index out of range");
 		uint32_t binding_index = uniform_binding_to_index[binding];
 		VkDescriptorSetLayoutBinding &descriptorSetLayoutBinding = descriptor_set_layout_bindings[binding_index];
-		HB_ASSERT(descriptorSetLayoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER ||
-				  descriptorSetLayoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, "binding#" + std::to_string(binding) + " is not a storage buffer");
+		HB_ASSERT(descriptorSetLayoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, "binding#" + std::to_string(binding) + " is not a storage buffer");
 		HB_ASSERT(buffer_count <= descriptorSetLayoutBinding.descriptorCount || descriptorSetLayoutBinding.descriptorCount == 0, "descriptor count mismatch");
 
 		VK_TexelBuffer **vk_buffers = reinterpret_cast<VK_TexelBuffer **>(buffers);

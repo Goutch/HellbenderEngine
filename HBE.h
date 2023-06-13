@@ -24,6 +24,7 @@
 #include "core/resource/raytracing/RaytracingPipelineInstance.h"
 #include "core/resource/AudioClip.h"
 #include "core/resource/AudioClipInstance.h"
+#include "core/resource/TexelBuffer.h"
 
 #include "core/scene/Entity.h"
 #include "core/scene/Scene.h"
