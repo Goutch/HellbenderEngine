@@ -40,6 +40,7 @@ namespace HBE {
 	}
 
 	VK_TexelBuffer::~VK_TexelBuffer() {
+		vkDestroyBufferView(device->getHandle(), view, nullptr);
 		delete buffer;
 	}
 

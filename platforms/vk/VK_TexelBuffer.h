@@ -9,6 +9,7 @@ namespace HBE {
 	class VK_Buffer;
 
 	class VK_TexelBuffer : public TexelBuffer {
+		VK_Device *device;
 		uint32_t count;
 		VkBufferView view;
 		VK_Buffer *buffer;
