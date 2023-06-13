@@ -8,6 +8,7 @@
 
 #include "array"
 #include "map"
+#include "core/resource/TexelBuffer.h"
 
 namespace HBE {
 	class VK_PipelineLayout;
@@ -76,6 +77,9 @@ namespace HBE {
 		void setTexture(uint32_t binding, const Texture *texture, int32_t frame, uint32_t mip_level);
 		void setTextureArray(uint32_t binding, Texture **textures, uint32_t texture_count, int32_t frame, int32_t mip_level);
 
+		void setTexelBuffer(uint32_t binding, const TexelBuffer *buffer, int32_t frame, uint32_t mip_level);
+		void setTexelBufferArray(uint32_t binding, TexelBuffer **buffers, uint32_t buffer_count, int32_t frame);
+
 		void setAccelerationStructure(uint32_t binding, const VK_TopLevelAccelerationStructure *acceleration_structure, int32_t frame);
 
 		void setStorageBuffer(uint32_t binding, StorageBuffer *buffer, int32_t frame);
@@ -86,6 +90,7 @@ namespace HBE {
 		void createDescriptorWrites(DescriptorPool &pool);
 		void createDescriptorPool(DescriptorPool &pool);
 
+		void createVariableSizeDescriptors(uint32_t binding, VkDescriptorType descriptor_type, uint32_t count, int32_t frame);
 	};
 
 }

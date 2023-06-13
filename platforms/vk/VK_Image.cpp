@@ -6,7 +6,7 @@
 #include "VK_CommandPool.h"
 #include "VK_Fence.h"
 #include "VK_Semaphore.h"
-
+#include "VK_Utils.h"
 namespace HBE {
 	uint32_t VK_Image::current_id = 0;
 
@@ -23,107 +23,6 @@ namespace HBE {
 
 	void VK_Image::update(const void *data) {
 		device->getAllocator()->update(*this, data, width, height, depth);
-	}
-
-	uint32_t VK_Image::getBytePerPixel(IMAGE_FORMAT format) {
-		uint32_t byte_per_pixel = 0;
-		switch (format) {
-			case IMAGE_FORMAT_R8:
-			case IMAGE_FORMAT_SR8_NON_LINEAR:
-				return 1;
-				break;
-			case IMAGE_FORMAT_RG8:
-			case IMAGE_FORMAT_SRG8_NON_LINEAR:
-
-				return 2;
-				break;
-			case IMAGE_FORMAT_RGB8:
-			case IMAGE_FORMAT_SRGB8_NON_LINEAR:
-				return 3;
-
-			case IMAGE_FORMAT_RGBA8:
-			case IMAGE_FORMAT_SRGBA8_NON_LINEAR:
-			case IMAGE_FORMAT_SBGRA8_NON_LINEAR:
-			case IMAGE_FORMAT_R32F:
-				return 4;
-
-
-			case IMAGE_FORMAT_RG32F:
-				return 8;
-				break;
-			case IMAGE_FORMAT_RGB32F:
-				return 12;
-				break;
-			case IMAGE_FORMAT_RGBA32F:
-				return 16;
-			case IMAGE_FORMAT_DEPTH32F:
-				return 4;
-				break;
-			case IMAGE_FORMAT_DEPTH32f_STENCIL8U:
-				return 5;
-				break;
-			case IMAGE_FORMAT_DEPTH24f_STENCIL8U:
-				return 4;
-				break;
-
-		}
-		return 0;
-	}
-
-	VkFormat VK_Image::getVkFormat(IMAGE_FORMAT format) {
-		VkFormat vk_format = VK_FORMAT_UNDEFINED;
-		switch (format) {
-			case IMAGE_FORMAT_R8:
-				vk_format = VK_FORMAT_R8_UINT;
-				break;
-			case IMAGE_FORMAT_RG8:
-				vk_format = VK_FORMAT_R8G8_UINT;
-				break;
-			case IMAGE_FORMAT_RGB8:
-				vk_format = VK_FORMAT_R8G8B8_UINT;
-				break;
-			case IMAGE_FORMAT_RGBA8:
-				vk_format = VK_FORMAT_R8G8B8A8_UINT;
-				break;
-			case IMAGE_FORMAT_R32F:
-				vk_format = VK_FORMAT_R32_SFLOAT;
-				break;
-			case IMAGE_FORMAT_RG32F:
-				vk_format = VK_FORMAT_R32G32_SFLOAT;
-				break;
-			case IMAGE_FORMAT_RGB32F:
-				vk_format = VK_FORMAT_R32G32B32_SFLOAT;
-				break;
-			case IMAGE_FORMAT_RGBA32F:
-				vk_format = VK_FORMAT_R32G32B32A32_SFLOAT;
-				break;
-			case IMAGE_FORMAT_DEPTH32F:
-				// look into choosing depth with device format properties: https://vulkan-tutorial.com/Depth_buffering
-				vk_format = VK_FORMAT_D32_SFLOAT;
-				break;
-			case IMAGE_FORMAT_DEPTH32f_STENCIL8U:
-				vk_format = VK_FORMAT_D32_SFLOAT_S8_UINT;
-				break;
-			case IMAGE_FORMAT_DEPTH24f_STENCIL8U:
-				vk_format = VK_FORMAT_D24_UNORM_S8_UINT;
-				break;
-			case IMAGE_FORMAT_SBGRA8_NON_LINEAR:
-				vk_format = VK_FORMAT_B8G8R8A8_SRGB;
-				break;
-			case IMAGE_FORMAT_SR8_NON_LINEAR:
-				vk_format = VK_FORMAT_R8_SRGB;
-				break;
-			case IMAGE_FORMAT_SRG8_NON_LINEAR:
-				vk_format = VK_FORMAT_R8G8_SRGB;
-				break;
-			case IMAGE_FORMAT_SRGB8_NON_LINEAR:
-				vk_format = VK_FORMAT_R8G8B8_SRGB;
-				break;
-			case IMAGE_FORMAT_SRGBA8_NON_LINEAR:
-				vk_format = VK_FORMAT_R8G8B8A8_SRGB;
-				break;
-		}
-		return vk_format;
 	}
 
 	VK_Image::VK_Image(VK_Device *device, const TextureInfo &info) {
@@ -151,8 +50,8 @@ namespace HBE {
 			type = VK_IMAGE_TYPE_3D;
 			view_type = VK_IMAGE_VIEW_TYPE_3D;
 		}
-		vk_format = getVkFormat(format);
-		byte_per_pixel = getBytePerPixel(format);
+		vk_format =  VK_Utils::getVkFormat(format);
+		byte_per_pixel = VK_Utils::getFormatStride(format);
 
 		layout = VK_IMAGE_LAYOUT_UNDEFINED;
 
@@ -274,11 +173,11 @@ namespace HBE {
 		device->getAllocator()->free(allocation);
 	}
 
-	const VkSampler &VK_Image::getSampler() const {
+	VkSampler VK_Image::getSampler() const {
 		return sampler_handle;
 	}
 
-	const VkImageView &VK_Image::getImageView(uint32_t mip_level) const {
+	VkImageView VK_Image::getImageView(uint32_t mip_level) const {
 		HB_ASSERT(mip_level < mip_levels, "Texture does not have mip level " + std::to_string(mip_level));
 		return image_views[mip_level];
 	}
@@ -295,15 +194,15 @@ namespace HBE {
 		return depth;
 	}
 
-	const VkImageLayout VK_Image::getImageLayout() const {
+	VkImageLayout VK_Image::getImageLayout() const {
 		return layout;
 	}
 
-	const VkFormat VK_Image::getVkFormat() const {
+	VkFormat VK_Image::getVkFormat() const {
 		return vk_format;
 	}
 
-	const VkImage &VK_Image::getHandle() const {
+	VkImage VK_Image::getHandle() const {
 		return handle;
 	}
 
@@ -315,11 +214,11 @@ namespace HBE {
 		return vec3u(width, height, depth);
 	}
 
-	const uint32_t VK_Image::bytePerPixel() const {
+	uint32_t VK_Image::bytePerPixel() const {
 		return byte_per_pixel;
 	}
 
-	const VkImageLayout VK_Image::getDesiredLayout() const {
+	VkImageLayout VK_Image::getDesiredLayout() const {
 		return desired_layout;
 	}
 

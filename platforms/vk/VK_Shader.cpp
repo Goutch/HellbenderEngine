@@ -99,10 +99,10 @@ namespace HBE {
 		if (variable_size) {
 			switch (descriptor_type) {
 				case VK_DESCRIPTOR_TYPE_STORAGE_IMAGE:
+				case VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
 					descriptor_count = limits.maxPerStageDescriptorStorageImages;
 					break;
 				case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
-				case VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
 					descriptor_count = limits.maxPerStageDescriptorStorageBuffers;
 					break;
 				case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
@@ -111,6 +111,7 @@ namespace HBE {
 
 			}
 		}
+
 		VkDescriptorSetLayoutBinding layout_binding = {};
 		layout_binding.binding = glsl.get_decoration(resource.id, spv::DecorationBinding);
 		layout_binding.descriptorType = descriptor_type;
@@ -170,11 +171,9 @@ namespace HBE {
 		}
 
 		//----------------------------------------------STORAGE BUFFERS------------------------------------------------
-		//todo:Handle texel buffers
 		for (auto &sb: resources.storage_buffers) {
 			size_t size = glsl.get_declared_struct_size(glsl.get_type(sb.base_type_id));
 			HB_ASSERT(size <= device->getPhysicalDevice().getProperties().limits.maxStorageBufferRange, "Storage buffer size is too big!");
-			auto type = glsl.get_type(sb.type_id);
 			VK_UniformInfo uniform_info = generateUniformInfo(vk_stage, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, glsl, sb, limits);
 			uniforms.emplace_back(uniform_info);
 		}
@@ -183,9 +182,18 @@ namespace HBE {
 			VK_UniformInfo uniform_info = generateUniformInfo(vk_stage, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, glsl, image, limits);
 			uniforms.emplace_back(uniform_info);
 		}
-		//--------------------------------------------------------STORAGE_IMAGES----------------------------------------
+		//----------------------------------------------STORAGE_IMAGES & TEXEL BUFFERS------------------------------------------------
 		for (auto &image: resources.storage_images) {
-			VK_UniformInfo uniform_info = generateUniformInfo(vk_stage, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, glsl, image, limits);
+			VK_UniformInfo uniform_info;
+			auto type = glsl.get_type(image.type_id);
+			if (type.image.dim == spv::DimBuffer) {
+				// The image is an imageBuffer
+				uniform_info = generateUniformInfo(vk_stage, VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, glsl, image, limits);
+			} else {
+				// The image is a storageImage
+				uniform_info = generateUniformInfo(vk_stage, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, glsl, image, limits);
+			}
+
 			uniforms.emplace_back(uniform_info);
 		}
 

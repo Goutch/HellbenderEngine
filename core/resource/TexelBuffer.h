@@ -11,7 +11,6 @@ namespace HBE {
     };
     struct TexelBufferInfo {
         IMAGE_FORMAT format = IMAGE_FORMAT_R8;
-        uint32_t stride = 0;
         uint32_t count = 0;
         TEXEL_BUFFER_FLAGS flags = TEXEL_BUFFER_FLAG_NONE;
     };

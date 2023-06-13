@@ -99,8 +99,7 @@ namespace HBE {
 			VK_UniformInfo &uniform_info = merged_unfiorms[binding_index];
 			for (int i = 0; i < merged_unfiorms.size(); ++i) {
 				HB_ASSERT(variable_size_binding >= merged_unfiorms[i].layout_binding.binding, "Variable size binding must be the last binding of the set");
-				if (variable_size_binding != merged_unfiorms[i].layout_binding.binding &&
-					merged_unfiorms[i].layout_binding.descriptorType == uniform_info.layout_binding.descriptorType) {
+				if (variable_size_binding != merged_unfiorms[i].layout_binding.binding) {
 					uniform_info.layout_binding.descriptorCount -= merged_unfiorms[i].layout_binding.descriptorCount;
 					uniform_descriptor_set_layout_bindings[binding_index].descriptorCount -= merged_unfiorms[i].layout_binding.descriptorCount;
 				}

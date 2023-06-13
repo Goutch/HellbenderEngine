@@ -5,6 +5,7 @@
 #include "VK_CommandPool.h"
 #include "VK_Fence.h"
 #include "core/utility/Log.h"
+#include "VK_Utils.h"
 
 namespace HBE {
 
@@ -14,7 +15,7 @@ namespace HBE {
 		this->width = info.width;
 		this->height = info.height;
 		this->clear_color = info.clear_color;
-		this->vk_format = VK_Image::getVkFormat(info.format);
+		this->vk_format = VK_Utils::getVkFormat(info.format);
 		this->format = info.format;
 		this->has_color_attachment = info.flags & RENDER_TARGET_FLAG_COLOR_ATTACHMENT;
 		this->has_depth_attachment = info.flags & RENDER_TARGET_FLAG_DEPTH_ATTACHMENT;
@@ -68,7 +69,7 @@ namespace HBE {
 		}
 		if (has_depth_attachment) {
 			VkAttachmentDescription depthAttachment{};
-			depthAttachment.format = VK_Image::getVkFormat(IMAGE_FORMAT_DEPTH32F);
+			depthAttachment.format = VK_Utils::getVkFormat(IMAGE_FORMAT_DEPTH32F);
 			depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 			depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 			depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;

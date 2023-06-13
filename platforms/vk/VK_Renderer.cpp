@@ -238,7 +238,8 @@ namespace HBE {
 								  trace_rays_cmd_info.resolution.x,
 								  trace_rays_cmd_info.resolution.y,
 								  1);
-		//vkCmdPipelineBarrier(command_pool->getCurrentBuffer(), VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_DEPENDENCY_BY_REGION_BIT, 0, nullptr, 0, nullptr, 0, nullptr);
+		//TODO:Might need barrier here
+
 
 		vk_pipeline_instance->unbind();
 		vk_pipeline->unbind();
