@@ -53,7 +53,7 @@ namespace HBE {
 		descriptors->setTextureArray(descriptors->getBinding(name), texture, texture_count, frame, mip_level);
 	}
 
-	void VK_RaytracingPipelineInstance::setTextureArray(uint32_t binding,  Texture **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) {
+	void VK_RaytracingPipelineInstance::setTextureArray(uint32_t binding, Texture **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) {
 		descriptors->setTextureArray(binding, texture, texture_count, mip_level, frame);
 	}
 
@@ -79,5 +79,21 @@ namespace HBE {
 
 	void VK_RaytracingPipelineInstance::setAccelerationStructure(const std::string &name, const RootAccelerationStructure *accelerationStructure, int32_t frame) {
 		descriptors->setAccelerationStructure(descriptors->getBinding(name), dynamic_cast<const VK_TopLevelAccelerationStructure *>(accelerationStructure), frame);
+	}
+
+	void VK_RaytracingPipelineInstance::setTexelBuffer(uint32_t binding, TexelBuffer *buffer, int32_t frame) {
+		descriptors->setTexelBuffer(binding, buffer, frame);
+	}
+
+	void VK_RaytracingPipelineInstance::setTexelBufferArray(uint32_t binding, TexelBuffer **buffers, uint32_t count, int32_t frame) {
+		descriptors->setTexelBufferArray(binding, buffers, count, frame);
+	}
+
+	void VK_RaytracingPipelineInstance::setTexelBuffer(const std::string &name, TexelBuffer *buffer, int32_t frame) {
+		descriptors->setTexelBuffer(descriptors->getBinding(name), buffer, frame);
+	}
+
+	void VK_RaytracingPipelineInstance::setTexelBufferArray(const std::string &name, TexelBuffer **buffers, uint32_t count, int32_t frame) {
+		descriptors->setTexelBufferArray(descriptors->getBinding(name), buffers, count, frame);
 	}
 }

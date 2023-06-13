@@ -73,5 +73,21 @@ namespace HBE {
 		descriptors->setStorageBufferArray(descriptors->getBinding(name), buffers, count, frame);
 	}
 
+	void VK_GraphicPipelineInstance::setTexelBuffer(const std::string &name, TexelBuffer *buffer, int32_t frame) {
+		descriptors->setTexelBuffer(descriptors->getBinding(name), buffer, frame);
+	}
+
+	void VK_GraphicPipelineInstance::setTexelBufferArray(const std::string &name, TexelBuffer **buffers, uint32_t count, int32_t frame) {
+		descriptors->setTexelBufferArray(descriptors->getBinding(name), buffers, count, frame);
+	}
+
+	void VK_GraphicPipelineInstance::setTexelBuffer(uint32_t binding, TexelBuffer *buffer, int32_t frame) {
+		descriptors->setTexelBuffer(binding, buffer, frame);
+	}
+
+	void VK_GraphicPipelineInstance::setTexelBufferArray(uint32_t binding, TexelBuffer **buffers, uint32_t count, int32_t frame) {
+		descriptors->setTexelBufferArray(binding, buffers, count, frame);
+	}
+
 
 }

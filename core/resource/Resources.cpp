@@ -14,6 +14,7 @@
 #include "core/resource/raytracing/RaytracingPipelineInstance.h"
 #include "core/resource/StorageBuffer.h"
 #include "AudioClipInstance.h"
+#include "core/resource/TexelBuffer.h"
 
 namespace HBE {
 	const ResourceFactory *Resources::factory = nullptr;
@@ -201,5 +202,15 @@ namespace HBE {
 		AudioClipInstance *ac = new AudioClipInstance(info);
 		add(name, ac);
 		return ac;
+	}
+
+	TexelBuffer *Resources::createTexelBuffer(const TexelBufferInfo &info, const std::string &name) {
+		TexelBuffer *tb = factory->createTexelBuffer(info);
+		add(name, tb);
+		return tb;
+	}
+
+	TexelBuffer* Resources::createTexelBuffer(const TexelBufferInfo& info) {
+		return factory->createTexelBuffer(info);
 	}
 }

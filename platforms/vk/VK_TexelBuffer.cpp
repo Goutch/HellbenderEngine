@@ -42,7 +42,7 @@ namespace HBE {
 		delete buffer;
 	}
 
-	VkBufferView VK_TexelBuffer::getView() const {
+	const VkBufferView& VK_TexelBuffer::getView() const {
 		return view;
 	}
 

@@ -16,7 +16,9 @@ namespace HBE {
 		VK_TexelBuffer(VK_Device *device, const TexelBufferInfo &info);
 
 		void update(const void *data) override;
-		VkBufferView getView() const;
+
+		const VkBufferView &getView() const;
+
 		~VK_TexelBuffer() override;
 	};
 }

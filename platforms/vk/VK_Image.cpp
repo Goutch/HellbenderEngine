@@ -173,11 +173,11 @@ namespace HBE {
 		device->getAllocator()->free(allocation);
 	}
 
-	VkSampler VK_Image::getSampler() const {
+	const VkSampler& VK_Image::getSampler() const {
 		return sampler_handle;
 	}
 
-	VkImageView VK_Image::getImageView(uint32_t mip_level) const {
+	const VkImageView& VK_Image::getImageView(uint32_t mip_level) const {
 		HB_ASSERT(mip_level < mip_levels, "Texture does not have mip level " + std::to_string(mip_level));
 		return image_views[mip_level];
 	}
@@ -202,7 +202,7 @@ namespace HBE {
 		return vk_format;
 	}
 
-	VkImage VK_Image::getHandle() const {
+	const VkImage& VK_Image::getHandle() const {
 		return handle;
 	}
 

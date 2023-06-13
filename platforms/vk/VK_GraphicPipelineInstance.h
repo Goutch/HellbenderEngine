@@ -22,6 +22,8 @@ namespace HBE {
 	public:
 		VK_GraphicPipelineInstance(VK_Renderer *renderer, const GraphicPipelineInstanceInfo &info);
 		~VK_GraphicPipelineInstance() override;
+
+		//---------------------------IPipelineInstance Implementation---------------------------
 		void bind() const override;
 		void unbind() const override;
 
@@ -37,6 +39,11 @@ namespace HBE {
 		void setStorageBufferArray(uint32_t binding, StorageBuffer **buffer, uint32_t count, int32_t frame) override;
 		void setStorageBuffer(const std::string &name, StorageBuffer *buffer, int32_t frame) override;
 		void setStorageBufferArray(const std::string &name, StorageBuffer **buffers, uint32_t count, int32_t frame) override;
+
+		void setTexelBuffer(const std::string &name, TexelBuffer *buffer, int32_t frame) override;
+		void setTexelBufferArray(const std::string &name, TexelBuffer **buffers, uint32_t count, int32_t frame) override;
+		void setTexelBuffer(uint32_t binding, TexelBuffer *buffer, int32_t frame) override;
+		void setTexelBufferArray(uint32_t binding, TexelBuffer **buffers, uint32_t count, int32_t frame) override;
 
 		const GraphicPipeline *getGraphicPipeline() const override;
 		VK_GraphicPipeline *getVkGraphicPipeline();

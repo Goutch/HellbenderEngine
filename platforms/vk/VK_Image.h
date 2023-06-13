@@ -41,15 +41,16 @@ namespace HBE {
 		vec3u getSize() const override;
 		void update(const void *data) override;
 
-		VkSampler getSampler() const;
-		VkImage getHandle() const;
-		void setImageLayout(VkImageLayout layout);
-		VkImageLayout getImageLayout() const;
-		uint32_t bytePerPixel() const;
-		VkImageLayout getDesiredLayout() const;
-		VkImageView getImageView(uint32_t mip_level = 0) const;
+		const VkSampler& getSampler() const;
+		const VkImage& getHandle() const;
+		const VkImageView& getImageView(uint32_t mip_level = 0) const;
 		uint32_t getMipLevelCount() const;
 		VkFormat getVkFormat() const;
+		VkImageLayout getImageLayout() const;
+		VkImageLayout getDesiredLayout() const;
+		uint32_t bytePerPixel() const;
+
+		void setImageLayout(VkImageLayout layout);
 	private:
 		VkImageLayout chooseLayout();
 

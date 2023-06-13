@@ -121,7 +121,6 @@ namespace HBE {
 
 		static GraphicPipeline *createGraphicPipeline(const GraphicPipelineInfo &info, const std::string &name);
 
-
 		static GraphicPipeline *createGraphicPipeline(const GraphicPipelineInfo &info);
 
 		static ComputePipeline *createComputePipeline(const ComputePipelineInfo &info, const std::string &name);
@@ -179,5 +178,9 @@ namespace HBE {
 		static HBE::AudioClipInstance *createAudioClipInstance(const AudioClipInstanceInfo &info);
 
 		static AudioClipInstance *createAudioClipInstance(const AudioClipInstanceInfo &info, const std::string &name);
+
+		static TexelBuffer *createTexelBuffer(const TexelBufferInfo &info, const std::string &name);
+
+		static TexelBuffer *createTexelBuffer(const TexelBufferInfo &info);
 	};
 }

@@ -69,6 +69,8 @@ namespace HBE {
 		void onFrameChange(uint32_t frame);
 		void bind() const;
 		uint32_t getBinding(const std::string &name) const;
+
+
 		void bind(VkCommandBuffer command_buffer, uint32_t frame) const;
 		void unbind() const;
 
@@ -77,7 +79,7 @@ namespace HBE {
 		void setTexture(uint32_t binding, const Texture *texture, int32_t frame, uint32_t mip_level);
 		void setTextureArray(uint32_t binding, Texture **textures, uint32_t texture_count, int32_t frame, int32_t mip_level);
 
-		void setTexelBuffer(uint32_t binding, const TexelBuffer *buffer, int32_t frame, uint32_t mip_level);
+		void setTexelBuffer(uint32_t binding, const TexelBuffer *buffer, int32_t frame);
 		void setTexelBufferArray(uint32_t binding, TexelBuffer **buffers, uint32_t buffer_count, int32_t frame);
 
 		void setAccelerationStructure(uint32_t binding, const VK_TopLevelAccelerationStructure *acceleration_structure, int32_t frame);

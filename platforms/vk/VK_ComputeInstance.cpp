@@ -59,7 +59,7 @@ namespace HBE {
 									  uint32_t group_count_y,
 									  uint32_t group_count_z) {
 		fence->wait();
-		VK_Device* device = renderer->getDevice();
+		VK_Device *device = renderer->getDevice();
 
 		VK_Queue &queue = device->hasQueue(QUEUE_FAMILY_TRANSFER) ? device->getQueue(QUEUE_FAMILY_COMPUTE) : device->getQueue(QUEUE_FAMILY_GRAPHICS);
 		queue.beginCommand();
@@ -95,11 +95,11 @@ namespace HBE {
 		fence->wait();
 	}
 
-	void VK_ComputeInstance::setTextureArray(uint32_t binding,  Texture **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) {
+	void VK_ComputeInstance::setTextureArray(uint32_t binding, Texture **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) {
 		descriptors->setTextureArray(binding, texture, texture_count, frame, mip_level);
 	}
 
-	void VK_ComputeInstance::setTextureArray(const std::string &name,Texture **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) {
+	void VK_ComputeInstance::setTextureArray(const std::string &name, Texture **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) {
 		descriptors->setTextureArray(descriptors->getBinding(name), texture, texture_count, frame, mip_level);
 	}
 
@@ -117,6 +117,22 @@ namespace HBE {
 
 	void VK_ComputeInstance::setStorageBufferArray(const std::string &name, StorageBuffer **buffer, uint32_t count, int32_t frame) {
 		descriptors->setStorageBufferArray(descriptors->getBinding(name), buffer, count, frame);
+	}
+
+	void VK_ComputeInstance::setTexelBuffer(uint32_t binding, TexelBuffer *buffer, int32_t frame) {
+		descriptors->setTexelBuffer(binding, buffer, frame);
+	}
+
+	void VK_ComputeInstance::setTexelBufferArray(uint32_t binding, TexelBuffer **buffers, uint32_t count, int32_t frame) {
+		descriptors->setTexelBufferArray(binding, buffers, count, frame);
+	}
+
+	void VK_ComputeInstance::setTexelBuffer(const std::string &name, TexelBuffer *buffer, int32_t frame) {
+		descriptors->setTexelBuffer(descriptors->getBinding(name), buffer, frame);
+	}
+
+	void VK_ComputeInstance::setTexelBufferArray(const std::string &name, TexelBuffer **buffers, uint32_t count, int32_t frame) {
+		descriptors->setTexelBufferArray(descriptors->getBinding(name), buffers, count, frame);
 	}
 
 }

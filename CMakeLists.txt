@@ -184,8 +184,6 @@ set(VK_FILES
         platforms/vk/raytracing/VK_RaytracingPipelineInstance.h
         platforms/vk/VK_StorageBuffer.cpp
         platforms/vk/VK_StorageBuffer.h
-        platforms/vk/VK_DescriptorAllocator.cpp
-        platforms/vk/VK_DescriptorAllocator.h
         platforms/vk/VK_TexelBuffer.cpp
         platforms/vk/VK_TexelBuffer.h platforms/vk/VK_Utils.h)
 

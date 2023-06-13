@@ -12,6 +12,7 @@
 #include "VK_StorageBuffer.h"
 #include "core/graphics/Graphics.h"
 #include "core/utility/Profiler.h"
+#include "VK_TexelBuffer.h"
 
 namespace HBE {
 
@@ -522,8 +523,58 @@ namespace HBE {
 			descriptor_pool.writes[frame][binding_index].pBufferInfo = &buffer_info;
 			vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_pool.writes[frame][binding_index], 0, nullptr);
 		}
+	}
 
+	void VK_PipelineDescriptors::setTexelBuffer(uint32_t binding, const TexelBuffer *buffer, int32_t frame) {
+		HB_ASSERT(frame < int32_t(MAX_FRAMES_IN_FLIGHT), "Frame index out of range");
+		uint32_t binding_index = uniform_binding_to_index[binding];
+		VkDescriptorSetLayoutBinding &descriptorSetLayoutBinding = descriptor_set_layout_bindings[binding_index];
+		HB_ASSERT(descriptorSetLayoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, "binding#" + std::to_string(binding) + " is not a storage buffer");
 
+		const VK_TexelBuffer *vk_texel_buffer = dynamic_cast<const VK_TexelBuffer *>(buffer);
+
+		if (frame == -1) {
+			for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+				descriptor_pool.writes[i][binding_index].pTexelBufferView = &vk_texel_buffer->getView();
+				vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_pool.writes[i][binding_index], 0, nullptr);
+			}
+		} else {
+			descriptor_pool.writes[frame][binding_index].pTexelBufferView = &vk_texel_buffer->getView();
+			vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_pool.writes[frame][binding_index], 0, nullptr);
+		}
+	}
+
+	void VK_PipelineDescriptors::setTexelBufferArray(uint32_t binding, TexelBuffer **buffers, uint32_t buffer_count, int32_t frame) {
+		HB_ASSERT(frame < int32_t(MAX_FRAMES_IN_FLIGHT), "Frame index out of range");
+		uint32_t binding_index = uniform_binding_to_index[binding];
+		VkDescriptorSetLayoutBinding &descriptorSetLayoutBinding = descriptor_set_layout_bindings[binding_index];
+		HB_ASSERT(descriptorSetLayoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER ||
+				  descriptorSetLayoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, "binding#" + std::to_string(binding) + " is not a storage buffer");
+		HB_ASSERT(buffer_count <= descriptorSetLayoutBinding.descriptorCount || descriptorSetLayoutBinding.descriptorCount == 0, "descriptor count mismatch");
+
+		VK_TexelBuffer **vk_buffers = reinterpret_cast<VK_TexelBuffer **>(buffers);
+		//variable descriptor count
+		if (pipeline_layout->IsBindingVariableSize(binding)) {
+			createVariableSizeDescriptors(binding, descriptorSetLayoutBinding.descriptorType, buffer_count, frame);
+		}
+
+		std::vector<VkBufferView> buffer_views(buffer_count);
+		for (int i = 0; i < buffer_count; i++) {
+			buffer_views[i] = vk_buffers[i]->getView();
+		}
+
+		if (frame == -1) {
+			for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+				descriptor_pool.writes[frame][binding_index].descriptorCount = buffer_views.size();
+				descriptor_pool.writes[frame][binding_index].pTexelBufferView = buffer_views.data();
+				vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_pool.writes[i][binding_index], 0, nullptr);
+			}
+		} else {
+			descriptor_pool.writes[frame][binding_index].descriptorCount = buffer_views.size();
+			descriptor_pool.writes[frame][binding_index].pTexelBufferView = buffer_views.data();
+			vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_pool.writes[frame][binding_index], 0, nullptr);
+
+		}
 	}
 
 	void VK_PipelineDescriptors::onFrameChange(uint32_t frame) {
@@ -531,14 +582,6 @@ namespace HBE {
 			vkDestroyDescriptorPool(device->getHandle(), old_descriptor_pools.front().second, nullptr);
 			old_descriptor_pools.pop();
 		}
-	}
-
-	void VK_PipelineDescriptors::setTexelBuffer(uint32_t binding, const TexelBuffer *buffer, int32_t frame, uint32_t mip_level) {
-
-	}
-
-	void VK_PipelineDescriptors::setTexelBufferArray(uint32_t binding, TexelBuffer **buffers, uint32_t buffer_count, int32_t frame) {
-
 	}
 
 
