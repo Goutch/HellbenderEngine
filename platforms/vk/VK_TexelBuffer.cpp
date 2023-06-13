@@ -24,6 +24,7 @@ namespace HBE {
 
 
 		VkBufferViewCreateInfo view_create_info = {};
+		view_create_info.sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO;
 		view_create_info.buffer = buffer->getHandle();
 		view_create_info.format = VK_Utils::getVkFormat(info.format);
 		view_create_info.offset = 0;
@@ -42,7 +43,7 @@ namespace HBE {
 		delete buffer;
 	}
 
-	const VkBufferView& VK_TexelBuffer::getView() const {
+	const VkBufferView &VK_TexelBuffer::getView() const {
 		return view;
 	}
 
