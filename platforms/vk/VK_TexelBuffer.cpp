@@ -20,7 +20,7 @@ namespace HBE {
 
 
 		size_t size = VK_Utils::getFormatStride(info.format) * count;
-		buffer = new VK_Buffer(device, static_cast<VkDeviceSize>(size), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, flags);
+		buffer = new VK_Buffer(device, static_cast<VkDeviceSize>(size), VK_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT, flags);
 
 
 		VkBufferViewCreateInfo view_create_info = {};
