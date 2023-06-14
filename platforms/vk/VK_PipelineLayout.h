@@ -19,8 +19,7 @@ namespace HBE {
 		VK_Device *device = nullptr;
 		VkDescriptorSetLayout descriptor_set_layout_handle = VK_NULL_HANDLE;
 
-		std::vector<VkDescriptorSetLayoutBinding> descriptor_set_layout_bindings;
-		std::vector<VkDeviceSize> uniform_sizes;
+		std::vector<VkDeviceSize> descriptor_sizes;
 		std::map<std::string, size_t> descriptor_name_to_binding;
 		std::vector<bool> variable_descriptors;
 		std::vector<VkDescriptorSetLayoutBinding> layout_bindings;
@@ -51,7 +50,9 @@ namespace HBE {
 
 		bool IsBindingVariableSize(uint32_t binding) const;
 
-		void mergeStages(VK_Shader **shaders, size_t count);
+		void mergeStages(const VK_Shader **shaders, size_t count);
+
+		void mergeDescriptorStages(VK_DescriptorInfo &merged_descriptor, VK_DescriptorInfo &old_descriptor, VK_DescriptorInfo &new_descriptor);
 	};
 }
 

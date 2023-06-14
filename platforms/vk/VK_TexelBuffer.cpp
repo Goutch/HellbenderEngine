@@ -11,7 +11,7 @@
 namespace HBE {
 
 	VK_TexelBuffer::VK_TexelBuffer(VK_Device *device, const TexelBufferInfo &info) {
-
+		this->device = device;
 		ALLOC_FLAGS flags = ALLOC_FLAG_NONE;
 		if ((info.flags & TEXEL_BUFFER_FLAG_MAPPABLE) != 0) {
 			flags |= ALLOC_FLAG_MAPPABLE;
