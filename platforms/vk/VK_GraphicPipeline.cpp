@@ -67,7 +67,7 @@ namespace HBE {
 		vertexInputInfo.pVertexBindingDescriptions = binding_descriptions.data();
 
 		std::vector<VkVertexInputAttributeDescription> attribute_descriptions;
-		std::vector<VK_VertexInputInfo> vertex_inputs = vk_vertex->getVertexInputs();
+		std::vector<VK_VertexAttributeInfo> vertex_inputs = vk_vertex->getVertexInputs();
 		attribute_descriptions.resize(vertex_inputs.size());
 		uint32_t offset = 0;
 		uint32_t binding = 0;

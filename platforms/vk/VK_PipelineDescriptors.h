@@ -56,8 +56,6 @@ namespace HBE {
 		std::unordered_map<uint32_t, std::vector<VK_Buffer *>> uniform_buffers;
 
 		std::vector<VkDescriptorSetLayoutBinding> descriptor_set_layout_bindings;
-		std::map<std::string, size_t> uniform_name_to_index;
-		std::map<uint32_t, size_t> uniform_binding_to_index;
 
 		std::queue<std::pair<uint32_t, VkDescriptorPool>> old_descriptor_pools;
 
@@ -86,7 +84,7 @@ namespace HBE {
 
 		void setStorageBuffer(uint32_t binding, StorageBuffer *buffer, int32_t frame);
 		void setStorageBufferArray(uint32_t binding, StorageBuffer **buffers, uint32_t count, int32_t frame);
-
+		
 	private:
 		void copyDescriptorSets(DescriptorPool &from, DescriptorPool &to, int32_t frame);
 		void createDescriptorWrites(DescriptorPool &pool);

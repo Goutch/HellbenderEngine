@@ -12,16 +12,17 @@ namespace HBE {
 
 	class VK_CommandPool;
 
-	struct VK_VertexInputInfo {
+	struct VK_VertexAttributeInfo {
 		uint32_t location;
 		uint32_t size;
 		VkFormat format;
 	};
 
-	struct VK_UniformInfo {
+	struct VK_DescriptorInfo {
 		std::string name;
 		VkDeviceSize size = 0;
-		VkDescriptorSetLayoutBinding layout_binding;
+		uint32_t set = 0;
+		VkDescriptorSetLayoutBinding layout_binding{};
 		bool variable_size = false;
 	};
 
@@ -34,8 +35,8 @@ namespace HBE {
 	private:
 		const VK_Device *device;
 		VkShaderModule handle = VK_NULL_HANDLE;
-		std::vector<VK_VertexInputInfo> vertex_inputs;
-		std::vector<VK_UniformInfo> uniforms;
+		std::vector<VK_VertexAttributeInfo> vertex_inputs;
+		std::vector<VK_DescriptorInfo> uniforms;
 		std::vector<VK_PushConstantInfo> push_constants;
 
 		SHADER_STAGE stage;
@@ -51,9 +52,9 @@ namespace HBE {
 
 		const std::vector<VK_PushConstantInfo> &getPushConstants() const;
 
-		const std::vector<VK_UniformInfo> &getUniforms() const;
+		const std::vector<VK_DescriptorInfo> &getDescriptorInfos() const;
 
-		const std::vector<VK_VertexInputInfo> &getVertexInputs() const;
+		const std::vector<VK_VertexAttributeInfo> &getVertexInputs() const;
 
 		SHADER_STAGE getStage() const override;
 
