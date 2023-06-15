@@ -21,7 +21,7 @@ namespace HBE {
 	struct VK_DescriptorInfo {
 		std::string name;
 		VkDeviceSize size = 0;
-		uint32_t set = 0;
+		uint32_t descriptor_set = 0;
 		VkDescriptorSetLayoutBinding layout_binding{};
 		bool variable_size = false;
 	};

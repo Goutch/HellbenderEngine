@@ -240,8 +240,7 @@ namespace HBE {
 			Log::error("failed to create descriptor pool!");
 		}
 
-
-		std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, pipeline_layout->getDescriptorSetLayout());
+		std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, pipeline_layout->getDescriptorSetLayoutHandles()[0]);
 
 		VkDescriptorSetAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;

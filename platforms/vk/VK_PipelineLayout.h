@@ -14,15 +14,17 @@ namespace HBE {
 
 	class Texture;
 
+	class VK_DescriptorSetLayout;
+
 	class VK_PipelineLayout {
 		VkPipelineLayout handle = VK_NULL_HANDLE;
 		VK_Device *device = nullptr;
-		VkDescriptorSetLayout descriptor_set_layout_handle = VK_NULL_HANDLE;
-
+		std::vector<VkDescriptorSetLayout> descriptor_set_layout_handles;
+		std::vector<VK_DescriptorSetLayout *> descriptor_set_layouts;
 		std::vector<VkDeviceSize> descriptor_sizes;
 		std::map<std::string, size_t> descriptor_name_to_binding;
 		std::vector<bool> variable_descriptors;
-		std::vector<VkDescriptorSetLayoutBinding> layout_bindings;
+		std::vector<VkDescriptorSetLayoutBinding> bindings;
 		std::vector<VkPushConstantRange> push_constants_ranges;
 		std::map<std::string, size_t> push_constant_name_to_index;
 		std::vector<VK_DescriptorInfo> pipeline_descriptors;
@@ -46,7 +48,7 @@ namespace HBE {
 
 		const std::vector<VkDeviceSize> &getDescriptorSizes() const;
 
-		VkDescriptorSetLayout getDescriptorSetLayout() const;
+		const std::vector<VkDescriptorSetLayout> &getDescriptorSetLayoutHandles() const;
 
 		bool IsBindingVariableSize(uint32_t binding) const;
 

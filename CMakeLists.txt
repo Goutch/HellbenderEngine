@@ -185,7 +185,7 @@ set(VK_FILES
         platforms/vk/VK_StorageBuffer.cpp
         platforms/vk/VK_StorageBuffer.h
         platforms/vk/VK_TexelBuffer.cpp
-        platforms/vk/VK_TexelBuffer.h platforms/vk/VK_Utils.h)
+        platforms/vk/VK_TexelBuffer.h platforms/vk/VK_Utils.h platforms/vk/VK_DescriptorSetLayout.cpp platforms/vk/VK_DescriptorSetLayout.h)
 
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")

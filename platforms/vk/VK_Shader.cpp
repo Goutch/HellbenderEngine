@@ -121,7 +121,7 @@ namespace HBE {
 
 		VK_DescriptorInfo descriptor_info{};
 		descriptor_info.layout_binding = layout_binding;
-		descriptor_info.set = set_index;
+		descriptor_info.descriptor_set = set_index;
 		descriptor_info.name = name;
 		descriptor_info.size = size;
 		descriptor_info.variable_size = variable_size;
