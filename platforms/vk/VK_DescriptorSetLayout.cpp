@@ -6,25 +6,31 @@ namespace HBE {
 
 	VK_DescriptorSetLayout::VK_DescriptorSetLayout(VK_Device *device, uint32_t descriptor_set_index, const std::vector<VK_DescriptorInfo> &pipeline_descriptors) {
 		this->device = device;
-		for (const VK_DescriptorInfo &pipeline_descriptor: pipeline_descriptors) {
-			if (pipeline_descriptor.descriptor_set == descriptor_set_index) {
-				descriptor_infos.emplace_back(pipeline_descriptor);
-			}
-		}
-		HB_ASSERT(descriptor_infos.empty(), "No descriptors for descriptor set " + std::to_string(descriptor_set_index));
+		bool variable_descriptor_reached = false;
+		for (int i = 0; i < pipeline_descriptors.size(); ++i) {
+			if (pipeline_descriptors[i].descriptor_set == descriptor_set_index) {
+				descriptor_infos.emplace_back(pipeline_descriptors[i]);
 
-		bool has_a_variable_size_binding = false;
-		VkDescriptorSetLayoutBindingFlagsCreateInfoEXT flagsInfo{};
-		std::vector<VkDescriptorBindingFlagsEXT> descriptor_binding_flags(pipeline_descriptors.size(), 0);
-		for (int i = 0; i < descriptor_infos.size(); ++i) {
-			if (descriptor_infos[i].variable_size) {
-				has_a_variable_size_binding = true;
-				for (int j = 0; j < pipeline_descriptors.size(); ++j) {
-					descriptor_infos[i].layout_binding.descriptorCount -= pipeline_descriptors[j].layout_binding.descriptorCount;
+				HB_ASSERT(!variable_descriptor_reached, "Variable descriptor must only be the last descriptor in the descriptor set");
+				if (pipeline_descriptors[i].variable_size && !variable_descriptor_reached) {
+					variable_descriptor_reached = true;
 				}
 			}
-			descriptor_binding_flags[i] = pipeline_descriptors[i].variable_size ? VK_DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT_BIT : 0;
 		}
+
+		HB_ASSERT(!descriptor_infos.empty(), "No descriptors for descriptor set " + std::to_string(descriptor_set_index));
+
+		VkDescriptorSetLayoutBindingFlagsCreateInfoEXT flagsInfo{};
+		std::vector<VkDescriptorBindingFlagsEXT> descriptor_binding_flags(pipeline_descriptors.size(), 0);
+
+		VK_DescriptorInfo &last_descriptor = descriptor_infos[descriptor_infos.size() - 1];
+		if (last_descriptor.variable_size) {
+			for (int i = 0; i < pipeline_descriptors.size(); ++i) {
+				if (last_descriptor.layout_binding.binding != pipeline_descriptors[i].layout_binding.binding)
+					last_descriptor.layout_binding.descriptorCount -= pipeline_descriptors[i].layout_binding.descriptorCount;
+			}
+		}
+		descriptor_binding_flags[descriptor_binding_flags.size() - 1] = last_descriptor.variable_size ? VK_DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT_BIT : 0;
 
 		for (int i = 0; i < descriptor_infos.size(); ++i) {
 			bindings.emplace_back(descriptor_infos[i].layout_binding);
@@ -34,7 +40,7 @@ namespace HBE {
 		layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 		layoutInfo.bindingCount = bindings.size();
 		layoutInfo.pBindings = bindings.data();
-		if (has_a_variable_size_binding) {
+		if (last_descriptor.variable_size) {
 			layoutInfo.pNext = &flagsInfo;
 			flagsInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO_EXT;
 			flagsInfo.bindingCount = bindings.size();
