@@ -40,7 +40,7 @@ namespace HBE {
 
 		void pushConstant(VkCommandBuffer command_buffer, const std::string &name, const void *data) const;
 
-		const std::vector<VkDescriptorSetLayoutBinding> &getDescriptorSetLayoutBindings() const;
+		const std::vector<VkDescriptorSetLayoutBinding> &getDescriptorBindings() const;
 
 		uint32_t getDescriptorBinding(const std::string &name) const;
 
@@ -50,6 +50,7 @@ namespace HBE {
 
 		const std::vector<VkDescriptorSetLayout> &getDescriptorSetLayoutHandles() const;
 
+		const std::vector<VK_DescriptorInfo> &getDescriptorInfos() const;
 		bool IsBindingVariableSize(uint32_t binding) const;
 
 		void mergeStages(const VK_Shader **shaders, size_t count);

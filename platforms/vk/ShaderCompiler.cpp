@@ -338,15 +338,16 @@ namespace HBE {
 				}
 				glslang::SpvOptions options{};
 #ifdef DEBUG_MODE
-				//options.generateDebugInfo = true;
-				//options.stripDebugInfo = false;
-				//options.disableOptimizer = true;
+				options.generateDebugInfo = true;
+				options.stripDebugInfo = false;
+				options.disableOptimizer = true;
 #else
 				options.generateDebugInfo=false;
 				options.stripDebugInfo=true;
 				options.disableOptimizer=false;
 #endif
 				glslang::GlslangToSpv(*program.getIntermediate(stage), spirv, &options);
+
 			}
 		}
 		glslang::FinalizeProcess();

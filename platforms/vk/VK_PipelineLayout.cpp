@@ -144,7 +144,7 @@ namespace HBE {
 						   data);
 	}
 
-	const std::vector<VkDescriptorSetLayoutBinding> &VK_PipelineLayout::getDescriptorSetLayoutBindings() const {
+	const std::vector<VkDescriptorSetLayoutBinding> &VK_PipelineLayout::getDescriptorBindings() const {
 		return bindings;
 	}
 
@@ -166,6 +166,10 @@ namespace HBE {
 
 	uint32_t VK_PipelineLayout::getDescriptorBinding(const std::string &name) const {
 		return descriptor_name_to_binding.find(name)->second;
+	}
+
+	const std::vector<VK_DescriptorInfo> &VK_PipelineLayout::getDescriptorInfos() const {
+		return pipeline_descriptors;
 	}
 
 

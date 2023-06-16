@@ -4,7 +4,7 @@
 
 namespace HBE {
 
-	VK_DescriptorSetLayout::VK_DescriptorSetLayout(VK_Device *device, uint32_t descriptor_set_index, const std::vector<VK_DescriptorInfo> &pipeline_descriptors) {
+	VK_DescriptorSetLayout::VK_DescriptorSetLayout(VK_Device *device, uint32_t descriptor_set_index, std::vector<VK_DescriptorInfo> &pipeline_descriptors) {
 		this->device = device;
 		bool variable_descriptor_reached = false;
 		for (int i = 0; i < pipeline_descriptors.size(); ++i) {
@@ -48,6 +48,11 @@ namespace HBE {
 		}
 
 		vkCreateDescriptorSetLayout(device->getHandle(), &layoutInfo, nullptr, &handle);
+
+
+		for (int i = 0; i < descriptor_infos.size(); ++i) {
+			pipeline_descriptors[descriptor_infos[i].layout_binding.binding] = descriptor_infos[i];
+		}
 	}
 
 	VK_DescriptorSetLayout::~VK_DescriptorSetLayout() {

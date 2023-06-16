@@ -14,7 +14,7 @@ namespace HBE {
 		std::vector<VkDescriptorSetLayoutBinding> bindings;
 		std::vector<VK_DescriptorInfo> descriptor_infos;
 	public :
-		VK_DescriptorSetLayout(VK_Device *device, uint32_t descriptor_set_index, const std::vector<VK_DescriptorInfo> &pipeline_descriptors);
+		VK_DescriptorSetLayout(VK_Device *device, uint32_t descriptor_set_index, std::vector<VK_DescriptorInfo> &pipeline_descriptors);
 
 		~VK_DescriptorSetLayout();
 
