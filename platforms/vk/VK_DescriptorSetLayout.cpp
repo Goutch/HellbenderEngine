@@ -70,4 +70,9 @@ namespace HBE {
 	const std::vector<VK_DescriptorInfo> &VK_DescriptorSetLayout::getDescriptorInfos() const {
 		return descriptor_infos;
 	}
+
+	uint32_t VK_DescriptorSetLayout::getLastBinding() const {
+		return bindings[bindings.size() - 1].binding;
+	}
+
 }

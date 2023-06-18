@@ -46,14 +46,21 @@ namespace HBE {
 
 	VK_PipelineDescriptors::~VK_PipelineDescriptors() {
 		for (const auto &buffers_per_frame: uniform_buffers) {
-			for (auto binding: buffers_per_frame) {
-				delete binding;
+			for (auto b: buffers_per_frame) {
+				delete b;
 			}
 		}
 		vkDestroyDescriptorPool(device->getHandle(), descriptor_pool.handle, nullptr);
 	}
 
 	void VK_PipelineDescriptors::createDescriptorPool(DescriptorPool &pool) {
+
+		const std::vector<VkDescriptorSetLayout> pipeline_descriptor_set_layouts = pipeline_layout->getDescriptorSetLayoutHandles();
+		std::vector<VkDescriptorSetLayout> descriptor_set_layouts(MAX_FRAMES_IN_FLIGHT * pipeline_descriptor_set_layouts.size());
+		for (int i = 0; i < descriptor_set_layouts.size(); ++i) {
+			descriptor_set_layouts[i] = pipeline_descriptor_set_layouts[i % pipeline_descriptor_set_layouts.size()];
+		}
+
 		size_t combined_image_sampler_count = 0;
 		size_t separate_image_count = 0;
 		size_t storage_image_count = 0;
@@ -91,29 +98,41 @@ namespace HBE {
 					break;
 			}
 		}
-		for (auto &variable_descriptor: pool.variable_descriptors) {
-			switch (variable_descriptor.type) {
-				case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
-					uniform_buffer_count += variable_descriptor.count;
-					break;
-				case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
-					combined_image_sampler_count += variable_descriptor.count;
-					break;
-				case VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE:
-					separate_image_count += variable_descriptor.count;
-					break;
-				case VK_DESCRIPTOR_TYPE_STORAGE_IMAGE:
-					storage_image_count += variable_descriptor.count;
-					break;
-				case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
-					storage_buffer_count += variable_descriptor.count;
-					break;
-				case VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
-					storage_texel_buffer_count += variable_descriptor.count;
-					break;
-				case VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
-					uniform_texel_buffer_count += variable_descriptor.count;
-					break;
+
+		if (pool.variable_descriptor_sets.size() < descriptor_set_layouts.size()) {
+			pool.variable_descriptor_sets.resize(descriptor_set_layouts.size(), {});
+		}
+		std::vector<uint32_t> variable_sizes(pool.variable_descriptor_sets.size(), 0);
+		for (int i = 0; i < pool.variable_descriptor_sets.size(); ++i) {
+			VariableDescriptorSet &variable_descriptor = pool.variable_descriptor_sets[i];
+			variable_descriptor.binding = pipeline_layout->getLastDescriptorSetBinding(i % pipeline_layout->getDescriptorSetCount());
+			variable_descriptor.type = pipeline_layout->getDescriptorInfos()[pool.variable_descriptor_sets[i].binding].layout_binding.descriptorType;
+
+			if (pipeline_layout->IsBindingVariableSize(variable_descriptor.binding)) {
+				variable_sizes[i] += variable_descriptor.count;
+				switch (variable_descriptor.type) {
+					case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
+						uniform_buffer_count += variable_descriptor.count;
+						break;
+					case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
+						combined_image_sampler_count += variable_descriptor.count;
+						break;
+					case VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE:
+						separate_image_count += variable_descriptor.count;
+						break;
+					case VK_DESCRIPTOR_TYPE_STORAGE_IMAGE:
+						storage_image_count += variable_descriptor.count;
+						break;
+					case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
+						storage_buffer_count += variable_descriptor.count;
+						break;
+					case VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
+						storage_texel_buffer_count += variable_descriptor.count;
+						break;
+					case VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
+						uniform_texel_buffer_count += variable_descriptor.count;
+						break;
+				}
 			}
 		}
 		std::vector<VkDescriptorPoolSize> poolSizes{};
@@ -153,42 +172,30 @@ namespace HBE {
 			poolSizes[poolSizes.size() - 1].descriptorCount = uniform_texel_buffer_count * MAX_FRAMES_IN_FLIGHT;
 		}
 
-		const std::vector<VkDescriptorSetLayout> descriptor_set_layouts = pipeline_layout->getDescriptorSetLayoutHandles();
+
 		VkDescriptorPoolCreateInfo poolInfo{};
 		poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 		poolInfo.poolSizeCount = poolSizes.size();
 		poolInfo.pPoolSizes = poolSizes.data();
-		poolInfo.maxSets = MAX_FRAMES_IN_FLIGHT * descriptor_set_layouts.size();
+		poolInfo.maxSets = descriptor_set_layouts.size();
 		if (vkCreateDescriptorPool(device->getHandle(), &poolInfo, nullptr, &pool.handle) != VK_SUCCESS) {
 			Log::error("failed to create descriptor pool!");
 		}
-
-		std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT * descriptor_set_layouts.size());
-		for (int i = 0; i < layouts.size(); ++i) {
-			layouts[i] = descriptor_set_layouts[i % descriptor_set_layouts.size()];
-		}
-
+		pool.descriptor_set_handles.resize(descriptor_set_layouts.size());
 		VkDescriptorSetAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		allocInfo.descriptorPool = pool.handle;
-		allocInfo.descriptorSetCount = MAX_FRAMES_IN_FLIGHT * layouts.size();
-		allocInfo.pSetLayouts = layouts.data();
-		VkDescriptorSetVariableDescriptorCountAllocateInfo variable_count_info{};
-		if (pool.variable_descriptors.size() > 0) {
-			std::array<uint32_t, MAX_FRAMES_IN_FLIGHT> sizes{};
-			for (uint32_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-				sizes[i] = 0;
-				for (auto &variable_descriptor: pool.variable_descriptors) {
-					sizes[i] += variable_descriptor.count;
-				}
-			}
-			variable_count_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO;
-			variable_count_info.descriptorSetCount = MAX_FRAMES_IN_FLIGHT;
-			variable_count_info.pDescriptorCounts = sizes.data();
-			allocInfo.pNext = &variable_count_info;
-		}
+		allocInfo.descriptorSetCount = descriptor_set_layouts.size();
+		allocInfo.pSetLayouts = descriptor_set_layouts.data();
 
-		pool.descriptor_set_handles.resize(MAX_FRAMES_IN_FLIGHT * layouts.size());
+
+		VkDescriptorSetVariableDescriptorCountAllocateInfo variable_count_info{};
+		variable_count_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO;
+		variable_count_info.descriptorSetCount = allocInfo.descriptorSetCount;
+		variable_count_info.pDescriptorCounts = variable_sizes.data();
+		allocInfo.pNext = &variable_count_info;
+
+
 		if (vkAllocateDescriptorSets(device->getHandle(), &allocInfo, pool.descriptor_set_handles.data()) != VK_SUCCESS) {
 			Log::error("failed to allocate descriptor sets!");
 		}
@@ -226,20 +233,17 @@ namespace HBE {
 		const std::vector<VkDescriptorSetLayoutBinding> layout_bindings = pipeline_layout->getDescriptorBindings();
 		const std::vector<VkDescriptorSetLayout> &descriptor_set_layouts = pipeline_layout->getDescriptorSetLayoutHandles();
 		const std::vector<VK_DescriptorInfo> &descriptor_infos = pipeline_layout->getDescriptorInfos();
+
 		for (uint32_t frame_index = 0; frame_index < MAX_FRAMES_IN_FLIGHT; ++frame_index) {
 			std::vector<VkWriteDescriptorSet> descriptor_writes;
 			for (size_t binding = 0; binding < layout_bindings.size(); ++binding) {
 				auto descriptor_type = layout_bindings[binding].descriptorType;
 				uint32_t descriptor_count = layout_bindings[binding].descriptorCount;
-				if (pipeline_layout->IsBindingVariableSize(binding)) {
-					if (pool.variable_descriptors[binding].initialized) {
-						descriptor_count = pool.variable_descriptors[binding].count;
-					} else {
-						descriptor_count = 0;
-					}
-				}
-
 				uint32_t descriptor_set_index = (frame_index * descriptor_set_layouts.size()) + descriptor_infos[binding].descriptor_set;
+
+				if (pipeline_layout->IsBindingVariableSize(binding)) {
+					descriptor_count = pool.variable_descriptor_sets[descriptor_set_index].count;
+				}
 
 				VkWriteDescriptorSet write = {};
 				write.descriptorType = descriptor_type;
@@ -262,10 +266,13 @@ namespace HBE {
 			if (descriptor_writes.size() > 0) {
 				std::vector<VkDescriptorBufferInfo> uniform_buffer_infos(descriptor_writes.size());
 				for (int i = 0; i < descriptor_writes.size(); ++i) {
+					if (descriptor_writes[i].descriptorType != VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
+						continue;
+					}
 					VkDescriptorBufferInfo buffer_info = {};
-					buffer_info.buffer = uniform_buffers[descriptor_writes[i].dstBinding][frame_index]->getHandle();
+					buffer_info.buffer = uniform_buffers[frame_index][descriptor_writes[i].dstBinding]->getHandle();
 					buffer_info.offset = 0;
-					buffer_info.range = uniform_buffers[descriptor_writes[i].dstBinding][frame_index]->getSize();
+					buffer_info.range = uniform_buffers[frame_index][descriptor_writes[i].dstBinding]->getSize();
 					uniform_buffer_infos[i] = buffer_info;
 					descriptor_writes[i].pBufferInfo = &uniform_buffer_infos[i];
 				}
@@ -275,22 +282,21 @@ namespace HBE {
 	}
 
 	void VK_PipelineDescriptors::createVariableSizeDescriptors(uint32_t binding, VkDescriptorType descriptor_type, uint32_t count, int32_t frame) {
-		if (descriptor_pool.variable_descriptors[binding].initialized == false) {
-			VariableDescriptor variable_descriptor{};
-			variable_descriptor.binding = binding;
-			variable_descriptor.count = 0;
-			variable_descriptor.type = descriptor_type;
-			variable_descriptor.initialized = true;
-		}
 
-		if (descriptor_pool.variable_descriptors[binding].count != count) {
-			VariableDescriptor variable_descriptor{};
+		uint32_t descriptor_set = pipeline_layout->getDescriptorInfos()[binding].descriptor_set;
+		uint32_t last_binding = pipeline_layout->getLastDescriptorSetBinding(descriptor_set);
+
+		uint32_t descriptor_set_index = (frame * pipeline_layout->getDescriptorSetLayoutHandles().size()) + descriptor_set;
+
+		if (descriptor_pool.variable_descriptor_sets[descriptor_set_index].count != count) {
+			VariableDescriptorSet variable_descriptor{};
 			variable_descriptor.binding = binding;
 			variable_descriptor.count = count;
 			variable_descriptor.type = descriptor_type;
-			variable_descriptor.initialized = true;
 
-			temp_descriptor_pool.variable_descriptors[binding] = variable_descriptor;
+			temp_descriptor_pool.variable_descriptor_sets = descriptor_pool.variable_descriptor_sets;
+			temp_descriptor_pool.variable_descriptor_sets[descriptor_set_index] = variable_descriptor;
+
 			createDescriptorPool(temp_descriptor_pool);
 			createDescriptorWrites(temp_descriptor_pool);
 			copyDescriptorSets(descriptor_pool, temp_descriptor_pool, frame);
@@ -298,7 +304,7 @@ namespace HBE {
 			old_descriptor_pools.push(std::make_pair(renderer->getCurrentFrame(), descriptor_pool.handle));
 
 			descriptor_pool.handle = temp_descriptor_pool.handle;
-			descriptor_pool.variable_descriptors = temp_descriptor_pool.variable_descriptors;
+			descriptor_pool.variable_descriptor_sets = temp_descriptor_pool.variable_descriptor_sets;
 			descriptor_pool.writes = temp_descriptor_pool.writes;
 			descriptor_pool.descriptor_set_handles = temp_descriptor_pool.descriptor_set_handles;
 		}
@@ -427,11 +433,11 @@ namespace HBE {
 		HB_ASSERT(pipeline_layout->getDescriptorBindings()[binding].descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 				  "binding#" + std::to_string(binding) + " is not a uniform buffer");
 		if (frame < 0) {
-			for (VK_Buffer *buffer: uniform_buffers[binding]) {
-				buffer->update(data);
+			for (int frame_i = 0; frame_i < MAX_FRAMES_IN_FLIGHT; ++frame_i) {
+				uniform_buffers[frame_i][binding]->update(data);
 			}
 		} else {
-			uniform_buffers[binding][frame]->update(data);
+			uniform_buffers[frame][binding]->update(data);
 		}
 	}
 

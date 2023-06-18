@@ -23,6 +23,9 @@ namespace HBE {
 		const std::vector<VkDescriptorSetLayoutBinding> &getBindings() const;
 
 		const std::vector<VK_DescriptorInfo> &getDescriptorInfos() const;
+
+		uint32_t getLastBinding() const;
+
 	};
 
 

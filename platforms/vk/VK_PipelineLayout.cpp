@@ -156,7 +156,7 @@ namespace HBE {
 		return descriptor_sizes;
 	}
 
-	const std::vector<VkDescriptorSetLayout>& VK_PipelineLayout::getDescriptorSetLayoutHandles() const {
+	const std::vector<VkDescriptorSetLayout> &VK_PipelineLayout::getDescriptorSetLayoutHandles() const {
 		return descriptor_set_layout_handles;
 	}
 
@@ -170,6 +170,14 @@ namespace HBE {
 
 	const std::vector<VK_DescriptorInfo> &VK_PipelineLayout::getDescriptorInfos() const {
 		return pipeline_descriptors;
+	}
+
+	uint32_t VK_PipelineLayout::getLastDescriptorSetBinding(uint32_t set) const {
+		return descriptor_set_layouts[set]->getLastBinding();
+	}
+
+	uint32_t VK_PipelineLayout::getDescriptorSetCount() const {
+		return descriptor_set_layouts.size();
 	}
 
 

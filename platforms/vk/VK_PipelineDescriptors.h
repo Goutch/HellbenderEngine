@@ -29,17 +29,16 @@ namespace HBE {
 
 	class Texture;
 
-	struct VariableDescriptor {
-		bool initialized = false;
+	struct VariableDescriptorSet {
 		uint32_t binding;
-		uint32_t count;
+		uint32_t count=0;
 		VkDescriptorType type;
 	};
 	struct DescriptorPool {
 		VkDescriptorPool handle;
-		std::vector<VkDescriptorSet> descriptor_set_handles;
+		std::vector<VkDescriptorSet> descriptor_set_handles;//frame0 set0 |frame0 set1 | frame1 set0 | frame1 set1| frame2 set0 | frame2 set1
 		std::array<std::vector<VkWriteDescriptorSet>, MAX_FRAMES_IN_FLIGHT> writes;
-		std::vector<VariableDescriptor> variable_descriptors;
+		std::vector<VariableDescriptorSet> variable_descriptor_sets;//frame0 set0 |frame0 set1 | frame1 set0 | frame1 set1| frame2 set0 | frame2 set1
 	};
 
 	class VK_PipelineDescriptors {

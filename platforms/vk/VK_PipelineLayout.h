@@ -51,11 +51,16 @@ namespace HBE {
 		const std::vector<VkDescriptorSetLayout> &getDescriptorSetLayoutHandles() const;
 
 		const std::vector<VK_DescriptorInfo> &getDescriptorInfos() const;
+
 		bool IsBindingVariableSize(uint32_t binding) const;
 
 		void mergeStages(const VK_Shader **shaders, size_t count);
 
 		void mergeDescriptorStages(VK_DescriptorInfo &merged_descriptor, VK_DescriptorInfo &old_descriptor, VK_DescriptorInfo &new_descriptor);
+
+		uint32_t getLastDescriptorSetBinding(uint32_t set) const;
+
+		uint32_t getDescriptorSetCount() const;
 	};
 }
 
