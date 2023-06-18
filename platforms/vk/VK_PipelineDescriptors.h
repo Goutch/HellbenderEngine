@@ -69,6 +69,7 @@ namespace HBE {
 
 		uint32_t getBinding(const std::string &name) const;
 
+        void resetPool(DescriptorPool& pool);
 
 		void bind(VkCommandBuffer command_buffer, uint32_t frame) const;
 
