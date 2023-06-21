@@ -21,16 +21,18 @@ namespace HBE {
 		HB_ASSERT(!descriptor_infos.empty(), "No descriptors for descriptor set " + std::to_string(descriptor_set_index));
 
 		VkDescriptorSetLayoutBindingFlagsCreateInfoEXT flagsInfo{};
-		std::vector<VkDescriptorBindingFlagsEXT> descriptor_binding_flags(pipeline_descriptors.size(), 0);
+		std::vector<VkDescriptorBindingFlagsEXT> descriptor_binding_flags(descriptor_infos.size(), 0);
 
 		VK_DescriptorInfo &last_descriptor = descriptor_infos[descriptor_infos.size() - 1];
 		if (last_descriptor.variable_size) {
 			for (int i = 0; i < pipeline_descriptors.size(); ++i) {
-				if (last_descriptor.layout_binding.binding != pipeline_descriptors[i].layout_binding.binding)
+				if (last_descriptor.layout_binding.binding != pipeline_descriptors[i].layout_binding.binding) {
 					last_descriptor.layout_binding.descriptorCount -= pipeline_descriptors[i].layout_binding.descriptorCount;
+				}
 			}
 		}
-		descriptor_binding_flags[descriptor_binding_flags.size() - 1] = last_descriptor.variable_size ? VK_DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT_BIT : 0;
+		descriptor_binding_flags[descriptor_binding_flags.size() - 1] = last_descriptor.variable_size ?
+																		VK_DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT_BIT: 0;
 
 		for (int i = 0; i < descriptor_infos.size(); ++i) {
 			bindings.emplace_back(descriptor_infos[i].layout_binding);
