@@ -19,7 +19,7 @@ namespace HBE {
 		VK_ValidationLayers *validation_layers = nullptr;
 		std::vector<VkValidationFeatureEnableEXT> ENABLED_VALIDATION_FEATURES{
 				VK_VALIDATION_FEATURE_ENABLE_SYNCHRONIZATION_VALIDATION_EXT,
-				//VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT,
+				VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT,
 		};
 	public:
 		VK_Instance();

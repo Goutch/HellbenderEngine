@@ -79,6 +79,9 @@ namespace HBE {
 	void Graphics::waitCurrentFrame() {
 		renderer->waitCurrentFrame();
 	}
+	void Graphics::waitLastFrame(){
+		renderer->waitLastFrame();
+	}
 
 }
 

@@ -52,7 +52,7 @@ namespace HBE {
 
 		~RawComponentPool();
 
-		char *attach(entity_handle handle, char *component);
+		char *getMemory(entity_handle handle);
 
 		template<typename Component>
 		Component &getAs(entity_handle handle) {

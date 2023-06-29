@@ -69,5 +69,7 @@ namespace HBE {
 		static uint32_t getCurrentFrame();
 
 		static uint32_t getFrameCount();
+
+		static void waitLastFrame();
 	};
 }

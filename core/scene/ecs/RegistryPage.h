@@ -52,8 +52,9 @@ namespace HBE {
 				components_signature.set(type.signature_bit, true);
 			}
 			Component component{};
-			char *raw_ptr = component_pages[type.signature_bit]->attach(handle, reinterpret_cast<char *>(&component));
-			return *reinterpret_cast<Component *>(raw_ptr);
+			char *raw_ptr = component_pages[type.signature_bit]->getMemory(handle);
+			Component *ptr = new(raw_ptr) Component{};
+			return *ptr;
 		};
 
 		void detach(entity_handle handle, ComponentTypeInfo &type) {

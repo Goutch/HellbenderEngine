@@ -229,7 +229,7 @@ namespace HBE {
 				copy.dstSet = to_write.dstSet;
 				copy.srcBinding = from_write.dstBinding;
 				copy.dstBinding = to_write.dstBinding;
-				copy.descriptorCount = from_write.descriptorCount;
+				copy.descriptorCount = std::min(from_write.descriptorCount,to_write.descriptorCount);
 				if (copy.descriptorCount > 0) {
 					descriptor_set_copy_infos.emplace_back(copy);
 				}
@@ -589,18 +589,20 @@ namespace HBE {
 		for (int i = 0; i < buffer_count; i++) {
 			buffer_views[i] = vk_buffers[i]->getView();
 		}
-
-		if (frame == -1) {
-			for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-				descriptor_pool.writes[i][binding].descriptorCount = buffer_views.size();
-				descriptor_pool.writes[i][binding].pTexelBufferView = buffer_views.data();
-				vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_pool.writes[i][binding], 0, nullptr);
+		if (buffer_count != 0) {
+			if (frame == -1) {
+				for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+					descriptor_pool.writes[i][binding].descriptorCount = buffer_views.size();
+					descriptor_pool.writes[i][binding].pTexelBufferView = buffer_views.data();
+					vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_pool.writes[i][binding], 0, nullptr);
+				}
+			} else {
+				descriptor_pool.writes[frame][binding].descriptorCount = buffer_views.size();
+				descriptor_pool.writes[frame][binding].pTexelBufferView = buffer_views.data();
+				vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_pool.writes[frame][binding], 0, nullptr);
 			}
-		} else {
-			descriptor_pool.writes[frame][binding].descriptorCount = buffer_views.size();
-			descriptor_pool.writes[frame][binding].pTexelBufferView = buffer_views.data();
-			vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_pool.writes[frame][binding], 0, nullptr);
 		}
+
 	}
 
 	void VK_PipelineDescriptors::onFrameChange(uint32_t frame) {

@@ -8,7 +8,7 @@
 namespace HBE {
 
 
-	VK_Buffer::VK_Buffer(VK_Device *device, VkDeviceSize size, VkBufferUsageFlags usage, ALLOC_FLAGS flags) {
+	VK_Buffer::VK_Buffer(VK_Device *device, VkDeviceSize size, VkBufferUsageFlags usage, ALLOC_FLAGS flags,VkDeviceSize custom_alignment) {
 		this->device = device;
 		this->size = size;
 		std::vector<uint32_t> queues = {device->getQueue(QUEUE_FAMILY_GRAPHICS).getFamilyIndex()};
@@ -33,12 +33,14 @@ namespace HBE {
 #endif
 		VkMemoryRequirements requirements;
 		vkGetBufferMemoryRequirements(device->getHandle(), handle, &requirements);
+		requirements.alignment = std::max(requirements.alignment, custom_alignment);
 
 		this->allocation = device->getAllocator()->alloc(requirements, flags);
 		vkBindBufferMemory(device->getHandle(), handle, allocation.block->memory, allocation.offset);
 	}
 
-	VK_Buffer::VK_Buffer(VK_Device *device, const void *data, VkDeviceSize size, VkBufferUsageFlags usage, ALLOC_FLAGS flags) : VK_Buffer(device, size, usage, flags) {
+	VK_Buffer::VK_Buffer(VK_Device *device, const void *data, VkDeviceSize size, VkBufferUsageFlags usage, ALLOC_FLAGS flags, VkDeviceSize custom_alignment) : VK_Buffer(device, size, usage,
+																																											 flags, custom_alignment) {
 		update(data);
 	}
 

@@ -13,20 +13,25 @@ namespace HBE {
 
 	class VK_CommandPool {
 		mutable int32_t current = 0;
+		int32_t last_summited = 0;
 		VkCommandPool handle;
 		VK_Device &device;
 		std::vector<VkCommandBuffer> command_buffers;
 		std::vector<VK_Fence *> fences;
+
 		void begin(uint32_t i) const;
 
 		void end(uint32_t i) const;
+
 		void reset(uint32_t i);
+
 	public:
 		~VK_CommandPool();
 
 		VK_CommandPool(VK_Device &device, int command_buffers_count, const VK_Queue &queue);
 
 		void begin() const;
+
 		void end() const;
 
 		const std::vector<VkCommandBuffer> &getBuffers() const;
@@ -38,15 +43,18 @@ namespace HBE {
 		void createCommandBuffers(int count);
 
 		void wait(int frame);
+
 		const VkCommandPool &getHandle() const;
-		VK_Fence& submit(HBE::QUEUE_FAMILY queue, VkSemaphore *wait = nullptr,
-					VkPipelineStageFlags *wait_stage = nullptr,
-					uint32_t wait_count = 0,
-					VkSemaphore *signal = nullptr,
-					uint32_t signal_count = 0);
+
+		VK_Fence &submit(HBE::QUEUE_FAMILY queue, VkSemaphore *wait = nullptr,
+						 VkPipelineStageFlags *wait_stage = nullptr,
+						 uint32_t wait_count = 0,
+						 VkSemaphore *signal = nullptr,
+						 uint32_t signal_count = 0);
 
 
 		VK_Fence &getCurrentFence();
 
+		VK_Fence &getLastFence();
 	};
 }

@@ -6,7 +6,7 @@
 
 namespace HBE {
 	HBE::VK_CommandPool::~VK_CommandPool() {
-		for (VK_Fence *fence:fences) {
+		for (VK_Fence *fence: fences) {
 			fence->wait();
 			delete fence;
 		}
@@ -15,7 +15,7 @@ namespace HBE {
 	}
 
 	void HBE::VK_CommandPool::clear() {
-		for (VK_Fence *fence:fences) {
+		for (VK_Fence *fence: fences) {
 			fence->wait();
 			delete fence;
 		}
@@ -118,10 +118,15 @@ namespace HBE {
 									  wait_count,
 									  signal,
 									  signal_count);
+		last_summited = current;
 		current++;
 		current %= command_buffers.size();
 
 		return *fences[current];
+	}
+
+	VK_Fence &VK_CommandPool::getLastFence() {
+		return *fences[last_summited];
 	}
 }
 

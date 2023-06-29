@@ -116,5 +116,7 @@ namespace HBE {
 		virtual uint32_t getCurrentFrame() const = 0;
 
 		virtual void waitCurrentFrame() = 0;
+
+		virtual void waitLastFrame() =0;
 	};
 }

@@ -26,14 +26,13 @@ namespace HBE{
 		delete[] data;
 	}
 
-	char *RawComponentPool::attach(entity_handle handle, char *component) {
+	char *RawComponentPool::getMemory(entity_handle handle) {
 		size_t i = handle - offset;
 		if (!valid[i]) {
 			handles.emplace_back(handle);
 			valid[i] = true;
 			std::sort(handles.begin(), handles.end());
 		}
-		memcpy(data + (i * info.size), component, info.size);
 		return &data[i * info.size];
 	}
 

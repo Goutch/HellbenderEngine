@@ -494,6 +494,10 @@ namespace HBE {
 		command_pool->getCurrentFence().wait();
 	}
 
+	void VK_Renderer::waitLastFrame(){
+		command_pool->getLastFence().wait();
+	}
+
 	uint32_t VK_Renderer::getFrameCount() const {
 		return MAX_FRAMES_IN_FLIGHT;
 	}

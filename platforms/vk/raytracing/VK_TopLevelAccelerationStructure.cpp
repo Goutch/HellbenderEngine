@@ -86,11 +86,13 @@ namespace HBE {
 		accelerationStructureCreateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR;
 		device->vkCreateAccelerationStructureKHR(device->getHandle(), &accelerationStructureCreateInfo, nullptr, &handle);
 
+		const VkPhysicalDeviceAccelerationStructurePropertiesKHR& properties = device->getPhysicalDevice().getAccelerationStructureProperties();
 		// Create a small scratch buffer used during build of the top level acceleration structure
 		VK_Buffer scratchBuffer = VK_Buffer(device,
 											accelerationStructureBuildSizesInfo.buildScratchSize,
 											VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
-											ALLOC_FLAG_NONE);
+											ALLOC_FLAG_NONE,
+											properties.minAccelerationStructureScratchOffsetAlignment);
 
 		VkAccelerationStructureBuildGeometryInfoKHR accelerationBuildGeometryInfo{};
 		accelerationBuildGeometryInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
@@ -134,9 +136,8 @@ namespace HBE {
 	}
 
 	VK_TopLevelAccelerationStructure::~VK_TopLevelAccelerationStructure() {
-		delete buffer;
 		device->vkDestroyAccelerationStructureKHR(device->getHandle(), handle, nullptr);
-
+		delete buffer;
 	}
 
 	const VkAccelerationStructureKHR VK_TopLevelAccelerationStructure::getHandle() const {
