@@ -14,6 +14,7 @@
 #include "VK_TexelBuffer.h"
 #include "core/utility/Profiler.h"
 #include "VK_TexelBuffer.h"
+#include "Application.h"
 
 namespace HBE {
 
@@ -111,6 +112,7 @@ namespace HBE {
 		if (pool.variable_descriptor_sets.size() < descriptor_set_layouts.size()) {
 			pool.variable_descriptor_sets.resize(descriptor_set_layouts.size(), {});
 		}
+		bool has_variable_size_descriptors = false;
 		std::vector<uint32_t> variable_sizes(pool.variable_descriptor_sets.size(), 0);
 		for (int i = 0; i < pool.variable_descriptor_sets.size(); ++i) {
 			VariableDescriptorSet &variable_descriptor = pool.variable_descriptor_sets[i];
@@ -118,6 +120,7 @@ namespace HBE {
 			variable_descriptor.type = pipeline_layout->getDescriptorInfos()[pool.variable_descriptor_sets[i].binding].layout_binding.descriptorType;
 
 			if (pipeline_layout->IsBindingVariableSize(variable_descriptor.binding)) {
+				has_variable_size_descriptors = true;
 				variable_sizes[i] += variable_descriptor.count;
 				switch (variable_descriptor.type) {
 					case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
@@ -197,13 +200,15 @@ namespace HBE {
 		allocInfo.descriptorSetCount = descriptor_set_layouts.size();
 		allocInfo.pSetLayouts = descriptor_set_layouts.data();
 
-
-		VkDescriptorSetVariableDescriptorCountAllocateInfo variable_count_info{};
-		variable_count_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO;
-		variable_count_info.descriptorSetCount = allocInfo.descriptorSetCount;
-		variable_count_info.pDescriptorCounts = variable_sizes.data();
-		allocInfo.pNext = &variable_count_info;
-
+		if (has_variable_size_descriptors) {
+			bool descriptor_indexing_enabled = Application::getInfo().hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_DESCRIPTOR_INDEXING_CAPABILITIES;
+			HB_ASSERT(has_variable_size_descriptors == descriptor_indexing_enabled, "Descriptor indexing is not enabled but variable size descriptors are used!");
+			VkDescriptorSetVariableDescriptorCountAllocateInfo variable_count_info{};
+			variable_count_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO;
+			variable_count_info.descriptorSetCount = allocInfo.descriptorSetCount;
+			variable_count_info.pDescriptorCounts = variable_sizes.data();
+			allocInfo.pNext = &variable_count_info;
+		}
 
 		if (vkAllocateDescriptorSets(device->getHandle(), &allocInfo, pool.descriptor_set_handles.data()) != VK_SUCCESS) {
 			Log::error("failed to allocate descriptor sets!");
@@ -229,7 +234,7 @@ namespace HBE {
 				copy.dstSet = to_write.dstSet;
 				copy.srcBinding = from_write.dstBinding;
 				copy.dstBinding = to_write.dstBinding;
-				copy.descriptorCount = std::min(from_write.descriptorCount,to_write.descriptorCount);
+				copy.descriptorCount = std::min(from_write.descriptorCount, to_write.descriptorCount);
 				if (copy.descriptorCount > 0) {
 					descriptor_set_copy_infos.emplace_back(copy);
 				}
