@@ -125,19 +125,19 @@ namespace HBE {
 		return staging_buffer;
 	}
 
-	void VK_Allocator::update(const VK_Buffer &buffer, const void *data, size_t size) {
+	void VK_Allocator::update(const VK_Buffer &buffer, const void *data, size_t size, size_t offset) {
 		const Allocation &alloc = buffer.getAllocation();
 		if (alloc.flags & ALLOC_FLAG_MAPPABLE) {
 			void *buffer_data;
-			vkMapMemory(device->getHandle(), alloc.block->memory, alloc.offset, alloc.size, 0, &buffer_data);
+			vkMapMemory(device->getHandle(), alloc.block->memory, alloc.offset + offset, alloc.size, 0, &buffer_data);
 			size_t copy_size = (size_t) size;
 			memcpy(buffer_data, data, copy_size);
 			vkUnmapMemory(device->getHandle(), alloc.block->memory);
 		} else {
 			StagingBuffer staging_buffer = createTempStagingBuffer(data, size);
 			staging_buffer.fence = &command_pool->getCurrentFence();
-			copy(staging_buffer.buffer, buffer.getHandle(), size);
-			staging_buffers_queue.emplace(staging_buffer);
+			copy(staging_buffer.buffer, buffer.getHandle(), size, offset);
+			staging_buffers_delete_queue.emplace(staging_buffer);
 		}
 	}
 
@@ -147,7 +147,7 @@ namespace HBE {
 
 		copy(staging_buffer.buffer, &image, image.getDesiredLayout());
 
-		staging_buffers_queue.emplace(staging_buffer);
+		staging_buffers_delete_queue.emplace(staging_buffer);
 	}
 
 	//https://www.khronos.org/registry/vulkan/specs/1.2-extensions/man/html/VkMemoryPropertyFlagBits.html
@@ -248,21 +248,21 @@ namespace HBE {
 	}
 
 	void VK_Allocator::freeStagingBuffers() {
-		while (!staging_buffers_queue.empty() && vkGetFenceStatus(device->getHandle(), staging_buffers_queue.front().fence->getHandle()) == VK_SUCCESS) {
-			vkDestroyBuffer(device->getHandle(), staging_buffers_queue.front().buffer, nullptr);
-			free(staging_buffers_queue.front().allocation);
-			staging_buffers_queue.pop();
+		while (!staging_buffers_delete_queue.empty() && vkGetFenceStatus(device->getHandle(), staging_buffers_delete_queue.front().fence->getHandle()) == VK_SUCCESS) {
+			vkDestroyBuffer(device->getHandle(), staging_buffers_delete_queue.front().buffer, nullptr);
+			free(staging_buffers_delete_queue.front().allocation);
+			staging_buffers_delete_queue.pop();
 		}
 	}
 
-	void VK_Allocator::copy(VkBuffer src, VkBuffer dest, VkDeviceSize size) {
+	void VK_Allocator::copy(VkBuffer src, VkBuffer dest, VkDeviceSize size, VkDeviceSize offset) {
 		command_pool->begin();
 		VkBufferMemoryBarrier barriers[2];
 		barriers[0] = {};
 		barriers[0].sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
 		barriers[0].buffer = dest;
 		barriers[0].size = size;
-		barriers[0].offset = 0;
+		barriers[0].offset = offset;
 		barriers[0].srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 		barriers[0].dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT | VK_ACCESS_MEMORY_WRITE_BIT;
 		barriers[0].dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
@@ -272,7 +272,7 @@ namespace HBE {
 		barriers[1].sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
 		barriers[1].buffer = src;
 		barriers[1].size = size;
-		barriers[1].offset = 0;
+		barriers[1].offset = offset;
 		barriers[1].srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
 		barriers[1].dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT | VK_ACCESS_MEMORY_WRITE_BIT;
 		barriers[1].dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
@@ -291,8 +291,8 @@ namespace HBE {
 
 
 		VkBufferCopy copyRegion{};
-		copyRegion.srcOffset = 0; // buffer offset not memory
-		copyRegion.dstOffset = 0; // buffer offset not memory
+		copyRegion.srcOffset = offset; // buffer offset not memory
+		copyRegion.dstOffset = offset; // buffer offset not memory
 		copyRegion.size = size;
 
 

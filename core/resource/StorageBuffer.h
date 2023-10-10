@@ -19,6 +19,12 @@ namespace HBE {
 	public :
 		virtual void update(const void *data) = 0;
 
+		virtual void update(const void *data, size_t size, size_t offset = 0) = 0;
+
+		virtual uint32_t getCount() const = 0;
+
+		virtual uint32_t getStride() const = 0;
+
 		virtual ~StorageBuffer() {};
 	};
 }

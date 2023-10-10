@@ -14,7 +14,6 @@
 #include "VK_TexelBuffer.h"
 #include "core/utility/Profiler.h"
 #include "VK_TexelBuffer.h"
-#include "Application.h"
 
 namespace HBE {
 
@@ -78,6 +77,8 @@ namespace HBE {
 		size_t storage_buffer_count = 0;
 		size_t storage_texel_buffer_count = 0;
 		size_t uniform_texel_buffer_count = 0;
+		size_t acceleration_structure_count = 0;
+
 		for (auto layout_binding: pipeline_layout->getDescriptorBindings()) {
 			if (pipeline_layout->IsBindingVariableSize(layout_binding.binding)) {
 				continue;
@@ -106,13 +107,15 @@ namespace HBE {
 				case VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
 					uniform_texel_buffer_count += layout_binding.descriptorCount;
 					break;
+				case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR:
+					acceleration_structure_count += layout_binding.descriptorCount;
+					break;
 			}
 		}
 
 		if (pool.variable_descriptor_sets.size() < descriptor_set_layouts.size()) {
 			pool.variable_descriptor_sets.resize(descriptor_set_layouts.size(), {});
 		}
-		bool has_variable_size_descriptors = false;
 		std::vector<uint32_t> variable_sizes(pool.variable_descriptor_sets.size(), 0);
 		for (int i = 0; i < pool.variable_descriptor_sets.size(); ++i) {
 			VariableDescriptorSet &variable_descriptor = pool.variable_descriptor_sets[i];
@@ -120,7 +123,6 @@ namespace HBE {
 			variable_descriptor.type = pipeline_layout->getDescriptorInfos()[pool.variable_descriptor_sets[i].binding].layout_binding.descriptorType;
 
 			if (pipeline_layout->IsBindingVariableSize(variable_descriptor.binding)) {
-				has_variable_size_descriptors = true;
 				variable_sizes[i] += variable_descriptor.count;
 				switch (variable_descriptor.type) {
 					case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
@@ -143,6 +145,9 @@ namespace HBE {
 						break;
 					case VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
 						uniform_texel_buffer_count += variable_descriptor.count;
+						break;
+					case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR:
+						acceleration_structure_count += variable_descriptor.count;
 						break;
 				}
 			}
@@ -183,6 +188,11 @@ namespace HBE {
 			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
 			poolSizes[poolSizes.size() - 1].descriptorCount = uniform_texel_buffer_count * MAX_FRAMES_IN_FLIGHT;
 		}
+		if (acceleration_structure_count > 0) {
+			poolSizes.emplace_back();
+			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
+			poolSizes[poolSizes.size() - 1].descriptorCount = acceleration_structure_count * MAX_FRAMES_IN_FLIGHT;
+		}
 
 
 		VkDescriptorPoolCreateInfo poolInfo{};
@@ -200,15 +210,13 @@ namespace HBE {
 		allocInfo.descriptorSetCount = descriptor_set_layouts.size();
 		allocInfo.pSetLayouts = descriptor_set_layouts.data();
 
-		if (has_variable_size_descriptors) {
-			bool descriptor_indexing_enabled = Application::getInfo().hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_DESCRIPTOR_INDEXING_CAPABILITIES;
-			HB_ASSERT(has_variable_size_descriptors == descriptor_indexing_enabled, "Descriptor indexing is not enabled but variable size descriptors are used!");
-			VkDescriptorSetVariableDescriptorCountAllocateInfo variable_count_info{};
-			variable_count_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO;
-			variable_count_info.descriptorSetCount = allocInfo.descriptorSetCount;
-			variable_count_info.pDescriptorCounts = variable_sizes.data();
-			allocInfo.pNext = &variable_count_info;
-		}
+
+		VkDescriptorSetVariableDescriptorCountAllocateInfo variable_count_info{};
+		variable_count_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO;
+		variable_count_info.descriptorSetCount = allocInfo.descriptorSetCount;
+		variable_count_info.pDescriptorCounts = variable_sizes.data();
+		allocInfo.pNext = &variable_count_info;
+
 
 		if (vkAllocateDescriptorSets(device->getHandle(), &allocInfo, pool.descriptor_set_handles.data()) != VK_SUCCESS) {
 			Log::error("failed to allocate descriptor sets!");

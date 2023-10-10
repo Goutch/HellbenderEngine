@@ -1,7 +1,7 @@
 
 #pragma once
-namespace HBE{
-	class VK_Utils{
+namespace HBE {
+	class VK_Utils {
 
 	public:
 		static uint32_t getFormatStride(IMAGE_FORMAT format) {
@@ -32,6 +32,7 @@ namespace HBE{
 					return 12;
 					break;
 				case IMAGE_FORMAT_RGBA32F:
+				case IMAGE_FORMAT_RGBA32_UINT:
 					return 16;
 				case IMAGE_FORMAT_DEPTH32F:
 					return 4;
@@ -98,6 +99,9 @@ namespace HBE{
 					break;
 				case IMAGE_FORMAT_SRGBA8_NON_LINEAR:
 					vk_format = VK_FORMAT_R8G8B8A8_SRGB;
+					break;
+				case IMAGE_FORMAT_RGBA32_UINT:
+					vk_format = VK_FORMAT_R32G32B32A32_UINT;
 					break;
 			}
 			return vk_format;

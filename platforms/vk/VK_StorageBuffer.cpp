@@ -33,11 +33,15 @@ namespace HBE {
 	}
 
 	uint32_t VK_StorageBuffer::getStride() const {
-		return count;
+		return stride;
 	}
 
 	uint32_t VK_StorageBuffer::getCount() const {
-		return stride;
+		return count;
+	}
+
+	void VK_StorageBuffer::update(const void *data, size_t size, size_t offset) {
+		buffer->update(data, static_cast<VkDeviceSize>(size * stride), static_cast<VkDeviceSize>(offset * stride));
 	}
 }
 

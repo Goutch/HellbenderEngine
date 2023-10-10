@@ -8,7 +8,7 @@
 namespace HBE {
 
 
-	VK_Buffer::VK_Buffer(VK_Device *device, VkDeviceSize size, VkBufferUsageFlags usage, ALLOC_FLAGS flags,VkDeviceSize custom_alignment) {
+	VK_Buffer::VK_Buffer(VK_Device *device, VkDeviceSize size, VkBufferUsageFlags usage, ALLOC_FLAGS flags, VkDeviceSize custom_alignment) {
 		this->device = device;
 		this->size = size;
 		std::vector<uint32_t> queues = {device->getQueue(QUEUE_FAMILY_GRAPHICS).getFamilyIndex()};
@@ -40,7 +40,7 @@ namespace HBE {
 	}
 
 	VK_Buffer::VK_Buffer(VK_Device *device, const void *data, VkDeviceSize size, VkBufferUsageFlags usage, ALLOC_FLAGS flags, VkDeviceSize custom_alignment) : VK_Buffer(device, size, usage,
-																																											 flags, custom_alignment) {
+																																										 flags, custom_alignment) {
 		update(data);
 	}
 
@@ -86,5 +86,9 @@ namespace HBE {
 		} else {
 			Log::error("Buffer is not mappable");
 		}
+	}
+
+	void VK_Buffer::update(const void *data, VkDeviceSize size, VkDeviceSize offset) {
+		device->getAllocator()->update(*this, data, size, offset);
 	}
 }

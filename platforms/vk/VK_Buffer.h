@@ -28,6 +28,8 @@ namespace HBE {
 
 		void update(const void *data);
 
+		void update(const void *data, VkDeviceSize size, VkDeviceSize offset = 0);
+
 		VkBuffer getHandle() const;
 
 		void copy(VK_Buffer *other);

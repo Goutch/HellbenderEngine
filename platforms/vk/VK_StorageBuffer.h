@@ -14,12 +14,18 @@ namespace HBE {
 		VK_Buffer *buffer;
 	public:
 		VK_StorageBuffer(VK_Device *device, const StorageBufferInfo &info);
+
 		~VK_StorageBuffer() override;
+
 		void update(const void *data) override;
 
-		uint32_t getStride() const;
-		uint32_t getCount() const;
+		uint32_t getStride() const override;
+
 		const VK_Buffer &getBuffer() const;
+
+		void update(const void *data, size_t size, size_t offset) override;
+
+		uint32_t getCount() const override;
 	};
 
 }
