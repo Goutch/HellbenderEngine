@@ -72,8 +72,6 @@ namespace HBE {
 		descriptor_indexing_features.shaderStorageTexelBufferArrayNonUniformIndexing = physical_device.getDescriptorIndexingFeatures().shaderStorageTexelBufferArrayNonUniformIndexing;
 		descriptor_indexing_features.descriptorBindingUpdateUnusedWhilePending = physical_device.getDescriptorIndexingFeatures().descriptorBindingUpdateUnusedWhilePending;
 
-
-
 		device_create_info.pNext=&robustness_features;
 		void** ppNext=&robustness_features.pNext;
 		if(enabled_extensions_flags & EXTENSION_FLAG_BUFFER_DEVICE_ADDRESS)

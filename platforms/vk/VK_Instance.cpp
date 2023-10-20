@@ -85,7 +85,10 @@ namespace HBE {
 			required_extensions.push_back(glfw_extensions[i]);
 		}
 		if (ENABLE_VALIDATION_LAYERS)
+		{
 			required_extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+		}
+
 
 	}
 

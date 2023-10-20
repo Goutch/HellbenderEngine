@@ -137,6 +137,11 @@ namespace HBE {
 				return false;
 			device_enabled_extensions[physical_device].insert(device_enabled_extensions[physical_device].end(), DESCRIPTOR_INDEXING_EXTENSIONS.begin(), DESCRIPTOR_INDEXING_EXTENSIONS.end());
 		}
+
+
+		if (checkExtensionsSupport(physical_device, DEBUG_EXTENSIONS))
+			device_enabled_extensions[physical_device].insert(device_enabled_extensions[physical_device].end(), DEBUG_EXTENSIONS.begin(), DEBUG_EXTENSIONS.end());
+
 		return true;
 	}
 

@@ -46,7 +46,7 @@ namespace HBE {
 
 	class VK_PhysicalDevice {
 		const std::vector<const char *> REQUIRED_EXTENSIONS = {
-				VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+				VK_KHR_SWAPCHAIN_EXTENSION_NAME
 		};
 		const std::vector<const char *> RAYTRACING_EXTENSIONS = {
 				VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME,
@@ -60,6 +60,10 @@ namespace HBE {
 
 		const std::vector<const char *> DESCRIPTOR_INDEXING_EXTENSIONS = {
 				VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME
+		};
+
+		const std::vector<const char*> DEBUG_EXTENSIONS = {
+				VK_KHR_SHADER_NON_SEMANTIC_INFO_EXTENSION_NAME
 		};
 
 		VkInstance vk_instance_handle;
