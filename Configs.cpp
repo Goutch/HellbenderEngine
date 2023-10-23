@@ -2,7 +2,7 @@
 
 namespace HBE {
 
-    std::string Configs::icon_path = "../wall.png";
+    std::string Configs::icon_path = "images/logo/HellbenderLogo.png";
 
     bool Configs::antialiasing = true;
     Event<bool> Configs::onAntialiasingChange;
@@ -34,4 +34,7 @@ namespace HBE {
         return icon_path;
     }
 
+	void Configs::setWindowIconPath(std::string path) {
+		icon_path = path;
+	}
 }
