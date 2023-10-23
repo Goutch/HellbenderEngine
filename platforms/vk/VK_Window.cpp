@@ -44,7 +44,7 @@ namespace HBE {
 		handle = glfwCreateWindow(width, height, title, nullptr, nullptr);
 		glfwSetWindowUserPointer(handle, (void *) this);
 		glfwSetWindowSizeCallback(handle, windowSizeCallback);
-		setLogo(Configs::getIcon());
+		setLogo(Configs::getWindowIconPath().c_str());
 	}
 
 	VK_Window::~VK_Window() {
