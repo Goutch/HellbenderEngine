@@ -8,6 +8,7 @@
 #include "Application.h"
 #include "stb_image.h"
 #include "stdio.h"
+
 namespace HBE {
 	void VK_Window::windowSizeCallback(GLFWwindow *handle, int width, int height) {
 		Window *window = (Window *) glfwGetWindowUserPointer(handle);
@@ -44,7 +45,8 @@ namespace HBE {
 		handle = glfwCreateWindow(width, height, title, nullptr, nullptr);
 		glfwSetWindowUserPointer(handle, (void *) this);
 		glfwSetWindowSizeCallback(handle, windowSizeCallback);
-		setLogo(Configs::getWindowIconPath().c_str());
+
+		setLogo(Configs::getWindowIconPaths());
 	}
 
 	VK_Window::~VK_Window() {
@@ -116,39 +118,37 @@ namespace HBE {
 	}
 
 
-	void VK_Window::setLogo(const char *path) {
-
-		FILE *file = fopen((RESOURCE_PATH + std::string(path)).c_str(), "rb");
-
-		if (file == nullptr) {
-			Log::error("Failed to open file: " + std::string(path));
-		}
-		int32_t image_width, image_height;
-		unsigned char *buffer;
-
+	void VK_Window::setLogo(const std::vector<std::string>& paths) {
 		stbi_set_flip_vertically_on_load(false);
-		int nb_channels;
-		int expected_channels = 4;
-		buffer = stbi_load_from_file(file, &image_width, &image_height, &nb_channels, expected_channels);
+		std::vector<GLFWimage> images;
+		for (auto path: paths) {
+			FILE *file = fopen((RESOURCE_PATH + std::string(path)).c_str(), "rb");
+			if (file == nullptr) {
+				Log::error("Failed to open file: " + std::string(path));
+			}
+			int32_t image_width, image_height;
+			unsigned char *buffer;
+			int nb_channels;
+			int expected_channels = 4;
+			buffer = stbi_load_from_file(file, &image_width, &image_height, &nb_channels, expected_channels);
 
-		if (nb_channels != expected_channels) {
-			Log::error("Texture format missmatch. Expected " + std::to_string(expected_channels) + " channels, got " + std::to_string(nb_channels));
+			if (nb_channels != expected_channels) {
+				Log::error("Texture format missmatch. Expected " + std::to_string(expected_channels) + " channels, got " + std::to_string(nb_channels));
+			}
+			if (buffer == nullptr) {
+				Log::error("Failed to load texture: " + std::string(path));
+			}
+			images.push_back({image_width, image_height, buffer});
+			fclose(file);
 		}
-		if (buffer == nullptr) {
-			Log::error("Failed to load texture: " + std::string(path));
+
+
+		glfwSetWindowIcon(handle, images.size(), images.data());
+
+
+		for (auto image: images) {
+			stbi_image_free(image.pixels);
 		}
-
-
-		GLFWimage images[2];
-		GLFWimage icon = {image_width, image_height, buffer};
-		images[0] = icon;
-		images[1] = icon;
-
-		glfwSetWindowIcon(handle, 2, images);
-
-		stbi_image_free(buffer);
-
-		fclose(file);
 	}
 
 }

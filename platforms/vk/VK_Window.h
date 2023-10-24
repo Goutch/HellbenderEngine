@@ -35,7 +35,7 @@ namespace HBE {
 		static void windowSizeCallback(GLFWwindow *handle, int width, int height);
 		void onTitleChange(std::string title);
 
-		void setLogo(const char *path);
+		void setLogo(const std::vector<std::string> &paths);
 	};
 }
 

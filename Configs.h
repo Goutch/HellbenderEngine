@@ -7,7 +7,7 @@
 namespace HBE {
 	class HB_API Configs {
 	private:
-		static std::string icon_path;
+		static std::vector<std::string> icon_paths;
 		static bool antialiasing;
 		static bool vertical_sync;
 		static bool present_automaticaly;
@@ -23,12 +23,12 @@ namespace HBE {
 
 		static bool getVerticalSync();
 
-		static std::string getWindowIconPath();
-
 		static void setVerticalSync(bool v_sync);
 
-		static const char *getIcon();
+		static std::vector<std::string> getWindowIconPaths();
 
-		void setWindowIconPath(std::string path);
+		void setWindowIconPaths(std::vector<std::string> paths);
+
+
 	};
 }
