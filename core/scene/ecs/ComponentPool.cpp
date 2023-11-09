@@ -19,7 +19,6 @@ namespace HBE{
 		memset(data, 0, info.size * REGISTRY_PAGE_SIZE);
 		memset(&valid, 0, sizeof(bool) * REGISTRY_PAGE_SIZE);
 		this->offset = offset;
-		Log::debug("new Component page");
 	}
 
 	RawComponentPool::~RawComponentPool()  {

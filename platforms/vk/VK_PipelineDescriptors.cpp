@@ -38,9 +38,7 @@ namespace HBE {
 																ALLOC_FLAG_MAPPABLE);
 			}
 		}
-		Log::debug("begin create descriptor pool");
 		createDescriptorPool(descriptor_pool);
-		Log::debug("begin create descriptor writes");
 		createDescriptorWrites(descriptor_pool);
 		Graphics::onFrameChange.subscribe(this, &VK_PipelineDescriptors::onFrameChange);
 	}
@@ -114,7 +112,6 @@ namespace HBE {
 					break;
 			}
 		}
-		Log::debug("mid create descriptor pool");
 		if (pool.variable_descriptor_sets.size() < descriptor_set_layouts.size()) {
 			pool.variable_descriptor_sets.resize(descriptor_set_layouts.size(), {});
 		}
@@ -204,11 +201,9 @@ namespace HBE {
 		poolInfo.poolSizeCount = poolSizes.size();
 		poolInfo.pPoolSizes = poolSizes.data();
 		poolInfo.maxSets = descriptor_set_layouts.size();
-		Log::debug("before create descriptor pool");
 		if (vkCreateDescriptorPool(device->getHandle(), &poolInfo, nullptr, &pool.handle) != VK_SUCCESS) {
 			Log::error("failed to create descriptor pool!");
 		}
-		Log::debug("after create descriptor pool");
 		pool.descriptor_set_handles.resize(descriptor_set_layouts.size());
 		VkDescriptorSetAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -218,7 +213,6 @@ namespace HBE {
 
 		VkDescriptorSetVariableDescriptorCountAllocateInfo variable_count_info{};
 		if (has_variable_size_descriptors) {
-			Log::debug("has_variable_size_descriptors create descriptor pool");
 			bool descriptor_indexing_enabled = Application::getInfo().required_extension_flags & VULKAN_REQUIRED_EXTENSION_DESCRIPTOR_INDEXING;
 			HB_ASSERT(has_variable_size_descriptors == descriptor_indexing_enabled, "Descriptor indexing is not enabled but variable size descriptors are used!");
 			variable_count_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO;
@@ -228,7 +222,6 @@ namespace HBE {
 		}
 
 
-		Log::debug("alloc create descriptor pool");
 		if (vkAllocateDescriptorSets(device->getHandle(), &allocInfo, pool.descriptor_set_handles.data()) != VK_SUCCESS) {
 			Log::error("failed to allocate descriptor sets!");
 		}

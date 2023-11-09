@@ -11,13 +11,10 @@
 
 namespace HBE {
 	VK_RaytracingPipelineInstance::VK_RaytracingPipelineInstance(VK_Renderer &renderer, const RaytracingPipelineInstanceInfo &info) {
-		Log::debug("begin create raytracing pipeline instance");
 		VK_RaytracingPipeline *raytracing_pipeline = dynamic_cast<VK_RaytracingPipeline *>(info.raytracing_pipeline);
 		const VK_PipelineLayout *layout = raytracing_pipeline->getPipelineLayout();
-		Log::debug("begin create VK_PipelineDescriptors");
 		descriptors = new VK_PipelineDescriptors(&renderer, *layout);
 		pipeline = raytracing_pipeline;
-		Log::debug("end create raytracing pipeline instance");
 	}
 
 	VK_RaytracingPipelineInstance::~VK_RaytracingPipelineInstance() {
