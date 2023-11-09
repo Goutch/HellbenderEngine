@@ -2,7 +2,7 @@
 
 #include "Core.h"
 #include "Log.h"
-#include "Clock.h"
+#include "Timer.h"
 #include "stack"
 #include "unordered_map"
 
@@ -19,7 +19,7 @@ namespace HBE {
 	};
 	struct Profile {
 		ProfileGraphNode* node;
-		Clock clock;
+		Timer clock;
 	};
 	class HB_API Profiler {
 		static std::stack<Profile> profile_stack;

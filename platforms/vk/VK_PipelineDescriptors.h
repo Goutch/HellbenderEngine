@@ -31,7 +31,7 @@ namespace HBE {
 
 	struct VariableDescriptorSet {
 		uint32_t binding;
-		uint32_t count=0;
+		uint32_t count=1;
 		VkDescriptorType type;
 	};
 	struct DescriptorPool {

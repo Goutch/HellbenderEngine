@@ -50,7 +50,7 @@
 #include "core/threading/JobManager.h"
 
 #include "core/utility/Event.h"
-#include "core/utility/Clock.h"
+#include "core/utility/Timer.h"
 #include "core/utility/Log.h"
 #include "core/utility/Geometry.h"
 #include "core/utility/Random.h"

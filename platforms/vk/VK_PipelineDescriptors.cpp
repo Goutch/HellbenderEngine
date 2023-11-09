@@ -38,8 +38,9 @@ namespace HBE {
 																ALLOC_FLAG_MAPPABLE);
 			}
 		}
-
+		Log::debug("begin create descriptor pool");
 		createDescriptorPool(descriptor_pool);
+		Log::debug("begin create descriptor writes");
 		createDescriptorWrites(descriptor_pool);
 		Graphics::onFrameChange.subscribe(this, &VK_PipelineDescriptors::onFrameChange);
 	}
@@ -113,7 +114,7 @@ namespace HBE {
 					break;
 			}
 		}
-
+		Log::debug("mid create descriptor pool");
 		if (pool.variable_descriptor_sets.size() < descriptor_set_layouts.size()) {
 			pool.variable_descriptor_sets.resize(descriptor_set_layouts.size(), {});
 		}
@@ -159,42 +160,42 @@ namespace HBE {
 		if (uniform_buffer_count > 0) {
 			poolSizes.emplace_back();
 			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			poolSizes[poolSizes.size() - 1].descriptorCount = uniform_buffer_count * MAX_FRAMES_IN_FLIGHT;
+			poolSizes[poolSizes.size() - 1].descriptorCount = uniform_buffer_count;
 		}
 		if (combined_image_sampler_count > 0) {
 			poolSizes.emplace_back();
 			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-			poolSizes[poolSizes.size() - 1].descriptorCount = combined_image_sampler_count * MAX_FRAMES_IN_FLIGHT;
+			poolSizes[poolSizes.size() - 1].descriptorCount = combined_image_sampler_count;
 		}
 		if (storage_image_count > 0) {
 			poolSizes.emplace_back();
 			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-			poolSizes[poolSizes.size() - 1].descriptorCount = storage_image_count * MAX_FRAMES_IN_FLIGHT;
+			poolSizes[poolSizes.size() - 1].descriptorCount = storage_image_count;
 		}
 		if (separate_image_count > 0) {
 			poolSizes.emplace_back();
 			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-			poolSizes[poolSizes.size() - 1].descriptorCount = separate_image_count * MAX_FRAMES_IN_FLIGHT;
+			poolSizes[poolSizes.size() - 1].descriptorCount = separate_image_count;
 		}
 		if (storage_buffer_count > 0) {
 			poolSizes.emplace_back();
 			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-			poolSizes[poolSizes.size() - 1].descriptorCount = storage_buffer_count * MAX_FRAMES_IN_FLIGHT;
+			poolSizes[poolSizes.size() - 1].descriptorCount = storage_buffer_count;
 		}
 		if (storage_texel_buffer_count > 0) {
 			poolSizes.emplace_back();
 			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
-			poolSizes[poolSizes.size() - 1].descriptorCount = storage_texel_buffer_count * MAX_FRAMES_IN_FLIGHT;
+			poolSizes[poolSizes.size() - 1].descriptorCount = storage_texel_buffer_count;
 		}
 		if (uniform_texel_buffer_count > 0) {
 			poolSizes.emplace_back();
 			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
-			poolSizes[poolSizes.size() - 1].descriptorCount = uniform_texel_buffer_count * MAX_FRAMES_IN_FLIGHT;
+			poolSizes[poolSizes.size() - 1].descriptorCount = uniform_texel_buffer_count;
 		}
 		if (acceleration_structure_count > 0) {
 			poolSizes.emplace_back();
 			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
-			poolSizes[poolSizes.size() - 1].descriptorCount = acceleration_structure_count * MAX_FRAMES_IN_FLIGHT;
+			poolSizes[poolSizes.size() - 1].descriptorCount = acceleration_structure_count;
 		}
 
 
@@ -203,9 +204,11 @@ namespace HBE {
 		poolInfo.poolSizeCount = poolSizes.size();
 		poolInfo.pPoolSizes = poolSizes.data();
 		poolInfo.maxSets = descriptor_set_layouts.size();
+		Log::debug("before create descriptor pool");
 		if (vkCreateDescriptorPool(device->getHandle(), &poolInfo, nullptr, &pool.handle) != VK_SUCCESS) {
 			Log::error("failed to create descriptor pool!");
 		}
+		Log::debug("after create descriptor pool");
 		pool.descriptor_set_handles.resize(descriptor_set_layouts.size());
 		VkDescriptorSetAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -213,11 +216,11 @@ namespace HBE {
 		allocInfo.descriptorSetCount = descriptor_set_layouts.size();
 		allocInfo.pSetLayouts = descriptor_set_layouts.data();
 
-
+		VkDescriptorSetVariableDescriptorCountAllocateInfo variable_count_info{};
 		if (has_variable_size_descriptors) {
-			bool descriptor_indexing_enabled = Application::getInfo().hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_DESCRIPTOR_INDEXING_CAPABILITIES;
+			Log::debug("has_variable_size_descriptors create descriptor pool");
+			bool descriptor_indexing_enabled = Application::getInfo().required_extension_flags & VULKAN_REQUIRED_EXTENSION_DESCRIPTOR_INDEXING;
 			HB_ASSERT(has_variable_size_descriptors == descriptor_indexing_enabled, "Descriptor indexing is not enabled but variable size descriptors are used!");
-			VkDescriptorSetVariableDescriptorCountAllocateInfo variable_count_info{};
 			variable_count_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO;
 			variable_count_info.descriptorSetCount = allocInfo.descriptorSetCount;
 			variable_count_info.pDescriptorCounts = variable_sizes.data();
@@ -225,6 +228,7 @@ namespace HBE {
 		}
 
 
+		Log::debug("alloc create descriptor pool");
 		if (vkAllocateDescriptorSets(device->getHandle(), &allocInfo, pool.descriptor_set_handles.data()) != VK_SUCCESS) {
 			Log::error("failed to allocate descriptor sets!");
 		}

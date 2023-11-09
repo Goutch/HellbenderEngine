@@ -2,7 +2,7 @@
 #include "core/graphics/Graphics.h"
 #include "core/input/Input.h"
 #include "GLFW/glfw3.h"
-#include "core/utility/Clock.h"
+#include "core/utility/Timer.h"
 #include "core/threading/JobManager.h"
 #include <core/graphics/Window.h>
 #include "core/utility/Profiler.h"
@@ -13,7 +13,7 @@
 namespace HBE {
 	ApplicationInfo Application::info = {};
 	Window *Application::window = nullptr;
-	Clock *Application::time = nullptr;
+	Timer *Application::time = nullptr;
 	int Application::fps_counter = 0;
 	float Application::fps_timer = 0;
 	Event<> Application::onInit = Event<>();
@@ -36,8 +36,8 @@ namespace HBE {
 
 	void Application::run() {
 
-		time = new Clock();
-		Clock update_clock = Clock();
+		time = new Timer();
+		Timer update_clock = Timer();
 		float delta_t = 0.0f;
 		while (!window->shouldClose()) {
 			window->swapBuffers();
@@ -45,7 +45,6 @@ namespace HBE {
 			HB_PROFILE_BEGIN("TOTAL_FRAME");
 			JobManager::updateJobsStatus();
 			HB_PROFILE_BEGIN("UPDATE");
-
 			onUpdate.invoke(delta_t);
 			HB_PROFILE_END("UPDATE");
 

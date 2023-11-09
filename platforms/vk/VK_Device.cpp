@@ -39,7 +39,6 @@ namespace HBE {
 		device_create_info.ppEnabledExtensionNames = enabled_extensions.data();
 
 
-
 		VkPhysicalDeviceRobustness2FeaturesEXT robustness_features{};
 		robustness_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT;
 		robustness_features.nullDescriptor = true;
@@ -49,15 +48,15 @@ namespace HBE {
 
 		VkPhysicalDeviceBufferDeviceAddressFeatures buffer_device_address_features{};
 		buffer_device_address_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
-		buffer_device_address_features.bufferDeviceAddress = (enabled_extensions_flags & EXTENSION_FLAG_BUFFER_DEVICE_ADDRESS)>0;
+		buffer_device_address_features.bufferDeviceAddress = (enabled_extensions_flags & EXTENSION_FLAG_BUFFER_DEVICE_ADDRESS) > 0;
 
 		VkPhysicalDeviceRayTracingPipelineFeaturesKHR ray_tracing_features{};
 		ray_tracing_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
-		ray_tracing_features.rayTracingPipeline = (enabled_extensions_flags & EXTENSION_FLAG_RAY_TRACING_PIPELINE)>0;
+		ray_tracing_features.rayTracingPipeline = (enabled_extensions_flags & EXTENSION_FLAG_RAY_TRACING_PIPELINE) > 0;
 
 		VkPhysicalDeviceAccelerationStructureFeaturesKHR acceleration_structure_features{};
 		acceleration_structure_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
-		acceleration_structure_features.accelerationStructure = (enabled_extensions_flags & EXTENSION_FLAG_ACCELERATION_STRUCTURE)>0;
+		acceleration_structure_features.accelerationStructure = (enabled_extensions_flags & EXTENSION_FLAG_ACCELERATION_STRUCTURE) > 0;
 
 		VkPhysicalDeviceDescriptorIndexingFeatures descriptor_indexing_features{};
 		descriptor_indexing_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
@@ -72,25 +71,21 @@ namespace HBE {
 		descriptor_indexing_features.shaderStorageTexelBufferArrayNonUniformIndexing = physical_device.getDescriptorIndexingFeatures().shaderStorageTexelBufferArrayNonUniformIndexing;
 		descriptor_indexing_features.descriptorBindingUpdateUnusedWhilePending = physical_device.getDescriptorIndexingFeatures().descriptorBindingUpdateUnusedWhilePending;
 
-		device_create_info.pNext=&robustness_features;
-		void** ppNext=&robustness_features.pNext;
-		if(enabled_extensions_flags & EXTENSION_FLAG_BUFFER_DEVICE_ADDRESS)
-		{
+		device_create_info.pNext = &robustness_features;
+		void **ppNext = &robustness_features.pNext;
+		if (enabled_extensions_flags & EXTENSION_FLAG_BUFFER_DEVICE_ADDRESS) {
 			*ppNext = &buffer_device_address_features;
 			ppNext = &buffer_device_address_features.pNext;
 		}
-		if(enabled_extensions_flags & EXTENSION_FLAG_RAY_TRACING_PIPELINE)
-		{
+		if (enabled_extensions_flags & EXTENSION_FLAG_RAY_TRACING_PIPELINE) {
 			*ppNext = &ray_tracing_features;
 			ppNext = &ray_tracing_features.pNext;
 		}
-		if(enabled_extensions_flags & EXTENSION_FLAG_ACCELERATION_STRUCTURE)
-		{
+		if (enabled_extensions_flags & EXTENSION_FLAG_ACCELERATION_STRUCTURE) {
 			*ppNext = &acceleration_structure_features;
 			ppNext = &acceleration_structure_features.pNext;
 		}
-		if(enabled_extensions_flags & EXTENSION_FLAG_DESCRIPTOR_INDEXING)
-		{
+		if (enabled_extensions_flags & EXTENSION_FLAG_DESCRIPTOR_INDEXING) {
 			*ppNext = &descriptor_indexing_features;
 			ppNext = &descriptor_indexing_features.pNext;
 		}
@@ -138,6 +133,7 @@ namespace HBE {
 	}
 
 	void VK_Device::initFunctionPointers() {
+
 		vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(vkGetDeviceProcAddr(handle, "vkGetBufferDeviceAddressKHR"));
 		vkCmdBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkCmdBuildAccelerationStructuresKHR>(vkGetDeviceProcAddr(handle, "vkCmdBuildAccelerationStructuresKHR"));
 		vkBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkBuildAccelerationStructuresKHR>(vkGetDeviceProcAddr(handle, "vkBuildAccelerationStructuresKHR"));

@@ -20,7 +20,7 @@ namespace HBE {
 		VkPhysicalDeviceFeatures2 features2{};
 		features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
 		void **ppNext = &features2.pNext;
-		if (app_info.hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_RTX_CAPABILITIES) {
+		if (app_info.required_extension_flags & VULKAN_REQUIRED_EXTENSION_RTX) {
 			enabled_extension_flags |= EXTENSION_FLAG_RAY_TRACING_PIPELINE;
 			enabled_extension_flags |= EXTENSION_FLAG_ACCELERATION_STRUCTURE;
 			enabled_extension_flags |= EXTENSION_FLAG_BUFFER_DEVICE_ADDRESS;
@@ -34,8 +34,8 @@ namespace HBE {
 			acceleration_structure_features.pNext = &ray_tracing_pipeline_features;
 			ppNext = &ray_tracing_pipeline_features.pNext;
 		}
-		if (app_info.hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_DESCRIPTOR_INDEXING_CAPABILITIES ||
-			app_info.hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_RTX_CAPABILITIES) {
+		if (app_info.required_extension_flags & VULKAN_REQUIRED_EXTENSION_DESCRIPTOR_INDEXING ||
+			app_info.required_extension_flags & VULKAN_REQUIRED_EXTENSION_RTX) {
 			enabled_extension_flags |= EXTENSION_FLAG_DESCRIPTOR_INDEXING;
 			descriptor_indexing_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
 			*ppNext = &descriptor_indexing_features;
@@ -126,18 +126,27 @@ namespace HBE {
 		device_enabled_extensions.emplace(physical_device, REQUIRED_EXTENSIONS);
 
 		ApplicationInfo app_info = Application::getInfo();
-		if (app_info.hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_RTX_CAPABILITIES) {
-			if (!checkExtensionsSupport(physical_device, RAYTRACING_EXTENSIONS))
+
+
+		if (app_info.required_extension_flags & VULKAN_REQUIRED_EXTENSION_RTX) {
+			const std::vector<const char *> *raytracing_extensions;
+			if (app_info.vulkan_version >= VULKAN_VERSION_1_2)
+				raytracing_extensions = &RAYTRACING_EXTENSIONS_1_2;
+			else
+				raytracing_extensions = &RAYTRACING_EXTENSIONS_1_1;
+
+			if (!checkExtensionsSupport(physical_device, *raytracing_extensions))
 				return false;
-			device_enabled_extensions[physical_device].insert(device_enabled_extensions[physical_device].end(), RAYTRACING_EXTENSIONS.begin(), RAYTRACING_EXTENSIONS.end());
+			device_enabled_extensions[physical_device].insert(device_enabled_extensions[physical_device].end(), raytracing_extensions->begin(), raytracing_extensions->end());
 		}
 
-		if (app_info.hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_DESCRIPTOR_INDEXING_CAPABILITIES) {
-			if (!checkExtensionsSupport(physical_device, DESCRIPTOR_INDEXING_EXTENSIONS))
+		//descriptor indexing added to Vulkan 1.2
+		if ((app_info.required_extension_flags & VULKAN_REQUIRED_EXTENSION_DESCRIPTOR_INDEXING) &&
+			(app_info.vulkan_version < VULKAN_VERSION_1_2)) {
+			if (!checkExtensionsSupport(physical_device, DESCRIPTOR_INDEXING_EXTENSIONS_1_1))
 				return false;
-			device_enabled_extensions[physical_device].insert(device_enabled_extensions[physical_device].end(), DESCRIPTOR_INDEXING_EXTENSIONS.begin(), DESCRIPTOR_INDEXING_EXTENSIONS.end());
+			device_enabled_extensions[physical_device].insert(device_enabled_extensions[physical_device].end(), DESCRIPTOR_INDEXING_EXTENSIONS_1_1.begin(), DESCRIPTOR_INDEXING_EXTENSIONS_1_1.end());
 		}
-
 
 		if (checkExtensionsSupport(physical_device, DEBUG_EXTENSIONS))
 			device_enabled_extensions[physical_device].insert(device_enabled_extensions[physical_device].end(), DEBUG_EXTENSIONS.begin(), DEBUG_EXTENSIONS.end());

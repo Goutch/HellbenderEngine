@@ -26,6 +26,7 @@
 #define GLAD_GLAPI_EXPORT
 #endif
 
+
 #ifdef NDEBUG
 #define RELEASE_MODE
 #else

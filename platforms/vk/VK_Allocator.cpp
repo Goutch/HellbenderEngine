@@ -222,7 +222,7 @@ namespace HBE {
 			ApplicationInfo applicationInfo = Application::getInfo();
 			VkMemoryAllocateFlagsInfo flagsInfo{};
 			flagsInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO;
-			flagsInfo.flags = applicationInfo.hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_RTX_CAPABILITIES ? VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT : 0;
+			flagsInfo.flags = applicationInfo.required_extension_flags & VULKAN_REQUIRED_EXTENSION_RTX ? VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT : 0;
 			allocInfo.pNext = &flagsInfo;
 			if (vkAllocateMemory(device->getHandle(), &allocInfo, nullptr, &block->memory) != VK_SUCCESS) {
 				Log::error("failed to allocate buffer memory!");

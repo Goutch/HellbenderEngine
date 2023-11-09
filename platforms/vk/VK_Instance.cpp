@@ -18,12 +18,12 @@ namespace HBE {
 		vk_app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
 		vk_app_info.pEngineName = "Hellbender";
 		vk_app_info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-		vk_app_info.apiVersion = VK_API_VERSION_1_1;
-		if (app_info.hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_VULKAN_1_3)
-			vk_app_info.apiVersion = VK_API_VERSION_1_3;
-		else if (app_info.hardware_flags & HARDWARE_FLAG_GPU_REQUIRE_VULKAN_1_2)
-			vk_app_info.apiVersion = VK_API_VERSION_1_2;
 
+		vk_app_info.apiVersion = VK_API_VERSION_1_1;
+		if (app_info.vulkan_version == VULKAN_VERSION_1_2)
+			vk_app_info.apiVersion = VK_API_VERSION_1_2;
+		else if (app_info.vulkan_version == VULKAN_VERSION_1_3)
+			vk_app_info.apiVersion = VK_API_VERSION_1_3;
 
 		VkInstanceCreateInfo create_info{};
 		create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -84,8 +84,7 @@ namespace HBE {
 		for (unsigned int i = 0; i < glfw_extension_count; ++i) {
 			required_extensions.push_back(glfw_extensions[i]);
 		}
-		if (ENABLE_VALIDATION_LAYERS)
-		{
+		if (ENABLE_VALIDATION_LAYERS) {
 			required_extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 		}
 

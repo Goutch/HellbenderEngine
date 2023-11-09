@@ -1,30 +1,30 @@
 
 
-#include "Clock.h"
+#include "Timer.h"
 namespace HBE {
-    Clock::Clock() {
+    Timer::Timer() {
         start_time = std::chrono::high_resolution_clock::now();
     }
 
-    void Clock::stop() {
+    void Timer::stop() {
         //todo
     }
 
-    void Clock::start() {
+    void Timer::start() {
         //todo
     }
 
-    void Clock::reset() {
+    void Timer::reset() {
 
         start_time = std::chrono::high_resolution_clock::now();
     }
 
-    float Clock::ms() const {
+    float Timer::ms() const {
         std::chrono::duration<float> duration = std::chrono::high_resolution_clock::now() - start_time;
         return static_cast<float>(std::chrono::duration_cast<std::chrono::milliseconds>(duration).count());
     }
 
-    float Clock::ns() const {
+    float Timer::ns() const {
         std::chrono::duration<float> duration = std::chrono::high_resolution_clock::now() - start_time;
         return static_cast<float>(std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count());
     }

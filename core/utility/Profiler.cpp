@@ -28,7 +28,7 @@ namespace HBE {
 			}
 		}
 
-		profile_stack.emplace(Profile{current_node, Clock()});
+		profile_stack.emplace(Profile{current_node, Timer()});
 		profile_stack.top().clock.reset();
 		std::string indent = "";
 		for (int i = 0; i < profile_stack.size(); ++i) {
