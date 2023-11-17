@@ -61,7 +61,7 @@ namespace HBE {
 			colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 			colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-			colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+			colorAttachment.initialLayout = (flags & RENDER_TARGET_FLAG_CLEAR_COLOR) ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 			colorAttachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 			attachments.push_back(colorAttachment);
 
@@ -74,9 +74,12 @@ namespace HBE {
 			depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 			depthAttachment.loadOp = (flags & RENDER_TARGET_FLAG_CLEAR_DEPTH) ? VK_ATTACHMENT_LOAD_OP_CLEAR
 																			  : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-			depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-			depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-			depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+			if (!(flags & RENDER_TARGET_FLAG_CLEAR_DEPTH))
+				Log::warning("Not clearing depth buffer will result in all depth test failing if the depth is not initialized to 1.0");
+			depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+			depthAttachment.stencilLoadOp = (flags & RENDER_TARGET_FLAG_CLEAR_DEPTH) ? VK_ATTACHMENT_LOAD_OP_CLEAR
+																					 : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+			depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_STORE;
 			depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 			depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 			attachments.push_back(depthAttachment);
@@ -158,21 +161,19 @@ namespace HBE {
 		renderPassInfo.renderArea.offset = {0, 0};
 		renderPassInfo.renderArea.extent = {width, height};
 
-		bool clear = flags & RENDER_TARGET_FLAG_CLEAR_COLOR;
-		std::array<VkClearValue, 2> clear_values{};
+
+		VkClearValue clear_values[2] = {VkClearValue{}, VkClearValue{}};
 		uint32_t clear_value_count = 0;
-		if (clear) {
-			if (has_color_attachment) {
-				clear_values[clear_value_count].color = {clear_color.x, clear_color.y, clear_color.z, clear_color.w};
-				clear_value_count++;
-			}
-			if (has_depth_attachment) {
-				clear_values[clear_value_count].depthStencil = {1.0f, 0};
-				clear_value_count++;
-			}
+		if (has_color_attachment) {
+			clear_values[clear_value_count].color = {clear_color.x, clear_color.y, clear_color.z, clear_color.w};
+			clear_value_count++;
+		}
+		if (has_depth_attachment) {
+			clear_values[clear_value_count].depthStencil = {1.0f, 0};
+			clear_value_count++;
 		}
 
-		renderPassInfo.pClearValues = clear_values.data();
+		renderPassInfo.pClearValues = clear_values;
 		renderPassInfo.clearValueCount = clear_value_count;
 		vkCmdBeginRenderPass(command_buffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 	}

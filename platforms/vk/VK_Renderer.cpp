@@ -302,7 +302,6 @@ namespace HBE {
 			VK_Allocator::barrierTransitionImageLayout(command_pool, vk_images[i], VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 		}
 
-
 		screen_pipeline_instance->setTextureArray("layers", &present_cmd_info.images[0], present_cmd_info.image_count, current_frame, 0);
 		screen_pipeline_instance->setUniform("ubo", &present_cmd_info.image_count);
 
@@ -438,7 +437,7 @@ namespace HBE {
 		render_target_info.height = swapchain->getExtent().height;
 		render_target_info.clear_color = vec4(0.f, 0.f, 0.f, 1.f);
 		render_target_info.format = IMAGE_FORMAT_SRGBA8_NON_LINEAR;
-		render_target_info.flags = RENDER_TARGET_FLAG_COLOR_ATTACHMENT | RENDER_TARGET_FLAG_DEPTH_ATTACHMENT;
+		render_target_info.flags = RENDER_TARGET_FLAG_COLOR_ATTACHMENT | RENDER_TARGET_FLAG_DEPTH_ATTACHMENT |RENDER_TARGET_FLAG_CLEAR_COLOR| RENDER_TARGET_FLAG_CLEAR_DEPTH;
 
 		main_render_target = Resources::createRenderTarget(render_target_info, "DEFAULT_RENDER_TARGET");
 
