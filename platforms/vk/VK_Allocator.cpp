@@ -304,7 +304,7 @@ namespace HBE {
 		command_pool->submit(QUEUE_FAMILY_GRAPHICS);
 	}
 
-	void VK_Allocator::barrierTransitionImageLayout(VK_Image *image, VkImageLayout new_layout) {
+	void VK_Allocator::barrierTransitionImageLayout(VK_CommandPool *command_pool, VK_Image *image, VkImageLayout new_layout) {
 		VkImageLayout old_layout = image->getImageLayout();
 		if (old_layout == new_layout) return;
 
@@ -367,6 +367,17 @@ namespace HBE {
 			case VK_IMAGE_LAYOUT_GENERAL:
 				barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 				sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+				break;
+			case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
+				barrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+				sourceStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+				break;
+			case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
+				barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+				sourceStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+				break;
+			default:
+				Log::error("unsupported layout transition!");
 				break;
 		}
 		switch (new_layout) {
@@ -513,7 +524,7 @@ namespace HBE {
 
 	void VK_Allocator::copy(VkBuffer src, VK_Image *dest, VkImageLayout dst_end_layout) {
 		command_pool->begin();
-		barrierTransitionImageLayout(dest, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+		barrierTransitionImageLayout(command_pool, dest, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 		VkBufferImageCopy region{};
 		region.bufferOffset = 0;
 		region.bufferRowLength = 0;
@@ -542,7 +553,7 @@ namespace HBE {
 		if (dest->getMipLevelCount() > 1) {
 			generateMipmaps(*dest);
 		} else {
-			barrierTransitionImageLayout(dest, dst_end_layout);
+			barrierTransitionImageLayout(command_pool, dest, dst_end_layout);
 		}
 
 
@@ -554,8 +565,8 @@ namespace HBE {
 		VkImageAspectFlagBits src_aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT;//todo change for depth if image is depth or stencil
 		VkImageAspectFlagBits dst_aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT;
 		command_pool->begin();
-		barrierTransitionImageLayout(dest, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-		barrierTransitionImageLayout(src, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+		barrierTransitionImageLayout(command_pool, dest, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+		barrierTransitionImageLayout(command_pool, src, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 		VkImageCopy region{};
 		region.dstOffset = {0, 0, 0};
 		region.extent = {src->getWidth(), src->getHeight(), src->getDepth()};
@@ -577,8 +588,8 @@ namespace HBE {
 				1,
 				&region
 		);
-		barrierTransitionImageLayout(dest, dst_end_layout);
-		barrierTransitionImageLayout(src, src_end_layout);
+		barrierTransitionImageLayout(command_pool, dest, dst_end_layout);
+		barrierTransitionImageLayout(command_pool, src, src_end_layout);
 		command_pool->end();
 		command_pool->submit(QUEUE_FAMILY_GRAPHICS);
 	}
@@ -616,7 +627,7 @@ namespace HBE {
 
 	void VK_Allocator::setImageLayout(VK_Image *image, VkImageLayout newLayout) {
 		command_pool->begin();
-		barrierTransitionImageLayout(image, newLayout);
+		VK_Allocator::barrierTransitionImageLayout(command_pool, image, newLayout);
 		command_pool->end();
 		command_pool->submit(QUEUE_FAMILY_GRAPHICS);
 	}

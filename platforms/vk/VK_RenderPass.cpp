@@ -56,12 +56,13 @@ namespace HBE {
 			VkAttachmentDescription colorAttachment{};
 			colorAttachment.format = vk_format;
 			colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-			colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+			colorAttachment.loadOp = (flags & RENDER_TARGET_FLAG_CLEAR_COLOR) ? VK_ATTACHMENT_LOAD_OP_CLEAR
+																			  : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 			colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 			colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-			colorAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			colorAttachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 			attachments.push_back(colorAttachment);
 
 			color_attachment_ref.attachment = attachments.size() - 1;
@@ -71,7 +72,8 @@ namespace HBE {
 			VkAttachmentDescription depthAttachment{};
 			depthAttachment.format = VK_Utils::getVkFormat(IMAGE_FORMAT_DEPTH32F);
 			depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-			depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+			depthAttachment.loadOp = (flags & RENDER_TARGET_FLAG_CLEAR_DEPTH) ? VK_ATTACHMENT_LOAD_OP_CLEAR
+																			  : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 			depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
@@ -103,7 +105,7 @@ namespace HBE {
 
 		VkSubpassDependency dependency{};
 		dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-		dependency.dstSubpass = 0 ;
+		dependency.dstSubpass = 0;
 
 		dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 		dependency.srcStageMask |= (flags & RENDER_TARGET_FLAG_DEPTH_ATTACHMENT) ? VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT : 0;
@@ -119,7 +121,7 @@ namespace HBE {
 		render_pass_info.pDependencies = &dependency;
 
 		if (vkCreateRenderPass(device->getHandle(), &render_pass_info,
-								   nullptr, &handle) != VK_SUCCESS) {
+							   nullptr, &handle) != VK_SUCCESS) {
 			Log::error("failed to create render pass!");
 		}
 		createFramebuffers();
@@ -156,18 +158,20 @@ namespace HBE {
 		renderPassInfo.renderArea.offset = {0, 0};
 		renderPassInfo.renderArea.extent = {width, height};
 
-		renderPassInfo.clearValueCount = has_color_attachment + has_depth_attachment;
-
+		bool clear = flags & RENDER_TARGET_FLAG_CLEAR_COLOR;
 		std::array<VkClearValue, 2> clear_values{};
 		uint32_t clear_value_count = 0;
-		if (has_color_attachment) {
-			clear_values[clear_value_count].color = {clear_color.x, clear_color.y, clear_color.z, clear_color.w};
-			clear_value_count++;
+		if (clear) {
+			if (has_color_attachment) {
+				clear_values[clear_value_count].color = {clear_color.x, clear_color.y, clear_color.z, clear_color.w};
+				clear_value_count++;
+			}
+			if (has_depth_attachment) {
+				clear_values[clear_value_count].depthStencil = {1.0f, 0};
+				clear_value_count++;
+			}
 		}
-		if (has_depth_attachment) {
-			clear_values[clear_value_count].depthStencil = {1.0f, 0};
-			clear_value_count++;
-		}
+
 		renderPassInfo.pClearValues = clear_values.data();
 		renderPassInfo.clearValueCount = clear_value_count;
 		vkCmdBeginRenderPass(command_buffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);

@@ -101,7 +101,7 @@ namespace HBE {
 
 		void free(const Allocation &allocation);
 
-		void copy(VkBuffer src, VkBuffer dest, VkDeviceSize size,VkDeviceSize offset =0);
+		void copy(VkBuffer src, VkBuffer dest, VkDeviceSize size, VkDeviceSize offset = 0);
 
 		void copy(VkBuffer src, VK_Image *dest, VkImageLayout dst_end_layout);
 
@@ -115,8 +115,10 @@ namespace HBE {
 
 		void freeStagingBuffers();
 
+		static void barrierTransitionImageLayout(VK_CommandPool* command_pool,VK_Image *image, VkImageLayout new_layout);
+
 	private:
-		void barrierTransitionImageLayout(VK_Image *image, VkImageLayout new_layout);
+
 
 		uint32_t findMemoryTypeIndex(VkMemoryRequirements memory_requirement, ALLOC_FLAGS flags);
 

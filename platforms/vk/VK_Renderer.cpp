@@ -297,36 +297,11 @@ namespace HBE {
 		vkCmdSetViewport(command_pool->getCurrentBuffer(), 0, 1, &viewport);
 		vkCmdSetScissor(command_pool->getCurrentBuffer(), 0, 1, &scissor);
 
-		/*VK_Image **vk_images = reinterpret_cast< VK_Image **>(present_cmd_info.images);
+		VK_Image **vk_images = reinterpret_cast< VK_Image **>(present_cmd_info.images);
 		for (int i = 0; i < present_cmd_info.image_count; ++i) {
-			const VK_Image *vk_image = dynamic_cast<const VK_Image *>(vk_images[i]);
-			VkImageMemoryBarrier image_barrier{};
-			image_barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-			image_barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
-			image_barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+			VK_Allocator::barrierTransitionImageLayout(command_pool, vk_images[i], VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+		}
 
-			image_barrier.oldLayout = vk_image->getImageLayout();
-			image_barrier.newLayout = vk_image->getImageLayout();
-
-			image_barrier.image = vk_images[i]->getHandle();
-
-			image_barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-			image_barrier.subresourceRange.baseMipLevel = 0;
-			image_barrier.subresourceRange.levelCount = 1;
-			image_barrier.subresourceRange.baseArrayLayer = 0;
-			image_barrier.subresourceRange.layerCount = 1;
-
-			vkCmdPipelineBarrier(command_pool->getCurrentBuffer(),
-								 VK_PIPELINE_STAGE_TRANSFER_BIT | VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-								 VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-								 0,
-								 0,
-								 nullptr,
-								 0,
-								 nullptr,
-								 1,
-								 &image_barrier);
-		}*/
 
 		screen_pipeline_instance->setTextureArray("layers", &present_cmd_info.images[0], present_cmd_info.image_count, current_frame, 0);
 		screen_pipeline_instance->setUniform("ubo", &present_cmd_info.image_count);
@@ -342,6 +317,10 @@ namespace HBE {
 		screen_pipeline->unbind();
 
 		swapchain->endRenderPass(command_pool->getCurrentBuffer());
+
+		for (int i = 0; i < present_cmd_info.image_count; ++i) {
+			VK_Allocator::barrierTransitionImageLayout(command_pool, vk_images[i], vk_images[i]->getDesiredLayout());
+		}
 
 		command_pool->end();
 		VkSemaphore wait_semaphores[] = {frames[current_frame].image_available_semaphore->getHandle()};
@@ -494,7 +473,7 @@ namespace HBE {
 		command_pool->getCurrentFence().wait();
 	}
 
-	void VK_Renderer::waitLastFrame(){
+	void VK_Renderer::waitLastFrame() {
 		command_pool->getLastFence().wait();
 	}
 
