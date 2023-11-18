@@ -34,6 +34,7 @@ namespace HBE {
 		}
 
 	};
+
 	class CameraSystem;
 
 	class ModelRendererSystem;
@@ -177,6 +178,7 @@ namespace HBE {
 
 	template<typename Component>
 	Component &Entity::get() {
+		HB_ASSERT(scene->has<Component>(handle), "Entity does not have component");
 		return scene->get<Component>(handle);
 	}
 

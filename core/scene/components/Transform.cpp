@@ -1,9 +1,9 @@
 #include "Transform.h"
 
-namespace HBE{
+namespace HBE {
 	void Transform::translate(vec3 translation) {
 		is_dirty = true;
-		local_mat = glm::translate(local_mat, translation);
+		local_mat[3] += vec4(translation, 0);
 	}
 
 	vec3 Transform::position() const {
