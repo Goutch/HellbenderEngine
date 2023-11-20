@@ -3,7 +3,7 @@
 namespace HBE {
 	void Transform::translate(vec3 translation) {
 		is_dirty = true;
-		local_mat[3] += vec4(translation, 0);
+		local_mat = glm::translate(local_mat, translation);
 	}
 
 	vec3 Transform::position() const {
