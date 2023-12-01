@@ -4,6 +4,7 @@
 #include "Core.h"
 #include "Event.h"
 #include "Timer.h"
+using namespace utils;
 namespace HBE {
 	class Window;
 

@@ -4,6 +4,8 @@
 #include "Core.h"
 #include "Texture.h"
 #include "Event.h"
+
+using namespace utils;
 namespace HBE {
 	class Framebuffer;
 
@@ -33,10 +35,15 @@ namespace HBE {
 
 	public:
 		mutable Event<RenderTarget *> onResolutionChange;
+
 		virtual void setResolution(uint32_t width, uint32_t height) = 0;
+
 		virtual vec2i getResolution() const = 0;
+
 		virtual void setClearColor(vec4 color) = 0;
+
 		virtual const vec4 &getClearColor() const = 0;
+
 		virtual Texture *getFramebufferTexture(uint32_t frame) const = 0;
 	};
 }

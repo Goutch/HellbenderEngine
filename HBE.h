@@ -57,3 +57,9 @@
 #include "glm/gtx/quaternion.hpp"
 
 #include "core/math/fixed.h"
+
+#include "Random.h"
+#include "Event.h"
+#include "Timer.h"
+
+using namespace utils;

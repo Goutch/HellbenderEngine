@@ -5,6 +5,7 @@
 #include "HBETypes.h"
 
 struct GLFWwindow;
+using namespace utils;
 namespace HBE {
 	class HB_API Window {
 	protected:

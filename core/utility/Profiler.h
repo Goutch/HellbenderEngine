@@ -5,7 +5,7 @@
 #include "Timer.h"
 #include "stack"
 #include "unordered_map"
-
+using namespace utils;
 namespace HBE {
 	struct ProfileGraphNode{
 		std::string message;

@@ -5,7 +5,7 @@
 #include "HBETypes.h"
 #include "Event.h"
 struct GLFWwindow;
-
+using namespace utils;
 namespace HBE {
 
 	enum KEY {

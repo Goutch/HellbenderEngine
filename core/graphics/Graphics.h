@@ -29,7 +29,7 @@ namespace HBE {
 	class RenderTarget;
 
 	class Texture;
-
+	using namespace utils;
 	class HB_API Graphics {
 		static Renderer *renderer;
 		static Window *window;

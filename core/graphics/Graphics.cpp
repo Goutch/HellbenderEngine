@@ -1,7 +1,6 @@
 
 #include "Graphics.h"
 #include <core/utility/Log.h>
-#include "Event.h"
 #include <core/resource/RenderTarget.h>
 #include <Configs.h>
 #include <core/resource/Model.h>
