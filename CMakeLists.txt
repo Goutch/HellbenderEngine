@@ -110,10 +110,6 @@ set(CORE_FILES
         core/utility/Log.cpp
         core/utility/Geometry.cpp
         core/utility/Geometry.h
-        core/utility/Clock.cpp
-        core/utility/Random.cpp
-        core/utility/Random.h
-        core/utility/ByteVector.h
         core/utility/Profiler.cpp
         core/utility/Profiler.h
 

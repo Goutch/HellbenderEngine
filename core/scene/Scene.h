@@ -5,7 +5,6 @@
 #include "core/scene/ecs/Registry.h"
 #include "unordered_map"
 
-#include "core/utility/Event.h"
 #include "core/graphics/RenderGraph.h"
 
 #include "core/graphics/Graphics.h"

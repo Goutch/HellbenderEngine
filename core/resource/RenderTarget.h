@@ -2,9 +2,8 @@
 
 #include <core/resource/Resource.h>
 #include "Core.h"
-#include "core/utility/Event.h"
 #include "Texture.h"
-
+#include "Event.h"
 namespace HBE {
 	class Framebuffer;
 

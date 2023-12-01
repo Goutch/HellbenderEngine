@@ -6,7 +6,7 @@
 #include "unordered_map"
 #include "list"
 #include "array"
-#include "core/utility/Event.h"
+#include "Event.h"
 
 namespace HBE {
 	class VK_Window;

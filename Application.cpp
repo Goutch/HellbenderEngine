@@ -1,8 +1,8 @@
+
 #include "Application.h"
 #include "core/graphics/Graphics.h"
 #include "core/input/Input.h"
 #include "GLFW/glfw3.h"
-#include "core/utility/Timer.h"
 #include "core/threading/JobManager.h"
 #include <core/graphics/Window.h>
 #include "core/utility/Profiler.h"

@@ -2,12 +2,10 @@
 #pragma once
 
 #include "Core.h"
-#include "core/utility/Event.h"
-
+#include "Event.h"
+#include "Timer.h"
 namespace HBE {
 	class Window;
-
-	class Timer;
 
 	class Scene;
 

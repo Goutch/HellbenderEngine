@@ -4,7 +4,7 @@
 #include "HBETypes.h"
 #include "vector"
 #include "glm/glm.hpp"
-#include "core/utility/Event.h"
+#include "Event.h"
 #include <string>
 
 namespace HBE {

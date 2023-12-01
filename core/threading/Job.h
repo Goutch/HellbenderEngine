@@ -1,7 +1,7 @@
 #pragma once
 #include "Core.h"
 #include <thread>
-#include "core/utility/Function.h"
+#include "Function.h"
 #include <future>
 #include "core/utility/Log.h"
 namespace HBE {

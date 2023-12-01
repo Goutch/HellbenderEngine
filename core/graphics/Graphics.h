@@ -22,9 +22,6 @@ namespace HBE {
 
 	class GraphicPipelineInstance;
 
-	template<typename... Args>
-	class Event;
-
 	class RaytracingPipelineInstance;
 
 	class RootAccelerationStructure;

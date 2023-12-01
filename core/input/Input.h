@@ -3,12 +3,10 @@
 #include "Core.h"
 #include "queue"
 #include "HBETypes.h"
-
+#include "Event.h"
 struct GLFWwindow;
 
 namespace HBE {
-	template<typename... Args>
-	class Event;
 
 	enum KEY {
 		KEY_UNKNOWN = -1,
