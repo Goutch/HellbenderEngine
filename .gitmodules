@@ -1,0 +1,3 @@
+[submodule "dependencies/utils-collection"]
+	path = dependencies/utils-collection
+	url = https://Github/Goutch/UtilsCollection

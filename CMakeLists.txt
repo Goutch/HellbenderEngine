@@ -1,7 +1,13 @@
 cmake_minimum_required(VERSION 3.15)
 set(CMAKE_CXX_STANDARD 20)
-
 project(HBE CXX)
+
+if(WIN32)
+    execute_process(COMMAND cmd /C ${CMAKE_CURRENT_SOURCE_DIR}/UpdateSubmodules.bat)
+else(UNIX)
+    execute_process(COMMAND cmd /C ${CMAKE_CURRENT_SOURCE_DIR}/UpdateSubmodules.sh)
+endif()
+
 add_compile_definitions(HB_BUILD)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -13,7 +19,6 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     set(MSVC_COMPILE_FLAGS "/MP /Ot")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_COMPILE_FLAGS}")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
-
 endif ()
 
 set(CORE_FILES
@@ -189,7 +194,7 @@ set(VK_FILES
 
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
-
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/utils-collection/")
 #------------------------------------VULKAN------------------------------------
 find_package(Vulkan REQUIRED)
 if (VULKAN_FOUND)
@@ -381,3 +386,4 @@ set_target_properties(${PROJECT_NAME}
         )
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res DESTINATION ${HBE_OUTPUT_DIR})
+
