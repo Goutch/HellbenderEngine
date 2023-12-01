@@ -329,7 +329,8 @@ target_include_directories(${PROJECT_NAME}
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb/"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf/"
-        PUBLIC "${FREETYPE_INCLUDE_DIRS}")
+        PUBLIC "${FREETYPE_INCLUDE_DIRS}"
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/utils-collection")
 
 
 set(GLSLANG_LIBS
