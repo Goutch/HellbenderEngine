@@ -1,8 +1,9 @@
 
 #include "ModelRendererSystem.h"
 #include "core/scene/Scene.h"
-namespace HBE
-{
+#include "core/scene/components/EntityState.h"
+
+namespace HBE {
 	ModelRendererSystem::ModelRendererSystem(Scene *scene) : System(scene) {
 		scene->onDraw.subscribe(this, &ModelRendererSystem::draw);
 	}
@@ -37,13 +38,15 @@ namespace HBE
 
 		HB_PROFILE_BEGIN("ModelRendererUpdate");
 		HB_PROFILE_BEGIN("ModelRendererUpdateGroup");
-		auto group = scene->group<Transform, ModelRenderer>();
+		auto group = scene->group<EntityState, Transform, ModelRenderer>();
 		HB_PROFILE_END("ModelRendererUpdateGroup");
-		for (auto[handle, transform, model_renderer]: group) {
-			if (model_renderer.active) {
-				for (const ModelNode &node: model_renderer.model->getNodes()) {
-					drawNode(render_graph, node, transform.world());
-				}
+		for (auto [handle, state, transform, model_renderer]: group) {
+
+			if (!model_renderer.active || state.state == ENTITY_STATE_INACTIVE)
+				continue;
+
+			for (const ModelNode &node: model_renderer.model->getNodes()) {
+				drawNode(render_graph, node, transform.world());
 			}
 		}
 

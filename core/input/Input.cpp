@@ -22,7 +22,7 @@ namespace HBE {
 	Event<vec2> Input::onMouseLeftClickDown = Event<vec2>();
 	Event<vec2> Input::onMouseLeftClickUp = Event<vec2>();
 	Event<vec2> Input::onMouseLeftClick = Event<vec2>();
-	
+
 
 	bool Input::getKey(KEY code) {
 		return pressed[code];
@@ -45,7 +45,7 @@ namespace HBE {
 
 		glfwGetCursorPos(window, &mouse_x, &mouse_y);
 		//mouse_x / Graphics::getWindow()->getWidth();
-		//mouse_y / Graphics::getWindow()->getHeight();
+		mouse_y = Graphics::getWindow()->getHeight() - mouse_y;
 		return vec2(static_cast<float>(mouse_x), static_cast<float>(mouse_y));
 	}
 

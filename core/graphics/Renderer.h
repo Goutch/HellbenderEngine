@@ -50,8 +50,10 @@ namespace HBE {
 	enum PRESENT_CMD_FLAG {
 		PRESENT_CMD_FLAG_NONE = 0,
 	};
+
 	struct PushConstantInfo {
 		std::string name;
+		//array of 128bytes max
 		void *data;
 		uint32_t size;
 	};
@@ -60,6 +62,7 @@ namespace HBE {
 		const Mesh *mesh = nullptr;
 		GraphicPipelineInstance *pipeline_instance = nullptr;
 		uint32_t layer = 0;
+		uint32_t order_in_layer = 0;//ignored if ordered flag is not set
 		uint32_t push_constants_count = 0;
 		PushConstantInfo *push_constants = nullptr;
 		DRAW_CMD_FLAGS flags = DRAW_CMD_FLAG_NONE;
@@ -117,6 +120,6 @@ namespace HBE {
 
 		virtual void waitCurrentFrame() = 0;
 
-		virtual void waitLastFrame() =0;
+		virtual void waitLastFrame() = 0;
 	};
 }

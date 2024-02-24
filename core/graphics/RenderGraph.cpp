@@ -34,8 +34,8 @@ namespace HBE {
 			}
 			void *cache_address = (void *) (&push_constant_blocks[current_pc_block][current_pc_block_offset]);
 			memcpy(cache_address,
-				   draw_cmd_info.push_constants[i].data,
-				   draw_cmd_info.push_constants[i].size);
+			       draw_cmd_info.push_constants[i].data,
+			       draw_cmd_info.push_constants[i].size);
 			current_pc_block_offset += draw_cmd_info.push_constants[i].size;
 			draw_cmd_info.push_constants[i].data = cache_address;
 		}
@@ -50,8 +50,8 @@ namespace HBE {
 		}
 		void *cache_address = (void *) (&push_constant_blocks[current_pc_block][current_pc_block_offset]);
 		memcpy(cache_address,
-			   draw_cmd_info.push_constants,
-			   sizeof(PushConstantInfo) * draw_cmd_info.push_constants_count);
+		       draw_cmd_info.push_constants,
+		       sizeof(PushConstantInfo) * draw_cmd_info.push_constants_count);
 		draw_cmd_info.push_constants = (PushConstantInfo *) cache_address;
 		current_pc_block_offset += sizeof(PushConstantInfo) * draw_cmd_info.push_constants_count;
 		if (draw_cmd_info.flags & DRAW_CMD_FLAG_ORDERED) {
@@ -69,18 +69,29 @@ namespace HBE {
 	}
 
 	const std::vector<DrawCmdInfo> &RenderGraph::getOrderedRenderCache() {
+		HB_PROFILE_BEGIN("SortOrderedRenderCache");
+		std::sort(ordered_render_cache.begin(), ordered_render_cache.end(), [](const DrawCmdInfo &cmd1, const DrawCmdInfo &cmd2) {
+			return RenderGraph::compareDrawCmdOrdered(cmd1, cmd2);
+		});
+		HB_PROFILE_END("SortOrderedRenderCache");
 		return ordered_render_cache;
 	}
 
 	const std::vector<DrawCmdInfo> &RenderGraph::getRenderCache() {
-
 		HB_PROFILE_BEGIN("SortRenderCache");
 		std::sort(render_cache.begin(), render_cache.end(), [](const DrawCmdInfo &cmd1, const DrawCmdInfo &cmd2) {
 			return RenderGraph::compareDrawCmd(cmd1, cmd2);
 		});
-
 		HB_PROFILE_END("SortRenderCache");
 		return render_cache;
+	}
+
+	bool RenderGraph::compareDrawCmdOrdered(const DrawCmdInfo &cmd1, const DrawCmdInfo &cmd2) {
+		if (cmd1.layer == cmd2.layer) {
+			return cmd1.order_in_layer > cmd2.order_in_layer;
+		} else {
+			return cmd1.layer > cmd2.layer;
+		}
 	}
 
 	bool RenderGraph::compareDrawCmd(const DrawCmdInfo &cmd1, const DrawCmdInfo &cmd2) {

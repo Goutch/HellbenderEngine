@@ -23,14 +23,26 @@
 
 namespace HBE {
 	struct SceneNode {
+		friend class Scene;
+
 		Entity entity;
 		bool has_parent = false;
 		SceneNode *parent = nullptr;
 		std::list<SceneNode> children;
 
+		SceneNode(Entity entity) : entity(entity) {};
+
+
+		int getHierarchyOrder() {
+			return order_in_hierarchy;
+		}
+
 		bool operator==(const SceneNode &other) const {
 			return entity.getHandle() == other.entity.getHandle();
 		}
+
+	private:
+		int order_in_hierarchy = 0;
 
 	};
 
@@ -49,10 +61,10 @@ namespace HBE {
 	public:
 		Event<RenderGraph *> onRender;
 		Event<RenderGraph *> onDraw;
+		Event<RenderGraph *, SceneNode &> onDrawNode;
 		Event<float> onUpdate;
 		Event<Scene *> onSceneActivate;
 		Event<Scene *> onSceneDeactivate;
-
 	private:
 		std::vector<System *> systems;
 		bool is_active = true;
@@ -143,13 +155,21 @@ namespace HBE {
 
 		void setParent(Entity entity, Entity parent = {});
 
+		void setParent(entity_handle entity, entity_handle parent);
+
 		Entity getParent(Entity entity);
+
+		Entity getParent(entity_handle entity);
 
 		const std::list<SceneNode> &getChildren(Entity entity);
 
 		void printSceneHierarchy();
 
 		SceneNode *getNode(Entity entity);
+
+		bool IsActiveInHierarchy(const Entity entity);
+
+		bool isActiveInHierarchy(entity_handle entity);
 
 	private:
 
@@ -162,7 +182,9 @@ namespace HBE {
 
 		void onFrameChange(uint32_t frame);
 
-		void addDefaultSystems();
+
+		void drawNode(RenderGraph *render_graph, SceneNode &node, int &count);
+
 	};
 
 	template<typename Component>
@@ -177,7 +199,7 @@ namespace HBE {
 
 	template<typename Component>
 	Component &Entity::get() {
-		HB_ASSERT(scene->has<Component>(handle), "Entity does not have component");
+		HB_ASSERT(scene->has<Component>(handle), std::string("Entity#") + std::to_string(handle) + " does not have component " + typeid(Component).name());
 		return scene->get<Component>(handle);
 	}
 

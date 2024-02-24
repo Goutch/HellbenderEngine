@@ -7,6 +7,7 @@
 #include "core/scene/systems/CameraControllerSystem.h"
 #include "core/scene/systems/ModelRendererSystem.h"
 #include "core/scene/systems/MeshRendererSystem.h"
+#include "core/scene/components/EntityState.h"
 
 namespace HBE {
 
@@ -44,8 +45,27 @@ namespace HBE {
 		}
 	}
 
+	void Scene::drawNode(RenderGraph *render_graph, SceneNode &node, int &count) {
+		DrawCmdInfo draw_cmd{};
+		draw_cmd.flags = DRAW_CMD_FLAG_ORDERED;
+		if (node.entity.has<EntityState>() &&
+		    node.entity.get<EntityState>().state == ENTITY_STATE_INACTIVE) {
+			return;
+		}
+		node.order_in_hierarchy = count;
+		count++;
+		onDrawNode.invoke(render_graph, node);
+		for (auto &child: node.children) {
+			drawNode(render_graph, child, count);
+		}
+	}
+
 	void Scene::draw() {
 		if (is_active) {
+			int node_count = 0;
+			for (SceneNode node: root_nodes) {
+				drawNode(&render_graph, node, node_count);
+			}
 			onDraw.invoke(&render_graph);
 		}
 	}
@@ -83,6 +103,8 @@ namespace HBE {
 		Entity e = Entity(registry.create(), this);
 		root_nodes.push_back(SceneNode{e});
 		node_map.emplace(e.getHandle(), &root_nodes.back());
+
+		attach<EntityState>(e.getHandle());
 		return e;
 	}
 
@@ -91,7 +113,11 @@ namespace HBE {
 	}
 
 	Entity Scene::getParent(Entity entity) {
-		SceneNode *node = node_map[entity.getHandle()];
+		return getParent(entity.getHandle());
+	}
+
+	Entity Scene::getParent(entity_handle entity) {
+		SceneNode *node = node_map[entity];
 		if (node->has_parent) {
 			return node->parent->entity;
 		}
@@ -201,36 +227,44 @@ namespace HBE {
 
 	Entity Scene::createEntity3D() {
 		Entity e(registry.create(), this);
-		root_nodes.emplace_back(SceneNode{e, false});
+		root_nodes.emplace_back(SceneNode{e});
 		node_map.emplace(e.getHandle(), &root_nodes.back());
+
+		attach<EntityState>(e.getHandle());
 		attach<Transform>(e.getHandle());
 		return e;
 	}
 
 	Entity Scene::createEntity2D() {
 		Entity e(registry.create(), this);
-		root_nodes.emplace_back(SceneNode{e, false});
+		root_nodes.emplace_back(SceneNode{e});
 		node_map.emplace(e.getHandle(), &root_nodes.back());
+
+		attach<EntityState>(e.getHandle());
 		attach<Transform2D>(e.getHandle());
 		return e;
 	}
 
 	void Scene::setParent(Entity entity, Entity parent) {
-		SceneNode *node = node_map[entity.getHandle()];
+		setParent(entity.getHandle(), parent.getHandle());
+	}
+
+	void Scene::setParent(entity_handle entity, entity_handle parent) {
+		SceneNode *node = node_map[entity];
 		std::list<SceneNode> &source = node->has_parent ? node->parent->children : root_nodes;
-		std::list<SceneNode> &destination = parent.valid() ? node_map[parent.getHandle()]->children : root_nodes;
+		std::list<SceneNode> &destination = valid(parent) ? node_map[parent]->children : root_nodes;
 		auto iterator = std::find(source.begin(), source.end(), *node);
 		destination.splice(destination.end(), source, iterator, std::next(iterator));
-		node->has_parent = parent.valid();
+		node->has_parent = valid(parent);
 		if (node->has_parent)
-			node->parent = node_map[parent.getHandle()];
+			node->parent = node_map[parent];
 		else
 			node->parent = nullptr;
 
-		if (entity.has<Transform>()) {
-			Transform &transform = entity.get<Transform>();
+		if (has<Transform>(entity)) {
+			Transform &transform = get<Transform>(entity);
 			transform.is_dirty = true;
-			transform.parent = &parent.get<Transform>();
+			transform.parent = &get<Transform>(parent);
 			setChildrenDirty(node);
 		}
 	}
@@ -262,5 +296,21 @@ namespace HBE {
 				setChildrenDirty(&child);
 			}
 		}
+	}
+
+	bool Scene::isActiveInHierarchy(entity_handle entity) {
+		while (getParent(entity).valid()) {
+			entity = getParent(entity).getHandle();
+			bool has_state = has<EntityState>(entity);
+			if (!has_state)
+				continue;
+			if (get<EntityState>(entity).state == ENTITY_STATE_INACTIVE)
+				return false;
+		}
+		return true;
+	}
+
+	bool Scene::IsActiveInHierarchy(const Entity entity) {
+		return isActiveInHierarchy(entity.getHandle());
 	}
 }

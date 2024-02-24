@@ -21,7 +21,6 @@ namespace HBE {
 				Log::error("Unable to find file:" + path);
 			}
 			/*
-
 			FILE *file = fopen(res_path.c_str(), "r");
 			if (ferror(file)) {
 				Log::error("Unable to find file:" + path);

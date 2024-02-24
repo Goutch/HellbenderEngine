@@ -2,11 +2,11 @@ cmake_minimum_required(VERSION 3.15)
 set(CMAKE_CXX_STANDARD 20)
 project(HBE CXX)
 
-if(WIN32)
+if (WIN32)
     execute_process(COMMAND cmd /C ${CMAKE_CURRENT_SOURCE_DIR}/UpdateSubmodules.bat)
-else(UNIX)
+else (UNIX)
     execute_process(COMMAND cmd /C ${CMAKE_CURRENT_SOURCE_DIR}/UpdateSubmodules.sh)
-endif()
+endif ()
 
 add_compile_definitions(HB_BUILD)
 
@@ -118,7 +118,15 @@ set(CORE_FILES
         core/resource/StorageBuffer.h
         core/graphics/RenderGraph.cpp
         core/graphics/RenderGraph.h
-        core/scene/ecs/Group.cpp core/scene/ecs/Group.h core/scene/ecs/RegistryPage.cpp core/scene/ecs/RegistryPage.h core/math/SignedDistance.h)
+        core/scene/ecs/Group.cpp
+        core/scene/ecs/Group.h
+        core/scene/ecs/RegistryPage.cpp
+        core/scene/ecs/RegistryPage.h
+        core/math/SignedDistance.h
+        core/scene/ecs/Component.h
+        core/scene/systems/ui/UIPanelSystem.cpp
+        core/scene/systems/ui/ButtonSystem.cpp
+        core/scene/systems/ui/TextBoxSystem.cpp)
 set(VK_FILES
         platforms/vk/VK_Renderer.cpp
         platforms/vk/VK_Instance.cpp
@@ -186,7 +194,7 @@ set(VK_FILES
         platforms/vk/VK_StorageBuffer.cpp
         platforms/vk/VK_StorageBuffer.h
         platforms/vk/VK_TexelBuffer.cpp
-        platforms/vk/VK_TexelBuffer.h platforms/vk/VK_Utils.h platforms/vk/VK_DescriptorSetLayout.cpp platforms/vk/VK_DescriptorSetLayout.h)
+        platforms/vk/VK_TexelBuffer.h platforms/vk/VK_Utils.h platforms/vk/VK_DescriptorSetLayout.cpp platforms/vk/VK_DescriptorSetLayout.h core/scene/components/EntityState.cpp core/scene/components/EntityState.h core/scene/ecs/Component.h)
 
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")

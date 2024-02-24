@@ -82,6 +82,7 @@ namespace HBE {
                 atlas_info.format = IMAGE_FORMAT_RGBA32F;
                 atlas_info.data = storage.pixels;
 
+
                 atlas = Resources::createTexture(atlas_info);
                 for (auto glyph: glyphs) {
                     msdf_atlas::unicode_t unicode = glyph.getCodepoint();

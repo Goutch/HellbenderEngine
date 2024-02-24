@@ -10,7 +10,7 @@ namespace HBE {
 
     struct FontInfo {
         std::string path;
-        char *characters;
+        const char *characters;
         uint32_t characters_count;
         uint32_t glyph_resolution = 32;
     };

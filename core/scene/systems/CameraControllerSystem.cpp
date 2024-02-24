@@ -7,6 +7,8 @@
 #include "core/scene/components/Camera2D.h"
 #include "core/scene/components/PixelCamera.h"
 #include "core/scene/components/Transform.h"
+#include "core/scene/components/EntityState.h"
+
 namespace HBE {
 	CameraControllerSystem::CameraControllerSystem(Scene *scene) : System(scene) {
 		scene->onUpdate.subscribe(this, &CameraControllerSystem::update);
@@ -17,9 +19,12 @@ namespace HBE {
 	void CameraControllerSystem::update(float delta_t) {
 		HB_PROFILE_BEGIN("CameraControllerUpdate");
 		HB_PROFILE_BEGIN("CameraControllerUpdateGroup");
-		auto group = scene->group<Transform, Camera, CameraController>();
+		auto group = scene->group<EntityState, Transform, Camera, CameraController>();
 		HB_PROFILE_END("CameraControllerUpdateGroup");
-		for (auto [handle, transform, camera, controller]: group) {
+		for (auto [handle, state, transform, camera, controller]: group) {
+			if (state.state == ENTITY_STATE_INACTIVE) {
+				continue;
+			}
 			float max_pitch_radian = glm::radians(controller.max_pitch);
 
 			vec2i resolution = camera.getRenderTarget()->getResolution();

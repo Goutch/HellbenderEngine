@@ -24,6 +24,8 @@ namespace HBE {
 
 		static bool compareDrawCmd(const DrawCmdInfo &cmd1, const DrawCmdInfo &cmd2);
 
+		static bool compareDrawCmdOrdered(const DrawCmdInfo &cmd1, const DrawCmdInfo &cmd2);
+
 	public:
 		RenderGraph();
 

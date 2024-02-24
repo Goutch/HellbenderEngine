@@ -29,6 +29,7 @@
 #include "core/scene/Entity.h"
 #include "core/scene/Scene.h"
 #include "core/scene/System.h"
+#include "core/scene/components/EntityState.h"
 #include "core/scene/components/ModelRenderer.h"
 #include "core/scene/components/MeshRenderer.h"
 #include "core/scene/components/Camera.h"
@@ -37,6 +38,9 @@
 #include "core/scene/components/CameraController.h"
 #include "core/scene/components/Transform2D.h"
 #include "core/scene/components/Transform.h"
+#include "core/scene/systems/ui/UIPanelSystem.h"
+#include "core/scene/systems/ui/ButtonSystem.h"
+#include "core/scene/systems/ui/TextBoxSystem.h"
 
 #include "core/graphics/Graphics.h"
 #include "core/graphics/Window.h"

@@ -4,8 +4,9 @@
 #include "core/scene/components/Camera.h"
 #include "core/scene/components/Camera2D.h"
 #include "core/scene/components/PixelCamera.h"
-namespace HBE
-{
+#include "core/scene/components/EntityState.h"
+
+namespace HBE {
 	CameraSystem::CameraSystem(Scene *scene) : System(scene) {
 		this->scene = scene;
 		scene->onRender.subscribe(this, &CameraSystem::render);
@@ -47,13 +48,16 @@ namespace HBE
 	void CameraSystem::render(RenderGraph *render_graph) {
 		HB_PROFILE_BEGIN("CameraRender");
 		HB_PROFILE_BEGIN("CameraRenderGroup");
-		auto group = scene->group<Transform, Camera>();
-		auto group_2D = scene->group<Transform, Camera2D>();
-		auto group_pixel = scene->group<Transform, PixelCamera>();
+		auto group = scene->group<EntityState, Transform, Camera>();
+		auto group_2D = scene->group<EntityState, Transform, Camera2D>();
+		auto group_pixel = scene->group<EntityState, Transform, PixelCamera>();
 		RenderCmdInfo render_cmd_info{};
 		render_cmd_info.render_graph = render_graph;
 		HB_PROFILE_END("CameraRenderGroup");
-		for (auto[handle, transform, camera]: group) {
+		for (auto [handle, state, transform, camera]: group) {
+			if (state.state == ENTITY_STATE_INACTIVE) {
+				continue;
+			}
 			if (camera.active) {
 				render_cmd_info.render_target = camera.getRenderTarget();
 				render_cmd_info.projection = camera.projection;
@@ -62,7 +66,10 @@ namespace HBE
 				Graphics::render(render_cmd_info);
 			}
 		}
-		for (auto[handle, transform, camera]: group_2D) {
+		for (auto [handle, state, transform, camera]: group_2D) {
+			if (state.state == ENTITY_STATE_INACTIVE) {
+				continue;
+			}
 			if (camera.active) {
 				render_cmd_info.render_target = camera.getRenderTarget();
 				render_cmd_info.projection = camera.projection;
@@ -71,7 +78,10 @@ namespace HBE
 				Graphics::render(render_cmd_info);
 			}
 		}
-		for (auto[handle, transform, camera]: group_pixel) {
+		for (auto [handle, state, transform, camera]: group_pixel) {
+			if (state.state == ENTITY_STATE_INACTIVE) {
+				continue;
+			}
 			if (camera.active) {
 				render_cmd_info.render_target = camera.getRenderTarget();
 				render_cmd_info.projection = camera.projection;
