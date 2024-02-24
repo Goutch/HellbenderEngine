@@ -19,11 +19,11 @@ namespace HBE {
 
 		scene->onUpdate.subscribe(this, &ButtonSystem::onUpdate);
 		//region ---------------------------------------------button pipelines---------------------------------------------
-		const char *characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{};':\",./<>?\\|`~";
+		std::string characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{};':\",./<>?\\|`~";
 		FontInfo font_info{};
-		font_info.path = "fonts/OpenSans-Regular.ttf";
-		font_info.characters = characters;
-		font_info.characters_count = 94;
+		font_info.path = "fonts/Roboto-Regular.ttf";
+		font_info.characters = characters.data();
+		font_info.characters_count = characters.size();
 		font_info.glyph_resolution = 64;
 
 		default_font = Resources::createFont(font_info);
@@ -127,9 +127,6 @@ namespace HBE {
 		text_renderer.pipeline_instance = default_text_pipeline_instance;
 		text_renderer.ordered = true;
 
-		Transform &text_t = button.text_entity.get<Transform>();
-		text_t.setPosition(vec3(0, -100, 0));
-
 		scene->setParent(button.background_entity, entity);
 		scene->setParent(button.text_entity, button.background_entity);
 
@@ -153,9 +150,10 @@ namespace HBE {
 		for (auto [e, s, t, b]: group) {
 			if (!scene->isActiveInHierarchy(e))
 				continue;
-			Transform &background_transform = b.background_entity.get<Transform>();
-			vec2 min = (t.worldPosition() - (background_transform.worldScale() / 2.0f));
-			vec2 max = (t.worldPosition() + (background_transform.worldScale() / 2.0f));
+
+			UIPanel panel = b.background_entity.get<UIPanel>();
+			vec2 min = vec2(t.worldPosition()) - (panel.size / 2.0f);
+			vec2 max = vec2(t.worldPosition()) + (panel.size / 2.0f);
 			if (max.x > position.x && min.x < position.x && max.y > position.y && min.y < position.y) {
 				b.onButtonClicked.invoke(Entity(e, scene));
 			}

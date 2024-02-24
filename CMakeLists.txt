@@ -53,6 +53,7 @@ set(CORE_FILES
         core/resource/TexelBuffer.h
         core/resource/Font.cpp
         core/resource/Font.h
+        core/resource/StorageBuffer.h
 
         core/graphics/Window.h
         core/graphics/Renderer.h
@@ -60,6 +61,8 @@ set(CORE_FILES
         core/graphics/Graphics.h
         core/graphics/Renderer.cpp
         core/graphics/Window.cpp
+        core/graphics/RenderGraph.cpp
+        core/graphics/RenderGraph.h
 
         core/input/Input.h
         core/input/Input.cpp
@@ -68,6 +71,15 @@ set(CORE_FILES
         core/audio/Audio.h
 
         core/scene/ecs/Registry.h
+        core/scene/ecs/Registry.cpp
+        core/scene/ecs/ComponentPool.cpp
+        core/scene/ecs/ComponentPool.h
+        core/scene/ecs/ComponentTypeRegistry.h
+        core/scene/ecs/Group.cpp
+        core/scene/ecs/Group.h
+        core/scene/ecs/RegistryPage.cpp
+        core/scene/ecs/RegistryPage.h
+        core/scene/ecs/Component.h
         core/scene/Entity.h
         core/scene/Scene.cpp
         core/scene/System.cpp
@@ -77,6 +89,14 @@ set(CORE_FILES
         core/scene/systems/MeshRendererSystem.h
         core/scene/systems/CameraControllerSystem.h
         core/scene/systems/ModelRendererSystem.h
+        core/scene/systems/CameraControllerSystem.cpp
+        core/scene/systems/CameraSystem.cpp
+        core/scene/systems/ui/UIPanelSystem.cpp
+        core/scene/systems/ui/ButtonSystem.cpp
+        core/scene/systems/ui/TextBoxSystem.cpp
+        core/scene/systems/MeshRendererSystem.cpp
+        core/scene/systems/ModelRendererSystem.cpp
+
         core/resource/AudioClip.cpp
         core/resource/AudioClip.h
         core/resource/AudioClipInstance.cpp
@@ -97,15 +117,11 @@ set(CORE_FILES
         core/scene/components/Camera2D.cpp
         core/scene/components/Camera.cpp
         core/scene/components/Transform.cpp
+        core/scene/components/EntityState.cpp
+        core/scene/components/EntityState.h
         core/scene/components/CameraController.cpp
-        core/scene/ecs/Registry.cpp
-        core/scene/ecs/ComponentPool.cpp
-        core/scene/ecs/ComponentPool.h
-        core/scene/systems/CameraControllerSystem.cpp
-        core/scene/systems/CameraSystem.cpp
-        core/scene/systems/MeshRendererSystem.cpp
-        core/scene/systems/ModelRendererSystem.cpp
-        core/scene/ecs/ComponentTypeRegistry.h
+
+
 
         core/utility/Log.cpp
         core/utility/Geometry.cpp
@@ -115,18 +131,11 @@ set(CORE_FILES
 
         core/threading/JobManager.cpp
         core/threading/JobManager.h
-        core/resource/StorageBuffer.h
-        core/graphics/RenderGraph.cpp
-        core/graphics/RenderGraph.h
-        core/scene/ecs/Group.cpp
-        core/scene/ecs/Group.h
-        core/scene/ecs/RegistryPage.cpp
-        core/scene/ecs/RegistryPage.h
+
+
         core/math/SignedDistance.h
-        core/scene/ecs/Component.h
-        core/scene/systems/ui/UIPanelSystem.cpp
-        core/scene/systems/ui/ButtonSystem.cpp
-        core/scene/systems/ui/TextBoxSystem.cpp)
+
+        core/scene/ecs/Component.h)
 set(VK_FILES
         platforms/vk/VK_Renderer.cpp
         platforms/vk/VK_Instance.cpp
@@ -194,7 +203,10 @@ set(VK_FILES
         platforms/vk/VK_StorageBuffer.cpp
         platforms/vk/VK_StorageBuffer.h
         platforms/vk/VK_TexelBuffer.cpp
-        platforms/vk/VK_TexelBuffer.h platforms/vk/VK_Utils.h platforms/vk/VK_DescriptorSetLayout.cpp platforms/vk/VK_DescriptorSetLayout.h core/scene/components/EntityState.cpp core/scene/components/EntityState.h core/scene/ecs/Component.h)
+        platforms/vk/VK_TexelBuffer.h
+        platforms/vk/VK_Utils.h
+        platforms/vk/VK_DescriptorSetLayout.cpp
+        platforms/vk/VK_DescriptorSetLayout.h)
 
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")

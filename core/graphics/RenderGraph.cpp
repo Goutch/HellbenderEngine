@@ -69,11 +69,11 @@ namespace HBE {
 	}
 
 	const std::vector<DrawCmdInfo> &RenderGraph::getOrderedRenderCache() {
-		HB_PROFILE_BEGIN("SortOrderedRenderCache");
+		/*HB_PROFILE_BEGIN("SortOrderedRenderCache");
 		std::sort(ordered_render_cache.begin(), ordered_render_cache.end(), [](const DrawCmdInfo &cmd1, const DrawCmdInfo &cmd2) {
 			return RenderGraph::compareDrawCmdOrdered(cmd1, cmd2);
 		});
-		HB_PROFILE_END("SortOrderedRenderCache");
+		HB_PROFILE_END("SortOrderedRenderCache");*/
 		return ordered_render_cache;
 	}
 
@@ -88,9 +88,9 @@ namespace HBE {
 
 	bool RenderGraph::compareDrawCmdOrdered(const DrawCmdInfo &cmd1, const DrawCmdInfo &cmd2) {
 		if (cmd1.layer == cmd2.layer) {
-			return cmd1.order_in_layer > cmd2.order_in_layer;
+			return cmd1.order_in_layer < cmd2.order_in_layer;
 		} else {
-			return cmd1.layer > cmd2.layer;
+			return cmd1.layer < cmd2.layer;
 		}
 	}
 
