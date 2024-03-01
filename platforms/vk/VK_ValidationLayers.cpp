@@ -67,14 +67,15 @@ namespace HBE {
 			Log::error(pCallbackData->pMessage);
 		} else if (messageSeverity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
 			Log::warning(pCallbackData->pMessage);
+		} else if (messageSeverity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
+			std::string message = pCallbackData->pMessage;
+			int new_line_index = message.find('|');
+			if (new_line_index != -1) {
+				Log::debug(message.substr(new_line_index, message.size() - (new_line_index)));
+			} else {
+				Log::debug(message);
+			}
 		}
-		else if(messageSeverity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT)
-		{
-			Log::debug(pCallbackData->pMessage);
-		}
-
-
-
 		return VK_FALSE;
 	}
 
