@@ -35,12 +35,16 @@ namespace HBE {
 			ppNext = &ray_tracing_pipeline_features.pNext;
 		}
 		if (app_info.required_extension_flags & VULKAN_REQUIRED_EXTENSION_DESCRIPTOR_INDEXING ||
-			app_info.required_extension_flags & VULKAN_REQUIRED_EXTENSION_RTX) {
+		    app_info.required_extension_flags & VULKAN_REQUIRED_EXTENSION_RTX) {
 			enabled_extension_flags |= EXTENSION_FLAG_DESCRIPTOR_INDEXING;
 			descriptor_indexing_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
 			*ppNext = &descriptor_indexing_features;
 		}
-
+		if (app_info.vulkan_version >= VULKAN_VERSION_1_3) {
+			enabled_extension_flags |= EXTENSION_FLAG_DYNAMIC_RENDERING;
+			dynamic_rendering_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES;
+			*ppNext = &dynamic_rendering_features;
+		}
 
 		vkGetPhysicalDeviceFeatures2(handle, &features2);
 
@@ -49,6 +53,7 @@ namespace HBE {
 		acceleration_structure_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_PROPERTIES_KHR;
 		ray_tracing_pipeline_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
 		descriptor_indexing_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES;
+
 
 		properties2.pNext = &acceleration_structure_properties;
 		acceleration_structure_properties.pNext = &ray_tracing_pipeline_properties;
@@ -142,7 +147,7 @@ namespace HBE {
 
 		//descriptor indexing added to Vulkan 1.2
 		if ((app_info.required_extension_flags & VULKAN_REQUIRED_EXTENSION_DESCRIPTOR_INDEXING) &&
-			(app_info.vulkan_version < VULKAN_VERSION_1_2)) {
+		    (app_info.vulkan_version < VULKAN_VERSION_1_2)) {
 			if (!checkExtensionsSupport(physical_device, DESCRIPTOR_INDEXING_EXTENSIONS_1_1))
 				return false;
 			device_enabled_extensions[physical_device].insert(device_enabled_extensions[physical_device].end(), DESCRIPTOR_INDEXING_EXTENSIONS_1_1.begin(), DESCRIPTOR_INDEXING_EXTENSIONS_1_1.end());
@@ -150,6 +155,8 @@ namespace HBE {
 
 		if (checkExtensionsSupport(physical_device, DEBUG_EXTENSIONS))
 			device_enabled_extensions[physical_device].insert(device_enabled_extensions[physical_device].end(), DEBUG_EXTENSIONS.begin(), DEBUG_EXTENSIONS.end());
+
+
 
 		return true;
 	}
@@ -233,30 +240,30 @@ namespace HBE {
 
 		uint32_t format_count;
 		vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device,
-											 surface_handle,
-											 &format_count,
-											 nullptr);
+		                                     surface_handle,
+		                                     &format_count,
+		                                     nullptr);
 
 		if (format_count != 0) {
 			details.formats.resize(format_count);
 			vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device,
-												 surface_handle,
-												 &format_count,
-												 details.formats.data());
+			                                     surface_handle,
+			                                     &format_count,
+			                                     details.formats.data());
 		}
 
 		uint32_t present_mode_count;
 		vkGetPhysicalDeviceSurfacePresentModesKHR(physical_device,
-												  surface_handle,
-												  &present_mode_count,
-												  nullptr);
+		                                          surface_handle,
+		                                          &present_mode_count,
+		                                          nullptr);
 
 		if (present_mode_count != 0) {
 			details.present_modes.resize(present_mode_count);
 			vkGetPhysicalDeviceSurfacePresentModesKHR(physical_device,
-													  surface_handle,
-													  &present_mode_count,
-													  details.present_modes.data());
+			                                          surface_handle,
+			                                          &present_mode_count,
+			                                          details.present_modes.data());
 		}
 
 		return details;

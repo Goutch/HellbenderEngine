@@ -10,13 +10,11 @@ namespace HBE {
 	typedef uint32_t EXTENSION_FLAGS;
 	enum EXTENSION_FLAG {
 		EXTENSION_FLAG_NONE = 0,
-		EXTENSION_FLAG_SHADER_FLOAT_CONTROLS,
-		EXTENSION_FLAG_SPIRV_1_4 = 1 << 0,
 		EXTENSION_FLAG_RAY_TRACING_PIPELINE = 1 << 0,
 		EXTENSION_FLAG_ACCELERATION_STRUCTURE = 1 << 1,
 		EXTENSION_FLAG_BUFFER_DEVICE_ADDRESS = 1 << 2,
 		EXTENSION_FLAG_DESCRIPTOR_INDEXING = 1 << 3,
-
+		EXTENSION_FLAG_DYNAMIC_RENDERING = 1 << 4,
 	};
 
 	struct QueueFamilyIndices {
@@ -27,14 +25,14 @@ namespace HBE {
 
 		bool hasMinimumRequirements() {
 			return graphics_family.has_value() &&
-				   present_family.has_value();
+			       present_family.has_value();
 		}
 
 		bool isComplete() {
 			return graphics_family.has_value() &&
-				   present_family.has_value() &&
-				   compute_family.has_value() &&
-				   transfer_family.has_value();
+			       present_family.has_value() &&
+			       compute_family.has_value() &&
+			       transfer_family.has_value();
 		}
 	};
 
@@ -68,7 +66,7 @@ namespace HBE {
 				VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME
 		};
 
-		const std::vector<const char*> DEBUG_EXTENSIONS = {
+		const std::vector<const char *> DEBUG_EXTENSIONS = {
 				VK_KHR_SHADER_NON_SEMANTIC_INFO_EXTENSION_NAME
 		};
 
@@ -86,10 +84,12 @@ namespace HBE {
 		VkPhysicalDeviceRayTracingPipelinePropertiesKHR ray_tracing_pipeline_properties{};
 		VkPhysicalDeviceDescriptorIndexingProperties descriptor_indexing_properties{};
 
+
 		VkPhysicalDeviceAccelerationStructureFeaturesKHR acceleration_structure_features{};
 		VkPhysicalDeviceRayTracingPipelineFeaturesKHR ray_tracing_pipeline_features{};
 		VkPhysicalDeviceDescriptorIndexingFeatures descriptor_indexing_features{};
 		VkPhysicalDeviceBufferDeviceAddressFeatures buffer_device_address_features{};
+		VkPhysicalDeviceDynamicRenderingFeatures dynamic_rendering_features{};
 
 		std::vector<const char *> enabled_extensions;
 		std::multimap<uint32_t, VkPhysicalDevice> device_score;
@@ -131,6 +131,9 @@ namespace HBE {
 		const VkPhysicalDeviceAccelerationStructurePropertiesKHR &getAccelerationStructureProperties() const;
 
 		const EXTENSION_FLAGS &getEnabledExtensionFlags() const;
+
+
+
 	private:
 		void pickBestPhysicalDevice();
 
@@ -141,6 +144,7 @@ namespace HBE {
 		bool isDeviceSuitable(const VkPhysicalDevice &physical_device);
 
 		void calculateScore(const VkPhysicalDevice &physical_device);
+
 
 	};
 

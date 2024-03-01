@@ -5,7 +5,6 @@
 #include "core/scene/Entity.h"
 #include "core/scene/System.h"
 #include "Event.h"
-
 using namespace utils;
 namespace HBE {
 
@@ -34,6 +33,15 @@ namespace HBE {
 		Mesh *text_mesh = nullptr;
 		ButtonMaterial material_properties;
 		Event<Entity> onButtonClicked;
+
+	private:
+		std::string current_text;
+		float text_width = 0;
+		float text_height = 0;
+	public:
+		vec2 getTextSize() const;
+
+		const std::string& getCurerntText() const;
 
 		void setSize(vec2 size);
 

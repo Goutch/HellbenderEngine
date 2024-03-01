@@ -4,13 +4,11 @@ namespace HBE {
 	uint32_t ComponentTypeRegistry::current_bit = 0;
 
 	bool Registry::valid(HBE::entity_handle handle) {
-		{
-			size_t page = getPage(handle);
-			if (page < pages.size() && pages[page] != nullptr) {
-				return pages[page]->valid(handle);
-			}
-			return false;
+		size_t page = getPage(handle);
+		if (page < pages.size() && pages[page] != nullptr) {
+			return pages[page]->valid(handle);
 		}
+		return false;
 	}
 
 	void Registry::destroy(entity_handle handle) {

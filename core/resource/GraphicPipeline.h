@@ -29,6 +29,9 @@ namespace HBE {
 		const Shader *fragment_shader = nullptr;
 		const Shader *geometry_shader = nullptr;
 		const VertexAttributeInfo *attribute_infos = nullptr;
+		/*
+		 * Not used with Vulkan version 1.3 or Higher (dynamic rendering)
+		 */
 		const RenderTarget *render_target = nullptr;
 		uint32_t attribute_info_count = 0;
 		VERTEX_TOPOLOGY topology = VERTEX_TOPOLOGY_TRIANGLE;

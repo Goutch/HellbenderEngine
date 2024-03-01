@@ -10,8 +10,7 @@
 #include "core/scene/components/EntityState.h"
 
 namespace HBE {
-
-
+	const Entity Entity::NULL_ENTITY = Entity();
 	Entity Scene::getCameraEntity() {
 		return main_camera_entity;
 	}
@@ -203,6 +202,10 @@ namespace HBE {
 
 	void Entity::destroy() {
 		scene->destroyEntity(handle);
+	}
+
+	int Entity::operator==(const Entity &other) const {
+		return other.handle == handle && other.scene == scene;
 	}
 
 	void Scene::addSystem(System *system) {

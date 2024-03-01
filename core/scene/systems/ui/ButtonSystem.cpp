@@ -202,7 +202,7 @@ namespace HBE {
 
 	void ButtonComponent::setText(const std::string &text, Font *font) {
 		MeshRenderer &mesh_renderer = text_entity.get<MeshRenderer>();
-		float total_width, total_height;
+		current_text = text;
 		if (text_mesh != nullptr) {
 			Geometry::updateText(*text_mesh,
 			                     text,
@@ -211,8 +211,8 @@ namespace HBE {
 			                     0.5f,
 			                     TEXT_ALIGNMENT_CENTER,
 			                     PIVOT_CENTER,
-			                     total_width,
-			                     total_height);
+			                     text_width,
+			                     text_height);
 		} else {
 			text_mesh = Geometry::createText(text,
 			                                 *font,
@@ -220,8 +220,8 @@ namespace HBE {
 			                                 0.5f,
 			                                 TEXT_ALIGNMENT_CENTER,
 			                                 PIVOT_CENTER,
-			                                 total_width,
-			                                 total_height);
+			                                 text_width,
+			                                 text_height);
 		}
 		mesh_renderer.mesh = text_mesh;
 	}
@@ -230,5 +230,14 @@ namespace HBE {
 		Transform &text_transform = text_entity.get<Transform>();
 		text_transform.setLocalScale(vec3(height, height, 1.0f));
 	}
+
+	const std::string &ButtonComponent::getCurerntText() const {
+		return current_text;
+	}
+
+	vec2 ButtonComponent::getTextSize() const {
+		return vec2(text_width, text_height);
+	}
+
 }
 

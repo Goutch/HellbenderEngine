@@ -62,8 +62,6 @@ namespace HBE {
 
 	protected:
 		virtual void createFramebuffers();
-
-
 	};
 }
 

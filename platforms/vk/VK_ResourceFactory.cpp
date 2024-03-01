@@ -17,6 +17,7 @@
 #include "raytracing/VK_RaytracingPipelineInstance.h"
 #include "VK_StorageBuffer.h"
 #include "VK_TexelBuffer.h"
+#include "VK_DynamicRenderTarget.h"
 
 namespace HBE {
 	VK_ResourceFactory::VK_ResourceFactory(VK_Renderer *renderer) {
@@ -44,7 +45,16 @@ namespace HBE {
 	}
 
 	RenderTarget *VK_ResourceFactory::createRenderTarget(const RenderTargetInfo &info) const {
-		return new VK_RenderPass(renderer, info);
+		//use dynamic rendering if the device supports it
+		if(renderer->getDevice()->getPhysicalDevice().getEnabledExtensionFlags() & EXTENSION_FLAG_DYNAMIC_RENDERING)
+		{
+			return new VK_RenderPass(renderer, info);
+			//return new VK_DynamicRenderTarget(renderer, info);
+		}
+		else
+		{
+			return new VK_RenderPass(renderer, info);
+		}
 	}
 
 	GraphicPipelineInstance *VK_ResourceFactory::createMaterial(const GraphicPipelineInstanceInfo &info) const {
