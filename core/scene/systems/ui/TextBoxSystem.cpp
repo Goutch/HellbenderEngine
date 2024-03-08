@@ -7,6 +7,7 @@ namespace HBE {
 
 	void TextBoxSystem::onUpdate(float delta) {
 		if (active_textbox_entity.valid() && active_textbox_entity.has<TextBoxComponent>()) {
+			TextBoxComponent *textbox_component = active_textbox_entity.get<TextBoxComponent>();
 			ButtonComponent *button_component = active_textbox_entity.get<ButtonComponent>();
 			cursor_blink_t += delta;
 			if (cursor_blink_t > 1.0f) {
@@ -15,13 +16,17 @@ namespace HBE {
 
 			if (Input::getKeyDown(KEY_BACKSPACE)) {
 				std::string current_text = button_component->getText();
-				if (current_text.size() > 0) {
+				if (!current_text.empty()) {
 					current_text.pop_back();
 					button_component->setText(current_text);
 				}
 			}
 			if (Input::getKeyDown(KEY_ENTER)) {
 				active_textbox_entity = Entity::NULL_ENTITY;
+				if (button_component->getText().empty()) {
+					button_component->setText(textbox_component->hint_text);
+					textbox_component->is_hint_visible = true;
+				}
 			}
 		}
 	}
@@ -34,10 +39,12 @@ namespace HBE {
 
 	void TextBoxSystem::onCharacterPressed(char character) {
 		if (active_textbox_entity.valid() && active_textbox_entity.has<ButtonComponent>()) {
+			TextBoxComponent *textbox_component = active_textbox_entity.get<TextBoxComponent>();
 			ButtonComponent *button_component = active_textbox_entity.get<ButtonComponent>();
 			std::string current_text = button_component->getText();
 			current_text += (char) character;
 			button_component->setText(current_text);
+			textbox_component->is_hint_visible = false;
 		}
 	}
 
@@ -54,7 +61,24 @@ namespace HBE {
 	}
 
 	void TextBoxSystem::onTextBoxClicked(Entity button) {
+		if (active_textbox_entity.valid()) {
+			ButtonComponent *button_component = active_textbox_entity.get<ButtonComponent>();
+			TextBoxComponent *textbox_component = active_textbox_entity.get<TextBoxComponent>();
+			if (button_component->getText().empty()) {
+				button_component->setText(textbox_component->hint_text);
+				textbox_component->is_hint_visible = true;
+			}
+		}
 		active_textbox_entity = button;
+		if (active_textbox_entity.valid()) {
+			ButtonComponent *button_component = active_textbox_entity.get<ButtonComponent>();
+			TextBoxComponent *textbox_component = active_textbox_entity.get<TextBoxComponent>();
+			if (textbox_component->is_hint_visible) {
+				button_component->setText("");
+				textbox_component->is_hint_visible = false;
+			}
+		}
+
 		cursor_blink_t = 0;
 	}
 
@@ -66,5 +90,16 @@ namespace HBE {
 	void TextBoxComponent::setTextHeight(float height) {
 		ButtonComponent *button_component = entity.get<ButtonComponent>();
 		button_component->setTextHeight(height);
+	}
+
+	void TextBoxComponent::setHintText(const std::string &hint) {
+		hint_text = hint;
+		ButtonComponent *button_component = entity.get<ButtonComponent>();
+		TextBoxComponent *textbox_component = entity.get<TextBoxComponent>();
+		if (button_component->getText().empty()) {
+			button_component->setText(hint);
+			textbox_component->is_hint_visible = true;
+		}
+
 	}
 }

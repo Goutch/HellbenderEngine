@@ -5,14 +5,25 @@
 #include "core/scene/Entity.h"
 #include "Core.h"
 #include "HBETypes.h"
+
 using namespace HBE;
 namespace HBE {
 	class Font;
+
 	struct HB_API TextBoxComponent {
+		friend class TextBoxSystem;
+
 		Entity entity;
 
 		void setSize(vec2 size);
+
 		void setTextHeight(float height);
+
+		void setHintText(const std::string &hint);
+
+	private :
+		std::string hint_text;
+		bool is_hint_visible = true;
 	};
 
 	class HB_API TextBoxSystem : public System {
