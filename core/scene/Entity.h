@@ -25,16 +25,16 @@ namespace HBE {
 		Scene *getScene();
 
 		template<typename Component>
-		Component &attach();
+		Component *attach();
 
 		template<typename Component>
-		Component &attach(Component &component);
+		Component *attach(Component &component);
 
 		template<typename Component>
-		Component &get();
+		Component *get();
 
 		template<typename Component>
-		Component &get(size_t signature_bit);
+		Component *get(size_t signature_bit);
 
 		template<typename Component>
 		void detach();

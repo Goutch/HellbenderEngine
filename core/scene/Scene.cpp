@@ -48,7 +48,7 @@ namespace HBE {
 		DrawCmdInfo draw_cmd{};
 		draw_cmd.flags = DRAW_CMD_FLAG_ORDERED;
 		if (node.entity.has<EntityState>() &&
-		    node.entity.get<EntityState>().state == ENTITY_STATE_INACTIVE) {
+		    node.entity.get<EntityState>()->state == ENTITY_STATE_INACTIVE) {
 			return;
 		}
 		node.order_in_hierarchy = count;
@@ -265,28 +265,28 @@ namespace HBE {
 			node->parent = nullptr;
 
 		if (has<Transform>(entity)) {
-			Transform &transform = get<Transform>(entity);
-			transform.is_dirty = true;
-			transform.parent = &get<Transform>(parent);
+			Transform *transform = get<Transform>(entity);
+			transform->is_dirty = true;
+			transform->parent = get<Transform>(parent);
 			setChildrenDirty(node);
 		}
 	}
 
 	void Scene::onAttachTransform(Entity entity) {
-		Transform &transform = entity.get<Transform>();
+
 	}
 
 	Texture *Scene::getMainCameraTexture() {
 		if (main_camera_entity.valid() && (main_camera_entity.has<Camera>() || main_camera_entity.has<Camera2D>() || main_camera_entity.has<PixelCamera>())) {
 
 			if (main_camera_entity.valid() && (main_camera_entity.has<Camera>())) {
-				return main_camera_entity.get<Camera>().getRenderTarget()->getFramebufferTexture(Graphics::getCurrentFrame());
+				return main_camera_entity.get<Camera>()->getRenderTarget()->getFramebufferTexture(Graphics::getCurrentFrame());
 			}
 			if (main_camera_entity.valid() && (main_camera_entity.has<Camera2D>())) {
-				return main_camera_entity.get<Camera2D>().getRenderTarget()->getFramebufferTexture(Graphics::getCurrentFrame());
+				return main_camera_entity.get<Camera2D>()->getRenderTarget()->getFramebufferTexture(Graphics::getCurrentFrame());
 			}
 			if (main_camera_entity.valid() && (main_camera_entity.has<PixelCamera>())) {
-				return main_camera_entity.get<PixelCamera>().getRenderTarget()->getFramebufferTexture(Graphics::getCurrentFrame());
+				return main_camera_entity.get<PixelCamera>()->getRenderTarget()->getFramebufferTexture(Graphics::getCurrentFrame());
 			}
 		}
 		return nullptr;
@@ -295,7 +295,7 @@ namespace HBE {
 	void Scene::setChildrenDirty(SceneNode *node) {
 		for (SceneNode &child: node->children) {
 			if (child.entity.has<Transform>()) {
-				child.entity.get<Transform>().is_dirty = true;
+				child.entity.get<Transform>()->is_dirty = true;
 				setChildrenDirty(&child);
 			}
 		}
@@ -307,7 +307,7 @@ namespace HBE {
 			bool has_state = has<EntityState>(entity);
 			if (!has_state)
 				continue;
-			if (get<EntityState>(entity).state == ENTITY_STATE_INACTIVE)
+			if (get<EntityState>(entity)->state == ENTITY_STATE_INACTIVE)
 				return false;
 		}
 		return true;

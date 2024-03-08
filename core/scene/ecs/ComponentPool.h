@@ -55,9 +55,9 @@ namespace HBE {
 		char *getMemory(entity_handle handle);
 
 		template<typename Component>
-		Component &getAs(entity_handle handle) {
+		Component *getAs(entity_handle handle) {
 			size_t i = handle - offset;
-			return *reinterpret_cast<Component *>(&data[i * info.size]);
+			return reinterpret_cast<Component *>(&data[i * info.size]);
 		}
 
 		void detach(entity_handle handle);

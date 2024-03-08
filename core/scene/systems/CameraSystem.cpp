@@ -16,9 +16,9 @@ namespace HBE {
 	}
 
 	void CameraSystem::onCameraAttached(Entity entity) {
-		Camera &camera = entity.get<Camera>();
-		if (camera.getRenderTarget() == nullptr)
-			camera.setRenderTarget(Graphics::getDefaultRenderTarget());
+		Camera *camera = entity.get<Camera>();
+		if (camera->getRenderTarget() == nullptr)
+			camera->setRenderTarget(Graphics::getDefaultRenderTarget());
 
 		if (!scene->getCameraEntity().valid()) {
 			scene->setCameraEntity(entity);
@@ -26,9 +26,9 @@ namespace HBE {
 	}
 
 	void CameraSystem::onCamera2DAttached(Entity entity) {
-		Camera2D &camera = entity.get<Camera2D>();
-		if (camera.getRenderTarget() == nullptr)
-			camera.setRenderTarget(Graphics::getDefaultRenderTarget());
+		Camera2D *camera = entity.get<Camera2D>();
+		if (camera->getRenderTarget() == nullptr)
+			camera->setRenderTarget(Graphics::getDefaultRenderTarget());
 
 		if (!scene->getCameraEntity().valid()) {
 			scene->setCameraEntity(entity);
@@ -36,9 +36,9 @@ namespace HBE {
 	}
 
 	void CameraSystem::onPixelCameraAttached(Entity entity) {
-		PixelCamera &camera = entity.get<PixelCamera>();
-		if (camera.getRenderTarget() == nullptr)
-			camera.setRenderTarget(Graphics::getDefaultRenderTarget());
+		PixelCamera *camera = entity.get<PixelCamera>();
+		if (camera->getRenderTarget() == nullptr)
+			camera->setRenderTarget(Graphics::getDefaultRenderTarget());
 
 		if (!scene->getCameraEntity().valid()) {
 			scene->setCameraEntity(entity);

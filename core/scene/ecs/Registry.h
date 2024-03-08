@@ -90,7 +90,7 @@ namespace HBE {
 		}
 
 		template<typename Component>
-		Component &get(entity_handle handle) {
+		Component *get(entity_handle handle) {
 			size_t signature_bit = type_registry.getSignatureBit<Component>();
 			initType<Component>(signature_bit);
 			HB_ASSERT(initialized_types.test(signature_bit), "component" + typeName<Component>() + " is not initialized");
@@ -123,7 +123,7 @@ namespace HBE {
 		bool valid(entity_handle handle);
 
 		template<typename Component>
-		Component &attach(entity_handle handle) {
+		Component *attach(entity_handle handle) {
 			const size_t signature_bit = type_registry.getSignatureBit<Component>();
 			initType<Component>(signature_bit);
 			size_t page = getPage(handle);

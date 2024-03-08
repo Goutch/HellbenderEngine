@@ -5,6 +5,7 @@
 #include "core/scene/Entity.h"
 #include "core/scene/System.h"
 #include "Event.h"
+
 using namespace utils;
 namespace HBE {
 
@@ -27,26 +28,15 @@ namespace HBE {
 	};
 
 	struct HB_API ButtonComponent {
-		Entity root;
-		Entity background_entity;
-		Entity text_entity;
-		Mesh *text_mesh = nullptr;
+		Entity entity;
+		Entity label_entity;
 		ButtonMaterial material_properties;
 		Event<Entity> onButtonClicked;
 
-	private:
-		std::string current_text;
-		float text_width = 0;
-		float text_height = 0;
-	public:
-		vec2 getTextSize() const;
-
-		const std::string& getCurerntText() const;
-
 		void setSize(vec2 size);
-
-		void setText(const std::string &text, Font *font);
-
+		void setText(const std::string &text);
+		void setFont(Font *font);
+		const std::string& getText();
 		void setTextHeight(float height);
 	};
 
@@ -76,18 +66,12 @@ namespace HBE {
 		GraphicPipelineInstance *default_button_hover_pipeline_instance = nullptr;
 		GraphicPipelineInstance *default_button_pressed_pipeline_instance = nullptr;
 
-
-		Font *default_font = nullptr;
-		Shader *default_text_frag_shader = nullptr;
-		Shader *default_text_vert_shader = nullptr;
-		GraphicPipeline *default_text_pipeline = nullptr;
-		GraphicPipelineInstance *default_text_pipeline_instance = nullptr;
-
 	public:
 
 		ButtonSystem(Scene *scene, RenderTarget *render_target);
 
 		~ButtonSystem();
+
 
 	private:
 		void onUpdate(float delta);

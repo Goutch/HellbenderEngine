@@ -47,18 +47,18 @@ namespace HBE {
 
 	void UIPanelSystem::onDrawSceneNode(RenderGraph *graph, SceneNode &node) {
 		if (node.entity.has<UIPanel>()) {
-			UIPanel &panel = node.entity.get<UIPanel>();
-			if (!panel.active || !panel.pipeline_instance) {
+			UIPanel *panel = node.entity.get<UIPanel>();
+			if (!panel->active || !panel->pipeline_instance) {
 				return;
 			}
-			Transform &transform = node.entity.get<Transform>();
+			Transform *transform = node.entity.get<Transform>();
 			DrawCmdInfo cmd{};
-			cmd.mesh = anchor_meshes[panel.anchor];
-			cmd.pipeline_instance = panel.pipeline_instance;
+			cmd.mesh = anchor_meshes[panel->anchor];
+			cmd.pipeline_instance = panel->pipeline_instance;
 			cmd.order_in_layer = node.getHierarchyOrder();
 			PanelPushConstant push_constant{};
-			push_constant.size = panel.size;
-			push_constant.world_matrix = transform.world();
+			push_constant.size = panel->size;
+			push_constant.world_matrix = transform->world();
 
 
 			PushConstantInfo push_constant_info{};
@@ -68,7 +68,7 @@ namespace HBE {
 			cmd.push_constants = &push_constant_info;
 			cmd.push_constants_count = 1;
 			cmd.flags = DRAW_CMD_FLAG_ORDERED;
-			cmd.layer = panel.layer;
+			cmd.layer = panel->layer;
 
 			graph->draw(cmd);
 		}

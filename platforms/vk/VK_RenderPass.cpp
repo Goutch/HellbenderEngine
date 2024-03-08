@@ -57,7 +57,7 @@ namespace HBE {
 			colorAttachment.format = vk_format;
 			colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 			colorAttachment.loadOp = (flags & RENDER_TARGET_FLAG_CLEAR_COLOR) ? VK_ATTACHMENT_LOAD_OP_CLEAR
-																			  : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+			                                                                  : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 			colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
@@ -73,12 +73,12 @@ namespace HBE {
 			depthAttachment.format = VK_Utils::getVkFormat(IMAGE_FORMAT_DEPTH32F);
 			depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 			depthAttachment.loadOp = (flags & RENDER_TARGET_FLAG_CLEAR_DEPTH) ? VK_ATTACHMENT_LOAD_OP_CLEAR
-																			  : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+			                                                                  : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			if (!(flags & RENDER_TARGET_FLAG_CLEAR_DEPTH))
 				Log::warning("Not clearing depth buffer will result in all depth test failing if the depth is not initialized to 1.0");
 			depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 			depthAttachment.stencilLoadOp = (flags & RENDER_TARGET_FLAG_CLEAR_DEPTH) ? VK_ATTACHMENT_LOAD_OP_CLEAR
-																					 : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+			                                                                         : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_STORE;
 			depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 			depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
@@ -124,7 +124,7 @@ namespace HBE {
 		render_pass_info.pDependencies = &dependency;
 
 		if (vkCreateRenderPass(device->getHandle(), &render_pass_info,
-							   nullptr, &handle) != VK_SUCCESS) {
+		                       nullptr, &handle) != VK_SUCCESS) {
 			Log::error("failed to create render pass!");
 		}
 		createFramebuffers();
@@ -260,7 +260,7 @@ namespace HBE {
 			framebuffer_create_info.height = height;
 			framebuffer_create_info.layers = 1;
 			if (vkCreateFramebuffer(device->getHandle(), &framebuffer_create_info, nullptr, &frame_buffers[i]) !=
-				VK_SUCCESS) {
+			    VK_SUCCESS) {
 				Log::error("Failed to create framebuffer!");
 			}
 		}
@@ -271,8 +271,9 @@ namespace HBE {
 	}
 
 	void VK_RenderPass::setResolution(uint32_t width, uint32_t height) {
-		this->width = width;
-		this->height = height;
+		this->width = width > 0 ? width : 1;
+		this->height = height > 0 ? height : 1;
+
 		recreate();
 		onResolutionChange.invoke(this);
 	}

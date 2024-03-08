@@ -38,7 +38,7 @@ namespace HBE {
 		}
 
 		template<typename Component>
-		Component &attach(entity_handle handle, ComponentTypeInfo &type) {
+		Component *attach(entity_handle handle, ComponentTypeInfo &type) {
 			size_t i = handleToIndex(handle);
 			HB_ASSERT(valid_entities[i], "Enitty#" + std::to_string(handle) + "is not valid");
 
@@ -54,7 +54,7 @@ namespace HBE {
 			Component component{};
 			char *raw_ptr = component_pages[type.signature_bit]->getMemory(handle);
 			Component *ptr = new(raw_ptr) Component{};
-			return *ptr;
+			return ptr;
 		};
 
 		void detach(entity_handle handle, ComponentTypeInfo &type) {

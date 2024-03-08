@@ -135,9 +135,9 @@ namespace HBE {
 	}
 
 	void CameraControllerSystem::onDetach(Entity entity) {
-		CameraController &c = entity.get<CameraController>();
-		Transform &t = entity.get<Transform>();
-		t.rotate(vec3(-c.current_pitch, 0, 0));
+		CameraController *c = entity.get<CameraController>();
+		Transform *t = entity.get<Transform>();
+		t->rotate(vec3(-c->current_pitch, 0, 0));
 	}
 
 }

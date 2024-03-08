@@ -400,10 +400,10 @@ namespace HBE {
 		}
 
 
-		if (vertex_buffer.size() > 0) {
+		//if (vertex_buffer.size() > 0) {
 			mesh.setBuffer(0, vertex_buffer.data(), vertex_count);
 			mesh.setVertexIndices(index_buffer.data(), index_buffer.size());
-		}
+		//}
 	}
 
 	Mesh *Geometry::createText(const std::string &text,

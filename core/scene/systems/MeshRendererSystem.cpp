@@ -5,7 +5,6 @@
 #include <core/scene/Scene.h>
 #include <core/graphics/RenderGraph.h>
 #include "core/scene/components/Transform.h"
-#include "core/scene/components/MeshRenderer.h"
 #include "core/scene/components/EntityState.h"
 
 namespace HBE {
@@ -54,13 +53,13 @@ namespace HBE {
 	void MeshRendererSystem::drawSceneNode(RenderGraph *render_graph, SceneNode &node) {
 		if (node.entity.has<MeshRenderer>()) {
 			DrawCmdInfo draw_cmd{};
-			MeshRenderer &mesh_renderer = node.entity.get<MeshRenderer>();
-			if (!mesh_renderer.active || !mesh_renderer.mesh || !mesh_renderer.pipeline_instance || !mesh_renderer.ordered) {
+			MeshRenderer *mesh_renderer = node.entity.get<MeshRenderer>();
+			if (!mesh_renderer->active || !mesh_renderer->mesh || !mesh_renderer->pipeline_instance || !mesh_renderer->ordered) {
 				return;
 			}
-			Transform &transform = node.entity.get<Transform>();
+			Transform *transform = node.entity.get<Transform>();
 
-			mat4 world_mat = transform.world();
+			mat4 world_mat = transform->world();
 
 			PushConstantInfo push_constant_info{};
 			push_constant_info.size = sizeof(mat4);
@@ -69,13 +68,13 @@ namespace HBE {
 			draw_cmd.push_constants_count = 1;
 			draw_cmd.push_constants = &push_constant_info;
 
-			draw_cmd.mesh = mesh_renderer.mesh;
-			draw_cmd.pipeline_instance = mesh_renderer.pipeline_instance;
-			draw_cmd.layer = mesh_renderer.layer;
+			draw_cmd.mesh = mesh_renderer->mesh;
+			draw_cmd.pipeline_instance = mesh_renderer->pipeline_instance;
+			draw_cmd.layer = mesh_renderer->layer;
 			draw_cmd.order_in_layer = node.getHierarchyOrder();
 			draw_cmd.flags = DRAW_CMD_FLAG_ORDERED;
 
-			mat4 world_matrix = transform.world();
+			mat4 world_matrix = transform->world();
 			push_constant_info.data = &world_matrix;
 			render_graph->draw(draw_cmd);
 		}

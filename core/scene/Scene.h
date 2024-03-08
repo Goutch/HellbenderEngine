@@ -18,7 +18,6 @@
 #include "core/scene/components/Camera2D.h"
 #include "core/scene/components/PixelCamera.h"
 #include "core/scene/components/ModelRenderer.h"
-#include "core/scene/components/MeshRenderer.h"
 
 
 namespace HBE {
@@ -121,19 +120,19 @@ namespace HBE {
 		std::list<SceneNode> getSceneNodes();
 
 		template<typename Component>
-		Component &get(entity_handle handle);
+		Component *get(entity_handle handle);
 
 		template<typename Component>
-		Component &get(entity_handle handle, size_t signature_bit);
+		Component *get(entity_handle handle, size_t signature_bit);
 
 		template<typename Component>
 		size_t getComponentSignatureBit();
 
 		template<typename Component>
-		Component &attach(entity_handle handle);
+		Component *attach(entity_handle handle);
 
 		template<typename Component>
-		Component &attach(entity_handle handle, Component &component);
+		Component *attach(entity_handle handle, Component &component);
 
 		template<typename Component>
 		bool has(entity_handle handle);
@@ -188,24 +187,24 @@ namespace HBE {
 	};
 
 	template<typename Component>
-	Component &Entity::attach(Component &component) {
+	Component *Entity::attach(Component &component) {
 		return scene->attach<Component>(handle, component);
 	}
 
 	template<typename Component>
-	Component &Entity::attach() {
+	Component *Entity::attach() {
 		return scene->attach<Component>(handle);
 	}
 
 	template<typename Component>
-	Component &Entity::get() {
+	Component *Entity::get() {
 		HB_ASSERT(scene->valid(handle), "Entity does not exist");
 		HB_ASSERT(scene->has<Component>(handle), std::string("Entity#") + std::to_string(handle) + " does not have component " + typeid(Component).name());
 		return scene->get<Component>(handle);
 	}
 
 	template<typename Component>
-	Component &Entity::get(size_t signature_bit) {
+	Component *Entity::get(size_t signature_bit) {
 		return scene->get<Component>(handle, signature_bit);
 	}
 
@@ -226,18 +225,18 @@ namespace HBE {
 
 
 	template<typename Component>
-	Component &Scene::get(entity_handle handle) {
+	Component *Scene::get(entity_handle handle) {
 		return registry.get<Component>(handle);
 	}
 
 	template<typename Component>
-	Component &Scene::get(entity_handle handle, size_t id) {
+	Component *Scene::get(entity_handle handle, size_t id) {
 		return registry.get<Component>(handle, id);
 	}
 
 	template<typename Component>
-	Component &Scene::attach(entity_handle handle) {
-		Component &component = registry.attach<Component>(handle);
+	Component *Scene::attach(entity_handle handle) {
+		Component *component = registry.attach<Component>(handle);
 		Entity e = Entity(handle, this);
 		size_t bit = registry.type_registry.getSignatureBit<Component>();
 		if (attach_events.find(bit) != attach_events.end())
@@ -247,7 +246,7 @@ namespace HBE {
 
 
 	template<typename Component>
-	Component &Scene::attach(entity_handle handle, Component &component) {
+	Component *Scene::attach(entity_handle handle, Component &component) {
 		size_t hash = registry.type_registry.getSignatureBit<Component>();
 		Component &component_ref = registry.attach<Component>(handle, component);
 
