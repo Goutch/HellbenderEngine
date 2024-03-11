@@ -1,6 +1,6 @@
 
 #pragma once
-
+#include "Core.h"
 #include "string"
 #include "core/scene/System.h"
 #include "core/scene/Entity.h"

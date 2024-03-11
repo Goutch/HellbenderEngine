@@ -96,6 +96,7 @@ set(CORE_FILES
         core/scene/systems/ui/TextBoxSystem.cpp
         core/scene/systems/MeshRendererSystem.cpp
         core/scene/systems/ModelRendererSystem.cpp
+        core/scene/systems/ui/LabelSystem.cpp
 
         core/resource/AudioClip.cpp
         core/resource/AudioClip.h
