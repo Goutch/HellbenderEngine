@@ -44,7 +44,12 @@ namespace HBE {
 			//rotate on y axis
 			transform.rotate(vec3(0, mouse_delta.x, 0));
 			//go back to current pitch
-			controller.current_pitch += mouse_delta.y;
+
+			if (!controller.invert_y)
+				controller.current_pitch += mouse_delta.y;
+			else
+				controller.current_pitch -=  mouse_delta.y;
+
 			controller.current_pitch = glm::clamp(controller.current_pitch, -max_pitch_radian, max_pitch_radian);
 
 			transform.rotate(vec3(controller.current_pitch, 0, 0));
