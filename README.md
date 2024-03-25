@@ -46,11 +46,12 @@
 #### TODO :
 - [x] Model loading 
 - [ ] Model animations
-- [ ] Support for Multiple descriptor sets
+- [x] Support for Multiple descriptor sets
 - [ ] ECS multithreading support
 ## Getting started
-
-### Wiki
+### Examples
+- [HellbenderExamples](https://github.com/Goutch/HellbenderExamples) Repo
+### Wiki (Might be Out of date...)
 - [Home](https://github.com/Goutch/HellbenderEngine/wiki)
 ## Qestions and Answers
 Q: Why should I use this engine instead of unity/unreal?  
@@ -62,7 +63,7 @@ These are 2 tested compilers :
 - GCC (sometimes)
 
 ### Notes:
-HBE used to support Opengl but it is deprecated as of now I am not sure if I will support it in the future. Checkout the opengl branch if you want a "working" Opengl version.(Warning the engine was nothing like it is today)
+HBE used to support Opengl but it is deprecated as of now I am not sure if I will support it in the future. Checkout the opengl branch if you want a "working" Opengl version.(Warning: the engine was nothing like it is today)
 
 ![Path Tracing Screenshot](https://github.com/Goutch/HellbenderEngine/blob/develop/screenshots/pathtracing.PNG)
 
