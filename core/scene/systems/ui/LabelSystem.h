@@ -63,7 +63,7 @@ namespace HBE {
 
 		void drawSceneNode(RenderGraph *graph, SceneNode &node);
 
-		~LabelSystem();
+		~LabelSystem() override;
 
 		void onDetachLabel(Entity label);
 
