@@ -407,20 +407,19 @@ namespace HBE {
 		VK_Image **vk_texture = reinterpret_cast<VK_Image **>(textures);
 		std::vector<VkDescriptorImageInfo> image_infos;
 
-		VkWriteDescriptorSet write_descriptor_set = descriptor_pool.writes[frame][binding];
-
-		image_infos.resize(write_descriptor_set.descriptorCount);
-		for (uint32_t i = 0; i < write_descriptor_set.descriptorCount; ++i) {
-			int index = i >= texture_count ? texture_count - 1 : i;
-
-			image_infos[i].imageLayout = vk_texture[index]->getImageLayout();
-			image_infos[i].imageView = vk_texture[index]->getImageView(mip_level);
-			image_infos[i].sampler = vk_texture[index]->getSampler();
-		}
-
 
 		if (frame == -1) {
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+				VkWriteDescriptorSet write_descriptor_set = descriptor_pool.writes[i][binding];
+
+				image_infos.resize(write_descriptor_set.descriptorCount);
+				for (uint32_t i = 0; i < write_descriptor_set.descriptorCount; ++i) {
+					int index = i >= texture_count ? texture_count - 1 : i;
+
+					image_infos[i].imageLayout = vk_texture[index]->getImageLayout();
+					image_infos[i].imageView = vk_texture[index]->getImageView(mip_level);
+					image_infos[i].sampler = vk_texture[index]->getSampler();
+				}
 				write_descriptor_set.pImageInfo = image_infos.data();
 				vkUpdateDescriptorSets(device->getHandle(),
 									   1,
@@ -429,6 +428,16 @@ namespace HBE {
 									   nullptr);
 			}
 		} else {
+			VkWriteDescriptorSet write_descriptor_set = descriptor_pool.writes[frame][binding];
+
+			image_infos.resize(write_descriptor_set.descriptorCount);
+			for (uint32_t i = 0; i < write_descriptor_set.descriptorCount; ++i) {
+				int index = i >= texture_count ? texture_count - 1 : i;
+
+				image_infos[i].imageLayout = vk_texture[index]->getImageLayout();
+				image_infos[i].imageView = vk_texture[index]->getImageView(mip_level);
+				image_infos[i].sampler = vk_texture[index]->getSampler();
+			}
 			write_descriptor_set.pImageInfo = image_infos.data();
 			vkUpdateDescriptorSets(device->getHandle(),
 								   1,

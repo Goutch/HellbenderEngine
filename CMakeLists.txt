@@ -207,7 +207,7 @@ set(VK_FILES
         platforms/vk/VK_TexelBuffer.h
         platforms/vk/VK_Utils.h
         platforms/vk/VK_DescriptorSetLayout.cpp
-        platforms/vk/VK_DescriptorSetLayout.h platforms/vk/VK_RenderTarget.cpp platforms/vk/VK_RenderTarget.h platforms/vk/VK_DynamicRenderTarget.cpp platforms/vk/VK_DynamicRenderTarget.h)
+        platforms/vk/VK_DescriptorSetLayout.h platforms/vk/VK_RenderTarget.cpp platforms/vk/VK_RenderTarget.h platforms/vk/VK_DynamicRenderTarget.cpp platforms/vk/VK_DynamicRenderTarget.h core/graphics/GraphicLimits.h)
 
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")

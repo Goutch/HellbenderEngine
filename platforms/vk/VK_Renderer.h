@@ -1,5 +1,4 @@
 #pragma once
-
 #include "core/graphics/Renderer.h"
 #include "vulkan/vulkan.h"
 #include "VK_Semaphore.h"
@@ -28,7 +27,6 @@ namespace HBE {
 	class VK_CommandPool;
 
 	class VK_Fence;
-
 
 	class VK_Renderer : public Renderer {
 
@@ -102,12 +100,14 @@ namespace HBE {
 
 		uint32_t getCurrentFrame() const override;
 
-
 		const VK_Instance *getInstance() const;
 
 		void waitAll();
 
 		VkSampler getDefaultSampler();
+
+		GraphicLimits getLimits() override;
+
 
 	private:
 

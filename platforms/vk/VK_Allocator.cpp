@@ -52,7 +52,7 @@ namespace HBE {
 
 		for (uint32_t i = 0; i < memory_propeties->memoryTypeCount; i++) {
 			if ((type_filter & (1 << i)) &&
-				(memory_propeties->memoryTypes[i].propertyFlags & properties) == properties) {
+			    (memory_propeties->memoryTypes[i].propertyFlags & properties) == properties) {
 				return i;
 			}
 		}
@@ -93,7 +93,7 @@ namespace HBE {
 	std::string VK_Allocator::allocToString(const Allocation &alloc) {
 
 		return "Alloc#" + std::to_string(alloc.id) + " " + std::to_string(alloc.size) + " bytes of " + memoryTypeToString(alloc.block->memory_type_index) +
-			   " at position " + std::to_string(alloc.offset) + " in block " + std::to_string(alloc.block->index);
+		       " at position " + std::to_string(alloc.offset) + " in block " + std::to_string(alloc.block->index);
 
 	}
 
@@ -141,13 +141,58 @@ namespace HBE {
 		}
 	}
 
-	void VK_Allocator::update(VK_Image &image, const void *data, size_t width, size_t height, size_t depth) {
-		StagingBuffer staging_buffer = createTempStagingBuffer(data, width * height * depth * image.bytePerPixel());
+	void VK_Allocator::updateRegions(VK_Image &image, const void *data, uint32_t data_texel_count, TextureRegionUpdateInfo *update_infos, uint32_t update_count) {
+		VkBufferImageCopy *regions_copy_infos = new VkBufferImageCopy[update_count];
+
+		command_pool->begin();
+
+		StagingBuffer staging_buffer = createTempStagingBuffer(data, data_texel_count * image.bytePerPixel());
 		staging_buffer.fence = &command_pool->getCurrentFence();
+		barrierTransitionImageLayout(command_pool, &image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+		for (int i = 0; i < update_count; ++i) {
+			HB_ASSERT(data_texel_count - update_infos->data_texel_offset >= (update_infos[i].size.x * update_infos[i].size.y * update_infos->size.z),
+			          "Data size must be greater than or equal to the size of the region to update.");
 
-		copy(staging_buffer.buffer, &image, image.getDesiredLayout());
+			regions_copy_infos[i] = {};
+			regions_copy_infos[i].bufferOffset = update_infos[i].data_texel_offset * image.bytePerPixel();
+			regions_copy_infos[i].bufferRowLength = 0;
+			regions_copy_infos[i].bufferImageHeight = 0;
 
+			regions_copy_infos[i].imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			regions_copy_infos[i].imageSubresource.mipLevel = 0;
+			regions_copy_infos[i].imageSubresource.baseArrayLayer = 0;
+			regions_copy_infos[i].imageSubresource.layerCount = 1;
+			regions_copy_infos[i].imageOffset = {update_infos[i].offset.x, update_infos[i].offset.y, update_infos[i].offset.z};
+			regions_copy_infos[i].imageExtent = {update_infos[i].size.x, update_infos[i].size.y, update_infos[i].size.z};
+		}
+		vkCmdCopyBufferToImage(
+				command_pool->getCurrentBuffer(),
+				staging_buffer.buffer,
+				image.getHandle(),
+				VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+				update_count,
+				regions_copy_infos
+		);
 		staging_buffers_delete_queue.emplace(staging_buffer);
+		if (image.getMipLevelCount() > 1) {
+			generateMipmaps(image);
+		} else {
+			barrierTransitionImageLayout(command_pool, &image, image.getDesiredLayout());
+		}
+
+		command_pool->end();
+		command_pool->submit(QUEUE_FAMILY_GRAPHICS);
+
+
+		delete regions_copy_infos;
+	}
+
+	void VK_Allocator::update(VK_Image &image, const void *data, uint32_t width, uint32_t depth, uint32_t height) {
+		TextureRegionUpdateInfo info{};
+		info.offset = vec3i(0, 0, 0);
+		info.size = vec3u(width, height, depth);
+
+		updateRegions(image, data, width * height * depth, &info, 1);
 	}
 
 	//https://www.khronos.org/registry/vulkan/specs/1.2-extensions/man/html/VkMemoryPropertyFlagBits.html
@@ -279,15 +324,15 @@ namespace HBE {
 		barriers[1].srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 		barriers[1].pNext = nullptr;
 		vkCmdPipelineBarrier(command_pool->getCurrentBuffer(),
-							 VK_PIPELINE_STAGE_TRANSFER_BIT,
-							 VK_PIPELINE_STAGE_VERTEX_INPUT_BIT | VK_PIPELINE_STAGE_TRANSFER_BIT,
-							 0,
-							 0,
-							 nullptr,
-							 2,
-							 barriers,
-							 0,
-							 nullptr);
+		                     VK_PIPELINE_STAGE_TRANSFER_BIT,
+		                     VK_PIPELINE_STAGE_VERTEX_INPUT_BIT | VK_PIPELINE_STAGE_TRANSFER_BIT,
+		                     0,
+		                     0,
+		                     nullptr,
+		                     2,
+		                     barriers,
+		                     0,
+		                     nullptr);
 
 
 		VkBufferCopy copyRegion{};
@@ -319,8 +364,8 @@ namespace HBE {
 
 		barrier.image = image->getHandle();
 		barrier.subresourceRange.aspectMask = (new_layout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL || new_layout == VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL) ?
-											  VK_IMAGE_ASPECT_DEPTH_BIT :
-											  VK_IMAGE_ASPECT_COLOR_BIT;
+		                                      VK_IMAGE_ASPECT_DEPTH_BIT :
+		                                      VK_IMAGE_ASPECT_COLOR_BIT;
 		barrier.subresourceRange.baseMipLevel = 0;
 		barrier.subresourceRange.levelCount = image->getMipLevelCount();
 		barrier.subresourceRange.baseArrayLayer = 0;
@@ -457,10 +502,10 @@ namespace HBE {
 				barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
 
 				vkCmdPipelineBarrier(command_pool->getCurrentBuffer(),
-									 VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0,
-									 0, nullptr,
-									 0, nullptr,
-									 1, &barrier);
+				                     VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0,
+				                     0, nullptr,
+				                     0, nullptr,
+				                     1, &barrier);
 
 				VkImageBlit blit{};
 				blit.srcOffsets[0] = {0, 0, 0};
@@ -471,8 +516,8 @@ namespace HBE {
 				blit.srcSubresource.layerCount = 1;
 				blit.dstOffsets[0] = {0, 0, 0};
 				blit.dstOffsets[1] = {mipWidth > 1 ? mipWidth / 2 : 1,
-									  mipHeight > 1 ? mipHeight / 2 : 1,
-									  mipDepth > 1 ? mipDepth / 2 : 1};
+				                      mipHeight > 1 ? mipHeight / 2 : 1,
+				                      mipDepth > 1 ? mipDepth / 2 : 1};
 				blit.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 				blit.dstSubresource.mipLevel = i;
 				blit.dstSubresource.baseArrayLayer = 0;
@@ -480,10 +525,10 @@ namespace HBE {
 
 
 				vkCmdBlitImage(command_pool->getCurrentBuffer(),
-							   image.getHandle(), VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-							   image.getHandle(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-							   1, &blit,
-							   filter);
+				               image.getHandle(), VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+				               image.getHandle(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+				               1, &blit,
+				               filter);
 
 				barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
 				barrier.newLayout = image.getDesiredLayout();
@@ -491,10 +536,10 @@ namespace HBE {
 				barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 
 				vkCmdPipelineBarrier(command_pool->getCurrentBuffer(),
-									 VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0,
-									 0, nullptr,
-									 0, nullptr,
-									 1, &barrier);
+				                     VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0,
+				                     0, nullptr,
+				                     0, nullptr,
+				                     1, &barrier);
 
 				if (mipWidth > 1) mipWidth /= 2;
 				if (mipHeight > 1) mipHeight /= 2;
@@ -508,10 +553,10 @@ namespace HBE {
 			barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 
 			vkCmdPipelineBarrier(command_pool->getCurrentBuffer(),
-								 VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0,
-								 0, nullptr,
-								 0, nullptr,
-								 1, &barrier);
+			                     VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0,
+			                     0, nullptr,
+			                     0, nullptr,
+			                     1, &barrier);
 
 
 			image.setImageLayout(image.getDesiredLayout());
@@ -522,25 +567,9 @@ namespace HBE {
 		}
 	}
 
-	void VK_Allocator::copy(VkBuffer src, VK_Image *dest, VkImageLayout dst_end_layout) {
+	void VK_Allocator::copy(VkBuffer src, VK_Image *dest, VkImageLayout dst_end_layout, VkBufferImageCopy region) {
 		command_pool->begin();
 		barrierTransitionImageLayout(command_pool, dest, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-		VkBufferImageCopy region{};
-		region.bufferOffset = 0;
-		region.bufferRowLength = 0;
-		region.bufferImageHeight = 0;
-
-		region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		region.imageSubresource.mipLevel = 0;
-		region.imageSubresource.baseArrayLayer = 0;
-		region.imageSubresource.layerCount = 1;
-
-		region.imageOffset = {0, 0, 0};
-		region.imageExtent = {
-				dest->getWidth(),
-				dest->getHeight(),
-				dest->getDepth()
-		};
 		vkCmdCopyBufferToImage(
 				command_pool->getCurrentBuffer(),
 				src,

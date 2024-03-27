@@ -7,6 +7,7 @@
 #include "VK_Fence.h"
 #include "VK_Semaphore.h"
 #include "VK_Utils.h"
+
 namespace HBE {
 	uint32_t VK_Image::current_id = 0;
 
@@ -22,7 +23,12 @@ namespace HBE {
 	}
 
 	void VK_Image::update(const void *data) {
-		device->getAllocator()->update(*this, data, width, height, depth);
+		device->getAllocator()->update(*this, data, width, depth, height);
+	}
+
+
+	void VK_Image::updateRegion(const void *data, uint32_t data_texel_count, TextureRegionUpdateInfo* update_info, uint32_t update_count) {
+		device->getAllocator()->updateRegions(*this, data, data_texel_count, update_info, update_count);
 	}
 
 	VK_Image::VK_Image(VK_Device *device, const TextureInfo &info) {
@@ -50,7 +56,7 @@ namespace HBE {
 			type = VK_IMAGE_TYPE_3D;
 			view_type = VK_IMAGE_VIEW_TYPE_3D;
 		}
-		vk_format =  VK_Utils::getVkFormat(format);
+		vk_format = VK_Utils::getVkFormat(format);
 		byte_per_pixel = VK_Utils::getFormatStride(format);
 
 		layout = VK_IMAGE_LAYOUT_UNDEFINED;
@@ -98,8 +104,8 @@ namespace HBE {
 			//image data is set right now
 			update(info.data);
 		} else if (info.flags & IMAGE_FLAG_RENDER_TARGET ||
-				   info.flags & IMAGE_FLAG_DEPTH ||
-				   info.flags & IMAGE_FLAG_SHADER_WRITE) {
+		           info.flags & IMAGE_FLAG_DEPTH ||
+		           info.flags & IMAGE_FLAG_SHADER_WRITE) {
 			//image data will be set in the sahder
 			device->getAllocator()->setImageLayout(this, desired_layout);
 		} else {
@@ -173,11 +179,11 @@ namespace HBE {
 		device->getAllocator()->free(allocation);
 	}
 
-	const VkSampler& VK_Image::getSampler() const {
+	const VkSampler &VK_Image::getSampler() const {
 		return sampler_handle;
 	}
 
-	const VkImageView& VK_Image::getImageView(uint32_t mip_level) const {
+	const VkImageView &VK_Image::getImageView(uint32_t mip_level) const {
 		HB_ASSERT(mip_level < mip_levels, "Texture does not have mip level " + std::to_string(mip_level));
 		return image_views[mip_level];
 	}
@@ -202,7 +208,7 @@ namespace HBE {
 		return vk_format;
 	}
 
-	const VkImage& VK_Image::getHandle() const {
+	const VkImage &VK_Image::getHandle() const {
 		return handle;
 	}
 
@@ -225,6 +231,7 @@ namespace HBE {
 	uint32_t VK_Image::getMipLevelCount() const {
 		return mip_levels;
 	}
+
 
 
 }

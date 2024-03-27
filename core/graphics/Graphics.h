@@ -5,7 +5,7 @@
 #include <string>
 #include "glm/glm.hpp"
 #include "Renderer.h"
-
+#include "GraphicLimits.h"
 
 namespace HBE {
 	class Renderer;
@@ -29,11 +29,13 @@ namespace HBE {
 	class RenderTarget;
 
 	class Texture;
+
 	using namespace utils;
+
 	class HB_API Graphics {
 		static Renderer *renderer;
 		static Window *window;
-
+		static GraphicLimits limits;
 	public:
 		static Event<uint32_t> onFrameChange;
 		static Event<uint32_t, uint32_t> onSwapchainResized;
@@ -44,6 +46,8 @@ namespace HBE {
 		static void init(const char *title, uint32_t width, uint32_t height, bool fullscreen = false);
 
 		static Window *getWindow();
+
+		static const GraphicLimits &getLimits();
 
 		static void render(RenderCmdInfo &render_cmd_info);
 

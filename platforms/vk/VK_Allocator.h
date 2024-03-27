@@ -7,6 +7,7 @@
 #include "set"
 #include "string"
 #include "queue"
+#include "core/resource/Texture.h"
 
 namespace HBE {
 	class VK_CommandPool;
@@ -103,7 +104,7 @@ namespace HBE {
 
 		void copy(VkBuffer src, VkBuffer dest, VkDeviceSize size, VkDeviceSize offset = 0);
 
-		void copy(VkBuffer src, VK_Image *dest, VkImageLayout dst_end_layout);
+		void copy(VkBuffer src, VK_Image *dest, VkImageLayout dst_end_layout,VkBufferImageCopy region);
 
 		void copy(VK_Image *src, VkImageLayout src_end_layout, VK_Image *dest, VkImageLayout dst_end_layout);
 
@@ -111,7 +112,9 @@ namespace HBE {
 
 		void update(const VK_Buffer &buffer, const void *data, size_t size, size_t offset = 0);
 
-		void update(VK_Image &image, const void *data, size_t width, size_t height = 1, size_t depth = 1);
+		void update(VK_Image &image, const void *data, uint32_t width, uint32_t depth, uint32_t height);
+
+		void updateRegions(VK_Image &image, const void *data, uint32_t data_texel_count, TextureRegionUpdateInfo *update_infos, uint32_t update_count);
 
 		void freeStagingBuffers();
 

@@ -53,8 +53,13 @@ namespace HBE {
 
 	};
 
-	class HB_API Texture : public Resource {
+	struct TextureRegionUpdateInfo {
+		uint32_t data_texel_offset;
+		vec3i offset;
+		vec3u size;
+	};
 
+	class HB_API Texture : public Resource {
 	public:
 		virtual ~Texture() = default;
 
@@ -67,6 +72,8 @@ namespace HBE {
 		virtual vec3u getSize() const = 0;
 
 		virtual void update(const void *data) = 0;
+
+		virtual void updateRegion(const void *data, uint32_t data_texel_count, TextureRegionUpdateInfo *update_infos, uint32_t update_count) = 0;
 
 		static Texture *load(const std::string &path, IMAGE_FORMAT format, IMAGE_FLAGS flags);
 	};

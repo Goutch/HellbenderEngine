@@ -6,6 +6,7 @@
 #include "glm/glm.hpp"
 #include "Event.h"
 #include <string>
+#include "GraphicLimits.h"
 
 namespace HBE {
 
@@ -121,5 +122,7 @@ namespace HBE {
 		virtual void waitCurrentFrame() = 0;
 
 		virtual void waitLastFrame() = 0;
+
+		virtual GraphicLimits getLimits() = 0;
 	};
 }

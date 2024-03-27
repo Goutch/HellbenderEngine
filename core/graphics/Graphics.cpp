@@ -15,7 +15,7 @@ namespace HBE {
 	Event<uint32_t, uint32_t> Graphics::onSwapchainResized;
 	Renderer *Graphics::renderer = nullptr;
 	Window *Graphics::window = nullptr;
-
+	GraphicLimits Graphics::limits;
 	void Graphics::init(const char *title, uint32_t width, uint32_t height, bool fullscreen) {
 
 		window = Window::create(title, width, height);
@@ -24,6 +24,7 @@ namespace HBE {
 		renderer = Renderer::create();
 		Resources::init(*renderer->getResourceFactory());
 		renderer->createDefaultResources();
+		limits = renderer->getLimits();
 	}
 
 	void Graphics::render(RenderCmdInfo &render_cmd_info) {
@@ -78,8 +79,13 @@ namespace HBE {
 	void Graphics::waitCurrentFrame() {
 		renderer->waitCurrentFrame();
 	}
-	void Graphics::waitLastFrame(){
+
+	void Graphics::waitLastFrame() {
 		renderer->waitLastFrame();
+	}
+
+	const GraphicLimits &Graphics::getLimits() {
+		return limits;
 	}
 
 }

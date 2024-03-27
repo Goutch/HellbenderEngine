@@ -40,6 +40,7 @@ namespace HBE {
 		uint32_t getDepth() const override;
 		vec3u getSize() const override;
 		void update(const void *data) override;
+		void updateRegion(const void *data, uint32_t data_texel_count, TextureRegionUpdateInfo* update_info, uint32_t update_count) override;
 
 		const VkSampler& getSampler() const;
 		const VkImage& getHandle() const;

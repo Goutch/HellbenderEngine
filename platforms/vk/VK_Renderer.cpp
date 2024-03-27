@@ -231,13 +231,13 @@ namespace HBE {
 		vk_pipeline_instance->bind();
 
 		device->vkCmdTraceRaysKHR(command_pool->getCurrentBuffer(),
-								  &vk_pipeline->getRaygenShaderBindingTable(),
-								  &vk_pipeline->getMissShaderBindingTable(),
-								  &vk_pipeline->getHitShaderBindingTable(),
-								  &vk_pipeline->getCallableShaderBindingTable(),
-								  trace_rays_cmd_info.resolution.x,
-								  trace_rays_cmd_info.resolution.y,
-								  1);
+		                          &vk_pipeline->getRaygenShaderBindingTable(),
+		                          &vk_pipeline->getMissShaderBindingTable(),
+		                          &vk_pipeline->getHitShaderBindingTable(),
+		                          &vk_pipeline->getCallableShaderBindingTable(),
+		                          trace_rays_cmd_info.resolution.x,
+		                          trace_rays_cmd_info.resolution.y,
+		                          1);
 		//TODO:Might need barrier here
 
 
@@ -258,11 +258,11 @@ namespace HBE {
 		HB_PROFILE_BEGIN("AquireImage");
 		frame_presented = true;
 		VkResult result = vkAcquireNextImageKHR(device->getHandle(),
-												swapchain->getHandle(),
-												UINT64_MAX,
-												frames[current_frame].image_available_semaphore->getHandle(),
-												VK_NULL_HANDLE,
-												&current_image);
+		                                        swapchain->getHandle(),
+		                                        UINT64_MAX,
+		                                        frames[current_frame].image_available_semaphore->getHandle(),
+		                                        VK_NULL_HANDLE,
+		                                        &current_image);
 
 		if (result == VK_ERROR_OUT_OF_DATE_KHR) {
 			reCreateSwapchain();
@@ -327,11 +327,11 @@ namespace HBE {
 		VkSemaphore signal_semaphores[] = {frames[current_frame].finished_semaphore->getHandle()};
 
 		command_pool->submit(QUEUE_FAMILY_GRAPHICS,
-							 wait_semaphores,
-							 stages,
-							 1,
-							 signal_semaphores,
-							 1);
+		                     wait_semaphores,
+		                     stages,
+		                     1,
+		                     signal_semaphores,
+		                     1);
 		VkPresentInfoKHR presentInfo{};
 		presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 
@@ -437,7 +437,7 @@ namespace HBE {
 		render_target_info.height = swapchain->getExtent().height;
 		render_target_info.clear_color = vec4(0.f, 0.f, 0.f, 1.f);
 		render_target_info.format = IMAGE_FORMAT_SRGBA8_NON_LINEAR;
-		render_target_info.flags = RENDER_TARGET_FLAG_COLOR_ATTACHMENT | RENDER_TARGET_FLAG_DEPTH_ATTACHMENT |RENDER_TARGET_FLAG_CLEAR_COLOR| RENDER_TARGET_FLAG_CLEAR_DEPTH;
+		render_target_info.flags = RENDER_TARGET_FLAG_COLOR_ATTACHMENT | RENDER_TARGET_FLAG_DEPTH_ATTACHMENT | RENDER_TARGET_FLAG_CLEAR_COLOR | RENDER_TARGET_FLAG_CLEAR_DEPTH;
 
 		main_render_target = Resources::createRenderTarget(render_target_info, "DEFAULT_RENDER_TARGET");
 
@@ -466,6 +466,17 @@ namespace HBE {
 		screen_pipeline_instance_info.graphic_pipeline = screen_pipeline;
 		screen_pipeline_instance = new VK_GraphicPipelineInstance(this, screen_pipeline_instance_info);
 		Resources::add("DEFAULT_SCREEN_PIPELINE_INSTANCE", screen_pipeline_instance);
+	}
+
+	GraphicLimits VK_Renderer::getLimits() {
+		VkPhysicalDeviceLimits device_limits = device->getPhysicalDevice().getProperties().limits;
+		GraphicLimits limits{};
+		limits.max_1D_texture_size = device_limits.maxImageDimension1D;
+		limits.max_2D_texture_size = device_limits.maxImageDimension2D;
+		limits.max_3D_texture_size = device_limits.maxImageDimension3D;
+
+		limits.max_storage_buffer_size = device_limits.maxStorageBufferRange;
+		return limits;
 	}
 
 	void VK_Renderer::waitCurrentFrame() {
