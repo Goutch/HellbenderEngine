@@ -57,16 +57,16 @@ namespace HBE {
 		descriptors->setTextureArray(descriptors->getBinding(name), texture, texture_count, frame, mip_level);
 	}
 
-	void VK_GraphicPipelineInstance::setStorageBuffer(uint32_t binding, StorageBuffer *buffer, int32_t frame) {
-		descriptors->setStorageBuffer(binding, buffer, frame);
+	void VK_GraphicPipelineInstance::setStorageBuffer(uint32_t binding, StorageBuffer *buffer, size_t count, size_t offset, int32_t frame) {
+		descriptors->setStorageBuffer(binding, buffer, count, offset, frame);
 	}
 
 	void VK_GraphicPipelineInstance::setStorageBufferArray(uint32_t binding, StorageBuffer **buffers, uint32_t count, int32_t frame) {
 		descriptors->setStorageBufferArray(binding, buffers, count, frame);
 	}
 
-	void VK_GraphicPipelineInstance::setStorageBuffer(const std::string &name, StorageBuffer *buffer, int32_t frame) {
-		descriptors->setStorageBuffer(descriptors->getBinding(name), buffer, frame);
+	void VK_GraphicPipelineInstance::setStorageBuffer(const std::string &name, StorageBuffer *buffer, size_t count, size_t offset, int32_t frame) {
+		descriptors->setStorageBuffer(descriptors->getBinding(name), buffer, 0, 0, frame);
 	}
 
 	void VK_GraphicPipelineInstance::setStorageBufferArray(const std::string &name, StorageBuffer **buffers, uint32_t count, int32_t frame) {

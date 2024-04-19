@@ -16,9 +16,6 @@ namespace HBE {
 		GRAPHIC_PIPELINE_INSTANCE_FLAGS flags = GRAPHIC_PIPELINE_INSTANCE_FLAG_NONE;
 	};
 
-	/**
-	 * @brief A Material contains the uniform buffers(descriptorSets) and textures to use in a graphic pipeline.
-	 */
 	class HB_API GraphicPipelineInstance : public IPipelineInstance {
 	public:
 		virtual const GraphicPipeline *getGraphicPipeline() const = 0;

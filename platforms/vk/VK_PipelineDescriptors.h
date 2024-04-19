@@ -87,7 +87,7 @@ namespace HBE {
 
 		void setAccelerationStructure(uint32_t binding, const VK_TopLevelAccelerationStructure *acceleration_structure, int32_t frame);
 
-		void setStorageBuffer(uint32_t binding, StorageBuffer *buffer, int32_t frame);
+		void setStorageBuffer(uint32_t binding, StorageBuffer *buffer, size_t count, size_t offset, int32_t frame);
 
 		void setStorageBufferArray(uint32_t binding, StorageBuffer **buffers, uint32_t count, int32_t frame);
 

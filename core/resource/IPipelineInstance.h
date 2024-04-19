@@ -25,9 +25,9 @@ namespace HBE {
 		virtual void setTexture(const std::string &name, const Texture *texture, int32_t frame = -1, uint32_t mip_level = 0) = 0;
 		virtual void setTextureArray(const std::string &name, Texture **texture, uint32_t texture_count, int32_t frame = -1, uint32_t mip_level = 0) = 0;
 
-		virtual void setStorageBuffer(uint32_t binding, StorageBuffer *buffer, int32_t frame = -1) = 0;
+		virtual void setStorageBuffer(uint32_t binding, StorageBuffer *buffer, size_t count, size_t offset, int32_t frame) = 0;
 		virtual void setStorageBufferArray(uint32_t binding, StorageBuffer **buffers, uint32_t count, int32_t frame = -1) = 0;
-		virtual void setStorageBuffer(const std::string &name, StorageBuffer *buffer, int32_t frame = -1) = 0;
+		virtual void setStorageBuffer(const std::string &name, StorageBuffer *buffer, size_t count, size_t offset, int32_t frame = -1) = 0;
 		virtual void setStorageBufferArray(const std::string &name, StorageBuffer **buffers, uint32_t count, int32_t frame = -1) = 0;
 
 		virtual void setTexelBuffer(uint32_t binding,TexelBuffer *buffer, int32_t frame = -1) = 0;

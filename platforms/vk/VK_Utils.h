@@ -100,6 +100,15 @@ namespace HBE {
 				case IMAGE_FORMAT_SRGBA8_NON_LINEAR:
 					vk_format = VK_FORMAT_R8G8B8A8_SRGB;
 					break;
+				case IMAGE_FORMAT_R32_UINT:
+					vk_format = VK_FORMAT_R32_UINT;
+					break;
+				case IMAGE_FORMAT_RG32_UINT:
+					vk_format = VK_FORMAT_R32G32_UINT;
+					break;
+				case IMAGE_FORMAT_RGB32_UINT:
+					vk_format = VK_FORMAT_R32G32B32_UINT;
+					break;
 				case IMAGE_FORMAT_RGBA32_UINT:
 					vk_format = VK_FORMAT_R32G32B32A32_UINT;
 					break;

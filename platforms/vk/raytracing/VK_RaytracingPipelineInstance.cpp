@@ -57,8 +57,8 @@ namespace HBE {
 		descriptors->setTextureArray(binding, texture, texture_count, mip_level, frame);
 	}
 
-	void VK_RaytracingPipelineInstance::setStorageBuffer(uint32_t binding, StorageBuffer *buffer, int32_t frame) {
-		descriptors->setStorageBuffer(binding, buffer, frame);
+	void VK_RaytracingPipelineInstance::setStorageBuffer(uint32_t binding, StorageBuffer *buffer, size_t count, size_t offset, int32_t frame) {
+		descriptors->setStorageBuffer(binding, buffer, count, offset, frame);
 	}
 
 	void VK_RaytracingPipelineInstance::setStorageBufferArray(uint32_t binding, StorageBuffer **buffer, uint32_t count, int32_t frame) {
@@ -69,8 +69,8 @@ namespace HBE {
 		descriptors->setStorageBufferArray(descriptors->getBinding(name), buffer, count, frame);
 	}
 
-	void VK_RaytracingPipelineInstance::setStorageBuffer(const std::string &name, StorageBuffer *buffer, int32_t frame) {
-		descriptors->setStorageBuffer(descriptors->getBinding(name), buffer, frame);
+	void VK_RaytracingPipelineInstance::setStorageBuffer(const std::string &name, StorageBuffer *buffer, size_t count, size_t offset, int32_t frame) {
+		descriptors->setStorageBuffer(descriptors->getBinding(name), buffer, 0, 0, frame);
 	}
 
 	void VK_RaytracingPipelineInstance::setAccelerationStructure(uint32_t binding, const RootAccelerationStructure *accelerationStructure, int32_t frame) {
