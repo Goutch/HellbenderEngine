@@ -39,18 +39,24 @@ namespace HBE {
 			}
 		}
 
-		VK_Buffer instances_buffer(device, instances.data(),
-								   sizeof(VkAccelerationStructureInstanceKHR) * instances.size(),
-								   VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR);
-
 
 		VkAccelerationStructureGeometryKHR accelerationStructureGeometry{};
+		VK_Buffer instances_buffer = VK_Buffer(device);
+		bool has_geometry = instances.size() > 0;
+
+
 		accelerationStructureGeometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
 		accelerationStructureGeometry.geometryType = VK_GEOMETRY_TYPE_INSTANCES_KHR;
 		accelerationStructureGeometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
 		accelerationStructureGeometry.geometry.instances.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_INSTANCES_DATA_KHR;
 		accelerationStructureGeometry.geometry.instances.arrayOfPointers = VK_FALSE;
-		accelerationStructureGeometry.geometry.instances.data = instances_buffer.getDeviceAddress();
+		if (has_geometry) {
+			instances_buffer.alloc(instances.data(),
+			                       sizeof(VkAccelerationStructureInstanceKHR) * instances.size(),
+			                       VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR);
+			accelerationStructureGeometry.geometry.instances.data = instances_buffer.getDeviceAddress();
+		}
+
 
 		// Get size info
 		/*
@@ -61,7 +67,7 @@ namespace HBE {
 		accelerationStructureBuildGeometryInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR;
 		accelerationStructureBuildGeometryInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
 		accelerationStructureBuildGeometryInfo.geometryCount = 1;
-		accelerationStructureBuildGeometryInfo.pGeometries = &accelerationStructureGeometry;
+		accelerationStructureBuildGeometryInfo.pGeometries =&accelerationStructureGeometry;
 
 		uint32_t primitive_count = instances.size();
 
@@ -76,8 +82,8 @@ namespace HBE {
 
 
 		buffer = new VK_Buffer(device,
-							   accelerationStructureBuildSizesInfo.accelerationStructureSize,
-							   VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT);
+		                       accelerationStructureBuildSizesInfo.accelerationStructureSize,
+		                       VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT);
 
 		VkAccelerationStructureCreateInfoKHR accelerationStructureCreateInfo{};
 		accelerationStructureCreateInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR;
@@ -86,13 +92,13 @@ namespace HBE {
 		accelerationStructureCreateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR;
 		device->vkCreateAccelerationStructureKHR(device->getHandle(), &accelerationStructureCreateInfo, nullptr, &handle);
 
-		const VkPhysicalDeviceAccelerationStructurePropertiesKHR& properties = device->getPhysicalDevice().getAccelerationStructureProperties();
+		const VkPhysicalDeviceAccelerationStructurePropertiesKHR &properties = device->getPhysicalDevice().getAccelerationStructureProperties();
 		// Create a small scratch buffer used during build of the top level acceleration structure
 		VK_Buffer scratchBuffer = VK_Buffer(device,
-											accelerationStructureBuildSizesInfo.buildScratchSize,
-											VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
-											ALLOC_FLAG_NONE,
-											properties.minAccelerationStructureScratchOffsetAlignment);
+		                                    accelerationStructureBuildSizesInfo.buildScratchSize,
+		                                    VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
+		                                    ALLOC_FLAG_NONE,
+		                                    properties.minAccelerationStructureScratchOffsetAlignment);
 
 		VkAccelerationStructureBuildGeometryInfoKHR accelerationBuildGeometryInfo{};
 		accelerationBuildGeometryInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;

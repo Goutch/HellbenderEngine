@@ -9,8 +9,9 @@
 #include "VK_Device.h"
 
 namespace HBE {
-
 	VK_TexelBuffer::VK_TexelBuffer(VK_Device *device, const TexelBufferInfo &info) {
+
+		HB_ASSERT(info.count > 0, "Texel buffer count must be greater than 0");
 		this->device = device;
 		ALLOC_FLAGS flags = ALLOC_FLAG_NONE;
 		if ((info.flags & TEXEL_BUFFER_FLAG_MAPPABLE) != 0) {

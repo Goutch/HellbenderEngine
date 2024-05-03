@@ -14,17 +14,23 @@ namespace HBE {
 		VK_Device *device;
 		VkBuffer handle;
 		Allocation allocation;
-		VkDeviceSize size;
+		VkDeviceSize size = 0;
 	public:
 		VK_Buffer &operator=(const VK_Buffer &) = delete;
 
 		VK_Buffer(const VK_Buffer &) = delete;
+
+		VK_Buffer(VK_Device *device);
 
 		VK_Buffer(VK_Device *device, const void *data, VkDeviceSize size, VkBufferUsageFlags usage, ALLOC_FLAGS flags = ALLOC_FLAG_NONE, VkDeviceSize custom_alignment = 0);
 
 		VK_Buffer(VK_Device *device, VkDeviceSize size, VkBufferUsageFlags usage, ALLOC_FLAGS flags = ALLOC_FLAG_NONE, VkDeviceSize custom_alignment = 0);
 
 		~VK_Buffer();
+
+		void alloc(VkDeviceSize size, VkBufferUsageFlags usage, ALLOC_FLAGS flags = ALLOC_FLAG_NONE, VkDeviceSize custom_alignment = 0);
+
+		void alloc(const void *data, VkDeviceSize size, VkBufferUsageFlags usage, ALLOC_FLAGS flags = ALLOC_FLAG_NONE, VkDeviceSize custom_alignment = 0);
 
 		void update(const void *data);
 
@@ -41,6 +47,8 @@ namespace HBE {
 		VkDeviceOrHostAddressConstKHR getDeviceAddress() const;
 
 		void map(void *data);
+
+		bool allocated();
 	};
 
 }

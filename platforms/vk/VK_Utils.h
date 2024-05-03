@@ -1,5 +1,8 @@
 
 #pragma once
+
+#include "core/utility/Log.h"
+
 namespace HBE {
 	class VK_Utils {
 
@@ -23,6 +26,7 @@ namespace HBE {
 				case IMAGE_FORMAT_RGBA8:
 				case IMAGE_FORMAT_SRGBA8_NON_LINEAR:
 				case IMAGE_FORMAT_SBGRA8_NON_LINEAR:
+				case IMAGE_FORMAT_R32_UINT:
 				case IMAGE_FORMAT_R32F:
 					return 4;
 				case IMAGE_FORMAT_RG32F:
@@ -45,6 +49,7 @@ namespace HBE {
 					break;
 
 			}
+			Log::error("Format not supported");
 			return 0;
 		}
 

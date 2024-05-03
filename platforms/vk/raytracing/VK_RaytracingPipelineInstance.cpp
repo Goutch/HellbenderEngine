@@ -70,7 +70,7 @@ namespace HBE {
 	}
 
 	void VK_RaytracingPipelineInstance::setStorageBuffer(const std::string &name, StorageBuffer *buffer, size_t count, size_t offset, int32_t frame) {
-		descriptors->setStorageBuffer(descriptors->getBinding(name), buffer, 0, 0, frame);
+		descriptors->setStorageBuffer(descriptors->getBinding(name), buffer, count, 0, frame);
 	}
 
 	void VK_RaytracingPipelineInstance::setAccelerationStructure(uint32_t binding, const RootAccelerationStructure *accelerationStructure, int32_t frame) {
