@@ -130,9 +130,6 @@ set(CORE_FILES
         core/utility/Profiler.cpp
         core/utility/Profiler.h
 
-        core/threading/JobManager.cpp
-        core/threading/JobManager.h
-
 
         core/math/SignedDistance.h
 

@@ -9,6 +9,7 @@ namespace HBE {
 	typedef uint32_t COMPUTE_INSTANCE_FLAGS;
 	enum COMPUTE_INSTANCE_FLAG {
 		COMPUTE_INSTANCE_FLAG_NONE = 0,
+		GRAPHIC_INSTANCE_FLAG_EMPTY_DESCRIPTOR_ALLOWED = 1,
 	};
 	struct ComputeInstanceInfo {
 		ComputePipeline *compute_pipeline;

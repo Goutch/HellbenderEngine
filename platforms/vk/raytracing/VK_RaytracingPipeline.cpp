@@ -105,7 +105,7 @@ namespace HBE {
 			shader_groups.push_back(shaderGroup);
 		}
 
-		pipeline_layout = new VK_PipelineLayout(device, shaders.data(), shaders.size());
+		pipeline_layout = new VK_PipelineLayout(device, shaders.data(), shaders.size(),info.flags & RAYTRACING_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR);
 
 		VkRayTracingPipelineCreateInfoKHR rayTracingPipelineInfo{};
 		rayTracingPipelineInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_PIPELINE_CREATE_INFO_KHR;

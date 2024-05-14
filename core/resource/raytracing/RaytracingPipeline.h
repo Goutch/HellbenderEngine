@@ -4,6 +4,12 @@
 #include "../Shader.h"
 
 namespace HBE {
+	typedef uint32_t RAYTRACING_PIPELINE_FLAGS;
+	enum RAYTRACING_PIPELINE_FLAG {
+		RAYTRACING_PIPELINE_FLAG_NONE = 0,
+		RAYTRACING_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR = 1
+	};
+
 	struct RaytracingShaderGroup {
 		int32_t closest_hit_shader_index = -1;
 		///Optionnal
@@ -25,6 +31,8 @@ namespace HBE {
 		uint32_t shader_group_count;
 
 		uint32_t max_recursion_depth = 1;
+
+		RAYTRACING_PIPELINE_FLAGS flags = RAYTRACING_PIPELINE_FLAG_NONE;
 	};
 
 	class HB_API RaytracingPipeline : public Resource {

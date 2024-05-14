@@ -7,9 +7,8 @@
 #include "VK_DescriptorSetLayout.h"
 
 namespace HBE {
-	VK_PipelineLayout::VK_PipelineLayout(VK_Device *device,
-										 const VK_Shader **shaders,
-										 size_t count) {
+
+	VK_PipelineLayout::VK_PipelineLayout(VK_Device *device, const VK_Shader **shaders, size_t count, bool empty_descriptors_allowed) {
 		this->device = device;
 
 		if (shaders[0]->getVkStage() == VK_SHADER_STAGE_COMPUTE_BIT) {
@@ -22,7 +21,7 @@ namespace HBE {
 
 		descriptor_set_layout_handles.resize(descriptor_set_layouts.size());
 		for (int i = 0; i < descriptor_set_layouts.size(); ++i) {
-			descriptor_set_layouts[i] = new VK_DescriptorSetLayout(device, i, pipeline_descriptors);
+			descriptor_set_layouts[i] = new VK_DescriptorSetLayout(device, i, pipeline_descriptors, empty_descriptors_allowed);
 			descriptor_set_layout_handles[i] = descriptor_set_layouts[i]->getHandle();
 		}
 
@@ -179,6 +178,7 @@ namespace HBE {
 	uint32_t VK_PipelineLayout::getDescriptorSetCount() const {
 		return descriptor_set_layouts.size();
 	}
+
 
 
 }

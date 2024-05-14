@@ -15,6 +15,7 @@ namespace HBE {
 	typedef uint32_t COMPUTE_PIPELINE_FLAG;
 	enum COMPUTE_PIPELINE_FLAGS {
 		COMPUTE_PIPELINE_FLAG_NONE = 0,
+		COMPUTE_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR = 1,
 	};
 	struct ComputePipelineInfo {
 		Shader *compute_shader;

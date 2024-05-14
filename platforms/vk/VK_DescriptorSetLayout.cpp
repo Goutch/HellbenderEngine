@@ -1,10 +1,10 @@
 #include "VK_DescriptorSetLayout.h"
 #include "VK_Shader.h"
 #include "VK_Device.h"
-
+#include "VK_PhysicalDevice.h"
 namespace HBE {
 
-	VK_DescriptorSetLayout::VK_DescriptorSetLayout(VK_Device *device, uint32_t descriptor_set_index, std::vector<VK_DescriptorInfo> &pipeline_descriptors) {
+	VK_DescriptorSetLayout::VK_DescriptorSetLayout(VK_Device *device, uint32_t descriptor_set_index, std::vector<VK_DescriptorInfo> &pipeline_descriptors, bool empty_descriptor_allowed) {
 		this->device = device;
 		bool variable_descriptor_reached = false;
 		for (int i = 0; i < pipeline_descriptors.size(); ++i) {
@@ -15,6 +15,7 @@ namespace HBE {
 				if (pipeline_descriptors[i].variable_size && !variable_descriptor_reached) {
 					variable_descriptor_reached = true;
 				}
+
 			}
 		}
 
@@ -32,8 +33,15 @@ namespace HBE {
 			}
 		}
 		descriptor_binding_flags[descriptor_binding_flags.size() - 1] = last_descriptor.variable_size ?
-																		VK_DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT_BIT: 0;
+		                                                                VK_DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT_BIT : 0;
 
+
+		if (empty_descriptor_allowed) {
+			HB_ASSERT(device->getPhysicalDevice().getDescriptorIndexingFeatures().descriptorBindingPartiallyBound, "Descriptor binding partially bound not supported");
+			for (int i = 0; i < descriptor_binding_flags.size(); ++i) {
+				descriptor_binding_flags[i] |= VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT_EXT;
+			}
+		}
 		for (int i = 0; i < descriptor_infos.size(); ++i) {
 			bindings.emplace_back(descriptor_infos[i].layout_binding);
 		}

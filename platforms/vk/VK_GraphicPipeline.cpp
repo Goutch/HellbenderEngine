@@ -136,9 +136,9 @@ namespace HBE {
 		rasterizer.frontFace = (info.flags & GRAPHIC_PIPELINE_FLAG_FRONT_COUNTER_CLOCKWISE) ? VK_FRONT_FACE_COUNTER_CLOCKWISE : VK_FRONT_FACE_CLOCKWISE;
 		rasterizer.cullMode = VK_CULL_MODE_NONE;
 		rasterizer.cullMode |= (info.flags & GRAPHIC_PIPELINE_FLAG_CULL_BACK) == GRAPHIC_PIPELINE_FLAG_CULL_BACK
-							   ? VK_CULL_MODE_BACK_BIT : VK_CULL_MODE_NONE;
+		                       ? VK_CULL_MODE_BACK_BIT : VK_CULL_MODE_NONE;
 		rasterizer.cullMode |= (info.flags & GRAPHIC_PIPELINE_FLAG_CULL_FRONT) == GRAPHIC_PIPELINE_FLAG_CULL_FRONT
-							   ? VK_CULL_MODE_FRONT_BIT : VK_CULL_MODE_NONE;
+		                       ? VK_CULL_MODE_FRONT_BIT : VK_CULL_MODE_NONE;
 		rasterizer.depthBiasEnable = VK_FALSE;
 		rasterizer.depthBiasConstantFactor = 0.0f; // Optional
 		rasterizer.depthBiasClamp = 0.0f; // Optional
@@ -222,8 +222,8 @@ namespace HBE {
 
 		if (render_pass == VK_NULL_HANDLE) {
 			const VK_RenderPass *render_pass = info.render_target == nullptr ?
-											   dynamic_cast<const VK_RenderPass *>(Graphics::getDefaultRenderTarget()) :
-											   dynamic_cast<const VK_RenderPass *>(info.render_target);
+			                                   dynamic_cast<const VK_RenderPass *>(Graphics::getDefaultRenderTarget()) :
+			                                   dynamic_cast<const VK_RenderPass *>(info.render_target);
 			pipelineInfo.renderPass = render_pass->getHandle();
 		} else {
 			pipelineInfo.renderPass = render_pass;
@@ -234,7 +234,7 @@ namespace HBE {
 		pipelineInfo.basePipelineIndex = -1; // Optional
 
 		if (vkCreateGraphicsPipelines(device->getHandle(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &handle) !=
-			VK_SUCCESS) {
+		    VK_SUCCESS) {
 			Log::error("failed to create graphics pipeline!");
 		}
 	}
@@ -262,7 +262,7 @@ namespace HBE {
 	}
 
 	void VK_GraphicPipeline::createPipelineLayout() {
-		layout = new VK_PipelineLayout(device, shaders.data(), shaders.size());
+		layout = new VK_PipelineLayout(device, shaders.data(), shaders.size(), info.flags & GRAPHIC_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR);
 	}
 
 	bool VK_GraphicPipeline::bound() {

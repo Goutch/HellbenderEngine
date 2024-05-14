@@ -273,11 +273,11 @@ namespace HBE {
 		return support_details;
 	}
 
-	const VkPhysicalDeviceAccelerationStructureFeaturesKHR &VK_PhysicalDevice::getAccelerationStructureFeatures() {
+	const VkPhysicalDeviceAccelerationStructureFeaturesKHR &VK_PhysicalDevice::getAccelerationStructureFeatures() const {
 		return acceleration_structure_features;
 	}
 
-	const VkPhysicalDeviceRayTracingPipelineFeaturesKHR &VK_PhysicalDevice::getRayTracingPipelineFeatures() {
+	const VkPhysicalDeviceRayTracingPipelineFeaturesKHR &VK_PhysicalDevice::getRayTracingPipelineFeatures() const{
 		return ray_tracing_pipeline_features;
 	}
 
@@ -305,11 +305,11 @@ namespace HBE {
 		return acceleration_structure_properties;
 	}
 
-	const VkPhysicalDeviceBufferDeviceAddressFeatures &VK_PhysicalDevice::getBufferDeviceAddressFeatures() {
+	const VkPhysicalDeviceBufferDeviceAddressFeatures &VK_PhysicalDevice::getBufferDeviceAddressFeatures() const{
 		return buffer_device_address_features;
 	}
 
-	const VkPhysicalDeviceDescriptorIndexingFeatures &VK_PhysicalDevice::getDescriptorIndexingFeatures() {
+	const VkPhysicalDeviceDescriptorIndexingFeatures &VK_PhysicalDevice::getDescriptorIndexingFeatures() const{
 		return descriptor_indexing_features;
 	}
 

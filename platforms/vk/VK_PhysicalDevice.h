@@ -112,13 +112,13 @@ namespace HBE {
 
 		const VkPhysicalDeviceFeatures &getFeatures() const;
 
-		const VkPhysicalDeviceAccelerationStructureFeaturesKHR &getAccelerationStructureFeatures();
+		const VkPhysicalDeviceAccelerationStructureFeaturesKHR &getAccelerationStructureFeatures() const;
 
-		const VkPhysicalDeviceRayTracingPipelineFeaturesKHR &getRayTracingPipelineFeatures();
+		const VkPhysicalDeviceRayTracingPipelineFeaturesKHR &getRayTracingPipelineFeatures() const;
 
-		const VkPhysicalDeviceBufferDeviceAddressFeatures &getBufferDeviceAddressFeatures();
+		const VkPhysicalDeviceBufferDeviceAddressFeatures &getBufferDeviceAddressFeatures() const;
 
-		const VkPhysicalDeviceDescriptorIndexingFeatures &getDescriptorIndexingFeatures();
+		const VkPhysicalDeviceDescriptorIndexingFeatures &getDescriptorIndexingFeatures() const;
 
 		const VkPhysicalDeviceProperties &getProperties() const;
 

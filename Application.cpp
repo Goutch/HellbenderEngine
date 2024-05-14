@@ -3,7 +3,6 @@
 #include "core/graphics/Graphics.h"
 #include "core/input/Input.h"
 #include "GLFW/glfw3.h"
-#include "core/threading/JobManager.h"
 #include <core/graphics/Window.h>
 #include "core/utility/Profiler.h"
 #include "core/scene/Scene.h"
@@ -43,7 +42,6 @@ namespace HBE {
 			window->swapBuffers();
 			Input::pollEvents();
 			HB_PROFILE_BEGIN("TOTAL_FRAME");
-			JobManager::updateJobsStatus();
 			HB_PROFILE_BEGIN("UPDATE");
 			onUpdate.invoke(delta_t);
 			HB_PROFILE_END("UPDATE");

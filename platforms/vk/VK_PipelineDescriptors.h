@@ -43,7 +43,7 @@ namespace HBE {
 
 	class VK_PipelineDescriptors {
 	protected:
-
+		bool empty_descriptor_allowed;
 		VK_Renderer *renderer = nullptr;
 		VK_Device *device = nullptr;
 
@@ -59,7 +59,7 @@ namespace HBE {
 
 		mutable bool bound = false;
 	public:
-		VK_PipelineDescriptors(VK_Renderer *renderer, const VK_PipelineLayout &layout);
+		VK_PipelineDescriptors(VK_Renderer *renderer, const VK_PipelineLayout &layout, bool empty_descriptor_allowed = false);
 
 		~VK_PipelineDescriptors();
 
@@ -99,6 +99,8 @@ namespace HBE {
 		void createDescriptorPool(DescriptorPool &pool);
 
 		void createVariableSizeDescriptors(uint32_t binding, VkDescriptorType descriptor_type, uint32_t count, int32_t frame);
+
+
 	};
 
 }

@@ -17,12 +17,11 @@
 #include "Application.h"
 
 namespace HBE {
-
-	VK_PipelineDescriptors::VK_PipelineDescriptors(VK_Renderer *renderer, const VK_PipelineLayout &layout) {
+	VK_PipelineDescriptors::VK_PipelineDescriptors(VK_Renderer *renderer, const VK_PipelineLayout &layout, bool empty_descriptor_allowed) {
 		this->renderer = renderer;
 		this->device = renderer->getDevice();
 		this->pipeline_layout = &layout;
-
+		this->empty_descriptor_allowed = empty_descriptor_allowed;
 		const std::vector<VkDeviceSize> descriptor_sizes = pipeline_layout->getDescriptorSizes();
 		const std::vector<VkDescriptorSetLayoutBinding> descriptor_bindings = pipeline_layout->getDescriptorBindings();
 
@@ -637,6 +636,8 @@ namespace HBE {
 			old_descriptor_pools.pop();
 		}
 	}
+
+
 
 
 }

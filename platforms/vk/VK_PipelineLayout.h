@@ -32,7 +32,7 @@ namespace HBE {
 
 		VkPipelineBindPoint bind_point = VK_PIPELINE_BIND_POINT_GRAPHICS;
 	public:
-		VK_PipelineLayout(VK_Device *device, const VK_Shader **shaders, size_t count);
+		VK_PipelineLayout(VK_Device *device, const VK_Shader **shaders, size_t count,bool empty_descriptor_allowed = false);
 
 		~VK_PipelineLayout();
 

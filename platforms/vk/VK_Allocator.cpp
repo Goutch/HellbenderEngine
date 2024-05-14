@@ -1,4 +1,5 @@
 
+#include <algorithm>
 #include "VK_Allocator.h"
 #include "platforms/vk/VK_CommandPool.h"
 #include "platforms/vk/VK_Image.h"
@@ -24,7 +25,45 @@ namespace HBE {
 		this->command_pool = new VK_CommandPool(*device, 1, device->getQueue(QUEUE_FAMILY_GRAPHICS));
 
 		memory_propeties = &device->getPhysicalDevice().getMemoryProperties();
-		for (size_t i = 0; i < memory_propeties->memoryTypeCount; ++i) {
+		for (int i = 0; i < memory_propeties->memoryHeapCount; ++i) {
+			memory_heaps.push_back({memory_propeties->memoryHeaps[i].size, 0,
+			                        false});
+			memory_heaps[i].block_size = glm::min(static_cast<VkDeviceSize>(std::floor(memory_heaps[i].max_size / 10)), BLOCK_SIZE);
+		}
+		for (uint32_t i = 0; i < memory_propeties->memoryTypeCount; ++i) {
+			memory_types.push_back({i,
+			                        memory_propeties->memoryTypes[i].heapIndex,
+			                        (uint32_t(1) << i),
+			                        memory_propeties->memoryTypes[i].propertyFlags});
+			memory_heaps[memory_propeties->memoryTypes[i].heapIndex].memory_properties_flags |= memory_propeties->memoryTypes[i].propertyFlags;
+		}
+
+		for (int i = 0; i < memory_heaps.size(); ++i) {
+			std::vector<std::string> properties;
+			if (memory_heaps[i].memory_properties_flags & VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) {
+				properties.push_back("DEVICE_LOCAL");
+			}
+			if (memory_heaps[i].memory_properties_flags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT) {
+				properties.push_back("HOST_VISIBLE");
+			}
+			if (memory_heaps[i].memory_properties_flags & VK_MEMORY_PROPERTY_HOST_CACHED_BIT) {
+				properties.push_back("HOST_CACHED");
+			}
+			if (memory_heaps[i].memory_properties_flags & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT) {
+				properties.push_back("HOST_COHERENT");
+			}
+			std::string properties_str = "";
+			for (int j = 0; j < properties.size(); ++j) {
+				properties_str += properties[j];
+				if (j < properties.size() - 1) {
+					properties_str += " | ";
+				}
+			}
+
+			Log::message("Memory heap " + std::to_string(i) + " of " + std::to_string(memory_heaps[i].max_size / (1024 * 1024)) + "mb and properties: " + properties_str);
+		}
+
+		for (size_t i = 0; i < memory_propeties->memoryHeapCount; ++i) {
 			blocks.emplace(i, std::vector<Block *>());
 		}
 	}
@@ -45,17 +84,18 @@ namespace HBE {
 	}
 
 	uint32_t VK_Allocator::findMemoryTypeIndex(VkMemoryRequirements memory_requirement, ALLOC_FLAGS flags) {
-		//todo: handle out of memory.
 		//if all heap of a memory type are out of memory, return another memory type.
-		VkMemoryPropertyFlags properties = choseProperties(flags);
-		uint32_t type_filter = memory_requirement.memoryTypeBits;
+		VkMemoryPropertyFlags desired_properties = choseProperties(flags);
+		uint32_t available_type_bits = memory_requirement.memoryTypeBits;
 
-		for (uint32_t i = 0; i < memory_propeties->memoryTypeCount; i++) {
-			if ((type_filter & (1 << i)) &&
-			    (memory_propeties->memoryTypes[i].propertyFlags & properties) == properties) {
+		for (uint32_t i = 0; i < memory_types.size(); i++) {
+			if ((memory_types[i].memory_properties_flags & desired_properties) == desired_properties &&
+			    (available_type_bits & memory_types[i].bit) != 0 &&
+			    !memory_heaps[memory_types[i].heap_index].full) {
 				return i;
 			}
 		}
+
 		Log::error("Failed to find suitable memory type");
 		return 0;
 	}
@@ -197,9 +237,10 @@ namespace HBE {
 
 	//https://www.khronos.org/registry/vulkan/specs/1.2-extensions/man/html/VkMemoryPropertyFlagBits.html
 	Allocation VK_Allocator::alloc(VkMemoryRequirements mem_requirements, ALLOC_FLAGS flags) {
-		uint32_t memory_type = findMemoryTypeIndex(mem_requirements, flags);
+		MemoryTypeInfo memory_type = memory_types[findMemoryTypeIndex(mem_requirements, flags)];
 
-		for (Block *block: blocks[memory_type]) {
+
+		for (Block *block: blocks[memory_type.heap_index]) {
 			if (block->remaining < mem_requirements.size) {
 				continue;
 			}
@@ -217,7 +258,8 @@ namespace HBE {
 							position,
 							block,
 							flags,
-							current_id++).first;
+							current_id++,
+							memory_type.heap_index).first;
 					//Log::debug("Allocated " + allocToString(new_alloc));
 					return new_alloc;
 
@@ -240,7 +282,8 @@ namespace HBE {
 						position,
 						block,
 						flags,
-						current_id++).first;
+						current_id++,
+						memory_type.heap_index).first;
 
 				//Log::debug("Allocated " + allocToString(new_alloc));
 				return new_alloc;
@@ -248,21 +291,30 @@ namespace HBE {
 		}
 		//new block needed
 		Block *block;
-		auto block_it = block_cache.find(memory_type);
+		auto block_it = block_cache.find(memory_type.index);
 		if (block_it == block_cache.end()) {
-			uint32_t index = blocks[memory_type].size();
-			block = blocks[memory_type].emplace_back(new Block{
-					.size= mem_requirements.size > BLOCK_SIZE ? mem_requirements.size : BLOCK_SIZE,
+			uint32_t index = blocks[memory_type.heap_index].size();
+			block = blocks[memory_type.heap_index].emplace_back(new Block{
+					.size = mem_requirements.size > memory_heaps[memory_type.heap_index].block_size ? mem_requirements.size : memory_heaps[memory_type.heap_index].block_size,
 					.memory=VK_NULL_HANDLE,
-					.memory_type_index=memory_type,
+					.memory_type_index=memory_type.index,
 					.index=index,
 					.alloc_count=0,
-					.remaining=(mem_requirements.size > BLOCK_SIZE ? mem_requirements.size : BLOCK_SIZE) - mem_requirements.size});
+					.remaining=(mem_requirements.size > memory_heaps[memory_type.heap_index].block_size ? mem_requirements.size : memory_heaps[memory_type.heap_index].block_size) - mem_requirements.size});
 			VkMemoryAllocateInfo allocInfo{};
 			allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 			allocInfo.allocationSize = block->size;
-			allocInfo.memoryTypeIndex = memory_type;
+			allocInfo.memoryTypeIndex = memory_type.index;
 
+			memory_heaps[memory_type.heap_index].used_size += block->size;
+			float memory_used_ratio = static_cast<float>(memory_heaps[memory_type.heap_index].used_size) / static_cast<float>(memory_heaps[memory_type.heap_index].max_size);
+			if (memory_used_ratio >= 0.9f) {
+				memory_heaps[memory_type.heap_index].full = true;
+			}
+			Log::status("Allocated " + std::to_string(memory_heaps[memory_type.heap_index].used_size / (1024 * 1024)) + "/" +
+			            std::to_string(memory_heaps[memory_type.heap_index].max_size / (1024 * 1024)) + "mb of heap#" +
+			            std::to_string(memory_type.heap_index) + ".\n Total used memory: " +
+			            std::to_string((static_cast<float>(memory_heaps[memory_type.heap_index].used_size) / static_cast<float>(memory_heaps[memory_type.heap_index].max_size)) * 100) + "%");
 
 			ApplicationInfo applicationInfo = Application::getInfo();
 			VkMemoryAllocateFlagsInfo flagsInfo{};
@@ -270,13 +322,20 @@ namespace HBE {
 			flagsInfo.flags = applicationInfo.required_extension_flags & VULKAN_REQUIRED_EXTENSION_RTX ? VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT : 0;
 			allocInfo.pNext = &flagsInfo;
 			if (vkAllocateMemory(device->getHandle(), &allocInfo, nullptr, &block->memory) != VK_SUCCESS) {
+				size_t total_memory = 0;
+				for (auto &block: blocks) {
+					for (auto &block: block.second) {
+						total_memory += block->size;
+					}
+				}
+				Log::message("Failed to allocate buffer memory! total memory used = " + total_memory);
 				Log::error("failed to allocate buffer memory!");
 			}
 		} else {
 			block = block_it->second;
-			block->index = blocks[memory_type].size();
-			block_cache.erase(memory_type);
-			blocks[memory_type].emplace_back(block);
+			block->index = blocks[memory_type.heap_index].size();
+			block_cache.erase(memory_type.index);
+			blocks[memory_type.heap_index].emplace_back(block);
 		}
 		block->alloc_count++;
 		const Allocation &new_alloc = *block->allocations.emplace(
@@ -284,7 +343,8 @@ namespace HBE {
 				VkDeviceSize(0),
 				block,
 				flags,
-				current_id++).first;
+				current_id++,
+				memory_type.heap_index).first;
 		/*Log::debug(
 				"Created block " + std::to_string(block->index) + " of type " + memoryTypeToString(block->memory_type) +
 				" with " + std::to_string(block->size / 1048576.0f) + "mb");
@@ -627,11 +687,11 @@ namespace HBE {
 		//Log::debug("Freeing Alloc#" + std::to_string(allocation.id));
 		Block *block = allocation.block;
 
-		uint32_t memory_type_index = allocation.block->memory_type_index;
+		uint32_t heap_index = allocation.heap_index;
 		//Log::debug("Freed " + allocToString(allocation));
 		if (allocation.block->memory_type_index)
 			if (allocation.block->alloc_count == 1) {
-				auto it = blocks[memory_type_index].erase(blocks[memory_type_index].begin() + allocation.block->index);
+				auto it = blocks[heap_index].erase(blocks[heap_index].begin() + allocation.block->index);
 				auto block_pool_it = block_cache.find(allocation.block->memory_type_index);
 				if (block_pool_it == block_cache.end()) {
 					block->remaining = block->size;
@@ -639,11 +699,10 @@ namespace HBE {
 					block->allocations.clear();
 					block_cache.emplace(block->memory_type_index, block);
 				} else {
-
 					vkFreeMemory(device->getHandle(), allocation.block->memory, nullptr);
 					delete block;
 				}
-				for (; it != blocks[memory_type_index].end(); ++it) {
+				for (; it != blocks[heap_index].end(); ++it) {
 					(*it)->index--;
 				}
 

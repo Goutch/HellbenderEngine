@@ -12,7 +12,7 @@ namespace HBE {
 	VK_ComputePipeline::VK_ComputePipeline(VK_Renderer *renderer, const ComputePipelineInfo &info) {
 		this->renderer = renderer;
 		const VK_Shader *vk_shader = dynamic_cast<VK_Shader *>(info.compute_shader);
-		layout = new VK_PipelineLayout(renderer->getDevice(), &vk_shader, 1);
+		layout = new VK_PipelineLayout(renderer->getDevice(), &vk_shader, 1, info.flags & COMPUTE_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR);
 
 		VkPipelineShaderStageCreateInfo stage{};
 		stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -25,7 +25,7 @@ namespace HBE {
 		create_info.stage = stage;
 
 		if (vkCreateComputePipelines(renderer->getDevice()->getHandle(), VK_NULL_HANDLE, 1, &create_info, nullptr,
-									 &handle) != VK_SUCCESS) {
+		                             &handle) != VK_SUCCESS) {
 			Log::error("Failed to create compute pipeline");
 		}
 	}

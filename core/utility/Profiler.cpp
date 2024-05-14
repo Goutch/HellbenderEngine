@@ -39,7 +39,7 @@ namespace HBE {
 
 	void Profiler::end(std::string message) {
 		if (message != profile_stack.top().node->message) {
-			Log::error("Profiler::end() message does not match begin() message");
+			Log::error("Profiler::end() message does not match begin() message, begin: " + profile_stack.top().node->message + " end: " + message);
 		}
 		double ms = profile_stack.top().clock.ns() * NANOSECONDS_TO_MILISECONDS;
 
@@ -74,9 +74,9 @@ namespace HBE {
 			indent_str_tabs += "|    ";
 		}
 		Log::message(indent_str_tabs + "[" + node->message + "]" + std::to_string(node->count) + "\n" +
-					 indent_str_tabs + "|avg: " + std::to_string(node->time) + "ms|" + "\n" +
-					 indent_str_tabs + "|min: " + std::to_string(node->min) + "ms|#" + std::to_string(node->min_i) + "\n" +
-					 indent_str_tabs + "|max: " + std::to_string(node->max) + "ms|#" + std::to_string(node->max_i) );
+		             indent_str_tabs + "|avg: " + std::to_string(node->time) + "ms|" + "\n" +
+		             indent_str_tabs + "|min: " + std::to_string(node->min) + "ms|#" + std::to_string(node->min_i) + "\n" +
+		             indent_str_tabs + "|max: " + std::to_string(node->max) + "ms|#" + std::to_string(node->max_i));
 		for (auto n: node->sub_nodes) {
 			printNodeAverange(n.second, indent + 1);
 		}

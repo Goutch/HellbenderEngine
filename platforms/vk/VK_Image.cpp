@@ -43,7 +43,9 @@ namespace HBE {
 
 		desired_layout = chooseLayout();
 
+#ifdef DEBUG_MODE
 		Log::debug("Create image#" + std::to_string(id));
+#endif
 		VkImageType type;
 		VkImageViewType view_type;
 		if (height == 1 && depth == 1) {
