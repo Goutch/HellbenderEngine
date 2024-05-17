@@ -51,7 +51,7 @@
 #include "core/math/Plane.h"
 #include "core/math/SignedDistance.h"
 
-#include "core/threading/JobManager.h"
+#include "core/threading/Job.h
 
 #include "core/utility/Log.h"
 #include "core/utility/Geometry.h"
