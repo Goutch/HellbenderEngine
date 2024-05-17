@@ -15,6 +15,7 @@ namespace HBE {
 		EXTENSION_FLAG_BUFFER_DEVICE_ADDRESS = 1 << 2,
 		EXTENSION_FLAG_DESCRIPTOR_INDEXING = 1 << 3,
 		EXTENSION_FLAG_DYNAMIC_RENDERING = 1 << 4,
+		EXTENSION_FLAG_64BIT_INTEGER_GLSL_TYPE = 1 << 5,
 	};
 
 	struct QueueFamilyIndices {
@@ -131,7 +132,6 @@ namespace HBE {
 		const VkPhysicalDeviceAccelerationStructurePropertiesKHR &getAccelerationStructureProperties() const;
 
 		const EXTENSION_FLAGS &getEnabledExtensionFlags() const;
-
 
 
 	private:

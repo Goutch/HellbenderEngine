@@ -10,6 +10,7 @@ namespace HBE {
 		static uint32_t getFormatStride(IMAGE_FORMAT format) {
 			uint32_t byte_per_pixel = 0;
 			switch (format) {
+				case IMAGE_FORMAT_R8_UINT:
 				case IMAGE_FORMAT_R8:
 				case IMAGE_FORMAT_SR8_NON_LINEAR:
 					return 1;
@@ -56,17 +57,20 @@ namespace HBE {
 		static VkFormat getVkFormat(IMAGE_FORMAT format) {
 			VkFormat vk_format = VK_FORMAT_UNDEFINED;
 			switch (format) {
-				case IMAGE_FORMAT_R8:
+				case IMAGE_FORMAT_R8_UINT:
 					vk_format = VK_FORMAT_R8_UINT;
 					break;
+				case IMAGE_FORMAT_R8:
+					vk_format = VK_FORMAT_R8_SINT;
+					break;
 				case IMAGE_FORMAT_RG8:
-					vk_format = VK_FORMAT_R8G8_UINT;
+					vk_format = VK_FORMAT_R8G8_SINT;
 					break;
 				case IMAGE_FORMAT_RGB8:
-					vk_format = VK_FORMAT_R8G8B8_UINT;
+					vk_format = VK_FORMAT_R8G8B8_SINT;
 					break;
 				case IMAGE_FORMAT_RGBA8:
-					vk_format = VK_FORMAT_R8G8B8A8_UINT;
+					vk_format = VK_FORMAT_R8G8B8A8_SINT;
 					break;
 				case IMAGE_FORMAT_R32F:
 					vk_format = VK_FORMAT_R32_SFLOAT;

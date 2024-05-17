@@ -33,6 +33,7 @@ namespace HBE {
 		device_create_info.pQueueCreateInfos = queue_create_infos.data();
 		VkPhysicalDeviceFeatures device_features{};
 		device_features.samplerAnisotropy = physical_device.getFeatures().samplerAnisotropy;
+		device_features.shaderInt64 = physical_device.getFeatures().shaderInt64;
 		device_create_info.pEnabledFeatures = &device_features;
 		auto &enabled_extensions = physical_device.getExtensions();
 		device_create_info.enabledExtensionCount = enabled_extensions.size();
@@ -70,6 +71,7 @@ namespace HBE {
 		descriptor_indexing_features.shaderUniformTexelBufferArrayNonUniformIndexing = physical_device.getDescriptorIndexingFeatures().shaderUniformTexelBufferArrayNonUniformIndexing;
 		descriptor_indexing_features.shaderStorageTexelBufferArrayNonUniformIndexing = physical_device.getDescriptorIndexingFeatures().shaderStorageTexelBufferArrayNonUniformIndexing;
 		descriptor_indexing_features.descriptorBindingUpdateUnusedWhilePending = physical_device.getDescriptorIndexingFeatures().descriptorBindingUpdateUnusedWhilePending;
+
 
 		device_create_info.pNext = &robustness_features;
 		void **ppNext = &robustness_features.pNext;
