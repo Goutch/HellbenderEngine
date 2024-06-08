@@ -21,6 +21,11 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 endif ()
 
+if (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/utils-collection/)
+    message(FATAL_ERROR "HBE repository is incomplete, initialize submodules using:\n  git submodule update --init --recursive")
+endif ()
+
+
 set(CORE_FILES
         HBE.h
         Application.cpp
@@ -121,7 +126,6 @@ set(CORE_FILES
         core/scene/components/EntityState.cpp
         core/scene/components/EntityState.h
         core/scene/components/CameraController.cpp
-
 
 
         core/utility/Log.cpp
