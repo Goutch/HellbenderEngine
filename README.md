@@ -1,5 +1,6 @@
 # HellbenderEngine /!\ WIP /!\
 ## My personnal toy Rendering engine/framework.
+## A vulkan abstraction library
 
 # Goals
 - **Common library for my Vulkan projects**
@@ -13,22 +14,21 @@
 
 # Features
 #### HB Graphics library:
-- 3D rendering
-- 2D rendering
+- 3D & 2D rendering
 - Text/Font rendering
-- Instancing
 - Resource loading:
 	- Textures
 	- Shaders
 	- GLTF models
 - Compute shaders
+- Shader reflection
 - Ray tracing pipeline shaders
 	- miss
 	- closest hit
 	- any hit
 	- intersection
 #### Other
-- ECS
+- Optionnal scene/ECS architecture
 	- Camera (perspective)
 	- Camera2D (orthographic)
 	- CameraController
