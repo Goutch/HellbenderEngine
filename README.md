@@ -53,14 +53,9 @@
 - [HellbenderExamples](https://github.com/Goutch/HellbenderExamples) Repo
 ### Wiki (Might be Out of date...)
 - [Home](https://github.com/Goutch/HellbenderEngine/wiki)
-## Qestions and Answers
+## Q&A
 Q: Why should I use this engine instead of unity/unreal?  
 A: You shouldn't this is a toy engine made for me.
-
-### Compiling
-These are 2 tested compilers :
-- VC (always)
-- GCC (sometimes)
 
 ### Notes:
 HBE used to support Opengl but it is deprecated as of now I am not sure if I will support it in the future. Checkout the opengl branch if you want a "working" Opengl version.(Warning: the engine was nothing like it is today)
