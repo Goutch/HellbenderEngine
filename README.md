@@ -37,12 +37,6 @@
 - Event system
 - keyboard and mouse input handling
 
-#### Engine layers
-- Application (Game)
-- Optional Scene/ECS implementation
-- Engine Core API
-- Platform Implementation (Vulkan)
-
 #### TODO :
 - [x] Model loading 
 - [ ] Model animations
