@@ -59,7 +59,7 @@ namespace HBE {
 		acceleration_structure_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
 		acceleration_structure_features.accelerationStructure = (enabled_extensions_flags & EXTENSION_FLAG_ACCELERATION_STRUCTURE) > 0;
 
-		VkPhysicalDeviceDescriptorIndexingFeatures descriptor_indexing_features{};
+		VkPhysicalDeviceDescriptorIndexingFeatures descriptor_indexing_features=physical_device.getDescriptorIndexingFeatures();
 		descriptor_indexing_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
 		descriptor_indexing_features.runtimeDescriptorArray = physical_device.getDescriptorIndexingFeatures().runtimeDescriptorArray;
 		descriptor_indexing_features.descriptorBindingPartiallyBound = physical_device.getDescriptorIndexingFeatures().descriptorBindingPartiallyBound;

@@ -28,8 +28,8 @@ namespace HBE {
 			buffer_device_address_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
 			acceleration_structure_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
 			ray_tracing_pipeline_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
-
 			*ppNext = &buffer_device_address_features;
+
 			buffer_device_address_features.pNext = &acceleration_structure_features;
 			acceleration_structure_features.pNext = &ray_tracing_pipeline_features;
 			ppNext = &ray_tracing_pipeline_features.pNext;

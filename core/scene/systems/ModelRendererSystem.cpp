@@ -8,7 +8,7 @@ namespace HBE {
 		scene->onDraw.subscribe(this, &ModelRendererSystem::draw);
 	}
 
-	void drawNode(RenderGraph *render_graph, const ModelNode &node, mat4 parent_transform) {
+	void drawNode(RenderGraph *render_graph, Model &model, const ModelNode &node, mat4 parent_transform) {
 		mat4 transform = parent_transform * node.transform;
 
 		DrawCmdInfo draw_cmd{};
@@ -20,9 +20,11 @@ namespace HBE {
 		push_constant_info.data = &transform;
 		for (int i = 0; i < node.primitives.size(); ++i) {
 			const ModelPrimitive &primitive = node.primitives[i];
-			if (primitive.mesh != nullptr && primitive.material != nullptr) {
-				draw_cmd.mesh = primitive.mesh;
-				draw_cmd.pipeline_instance = primitive.material;
+			if (primitive.material != -1) {
+				Mesh *mesh = model.getResources().meshes[node.mesh][i];
+				GraphicPipelineInstance *material = model.getResources().materials[primitive.material];
+				draw_cmd.mesh = mesh;
+				draw_cmd.pipeline_instance = material;
 
 				render_graph->draw(draw_cmd);
 			} else {
@@ -30,7 +32,7 @@ namespace HBE {
 			}
 		}
 		for (int i = 0; i < node.children.size(); ++i) {
-			drawNode(render_graph, node.children[i], transform);
+			drawNode(render_graph, model, node.children[i], transform);
 		}
 	}
 
@@ -46,7 +48,7 @@ namespace HBE {
 				continue;
 
 			for (const ModelNode &node: model_renderer.model->getNodes()) {
-				drawNode(render_graph, node, transform.world());
+				drawNode(render_graph, *model_renderer.model, node, transform.world());
 			}
 		}
 

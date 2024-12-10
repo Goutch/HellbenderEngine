@@ -20,9 +20,9 @@ namespace HBE {
 
 		for (size_t i = 0; i < info.attribute_info_count; ++i) {
 			size_t number_of_buffers = (info.attribute_infos[i].flags & VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) != 0 ?
-									   MAX_FRAMES_IN_FLIGHT : 1;
-			buffers.emplace(info.attribute_infos[i].binding, std::vector<VK_Buffer *>(number_of_buffers, nullptr));
-			bindings.emplace(info.attribute_infos[i].binding, info.attribute_infos[i]);
+			                           MAX_FRAMES_IN_FLIGHT : 1;
+			buffers.emplace(info.attribute_infos[i].location, std::vector<VK_Buffer *>(number_of_buffers, nullptr));
+			bindings.emplace(info.attribute_infos[i].location, info.attribute_infos[i]);
 		}
 	}
 
@@ -31,7 +31,7 @@ namespace HBE {
 		if (count == 0) return;
 		auto it = buffers.find(location);
 		if (it == buffers.end()) {
-			Log::warning("Trying to set a mesh buffer at binding#" + std::to_string(location) + " but no such binding exists");
+			Log::warning("Trying to set a mesh buffer at location#" + std::to_string(location) + " but no such location exists");
 			return;
 		}
 		if (count == 0) {
@@ -48,12 +48,12 @@ namespace HBE {
 				delete buffers[location][renderer->getCurrentFrame()];
 			}
 			buffers[location][renderer->getCurrentFrame()] = new VK_Buffer(device,
-																		   vertices,
-																		   buffer_size,
-																		   VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
-																		   ((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
-																		   ALLOC_FLAG_MAPPABLE :
-																		   ALLOC_FLAG_NONE);
+			                                                               vertices,
+			                                                               buffer_size,
+			                                                               VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
+			                                                               ((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
+			                                                               ALLOC_FLAG_MAPPABLE :
+			                                                               ALLOC_FLAG_NONE);
 
 		} else {
 			//todo: add to delete queue instead of waiting and deleting immediately
@@ -62,12 +62,12 @@ namespace HBE {
 				delete buffers[location][0];
 			}
 			buffers[location][0] = new VK_Buffer(device,
-												 vertices,
-												 buffer_size,
-												 VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
-												 ((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
-												 ALLOC_FLAG_MAPPABLE :
-												 ALLOC_FLAG_NONE);
+			                                     vertices,
+			                                     buffer_size,
+			                                     VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
+			                                     ((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
+			                                     ALLOC_FLAG_MAPPABLE :
+			                                     ALLOC_FLAG_NONE);
 		}
 	}
 
@@ -83,12 +83,12 @@ namespace HBE {
 				delete buffers[location][renderer->getCurrentFrame()];
 			}
 			buffers[location][renderer->getCurrentFrame()] = new VK_Buffer(device,
-																		   data,
-																		   buffer_size,
-																		   VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
-																		   ((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
-																		   ALLOC_FLAG_MAPPABLE :
-																		   ALLOC_FLAG_NONE);
+			                                                               data,
+			                                                               buffer_size,
+			                                                               VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
+			                                                               ((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
+			                                                               ALLOC_FLAG_MAPPABLE :
+			                                                               ALLOC_FLAG_NONE);
 
 		} else {
 			device->getQueue(QUEUE_FAMILY_GRAPHICS).wait();
@@ -97,12 +97,12 @@ namespace HBE {
 			}
 
 			buffers[location][0] = new VK_Buffer(device,
-												 data,
-												 buffer_size,
-												 VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
-												 ((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
-												 ALLOC_FLAG_MAPPABLE :
-												 ALLOC_FLAG_NONE);
+			                                     data,
+			                                     buffer_size,
+			                                     VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
+			                                     ((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
+			                                     ALLOC_FLAG_MAPPABLE :
+			                                     ALLOC_FLAG_NONE);
 		}
 
 	}
@@ -129,10 +129,10 @@ namespace HBE {
 
 
 		indices_buffer = new VK_Buffer(device,
-									   reinterpret_cast<const void *>(data),
-									   buffer_size,
-									   VK_BUFFER_USAGE_INDEX_BUFFER_BIT | extra_usages,
-									   ALLOC_FLAG_NONE);
+		                               reinterpret_cast<const void *>(data),
+		                               buffer_size,
+		                               VK_BUFFER_USAGE_INDEX_BUFFER_BIT | extra_usages,
+		                               ALLOC_FLAG_NONE);
 		index_count = count;
 	}
 
@@ -160,22 +160,20 @@ namespace HBE {
 			} else {
 				flat_buffers[i] = buffer.second[0]->getHandle();
 			}
-
-
 			offsets[i] = 0;
 			i++;
 		}
 
 		vkCmdBindVertexBuffers(command_pool->getCurrentBuffer(),
-							   0,
-							   buffers.size(),
-							   flat_buffers,
-							   offsets);
+		                       0,
+		                       buffers.size(),
+		                       flat_buffers,
+		                       offsets);
 		if (indices_type != INDICES_TYPE_NONE) {
 			vkCmdBindIndexBuffer(command_pool->getCurrentBuffer(),
-								 indices_buffer->getHandle(),
-								 0,
-								 indices_type == INDICES_TYPE_UINT32 ? VK_INDEX_TYPE_UINT32 : VK_INDEX_TYPE_UINT16);
+			                     indices_buffer->getHandle(),
+			                     0,
+			                     indices_type == INDICES_TYPE_UINT32 ? VK_INDEX_TYPE_UINT32 : VK_INDEX_TYPE_UINT16);
 		}
 		delete[] offsets;
 		delete[] flat_buffers;

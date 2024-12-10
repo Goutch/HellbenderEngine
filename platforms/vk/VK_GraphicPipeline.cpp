@@ -13,20 +13,20 @@
 namespace HBE {
 
 	VK_GraphicPipeline::VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const GraphicPipelineInfo &info, VkRenderPass render_pass) {
+		this->info = info;
 		this->render_pass = render_pass;
-		createRenderPass(device, renderer, info);
+		createRenderPass(device, renderer);
 	}
 
 
 	VK_GraphicPipeline::VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const GraphicPipelineInfo &info) {
-		createRenderPass(device, renderer, info);
+		this->info = info;
+		createRenderPass(device, renderer);
 	}
 
-	void VK_GraphicPipeline::createRenderPass(VK_Device *device, VK_Renderer *renderer, const GraphicPipelineInfo &info) {
+	void VK_GraphicPipeline::createRenderPass(VK_Device *device, VK_Renderer *renderer) {
 		this->device = device;
 		this->renderer = renderer;
-
-		this->info = info;
 		this->binding_infos = std::vector<VertexAttributeInfo>(info.attribute_infos, info.attribute_infos + info.attribute_info_count);
 
 		const VK_Shader *vk_vertex = (dynamic_cast<const VK_Shader *>(info.vertex_shader));
@@ -56,7 +56,7 @@ namespace HBE {
 		std::vector<VkVertexInputBindingDescription> binding_descriptions;
 		binding_descriptions.resize(info.attribute_info_count);
 		for (size_t i = 0; i < info.attribute_info_count; ++i) {
-			binding_descriptions[i].binding = info.attribute_infos[i].binding;
+			binding_descriptions[i].binding = info.attribute_infos[i].location;
 			binding_descriptions[i].inputRate =
 					(info.attribute_infos[i].flags & VERTEX_ATTRIBUTE_FLAG_PER_INSTANCE) == VERTEX_ATTRIBUTE_FLAG_PER_INSTANCE ?
 					VK_VERTEX_INPUT_RATE_INSTANCE :

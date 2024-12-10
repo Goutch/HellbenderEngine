@@ -20,8 +20,6 @@ namespace HBE {
 	class VK_PipelineLayout;
 
 	class VK_GraphicPipeline : public GraphicPipeline {
-
-
 		VkPipeline handle = VK_NULL_HANDLE;
 		VK_PipelineLayout *layout = nullptr;
 
@@ -52,6 +50,6 @@ namespace HBE {
 
 		const VK_PipelineLayout *getPipelineLayout() const;
 
-		void createRenderPass(VK_Device *device, VK_Renderer *renderer, const GraphicPipelineInfo &info);
+		void createRenderPass(VK_Device *device, VK_Renderer *renderer);
 	};
 }

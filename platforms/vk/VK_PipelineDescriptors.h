@@ -31,7 +31,7 @@ namespace HBE {
 
 	struct VariableDescriptorSet {
 		uint32_t binding;
-		uint32_t count=1;
+		uint32_t count = 1;
 		VkDescriptorType type;
 	};
 	struct DescriptorPool {
@@ -54,7 +54,6 @@ namespace HBE {
 
 		std::array<std::vector<VK_Buffer *>, MAX_FRAMES_IN_FLIGHT> uniform_buffers;
 
-
 		std::queue<std::pair<uint32_t, VkDescriptorPool>> old_descriptor_pools;
 
 		mutable bool bound = false;
@@ -69,7 +68,7 @@ namespace HBE {
 
 		uint32_t getBinding(const std::string &name) const;
 
-        void resetPool(DescriptorPool& pool);
+		void resetPool(DescriptorPool &pool);
 
 		void bind(VkCommandBuffer command_buffer, uint32_t frame) const;
 
@@ -99,8 +98,6 @@ namespace HBE {
 		void createDescriptorPool(DescriptorPool &pool);
 
 		void createVariableSizeDescriptors(uint32_t binding, VkDescriptorType descriptor_type, uint32_t count, int32_t frame);
-
-
 	};
 
 }

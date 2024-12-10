@@ -15,15 +15,17 @@ namespace HBE {
 				case IMAGE_FORMAT_SR8_NON_LINEAR:
 					return 1;
 					break;
+				case IMAGE_FORMAT_RG8_UINT:
 				case IMAGE_FORMAT_RG8:
 				case IMAGE_FORMAT_SRG8_NON_LINEAR:
 
 					return 2;
 					break;
+				case IMAGE_FORMAT_RGB8_UINT:
 				case IMAGE_FORMAT_RGB8:
 				case IMAGE_FORMAT_SRGB8_NON_LINEAR:
 					return 3;
-
+				case IMAGE_FORMAT_RGBA8_UINT:
 				case IMAGE_FORMAT_RGBA8:
 				case IMAGE_FORMAT_SRGBA8_NON_LINEAR:
 				case IMAGE_FORMAT_SBGRA8_NON_LINEAR:
@@ -59,6 +61,15 @@ namespace HBE {
 			switch (format) {
 				case IMAGE_FORMAT_R8_UINT:
 					vk_format = VK_FORMAT_R8_UINT;
+					break;
+				case IMAGE_FORMAT_RG8_UINT:
+					vk_format = VK_FORMAT_R8G8_UINT;
+					break;
+				case IMAGE_FORMAT_RGB8_UINT:
+					vk_format = VK_FORMAT_R8G8B8_UINT;
+					break;
+				case IMAGE_FORMAT_RGBA8_UINT:
+					vk_format = VK_FORMAT_R8G8B8A8_UINT;
 					break;
 				case IMAGE_FORMAT_R8:
 					vk_format = VK_FORMAT_R8_SINT;

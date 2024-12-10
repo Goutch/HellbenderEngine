@@ -27,8 +27,72 @@ namespace HBE {
 	}
 
 
-	void VK_Image::updateRegion(const void *data, uint32_t data_texel_count, TextureRegionUpdateInfo* update_info, uint32_t update_count) {
+	void VK_Image::updateRegion(const void *data, uint32_t data_texel_count, TextureRegionUpdateInfo *update_info, uint32_t update_count) {
 		device->getAllocator()->updateRegions(*this, data, data_texel_count, update_info, update_count);
+	}
+
+	std::string getFormatString(IMAGE_FORMAT format) {
+		switch (format) {
+			case IMAGE_FORMAT_R8_UINT:
+				return "R8_UINT";
+			case IMAGE_FORMAT_RG8_UINT:
+				return "RG8_UINT";
+			case IMAGE_FORMAT_RGB8_UINT:
+				return "RGB8_UINT";
+			case IMAGE_FORMAT_RGBA8_UINT:
+				return "RGBA8_UINT";
+			case IMAGE_FORMAT_R8:
+				return "R8";
+			case IMAGE_FORMAT_RG8:
+				return "RG8";
+			case IMAGE_FORMAT_RGB8:
+				return "RGB8";
+			case IMAGE_FORMAT_RGBA8:
+				return "RGBA8";
+			case IMAGE_FORMAT_R32_UINT:
+				return "R32_UINT";
+			case IMAGE_FORMAT_R32F:
+				return "R32F";
+			case IMAGE_FORMAT_RG32F:
+				return "RG32F";
+			case IMAGE_FORMAT_RGB32F:
+				return "RGB32F";
+			case IMAGE_FORMAT_RGBA32F:
+				return "RGBA32F";
+			case IMAGE_FORMAT_DEPTH32F:
+				return "DEPTH32F";
+			case IMAGE_FORMAT_DEPTH32f_STENCIL8U:
+				return "DEPTH32f_STENCIL8U";
+			case IMAGE_FORMAT_DEPTH24f_STENCIL8U:
+				return "DEPTH24f_STENCIL8U";
+			case IMAGE_FORMAT_SBGRA8_NON_LINEAR:
+				return "SBGRA8_NON_LINEAR";
+			case IMAGE_FORMAT_SR8_NON_LINEAR:
+				return "SR8_NON_LINEAR";
+			case IMAGE_FORMAT_SRG8_NON_LINEAR:
+				return "SRG8_NON_LINEAR";
+			case IMAGE_FORMAT_SRGB8_NON_LINEAR:
+				return "SRGB8_NON_LINEAR";
+			case IMAGE_FORMAT_SRGBA8_NON_LINEAR:
+				return "SRGBA8_NON_LINEAR";
+			default:
+				return "UNKNOWN";
+		}
+	}
+
+	static VkSamplerAddressMode adressModeToVKAddressMode(TEXTURE_SAMPLER_ADDRESS_MODE adress_mode) {
+		switch (adress_mode) {
+			case TEXTURE_SAMPLER_ADDRESS_MODE_REPEAT:
+				return VK_SAMPLER_ADDRESS_MODE_REPEAT;
+			case TEXTURE_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT:
+				return VK_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT;
+			case TEXTURE_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE:
+				return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+			case TEXTURE_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER:
+				return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
+			case TEXTURE_SAMPLER_ADDRESS_MODE_MIRROR_CLAMP_TO_EDGE:
+				return VK_SAMPLER_ADDRESS_MODE_MIRROR_CLAMP_TO_EDGE;
+		}
 	}
 
 	VK_Image::VK_Image(VK_Device *device, const TextureInfo &info) {
@@ -44,7 +108,7 @@ namespace HBE {
 		desired_layout = chooseLayout();
 
 #ifdef DEBUG_MODE
-		Log::debug("Create image#" + std::to_string(id));
+		Log::debug("Create image#" + std::to_string(id) + "format " + getFormatString(format));
 #endif
 		VkImageType type;
 		VkImageViewType view_type;
@@ -58,7 +122,11 @@ namespace HBE {
 			type = VK_IMAGE_TYPE_3D;
 			view_type = VK_IMAGE_VIEW_TYPE_3D;
 		}
+
+
 		vk_format = VK_Utils::getVkFormat(format);
+
+
 		byte_per_pixel = VK_Utils::getFormatStride(format);
 
 		layout = VK_IMAGE_LAYOUT_UNDEFINED;
@@ -108,7 +176,7 @@ namespace HBE {
 		} else if (info.flags & IMAGE_FLAG_RENDER_TARGET ||
 		           info.flags & IMAGE_FLAG_DEPTH ||
 		           info.flags & IMAGE_FLAG_SHADER_WRITE) {
-			//image data will be set in the sahder
+			//image data will be set in the shader
 			device->getAllocator()->setImageLayout(this, desired_layout);
 		} else {
 			//image data must be set from a user setTexture(void *data) call
@@ -140,11 +208,11 @@ namespace HBE {
 		if ((flags & IMAGE_FLAG_NO_SAMPLER) != IMAGE_FLAG_NO_SAMPLER) {
 			VkSamplerCreateInfo samplerInfo{};
 			samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-			samplerInfo.magFilter = (info.flags & IMAGE_FLAG_FILTER_NEAREST) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;//If the object is close to the camera,
-			samplerInfo.minFilter = (info.flags & IMAGE_FLAG_FILTER_NEAREST) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;//If the object is further from the camera
-			samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-			samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-			samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+			samplerInfo.magFilter = (info.sampler_info.filter == TEXTURE_SAMPLER_FILTER_TYPE_NEAREST) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;//If the object is close to the camera,
+			samplerInfo.minFilter = (info.sampler_info.filter == TEXTURE_SAMPLER_FILTER_TYPE_NEAREST) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;//If the object is further from the camera
+			samplerInfo.addressModeU = adressModeToVKAddressMode(info.sampler_info.address_mode);
+			samplerInfo.addressModeV = adressModeToVKAddressMode(info.sampler_info.address_mode);
+			samplerInfo.addressModeW = adressModeToVKAddressMode(info.sampler_info.address_mode);
 
 			samplerInfo.anisotropyEnable = device->getPhysicalDevice().getFeatures().samplerAnisotropy;
 			samplerInfo.maxAnisotropy = device->getPhysicalDevice().getProperties().limits.maxSamplerAnisotropy;
@@ -155,16 +223,20 @@ namespace HBE {
 			samplerInfo.compareEnable = VK_FALSE;
 			samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
 
-			samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-			samplerInfo.minLod = 0.0f; // 0 when close the camera.
-			samplerInfo.maxLod = static_cast<float>(mip_levels);
-			samplerInfo.mipLodBias = 0.0f; // Optional
+
+			if (info.generate_mip_maps) {
+				samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+				samplerInfo.minLod = 0.0f; // 0 when close the camera.
+				samplerInfo.maxLod = static_cast<float>(mip_levels);
+				samplerInfo.mipLodBias = 0.0f; // Optional
+			}
 
 			if (vkCreateSampler(device->getHandle(), &samplerInfo, nullptr, &sampler_handle) != VK_SUCCESS) {
 				Log::error("failed to create texture sampler!");
 			}
 		}
 	}
+
 
 	VK_Image::~VK_Image() {
 		Log::debug("Delete image#" + std::to_string(id));
@@ -233,7 +305,6 @@ namespace HBE {
 	uint32_t VK_Image::getMipLevelCount() const {
 		return mip_levels;
 	}
-
 
 
 }

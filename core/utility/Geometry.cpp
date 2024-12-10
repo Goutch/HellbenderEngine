@@ -416,7 +416,7 @@ namespace HBE {
 							   float &total_height) {
 		VertexAttributeInfo vertex_attribute_info{};
 		vertex_attribute_info.size = sizeof(float) * 5;
-		vertex_attribute_info.binding = 0;
+		vertex_attribute_info.location = 0;
 		vertex_attribute_info.flags = 0;
 
 		MeshInfo mesh_info{};
