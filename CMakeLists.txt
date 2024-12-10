@@ -59,6 +59,10 @@ set(CORE_FILES
         core/resource/Font.cpp
         core/resource/Font.h
         core/resource/StorageBuffer.h
+        core/utility/GLTFLoader.cpp
+        core/utility/GLTFLoader.h
+        core/utility/DefaultModelParser.cpp
+        core/utility/DefaultModelParser.h
 
         core/graphics/Window.h
         core/graphics/Renderer.h
