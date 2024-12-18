@@ -40,10 +40,7 @@ namespace HBE {
 		device_create_info.ppEnabledExtensionNames = enabled_extensions.data();
 
 
-		VkPhysicalDeviceRobustness2FeaturesEXT robustness_features{};
-		robustness_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT;
-		robustness_features.nullDescriptor = true;
-
+		VkPhysicalDeviceRobustness2FeaturesEXT robustness_features= physical_device.getRobustnessFeatures();
 
 		EXTENSION_FLAGS enabled_extensions_flags = physical_device.getEnabledExtensionFlags();
 

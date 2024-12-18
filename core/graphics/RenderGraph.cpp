@@ -3,6 +3,9 @@
 //
 
 #include "RenderGraph.h"
+
+#include <algorithm>
+
 #include "core/resource/Mesh.h"
 #include "core/resource/GraphicPipelineInstance.h"
 #include "core/resource/GraphicPipeline.h"
