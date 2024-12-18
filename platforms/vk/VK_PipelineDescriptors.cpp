@@ -209,7 +209,6 @@ namespace HBE {
 		allocInfo.descriptorPool = pool.handle;
 		allocInfo.descriptorSetCount = descriptor_set_layouts.size();
 		allocInfo.pSetLayouts = descriptor_set_layouts.data();
-
 		VkDescriptorSetVariableDescriptorCountAllocateInfo variable_count_info{};
 		if (has_variable_size_descriptors) {
 			bool descriptor_indexing_enabled = Application::getInfo().required_extension_flags & VULKAN_REQUIRED_EXTENSION_DESCRIPTOR_INDEXING;

@@ -88,7 +88,7 @@ namespace HBE {
 		size_t channels = 0;
 		IMAGE_FORMAT format = IMAGE_FORMAT_RGBA8;
 		size_t bits_per_channels = 0;
-		TextureSamplerInfo sampler_info;
+		TextureSamplerInfo sampler_info = {};
 	};
 
 	struct ModelPrimitiveData {

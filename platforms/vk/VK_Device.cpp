@@ -31,21 +31,21 @@ namespace HBE {
 		device_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 		device_create_info.queueCreateInfoCount = static_cast<uint32_t>(queue_create_infos.size());
 		device_create_info.pQueueCreateInfos = queue_create_infos.data();
+
 		VkPhysicalDeviceFeatures device_features{};
 		device_features.samplerAnisotropy = physical_device.getFeatures().samplerAnisotropy;
 		device_features.shaderInt64 = physical_device.getFeatures().shaderInt64;
 		device_create_info.pEnabledFeatures = &device_features;
+
 		auto &enabled_extensions = physical_device.getExtensions();
 		device_create_info.enabledExtensionCount = enabled_extensions.size();
 		device_create_info.ppEnabledExtensionNames = enabled_extensions.data();
 
+		EXTENSION_FLAGS enabled_extensions_flags = physical_device.getEnabledExtensionFlags();
 
 		VkPhysicalDeviceRobustness2FeaturesEXT robustness_features = {};
 		robustness_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT;
-		robustness_features.nullDescriptor = physical_device.getRobustnessFeatures().nullDescriptor;
-
-
-		EXTENSION_FLAGS enabled_extensions_flags = physical_device.getEnabledExtensionFlags();
+		robustness_features.nullDescriptor = VK_TRUE;//physical_device.getRobustnessFeatures().nullDescriptor;
 
 		VkPhysicalDeviceBufferDeviceAddressFeatures buffer_device_address_features{};
 		buffer_device_address_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
@@ -71,6 +71,7 @@ namespace HBE {
 		descriptor_indexing_features.shaderUniformTexelBufferArrayNonUniformIndexing = physical_device.getDescriptorIndexingFeatures().shaderUniformTexelBufferArrayNonUniformIndexing;
 		descriptor_indexing_features.shaderStorageTexelBufferArrayNonUniformIndexing = physical_device.getDescriptorIndexingFeatures().shaderStorageTexelBufferArrayNonUniformIndexing;
 		descriptor_indexing_features.descriptorBindingUpdateUnusedWhilePending = physical_device.getDescriptorIndexingFeatures().descriptorBindingUpdateUnusedWhilePending;
+
 
 		device_create_info.pNext = &robustness_features;
 		void **ppNext = &robustness_features.pNext;

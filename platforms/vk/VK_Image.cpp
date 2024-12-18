@@ -210,6 +210,13 @@ namespace HBE {
 			samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
 			samplerInfo.magFilter = (info.sampler_info.filter == TEXTURE_SAMPLER_FILTER_TYPE_NEAREST) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;//If the object is close to the camera,
 			samplerInfo.minFilter = (info.sampler_info.filter == TEXTURE_SAMPLER_FILTER_TYPE_NEAREST) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;//If the object is further from the camera
+			VkFormatProperties format_properties;
+			vkGetPhysicalDeviceFormatProperties(device->getPhysicalDevice().getHandle(), vk_format, &format_properties);
+			if ((format_properties.linearTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT) == 0) {
+				samplerInfo.magFilter = VK_FILTER_NEAREST;
+				samplerInfo.minFilter = VK_FILTER_NEAREST;
+			}
+
 			samplerInfo.addressModeU = adressModeToVKAddressMode(info.sampler_info.address_mode);
 			samplerInfo.addressModeV = adressModeToVKAddressMode(info.sampler_info.address_mode);
 			samplerInfo.addressModeW = adressModeToVKAddressMode(info.sampler_info.address_mode);

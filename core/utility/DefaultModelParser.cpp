@@ -72,7 +72,6 @@ namespace HBE {
 
 		GraphicPipelineInstance *instance_ptr = Resources::createGraphicPipelineInstance(instance_info);
 
-
 		auto texture_type_it = parser_info.texture_names.find(MODEL_TEXTURE_TYPE_ALBEDO);
 		if (texture_type_it != parser_info.texture_names.end() && materialData.albedo_texture != -1)
 			instance_ptr->setTexture(texture_type_it->second, textures[materialData.albedo_texture]);

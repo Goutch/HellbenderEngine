@@ -16,13 +16,15 @@ namespace HBE {
 		vkGetPhysicalDeviceMemoryProperties(handle, &memory_properties);
 
 		ApplicationInfo app_info = Application::getInfo();
-		VkPhysicalDeviceFeatures2 features2{};
 		features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
 
 		void **ppNext = &features2.pNext;
-		robustness2_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT;
-		features2.pNext = &robustness2_features;
-		ppNext = &robustness2_features.pNext;
+		if (true) {
+			robustness2_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT;
+			enabled_extension_flags |= EXTENSION_FLAG_NULL_DESCRIPTORS;
+			*ppNext = &robustness2_features;
+			ppNext = &robustness2_features.pNext;
+		}
 		if (app_info.required_extension_flags & VULKAN_REQUIRED_EXTENSION_RTX) {
 			enabled_extension_flags |= EXTENSION_FLAG_RAY_TRACING_PIPELINE;
 			enabled_extension_flags |= EXTENSION_FLAG_ACCELERATION_STRUCTURE;
@@ -33,9 +35,11 @@ namespace HBE {
 					VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
 			ray_tracing_pipeline_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
 			*ppNext = &buffer_device_address_features;
+			ppNext = &buffer_device_address_features.pNext;
 
 			buffer_device_address_features.pNext = &acceleration_structure_features;
 			acceleration_structure_features.pNext = &ray_tracing_pipeline_features;
+			*ppNext = &buffer_device_address_features;
 			ppNext = &ray_tracing_pipeline_features.pNext;
 		}
 		if (app_info.required_extension_flags & VULKAN_REQUIRED_EXTENSION_DESCRIPTOR_INDEXING ||
@@ -43,11 +47,13 @@ namespace HBE {
 			enabled_extension_flags |= EXTENSION_FLAG_DESCRIPTOR_INDEXING;
 			descriptor_indexing_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
 			*ppNext = &descriptor_indexing_features;
+			ppNext = &descriptor_indexing_features.pNext;
 		}
 		if (app_info.vulkan_version >= VULKAN_VERSION_1_3) {
 			enabled_extension_flags |= EXTENSION_FLAG_DYNAMIC_RENDERING;
 			dynamic_rendering_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES;
 			*ppNext = &dynamic_rendering_features;
+			ppNext = &dynamic_rendering_features.pNext;
 		}
 
 		vkGetPhysicalDeviceFeatures2(handle, &features2);
@@ -133,11 +139,8 @@ namespace HBE {
 		device_enabled_extensions.emplace(physical_device, REQUIRED_EXTENSIONS);
 
 
-
-
 		ApplicationInfo app_info = Application::getInfo();
 
-		//robustness2
 		{
 			if (!checkExtensionsSupport(physical_device, ROBUSTNESS_EXTENSIONS)) {
 				return false;
@@ -339,5 +342,9 @@ namespace HBE {
 
 	const EXTENSION_FLAGS &VK_PhysicalDevice::getEnabledExtensionFlags() const {
 		return enabled_extension_flags;
+	}
+
+	const VkPhysicalDeviceFeatures2& VK_PhysicalDevice::getFeatures2() {
+		return features2;
 	}
 }

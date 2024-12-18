@@ -1,5 +1,5 @@
 #version 450
-
+#extension GL_EXT_nonuniform_qualifier: enable
 //----------------------inputs----------------------
 layout (location = 0) in vec4 fragmentPos;
 layout (location = 1) in vec3 fragmentNormal;
@@ -25,12 +25,12 @@ layout (binding = 2) uniform MaterialProperties {
 } material;
 
 void main() {
-    if (material.has_albedo == 0)
+    if (material.has_albedo == 1)
     {
-        outColor = material.base_color;
+        outColor = texture(albedo, fragmentUV) / 255.0f;
     }
     else
     {
-        outColor = texture(albedo, fragmentUV)/255.0f;
+        outColor = material.base_color;
     }
 }

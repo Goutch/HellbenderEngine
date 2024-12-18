@@ -163,12 +163,15 @@ namespace HBE {
 			ModelTextureData texture_data{};
 			if (gltf_texture.sampler != -1) {
 				const tinygltf::Sampler &gltf_sampler = model.samplers[gltf_texture.sampler];
-				//todo: handle sampler
-				texture_data.sampler_info.address_mode = gltfWrapModeToTextureSamplerAddressMode(gltf_sampler.wrapS);
-				texture_data.sampler_info.filter = gltfFilterModeToTextureSamplerFilter(gltf_sampler.minFilter);
+				if (gltf_sampler.wrapS != -1)
+					texture_data.sampler_info.address_mode = gltfWrapModeToTextureSamplerAddressMode(gltf_sampler.wrapS);
+				if (gltf_sampler.minFilter != -1)
+					texture_data.sampler_info.filter = gltfFilterModeToTextureSamplerFilter(gltf_sampler.minFilter);
+
 			}
 
-			texture_data.width = texture_data.width > 0 ? texture_data.width : 1;
+			HB_ASSERT(gltf_image.width >= 1 && gltf_image.height >= 1, "Image Witdh or Height is 0");
+			texture_data.width = gltf_image.width;
 			texture_data.height = gltf_image.height;
 			texture_data.channels = gltf_image.component;
 			texture_data.bits_per_channels = gltf_image.bits;

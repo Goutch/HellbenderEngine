@@ -91,7 +91,7 @@ namespace HBE {
 		VkPhysicalDeviceRayTracingPipelinePropertiesKHR ray_tracing_pipeline_properties{};
 		VkPhysicalDeviceDescriptorIndexingProperties descriptor_indexing_properties{};
 
-
+		VkPhysicalDeviceFeatures2 features2{};
 		VkPhysicalDeviceRobustness2FeaturesEXT robustness2_features{};
 		VkPhysicalDeviceAccelerationStructureFeaturesKHR acceleration_structure_features{};
 		VkPhysicalDeviceRayTracingPipelineFeaturesKHR ray_tracing_pipeline_features{};
@@ -143,6 +143,8 @@ namespace HBE {
 
 		const EXTENSION_FLAGS &getEnabledExtensionFlags() const;
 
+		const VkPhysicalDeviceFeatures2& getFeatures2();
+
 	private:
 		void pickBestPhysicalDevice();
 
@@ -154,5 +156,7 @@ namespace HBE {
 		bool isDeviceSuitable(const VkPhysicalDevice &physical_device);
 
 		void calculateScore(const VkPhysicalDevice &physical_device);
+
+
 	};
 }
