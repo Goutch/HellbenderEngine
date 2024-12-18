@@ -168,7 +168,7 @@ namespace HBE {
 				texture_data.sampler_info.filter = gltfFilterModeToTextureSamplerFilter(gltf_sampler.minFilter);
 			}
 
-			texture_data.width = texture_data.width;
+			texture_data.width = texture_data.width > 0 ? texture_data.width : 1;
 			texture_data.height = gltf_image.height;
 			texture_data.channels = gltf_image.component;
 			texture_data.bits_per_channels = gltf_image.bits;
