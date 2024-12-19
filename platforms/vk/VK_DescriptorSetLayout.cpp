@@ -35,10 +35,10 @@ namespace HBE {
 		}
 		descriptor_binding_flags[descriptor_binding_flags.size() - 1] = last_descriptor.variable_size ?
 		                                                                VK_DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT_BIT : 0;
-
-
+		
 		if (empty_descriptor_allowed) {
-			HB_ASSERT(device->getPhysicalDevice().getDescriptorIndexingFeatures().descriptorBindingPartiallyBound, "Descriptor binding partially bound not supported");
+			HB_ASSERT(device->getPhysicalDevice().getEnabledExtensionFlags() & EXTENSION_FLAG_DESCRIPTOR_INDEXING, "Empty descriptor needs descriptor indexing extension  enabled");
+			HB_ASSERT(device->getPhysicalDevice().getDescriptorIndexingFeatures().descriptorBindingPartiallyBound, "Descriptor binding partially bound not supported by graphic card");
 			for (int i = 0; i < descriptor_binding_flags.size(); ++i) {
 				descriptor_binding_flags[i] |= VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT;
 			}
@@ -52,11 +52,13 @@ namespace HBE {
 		layoutInfo.bindingCount = bindings.size();
 		layoutInfo.pBindings = bindings.data();
 
-		layoutInfo.pNext = &flagsInfo;
-		flagsInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO_EXT;
-		flagsInfo.bindingCount = bindings.size();
-		flagsInfo.pBindingFlags = descriptor_binding_flags.data();
-
+		//binding flags require descriptor indexing enabled
+		if (device->getPhysicalDevice().getEnabledExtensionFlags() & EXTENSION_FLAG_DESCRIPTOR_INDEXING) {
+			layoutInfo.pNext = &flagsInfo;
+			flagsInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO_EXT;
+			flagsInfo.bindingCount = bindings.size();
+			flagsInfo.pBindingFlags = descriptor_binding_flags.data();
+		}
 
 		vkCreateDescriptorSetLayout(device->getHandle(), &layoutInfo, nullptr, &handle);
 
