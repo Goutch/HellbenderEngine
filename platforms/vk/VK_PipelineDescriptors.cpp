@@ -84,30 +84,30 @@ namespace HBE {
 			}
 			switch (layout_binding.descriptorType) {
 				case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
-					uniform_buffer_count += layout_binding.descriptorCount;
+					uniform_buffer_count += layout_binding.descriptorCount*MAX_FRAMES_IN_FLIGHT;
 					break;
 				case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
-					combined_image_sampler_count += layout_binding.descriptorCount;
+					combined_image_sampler_count += layout_binding.descriptorCount*MAX_FRAMES_IN_FLIGHT;
 					break;
 				case VK_DESCRIPTOR_TYPE_SAMPLER:
 					break;
 				case VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE:
-					separate_image_count += layout_binding.descriptorCount;
+					separate_image_count += layout_binding.descriptorCount*MAX_FRAMES_IN_FLIGHT;
 					break;
 				case VK_DESCRIPTOR_TYPE_STORAGE_IMAGE:
-					storage_image_count += layout_binding.descriptorCount;
+					storage_image_count += layout_binding.descriptorCount*MAX_FRAMES_IN_FLIGHT;
 					break;
 				case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
-					storage_buffer_count += layout_binding.descriptorCount;
+					storage_buffer_count += layout_binding.descriptorCount*MAX_FRAMES_IN_FLIGHT;
 					break;
 				case VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
-					storage_texel_buffer_count += layout_binding.descriptorCount;
+					storage_texel_buffer_count += layout_binding.descriptorCount*MAX_FRAMES_IN_FLIGHT;
 					break;
 				case VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
-					uniform_texel_buffer_count += layout_binding.descriptorCount;
+					uniform_texel_buffer_count += layout_binding.descriptorCount*MAX_FRAMES_IN_FLIGHT;
 					break;
 				case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR:
-					acceleration_structure_count += layout_binding.descriptorCount;
+					acceleration_structure_count += layout_binding.descriptorCount*MAX_FRAMES_IN_FLIGHT;
 					break;
 			}
 		}
