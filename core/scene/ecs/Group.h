@@ -93,7 +93,6 @@ namespace HBE {
 			iterator(iterator &&other) : pages(other.pages) {
 				this->current_entity = other.current_entity;
 				this->current_page = other.current_page;
-				this->components_signature = other.components_signature;
 				this->current_pools = other.current_pools;
 				this->entities = other.entities;
 				this->pages = other.pages;
@@ -102,7 +101,6 @@ namespace HBE {
 			iterator(iterator &other) : pages(other.pages) {
 				this->current_entity = other.current_entity;
 				this->current_page = other.current_page;
-				this->components_signature = other.components_signature;
 				this->current_pools = other.current_pools;
 				this->entities = other.entities;
 				this->pages = other.pages;
