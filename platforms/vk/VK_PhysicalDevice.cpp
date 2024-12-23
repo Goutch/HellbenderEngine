@@ -39,7 +39,7 @@ namespace HBE {
 
 			buffer_device_address_features.pNext = &acceleration_structure_features;
 			acceleration_structure_features.pNext = &ray_tracing_pipeline_features;
-			*ppNext = &buffer_device_address_features;
+			*ppNext = &ray_tracing_pipeline_features;
 			ppNext = &ray_tracing_pipeline_features.pNext;
 		}
 		if (app_info.required_extension_flags & VULKAN_REQUIRED_EXTENSION_DESCRIPTOR_INDEXING ||
