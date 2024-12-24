@@ -8,7 +8,7 @@ layout(location = 2) in vec2 inUV;
 
 //--------------------outputs--------------------
 layout(location = 0) out vec4 fragmentPos;
-layout(location = 1) out vec3 fragmentNormal;
+layout(location = 1) out vec4 fragmentNormal;
 layout(location = 2) out vec2 fragmentUV;
 
 //----------------------uniforms----------------------
@@ -26,6 +26,6 @@ void main() {
     vec4 pos = constants.transform * vec4(inPosition, 1.0);
     gl_Position = ubo.projection * ubo.view * pos;
     fragmentPos = pos;
-    fragmentNormal = inNormal;
+    fragmentNormal = vec4(inNormal,1.0);
     fragmentUV = inUV;
 }

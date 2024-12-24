@@ -7,7 +7,7 @@
 #include "Resources.h"
 
 namespace HBE {
-	int getFormatNumberOfChannels(IMAGE_FORMAT format) {
+	int Texture::getFormatNumberOfChannels(IMAGE_FORMAT format) {
 		switch (format) {
 			case IMAGE_FORMAT_R32F:
 			case IMAGE_FORMAT_R8:
@@ -41,7 +41,7 @@ namespace HBE {
 
 		stbi_set_flip_vertically_on_load(true);
 		int nb_channels;
-		int expected_channels = getFormatNumberOfChannels(format);
+		int expected_channels = Texture::getFormatNumberOfChannels(format);
 		buffer = stbi_load_from_file(file, &width, &height, &nb_channels, expected_channels);
 
 		if (nb_channels != expected_channels) {

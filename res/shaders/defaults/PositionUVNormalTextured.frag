@@ -2,8 +2,8 @@
 #extension GL_EXT_nonuniform_qualifier: enable
 //----------------------inputs----------------------
 layout (location = 0) in vec4 fragmentPos;
-layout (location = 1) in vec4 fragmentNormal;
-layout (location = 2) in vec2 fragmentUV;
+layout (location = 1) in vec2 fragmentUV;
+layout (location = 2) in vec3 fragmentNormal;
 
 //----------------------outputs----------------------
 layout (location = 0) out vec4 outColor;
@@ -27,7 +27,8 @@ layout (binding = 2) uniform MaterialProperties {
 void main() {
     if (material.has_albedo == 1)
     {
-        outColor = texture(albedo, fragmentUV) / 255.0f;
+        outColor = vec4(abs(fragmentUV), 0.0, 1.0);
+        // outColor = texture(albedo,fragmentUV ) / 255.0f;
     }
     else
     {

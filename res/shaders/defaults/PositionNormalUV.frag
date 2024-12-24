@@ -1,7 +1,7 @@
 #version 450
 
 //----------------------inputs----------------------
-layout (location = 0) in vec4 fragmentPos;
+layout (location = 0) in vec3 fragmentPos;
 layout(location = 1) in vec3 fragmentNormal;
 layout(location = 2) in vec2 fragmentUV;
 

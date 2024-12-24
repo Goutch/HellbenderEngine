@@ -9,20 +9,26 @@
 #include "core/scene/components/Transform.h"
 #include "core/scene/components/EntityState.h"
 
-namespace HBE {
-	CameraControllerSystem::CameraControllerSystem(Scene *scene) : System(scene) {
+namespace HBE
+{
+	CameraControllerSystem::CameraControllerSystem(Scene* scene) : System(scene)
+	{
 		scene->onUpdate.subscribe(this, &CameraControllerSystem::update);
-		Event<Entity> &e = scene->onDetach<CameraController>();
+		Event<Entity>& e = scene->onDetach<CameraController>();
 		e.subscribe(this, &CameraControllerSystem::onDetach);
+		e.subscribe(this, &CameraControllerSystem::onAttach);
 	}
 
-	void CameraControllerSystem::update(float delta_t) {
+	void CameraControllerSystem::update(float delta_t)
+	{
 		HB_PROFILE_BEGIN("CameraControllerUpdate");
 		HB_PROFILE_BEGIN("CameraControllerUpdateGroup");
 		auto group = scene->group<EntityState, Transform, Camera, CameraController>();
 		HB_PROFILE_END("CameraControllerUpdateGroup");
-		for (auto [handle, state, transform, camera, controller]: group) {
-			if (state.state == ENTITY_STATE_INACTIVE) {
+		for (auto [handle, state, transform, camera, controller] : group)
+		{
+			if (state.state == ENTITY_STATE_INACTIVE)
+			{
 				continue;
 			}
 			float max_pitch_radian = glm::radians(controller.max_pitch);
@@ -48,7 +54,7 @@ namespace HBE {
 			if (!controller.invert_y)
 				controller.current_pitch += mouse_delta.y;
 			else
-				controller.current_pitch -=  mouse_delta.y;
+				controller.current_pitch -= mouse_delta.y;
 
 			controller.current_pitch = glm::clamp(controller.current_pitch, -max_pitch_radian, max_pitch_radian);
 
@@ -56,93 +62,119 @@ namespace HBE {
 
 			float boost = 1.0f;
 			vec3 translation = vec3(0);
-			if (Input::getKey(KEY_S)) {
+			if (Input::getKey(KEY_S))
+			{
 				translation.z += 1;
 			}
-			if (Input::getKey(KEY_W)) {
+			if (Input::getKey(KEY_W))
+			{
 				translation.z = -1;
 			}
-			if (Input::getKey(KEY_D)) {
+			if (Input::getKey(KEY_D))
+			{
 				translation.x += 1;
 			}
-			if (Input::getKey(KEY_A)) {
+			if (Input::getKey(KEY_A))
+			{
 				translation.x = -1;
 			}
-			if (Input::getKey(KEY_SPACE)) {
+			if (Input::getKey(KEY_SPACE))
+			{
 				translation.y += 1;
 			}
-			if (Input::getKey(KEY_LEFT_CONTROL)) {
+			if (Input::getKey(KEY_LEFT_CONTROL))
+			{
 				translation.y = -1;
 			}
-			if (Input::getKey(KEY_LEFT_SHIFT)) {
+			if (Input::getKey(KEY_LEFT_SHIFT))
+			{
 				boost = 10.0f;
 			}
 
 			transform.translate(translation * delta_t * controller.speed * boost);
 		}
 		auto group2D = scene->group<Transform, Camera2D, CameraController>();
-		for (auto [handle, transform, camera, controller]: group2D) {
+		for (auto [handle, transform, camera, controller] : group2D)
+		{
 			float boost = 1.0f;
 			vec3 translation = vec3(0);
-			if (Input::getKey(KEY_LEFT_SHIFT)) {
+			if (Input::getKey(KEY_LEFT_SHIFT))
+			{
 				boost = 10.0f;
 			}
-			if (Input::getKey(KEY_EQUAL)) {
+			if (Input::getKey(KEY_EQUAL))
+			{
 				camera.setZoomRatio(camera.getZoomRatio() + (delta_t * boost));
 			}
-			if (Input::getKey(KEY_MINUS)) {
+			if (Input::getKey(KEY_MINUS))
+			{
 				camera.setZoomRatio(camera.getZoomRatio() - (delta_t * boost));
 			}
-			if (Input::getKey(KEY_D)) {
+			if (Input::getKey(KEY_D))
+			{
 				translation.x += 1;
 			}
-			if (Input::getKey(KEY_A)) {
+			if (Input::getKey(KEY_A))
+			{
 				translation.x = -1;
 			}
-			if (Input::getKey(KEY_W)) {
+			if (Input::getKey(KEY_W))
+			{
 				translation.y += 1;
 			}
-			if (Input::getKey(KEY_S)) {
+			if (Input::getKey(KEY_S))
+			{
 				translation.y = -1;
 			}
 
 
 			transform.translate(translation * delta_t * controller.speed * boost);
-
 		}
 		auto group_pixel = scene->group<Transform, PixelCamera, CameraController>();
-		for (auto [handle, transform, camera, controller]: group_pixel) {
+		for (auto [handle, transform, camera, controller] : group_pixel)
+		{
 			float boost = 1.0f;
 			vec3 translation = vec3(0);
-			if (Input::getKey(KEY_LEFT_SHIFT)) {
+			if (Input::getKey(KEY_LEFT_SHIFT))
+			{
 				boost = 10.0f;
 			}
-			if (Input::getKey(KEY_D)) {
+			if (Input::getKey(KEY_D))
+			{
 				translation.x += 1;
 			}
-			if (Input::getKey(KEY_A)) {
+			if (Input::getKey(KEY_A))
+			{
 				translation.x = -1;
 			}
-			if (Input::getKey(KEY_W)) {
+			if (Input::getKey(KEY_W))
+			{
 				translation.y += 1;
 			}
-			if (Input::getKey(KEY_S)) {
+			if (Input::getKey(KEY_S))
+			{
 				translation.y = -1;
 			}
 			transform.translate(translation * delta_t * controller.speed * boost);
 		}
 		HB_PROFILE_END("CameraControllerUpdate");
-
 	}
 
-	CameraControllerSystem::~CameraControllerSystem() {
+	CameraControllerSystem::~CameraControllerSystem()
+	{
 		scene->onUpdate.unsubscribe(this);
 	}
 
-	void CameraControllerSystem::onDetach(Entity entity) {
-		CameraController *c = entity.get<CameraController>();
-		Transform *t = entity.get<Transform>();
-		t->rotate(vec3(-c->current_pitch, 0, 0));
+	void CameraControllerSystem::onAttach(Entity entity)
+	{
+		Input::setCursorVisible(false);
 	}
 
+	void CameraControllerSystem::onDetach(Entity entity)
+	{
+		Input::setCursorVisible(true);
+		CameraController* c = entity.get<CameraController>();
+		Transform* t = entity.get<Transform>();
+		t->rotate(vec3(-c->current_pitch, 0, 0));
+	}
 }

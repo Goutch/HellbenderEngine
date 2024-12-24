@@ -102,6 +102,7 @@ namespace HBE {
 
 		virtual void updateRegion(const void *data, uint32_t data_texel_count, TextureRegionUpdateInfo *update_infos, uint32_t update_count) = 0;
 
+		static int getFormatNumberOfChannels(IMAGE_FORMAT format);
 		static Texture *load(const std::string &path, IMAGE_FORMAT format, IMAGE_FLAGS flags);
 	};
 

@@ -215,6 +215,7 @@ namespace HBE {
 			if ((format_properties.linearTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT) == 0) {
 				samplerInfo.magFilter = VK_FILTER_NEAREST;
 				samplerInfo.minFilter = VK_FILTER_NEAREST;
+				Log::warning("Texture image format does not support linear filtering, using nearest instead");
 			}
 
 			samplerInfo.addressModeU = adressModeToVKAddressMode(info.sampler_info.address_mode);
@@ -241,6 +242,9 @@ namespace HBE {
 			if (vkCreateSampler(device->getHandle(), &samplerInfo, nullptr, &sampler_handle) != VK_SUCCESS) {
 				Log::error("failed to create texture sampler!");
 			}
+
+			Log::debug("Create sampler with mode:" + std::to_string(info.sampler_info.address_mode) );
+			Log::debug("Create sampler with filter:" + std::to_string(info.sampler_info.filter) );
 		}
 	}
 

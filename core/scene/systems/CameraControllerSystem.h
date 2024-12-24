@@ -8,6 +8,7 @@ namespace HBE {
 	public:
 		CameraControllerSystem(Scene *scene);
 		~CameraControllerSystem();
+		void onAttach(Entity entity);
 		void onDetach(Entity entity);
 		void update(float delta_t);
 	};
