@@ -52,7 +52,7 @@ namespace HBE {
 		}
 		info.width = width;
 		info.height = height;
-		info.format = format;
+		info.data_format = format;
 		info.flags = flags;
 		info.data = buffer;
 		texture = Resources::createTexture(info,path);

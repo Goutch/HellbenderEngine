@@ -299,7 +299,7 @@ namespace HBE {
 
 		VK_Image **vk_images = reinterpret_cast< VK_Image **>(present_cmd_info.images);
 		for (int i = 0; i < present_cmd_info.image_count; ++i) {
-			VK_Allocator::barrierTransitionImageLayout(command_pool, vk_images[i], VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+			VK_Allocator::cmdBarrierTransitionImageLayout(command_pool, vk_images[i], VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 		}
 
 		screen_pipeline_instance->setTextureArray("layers", &present_cmd_info.images[0], present_cmd_info.image_count, current_frame, 0);
@@ -318,7 +318,7 @@ namespace HBE {
 		swapchain->endRenderPass(command_pool->getCurrentBuffer());
 
 		for (int i = 0; i < present_cmd_info.image_count; ++i) {
-			VK_Allocator::barrierTransitionImageLayout(command_pool, vk_images[i], vk_images[i]->getDesiredLayout());
+			VK_Allocator::cmdBarrierTransitionImageLayout(command_pool, vk_images[i], vk_images[i]->getDesiredLayout());
 		}
 
 		command_pool->end();
@@ -373,7 +373,6 @@ namespace HBE {
 
 		frame_presented = false;
 		current_frame = (current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
-		device->getAllocator()->freeStagingBuffers();
 
 		command_pool->getCurrentFence().wait();
 

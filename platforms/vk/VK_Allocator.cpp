@@ -6,6 +6,8 @@
 #include "cstring"
 #include "VK_Renderer.h"
 #include "Application.h"
+#include "VK_Utils.h"
+#include "core/graphics/Graphics.h"
 
 namespace HBE
 {
@@ -29,25 +31,26 @@ namespace HBE
 		this->device = device;
 		this->command_pool = new VK_CommandPool(*device, 1, device->getQueue(QUEUE_FAMILY_GRAPHICS));
 
-		memory_propeties = &device->getPhysicalDevice().getMemoryProperties();
-		for (int i = 0; i < memory_propeties->memoryHeapCount; ++i)
+		Graphics::onFrameChange.subscribe(this, &VK_Allocator::freeStagingBuffers);
+		memory_properties = &device->getPhysicalDevice().getMemoryProperties();
+		for (int i = 0; i < memory_properties->memoryHeapCount; ++i)
 		{
 			memory_heaps.push_back({
-				memory_propeties->memoryHeaps[i].size, 0,
+				memory_properties->memoryHeaps[i].size, 0,
 				false
 			});
 			memory_heaps[i].block_size = glm::min(static_cast<VkDeviceSize>(std::floor(memory_heaps[i].max_size / 10)),
 			                                      BLOCK_SIZE);
 		}
-		for (uint32_t i = 0; i < memory_propeties->memoryTypeCount; ++i)
+		for (uint32_t i = 0; i < memory_properties->memoryTypeCount; ++i)
 		{
 			memory_types.push_back({
 				i,
-				memory_propeties->memoryTypes[i].heapIndex,
+				memory_properties->memoryTypes[i].heapIndex,
 				(uint32_t(1) << i),
-				memory_propeties->memoryTypes[i].propertyFlags
+				memory_properties->memoryTypes[i].propertyFlags
 			});
-			memory_heaps[memory_propeties->memoryTypes[i].heapIndex].memory_properties_flags |= memory_propeties->
+			memory_heaps[memory_properties->memoryTypes[i].heapIndex].memory_properties_flags |= memory_properties->
 				memoryTypes[i].propertyFlags;
 		}
 
@@ -56,21 +59,21 @@ namespace HBE
 			std::vector<std::string> properties;
 			if (memory_heaps[i].memory_properties_flags & VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)
 			{
-				properties.push_back("DEVICE_LOCAL");
+				properties.emplace_back("DEVICE_LOCAL");
 			}
 			if (memory_heaps[i].memory_properties_flags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT)
 			{
-				properties.push_back("HOST_VISIBLE");
+				properties.emplace_back("HOST_VISIBLE");
 			}
 			if (memory_heaps[i].memory_properties_flags & VK_MEMORY_PROPERTY_HOST_CACHED_BIT)
 			{
-				properties.push_back("HOST_CACHED");
+				properties.emplace_back("HOST_CACHED");
 			}
 			if (memory_heaps[i].memory_properties_flags & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)
 			{
-				properties.push_back("HOST_COHERENT");
+				properties.emplace_back("HOST_COHERENT");
 			}
-			std::string properties_str = "";
+			std::string properties_str;
 			for (int j = 0; j < properties.size(); ++j)
 			{
 				properties_str += properties[j];
@@ -85,7 +88,7 @@ namespace HBE
 				"mb and properties: " + properties_str);
 		}
 
-		for (size_t i = 0; i < memory_propeties->memoryHeapCount; ++i)
+		for (size_t i = 0; i < memory_properties->memoryHeapCount; ++i)
 		{
 			blocks.emplace(i, std::vector<Block*>());
 		}
@@ -94,11 +97,11 @@ namespace HBE
 
 	VK_Allocator::~VK_Allocator()
 	{
-		freeStagingBuffers();
+		freeStagingBuffers(0);
 		delete command_pool;
-		for (auto it = blocks.begin(); it != blocks.end(); ++it)
+		for (auto& it : blocks)
 		{
-			for (Block* block : it->second)
+			for (Block* block : it.second)
 			{
 				vkFreeMemory(device->getHandle(), block->memory, nullptr);
 			}
@@ -108,6 +111,7 @@ namespace HBE
 			vkFreeMemory(device->getHandle(), pooled_block.second->memory, nullptr);
 			delete pooled_block.second;
 		}
+		Graphics::onFrameChange.unsubscribe(this);
 	}
 
 	uint32_t VK_Allocator::findMemoryTypeIndex(VkMemoryRequirements memory_requirement, ALLOC_FLAGS flags)
@@ -134,7 +138,7 @@ namespace HBE
 	{
 		VkMemoryPropertyFlags flags = device->getPhysicalDevice().getMemoryProperties().memoryTypes[mem_type_index].
 			propertyFlags;
-		std::string type = "";
+		std::string type;
 		bool need_separator = false;
 		std::string separator = " & ";
 		if (VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT & flags)
@@ -172,7 +176,7 @@ namespace HBE
 			" at position " + std::to_string(alloc.offset) + " in block " + std::to_string(alloc.block->index);
 	}
 
-	StagingBuffer VK_Allocator::createTempStagingBuffer(const void* data, size_t size)
+	StagingAllocation VK_Allocator::createTempStagingBuffer(const void* data, size_t size)
 	{
 		VkBufferCreateInfo staging_buffer_info{};
 		staging_buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -193,7 +197,7 @@ namespace HBE
 		VkDeviceMemory& stagingBufferMemory = staging_alloc.block->memory;
 
 		vkBindBufferMemory(device->getHandle(), buffer, staging_alloc.block->memory, staging_alloc.offset);
-		StagingBuffer staging_buffer = StagingBuffer{staging_alloc, buffer};
+		StagingAllocation staging_buffer = StagingAllocation{staging_alloc, buffer};
 		void* staging_buffer_data;
 		vkMapMemory(device->getHandle(), staging_buffer.allocation.block->memory, staging_buffer.allocation.offset,
 		            staging_buffer.allocation.size, 0, &staging_buffer_data);
@@ -215,10 +219,10 @@ namespace HBE
 		}
 		else
 		{
-			StagingBuffer staging_buffer = createTempStagingBuffer(data, size);
+			StagingAllocation staging_buffer = createTempStagingBuffer(data, size);
 			staging_buffer.fence = &command_pool->getCurrentFence();
-			copy(staging_buffer.buffer, buffer.getHandle(), size, offset);
-			staging_buffers_delete_queue.emplace(staging_buffer);
+			copy(staging_buffer.vk_buffer, buffer.getHandle(), size, offset);
+			delete_queue.emplace(staging_buffer);
 		}
 	}
 
@@ -229,9 +233,9 @@ namespace HBE
 
 		command_pool->begin();
 
-		StagingBuffer staging_buffer = createTempStagingBuffer(data, data_texel_count * image.bytePerPixel());
+		StagingAllocation staging_buffer = createTempStagingBuffer(data, data_texel_count * image.bytePerPixel());
 		staging_buffer.fence = &command_pool->getCurrentFence();
-		barrierTransitionImageLayout(command_pool, &image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+		cmdBarrierTransitionImageLayout(command_pool, &image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 		for (int i = 0; i < update_count; ++i)
 		{
 			HB_ASSERT(
@@ -257,20 +261,20 @@ namespace HBE
 		}
 		vkCmdCopyBufferToImage(
 			command_pool->getCurrentBuffer(),
-			staging_buffer.buffer,
+			staging_buffer.vk_buffer,
 			image.getHandle(),
 			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
 			update_count,
 			regions_copy_infos
 		);
-		staging_buffers_delete_queue.emplace(staging_buffer);
+		delete_queue.emplace(staging_buffer);
 		if (image.getMipLevelCount() > 1)
 		{
 			generateMipmaps(image);
 		}
 		else
 		{
-			barrierTransitionImageLayout(command_pool, &image, image.getDesiredLayout());
+			cmdBarrierTransitionImageLayout(command_pool, &image, image.getDesiredLayout());
 		}
 
 		command_pool->end();
@@ -293,7 +297,6 @@ namespace HBE
 	Allocation VK_Allocator::alloc(VkMemoryRequirements mem_requirements, ALLOC_FLAGS flags)
 	{
 		MemoryTypeInfo memory_type = memory_types[findMemoryTypeIndex(mem_requirements, flags)];
-
 
 		for (Block* block : blocks[memory_type.heap_index])
 		{
@@ -435,14 +438,32 @@ namespace HBE
 		return new_alloc;
 	}
 
-	void VK_Allocator::freeStagingBuffers()
+	void VK_Allocator::freeStagingBuffers(uint32_t frame)
 	{
-		while (!staging_buffers_delete_queue.empty() && vkGetFenceStatus(
-			device->getHandle(), staging_buffers_delete_queue.front().fence->getHandle()) == VK_SUCCESS)
+		while (!delete_queue.empty() &&
+			(delete_queue.front().fence == VK_NULL_HANDLE || vkGetFenceStatus(device->getHandle(), delete_queue.front().fence->getHandle()) == VK_SUCCESS))
 		{
-			vkDestroyBuffer(device->getHandle(), staging_buffers_delete_queue.front().buffer, nullptr);
-			free(staging_buffers_delete_queue.front().allocation);
-			staging_buffers_delete_queue.pop();
+			StagingAllocation staging_allocation = delete_queue.front();
+			if (staging_allocation.vk_buffer != VK_NULL_HANDLE)
+			{
+				free(delete_queue.front().allocation);
+				vkDestroyBuffer(device->getHandle(), delete_queue.front().vk_buffer, nullptr);
+			}
+			else if (staging_allocation.vk_image != VK_NULL_HANDLE)
+			{
+				vkDestroyImage(device->getHandle(), staging_allocation.vk_image, nullptr);
+				free(delete_queue.front().allocation);
+			}
+			else if (staging_allocation.image != nullptr)
+			{
+				delete staging_allocation.image;
+			}
+			else if (staging_allocation.buffer != nullptr)
+			{
+				delete staging_allocation.buffer;
+			}
+
+			delete_queue.pop();
 		}
 	}
 
@@ -497,11 +518,10 @@ namespace HBE
 		command_pool->submit(QUEUE_FAMILY_GRAPHICS);
 	}
 
-	void VK_Allocator::barrierTransitionImageLayout(VK_CommandPool* command_pool, VK_Image* image,
-	                                                VkImageLayout new_layout)
+	void VK_Allocator::cmdBarrierTransitionImageLayout(VK_CommandPool* command_pool, VK_Image* image,
+	                                                   VkImageLayout new_layout)
 	{
 		VkImageLayout old_layout = image->getImageLayout();
-		if (old_layout == new_layout) return;
 
 		//block dstStage until srcStage is finished
 		VkImageMemoryBarrier barrier{};
@@ -523,11 +543,13 @@ namespace HBE
 		barrier.subresourceRange.layerCount = 1;
 		if (new_layout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
 		{
+			VkFormatProperties format_properties;
 			barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-			//todo: stencil
-			/*if (hasStencilComponent(format)) {
-					barrier.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
-			}*/
+			if (image->getVkFormat() == VK_FORMAT_D32_SFLOAT_S8_UINT ||
+				image->getVkFormat() == VK_FORMAT_D24_UNORM_S8_UINT)
+			{
+				barrier.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
+			}
 		}
 		else
 		{
@@ -560,6 +582,10 @@ namespace HBE
 			barrier.srcAccessMask = 0;
 			sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 			break;
+		case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
+			barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+			sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+			break;
 		case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
 			barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 			sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
@@ -577,7 +603,7 @@ namespace HBE
 			sourceStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 			break;
 		default:
-			Log::error("unsupported layout transition!");
+			Log::error("Unsupported layout transition! (unsuported)" + VK_Utils::layoutToString(old_layout) + " -> " + VK_Utils::layoutToString(new_layout));
 			break;
 		}
 		switch (new_layout)
@@ -590,7 +616,10 @@ namespace HBE
 			barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_INPUT_ATTACHMENT_READ_BIT;
 			destinationStage = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 			break;
-
+		case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
+			barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+			destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+			break;
 		case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
 			barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 			destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
@@ -607,7 +636,7 @@ namespace HBE
 			destinationStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 			break;
 		default:
-			Log::error("unsupported layout transition!");
+			Log::error("Unsupported layout transition! " + VK_Utils::layoutToString(old_layout) + " -> (unsuported)" + VK_Utils::layoutToString(new_layout));
 			return;
 		}
 
@@ -625,6 +654,57 @@ namespace HBE
 		);
 
 		image->setImageLayout(new_layout);
+	}
+
+	VK_Fence* VK_Allocator::blitImage(VK_Image& src, VK_Image& dest)
+	{
+		VK_Fence* fence = &command_pool->getCurrentFence();;
+		VkFormatProperties src_format_properties;
+		VkFormatProperties dest_format_properties;
+		vkGetPhysicalDeviceFormatProperties(device->getPhysicalDevice().getHandle(), src.getVkFormat(),
+		                                    &src_format_properties);
+		vkGetPhysicalDeviceFormatProperties(device->getPhysicalDevice().getHandle(), dest.getVkFormat(),
+		                                    &dest_format_properties);
+
+		if (src_format_properties.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT &&
+			dest_format_properties.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT)
+		{
+			VkImageBlit region{};
+			region.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			region.srcSubresource.layerCount = 1;
+			region.srcOffsets[1] = {0, 0, 1};
+			region.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			region.dstSubresource.layerCount = 1;
+			region.dstOffsets[1] = {0, 0, 1};
+
+			command_pool->begin();
+			cmdBarrierTransitionImageLayout(command_pool, &src, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+			cmdBarrierTransitionImageLayout(command_pool, &dest, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+			vkCmdBlitImage(
+				command_pool->getCurrentBuffer(),
+				src.getHandle(), src.getImageLayout(),
+				dest.getHandle(), dest.getImageLayout(),
+				1,
+				&region,
+				VK_FILTER_NEAREST
+			);
+
+			cmdBarrierTransitionImageLayout(command_pool, &src, src.getDesiredLayout());
+			cmdBarrierTransitionImageLayout(command_pool, &dest, dest.getDesiredLayout());
+
+			command_pool->end();
+			command_pool->submit(QUEUE_FAMILY_GRAPHICS);
+		}
+		else
+		{
+			Log::error("format is not suported for blitting");
+		}
+		return fence;
+	}
+
+	void VK_Allocator::destroyStagingAllocation(const StagingAllocation& allocation)
+	{
+		delete_queue.emplace(allocation);
 	}
 
 	void VK_Allocator::generateMipmaps(VK_Image& image)
@@ -734,7 +814,7 @@ namespace HBE
 	void VK_Allocator::copy(VkBuffer src, VK_Image* dest, VkImageLayout dst_end_layout, VkBufferImageCopy region)
 	{
 		command_pool->begin();
-		barrierTransitionImageLayout(command_pool, dest, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+		cmdBarrierTransitionImageLayout(command_pool, dest, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 		vkCmdCopyBufferToImage(
 			command_pool->getCurrentBuffer(),
 			src,
@@ -750,7 +830,7 @@ namespace HBE
 		}
 		else
 		{
-			barrierTransitionImageLayout(command_pool, dest, dst_end_layout);
+			cmdBarrierTransitionImageLayout(command_pool, dest, dst_end_layout);
 		}
 
 
@@ -764,8 +844,8 @@ namespace HBE
 		//todo change for depth if image is depth or stencil
 		VkImageAspectFlagBits dst_aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT;
 		command_pool->begin();
-		barrierTransitionImageLayout(command_pool, dest, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-		barrierTransitionImageLayout(command_pool, src, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+		cmdBarrierTransitionImageLayout(command_pool, dest, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+		cmdBarrierTransitionImageLayout(command_pool, src, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 		VkImageCopy region{};
 		region.dstOffset = {0, 0, 0};
 		region.extent = {src->getWidth(), src->getHeight(), src->getDepth()};
@@ -787,8 +867,8 @@ namespace HBE
 			1,
 			&region
 		);
-		barrierTransitionImageLayout(command_pool, dest, dst_end_layout);
-		barrierTransitionImageLayout(command_pool, src, src_end_layout);
+		cmdBarrierTransitionImageLayout(command_pool, dest, dst_end_layout);
+		cmdBarrierTransitionImageLayout(command_pool, src, src_end_layout);
 		command_pool->end();
 		command_pool->submit(QUEUE_FAMILY_GRAPHICS);
 	}
@@ -833,7 +913,7 @@ namespace HBE
 	void VK_Allocator::setImageLayout(VK_Image* image, VkImageLayout newLayout)
 	{
 		command_pool->begin();
-		VK_Allocator::barrierTransitionImageLayout(command_pool, image, newLayout);
+		VK_Allocator::cmdBarrierTransitionImageLayout(command_pool, image, newLayout);
 		command_pool->end();
 		command_pool->submit(QUEUE_FAMILY_GRAPHICS);
 	}

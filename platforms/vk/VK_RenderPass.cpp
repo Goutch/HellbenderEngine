@@ -1,4 +1,3 @@
-
 #include "VK_RenderPass.h"
 #include "VK_Swapchain.h"
 #include "VK_Renderer.h"
@@ -7,9 +6,10 @@
 #include "core/utility/Log.h"
 #include "VK_Utils.h"
 
-namespace HBE {
-
-	VK_RenderPass::VK_RenderPass(VK_Renderer *renderer, const RenderTargetInfo &info) {
+namespace HBE
+{
+	VK_RenderPass::VK_RenderPass(VK_Renderer* renderer, const RenderTargetInfo& info)
+	{
 		this->renderer = renderer;
 		this->device = renderer->getDevice();
 		this->width = info.width;
@@ -25,14 +25,18 @@ namespace HBE {
 		recreate();
 	}
 
-	void VK_RenderPass::recreate() {
-		if (handle != VK_NULL_HANDLE) {
+	void VK_RenderPass::recreate()
+	{
+		if (handle != VK_NULL_HANDLE)
+		{
 			renderer->waitAll();
 			vkDestroyRenderPass(device->getHandle(), handle, nullptr);
-			for (auto framebuffer: frame_buffers) {
+			for (auto framebuffer : frame_buffers)
+			{
 				vkDestroyFramebuffer(device->getHandle(), framebuffer, nullptr);
 			}
-			for (size_t i = 0; i < images.size(); ++i) {
+			for (size_t i = 0; i < images.size(); ++i)
+			{
 				if (has_color_attachment)
 					delete images[i];
 				if (has_depth_attachment)
@@ -51,13 +55,14 @@ namespace HBE {
 		VkAttachmentReference color_attachment_ref{};
 		VkAttachmentReference depth_attachment_ref{};
 
-		if (has_color_attachment) {
-
+		if (has_color_attachment)
+		{
 			VkAttachmentDescription colorAttachment{};
 			colorAttachment.format = vk_format;
 			colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-			colorAttachment.loadOp = (flags & RENDER_TARGET_FLAG_CLEAR_COLOR) ? VK_ATTACHMENT_LOAD_OP_CLEAR
-			                                                                  : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+			colorAttachment.loadOp = (flags & RENDER_TARGET_FLAG_CLEAR_COLOR)
+				                         ? VK_ATTACHMENT_LOAD_OP_CLEAR
+				                         : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 			colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
@@ -68,17 +73,20 @@ namespace HBE {
 			color_attachment_ref.attachment = attachments.size() - 1;
 			color_attachment_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 		}
-		if (has_depth_attachment) {
+		if (has_depth_attachment)
+		{
 			VkAttachmentDescription depthAttachment{};
 			depthAttachment.format = VK_Utils::getVkFormat(IMAGE_FORMAT_DEPTH32F);
 			depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-			depthAttachment.loadOp = (flags & RENDER_TARGET_FLAG_CLEAR_DEPTH) ? VK_ATTACHMENT_LOAD_OP_CLEAR
-			                                                                  : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+			depthAttachment.loadOp = (flags & RENDER_TARGET_FLAG_CLEAR_DEPTH)
+				                         ? VK_ATTACHMENT_LOAD_OP_CLEAR
+				                         : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			if (!(flags & RENDER_TARGET_FLAG_CLEAR_DEPTH))
 				Log::warning("Not clearing depth buffer will result in all depth test failing if the depth is not initialized to 1.0");
 			depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-			depthAttachment.stencilLoadOp = (flags & RENDER_TARGET_FLAG_CLEAR_DEPTH) ? VK_ATTACHMENT_LOAD_OP_CLEAR
-			                                                                         : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+			depthAttachment.stencilLoadOp = (flags & RENDER_TARGET_FLAG_CLEAR_DEPTH)
+				                                ? VK_ATTACHMENT_LOAD_OP_CLEAR
+				                                : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_STORE;
 			depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 			depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
@@ -124,35 +132,41 @@ namespace HBE {
 		render_pass_info.pDependencies = &dependency;
 
 		if (vkCreateRenderPass(device->getHandle(), &render_pass_info,
-		                       nullptr, &handle) != VK_SUCCESS) {
+		                       nullptr, &handle) != VK_SUCCESS)
+		{
 			Log::error("failed to create render pass!");
 		}
 		createFramebuffers();
 	}
 
-	void VK_RenderPass::setClearColor(vec4 color) {
+	void VK_RenderPass::setClearColor(vec4 color)
+	{
 		this->clear_color = color;
 	}
 
-	const vec4 &VK_RenderPass::getClearColor() const {
+	const vec4& VK_RenderPass::getClearColor() const
+	{
 		return clear_color;
 	}
 
-	VK_RenderPass::~VK_RenderPass() {
-
-		for (size_t i = 0; i < images.size(); ++i) {
+	VK_RenderPass::~VK_RenderPass()
+	{
+		for (size_t i = 0; i < images.size(); ++i)
+		{
 			if (has_color_attachment)
 				delete images[i];
 			if (has_depth_attachment)
 				delete depth_images[i];
 		}
-		for (auto framebuffer: frame_buffers) {
+		for (auto framebuffer : frame_buffers)
+		{
 			vkDestroyFramebuffer(device->getHandle(), framebuffer, nullptr);
 		}
 		vkDestroyRenderPass(device->getHandle(), handle, nullptr);
 	}
 
-	void VK_RenderPass::begin(const VkCommandBuffer &command_buffer, uint32_t i) const {
+	void VK_RenderPass::begin(const VkCommandBuffer& command_buffer, uint32_t i) const
+	{
 		VkRenderPassBeginInfo renderPassInfo{};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		renderPassInfo.renderPass = handle;
@@ -164,11 +178,13 @@ namespace HBE {
 
 		VkClearValue clear_values[2] = {VkClearValue{}, VkClearValue{}};
 		uint32_t clear_value_count = 0;
-		if (has_color_attachment) {
+		if (has_color_attachment)
+		{
 			clear_values[clear_value_count].color = {clear_color.x, clear_color.y, clear_color.z, clear_color.w};
 			clear_value_count++;
 		}
-		if (has_depth_attachment) {
+		if (has_depth_attachment)
+		{
 			clear_values[clear_value_count].depthStencil = {1.0f, 0};
 			clear_value_count++;
 		}
@@ -178,11 +194,13 @@ namespace HBE {
 		vkCmdBeginRenderPass(command_buffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 	}
 
-	const VkRenderPass &VK_RenderPass::getHandle() const {
+	const VkRenderPass& VK_RenderPass::getHandle() const
+	{
 		return handle;
 	}
 
-	void VK_RenderPass::end(const VkCommandBuffer &command_buffer) const {
+	void VK_RenderPass::end(const VkCommandBuffer& command_buffer) const
+	{
 		vkCmdEndRenderPass(command_buffer);
 
 		/*VkMemoryBarrier2 image_barrier{};
@@ -205,32 +223,41 @@ namespace HBE {
 		device->vkCmdPipelineBarrier2KHR(command_buffer, &dependency_info);*/
 	}
 
-	void VK_RenderPass::createFramebuffers() {
-
+	void VK_RenderPass::createFramebuffers()
+	{
 		std::vector<VkImageView> image_views;
 		std::vector<VkImageView> depth_image_views;
 		images.resize(MAX_FRAMES_IN_FLIGHT);
 		image_views.resize(MAX_FRAMES_IN_FLIGHT);
 
-		if (has_color_attachment) {
-			for (size_t i = 0; i < images.size(); ++i) {
+		if (has_color_attachment)
+		{
+			for (size_t i = 0; i < images.size(); ++i)
+			{
 				TextureInfo info{};
+				info.data_format = format;
 				info.format = format;
 				info.width = width;
 				info.height = height;
 				info.generate_mip_maps = false;
 				info.flags = IMAGE_FLAG_RENDER_TARGET;
+				info.sampler_info.filter = TEXTURE_SAMPLER_FILTER_TYPE_NEAREST;
+				info.sampler_info.address_mode = TEXTURE_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+
 				images[i] = new VK_Image(renderer->getDevice(), info);
 				image_views[i] = images[i]->getImageView();
 			}
 		}
 
 
-		if (has_depth_attachment) {
+		if (has_depth_attachment)
+		{
 			depth_images.resize(MAX_FRAMES_IN_FLIGHT);
 			depth_image_views.resize(MAX_FRAMES_IN_FLIGHT);
-			for (size_t i = 0; i < depth_images.size(); ++i) {
+			for (size_t i = 0; i < depth_images.size(); ++i)
+			{
 				TextureInfo info{};
+				info.data_format = IMAGE_FORMAT_DEPTH32F;
 				info.format = IMAGE_FORMAT_DEPTH32F;
 				info.width = width;
 				info.height = height;
@@ -241,13 +268,16 @@ namespace HBE {
 		}
 
 		frame_buffers.resize(MAX_FRAMES_IN_FLIGHT);
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
+		{
 			std::vector<VkImageView> attachments;
 
-			if (has_color_attachment) {
+			if (has_color_attachment)
+			{
 				attachments.push_back(image_views[i]);
 			}
-			if (has_depth_attachment) {
+			if (has_depth_attachment)
+			{
 				attachments.push_back(depth_image_views[i]);
 			}
 
@@ -260,17 +290,20 @@ namespace HBE {
 			framebuffer_create_info.height = height;
 			framebuffer_create_info.layers = 1;
 			if (vkCreateFramebuffer(device->getHandle(), &framebuffer_create_info, nullptr, &frame_buffers[i]) !=
-			    VK_SUCCESS) {
+				VK_SUCCESS)
+			{
 				Log::error("Failed to create framebuffer!");
 			}
 		}
 	}
 
-	const std::vector<VkFramebuffer> &VK_RenderPass::getFrameBuffers() const {
+	const std::vector<VkFramebuffer>& VK_RenderPass::getFrameBuffers() const
+	{
 		return frame_buffers;
 	}
 
-	void VK_RenderPass::setResolution(uint32_t width, uint32_t height) {
+	void VK_RenderPass::setResolution(uint32_t width, uint32_t height)
+	{
 		this->width = width > 0 ? width : 1;
 		this->height = height > 0 ? height : 1;
 
@@ -278,20 +311,19 @@ namespace HBE {
 		onResolutionChange.invoke(this);
 	}
 
-	vec2i VK_RenderPass::getResolution() const {
+	vec2i VK_RenderPass::getResolution() const
+	{
 		return vec2i(width, height);
 	}
 
-	const VK_Image *VK_RenderPass::getImage(uint32_t i) const {
+	const VK_Image* VK_RenderPass::getImage(uint32_t i) const
+	{
 		return images[i];
 	}
 
-	Texture *VK_RenderPass::getFramebufferTexture(uint32_t frame) const {
+	Texture* VK_RenderPass::getFramebufferTexture(uint32_t frame) const
+	{
 		HB_ASSERT(frame < images.size(), "Frame index out of bounds");
 		return images[frame];
 	}
-
 }
-
-
-

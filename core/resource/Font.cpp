@@ -79,7 +79,7 @@ namespace HBE {
                 TextureInfo atlas_info{};
                 atlas_info.width = width;
                 atlas_info.height = height;
-                atlas_info.format = IMAGE_FORMAT_RGBA32F;
+                atlas_info.data_format = IMAGE_FORMAT_RGBA32F;
                 atlas_info.data = storage.pixels;
 
 

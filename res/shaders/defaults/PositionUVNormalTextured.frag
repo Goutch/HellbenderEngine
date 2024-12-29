@@ -10,28 +10,28 @@ layout (location = 0) out vec4 outColor;
 
 
 //----------------------uniforms----------------------
-layout (binding = 1) uniform usampler2D albedo;
+layout (binding = 1) uniform sampler2D albedo;
 
 layout (binding = 2) uniform MaterialProperties {
-    vec4 base_color;
-    vec4 emmisive_factor;
-    float metal_factor;
-    float roughnes;
-    uint has_albedo;
-    uint has_metallic_roughness;
-    uint has_emmisive;
-    uint has_normal;
-    uint has_occlusion;
+	vec4 base_color;
+	vec4 emmisive_factor;
+	float metal_factor;
+	float roughnes;
+	uint has_albedo;
+	uint has_metallic_roughness;
+	uint has_emmisive;
+	uint has_normal;
+	uint has_occlusion;
 } material;
 
 void main() {
-    if (material.has_albedo == 1)
-    {
-        outColor = vec4(abs(fragmentUV), 0.0, 1.0);
-        // outColor = texture(albedo,fragmentUV ) / 255.0f;
-    }
-    else
-    {
-        outColor = material.base_color;
-    }
+	if (material.has_albedo == 1)
+	{
+		outColor = vec4(mod((fragmentUV+vec2(1))/2.0f, vec2(1.0)), 0.0, 1.0)/2.0;
+		outColor += texture(albedo, mod(fragmentUV, vec2(1, 1)))/2.0;
+	}
+	else
+	{
+		outColor = material.base_color;
+	}
 }

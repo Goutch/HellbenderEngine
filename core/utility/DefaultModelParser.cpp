@@ -14,6 +14,11 @@ namespace HBE
 
 	Mesh* DefaultModelParser::createMesh(const ModelPrimitiveData& data, const ModelInfo model_info)
 	{
+		std::vector<uint32_t> indices32;
+		std::vector<uint16_t> indices16;
+		std::vector<vec3> positions;
+		std::vector<vec2> uvs;
+		std::vector<vec3> normals;
 		MeshInfo mesh_info{};
 		mesh_info.flags = MESH_FLAG_NONE;
 		mesh_info.flags |= (model_info.flags & MODEL_FLAG_USED_IN_RAYTRACING) == MODEL_FLAG_USED_IN_RAYTRACING
@@ -31,6 +36,8 @@ namespace HBE
 			attribute_info.size = sizeof(vec3);
 			attribute_info.flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 			attribute_infos.emplace_back(attribute_info);
+			positions = std::vector<vec3>(reinterpret_cast<const vec3*>(position_it->second[0].data),
+			                              reinterpret_cast<const vec3*>(position_it->second[0].data) + position_it->second[0].count);
 		}
 		if (uv_it != data.buffers.end())
 		{
@@ -39,6 +46,8 @@ namespace HBE
 			attribute_info.size = sizeof(vec2);
 			attribute_info.flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 			attribute_infos.emplace_back(attribute_info);
+			uvs = std::vector<vec2>(reinterpret_cast<const vec2*>(uv_it->second[0].data),
+			                        reinterpret_cast<const vec2*>(uv_it->second[0].data) + uv_it->second[0].count);
 		}
 		if (normal_it != data.buffers.end())
 		{
@@ -47,6 +56,8 @@ namespace HBE
 			attribute_info.size = sizeof(vec3);
 			attribute_info.flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 			attribute_infos.emplace_back(attribute_info);
+			normals = std::vector<vec3>(reinterpret_cast<const vec3*>(normal_it->second[0].data),
+			                            reinterpret_cast<const vec3*>(normal_it->second[0].data) + normal_it->second[0].count);
 		}
 
 
@@ -57,9 +68,13 @@ namespace HBE
 		{
 		case 2:
 			mesh_ptr->setVertexIndices(reinterpret_cast<const uint16_t*>(data.indices.data), data.indices.count);
+			indices16 = std::vector<uint16_t>(reinterpret_cast<const uint16_t*>(data.indices.data),
+			                                  reinterpret_cast<const uint16_t*>(data.indices.data) + data.indices.count);
 			break;
 		case 4:
 			mesh_ptr->setVertexIndices(reinterpret_cast<const uint32_t*>(data.indices.data), data.indices.count);
+			indices32 = std::vector<uint32_t>(reinterpret_cast<const uint32_t*>(data.indices.data),
+			                                  reinterpret_cast<const uint32_t*>(data.indices.data) + data.indices.count);
 			break;
 		}
 
@@ -75,6 +90,7 @@ namespace HBE
 		{
 			mesh_ptr->setBuffer(2, normal_it->second[0].data, normal_it->second[0].count);
 		}
+
 
 		return mesh_ptr;
 	}

@@ -232,16 +232,16 @@ namespace HBE
 				switch (texture_data.channels)
 				{
 				case 1:
-					texture_data.format = IMAGE_FORMAT_R8_UINT;
+					texture_data.format = IMAGE_FORMAT_R8_UNORM;
 					break;
 				case 2:
-					texture_data.format = IMAGE_FORMAT_RG8_UINT;
+					texture_data.format = IMAGE_FORMAT_RG8_UNORM;
 					break;
 				case 3:
-					texture_data.format = IMAGE_FORMAT_RGB8_UINT;
+					texture_data.format = IMAGE_FORMAT_RGB8_UNORM;
 					break;
 				case 4:
-					texture_data.format = IMAGE_FORMAT_RGBA8_UINT;
+					texture_data.format = IMAGE_FORMAT_RGBA8_UNORM;
 					break;
 				}
 				break;
@@ -250,16 +250,16 @@ namespace HBE
 				switch (texture_data.channels)
 				{
 				case 1:
-					texture_data.format = IMAGE_FORMAT_R8;
+					texture_data.format = IMAGE_FORMAT_R8_SNORM;
 					break;
 				case 2:
-					texture_data.format = IMAGE_FORMAT_RG8;
+					texture_data.format = IMAGE_FORMAT_RG8_SNORM;
 					break;
 				case 3:
-					texture_data.format = IMAGE_FORMAT_RGB8;
+					texture_data.format = IMAGE_FORMAT_RGB8_SNORM;
 					break;
 				case 4:
-					texture_data.format = IMAGE_FORMAT_RGBA8;
+					texture_data.format = IMAGE_FORMAT_RGBA8_SNORM;
 					break;
 				}
 				break;
