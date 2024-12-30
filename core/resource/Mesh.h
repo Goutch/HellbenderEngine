@@ -31,7 +31,7 @@ namespace HBE {
 		uint32_t index_count = 0;
 		uint32_t instance_count = 1;
 		INDICES_TYPE indices_type = INDICES_TYPE_NONE;
-		std::unordered_map<uint32_t, VertexAttributeInfo> bindings;
+		std::unordered_map<uint32_t, VertexAttributeInfo> attributes_locations;
 	public:
 		void load(std::string path);
 		void loadAsync(std::string path);
@@ -40,7 +40,7 @@ namespace HBE {
 		uint32_t getIndexCount() const;
 		uint32_t getInstanceCount() const;
 		size_t getIndicesSize() const;
-		size_t getBindingSize(uint32_t binding) const;
+		size_t getAttributeElementSize(uint32_t location) const;
 		bool hasIndexBuffer() const;
 		virtual void setVertexIndices(const uint32_t *vertices, size_t count) = 0;
 		virtual void setVertexIndices(const uint16_t *vertices, size_t count) = 0;

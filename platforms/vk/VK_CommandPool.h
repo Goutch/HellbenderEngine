@@ -47,13 +47,13 @@ namespace HBE {
 		const VkCommandPool &getHandle() const;
 
 		VK_Fence &submit(HBE::QUEUE_FAMILY queue, VkSemaphore *wait = nullptr,
-						 VkPipelineStageFlags *wait_stage = nullptr,
-						 uint32_t wait_count = 0,
-						 VkSemaphore *signal = nullptr,
-						 uint32_t signal_count = 0);
+		                 VkPipelineStageFlags *wait_stage = nullptr,
+		                 uint32_t wait_count = 0,
+		                 VkSemaphore *signal = nullptr,
+		                 uint32_t signal_count = 0);
 
 
-		VK_Fence &getCurrentFence();
+		 VK_Fence &getCurrentFence();
 
 		VK_Fence &getLastFence();
 	};

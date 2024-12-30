@@ -14,7 +14,7 @@ namespace HBE {
 	class VK_Renderer;
 
 	class VK_Mesh : public Mesh {
-		const VK_CommandPool *command_pool;
+		VK_CommandPool *command_pool;
 		VK_Device *device = nullptr;
 		VK_Renderer *renderer = nullptr;
 		VK_Buffer *indices_buffer = nullptr;
@@ -22,7 +22,7 @@ namespace HBE {
 		VkBufferUsageFlags extra_usages = 0;
 		mutable bool bound = false;
 	public:
-		VK_Mesh(VK_Renderer *renderer, const VK_CommandPool *command_pool, const MeshInfo &info);
+		VK_Mesh(VK_Renderer *renderer, VK_CommandPool *command_pool, const MeshInfo &info);
 		~VK_Mesh() override;
 		void setVertexIndices(const uint32_t *data, size_t count) override;
 		void setVertexIndices(const uint16_t *data, size_t count) override;

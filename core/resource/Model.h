@@ -109,7 +109,8 @@ namespace HBE {
 
 	//A node represent an object in the model hierarchy. with zero, one or multiple meshes to render.
 	struct ModelNode {
-		mat4 transform;
+		std::string name;
+		mat4 transform = mat4(1.0f);
 		int mesh = -1;
 		std::vector<ModelPrimitive> primitives;
 		std::vector<ModelNode> children;

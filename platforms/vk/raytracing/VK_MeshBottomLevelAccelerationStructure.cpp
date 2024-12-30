@@ -11,7 +11,7 @@ namespace HBE {
 
 		//todo:initialize this
 		VK_Mesh *mesh = dynamic_cast<VK_Mesh *>(info.mesh);
-		VkDeviceSize vertex_size = mesh->getBindingSize(0);
+		VkDeviceSize vertex_size = mesh->getAttributeElementSize(0);
 
 		VkAccelerationStructureGeometryKHR accelerationStructureGeometry{};
 		accelerationStructureGeometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;

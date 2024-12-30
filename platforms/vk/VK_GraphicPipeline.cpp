@@ -65,13 +65,15 @@ namespace HBE {
 		}
 		vertexInputInfo.vertexBindingDescriptionCount = binding_descriptions.size();
 		vertexInputInfo.pVertexBindingDescriptions = binding_descriptions.data();
+		vertexInputInfo.vertexAttributeDescriptionCount = 0;
+		vertexInputInfo.pVertexAttributeDescriptions = nullptr;
 
 		std::vector<VkVertexInputAttributeDescription> attribute_descriptions;
 		std::vector<VK_VertexAttributeInfo> vertex_inputs = vk_vertex->getVertexInputs();
 		attribute_descriptions.resize(vertex_inputs.size());
 		uint32_t offset = 0;
 		uint32_t binding = 0;
-		if (binding_descriptions.size() != 0) {
+		if (!binding_descriptions.empty()) {
 			for (size_t i = 0; i < vertex_inputs.size(); ++i) {
 				for (size_t j = 0; j < binding_descriptions.size() - 1; ++j) {
 					if (binding == binding_descriptions[j].binding && offset == binding_descriptions[j].stride) {

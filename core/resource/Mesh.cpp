@@ -22,8 +22,8 @@ namespace HBE {
 		return indices_type == INDICES_TYPE_UINT32 ? sizeof(uint32_t) : sizeof(uint16_t);
 	}
 
-	size_t Mesh::getBindingSize(uint32_t binding) const {
-		return bindings.at(binding).size;
+	size_t Mesh::getAttributeElementSize(uint32_t location) const {
+		return attributes_locations.at(location).size;
 	}
 
 }

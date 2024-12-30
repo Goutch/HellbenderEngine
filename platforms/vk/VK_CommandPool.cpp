@@ -88,7 +88,7 @@ namespace HBE {
 		}
 	}
 
-	VK_Fence &VK_CommandPool::getCurrentFence() {
+	 VK_Fence &VK_CommandPool::getCurrentFence() {
 		return *fences[current];
 	}
 

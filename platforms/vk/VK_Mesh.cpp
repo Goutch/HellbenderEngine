@@ -8,7 +8,7 @@
 #include "VK_Renderer.h"
 
 namespace HBE {
-	VK_Mesh::VK_Mesh(VK_Renderer *renderer, const VK_CommandPool *command_pool, const MeshInfo &info) {
+	VK_Mesh::VK_Mesh(VK_Renderer *renderer, VK_CommandPool *command_pool, const MeshInfo &info) {
 		this->renderer = renderer;
 		this->device = renderer->getDevice();
 		this->command_pool = command_pool;
@@ -22,7 +22,7 @@ namespace HBE {
 			size_t number_of_buffers = (info.attribute_infos[i].flags & VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) != 0 ?
 			                           MAX_FRAMES_IN_FLIGHT : 1;
 			buffers.emplace(info.attribute_infos[i].location, std::vector<VK_Buffer *>(number_of_buffers, nullptr));
-			bindings.emplace(info.attribute_infos[i].location, info.attribute_infos[i]);
+			attributes_locations.emplace(info.attribute_infos[i].location, info.attribute_infos[i]);
 		}
 	}
 
@@ -38,20 +38,22 @@ namespace HBE {
 			Log::warning("Trying to set a mesh buffer with vertex count = 0");
 			return;
 		}
-		VertexAttributeInfo &binding_info = bindings[location];
-		VkDeviceSize buffer_size = binding_info.size * count;
+		VertexAttributeInfo &attribute_info = attributes_locations[location];
+		VkDeviceSize buffer_size = attribute_info.size * count;
 
-		if ((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) == VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) {
-			//todo: add to delete queue instead of waiting and deleting immediately
-			renderer->waitCurrentFrame();
+		if ((attribute_info.flags & VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) == VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) {
+
 			if (buffers[location][renderer->getCurrentFrame()]) {
-				delete buffers[location][renderer->getCurrentFrame()];
+				StagingAllocation staging_allocation{};
+				staging_allocation.buffer = buffers[location][renderer->getCurrentFrame()];
+				staging_allocation.fence = &command_pool->getCurrentFence();
+				device->getAllocator()->destroyStagingAllocation(staging_allocation);
 			}
 			buffers[location][renderer->getCurrentFrame()] = new VK_Buffer(device,
 			                                                               vertices,
 			                                                               buffer_size,
 			                                                               VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
-			                                                               ((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
+			                                                               ((attribute_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
 			                                                               ALLOC_FLAG_MAPPABLE :
 			                                                               ALLOC_FLAG_NONE);
 
@@ -65,7 +67,7 @@ namespace HBE {
 			                                     vertices,
 			                                     buffer_size,
 			                                     VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
-			                                     ((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
+			                                     ((attribute_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
 			                                     ALLOC_FLAG_MAPPABLE :
 			                                     ALLOC_FLAG_NONE);
 		}
@@ -74,7 +76,7 @@ namespace HBE {
 	void VK_Mesh::setInstanceBuffer(uint32_t location, const void *data, size_t count) {
 		this->instance_count = count;
 		if (count == 0) return;
-		VertexAttributeInfo &binding_info = bindings[location];
+		VertexAttributeInfo &binding_info = attributes_locations[location];
 		VkDeviceSize buffer_size = binding_info.size * count;
 
 		if ((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) == VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) {
@@ -108,7 +110,7 @@ namespace HBE {
 	}
 
 	VK_Mesh::~VK_Mesh() {
-		for (size_t i = 0; i < bindings.size(); ++i) {
+		for (size_t i = 0; i < attributes_locations.size(); ++i) {
 			for (size_t j = 0; j < buffers[i].size(); ++j) {
 				if (buffers[i][j])
 					delete buffers[i][j];
@@ -155,7 +157,7 @@ namespace HBE {
 		VkDeviceSize *offsets = new VkDeviceSize[buffers.size()];
 		int i = 0;
 		for (auto buffer: buffers) {
-			if ((bindings.at(buffer.first).flags & VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) == VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) {
+			if ((attributes_locations.at(buffer.first).flags & VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) == VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) {
 				flat_buffers[i] = buffer.second[renderer->getCurrentFrame()]->getHandle();
 			} else {
 				flat_buffers[i] = buffer.second[0]->getHandle();
