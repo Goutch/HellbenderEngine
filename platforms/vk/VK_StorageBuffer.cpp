@@ -21,7 +21,8 @@ namespace HBE {
 	}
 
 	VK_StorageBuffer::~VK_StorageBuffer() {
-		delete buffer;
+		if (this->deleteOnDestruction)
+			delete buffer;
 	}
 
 	void VK_StorageBuffer::update(const void *data) {
@@ -43,5 +44,14 @@ namespace HBE {
 	void VK_StorageBuffer::update(const void *data, size_t size, size_t offset) {
 		buffer->update(data, static_cast<VkDeviceSize>(size * stride), static_cast<VkDeviceSize>(offset * stride));
 	}
+
+	VK_StorageBuffer::VK_StorageBuffer(VK_Device *device, VK_Buffer *buffer, uint32_t stride, uint32_t count, bool deleteOnDestruction) {
+		this->buffer = buffer;
+		this->stride = stride;
+		this->count = count;
+		this->size = stride * count;
+		this->deleteOnDestruction = deleteOnDestruction;
+	}
+
 }
 

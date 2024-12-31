@@ -84,30 +84,30 @@ namespace HBE {
 			}
 			switch (layout_binding.descriptorType) {
 				case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
-					uniform_buffer_count += layout_binding.descriptorCount*MAX_FRAMES_IN_FLIGHT;
+					uniform_buffer_count += layout_binding.descriptorCount * MAX_FRAMES_IN_FLIGHT;
 					break;
 				case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
-					combined_image_sampler_count += layout_binding.descriptorCount*MAX_FRAMES_IN_FLIGHT;
+					combined_image_sampler_count += layout_binding.descriptorCount * MAX_FRAMES_IN_FLIGHT;
 					break;
 				case VK_DESCRIPTOR_TYPE_SAMPLER:
 					break;
 				case VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE:
-					separate_image_count += layout_binding.descriptorCount*MAX_FRAMES_IN_FLIGHT;
+					separate_image_count += layout_binding.descriptorCount * MAX_FRAMES_IN_FLIGHT;
 					break;
 				case VK_DESCRIPTOR_TYPE_STORAGE_IMAGE:
-					storage_image_count += layout_binding.descriptorCount*MAX_FRAMES_IN_FLIGHT;
+					storage_image_count += layout_binding.descriptorCount * MAX_FRAMES_IN_FLIGHT;
 					break;
 				case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
-					storage_buffer_count += layout_binding.descriptorCount*MAX_FRAMES_IN_FLIGHT;
+					storage_buffer_count += layout_binding.descriptorCount * MAX_FRAMES_IN_FLIGHT;
 					break;
 				case VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
-					storage_texel_buffer_count += layout_binding.descriptorCount*MAX_FRAMES_IN_FLIGHT;
+					storage_texel_buffer_count += layout_binding.descriptorCount * MAX_FRAMES_IN_FLIGHT;
 					break;
 				case VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
-					uniform_texel_buffer_count += layout_binding.descriptorCount*MAX_FRAMES_IN_FLIGHT;
+					uniform_texel_buffer_count += layout_binding.descriptorCount * MAX_FRAMES_IN_FLIGHT;
 					break;
 				case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR:
-					acceleration_structure_count += layout_binding.descriptorCount*MAX_FRAMES_IN_FLIGHT;
+					acceleration_structure_count += layout_binding.descriptorCount * MAX_FRAMES_IN_FLIGHT;
 					break;
 			}
 		}
@@ -543,8 +543,6 @@ namespace HBE {
 
 		if (frame == -1) {
 			for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-
-
 				descriptor_pool.writes[i][binding].descriptorCount = count;
 				descriptor_pool.writes[i][binding].pBufferInfo = buffer_infos.data();
 				vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_pool.writes[i][binding], 0, nullptr);
@@ -553,7 +551,6 @@ namespace HBE {
 			descriptor_pool.writes[frame][binding].pBufferInfo = buffer_infos.data();
 			descriptor_pool.writes[frame][binding].descriptorCount = count;
 			vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_pool.writes[frame][binding], 0, nullptr);
-
 		}
 	}
 
@@ -635,9 +632,5 @@ namespace HBE {
 			old_descriptor_pools.pop();
 		}
 	}
-
-
-
-
 }
 

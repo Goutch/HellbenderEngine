@@ -360,7 +360,6 @@ namespace HBE {
 	void VK_Renderer::endFrame() {
 		HB_PROFILE_BEGIN("endFrame");
 
-
 		if (!frame_presented) {
 			Texture *render_textures[1] = {
 					main_render_target->getFramebufferTexture(current_frame)

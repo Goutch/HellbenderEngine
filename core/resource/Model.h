@@ -7,6 +7,7 @@
 #include "map"
 #include "Resource.h"
 #include "core/resource/Texture.h"
+#include "core/resource/raytracing/AccelerationStructure.h"
 
 namespace HBE {
 	class GraphicPipelineInstance;
@@ -119,6 +120,8 @@ namespace HBE {
 		std::vector<std::vector<Mesh *>> meshes;
 		std::vector<Texture *> textures;
 		std::vector<GraphicPipelineInstance *> materials;
+		std::vector<MeshAccelerationStructure *> acceleration_structures;
+		std::vector<AccelerationStructureInstance> acceleration_structure_instances;
 	};
 
 	struct ModelData {
@@ -134,13 +137,6 @@ namespace HBE {
 		ModelParser *parser = nullptr;
 		std::string path;
 		MODEL_FLAGS flags = MODEL_FLAG_NONE;
-	};
-
-	class HB_API ModelParser {
-	public:
-		virtual Mesh *createMesh(const ModelPrimitiveData &data, ModelInfo info) = 0;
-
-		virtual GraphicPipelineInstance *createMaterial(const ModelMaterialData &materialData, Texture **textures) = 0;
 	};
 
 
@@ -160,13 +156,41 @@ namespace HBE {
 
 		const ModelResources &getResources();
 
-		void createMeshes();
-
 		const std::vector<ModelNode> &getNodes();
+
+		const std::vector<AccelerationStructureInstance> &getAccelerationStructureInstances();
+
+	private:
+
+		void createMeshes();
 
 		void createTextures();
 
 		void createMaterials();
+
+		void createAccelerationStructures();
+
+
+		void createAccelerationStructureInstances();
+	};
+
+	class HB_API ModelParser {
+	public:
+		virtual void onStartParsingModel(Model *model) {};
+
+		virtual void onEndParsingModel(Model *model) {};
+
+		virtual Mesh *createMesh(const ModelPrimitiveData &data, ModelInfo info) = 0;
+
+		virtual Texture *createTexture(const ModelTextureData &data) = 0;
+
+		virtual GraphicPipelineInstance *createMaterial(const ModelMaterialData &materialData, Texture **textures) = 0;
+
+		//Raytracing
+		virtual MeshAccelerationStructure *createMeshAccelerationStructure(Mesh *mesh, int mesh_index) { return nullptr; };
+
+		virtual AccelerationStructureInstance createAccelerationStructureInstance(ModelNode &node, int primitive) { return {}; };
+
 	};
 }
 

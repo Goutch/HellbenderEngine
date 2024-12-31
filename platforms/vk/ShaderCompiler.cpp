@@ -7,6 +7,7 @@
 
 #else
 
+#include <vulkan/vulkan_core.h>
 #include "glslang/Public/ShaderLang.h"
 #include "glslang/Include/intermediate.h"
 
@@ -15,12 +16,13 @@
 #include "SPIRV/GlslangToSpv.h"
 #include "ShaderCompiler.h"
 #include "core/utility/Log.h"
+#include "Application.h"
 
 namespace HBE {
 #ifdef GLSLANG_C
 	const glslang_resource_s DEFAULT_BUILT_IN_RESOURCE_LIMIT = {
 #else
-			const TBuiltInResource DEFAULT_BUILT_IN_RESOURCE_LIMIT = {
+	const TBuiltInResource DEFAULT_BUILT_IN_RESOURCE_LIMIT = {
 #endif
 
 			/* .MaxLights = */ 32,
@@ -126,17 +128,17 @@ namespace HBE {
 			/* maxMeshViewCountEXT;*/1,
 			/* .maxDualSourceDrawBuffersEXT = */1,
 			/* .limits = */
-							   {
-									   /* .nonInductiveForLoops = */ 1,
-									   /* .whileLoops = */ 1,
-									   /* .doWhileLoops = */ 1,
-									   /* .generalUniformIndexing = */ 1,
-									   /* .generalAttributeMatrixVectorIndexing = */ 1,
-									   /* .generalVaryingIndexing = */ 1,
-									   /* .generalSamplerIndexing = */ 1,
-									   /* .generalVariableIndexing = */ 1,
-									   /* .generalConstantMatrixVectorIndexing = */ 1,
-							   }};
+			                   {
+					                   /* .nonInductiveForLoops = */ 1,
+					                   /* .whileLoops = */ 1,
+					                   /* .doWhileLoops = */ 1,
+					                   /* .generalUniformIndexing = */ 1,
+					                   /* .generalAttributeMatrixVectorIndexing = */ 1,
+					                   /* .generalVaryingIndexing = */ 1,
+					                   /* .generalSamplerIndexing = */ 1,
+					                   /* .generalVariableIndexing = */ 1,
+					                   /* .generalConstantMatrixVectorIndexing = */ 1,
+			                   }};
 
 #ifndef GLSLANG_C
 
@@ -174,7 +176,7 @@ namespace HBE {
 			std::string *source = new std::string();
 			source->erase(std::find(source->begin(), source->end(), '\0'), source->end());
 			Shader::getSource(file_path, *source);
-			IncludeResult *result = new IncludeResult(path, source->c_str(), source->size()-2, source);
+			IncludeResult *result = new IncludeResult(path, source->c_str(), source->size() - 2, source);
 			results.emplace(result);
 			return result;
 		}
@@ -192,8 +194,7 @@ namespace HBE {
 		}
 
 		void releaseInclude(IncludeResult *result) override {
-			if(result!=NULL)
-			{
+			if (result != NULL) {
 				results.erase(result);
 				delete (std::string *) result->userData;
 				delete result;
@@ -201,7 +202,7 @@ namespace HBE {
 		}
 
 		~HBE_Includer() {
-			for (auto r:results) {
+			for (auto r: results) {
 				delete[] r->headerData;
 				delete r;
 			}
@@ -300,7 +301,24 @@ namespace HBE {
 			const char *source_str_ptr = source_str.c_str();
 			const char *const *source_ptr = &source_str_ptr;
 			int lenght = source_str.size();
-			shader.setEnvClient(glslang::EShClient::EShClientVulkan, glslang::EShTargetVulkan_1_3);
+
+
+			glslang::EshTargetClientVersion vulkan_version;
+			switch (Application::getInfo().vulkan_version) {
+				case VULKAN_VERSION_1_0:
+					vulkan_version = glslang::EShTargetVulkan_1_0;
+					break;
+				case VULKAN_VERSION_1_1:
+					vulkan_version = glslang::EShTargetVulkan_1_1;
+					break;
+				case VULKAN_VERSION_1_2:
+					vulkan_version = glslang::EShTargetVulkan_1_2;
+					break;
+				case VULKAN_VERSION_1_3:
+					vulkan_version = glslang::EShTargetVulkan_1_3;
+					break;
+			}
+			shader.setEnvClient(glslang::EShClient::EShClientVulkan, vulkan_version);
 			shader.setEnvTarget(glslang::EShTargetSpv, spirv_target);
 			shader.setStringsWithLengths(source_ptr, &lenght, 1);
 			shader.setSourceEntryPoint("main");
@@ -318,12 +336,12 @@ namespace HBE {
 			EShMessages message = static_cast<EShMessages>(EShMessages::EShMsgVulkanRules | EShMessages::EShMsgSpvRules);
 
 			if (!shader.parse(&DEFAULT_BUILT_IN_RESOURCE_LIMIT,
-							  450,
-							  ENoProfile,
-							  false,
-							  false,
-							  message,
-							  includer)) {
+			                  450,
+			                  ENoProfile,
+			                  false,
+			                  false,
+			                  message,
+			                  includer)) {
 				//Log::warning(shader.getInfoDebugLog());
 				Log::error(shader.getInfoLog());
 			}

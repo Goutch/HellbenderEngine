@@ -78,7 +78,8 @@ namespace HBE {
 		setSource(spirv);
 	}
 
-	VK_DescriptorInfo generateDescriptorInfo(VkShaderStageFlagBits stage, VkDescriptorType descriptor_type, spirv_cross::CompilerGLSL &glsl, spirv_cross::Resource &resource, VkPhysicalDeviceLimits limits) {
+	VK_DescriptorInfo
+	generateDescriptorInfo(VkShaderStageFlagBits stage, VkDescriptorType descriptor_type, spirv_cross::CompilerGLSL &glsl, spirv_cross::Resource &resource, VkPhysicalDeviceLimits limits) {
 		std::string name = glsl.get_name(resource.id);
 		uint32_t set_index = glsl.get_decoration(resource.id, spv::DecorationDescriptorSet);
 		spirv_cross::SPIRType type = glsl.get_type(resource.type_id);
@@ -92,6 +93,15 @@ namespace HBE {
 			descriptor_count = type.array[0];
 			if (descriptor_count == 0) {
 				variable_size = true;
+			}
+		}
+		spirv_cross::SPIRType parent_type = glsl.get_type(type.parent_type);
+		if (type.parent_type != 0) {
+			if (parent_type.array.size() >= 1) {
+				descriptor_count = type.array[0];
+				if (descriptor_count == 0) {
+					variable_size = true;
+				}
 			}
 		}
 
@@ -197,9 +207,9 @@ namespace HBE {
 			push_constants.emplace_back(push_constant_info);
 		}
 		std::sort(push_constants.begin(), push_constants.end(),
-				  [](const VK_PushConstantInfo &a, const VK_PushConstantInfo &b) -> bool {
-					  return a.push_constant_range.offset < b.push_constant_range.offset;
-				  });
+		          [](const VK_PushConstantInfo &a, const VK_PushConstantInfo &b) -> bool {
+			          return a.push_constant_range.offset < b.push_constant_range.offset;
+		          });
 
 		//----------------------------------------------------------VERTEX INPUTS-----------------------------
 		for (auto &stage_input: resources.stage_inputs) {
@@ -242,13 +252,13 @@ namespace HBE {
 			}
 		}
 		std::sort(uniforms.begin(), uniforms.end(),
-				  [](const VK_DescriptorInfo &a, const VK_DescriptorInfo &b) -> bool {
-					  return a.layout_binding.binding < b.layout_binding.binding;
-				  });
+		          [](const VK_DescriptorInfo &a, const VK_DescriptorInfo &b) -> bool {
+			          return a.layout_binding.binding < b.layout_binding.binding;
+		          });
 		std::sort(vertex_inputs.begin(), vertex_inputs.end(),
-				  [](const VK_VertexAttributeInfo &a, const VK_VertexAttributeInfo &b) -> bool {
-					  return a.location < b.location;
-				  });
+		          [](const VK_VertexAttributeInfo &a, const VK_VertexAttributeInfo &b) -> bool {
+			          return a.location < b.location;
+		          });
 	}
 
 

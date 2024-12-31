@@ -6,9 +6,11 @@
 #include "VK_Buffer.h"
 #include "VK_Allocator.h"
 #include "VK_Renderer.h"
+#include "VK_StorageBuffer.h"
 
 namespace HBE {
 	VK_Mesh::VK_Mesh(VK_Renderer *renderer, VK_CommandPool *command_pool, const MeshInfo &info) {
+		this->info = info;
 		this->renderer = renderer;
 		this->device = renderer->getDevice();
 		this->command_pool = command_pool;
@@ -16,6 +18,10 @@ namespace HBE {
 
 			this->extra_usages |= VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
 			this->extra_usages |= VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR;
+
+		}
+		if (info.flags & MESH_FLAG_GENERATE_ATTRIBUTE_STORAGE_BUFFER) {
+			this->extra_usages |= VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
 		}
 
 		for (size_t i = 0; i < info.attribute_info_count; ++i) {
@@ -56,7 +62,15 @@ namespace HBE {
 			                                                               ((attribute_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
 			                                                               ALLOC_FLAG_MAPPABLE :
 			                                                               ALLOC_FLAG_NONE);
-
+			if (info.flags & MESH_FLAG_GENERATE_ATTRIBUTE_STORAGE_BUFFER) {
+				auto it = storage_buffers.find(location);
+				if (it != storage_buffers.end()) {
+					delete it->second;
+					it->second = new VK_StorageBuffer(device, buffers[location][renderer->getCurrentFrame()], attribute_info.size, count, false);
+				} else {
+					storage_buffers[location] = new VK_StorageBuffer(device, buffers[location][renderer->getCurrentFrame()], attribute_info.size, count, false);
+				}
+			}
 		} else {
 			//todo: add to delete queue instead of waiting and deleting immediately
 			device->getQueue(QUEUE_FAMILY_GRAPHICS).wait();
@@ -70,6 +84,16 @@ namespace HBE {
 			                                     ((attribute_info.flags & VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) == VERTEX_ATTRIBUTE_FLAG_FAST_WRITE) ?
 			                                     ALLOC_FLAG_MAPPABLE :
 			                                     ALLOC_FLAG_NONE);
+
+			if (info.flags & MESH_FLAG_GENERATE_ATTRIBUTE_STORAGE_BUFFER) {
+				auto it = storage_buffers.find(location);
+				if (it != storage_buffers.end()) {
+					delete it->second;
+					it->second = new VK_StorageBuffer(device, buffers[location][0], attribute_info.size, count, false);
+				} else {
+					storage_buffers[location] = new VK_StorageBuffer(device, buffers[location][0], attribute_info.size, count, false);
+				}
+			}
 		}
 	}
 
@@ -119,6 +143,12 @@ namespace HBE {
 		buffers.clear();
 		if (indices_buffer)
 			delete indices_buffer;
+
+		if (indices_storage_buffer)
+			delete indices_storage_buffer;
+		for (auto &it: storage_buffers) {
+			delete it.second;
+		}
 	}
 
 	void VK_Mesh::setVertexIndices(const void *data, size_t count, size_t element_size) {
@@ -135,6 +165,13 @@ namespace HBE {
 		                               buffer_size,
 		                               VK_BUFFER_USAGE_INDEX_BUFFER_BIT | extra_usages,
 		                               ALLOC_FLAG_NONE);
+
+		if (info.flags & MESH_FLAG_GENERATE_ATTRIBUTE_STORAGE_BUFFER) {
+			if (indices_storage_buffer) {
+				delete indices_storage_buffer;
+			}
+			indices_storage_buffer = new VK_StorageBuffer(device, indices_buffer, element_size, count, false);
+		}
 		index_count = count;
 	}
 
@@ -193,8 +230,18 @@ namespace HBE {
 		return indices_buffer;
 	}
 
+	StorageBuffer *VK_Mesh::getAttributeStorageBuffer(uint32_t location) const {
+		HB_ASSERT(info.flags & MESH_FLAG_GENERATE_ATTRIBUTE_STORAGE_BUFFER, "Trying to get a storage buffer from a mesh that does not have the flag MESH_FLAG_GENERATE_ATTRIBUTE_STORAGE_BUFFER");
 
+		auto it = storage_buffers.find(location);
+		HB_ASSERT(it != storage_buffers.end(), "Trying to get a storage buffer from a mesh that does not have an attribute at location:" + std::to_string(location));
+
+		return it->second;
+	}
+
+	StorageBuffer *VK_Mesh::getIndicesStorageBuffer() const {
+		HB_ASSERT(info.flags & MESH_FLAG_GENERATE_ATTRIBUTE_STORAGE_BUFFER, "Trying to get a storage buffer from a mesh that does not have the flag MESH_FLAG_GENERATE_ATTRIBUTE_STORAGE_BUFFER");
+		HB_ASSERT(hasIndexBuffer(), "Trying to get a storage buffer from a mesh that does not have an index buffer");
+		return indices_storage_buffer;
+	}
 }
-
-
-

@@ -6,12 +6,16 @@
 #include "Resource.h"
 #include "unordered_map"
 #include "string"
-namespace HBE {
 
-	typedef uint32_t MESH_FLAGS;
+namespace HBE {
+	class StorageBuffer;
+	typedef uint32_t
+
+	MESH_FLAGS;
 	enum MESH_FLAG {
 		MESH_FLAG_NONE = 0,
 		MESH_FLAG_USED_IN_RAYTRACING = 1 << 0,
+		MESH_FLAG_GENERATE_ATTRIBUTE_STORAGE_BUFFER = 1 << 1,
 	};
 
 	struct MeshInfo {
@@ -34,21 +38,38 @@ namespace HBE {
 		std::unordered_map<uint32_t, VertexAttributeInfo> attributes_locations;
 	public:
 		void load(std::string path);
+
 		void loadAsync(std::string path);
+
 		virtual ~Mesh() = default;
+
 		uint32_t getVertexCount() const;
+
 		uint32_t getIndexCount() const;
+
 		uint32_t getInstanceCount() const;
+
 		size_t getIndicesSize() const;
+
 		size_t getAttributeElementSize(uint32_t location) const;
+
 		bool hasIndexBuffer() const;
+
 		virtual void setVertexIndices(const uint32_t *vertices, size_t count) = 0;
+
 		virtual void setVertexIndices(const uint16_t *vertices, size_t count) = 0;
+
 		virtual void setBuffer(uint32_t location, const void *vertices, size_t count) = 0;
+
 		virtual void setInstanceBuffer(uint32_t location, const void *data, size_t count) = 0;
+
 		virtual void bind() const = 0;
+
 		virtual void unbind() const = 0;
 
+		virtual StorageBuffer *getAttributeStorageBuffer(uint32_t location) const = 0;
+
+		virtual StorageBuffer *getIndicesStorageBuffer() const = 0;
 	};
 }
 
