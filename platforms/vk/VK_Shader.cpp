@@ -82,31 +82,48 @@ namespace HBE {
 	generateDescriptorInfo(VkShaderStageFlagBits stage, VkDescriptorType descriptor_type, spirv_cross::CompilerGLSL &glsl, spirv_cross::Resource &resource, VkPhysicalDeviceLimits limits) {
 		std::string name = glsl.get_name(resource.id);
 		uint32_t set_index = glsl.get_decoration(resource.id, spv::DecorationDescriptorSet);
-		spirv_cross::SPIRType type = glsl.get_type(resource.type_id);
-		size_t size = 0;
-		if (type.basetype == spirv_cross::SPIRType::Struct)
-			size = glsl.get_declared_struct_size(glsl.get_type(resource.base_type_id));
 		uint32_t descriptor_count = 1;
-
 		bool variable_size = false;
-		if (type.array.size() >= 1) {
-			descriptor_count = type.array[0];
-			if (descriptor_count == 0) {
-				variable_size = true;
-			}
-		}
-		spirv_cross::SPIRType parent_type = glsl.get_type(type.parent_type);
-		if (type.parent_type != 0) {
-			if (parent_type.array.size() >= 1) {
-				descriptor_count = type.array[0];
-				if (descriptor_count == 0) {
+		size_t size = 0;
+
+		spirv_cross::SPIRType type = glsl.get_type_from_variable(resource.id);
+
+		if (type.basetype == spirv_cross::SPIRType::Struct) {
+			size = glsl.get_declared_struct_size(type);
+			if (type.member_types.size() > 0) {
+				const spirv_cross::SPIRType &last_member_type = glsl.get_type(type.member_types.back());
+				if (last_member_type.array.size() == 1 && last_member_type.array[0] == 0) {
 					variable_size = true;
 				}
 			}
 		}
+		if (!type.array.empty()) {
+			descriptor_count = type.array[0];
+			if (descriptor_count <= 0) {
+				variable_size = true;
+			}
+		}
+		spirv_cross::TypeID parent_type_id = type.parent_type;
+		while (parent_type_id != 0){
+			spirv_cross::SPIRType parent_type = glsl.get_type(parent_type_id);
+			if (!parent_type.array.empty()) {
+				descriptor_count = parent_type.array[0];
+				if (descriptor_count <= 0) {
+					variable_size = true;
+				}
+			}
+
+			parent_type_id = parent_type.parent_type;
+		}
+
 
 		if (variable_size) {
 			switch (descriptor_type) {
+				case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
+				case VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE:
+					descriptor_count = limits.maxPerStageDescriptorSampledImages;
+					break;
+
 				case VK_DESCRIPTOR_TYPE_STORAGE_IMAGE:
 				case VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
 					descriptor_count = limits.maxPerStageDescriptorStorageImages;
@@ -143,6 +160,7 @@ namespace HBE {
 		VkPhysicalDeviceLimits limits = device->getPhysicalDevice().getProperties().limits;
 		spirv_cross::CompilerGLSL glsl(std::move(spirv));
 		spirv_cross::ShaderResources resources = glsl.get_shader_resources();
+		auto used_variables = glsl.get_active_interface_variables();
 
 		//----------------------------------------------UNIFORM BUFFERS------------------------------------------------
 		for (auto &ub: resources.uniform_buffers) {
@@ -155,12 +173,18 @@ namespace HBE {
 
 		//----------------------------------------------------------TEXTURE SAMPLERS----------------------------------------------------------
 		for (auto &sampler: resources.sampled_images) {
+			if(used_variables.find(sampler.id) == used_variables.end()){
+				//continue;
+			}
 			VK_DescriptorInfo uniform_info = generateDescriptorInfo(vk_stage, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, glsl, sampler, limits);
 			uniforms.emplace_back(uniform_info);
 		}
 
 		//----------------------------------------------STORAGE BUFFERS------------------------------------------------
 		for (auto &sb: resources.storage_buffers) {
+			if(used_variables.find(sb.id) == used_variables.end()){
+				//continue;
+			}
 			size_t size = glsl.get_declared_struct_size(glsl.get_type(sb.base_type_id));
 			HB_ASSERT(size <= device->getPhysicalDevice().getProperties().limits.maxStorageBufferRange, "Storage buffer size is too big!");
 			VK_DescriptorInfo uniform_info = generateDescriptorInfo(vk_stage, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, glsl, sb, limits);
@@ -168,6 +192,9 @@ namespace HBE {
 		}
 		//--------------------------------------------------------IMAGE----------------------------------------
 		for (auto &image: resources.separate_images) {
+			if(used_variables.find(image.id) == used_variables.end()){
+				//continue;
+			}
 			VK_DescriptorInfo uniform_info = generateDescriptorInfo(vk_stage, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, glsl, image, limits);
 			uniforms.emplace_back(uniform_info);
 		}

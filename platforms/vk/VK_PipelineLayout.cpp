@@ -93,30 +93,34 @@ namespace HBE {
 				push_constant_name_to_index.emplace(stage_push_constants[j].name, pipeline_push_constants.size() - 1);
 			}
 		}
+
 	}
 
 	void VK_PipelineLayout::mergeDescriptorStages(VK_DescriptorInfo &merged_descriptor, VK_DescriptorInfo &old_descriptor, VK_DescriptorInfo &new_descriptor) {
 		HB_ASSERT(old_descriptor.name == new_descriptor.name, "Uniforms have different names:" + old_descriptor.name + " and " + new_descriptor.name);
 		HB_ASSERT(old_descriptor.size == new_descriptor.size, "Uniform \"" + old_descriptor.name = "\" Binding#" + std::to_string(old_descriptor.layout_binding.binding) + " has different sizes");
 		HB_ASSERT(old_descriptor.layout_binding.descriptorType == new_descriptor.layout_binding.descriptorType,
-				  "Uniform \"" + old_descriptor.name = "\" Binding#" + std::to_string(old_descriptor.layout_binding.binding) + " has different types");
+		          "Uniform \"" + old_descriptor.name = "\" Binding#" + std::to_string(old_descriptor.layout_binding.binding) + " has different types");
 
 		merged_descriptor.name = new_descriptor.name;
 		merged_descriptor.size = new_descriptor.size;
 		merged_descriptor.layout_binding.binding = new_descriptor.layout_binding.binding;
 		merged_descriptor.layout_binding.descriptorType = new_descriptor.layout_binding.descriptorType;
 		merged_descriptor.layout_binding.stageFlags = old_descriptor.layout_binding.stageFlags | new_descriptor.layout_binding.stageFlags;
-
+		merged_descriptor.layout_binding.descriptorCount = old_descriptor.layout_binding.descriptorCount;
 
 		if (old_descriptor.variable_size == new_descriptor.variable_size) {
 			merged_descriptor.layout_binding.descriptorCount = old_descriptor.layout_binding.descriptorCount;
 			merged_descriptor.variable_size = old_descriptor.variable_size;
+			merged_descriptor.layout_binding.stageFlags = old_descriptor.layout_binding.stageFlags | new_descriptor.layout_binding.stageFlags;
 		} else if (old_descriptor.variable_size && !new_descriptor.variable_size) {
 			merged_descriptor.layout_binding.descriptorCount = old_descriptor.layout_binding.descriptorCount;
 			merged_descriptor.variable_size = true;
+			merged_descriptor.layout_binding.stageFlags = old_descriptor.layout_binding.stageFlags;
 		} else if (!old_descriptor.variable_size && new_descriptor.variable_size) {
 			merged_descriptor.layout_binding.descriptorCount = new_descriptor.layout_binding.descriptorCount;
 			merged_descriptor.variable_size = true;
+			merged_descriptor.layout_binding.stageFlags = new_descriptor.layout_binding.stageFlags;
 		}
 	}
 
@@ -136,11 +140,11 @@ namespace HBE {
 		auto it = push_constant_name_to_index.find(name);
 		HB_ASSERT(it != push_constant_name_to_index.end(), "No push constant is named:" + name);
 		vkCmdPushConstants(command_buffer,
-						   handle,
-						   push_constants_ranges[it->second].stageFlags,
-						   push_constants_ranges[it->second].offset,
-						   push_constants_ranges[it->second].size,
-						   data);
+		                   handle,
+		                   push_constants_ranges[it->second].stageFlags,
+		                   push_constants_ranges[it->second].offset,
+		                   push_constants_ranges[it->second].size,
+		                   data);
 	}
 
 	const std::vector<VkDescriptorSetLayoutBinding> &VK_PipelineLayout::getDescriptorBindings() const {
@@ -178,7 +182,6 @@ namespace HBE {
 	uint32_t VK_PipelineLayout::getDescriptorSetCount() const {
 		return descriptor_set_layouts.size();
 	}
-
 
 
 }

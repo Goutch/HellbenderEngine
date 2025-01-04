@@ -27,15 +27,24 @@ namespace HBE {
 
 		VK_DescriptorInfo &last_descriptor = descriptor_infos[descriptor_infos.size() - 1];
 		if (last_descriptor.variable_size) {
+			int same_type_variable_descriptors = 1;
 			for (int i = 0; i < pipeline_descriptors.size(); ++i) {
-				if (last_descriptor.layout_binding.binding != pipeline_descriptors[i].layout_binding.binding) {
+				if (last_descriptor.layout_binding.descriptorType == pipeline_descriptors[i].layout_binding.descriptorType) {
+					same_type_variable_descriptors++;
+				}
+			}
+			for (int i = 0; i < pipeline_descriptors.size(); ++i) {
+				if (last_descriptor.layout_binding.binding != pipeline_descriptors[i].layout_binding.binding &&
+				    pipeline_descriptors[i].descriptor_set == descriptor_set_index) {
 					last_descriptor.layout_binding.descriptorCount -= pipeline_descriptors[i].layout_binding.descriptorCount;
 				}
 			}
+			last_descriptor.layout_binding.descriptorCount = std::floor((float) last_descriptor.layout_binding.descriptorCount / (float) same_type_variable_descriptors);
 		}
+
 		descriptor_binding_flags[descriptor_binding_flags.size() - 1] = last_descriptor.variable_size ?
 		                                                                VK_DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT_BIT : 0;
-		
+
 		if (empty_descriptor_allowed) {
 			HB_ASSERT(device->getPhysicalDevice().getEnabledExtensionFlags() & EXTENSION_FLAG_DESCRIPTOR_INDEXING, "Empty descriptor needs descriptor indexing extension  enabled");
 			HB_ASSERT(device->getPhysicalDevice().getDescriptorIndexingFeatures().descriptorBindingPartiallyBound, "Descriptor binding partially bound not supported by graphic card");

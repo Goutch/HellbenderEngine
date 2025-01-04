@@ -332,7 +332,8 @@ namespace HBE {
 
 			createDescriptorPool(temp_descriptor_pool);
 			createDescriptorWrites(temp_descriptor_pool);
-			copyDescriptorSets(descriptor_pool, temp_descriptor_pool, frame);
+			//todo: current frame only
+			copyDescriptorSets(descriptor_pool, temp_descriptor_pool, -1);
 
 			old_descriptor_pools.emplace(renderer->getCurrentFrame(), descriptor_pool.handle);
 
