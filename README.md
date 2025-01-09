@@ -8,7 +8,7 @@
 - **Common library for my Vulkan projects**
 - **Cross platforms**
 - **Lightweight**
-- **Fast**
+- **Raytracing,Compute,Rasterization**
 
 # Why?
 - **I like Vulkan and graphics**
