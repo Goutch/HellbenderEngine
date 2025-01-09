@@ -100,6 +100,7 @@ namespace HBE {
 	void VK_Mesh::setInstanceBuffer(uint32_t location, const void *data, size_t count) {
 		this->instance_count = count;
 		if (count == 0) return;
+		HB_ASSERT(buffers.find(location) != buffers.end(), "Trying to set an instance buffer at a location that were not included in the attribute infos");
 		VertexAttributeInfo &binding_info = attributes_locations[location];
 		VkDeviceSize buffer_size = binding_info.size * count;
 

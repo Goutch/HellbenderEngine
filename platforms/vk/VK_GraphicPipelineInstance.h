@@ -1,11 +1,11 @@
 #pragma once
 
-#include "core/resource/GraphicPipelineInstance.h"
+#include "core/resource/RasterizationPipelineInstance.h"
 
 namespace HBE {
 	class VK_PipelineDescriptors;
 
-	class GraphicPipeline;
+	class RaterizationPipeline;
 
 	class VK_Renderer;
 
@@ -13,9 +13,9 @@ namespace HBE {
 
 	class StorageBuffer;
 
-	class VK_GraphicPipelineInstance : public GraphicPipelineInstance {
+	class VK_GraphicPipelineInstance : public RasterizationPipelineInstance {
 		VK_PipelineDescriptors *descriptors;
-		GraphicPipeline *pipeline;
+		RaterizationPipeline *pipeline;
 		VK_GraphicPipeline *vk_pipeline;
 
 		bool bound = false;
@@ -45,7 +45,7 @@ namespace HBE {
 		void setTexelBuffer(uint32_t binding, TexelBuffer *buffer, int32_t frame) override;
 		void setTexelBufferArray(uint32_t binding, TexelBuffer **buffers, uint32_t count, int32_t frame) override;
 
-		const GraphicPipeline *getGraphicPipeline() const override;
+		const RaterizationPipeline *getGraphicPipeline() const override;
 		VK_GraphicPipeline *getVkGraphicPipeline();
 
 	};

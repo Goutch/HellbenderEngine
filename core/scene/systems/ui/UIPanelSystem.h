@@ -9,14 +9,14 @@ using namespace HBE;
 namespace HBE {
 	class Mesh;
 
-	class GraphicPipelineInstance;
+	class RasterizationPipelineInstance;
 
 	class RenderGraph;
 
 	class SceneNode;
 
 	struct UIPanel {
-		GraphicPipelineInstance *pipeline_instance = nullptr;
+		RasterizationPipelineInstance *pipeline_instance = nullptr;
 		PIVOT anchor = PIVOT_CENTER;
 		int layer = 0;
 		bool active = true;

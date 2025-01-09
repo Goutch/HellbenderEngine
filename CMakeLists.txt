@@ -44,12 +44,12 @@ set(CORE_FILES
         core/resource/Shader.h
         core/resource/ResourceFactory.h
         core/resource/Resource.h
-        core/resource/GraphicPipeline.h
+        core/resource/RaterizationPipeline.h
         core/resource/ComputePipeline.h
         core/resource/Resources.h
         core/resource/Resources.cpp
         core/resource/Texture.cpp
-        core/resource/GraphicPipelineInstance.h
+        core/resource/RasterizationPipelineInstance.h
         core/resource/ComputeInstance.h
         core/resource/IPipelineInstance.h
         core/resource/RenderTarget.h
@@ -59,10 +59,10 @@ set(CORE_FILES
         core/resource/Font.cpp
         core/resource/Font.h
         core/resource/StorageBuffer.h
-        core/utility/GLTFLoader.cpp
-        core/utility/GLTFLoader.h
-        core/utility/DefaultModelParser.cpp
-        core/utility/DefaultModelParser.h
+        core/resource/AudioClip.cpp
+        core/resource/AudioClip.h
+        core/resource/AudioClipInstance.cpp
+        core/resource/AudioClipInstance.h
 
         core/graphics/Window.h
         core/graphics/Renderer.h
@@ -72,6 +72,7 @@ set(CORE_FILES
         core/graphics/Window.cpp
         core/graphics/RenderGraph.cpp
         core/graphics/RenderGraph.h
+        core/graphics/GraphicLimits.h
 
         core/input/Input.h
         core/input/Input.cpp
@@ -106,12 +107,6 @@ set(CORE_FILES
         core/scene/systems/MeshRendererSystem.cpp
         core/scene/systems/ModelRendererSystem.cpp
         core/scene/systems/ui/LabelSystem.cpp
-
-        core/resource/AudioClip.cpp
-        core/resource/AudioClip.h
-        core/resource/AudioClipInstance.cpp
-        core/resource/AudioClipInstance.h
-
         core/scene/components/Transform.h
         core/scene/components/Camera2D.h
         core/scene/components/Transform2D.h
@@ -130,18 +125,21 @@ set(CORE_FILES
         core/scene/components/EntityState.cpp
         core/scene/components/EntityState.h
         core/scene/components/CameraController.cpp
-
+        core/scene/ecs/Component.h
 
         core/utility/Log.cpp
         core/utility/Geometry.cpp
         core/utility/Geometry.h
         core/utility/Profiler.cpp
         core/utility/Profiler.h
+        core/utility/GLTFLoader.cpp
+        core/utility/GLTFLoader.h
+        core/utility/DefaultModelParser.cpp
+        core/utility/DefaultModelParser.h
 
 
         core/math/SignedDistance.h
-
-        core/scene/ecs/Component.h)
+        )
 set(VK_FILES
         platforms/vk/VK_Renderer.cpp
         platforms/vk/VK_Instance.cpp
@@ -212,7 +210,11 @@ set(VK_FILES
         platforms/vk/VK_TexelBuffer.h
         platforms/vk/VK_Utils.h
         platforms/vk/VK_DescriptorSetLayout.cpp
-        platforms/vk/VK_DescriptorSetLayout.h platforms/vk/VK_RenderTarget.cpp platforms/vk/VK_RenderTarget.h platforms/vk/VK_DynamicRenderTarget.cpp platforms/vk/VK_DynamicRenderTarget.h core/graphics/GraphicLimits.h)
+        platforms/vk/VK_DescriptorSetLayout.h
+        platforms/vk/VK_RenderTarget.cpp
+        platforms/vk/VK_RenderTarget.h
+        platforms/vk/VK_DynamicRenderTarget.cpp
+        platforms/vk/VK_DynamicRenderTarget.h)
 
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")

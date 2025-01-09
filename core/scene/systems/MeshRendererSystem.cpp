@@ -9,11 +9,11 @@
 
 namespace HBE {
 	MeshRendererSystem::MeshRendererSystem(Scene *scene) : System(scene) {
-		scene->onDraw.subscribe(this, &MeshRendererSystem::draw);
-		scene->onDrawNode.subscribe(this, &MeshRendererSystem::drawSceneNode);
+		scene->onPrepareRenderGraph.subscribe(this, &MeshRendererSystem::onPrepareRenderGraph);
+		scene->onPrepareRenderGraphOrdered.subscribe(this, &MeshRendererSystem::onPrepareRenderGraphOrdered);
 	}
 
-	void HBE::MeshRendererSystem::draw(RenderGraph *render_graph) {
+	void HBE::MeshRendererSystem::onPrepareRenderGraph(RenderGraph *render_graph) {
 		HB_PROFILE_BEGIN("MeshRendererDraw");
 		DrawCmdInfo draw_cmd{};
 
@@ -24,18 +24,25 @@ namespace HBE {
 				continue;
 			if (!mesh_renderer.ordered) {
 				if (mesh_renderer.mesh && mesh_renderer.pipeline_instance) {
+					mat4 world_mat = transform.world();
 					PushConstantInfo push_constant_info{};
-					push_constant_info.size = sizeof(mat4);
-					push_constant_info.name = "constants";
-					draw_cmd.push_constants_count = 1;
-					draw_cmd.push_constants = &push_constant_info;
+					if (mesh_renderer.use_transform_matrix_as_push_constant) {
+
+						push_constant_info.size = sizeof(mat4);
+						push_constant_info.name = "constants";
+						push_constant_info.data = &world_mat;
+						draw_cmd.push_constants_count = 1;
+						draw_cmd.push_constants = &push_constant_info;
+						mat4 world_matrix = transform.world();
+						push_constant_info.data = &world_matrix;
+					}
 					draw_cmd.mesh = mesh_renderer.mesh;
 					draw_cmd.pipeline_instance = mesh_renderer.pipeline_instance;
 					draw_cmd.layer = mesh_renderer.layer;
 
 					mat4 world_matrix = transform.world();
 					push_constant_info.data = &world_matrix;
-					render_graph->draw(draw_cmd);
+					render_graph->add(draw_cmd);
 				} else {
 					Log::warning("Mesh renderer does not have a material and/or a mesh assigned");
 				}
@@ -47,10 +54,10 @@ namespace HBE {
 	}
 
 	MeshRendererSystem::~MeshRendererSystem() {
-		scene->onDraw.unsubscribe(this);
+		scene->onPrepareRenderGraph.unsubscribe(this);
 	}
 
-	void MeshRendererSystem::drawSceneNode(RenderGraph *render_graph, SceneNode &node) {
+	void MeshRendererSystem::onPrepareRenderGraphOrdered(RenderGraph *render_graph, SceneNode &node) {
 		if (node.entity.has<MeshRenderer>()) {
 			DrawCmdInfo draw_cmd{};
 			MeshRenderer *mesh_renderer = node.entity.get<MeshRenderer>();
@@ -60,13 +67,18 @@ namespace HBE {
 			Transform *transform = node.entity.get<Transform>();
 
 			mat4 world_mat = transform->world();
-
 			PushConstantInfo push_constant_info{};
-			push_constant_info.size = sizeof(mat4);
-			push_constant_info.name = "constants";
-			push_constant_info.data = &world_mat;
-			draw_cmd.push_constants_count = 1;
-			draw_cmd.push_constants = &push_constant_info;
+			if (mesh_renderer->use_transform_matrix_as_push_constant) {
+
+				push_constant_info.size = sizeof(mat4);
+				push_constant_info.name = "constants";
+				push_constant_info.data = &world_mat;
+				draw_cmd.push_constants_count = 1;
+				draw_cmd.push_constants = &push_constant_info;
+				mat4 world_matrix = transform->world();
+				push_constant_info.data = &world_matrix;
+			}
+
 
 			draw_cmd.mesh = mesh_renderer->mesh;
 			draw_cmd.pipeline_instance = mesh_renderer->pipeline_instance;
@@ -74,9 +86,9 @@ namespace HBE {
 			draw_cmd.order_in_layer = node.getHierarchyOrder();
 			draw_cmd.flags = DRAW_CMD_FLAG_ORDERED;
 
-			mat4 world_matrix = transform->world();
-			push_constant_info.data = &world_matrix;
-			render_graph->draw(draw_cmd);
+
+
+			render_graph->add(draw_cmd);
 		}
 	}
 }

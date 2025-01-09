@@ -123,7 +123,7 @@ namespace HBE {
 		return factory;
 	}
 
-	void VK_Renderer::render(RenderCmdInfo &render_cmd_info) {
+	void VK_Renderer::rasterize(RasterizeCmdInfo &render_cmd_info) {
 		//todo: create scene specific render graph
 		HB_PROFILE_BEGIN("RenderPass");
 
@@ -132,7 +132,7 @@ namespace HBE {
 		vec2i resolution = render_pass->getResolution();
 		VkViewport viewport{};
 
-		if (RENDER_CMD_FLAG_INVERSE_Y & render_cmd_info.flags) {
+		if (RASTERIZE_CMD_FLAG_INVERSE_Y & render_cmd_info.flags) {
 			viewport.x = 0.0f;
 			viewport.y = static_cast<float>(resolution.y);
 			viewport.width = static_cast<float>(resolution.x);
@@ -168,8 +168,8 @@ namespace HBE {
 		caches[0] = render_cache_sorted;
 		caches[1] = ordered_render_cache;
 		HB_PROFILE_BEGIN("RenderPassLoopDrawCmd");
-		const GraphicPipeline *last_pipeline = nullptr;
-		GraphicPipelineInstance *last_pipeline_instance = nullptr;
+		const RaterizationPipeline *last_pipeline = nullptr;
+		RasterizationPipelineInstance *last_pipeline_instance = nullptr;
 		const Mesh *last_mesh = nullptr;
 		for (int cache_index = 0; cache_index < 2; ++cache_index) {
 			const std::vector<DrawCmdInfo> &cache = *caches[cache_index];
@@ -178,8 +178,8 @@ namespace HBE {
 				if ((current_cmd.layer & render_cmd_info.layer_mask) != cache[i].layer) {
 					continue;
 				}
-				const GraphicPipeline *current_pipeline = current_cmd.pipeline_instance->getGraphicPipeline();
-				GraphicPipelineInstance *current_pipeline_instance = current_cmd.pipeline_instance;
+				const RaterizationPipeline *current_pipeline = current_cmd.pipeline_instance->getGraphicPipeline();
+				RasterizationPipelineInstance *current_pipeline_instance = current_cmd.pipeline_instance;
 				const Mesh *current_mesh = current_cmd.mesh;
 				if (current_pipeline != last_pipeline) {
 					current_pipeline->bind();
@@ -239,7 +239,6 @@ namespace HBE {
 		                          trace_rays_cmd_info.resolution.y,
 		                          1);
 		//TODO:Might need barrier here
-
 
 		vk_pipeline_instance->unbind();
 		vk_pipeline->unbind();
@@ -453,7 +452,7 @@ namespace HBE {
 		Shader *frag = new VK_Shader(device, shader_info);
 		Resources::add("DEFAULT_SCREEN_FRAG_SHADER", frag);
 
-		GraphicPipelineInfo pipeline_info{};
+		RasterizationPipelineInfo pipeline_info{};
 		pipeline_info.vertex_shader = vert;
 		pipeline_info.fragment_shader = frag;
 		pipeline_info.attribute_info_count = 0;

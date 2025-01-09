@@ -22,9 +22,9 @@ namespace HBE {
 
 	class ResourceFactory;
 
-	class GraphicPipeline;
+	class RaterizationPipeline;
 
-	class GraphicPipelineInstance;
+	class RasterizationPipelineInstance;
 
 	class RootAccelerationStructure;
 
@@ -37,10 +37,10 @@ namespace HBE {
 		DRAW_CMD_FLAG_NONE = 0,
 		DRAW_CMD_FLAG_ORDERED = 1 << 0,
 	};
-	typedef uint32_t RENDER_CMD_FLAGS;
-	enum RENDER_CMD_FLAG {
-		REDNER_CMD_FLAG_NONE = 0,
-		RENDER_CMD_FLAG_INVERSE_Y = 1 << 0,
+	typedef uint32_t RASTERIZE_CMD_FLAGS;
+	enum RASTERIZE_CMD_FLAG {
+		RASTERIZE_CMD_FLAG_NONE = 0,
+		RASTERIZE_CMD_FLAG_INVERSE_Y = 1 << 0,
 	};
 	typedef uint32_t TRACE_RAYS_CMD_FLAGS;
 	enum TRACE_RAYS_CMD_FLAG {
@@ -61,7 +61,7 @@ namespace HBE {
 
 	struct DrawCmdInfo {
 		const Mesh *mesh = nullptr;
-		GraphicPipelineInstance *pipeline_instance = nullptr;
+		RasterizationPipelineInstance *pipeline_instance = nullptr;
 		uint32_t layer = 0;
 		uint32_t order_in_layer = 0;//ignored if ordered flag is not set
 		uint32_t push_constants_count = 0;
@@ -69,11 +69,11 @@ namespace HBE {
 		DRAW_CMD_FLAGS flags = DRAW_CMD_FLAG_NONE;
 	};
 
-	struct RenderCmdInfo {
+	struct RasterizeCmdInfo {
 		const RenderTarget *render_target;
 		RenderGraph *render_graph;
 		uint32_t layer_mask;
-		RENDER_CMD_FLAGS flags;
+		RASTERIZE_CMD_FLAGS flags;
 		mat4 view;
 		mat4 projection;
 	};
@@ -97,7 +97,7 @@ namespace HBE {
 
 		virtual ~Renderer() = default;
 
-		virtual void render(RenderCmdInfo &render_cmd_info) = 0;
+		virtual void rasterize(RasterizeCmdInfo &rasterize_cmd_info) = 0;
 
 		virtual void traceRays(TraceRaysCmdInfo &trace_rays_cmd_info) = 0;
 

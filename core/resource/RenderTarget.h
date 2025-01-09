@@ -9,7 +9,7 @@ using namespace utils;
 namespace HBE {
 	class Framebuffer;
 
-	class GraphicPipeline;
+	class RaterizationPipeline;
 
 	typedef uint32_t RENDER_TARGET_FLAGS;
 	enum RENDER_TARGET_FLAG {

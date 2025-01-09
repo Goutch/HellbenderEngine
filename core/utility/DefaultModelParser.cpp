@@ -1,4 +1,4 @@
-#include "core/resource/GraphicPipelineInstance.h"
+#include "core/resource/RasterizationPipelineInstance.h"
 #include "DefaultModelParser.h"
 #include "core/resource/Resources.h"
 #include "core/resource/Texture.h"
@@ -85,15 +85,15 @@ namespace HBE {
 		return mesh_ptr;
 	}
 
-	GraphicPipelineInstance *DefaultModelParser::createMaterial(const ModelMaterialData &materialData,
-	                                                            HBE::Texture **textures) {
+	RasterizationPipelineInstance *DefaultModelParser::createMaterial(const ModelMaterialData &materialData,
+	                                                                  HBE::Texture **textures) {
 		GraphicPipelineInstanceInfo instance_info{};
 		instance_info.graphic_pipeline = materialData.double_sided
 		                                 ? parser_info.graphic_pipeline_2_sided
 		                                 : parser_info.graphic_pipeline;
 		instance_info.flags = GRAPHIC_PIPELINE_INSTANCE_FLAG_EMPTY_DESCRIPTOR_ALLOWED;
 
-		GraphicPipelineInstance *instance_ptr = Resources::createGraphicPipelineInstance(instance_info);
+		RasterizationPipelineInstance *instance_ptr = Resources::createRasterizationPipelineInstance(instance_info);
 
 		auto texture_type_it = parser_info.texture_names.find(MODEL_TEXTURE_TYPE_ALBEDO);
 		if (texture_type_it != parser_info.texture_names.end() && materialData.albedo_texture != -1)

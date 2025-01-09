@@ -23,7 +23,7 @@ namespace HBE {
 
 	class VK_TopLevelAccelerationStructure;
 
-	class GraphicPipelineInstance;
+	class RasterizationPipelineInstance;
 
 	class RenderTarget;
 

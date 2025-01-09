@@ -16,7 +16,7 @@ namespace HBE {
 		delete descriptors;
 	}
 
-	const GraphicPipeline *HBE::VK_GraphicPipelineInstance::getGraphicPipeline() const {
+	const RaterizationPipeline *HBE::VK_GraphicPipelineInstance::getGraphicPipeline() const {
 		return pipeline;
 	}
 

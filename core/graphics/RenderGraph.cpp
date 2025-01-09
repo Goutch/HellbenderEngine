@@ -7,8 +7,8 @@
 #include <algorithm>
 
 #include "core/resource/Mesh.h"
-#include "core/resource/GraphicPipelineInstance.h"
-#include "core/resource/GraphicPipeline.h"
+#include "core/resource/RasterizationPipelineInstance.h"
+#include "core/resource/RaterizationPipeline.h"
 #include "core/graphics/Renderer.h"
 #include "core/utility/Profiler.h"
 
@@ -23,7 +23,7 @@ namespace HBE {
 		}
 	}
 
-	void RenderGraph::draw(DrawCmdInfo draw_cmd_info) {
+	void RenderGraph::add(DrawCmdInfo draw_cmd_info) {
 		if (draw_cmd_info.mesh->getInstanceCount() == 0) return;
 		//copy push constants data to cache
 		for (int i = 0; i < draw_cmd_info.push_constants_count; ++i) {
@@ -98,13 +98,13 @@ namespace HBE {
 	}
 
 	bool RenderGraph::compareDrawCmd(const DrawCmdInfo &cmd1, const DrawCmdInfo &cmd2) {
-		const GraphicPipeline *gp1 = cmd1.pipeline_instance->getGraphicPipeline();
-		const GraphicPipeline *gp2 = cmd2.pipeline_instance->getGraphicPipeline();
+		const RaterizationPipeline *gp1 = cmd1.pipeline_instance->getGraphicPipeline();
+		const RaterizationPipeline *gp2 = cmd2.pipeline_instance->getGraphicPipeline();
 		if (gp1 != gp2) {
 			return gp1 > gp2;
 		} else {
-			const GraphicPipelineInstance *gpi1 = cmd1.pipeline_instance;
-			const GraphicPipelineInstance *gpi2 = cmd2.pipeline_instance;
+			const RasterizationPipelineInstance *gpi1 = cmd1.pipeline_instance;
+			const RasterizationPipelineInstance *gpi2 = cmd2.pipeline_instance;
 			if (gpi1 != gpi2) {
 				return gpi1 > gpi2;
 			} else {

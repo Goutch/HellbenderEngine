@@ -12,7 +12,7 @@ namespace HBE {
 
 	class RenderTarget;
 
-	class GraphicPipeline;
+	class RaterizationPipeline;
 
 	class Mesh;
 
@@ -20,7 +20,7 @@ namespace HBE {
 
 	class Window;
 
-	class GraphicPipelineInstance;
+	class RasterizationPipelineInstance;
 
 	class RaytracingPipelineInstance;
 
@@ -49,7 +49,7 @@ namespace HBE {
 
 		static const GraphicLimits &getLimits();
 
-		static void render(RenderCmdInfo &render_cmd_info);
+		static void rasterize(RasterizeCmdInfo &rasterize_cmd_info);
 
 		static void traceRays(TraceRaysCmdInfo &trace_rays_cmd_info);
 

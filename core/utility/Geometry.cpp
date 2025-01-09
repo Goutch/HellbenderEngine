@@ -102,35 +102,41 @@ namespace HBE {
 		switch (flags) {
 			case 0://VERTEX_FLAG_NONE
 				vertices.assign({
-										size.x, -size.y, size.z,
-										size.x, size.y, size.z,
-										-size.x, size.y, size.z,
-										-size.x, -size.y, size.z,
+						                // Front face (Z+)
+						                size.x, -size.y, size.z,   // 0
+						                -size.x, -size.y, size.z,  // 1
+						                -size.x, size.y, size.z,   // 2
+						                size.x, size.y, size.z,    // 3
 
-										size.x, -size.y, -size.z,
-										size.x, size.y, -size.z,
-										size.x, size.y, size.z,
-										size.x, -size.y, size.z,
+						                // Right face (X+)
+						                size.x, -size.y, -size.z,  // 4
+						                size.x, -size.y, size.z,   // 5
+						                size.x, size.y, size.z,    // 6
+						                size.x, size.y, -size.z,   // 7
 
-										-size.x, -size.y, -size.z,
-										-size.x, size.y, -size.z,
-										size.x, size.y, -size.z,
-										size.x, -size.y, -size.z,
+						                // Back face (Z-)
+						                -size.x, -size.y, -size.z, // 8
+						                size.x, -size.y, -size.z,  // 9
+						                size.x, size.y, -size.z,   // 10
+						                -size.x, size.y, -size.z,  // 11
 
-										-size.x, -size.y, size.z,
-										-size.x, size.y, size.z,
-										-size.x, size.y, -size.z,
-										-size.x, -size.y, -size.z,
+						                // Left face (X-)
+						                -size.x, -size.y, size.z,  // 12
+						                -size.x, -size.y, -size.z, // 13
+						                -size.x, size.y, -size.z,  // 14
+						                -size.x, size.y, size.z,   // 15
 
-										-size.x, size.y, -size.z,
-										-size.x, size.y, size.z,
-										size.x, size.y, size.z,
-										size.x, size.y, -size.z,
+						                // Top face (Y+)
+						                -size.x, size.y, size.z,   // 16
+						                -size.x, size.y, -size.z,  // 17
+						                size.x, size.y, -size.z,   // 18
+						                size.x, size.y, size.z,    // 19
 
-										size.x, -size.y, size.z,
-										-size.x, -size.y, size.z,
-										-size.x, -size.y, -size.z,
-										size.x, -size.y, -size.z,
+						                // Bottom face (Y-)
+						                size.x, -size.y, size.z,   // 20
+						                size.x, -size.y, -size.z,  // 21
+						                -size.x, -size.y, -size.z, // 22
+						                -size.x, -size.y, size.z,  // 23
 								});
 
 				mesh.setBuffer(0, vertices.data(), vertices.size() / 3);

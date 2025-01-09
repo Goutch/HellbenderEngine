@@ -2,9 +2,9 @@
 #include "Resources.h"
 #include "map"
 
-#include "GraphicPipeline.h"
+#include "RaterizationPipeline.h"
 #include "Mesh.h"
-#include "GraphicPipelineInstance.h"
+#include "RasterizationPipelineInstance.h"
 #include "Texture.h"
 #include "core/utility/GLTFLoader.h"
 #include "core/resource/raytracing/AccelerationStructure.h"
@@ -20,7 +20,7 @@ namespace HBE {
 			}
 		}
 
-		for (GraphicPipelineInstance *material: resources.materials) {
+		for (RasterizationPipelineInstance *material: resources.materials) {
 			delete material;
 		}
 
@@ -76,7 +76,7 @@ namespace HBE {
 
 	void Model::createMaterials() {
 		for (int i = 0; i < data.material_properties.size(); ++i) {
-			GraphicPipelineInstance *material = info.parser->createMaterial(data.material_properties[i], resources.textures.data());
+			RasterizationPipelineInstance *material = info.parser->createMaterial(data.material_properties[i], resources.textures.data());
 			resources.materials.emplace_back(material);
 		}
 	}

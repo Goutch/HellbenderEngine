@@ -10,8 +10,8 @@ namespace HBE {
 		MESH_FLAG additional_mesh_flags = MESH_FLAG_NONE;
 		std::map<MODEL_TEXTURE_TYPE, std::string> texture_names;
 		std::string material_property_name;
-		GraphicPipeline *graphic_pipeline = nullptr;
-		GraphicPipeline *graphic_pipeline_2_sided = nullptr;
+		RaterizationPipeline *graphic_pipeline = nullptr;
+		RaterizationPipeline *graphic_pipeline_2_sided = nullptr;
 	};
 
 	class HB_API DefaultModelParser : public HBE::ModelParser {
@@ -26,7 +26,7 @@ namespace HBE {
 
 		Mesh *createMesh(const HBE::ModelPrimitiveData &data, ModelInfo model_info) override;
 
-		GraphicPipelineInstance *createMaterial(const HBE::ModelMaterialData &materialData, HBE::Texture **textures) override;
+		RasterizationPipelineInstance *createMaterial(const HBE::ModelMaterialData &materialData, HBE::Texture **textures) override;
 
 		Texture *createTexture(const ModelTextureData &data) override;
 

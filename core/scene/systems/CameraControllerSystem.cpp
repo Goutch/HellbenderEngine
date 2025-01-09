@@ -51,7 +51,7 @@ namespace HBE
 			transform.rotate(vec3(0, mouse_delta.x, 0));
 			//go back to current pitch
 
-			if (!controller.invert_y)
+			if (controller.invert_y)
 				controller.current_pitch += mouse_delta.y;
 			else
 				controller.current_pitch -= mouse_delta.y;

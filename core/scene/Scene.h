@@ -59,8 +59,8 @@ namespace HBE {
 
 	public:
 		Event<RenderGraph *> onRender;
-		Event<RenderGraph *> onDraw;
-		Event<RenderGraph *, SceneNode &> onDrawNode;
+		Event<RenderGraph *> onPrepareRenderGraph;
+		Event<RenderGraph *, SceneNode &> onPrepareRenderGraphOrdered;
 		Event<float> onUpdate;
 		Event<Scene *> onSceneActivate;
 		Event<Scene *> onSceneDeactivate;

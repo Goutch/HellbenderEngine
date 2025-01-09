@@ -10,9 +10,9 @@
 #include "core/resource/raytracing/AccelerationStructure.h"
 
 namespace HBE {
-	class GraphicPipelineInstance;
+	class RasterizationPipelineInstance;
 
-	class GraphicPipeline;
+	class RaterizationPipeline;
 
 	class Mesh;
 
@@ -117,9 +117,10 @@ namespace HBE {
 		std::vector<ModelNode> children;
 	};
 	struct ModelResources {
+		//todo: flatten meshes
 		std::vector<std::vector<Mesh *>> meshes;
 		std::vector<Texture *> textures;
-		std::vector<GraphicPipelineInstance *> materials;
+		std::vector<RasterizationPipelineInstance *> materials;
 		std::vector<MeshAccelerationStructure *> acceleration_structures;
 		std::vector<AccelerationStructureInstance> acceleration_structure_instances;
 	};
@@ -184,7 +185,7 @@ namespace HBE {
 
 		virtual Texture *createTexture(const ModelTextureData &data) = 0;
 
-		virtual GraphicPipelineInstance *createMaterial(const ModelMaterialData &materialData, Texture **textures) = 0;
+		virtual RasterizationPipelineInstance *createMaterial(const ModelMaterialData &materialData, Texture **textures) = 0;
 
 		//Raytracing
 		virtual MeshAccelerationStructure *createMeshAccelerationStructure(Mesh *mesh, int mesh_index) { return nullptr; };

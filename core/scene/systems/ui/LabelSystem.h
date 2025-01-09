@@ -10,9 +10,9 @@
 namespace HBE {
 	class Font;
 
-	class GraphicPipeline;
+	class RaterizationPipeline;
 
-	class GraphicPipelineInstance;
+	class RasterizationPipelineInstance;
 
 	class Shader;
 
@@ -32,7 +32,7 @@ namespace HBE {
 		TEXT_ALIGNMENT alignment = TEXT_ALIGNMENT_CENTER;
 
 		Font *font;
-		GraphicPipelineInstance *pipeline_instance = nullptr;
+		RasterizationPipelineInstance *pipeline_instance = nullptr;
 
 		const std::string &getText() const;
 
@@ -56,8 +56,8 @@ namespace HBE {
 		Font *default_font = nullptr;
 		Shader *default_text_frag_shader = nullptr;
 		Shader *default_text_vert_shader = nullptr;
-		GraphicPipeline *default_text_pipeline = nullptr;
-		GraphicPipelineInstance *default_text_pipeline_instance = nullptr;
+		RaterizationPipeline *default_text_pipeline = nullptr;
+		RasterizationPipelineInstance *default_text_pipeline_instance = nullptr;
 	public:
 		LabelSystem(Scene *scene, RenderTarget *render_target);
 

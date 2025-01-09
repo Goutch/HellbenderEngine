@@ -12,14 +12,14 @@
 
 namespace HBE {
 
-	VK_GraphicPipeline::VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const GraphicPipelineInfo &info, VkRenderPass render_pass) {
+	VK_GraphicPipeline::VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const RasterizationPipelineInfo &info, VkRenderPass render_pass) {
 		this->info = info;
 		this->render_pass = render_pass;
 		createRenderPass(device, renderer);
 	}
 
 
-	VK_GraphicPipeline::VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const GraphicPipelineInfo &info) {
+	VK_GraphicPipeline::VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const RasterizationPipelineInfo &info) {
 		this->info = info;
 		createRenderPass(device, renderer);
 	}
@@ -135,11 +135,11 @@ namespace HBE {
 		rasterizer.rasterizerDiscardEnable = VK_FALSE;
 		rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
 		rasterizer.lineWidth = 1.0f;
-		rasterizer.frontFace = (info.flags & GRAPHIC_PIPELINE_FLAG_FRONT_COUNTER_CLOCKWISE) ? VK_FRONT_FACE_COUNTER_CLOCKWISE : VK_FRONT_FACE_CLOCKWISE;
+		rasterizer.frontFace = (info.flags & RASTERIZATION_PIPELINE_FLAG_FRONT_COUNTER_CLOCKWISE) ? VK_FRONT_FACE_COUNTER_CLOCKWISE : VK_FRONT_FACE_CLOCKWISE;
 		rasterizer.cullMode = VK_CULL_MODE_NONE;
-		rasterizer.cullMode |= (info.flags & GRAPHIC_PIPELINE_FLAG_CULL_BACK) == GRAPHIC_PIPELINE_FLAG_CULL_BACK
+		rasterizer.cullMode |= (info.flags & RASTERIZATION_PIPELINE_FLAG_CULL_BACK) == RASTERIZATION_PIPELINE_FLAG_CULL_BACK
 		                       ? VK_CULL_MODE_BACK_BIT : VK_CULL_MODE_NONE;
-		rasterizer.cullMode |= (info.flags & GRAPHIC_PIPELINE_FLAG_CULL_FRONT) == GRAPHIC_PIPELINE_FLAG_CULL_FRONT
+		rasterizer.cullMode |= (info.flags & RASTERIZATION_PIPELINE_FLAG_CULL_FRONT) == RASTERIZATION_PIPELINE_FLAG_CULL_FRONT
 		                       ? VK_CULL_MODE_FRONT_BIT : VK_CULL_MODE_NONE;
 		rasterizer.depthBiasEnable = VK_FALSE;
 		rasterizer.depthBiasConstantFactor = 0.0f; // Optional
@@ -191,7 +191,7 @@ namespace HBE {
 		VkPipelineDepthStencilStateCreateInfo depthStencil{};
 		depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
 		depthStencil.depthTestEnable =
-				(info.flags & GRAPHIC_PIPELINE_FLAG_NO_DEPTH_TEST) == GRAPHIC_PIPELINE_FLAG_NO_DEPTH_TEST ? VK_FALSE : VK_TRUE;
+				(info.flags & RASTERIZATION_PIPELINE_FLAG_NO_DEPTH_TEST) == RASTERIZATION_PIPELINE_FLAG_NO_DEPTH_TEST ? VK_FALSE : VK_TRUE;
 		depthStencil.depthWriteEnable = VK_TRUE;
 		depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
 		depthStencil.depthBoundsTestEnable = VK_FALSE;
@@ -264,7 +264,7 @@ namespace HBE {
 	}
 
 	void VK_GraphicPipeline::createPipelineLayout() {
-		layout = new VK_PipelineLayout(device, shaders.data(), shaders.size(), info.flags & GRAPHIC_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR);
+		layout = new VK_PipelineLayout(device, shaders.data(), shaders.size(), info.flags & RASTERIZATION_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR);
 	}
 
 	bool VK_GraphicPipeline::bound() {

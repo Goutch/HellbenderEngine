@@ -8,8 +8,8 @@
 #include "core/resource/Font.h"
 #include "core/resource/Shader.h"
 #include "core/input/Input.h"
-#include "core/resource/GraphicPipeline.h"
-#include "core/resource/GraphicPipelineInstance.h"
+#include "core/resource/RaterizationPipeline.h"
+#include "core/resource/RasterizationPipelineInstance.h"
 
 namespace HBE {
 	ButtonSystem::ButtonSystem(Scene *scene, RenderTarget *render_target) : System(scene) {
@@ -31,14 +31,14 @@ namespace HBE {
 		button_vert_shader = Resources::createShader(button_vert_shader_info);
 		button_frag_shader = Resources::createShader(button_frag_shader_info);
 
-		GraphicPipelineInfo button_pipeline_info{};
+		RasterizationPipelineInfo button_pipeline_info{};
 		button_pipeline_info.vertex_shader = button_vert_shader;
 		button_pipeline_info.fragment_shader = button_frag_shader;
 		button_pipeline_info.render_target = render_target;
 		button_pipeline_info.attribute_info_count = 1;
 		button_pipeline_info.attribute_infos = &VERTEX_ATTRIBUTE_INFO_POSITION3D_UV_INTERLEAVED;
-		button_pipeline_info.flags = GRAPHIC_PIPELINE_FLAG_NO_DEPTH_TEST;
-		button_pipeline = Resources::createGraphicPipeline(button_pipeline_info);
+		button_pipeline_info.flags = RASTERIZATION_PIPELINE_FLAG_NO_DEPTH_TEST;
+		button_pipeline = Resources::createRasterizationPipeline(button_pipeline_info);
 
 
 		GraphicPipelineInstanceInfo button_pipeline_instance_info{};
@@ -46,9 +46,9 @@ namespace HBE {
 		button_pipeline_instance_info.flags = GRAPHIC_PIPELINE_INSTANCE_FLAG_NONE;
 
 
-		default_button_pipeline_instance = Resources::createGraphicPipelineInstance(button_pipeline_instance_info);
-		default_button_hover_pipeline_instance = Resources::createGraphicPipelineInstance(button_pipeline_instance_info);
-		default_button_pressed_pipeline_instance = Resources::createGraphicPipelineInstance(button_pipeline_instance_info);
+		default_button_pipeline_instance = Resources::createRasterizationPipelineInstance(button_pipeline_instance_info);
+		default_button_hover_pipeline_instance = Resources::createRasterizationPipelineInstance(button_pipeline_instance_info);
+		default_button_pressed_pipeline_instance = Resources::createRasterizationPipelineInstance(button_pipeline_instance_info);
 
 
 		default_button_material = ButtonMaterial{

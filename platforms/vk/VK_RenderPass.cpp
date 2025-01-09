@@ -134,7 +134,7 @@ namespace HBE
 		if (vkCreateRenderPass(device->getHandle(), &render_pass_info,
 		                       nullptr, &handle) != VK_SUCCESS)
 		{
-			Log::error("failed to create render pass!");
+			Log::error("failed to create rasterize pass!");
 		}
 		createFramebuffers();
 	}

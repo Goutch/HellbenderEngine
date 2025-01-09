@@ -5,7 +5,7 @@
 
 namespace HBE {
 	ModelRendererSystem::ModelRendererSystem(Scene *scene) : System(scene) {
-		scene->onDraw.subscribe(this, &ModelRendererSystem::draw);
+		scene->onPrepareRenderGraph.subscribe(this, &ModelRendererSystem::draw);
 	}
 
 	void drawNode(RenderGraph *render_graph, Model &model, const ModelNode &node, mat4 parent_transform) {
@@ -22,11 +22,11 @@ namespace HBE {
 			const ModelPrimitive &primitive = node.primitives[i];
 			if (primitive.material != -1) {
 				Mesh *mesh = model.getResources().meshes[node.mesh][i];
-				GraphicPipelineInstance *material = model.getResources().materials[primitive.material];
+				RasterizationPipelineInstance *material = model.getResources().materials[primitive.material];
 				draw_cmd.mesh = mesh;
 				draw_cmd.pipeline_instance = material;
 
-				render_graph->draw(draw_cmd);
+				render_graph->add(draw_cmd);
 			} else {
 				Log::warning("Model node does not have a material and/or a mesh assigned");
 			}
@@ -57,6 +57,6 @@ namespace HBE {
 	}
 
 	ModelRendererSystem::~ModelRendererSystem() {
-		scene->onDraw.unsubscribe(this);
+		scene->onPrepareRenderGraph.unsubscribe(this);
 	}
 }

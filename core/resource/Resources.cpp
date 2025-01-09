@@ -1,13 +1,13 @@
 
 #include "Resources.h"
 #include "core/resource/Shader.h"
-#include "core/resource/GraphicPipeline.h"
+#include "core/resource/RaterizationPipeline.h"
 #include "core/resource/ComputePipeline.h"
 #include "core/resource/Mesh.h"
 #include "core/resource/Texture.h"
 #include "core/resource/Model.h"
 #include "core/resource/RenderTarget.h"
-#include "core/resource/GraphicPipelineInstance.h"
+#include "core/resource/RasterizationPipelineInstance.h"
 #include "core/resource/ComputeInstance.h"
 #include "core/resource/raytracing/AccelerationStructure.h"
 #include "core/resource/raytracing/RaytracingPipeline.h"
@@ -52,14 +52,14 @@ namespace HBE {
 		return factory->createShader(info);
 	}
 
-	GraphicPipeline *Resources::createGraphicPipeline(const GraphicPipelineInfo &info, const std::string &name) {
+	RaterizationPipeline *Resources::createRasterizationPipeline(const RasterizationPipelineInfo &info, const std::string &name) {
 		auto gp = factory->createGraphicPipeline(info);
 		add(name, gp);
 		return gp;
 
 	}
 
-	GraphicPipeline *Resources::createGraphicPipeline(const GraphicPipelineInfo &info) {
+	RaterizationPipeline *Resources::createRasterizationPipeline(const RasterizationPipelineInfo &info) {
 		return factory->createGraphicPipeline(info);
 	}
 
@@ -94,13 +94,13 @@ namespace HBE {
 		return rt;
 	}
 
-	GraphicPipelineInstance *Resources::createGraphicPipelineInstance(const GraphicPipelineInstanceInfo &info, const std::string &name) {
-		GraphicPipelineInstance *m = factory->createMaterial(info);
+	RasterizationPipelineInstance *Resources::createGraphicPipelineInstance(const GraphicPipelineInstanceInfo &info, const std::string &name) {
+		RasterizationPipelineInstance *m = factory->createMaterial(info);
 		add(name, m);
 		return m;
 	}
 
-	GraphicPipelineInstance *Resources::createGraphicPipelineInstance(const GraphicPipelineInstanceInfo &info) {
+	RasterizationPipelineInstance *Resources::createRasterizationPipelineInstance(const GraphicPipelineInstanceInfo &info) {
 		return factory->createMaterial(info);
 	}
 

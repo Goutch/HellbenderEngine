@@ -54,14 +54,14 @@ namespace HBE {
 
 		RenderTarget *main_render_target = nullptr;
 		RenderTarget *ui_render_target = nullptr;
-		GraphicPipeline *screen_pipeline = nullptr;
-		GraphicPipelineInstance *screen_pipeline_instance = nullptr;
+		RaterizationPipeline *screen_pipeline = nullptr;
+		RasterizationPipelineInstance *screen_pipeline_instance = nullptr;
 		bool windowResized = false;
 		bool frame_presented = false;
 
 
 	public:
-		void render(RenderCmdInfo &render_cmd_info) override;
+		void rasterize(RasterizeCmdInfo &render_cmd_info) override;
 
 		void traceRays(TraceRaysCmdInfo &trace_rays_cmd_info) override;
 

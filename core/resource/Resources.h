@@ -17,7 +17,7 @@ namespace HBE {
 
 	class Shader;
 
-	class GraphicPipeline;
+	class RaterizationPipeline;
 
 	class ComputePipeline;
 
@@ -29,7 +29,7 @@ namespace HBE {
 
 	class RenderTarget;
 
-	class GraphicPipelineInstance;
+	class RasterizationPipelineInstance;
 
 	class ComputeInstance;
 
@@ -42,7 +42,7 @@ namespace HBE {
 	struct ModelInfo;
 	struct MeshInfo;
 	struct ShaderInfo;
-	struct GraphicPipelineInfo;
+	struct RasterizationPipelineInfo;
 	struct ComputePipelineInfo;
 	struct TextureInfo;
 	struct RenderTargetInfo;
@@ -119,9 +119,9 @@ namespace HBE {
 
 		static Shader *createShader(const ShaderInfo &info);
 
-		static GraphicPipeline *createGraphicPipeline(const GraphicPipelineInfo &info, const std::string &name);
+		static RaterizationPipeline *createRasterizationPipeline(const RasterizationPipelineInfo &info, const std::string &name);
 
-		static GraphicPipeline *createGraphicPipeline(const GraphicPipelineInfo &info);
+		static RaterizationPipeline *createRasterizationPipeline(const RasterizationPipelineInfo &info);
 
 		static ComputePipeline *createComputePipeline(const ComputePipelineInfo &info, const std::string &name);
 
@@ -135,9 +135,9 @@ namespace HBE {
 
 		static RenderTarget *createRenderTarget(const RenderTargetInfo &info, const std::string &name);
 
-		static GraphicPipelineInstance *createGraphicPipelineInstance(const GraphicPipelineInstanceInfo &info, const std::string &name);
+		static RasterizationPipelineInstance *createGraphicPipelineInstance(const GraphicPipelineInstanceInfo &info, const std::string &name);
 
-		static GraphicPipelineInstance *createGraphicPipelineInstance(const GraphicPipelineInstanceInfo &info);
+		static RasterizationPipelineInstance *createRasterizationPipelineInstance(const GraphicPipelineInstanceInfo &info);
 
 		static ComputeInstance *createComputeInstance(const ComputeInstanceInfo &info, const std::string &name);
 

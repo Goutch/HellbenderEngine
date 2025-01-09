@@ -27,8 +27,8 @@ namespace HBE {
 		limits = renderer->getLimits();
 	}
 
-	void Graphics::render(RenderCmdInfo &render_cmd_info) {
-		renderer->render(render_cmd_info);
+	void Graphics::rasterize(RasterizeCmdInfo &rasterize_cmd_info) {
+		renderer->rasterize(rasterize_cmd_info);
 	}
 
 	void Graphics::terminate() {

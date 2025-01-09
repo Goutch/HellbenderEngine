@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/resource/GraphicPipeline.h>
+#include <core/resource/RaterizationPipeline.h>
 #include <array>
 #include "vulkan/vulkan.h"
 #include "unordered_map"
@@ -19,7 +19,7 @@ namespace HBE {
 
 	class VK_PipelineLayout;
 
-	class VK_GraphicPipeline : public GraphicPipeline {
+	class VK_GraphicPipeline : public RaterizationPipeline {
 		VkPipeline handle = VK_NULL_HANDLE;
 		VK_PipelineLayout *layout = nullptr;
 
@@ -28,13 +28,13 @@ namespace HBE {
 		std::vector<const VK_Shader *> shaders;
 		VkRenderPass render_pass = VK_NULL_HANDLE;
 		std::vector<VertexAttributeInfo> binding_infos;
-		GraphicPipelineInfo info;
+		RasterizationPipelineInfo info;
 
 		mutable bool is_bound = false;
 
 	public:
-		VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const GraphicPipelineInfo &info, VkRenderPass render_pass);
-		VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const GraphicPipelineInfo &info);
+		VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const RasterizationPipelineInfo &info, VkRenderPass render_pass);
+		VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const RasterizationPipelineInfo &info);
 
 		void pushConstant(const std::string &name, const void *data) const override;
 

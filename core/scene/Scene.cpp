@@ -53,7 +53,7 @@ namespace HBE {
 		}
 		node.order_in_hierarchy = count;
 		count++;
-		onDrawNode.invoke(render_graph, node);
+		onPrepareRenderGraphOrdered.invoke(render_graph, node);
 		for (auto &child: node.children) {
 			drawNode(render_graph, child, count);
 		}
@@ -65,7 +65,7 @@ namespace HBE {
 			for (SceneNode node: root_nodes) {
 				drawNode(&render_graph, node, node_count);
 			}
-			onDraw.invoke(&render_graph);
+			onPrepareRenderGraph.invoke(&render_graph);
 		}
 	}
 

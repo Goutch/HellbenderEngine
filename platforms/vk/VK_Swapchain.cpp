@@ -244,7 +244,7 @@ namespace HBE {
 		render_pass_info.pDependencies = &dependency;
 
 		if (vkCreateRenderPass(device->getHandle(), &render_pass_info, nullptr, &render_pass) != VK_SUCCESS) {
-			Log::error("failed to create render pass!");
+			Log::error("failed to create rasterize pass!");
 		}
 		createFramebuffers();
 	}

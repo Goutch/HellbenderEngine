@@ -6,9 +6,9 @@
 #include "vector"
 
 namespace HBE {
-	class GraphicPipeline;
+	class RaterizationPipeline;
 
-	class GraphicPipelineInstance;
+	class RasterizationPipelineInstance;
 
 	class Mesh;
 
@@ -31,7 +31,7 @@ namespace HBE {
 
 		~RenderGraph();
 
-		void draw(DrawCmdInfo draw_cmd_info);
+		void add(DrawCmdInfo draw_cmd_info);
 
 		void clear();
 

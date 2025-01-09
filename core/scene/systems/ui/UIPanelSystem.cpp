@@ -34,7 +34,7 @@ namespace HBE {
 		Geometry::createQuad(*anchor_meshes[PIVOT_BOTTOM_CENTER], 1, 1, VERTEX_FLAG_UV, PIVOT_BOTTOM_CENTER);
 		Geometry::createQuad(*anchor_meshes[PIVOT_BOTTOM_RIGHT], 1, 1, VERTEX_FLAG_UV, PIVOT_BOTTOM_RIGHT);
 
-		scene->onDrawNode.subscribe(this, &UIPanelSystem::onDrawSceneNode);
+		scene->onPrepareRenderGraphOrdered.subscribe(this, &UIPanelSystem::onDrawSceneNode);
 
 	}
 
@@ -70,7 +70,7 @@ namespace HBE {
 			cmd.flags = DRAW_CMD_FLAG_ORDERED;
 			cmd.layer = panel->layer;
 
-			graph->draw(cmd);
+			graph->add(cmd);
 		}
 	}
 }

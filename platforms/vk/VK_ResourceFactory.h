@@ -11,13 +11,13 @@ namespace HBE {
         VK_Renderer* renderer;
     public:
         VK_ResourceFactory(VK_Renderer *renderer);
-		GraphicPipeline *createGraphicPipeline(const GraphicPipelineInfo &info) const override;
+		RaterizationPipeline *createGraphicPipeline(const RasterizationPipelineInfo &info) const override;
 		Shader *createShader(const ShaderInfo &info) const override;
 		Texture *createTexture(const TextureInfo &info) const override;
 		Mesh *createMesh(const MeshInfo &info) const override;
 		ComputePipeline *createComputePipeline(const ComputePipelineInfo &info) const override;
 		RenderTarget *createRenderTarget(const RenderTargetInfo &info) const override;
-		GraphicPipelineInstance *createMaterial(const GraphicPipelineInstanceInfo &info) const override;
+		RasterizationPipelineInstance *createMaterial(const GraphicPipelineInstanceInfo &info) const override;
 		ComputeInstance *createComputeInstance(const ComputeInstanceInfo &info) const override;
 		RootAccelerationStructure *createRootAccelerationStructure(const RootAccelerationStructureInfo &info) const override;
 		AABBAccelerationStructure *createAABBAccelerationStructure(const AABBAccelerationStructureInfo &info) const override;

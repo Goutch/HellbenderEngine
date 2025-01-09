@@ -10,7 +10,7 @@ namespace HBE {
 
 	class Mesh;
 
-	class GraphicPipelineInstance;
+	class RasterizationPipelineInstance;
 
 	class RenderGraph;
 
@@ -18,10 +18,11 @@ namespace HBE {
 
 	struct HB_API MeshRenderer {
 		Mesh *mesh = nullptr;
-		GraphicPipelineInstance *pipeline_instance = nullptr;
+		RasterizationPipelineInstance *pipeline_instance = nullptr;
 		uint32_t layer = 0;
 		bool ordered = false;
 		bool active = true;
+		bool use_transform_matrix_as_push_constant = true;
 	};
 
 	class MeshRendererSystem : public System {
@@ -31,12 +32,10 @@ namespace HBE {
 
 		~MeshRendererSystem();
 
-		void draw(RenderGraph *render_graph);
+		void onPrepareRenderGraph(RenderGraph *render_graph);
 
 	private :
-		void drawSceneNode(RenderGraph *render_graph, SceneNode &node);
-
-		void drawNode(SceneNode &node, RenderGraph *render_graph);
+		void onPrepareRenderGraphOrdered(RenderGraph *render_graph, SceneNode &node);
 	};
 }
 

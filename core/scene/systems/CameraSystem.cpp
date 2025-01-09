@@ -51,7 +51,7 @@ namespace HBE {
 		auto group = scene->group<EntityState, Transform, Camera>();
 		auto group_2D = scene->group<EntityState, Transform, Camera2D>();
 		auto group_pixel = scene->group<EntityState, Transform, PixelCamera>();
-		RenderCmdInfo render_cmd_info{};
+		RasterizeCmdInfo render_cmd_info{};
 		render_cmd_info.render_graph = render_graph;
 		HB_PROFILE_END("CameraRenderGroup");
 		for (auto [handle, state, transform, camera]: group) {
@@ -63,7 +63,7 @@ namespace HBE {
 				render_cmd_info.projection = camera.projection;
 				render_cmd_info.view = glm::inverse(transform.world());
 				render_cmd_info.layer_mask = camera.layer_mask;
-				Graphics::render(render_cmd_info);
+				Graphics::rasterize(render_cmd_info);
 			}
 		}
 		for (auto [handle, state, transform, camera]: group_2D) {
@@ -75,7 +75,7 @@ namespace HBE {
 				render_cmd_info.projection = camera.projection;
 				render_cmd_info.view = glm::inverse(transform.world());
 				render_cmd_info.layer_mask = camera.layer_mask;
-				Graphics::render(render_cmd_info);
+				Graphics::rasterize(render_cmd_info);
 			}
 		}
 		for (auto [handle, state, transform, camera]: group_pixel) {
@@ -87,7 +87,7 @@ namespace HBE {
 				render_cmd_info.projection = camera.projection;
 				render_cmd_info.view = glm::inverse(transform.world());
 				render_cmd_info.layer_mask = camera.layer_mask;
-				Graphics::render(render_cmd_info);
+				Graphics::rasterize(render_cmd_info);
 			}
 		}
 		HB_PROFILE_END("CameraRender");
