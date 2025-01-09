@@ -2,6 +2,9 @@
 ## My personnal toy Rendering engine/framework.
 ## A vulkan abstraction library
 
+For samples take a lot at the sample repository:
+- [HellbenderSamples](https://github.com/Goutch/HellbenderSamples)
+  
 ![Path Tracing Screenshot](https://github.com/Goutch/HellbenderEngine/blob/master/Screenshots/Sponza.PNG)
 
 # Goals
@@ -49,9 +52,7 @@
 - [ ] Model animations support
 - [x] Support for Multiple descriptor sets
 - [ ] ECS multithreading support
-## Getting started
-### Examples
-- [HellbenderExamples](https://github.com/Goutch/HellbenderExamples) Repo
+
 ### Wiki
 - [Home](https://github.com/Goutch/HellbenderEngine/wiki)
 
