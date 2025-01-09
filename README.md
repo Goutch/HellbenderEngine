@@ -59,5 +59,5 @@ A: You shouldn't this is a toy engine made for me.
 ### Notes:
 HBE used to support Opengl but it is deprecated as of now I am not sure if I will support it in the future. Checkout the opengl branch if you want a "working" Opengl version.(Warning: the engine was nothing like it is today)
 
-![Path Tracing Screenshot](https://github.com/Goutch/HellbenderEngine/blob/develop/screenshots/Sponza.PNG)
+![Path Tracing Screenshot](https://github.com/Goutch/HellbenderEngine/blob/master/screenshots/Sponza.PNG)
 
