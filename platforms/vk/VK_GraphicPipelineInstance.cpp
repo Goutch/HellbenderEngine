@@ -5,10 +5,10 @@
 
 namespace HBE {
 	VK_GraphicPipelineInstance::VK_GraphicPipelineInstance(VK_Renderer *renderer, const RasterizationPipelineInstanceInfo &info) {
-		VK_GraphicPipeline *graphic_pipeline = dynamic_cast<VK_GraphicPipeline *>(info.graphic_pipeline);
+		VK_GraphicPipeline *graphic_pipeline = dynamic_cast<VK_GraphicPipeline *>(info.rasterization_pipeline);
 		const VK_PipelineLayout *layout = graphic_pipeline->getPipelineLayout();
 		descriptors = new VK_PipelineDescriptors(renderer, *layout);
-		this->pipeline = info.graphic_pipeline;
+		this->pipeline = info.rasterization_pipeline;
 		this->vk_pipeline = graphic_pipeline;
 	}
 
@@ -16,7 +16,7 @@ namespace HBE {
 		delete descriptors;
 	}
 
-	const RaterizationPipeline *HBE::VK_GraphicPipelineInstance::getGraphicPipeline() const {
+	const RasterizationPipeline *HBE::VK_GraphicPipelineInstance::getGraphicPipeline() const {
 		return pipeline;
 	}
 

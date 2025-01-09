@@ -1,7 +1,7 @@
 
 #include "Resources.h"
 #include "core/resource/Shader.h"
-#include "core/resource/RaterizationPipeline.h"
+#include "core/resource/RasterizationPipeline.h"
 #include "core/resource/ComputePipeline.h"
 #include "core/resource/Mesh.h"
 #include "core/resource/Texture.h"
@@ -52,15 +52,15 @@ namespace HBE {
 		return factory->createShader(info);
 	}
 
-	RaterizationPipeline *Resources::createRasterizationPipeline(const RasterizationPipelineInfo &info, const std::string &name) {
-		auto gp = factory->createGraphicPipeline(info);
+	RasterizationPipeline *Resources::createRasterizationPipeline(const RasterizationPipelineInfo &info, const std::string &name) {
+		auto gp = factory->createRasterizationPipeline(info);
 		add(name, gp);
 		return gp;
 
 	}
 
-	RaterizationPipeline *Resources::createRasterizationPipeline(const RasterizationPipelineInfo &info) {
-		return factory->createGraphicPipeline(info);
+	RasterizationPipeline *Resources::createRasterizationPipeline(const RasterizationPipelineInfo &info) {
+		return factory->createRasterizationPipeline(info);
 	}
 
 	ComputePipeline *Resources::createComputePipeline(const ComputePipelineInfo &info, const std::string &name) {
@@ -94,14 +94,14 @@ namespace HBE {
 		return rt;
 	}
 
-	RasterizationPipelineInstance *Resources::createGraphicPipelineInstance(const RasterizationPipelineInstanceInfo &info, const std::string &name) {
-		RasterizationPipelineInstance *m = factory->createMaterial(info);
+	RasterizationPipelineInstance *Resources::createRasterizationPipelineInstance(const RasterizationPipelineInstanceInfo &info, const std::string &name) {
+		RasterizationPipelineInstance *m = factory->createRasterizationPipelineInstance(info);
 		add(name, m);
 		return m;
 	}
 
 	RasterizationPipelineInstance *Resources::createRasterizationPipelineInstance(const RasterizationPipelineInstanceInfo &info) {
-		return factory->createMaterial(info);
+		return factory->createRasterizationPipelineInstance(info);
 	}
 
 	ComputeInstance *Resources::createComputeInstance(const ComputeInstanceInfo &info, const std::string &name) {
@@ -174,11 +174,11 @@ namespace HBE {
 		return factory->createStorageBuffer(info);
 	}
 
-	Font *Resources::createFont(const FontInfo& info) {
+	Font *Resources::createFont(const FontInfo &info) {
 		return new Font(info);
 	}
 
-	Font *Resources::createFont(const FontInfo& info, const std::string &name) {
+	Font *Resources::createFont(const FontInfo &info, const std::string &name) {
 		Font *f = new Font(info);
 		add(name, f);
 		return f;
@@ -210,7 +210,7 @@ namespace HBE {
 		return tb;
 	}
 
-	TexelBuffer* Resources::createTexelBuffer(const TexelBufferInfo& info) {
+	TexelBuffer *Resources::createTexelBuffer(const TexelBufferInfo &info) {
 		return factory->createTexelBuffer(info);
 	}
 }

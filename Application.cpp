@@ -96,7 +96,7 @@ namespace HBE {
 		fps_counter++;
 		fps_timer += delta;
 		if (fps_timer >= 1.0) {
-			Log::debug("fps:" + std::to_string(fps_counter));
+			Log::debug("fps:" + std::to_string(fps_counter) + "(" + std::to_string(1000.0 / fps_counter) + "ms)");
 			fps_counter = 0;
 			fps_timer = 0;
 		}

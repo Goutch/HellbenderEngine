@@ -12,7 +12,7 @@
 namespace HBE {
 	class RasterizationPipelineInstance;
 
-	class RaterizationPipeline;
+	class RasterizationPipeline;
 
 	class Mesh;
 

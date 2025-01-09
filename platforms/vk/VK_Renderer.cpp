@@ -168,7 +168,7 @@ namespace HBE {
 		caches[0] = render_cache_sorted;
 		caches[1] = ordered_render_cache;
 		HB_PROFILE_BEGIN("RenderPassLoopDrawCmd");
-		const RaterizationPipeline *last_pipeline = nullptr;
+		const RasterizationPipeline *last_pipeline = nullptr;
 		RasterizationPipelineInstance *last_pipeline_instance = nullptr;
 		const Mesh *last_mesh = nullptr;
 		for (int cache_index = 0; cache_index < 2; ++cache_index) {
@@ -178,7 +178,7 @@ namespace HBE {
 				if ((current_cmd.layer & render_cmd_info.layer_mask) != cache[i].layer) {
 					continue;
 				}
-				const RaterizationPipeline *current_pipeline = current_cmd.pipeline_instance->getGraphicPipeline();
+				const RasterizationPipeline *current_pipeline = current_cmd.pipeline_instance->getGraphicPipeline();
 				RasterizationPipelineInstance *current_pipeline_instance = current_cmd.pipeline_instance;
 				const Mesh *current_mesh = current_cmd.mesh;
 				if (current_pipeline != last_pipeline) {
@@ -460,7 +460,7 @@ namespace HBE {
 		Resources::add("DEFAULT_SCREEN_PIPELINE", screen_pipeline);
 
 		RasterizationPipelineInstanceInfo screen_pipeline_instance_info{};
-		screen_pipeline_instance_info.graphic_pipeline = screen_pipeline;
+		screen_pipeline_instance_info.rasterization_pipeline = screen_pipeline;
 		screen_pipeline_instance = new VK_GraphicPipelineInstance(this, screen_pipeline_instance_info);
 		Resources::add("DEFAULT_SCREEN_PIPELINE_INSTANCE", screen_pipeline_instance);
 	}

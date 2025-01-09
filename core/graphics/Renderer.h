@@ -22,7 +22,7 @@ namespace HBE {
 
 	class ResourceFactory;
 
-	class RaterizationPipeline;
+	class RasterizationPipeline;
 
 	class RasterizationPipelineInstance;
 

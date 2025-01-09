@@ -6,7 +6,7 @@
 
 namespace HBE {
 
-	class RaterizationPipeline;
+	class RasterizationPipeline;
 
 	struct RasterizationPipelineInfo;
 
@@ -70,7 +70,7 @@ namespace HBE {
 	public:
 		virtual ~ResourceFactory() = default;
 
-		virtual RaterizationPipeline *createGraphicPipeline(const RasterizationPipelineInfo &info) const = 0;
+		virtual RasterizationPipeline *createRasterizationPipeline(const RasterizationPipelineInfo &info) const = 0;
 
 		virtual Shader *createShader(const ShaderInfo &info) const = 0;
 
@@ -82,7 +82,7 @@ namespace HBE {
 
 		virtual RenderTarget *createRenderTarget(const RenderTargetInfo &info) const = 0;
 
-		virtual RasterizationPipelineInstance *createMaterial(const RasterizationPipelineInstanceInfo &info) const = 0;
+		virtual RasterizationPipelineInstance *createRasterizationPipelineInstance(const RasterizationPipelineInstanceInfo &info) const = 0;
 
 		virtual ComputeInstance *createComputeInstance(const ComputeInstanceInfo &info) const = 0;
 

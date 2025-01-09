@@ -24,7 +24,7 @@ namespace HBE {
 		this->renderer = renderer;
 	}
 
-	RaterizationPipeline *VK_ResourceFactory::createGraphicPipeline(const RasterizationPipelineInfo &info) const {
+	RasterizationPipeline *VK_ResourceFactory::createRasterizationPipeline(const RasterizationPipelineInfo &info) const {
 		return new VK_GraphicPipeline(renderer->getDevice(), renderer, info);
 	}
 
@@ -57,7 +57,7 @@ namespace HBE {
 		}
 	}
 
-	RasterizationPipelineInstance *VK_ResourceFactory::createMaterial(const RasterizationPipelineInstanceInfo &info) const {
+	RasterizationPipelineInstance *VK_ResourceFactory::createRasterizationPipelineInstance(const RasterizationPipelineInstanceInfo &info) const {
 		return new VK_GraphicPipelineInstance(renderer, info);
 	}
 

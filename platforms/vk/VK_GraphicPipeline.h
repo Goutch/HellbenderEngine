@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/resource/RaterizationPipeline.h>
+#include <core/resource/RasterizationPipeline.h>
 #include <array>
 #include "vulkan/vulkan.h"
 #include "unordered_map"
@@ -19,7 +19,7 @@ namespace HBE {
 
 	class VK_PipelineLayout;
 
-	class VK_GraphicPipeline : public RaterizationPipeline {
+	class VK_GraphicPipeline : public RasterizationPipeline {
 		VkPipeline handle = VK_NULL_HANDLE;
 		VK_PipelineLayout *layout = nullptr;
 

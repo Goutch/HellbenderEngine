@@ -9,7 +9,7 @@
 
 #include "core/resource/Resources.h"
 #include "core/resource/Shader.h"
-#include "core/resource/RaterizationPipeline.h"
+#include "core/resource/RasterizationPipeline.h"
 #include "core/resource/ComputePipeline.h"
 #include "core/resource/ComputeInstance.h"
 #include "core/resource/Mesh.h"

@@ -10,8 +10,8 @@ namespace HBE {
 		MESH_FLAG additional_mesh_flags = MESH_FLAG_NONE;
 		std::map<MODEL_TEXTURE_TYPE, std::string> texture_names;
 		std::string material_property_name;
-		RaterizationPipeline *graphic_pipeline = nullptr;
-		RaterizationPipeline *graphic_pipeline_2_sided = nullptr;
+		RasterizationPipeline *graphic_pipeline = nullptr;
+		RasterizationPipeline *graphic_pipeline_2_sided = nullptr;
 	};
 
 	class HB_API DefaultModelParser : public HBE::ModelParser {

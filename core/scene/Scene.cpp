@@ -278,7 +278,6 @@ namespace HBE {
 
 	Texture *Scene::getMainCameraTexture() {
 		if (main_camera_entity.valid() && (main_camera_entity.has<Camera>() || main_camera_entity.has<Camera2D>() || main_camera_entity.has<PixelCamera>())) {
-
 			if (main_camera_entity.valid() && (main_camera_entity.has<Camera>())) {
 				return main_camera_entity.get<Camera>()->getRenderTarget()->getFramebufferTexture(Graphics::getCurrentFrame());
 			}

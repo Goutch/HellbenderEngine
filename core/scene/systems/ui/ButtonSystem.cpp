@@ -8,7 +8,7 @@
 #include "core/resource/Font.h"
 #include "core/resource/Shader.h"
 #include "core/input/Input.h"
-#include "core/resource/RaterizationPipeline.h"
+#include "core/resource/RasterizationPipeline.h"
 #include "core/resource/RasterizationPipelineInstance.h"
 
 namespace HBE {
@@ -42,7 +42,7 @@ namespace HBE {
 
 
 		RasterizationPipelineInstanceInfo button_pipeline_instance_info{};
-		button_pipeline_instance_info.graphic_pipeline = button_pipeline;
+		button_pipeline_instance_info.rasterization_pipeline = button_pipeline;
 		button_pipeline_instance_info.flags = GRAPHIC_PIPELINE_INSTANCE_FLAG_NONE;
 
 

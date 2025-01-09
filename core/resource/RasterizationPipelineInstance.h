@@ -5,7 +5,7 @@
 #include "string"
 
 namespace HBE {
-	class RaterizationPipeline;
+	class RasterizationPipeline;
 
 	typedef uint32_t GRAPHIC_PIPELINE_INSTANCE_FLAGS;
 	enum GRAPHIC_PIPELINE_INSTANCE_FLAG {
@@ -13,12 +13,12 @@ namespace HBE {
 		GRAPHIC_PIPELINE_INSTANCE_FLAG_EMPTY_DESCRIPTOR_ALLOWED = 1,
 	};
 	struct RasterizationPipelineInstanceInfo {
-		RaterizationPipeline *graphic_pipeline;
+		RasterizationPipeline *rasterization_pipeline;
 		GRAPHIC_PIPELINE_INSTANCE_FLAGS flags = GRAPHIC_PIPELINE_INSTANCE_FLAG_NONE;
 	};
 
 	class HB_API RasterizationPipelineInstance : public IPipelineInstance {
 	public:
-		virtual const RaterizationPipeline *getGraphicPipeline() const = 0;
+		virtual const RasterizationPipeline *getGraphicPipeline() const = 0;
 	};
 }

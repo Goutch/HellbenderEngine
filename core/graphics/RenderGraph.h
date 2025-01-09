@@ -6,7 +6,7 @@
 #include "vector"
 
 namespace HBE {
-	class RaterizationPipeline;
+	class RasterizationPipeline;
 
 	class RasterizationPipelineInstance;
 

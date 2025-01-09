@@ -2,7 +2,7 @@
 #include "Resources.h"
 #include "map"
 
-#include "RaterizationPipeline.h"
+#include "RasterizationPipeline.h"
 #include "Mesh.h"
 #include "RasterizationPipelineInstance.h"
 #include "Texture.h"

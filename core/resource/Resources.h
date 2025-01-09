@@ -17,7 +17,7 @@ namespace HBE {
 
 	class Shader;
 
-	class RaterizationPipeline;
+	class RasterizationPipeline;
 
 	class ComputePipeline;
 
@@ -119,9 +119,9 @@ namespace HBE {
 
 		static Shader *createShader(const ShaderInfo &info);
 
-		static RaterizationPipeline *createRasterizationPipeline(const RasterizationPipelineInfo &info, const std::string &name);
+		static RasterizationPipeline *createRasterizationPipeline(const RasterizationPipelineInfo &info, const std::string &name);
 
-		static RaterizationPipeline *createRasterizationPipeline(const RasterizationPipelineInfo &info);
+		static RasterizationPipeline *createRasterizationPipeline(const RasterizationPipelineInfo &info);
 
 		static ComputePipeline *createComputePipeline(const ComputePipelineInfo &info, const std::string &name);
 
@@ -135,7 +135,7 @@ namespace HBE {
 
 		static RenderTarget *createRenderTarget(const RenderTargetInfo &info, const std::string &name);
 
-		static RasterizationPipelineInstance *createGraphicPipelineInstance(const RasterizationPipelineInstanceInfo &info, const std::string &name);
+		static RasterizationPipelineInstance *createRasterizationPipelineInstance(const RasterizationPipelineInstanceInfo &info, const std::string &name);
 
 		static RasterizationPipelineInstance *createRasterizationPipelineInstance(const RasterizationPipelineInstanceInfo &info);
 

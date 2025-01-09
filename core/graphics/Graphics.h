@@ -12,7 +12,7 @@ namespace HBE {
 
 	class RenderTarget;
 
-	class RaterizationPipeline;
+	class RasterizationPipeline;
 
 	class Mesh;
 

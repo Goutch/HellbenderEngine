@@ -8,7 +8,7 @@
 
 #include "core/resource/Mesh.h"
 #include "core/resource/RasterizationPipelineInstance.h"
-#include "core/resource/RaterizationPipeline.h"
+#include "core/resource/RasterizationPipeline.h"
 #include "core/graphics/Renderer.h"
 #include "core/utility/Profiler.h"
 
@@ -98,8 +98,8 @@ namespace HBE {
 	}
 
 	bool RenderGraph::compareDrawCmd(const DrawCmdInfo &cmd1, const DrawCmdInfo &cmd2) {
-		const RaterizationPipeline *gp1 = cmd1.pipeline_instance->getGraphicPipeline();
-		const RaterizationPipeline *gp2 = cmd2.pipeline_instance->getGraphicPipeline();
+		const RasterizationPipeline *gp1 = cmd1.pipeline_instance->getGraphicPipeline();
+		const RasterizationPipeline *gp2 = cmd2.pipeline_instance->getGraphicPipeline();
 		if (gp1 != gp2) {
 			return gp1 > gp2;
 		} else {

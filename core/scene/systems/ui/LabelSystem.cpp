@@ -3,7 +3,7 @@
 #include "core/scene/systems/MeshRendererSystem.h"
 #include "core/resource/Shader.h"
 #include "core/resource/Resources.h"
-#include "core/resource/RaterizationPipeline.h"
+#include "core/resource/RasterizationPipeline.h"
 #include "core/resource/RasterizationPipelineInstance.h"
 #include "core/scene/components/Transform.h"
 #include "core/scene/Scene.h"
@@ -64,7 +64,7 @@ namespace HBE {
 		default_text_pipeline = Resources::createRasterizationPipeline(text_pipeline_info);
 
 		RasterizationPipelineInstanceInfo text_pipeline_instance_info{};
-		text_pipeline_instance_info.graphic_pipeline = default_text_pipeline;
+		text_pipeline_instance_info.rasterization_pipeline = default_text_pipeline;
 		text_pipeline_instance_info.flags = GRAPHIC_PIPELINE_INSTANCE_FLAG_NONE;
 		default_text_pipeline_instance = Resources::createRasterizationPipelineInstance(text_pipeline_instance_info);
 

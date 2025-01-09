@@ -13,7 +13,7 @@ namespace HBE {
 
 	class RasterizationPipelineInstance;
 
-	class RaterizationPipeline;
+	class RasterizationPipeline;
 
 	class Shader;
 
@@ -61,7 +61,7 @@ namespace HBE {
 
 		Shader *button_frag_shader = nullptr;
 		Shader *button_vert_shader = nullptr;
-		RaterizationPipeline *button_pipeline = nullptr;
+		RasterizationPipeline *button_pipeline = nullptr;
 		RasterizationPipelineInstance *default_button_pipeline_instance = nullptr;
 		RasterizationPipelineInstance *default_button_hover_pipeline_instance = nullptr;
 		RasterizationPipelineInstance *default_button_pressed_pipeline_instance = nullptr;

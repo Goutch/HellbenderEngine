@@ -10,7 +10,7 @@
 namespace HBE {
 	class Font;
 
-	class RaterizationPipeline;
+	class RasterizationPipeline;
 
 	class RasterizationPipelineInstance;
 
@@ -56,7 +56,7 @@ namespace HBE {
 		Font *default_font = nullptr;
 		Shader *default_text_frag_shader = nullptr;
 		Shader *default_text_vert_shader = nullptr;
-		RaterizationPipeline *default_text_pipeline = nullptr;
+		RasterizationPipeline *default_text_pipeline = nullptr;
 		RasterizationPipelineInstance *default_text_pipeline_instance = nullptr;
 	public:
 		LabelSystem(Scene *scene, RenderTarget *render_target);

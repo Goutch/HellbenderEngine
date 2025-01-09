@@ -5,7 +5,7 @@
 namespace HBE {
 	class VK_PipelineDescriptors;
 
-	class RaterizationPipeline;
+	class RasterizationPipeline;
 
 	class VK_Renderer;
 
@@ -15,7 +15,7 @@ namespace HBE {
 
 	class VK_GraphicPipelineInstance : public RasterizationPipelineInstance {
 		VK_PipelineDescriptors *descriptors;
-		RaterizationPipeline *pipeline;
+		RasterizationPipeline *pipeline;
 		VK_GraphicPipeline *vk_pipeline;
 
 		bool bound = false;
@@ -45,7 +45,7 @@ namespace HBE {
 		void setTexelBuffer(uint32_t binding, TexelBuffer *buffer, int32_t frame) override;
 		void setTexelBufferArray(uint32_t binding, TexelBuffer **buffers, uint32_t count, int32_t frame) override;
 
-		const RaterizationPipeline *getGraphicPipeline() const override;
+		const RasterizationPipeline *getGraphicPipeline() const override;
 		VK_GraphicPipeline *getVkGraphicPipeline();
 
 	};

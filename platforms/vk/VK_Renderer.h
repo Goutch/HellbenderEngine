@@ -54,7 +54,7 @@ namespace HBE {
 
 		RenderTarget *main_render_target = nullptr;
 		RenderTarget *ui_render_target = nullptr;
-		RaterizationPipeline *screen_pipeline = nullptr;
+		RasterizationPipeline *screen_pipeline = nullptr;
 		RasterizationPipelineInstance *screen_pipeline_instance = nullptr;
 		bool windowResized = false;
 		bool frame_presented = false;
