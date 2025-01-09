@@ -41,7 +41,7 @@ namespace HBE {
 		button_pipeline = Resources::createRasterizationPipeline(button_pipeline_info);
 
 
-		GraphicPipelineInstanceInfo button_pipeline_instance_info{};
+		RasterizationPipelineInstanceInfo button_pipeline_instance_info{};
 		button_pipeline_instance_info.graphic_pipeline = button_pipeline;
 		button_pipeline_instance_info.flags = GRAPHIC_PIPELINE_INSTANCE_FLAG_NONE;
 

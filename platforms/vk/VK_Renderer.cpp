@@ -459,7 +459,7 @@ namespace HBE {
 		screen_pipeline = new VK_GraphicPipeline(device, this, pipeline_info, swapchain->getRenderPass());
 		Resources::add("DEFAULT_SCREEN_PIPELINE", screen_pipeline);
 
-		GraphicPipelineInstanceInfo screen_pipeline_instance_info{};
+		RasterizationPipelineInstanceInfo screen_pipeline_instance_info{};
 		screen_pipeline_instance_info.graphic_pipeline = screen_pipeline;
 		screen_pipeline_instance = new VK_GraphicPipelineInstance(this, screen_pipeline_instance_info);
 		Resources::add("DEFAULT_SCREEN_PIPELINE_INSTANCE", screen_pipeline_instance);

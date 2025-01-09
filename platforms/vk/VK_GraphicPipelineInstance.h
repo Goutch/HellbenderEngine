@@ -20,7 +20,7 @@ namespace HBE {
 
 		bool bound = false;
 	public:
-		VK_GraphicPipelineInstance(VK_Renderer *renderer, const GraphicPipelineInstanceInfo &info);
+		VK_GraphicPipelineInstance(VK_Renderer *renderer, const RasterizationPipelineInstanceInfo &info);
 		~VK_GraphicPipelineInstance() override;
 
 		//---------------------------IPipelineInstance Implementation---------------------------

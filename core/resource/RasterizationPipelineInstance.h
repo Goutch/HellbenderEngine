@@ -12,7 +12,7 @@ namespace HBE {
 		GRAPHIC_PIPELINE_INSTANCE_FLAG_NONE = 0,
 		GRAPHIC_PIPELINE_INSTANCE_FLAG_EMPTY_DESCRIPTOR_ALLOWED = 1,
 	};
-	struct GraphicPipelineInstanceInfo {
+	struct RasterizationPipelineInstanceInfo {
 		RaterizationPipeline *graphic_pipeline;
 		GRAPHIC_PIPELINE_INSTANCE_FLAGS flags = GRAPHIC_PIPELINE_INSTANCE_FLAG_NONE;
 	};

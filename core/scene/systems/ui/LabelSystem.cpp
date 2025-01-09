@@ -63,7 +63,7 @@ namespace HBE {
 		text_pipeline_info.flags = RASTERIZATION_PIPELINE_FLAG_NO_DEPTH_TEST;
 		default_text_pipeline = Resources::createRasterizationPipeline(text_pipeline_info);
 
-		GraphicPipelineInstanceInfo text_pipeline_instance_info{};
+		RasterizationPipelineInstanceInfo text_pipeline_instance_info{};
 		text_pipeline_instance_info.graphic_pipeline = default_text_pipeline;
 		text_pipeline_instance_info.flags = GRAPHIC_PIPELINE_INSTANCE_FLAG_NONE;
 		default_text_pipeline_instance = Resources::createRasterizationPipelineInstance(text_pipeline_instance_info);

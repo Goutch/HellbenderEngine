@@ -57,7 +57,7 @@ namespace HBE {
 		}
 	}
 
-	RasterizationPipelineInstance *VK_ResourceFactory::createMaterial(const GraphicPipelineInstanceInfo &info) const {
+	RasterizationPipelineInstance *VK_ResourceFactory::createMaterial(const RasterizationPipelineInstanceInfo &info) const {
 		return new VK_GraphicPipelineInstance(renderer, info);
 	}
 

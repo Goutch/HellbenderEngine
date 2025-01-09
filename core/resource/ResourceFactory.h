@@ -32,7 +32,7 @@ namespace HBE {
 
 	class RasterizationPipelineInstance;
 
-	struct GraphicPipelineInstanceInfo;
+	struct RasterizationPipelineInstanceInfo;
 
 	class ComputeInstance;
 
@@ -82,7 +82,7 @@ namespace HBE {
 
 		virtual RenderTarget *createRenderTarget(const RenderTargetInfo &info) const = 0;
 
-		virtual RasterizationPipelineInstance *createMaterial(const GraphicPipelineInstanceInfo &info) const = 0;
+		virtual RasterizationPipelineInstance *createMaterial(const RasterizationPipelineInstanceInfo &info) const = 0;
 
 		virtual ComputeInstance *createComputeInstance(const ComputeInstanceInfo &info) const = 0;
 

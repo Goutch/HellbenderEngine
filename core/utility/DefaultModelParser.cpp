@@ -87,7 +87,7 @@ namespace HBE {
 
 	RasterizationPipelineInstance *DefaultModelParser::createMaterial(const ModelMaterialData &materialData,
 	                                                                  HBE::Texture **textures) {
-		GraphicPipelineInstanceInfo instance_info{};
+		RasterizationPipelineInstanceInfo instance_info{};
 		instance_info.graphic_pipeline = materialData.double_sided
 		                                 ? parser_info.graphic_pipeline_2_sided
 		                                 : parser_info.graphic_pipeline;

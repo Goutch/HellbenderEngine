@@ -94,13 +94,13 @@ namespace HBE {
 		return rt;
 	}
 
-	RasterizationPipelineInstance *Resources::createGraphicPipelineInstance(const GraphicPipelineInstanceInfo &info, const std::string &name) {
+	RasterizationPipelineInstance *Resources::createGraphicPipelineInstance(const RasterizationPipelineInstanceInfo &info, const std::string &name) {
 		RasterizationPipelineInstance *m = factory->createMaterial(info);
 		add(name, m);
 		return m;
 	}
 
-	RasterizationPipelineInstance *Resources::createRasterizationPipelineInstance(const GraphicPipelineInstanceInfo &info) {
+	RasterizationPipelineInstance *Resources::createRasterizationPipelineInstance(const RasterizationPipelineInstanceInfo &info) {
 		return factory->createMaterial(info);
 	}
 
