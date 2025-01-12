@@ -2,7 +2,7 @@
 ## My personnal toy Rendering engine/framework.
 ## A vulkan abstraction library
 
-For samples take a lot at the sample repository:
+For samples take a look at the sample repository:
 - [HellbenderSamples](https://github.com/Goutch/HellbenderSamples)
   
 ![Path Tracing Screenshot](https://github.com/Goutch/HellbenderEngine/blob/master/Screenshots/Sponza.PNG)
