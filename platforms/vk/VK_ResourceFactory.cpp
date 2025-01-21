@@ -32,7 +32,7 @@ namespace HBE {
 		return new VK_Shader(renderer->getDevice(), info);
 	}
 
-	Texture *VK_ResourceFactory::createTexture(const TextureInfo &info) const {
+	Image *VK_ResourceFactory::createTexture(const ImageInfo &info) const {
 		return new VK_Image(renderer->getDevice(), info);
 	}
 

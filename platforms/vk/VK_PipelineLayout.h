@@ -12,7 +12,7 @@ namespace HBE {
 
 	class RenderTarget;
 
-	class Texture;
+	class Image;
 
 	class VK_DescriptorSetLayout;
 

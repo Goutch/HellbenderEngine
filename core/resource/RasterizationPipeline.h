@@ -9,7 +9,7 @@
 namespace HBE {
 	class Shader;
 
-	class Texture;
+	class Image;
 
 	class MeshLayout;
 

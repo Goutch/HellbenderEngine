@@ -234,15 +234,15 @@ namespace HBE
 		{
 			for (size_t i = 0; i < images.size(); ++i)
 			{
-				TextureInfo info{};
+				ImageInfo info{};
 				info.data_format = format;
 				info.format = format;
 				info.width = width;
 				info.height = height;
 				info.generate_mip_maps = false;
 				info.flags = IMAGE_FLAG_RENDER_TARGET;
-				info.sampler_info.filter = TEXTURE_SAMPLER_FILTER_TYPE_NEAREST;
-				info.sampler_info.address_mode = TEXTURE_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+				info.sampler_info.filter = IMAGE_SAMPLER_FILTER_TYPE_NEAREST;
+				info.sampler_info.address_mode = IMAGE_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
 
 				images[i] = new VK_Image(renderer->getDevice(), info);
 				image_views[i] = images[i]->getImageView();
@@ -256,7 +256,7 @@ namespace HBE
 			depth_image_views.resize(MAX_FRAMES_IN_FLIGHT);
 			for (size_t i = 0; i < depth_images.size(); ++i)
 			{
-				TextureInfo info{};
+				ImageInfo info{};
 				info.data_format = IMAGE_FORMAT_DEPTH32F;
 				info.format = IMAGE_FORMAT_DEPTH32F;
 				info.width = width;
@@ -321,7 +321,7 @@ namespace HBE
 		return images[i];
 	}
 
-	Texture* VK_RenderPass::getFramebufferTexture(uint32_t frame) const
+	Image* VK_RenderPass::getFramebufferTexture(uint32_t frame) const
 	{
 		HB_ASSERT(frame < images.size(), "Frame index out of bounds");
 		return images[frame];

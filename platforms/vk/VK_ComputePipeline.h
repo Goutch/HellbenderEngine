@@ -12,6 +12,8 @@ namespace HBE {
 		VkPipeline handle = VK_NULL_HANDLE;
 		VK_PipelineLayout *layout = nullptr;
 		VK_Renderer *renderer = nullptr;
+	public:
+		const vec3i &getWorkgroupSize() const override;
 
 	public:
 		VK_ComputePipeline(VK_Renderer *renderer, const ComputePipelineInfo &info);

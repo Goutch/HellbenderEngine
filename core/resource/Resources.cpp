@@ -4,7 +4,7 @@
 #include "core/resource/RasterizationPipeline.h"
 #include "core/resource/ComputePipeline.h"
 #include "core/resource/Mesh.h"
-#include "core/resource/Texture.h"
+#include "core/resource/Image.h"
 #include "core/resource/Model.h"
 #include "core/resource/RenderTarget.h"
 #include "core/resource/RasterizationPipelineInstance.h"
@@ -73,13 +73,13 @@ namespace HBE {
 		return factory->createComputePipeline(info);
 	}
 
-	Texture *Resources::createTexture(const TextureInfo &info, const std::string &name) {
+	Image *Resources::createTexture(const ImageInfo &info, const std::string &name) {
 		auto t = factory->createTexture(info);
 		add(name, t);
 		return t;
 	}
 
-	Texture *Resources::createTexture(const TextureInfo &info) {
+	Image *Resources::createTexture(const ImageInfo &info) {
 		return factory->createTexture(info);
 	}
 

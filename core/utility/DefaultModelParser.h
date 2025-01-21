@@ -26,9 +26,9 @@ namespace HBE {
 
 		Mesh *createMesh(const HBE::ModelPrimitiveData &data, ModelInfo model_info) override;
 
-		RasterizationPipelineInstance *createMaterial(const HBE::ModelMaterialData &materialData, HBE::Texture **textures) override;
+		RasterizationPipelineInstance *createMaterial(const HBE::ModelMaterialData &materialData, HBE::Image **textures) override;
 
-		Texture *createTexture(const ModelTextureData &data) override;
+		Image *createTexture(const ModelTextureData &data) override;
 
 		MeshAccelerationStructure *createMeshAccelerationStructure(Mesh *mesh, int mesh_index) override;
 	};

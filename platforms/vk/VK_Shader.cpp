@@ -13,6 +13,7 @@ namespace HBE {
 	}
 
 	VK_Shader::VK_Shader(const VK_Device *device, const ShaderInfo &info) {
+		this->info = info;
 		this->device = device;
 		this->stage = info.stage;
 		switch (info.stage) {
@@ -46,7 +47,7 @@ namespace HBE {
 			case SHADER_STAGE_NONE:
 				break;
 		}
-		load(info.path);
+		load();
 
 	}
 
@@ -70,11 +71,11 @@ namespace HBE {
 		return stage;
 	}
 
-	void VK_Shader::load(const std::string &path) {
+	void VK_Shader::load() {
 		std::string source;
-		getSource(path, source);
+		getSource(info.path, source);
 		std::vector<uint32_t> spirv;
-		ShaderCompiler::GLSLToSpirV(source.c_str(), source.size(), spirv, stage, path);
+		ShaderCompiler::GLSLToSpirV(source.c_str(), source.size(), spirv, stage, info.path, info.entry_point);
 		setSource(spirv);
 	}
 
@@ -88,6 +89,7 @@ namespace HBE {
 
 		spirv_cross::SPIRType type = glsl.get_type_from_variable(resource.id);
 
+
 		if (type.basetype == spirv_cross::SPIRType::Struct) {
 			size = glsl.get_declared_struct_size(type);
 			if (type.member_types.size() > 0) {
@@ -97,16 +99,25 @@ namespace HBE {
 				}
 			}
 		}
-		if (!type.array.empty()) {
+
+		if (!type.array.
+
+				empty()
+
+				) {
 			descriptor_count = type.array[0];
 			if (descriptor_count <= 0) {
 				variable_size = true;
 			}
 		}
 		spirv_cross::TypeID parent_type_id = type.parent_type;
-		while (parent_type_id != 0){
+		while (parent_type_id != 0) {
 			spirv_cross::SPIRType parent_type = glsl.get_type(parent_type_id);
-			if (!parent_type.array.empty()) {
+			if (!parent_type.array.
+
+					empty()
+
+					) {
 				descriptor_count = parent_type.array[0];
 				if (descriptor_count <= 0) {
 					variable_size = true;
@@ -139,23 +150,34 @@ namespace HBE {
 		}
 
 		VkDescriptorSetLayoutBinding layout_binding = {};
-		layout_binding.binding = glsl.get_decoration(resource.id, spv::DecorationBinding);
-		layout_binding.descriptorType = descriptor_type;
-		layout_binding.stageFlags = stage;
-		layout_binding.descriptorCount = descriptor_count; //this is for array
-		layout_binding.pImmutableSamplers = nullptr;
+		layout_binding.
+				binding = glsl.get_decoration(resource.id, spv::DecorationBinding);
+		layout_binding.
+				descriptorType = descriptor_type;
+		layout_binding.
+				stageFlags = stage;
+		layout_binding.
+				descriptorCount = descriptor_count; //this is for array
+		layout_binding.
+				pImmutableSamplers = nullptr;
 
 
 		VK_DescriptorInfo descriptor_info{};
-		descriptor_info.layout_binding = layout_binding;
-		descriptor_info.descriptor_set = set_index;
-		descriptor_info.name = name;
-		descriptor_info.size = size;
-		descriptor_info.variable_size = variable_size;
-		return descriptor_info;
+		descriptor_info.
+				layout_binding = layout_binding;
+		descriptor_info.
+				descriptor_set = set_index;
+		descriptor_info.
+				name = name;
+		descriptor_info.
+				size = size;
+		descriptor_info.
+				variable_size = variable_size;
+		return
+				descriptor_info;
 	}
 
-	//does what the relect_c function does but with the c++ api
+//does what the relect_c function does but with the c++ api
 	void VK_Shader::reflect(const std::vector<uint32_t> &spirv) {
 		VkPhysicalDeviceLimits limits = device->getPhysicalDevice().getProperties().limits;
 		spirv_cross::CompilerGLSL glsl(std::move(spirv));
@@ -173,7 +195,7 @@ namespace HBE {
 
 		//----------------------------------------------------------TEXTURE SAMPLERS----------------------------------------------------------
 		for (auto &sampler: resources.sampled_images) {
-			if(used_variables.find(sampler.id) == used_variables.end()){
+			if (used_variables.find(sampler.id) == used_variables.end()) {
 				//continue;
 			}
 			VK_DescriptorInfo uniform_info = generateDescriptorInfo(vk_stage, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, glsl, sampler, limits);
@@ -182,7 +204,7 @@ namespace HBE {
 
 		//----------------------------------------------STORAGE BUFFERS------------------------------------------------
 		for (auto &sb: resources.storage_buffers) {
-			if(used_variables.find(sb.id) == used_variables.end()){
+			if (used_variables.find(sb.id) == used_variables.end()) {
 				//continue;
 			}
 			size_t size = glsl.get_declared_struct_size(glsl.get_type(sb.base_type_id));
@@ -192,7 +214,7 @@ namespace HBE {
 		}
 		//--------------------------------------------------------IMAGE----------------------------------------
 		for (auto &image: resources.separate_images) {
-			if(used_variables.find(image.id) == used_variables.end()){
+			if (used_variables.find(image.id) == used_variables.end()) {
 				//continue;
 			}
 			VK_DescriptorInfo uniform_info = generateDescriptorInfo(vk_stage, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, glsl, image, limits);
@@ -278,6 +300,15 @@ namespace HBE {
 				location++;
 			}
 		}
+		if (this->stage == SHADER_STAGE_COMPUTE) {
+			// Get the entry point.
+			auto entry_point = glsl.get_entry_point(info.entry_point, spv::ExecutionModelGLCompute);
+			// Get the workgroup size.
+			workgroup_size.x = entry_point.workgroup_size.x;
+			workgroup_size.y = entry_point.workgroup_size.y;
+			workgroup_size.z = entry_point.workgroup_size.z;
+		}
+
 		std::sort(uniforms.begin(), uniforms.end(),
 		          [](const VK_DescriptorInfo &a, const VK_DescriptorInfo &b) -> bool {
 			          return a.layout_binding.binding < b.layout_binding.binding;
@@ -304,4 +335,5 @@ namespace HBE {
 	const std::vector<VK_VertexAttributeInfo> &VK_Shader::getVertexInputs() const {
 		return vertex_inputs;
 	}
+
 }

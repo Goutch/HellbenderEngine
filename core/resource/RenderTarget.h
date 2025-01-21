@@ -2,7 +2,7 @@
 
 #include <core/resource/Resource.h>
 #include "Core.h"
-#include "Texture.h"
+#include "Image.h"
 #include "Event.h"
 
 using namespace utils;
@@ -44,6 +44,6 @@ namespace HBE {
 
 		virtual const vec4 &getClearColor() const = 0;
 
-		virtual Texture *getFramebufferTexture(uint32_t frame) const = 0;
+		virtual Image *getFramebufferTexture(uint32_t frame) const = 0;
 	};
 }

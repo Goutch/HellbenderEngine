@@ -48,7 +48,7 @@ namespace HBE {
 		const vec4 &getClearColor() const override;
 
 		const VkRenderPass &getHandle() const;
-		Texture *getFramebufferTexture(uint32_t frame) const override;
+		Image *getFramebufferTexture(uint32_t frame) const override;
 
 		const std::vector<VkFramebuffer> &getFrameBuffers() const;
 

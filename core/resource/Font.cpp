@@ -1,7 +1,7 @@
 #include "Font.h"
 #include "msdfgen.h"
 #include "msdfgen-ext.h"
-#include "Texture.h"
+#include "Image.h"
 #include "core/utility/Log.h"
 #include "msdf-atlas-gen/msdf-atlas-gen.h"
 #include "Resources.h"
@@ -76,7 +76,7 @@ namespace HBE {
                 // The atlas bitmap can now be retrieved via atlasStorage as a BitmapConstRef.
                 // The glyphs array (or fontGeometry) contains positioning data for typesetting text.
                 msdfgen::BitmapConstRef<float, number_of_channels> storage = generator.atlasStorage();
-                TextureInfo atlas_info{};
+                ImageInfo atlas_info{};
                 atlas_info.width = width;
                 atlas_info.height = height;
                 atlas_info.data_format = IMAGE_FORMAT_RGBA32F;
@@ -115,7 +115,7 @@ namespace HBE {
         delete atlas;
     }
 
-    Texture *Font::getTextureAtlas() {
+    Image *Font::getTextureAtlas() {
         return atlas;
     }
 

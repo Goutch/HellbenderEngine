@@ -6,7 +6,7 @@
 #include "unordered_map"
 
 namespace HBE {
-    class Texture;
+    class Image;
 
     struct FontInfo {
         std::string path;
@@ -26,14 +26,14 @@ namespace HBE {
         friend class Resources;
 
         std::unordered_map<char, Glyph> characters_glyphs;
-        Texture *atlas;
+        Image *atlas;
     private:
         Font(const FontInfo &info);
 
     public:
         ~Font();
 
-        Texture *getTextureAtlas();
+        Image *getTextureAtlas();
 
         Glyph getCharacterGlyph(char character);
 

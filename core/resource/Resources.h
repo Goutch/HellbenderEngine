@@ -23,7 +23,7 @@ namespace HBE {
 
 	class Mesh;
 
-	class Texture;
+	class Image;
 
 	class Model;
 
@@ -44,7 +44,7 @@ namespace HBE {
 	struct ShaderInfo;
 	struct RasterizationPipelineInfo;
 	struct ComputePipelineInfo;
-	struct TextureInfo;
+	struct ImageInfo;
 	struct RenderTargetInfo;
 	struct RasterizationPipelineInstanceInfo;
 	struct ComputeInstanceInfo;
@@ -127,9 +127,9 @@ namespace HBE {
 
 		static ComputePipeline *createComputePipeline(const ComputePipelineInfo &info);
 
-		static Texture *createTexture(const TextureInfo &info, const std::string &name);
+		static Image *createTexture(const ImageInfo &info, const std::string &name);
 
-		static Texture *createTexture(const TextureInfo &info);
+		static Image *createTexture(const ImageInfo &info);
 
 		static RenderTarget *createRenderTarget(const RenderTargetInfo &info);
 

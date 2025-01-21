@@ -26,6 +26,8 @@
 #include "VK_GraphicPipelineInstance.h"
 #include "raytracing/VK_RaytracingPipelineInstance.h"
 #include "core/graphics/RenderGraph.h"
+#include "platforms/vk/VK_ComputePipeline.h"
+#include "VK_ComputeInstance.h"
 
 namespace HBE {
 	struct UniformBufferObject {
@@ -97,6 +99,34 @@ namespace HBE {
 
 	void VK_Renderer::onWindowClosed() {
 		device->wait();
+	}
+
+	void VK_Renderer::computeDispatch(ComputeDispatchCmdInfo &compute_dispatch_cmd_info) {
+		VkMemoryBarrier memoryBarrier = {};
+		memoryBarrier.sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
+		memoryBarrier.srcAccessMask =
+				VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT | VK_ACCESS_MEMORY_READ_BIT | VK_ACCESS_MEMORY_WRITE_BIT;  // Ensure all graphics memory accesses are complete
+		memoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT | VK_ACCESS_MEMORY_READ_BIT | VK_ACCESS_MEMORY_WRITE_BIT;  // Prepare for compute shader access
+		uint32_t extra_bits = device->getPhysicalDevice().getEnabledExtensionFlags() & EXTENSION_FLAG_RAY_TRACING_PIPELINE ? VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR : 0;
+		vkCmdPipelineBarrier(
+				command_pool->getCurrentBuffer(),
+				VK_PIPELINE_STAGE_TRANSFER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT | VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT | extra_bits,  // Wait for all graphics stages to complete
+				VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,  // Ensure the compute shader starts after
+				0,
+				1,
+				&memoryBarrier,
+				0,
+				nullptr,
+				0,
+				nullptr
+		);
+		HB_PROFILE_BEGIN("ComputeDispatch");
+		const VK_ComputePipeline *vk_pipeline = dynamic_cast<const VK_ComputePipeline *>(compute_dispatch_cmd_info.pipeline_instance->getComputePipeline());
+		vkCmdBindPipeline(command_pool->getCurrentBuffer(), VK_PIPELINE_BIND_POINT_COMPUTE, vk_pipeline->getHandle());
+		compute_dispatch_cmd_info.pipeline_instance->bind();
+		vkCmdDispatch(command_pool->getCurrentBuffer(), compute_dispatch_cmd_info.size_x, compute_dispatch_cmd_info.size_y, compute_dispatch_cmd_info.size_z);
+		compute_dispatch_cmd_info.pipeline_instance->unbind();
+		HB_PROFILE_END("ComputeDispatch");
 	}
 
 	VK_Renderer::~VK_Renderer() {
@@ -225,6 +255,23 @@ namespace HBE {
 	}
 
 	void VK_Renderer::traceRays(TraceRaysCmdInfo &trace_rays_cmd_info) {
+		VkMemoryBarrier memoryBarrier = {};
+		memoryBarrier.sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
+		memoryBarrier.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT | VK_ACCESS_MEMORY_WRITE_BIT;  // Ensure all graphics memory accesses are complete
+		memoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;  // Prepare for compute shader access
+		vkCmdPipelineBarrier(
+				command_pool->getCurrentBuffer(),
+				VK_PIPELINE_STAGE_TRANSFER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT | VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT |
+				VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,  // Wait for all graphics stages to complete
+				VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,  // Ensure the compute shader starts after
+				0,
+				1,
+				&memoryBarrier,
+				0,
+				nullptr,
+				0,
+				nullptr
+		);
 		const VK_RaytracingPipelineInstance *vk_pipeline_instance = dynamic_cast<const VK_RaytracingPipelineInstance *>(trace_rays_cmd_info.pipeline_instance);
 		const VK_RaytracingPipeline *vk_pipeline = vk_pipeline_instance->getPipeline();
 		vk_pipeline->bind();
@@ -238,8 +285,6 @@ namespace HBE {
 		                          trace_rays_cmd_info.resolution.x,
 		                          trace_rays_cmd_info.resolution.y,
 		                          1);
-		//TODO:Might need barrier here
-
 		vk_pipeline_instance->unbind();
 		vk_pipeline->unbind();
 	}
@@ -298,10 +343,10 @@ namespace HBE {
 
 		VK_Image **vk_images = reinterpret_cast< VK_Image **>(present_cmd_info.images);
 		for (int i = 0; i < present_cmd_info.image_count; ++i) {
-			VK_Allocator::cmdBarrierTransitionImageLayout(command_pool, vk_images[i], VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+			device->getAllocator()->cmdBarrierTransitionImageLayout(command_pool, vk_images[i], VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 		}
 
-		screen_pipeline_instance->setTextureArray("layers", &present_cmd_info.images[0], present_cmd_info.image_count, current_frame, 0);
+		screen_pipeline_instance->setImageArray("layers", &present_cmd_info.images[0], present_cmd_info.image_count, current_frame, 0);
 		screen_pipeline_instance->setUniform("ubo", &present_cmd_info.image_count);
 
 		swapchain->beginRenderPass(current_image, command_pool->getCurrentBuffer());
@@ -317,7 +362,7 @@ namespace HBE {
 		swapchain->endRenderPass(command_pool->getCurrentBuffer());
 
 		for (int i = 0; i < present_cmd_info.image_count; ++i) {
-			VK_Allocator::cmdBarrierTransitionImageLayout(command_pool, vk_images[i], vk_images[i]->getDesiredLayout());
+			device->getAllocator()->cmdBarrierTransitionImageLayout(command_pool, vk_images[i], vk_images[i]->getDesiredLayout());
 		}
 
 		command_pool->end();
@@ -360,7 +405,7 @@ namespace HBE {
 		HB_PROFILE_BEGIN("endFrame");
 
 		if (!frame_presented) {
-			Texture *render_textures[1] = {
+			Image *render_textures[1] = {
 					main_render_target->getFramebufferTexture(current_frame)
 			};
 			PresentCmdInfo present_cmd_info{};

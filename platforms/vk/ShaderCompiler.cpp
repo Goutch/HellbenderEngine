@@ -249,7 +249,11 @@ namespace HBE {
 	}
 
 //https://lxjk.github.io/2020/03/10/Translate-GLSL-to-SPIRV-for-Vulkan-at-Runtime.html
-	void ShaderCompiler::GLSLToSpirV(const char *source, size_t size, std::vector<uint32_t> &spirv, SHADER_STAGE type, const std::string &shader_path) {
+	void ShaderCompiler::GLSLToSpirV(const char *source, size_t size,
+									 std::vector<uint32_t> &spirv,
+									 SHADER_STAGE type,
+									 const std::string &shader_path,
+									 const std::string &entry_point) {
 		Log::status("Compiling shader at: " + shader_path);
 #ifndef GLSLANG_C
 		glslang::InitializeProcess();
@@ -302,7 +306,6 @@ namespace HBE {
 			const char *const *source_ptr = &source_str_ptr;
 			int lenght = source_str.size();
 
-
 			glslang::EshTargetClientVersion vulkan_version;
 			switch (Application::getInfo().vulkan_version) {
 				case VULKAN_VERSION_1_0:
@@ -318,12 +321,12 @@ namespace HBE {
 					vulkan_version = glslang::EShTargetVulkan_1_3;
 					break;
 			}
+
 			shader.setEnvClient(glslang::EShClient::EShClientVulkan, vulkan_version);
 			shader.setEnvTarget(glslang::EShTargetSpv, spirv_target);
 			shader.setStringsWithLengths(source_ptr, &lenght, 1);
-			shader.setSourceEntryPoint("main");
-			shader.setEntryPoint("main");
-
+			shader.setSourceEntryPoint(entry_point.c_str());
+			shader.setEntryPoint(entry_point.c_str());
 			shader.getIntermediate()->setSource(glslang::EShSourceGlsl);
 			//shader.getIntermediate()->setSourceFile(shader_path.c_str());
 			//shader.getIntermediate()->setEntryPointName("main");

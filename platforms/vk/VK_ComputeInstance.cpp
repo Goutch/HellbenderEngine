@@ -38,12 +38,11 @@ namespace HBE {
 		descriptors->unbind();
 	}
 
-
 	void VK_ComputeInstance::setUniform(uint32_t binding, const void *data, int32_t frame) {
 		descriptors->setUniform(binding, data, frame);
 	}
 
-	void VK_ComputeInstance::setTexture(uint32_t binding, const Texture *texture, int32_t frame, uint32_t mip_level) {
+	void VK_ComputeInstance::setImage(uint32_t binding, const Image *texture, int32_t frame, uint32_t mip_level) {
 		descriptors->setTexture(binding, texture, mip_level, frame);
 	}
 
@@ -51,36 +50,28 @@ namespace HBE {
 		descriptors->setUniform(descriptors->getBinding(name), data, frame);
 	}
 
-	void VK_ComputeInstance::setTexture(const std::string &name, const Texture *texture, int32_t frame, uint32_t mip_level) {
+	void VK_ComputeInstance::setImage(const std::string &name, const Image *texture, int32_t frame, uint32_t mip_level) {
 		descriptors->setTexture(descriptors->getBinding(name), texture, frame, mip_level);
 	}
 
-	void VK_ComputeInstance::dispatch(uint32_t group_count_x,
-									  uint32_t group_count_y,
-									  uint32_t group_count_z) {
+	void VK_ComputeInstance::dispatchAsync(uint32_t size_x,
+	                                       uint32_t size_y,
+	                                       uint32_t size_z) {
 		fence->wait();
 		VK_Device *device = renderer->getDevice();
 
-		VK_Queue &queue = device->hasQueue(QUEUE_FAMILY_TRANSFER) ? device->getQueue(QUEUE_FAMILY_COMPUTE) : device->getQueue(QUEUE_FAMILY_GRAPHICS);
+		VK_Queue &queue = device->hasQueue(QUEUE_FAMILY_COMPUTE) ? device->getQueue(QUEUE_FAMILY_COMPUTE) : device->getQueue(QUEUE_FAMILY_GRAPHICS);
 		queue.beginCommand();
 
 		const VkCommandBuffer &command_buffer = queue.getCommandPool()->getCurrentBuffer();
 		vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline->getHandle());
 
 		descriptors->bind(command_buffer, renderer->getCurrentFrame());
-		vkCmdDispatch(command_buffer, group_count_x, group_count_y, group_count_z);
+		vkCmdDispatch(command_buffer,
+		              static_cast<uint32_t>(ceil(pipeline->getWorkgroupSize().x / float(size_x))),
+		              static_cast<uint32_t>(ceil(pipeline->getWorkgroupSize().y / float(size_y))),
+		              static_cast<uint32_t>(ceil(pipeline->getWorkgroupSize().z / float(size_x))));
 
-		/*vkCmdPipelineBarrier(command_buffer,
-							 VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-							 VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
-							 0,
-							 0,
-							 nullptr,
-							 0,
-							 nullptr,
-							 0,
-							 nullptr);
-		vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_COMPUTE, handle);*/
 		queue.endCommand();
 
 		fence->reset();
@@ -95,11 +86,11 @@ namespace HBE {
 		fence->wait();
 	}
 
-	void VK_ComputeInstance::setTextureArray(uint32_t binding, Texture **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) {
+	void VK_ComputeInstance::setImageArray(uint32_t binding, Image **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) {
 		descriptors->setTextureArray(binding, texture, texture_count, frame, mip_level);
 	}
 
-	void VK_ComputeInstance::setTextureArray(const std::string &name, Texture **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) {
+	void VK_ComputeInstance::setImageArray(const std::string &name, Image **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) {
 		descriptors->setTextureArray(descriptors->getBinding(name), texture, texture_count, frame, mip_level);
 	}
 

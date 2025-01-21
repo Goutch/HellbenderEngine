@@ -40,20 +40,20 @@ namespace HBE {
 		descriptors->setUniform(binding, data, frame);
 	}
 
-	void VK_GraphicPipelineInstance::setTexture(uint32_t binding, const Texture *texture, int32_t frame, uint32_t mip_level) {
+	void VK_GraphicPipelineInstance::setImage(uint32_t binding, const Image *texture, int32_t frame, uint32_t mip_level) {
 		descriptors->setTexture(binding, texture, mip_level, frame);
 	}
 
-	void VK_GraphicPipelineInstance::setTexture(const std::string &name, const Texture *texture, int32_t frame, uint32_t mip_level) {
+	void VK_GraphicPipelineInstance::setImage(const std::string &name, const Image *texture, int32_t frame, uint32_t mip_level) {
 		descriptors->setTexture(descriptors->getBinding(name), texture, frame, mip_level);
 	}
 
 
-	void VK_GraphicPipelineInstance::setTextureArray(uint32_t binding, Texture **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) {
+	void VK_GraphicPipelineInstance::setImageArray(uint32_t binding, Image **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) {
 		descriptors->setTextureArray(binding, texture, texture_count, frame, mip_level);
 	}
 
-	void VK_GraphicPipelineInstance::setTextureArray(const std::string &name, Texture **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) {
+	void VK_GraphicPipelineInstance::setImageArray(const std::string &name, Image **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) {
 		descriptors->setTextureArray(descriptors->getBinding(name), texture, texture_count, frame, mip_level);
 	}
 

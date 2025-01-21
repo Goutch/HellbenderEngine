@@ -6,7 +6,7 @@
 namespace HBE {
 	class Shader;
 
-	class Texture;
+	class Image;
 
 	class ComputeBuffer;
 
@@ -23,6 +23,13 @@ namespace HBE {
 	};
 
 	class HB_API ComputePipeline : public Resource {
+	protected:
+		vec3i workgroup_size;
+	public:
+		virtual const vec3i &getWorkgroupSize() const = 0;
+
+		virtual ~ComputePipeline() = default;
+
 
 	};
 }

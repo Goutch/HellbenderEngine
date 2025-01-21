@@ -6,7 +6,7 @@
 
 #include "tiny_gltf.h"
 #include "core/resource/Model.h"
-#include "core/resource/Texture.h"
+#include "core/resource/Image.h"
 #include "core/scene/components/Transform.h"
 
 namespace HBE {
@@ -158,24 +158,24 @@ namespace HBE {
 		}
 	}
 
-	static TEXTURE_SAMPLER_ADDRESS_MODE gltfWrapModeToTextureSamplerAddressMode(int wrap) {
+	static IMAGE_SAMPLER_ADDRESS_MODE gltfWrapModeToTextureSamplerAddressMode(int wrap) {
 		switch (wrap) {
 			case TINYGLTF_TEXTURE_WRAP_REPEAT:
-				return TEXTURE_SAMPLER_ADDRESS_MODE_REPEAT;
+				return IMAGE_SAMPLER_ADDRESS_MODE_REPEAT;
 			case TINYGLTF_TEXTURE_WRAP_CLAMP_TO_EDGE:
-				return TEXTURE_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+				return IMAGE_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
 			case TINYGLTF_TEXTURE_WRAP_MIRRORED_REPEAT:
-				return TEXTURE_SAMPLER_ADDRESS_MODE_MIRROR_CLAMP_TO_EDGE;
+				return IMAGE_SAMPLER_ADDRESS_MODE_MIRROR_CLAMP_TO_EDGE;
 		}
 	}
 
-	static TEXTURE_SAMPLER_FILTER_TYPE gltfFilterModeToTextureSamplerFilter(int filter) {
+	static IMAGE_SAMPLER_FILTER_TYPE gltfFilterModeToTextureSamplerFilter(int filter) {
 		switch (filter) {
 			case TINYGLTF_TEXTURE_FILTER_NEAREST:
-				return TEXTURE_SAMPLER_FILTER_TYPE_NEAREST;
+				return IMAGE_SAMPLER_FILTER_TYPE_NEAREST;
 			default:
 			case TINYGLTF_TEXTURE_FILTER_LINEAR:
-				return TEXTURE_SAMPLER_FILTER_TYPE_LINEAR;
+				return IMAGE_SAMPLER_FILTER_TYPE_LINEAR;
 		}
 	}
 
@@ -254,16 +254,16 @@ namespace HBE {
 				case TINYGLTF_COMPONENT_TYPE_FLOAT:
 					switch (texture_data.channels) {
 						case 1:
-							texture_data.format = IMAGE_FORMAT_R32F;
+							texture_data.format = texture_data.bits_per_channels == 32 ? IMAGE_FORMAT_R32F : IMAGE_FORMAT_R16F;
 							break;
 						case 2:
-							texture_data.format = IMAGE_FORMAT_RG32F;
+							texture_data.format = texture_data.bits_per_channels == 32 ? IMAGE_FORMAT_RG32F : IMAGE_FORMAT_RG16F;
 							break;
 						case 3:
-							texture_data.format = IMAGE_FORMAT_RGB32F;
+							texture_data.format = texture_data.bits_per_channels == 32 ? IMAGE_FORMAT_RGB32F : IMAGE_FORMAT_RGB16F;
 							break;
 						case 4:
-							texture_data.format = IMAGE_FORMAT_RGBA32F;
+							texture_data.format = texture_data.bits_per_channels == 32 ? IMAGE_FORMAT_RGBA32F : IMAGE_FORMAT_RGBA16F;
 							break;
 					}
 					texture_data.format = IMAGE_FORMAT_R32F;

@@ -1,4 +1,4 @@
-#include "Texture.h"
+#include "Image.h"
 #include "fstream"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -7,7 +7,7 @@
 #include "Resources.h"
 
 namespace HBE {
-	int Texture::getFormatNumberOfChannels(IMAGE_FORMAT format) {
+	int Image::getFormatNumberOfChannels(IMAGE_FORMAT format) {
 		switch (format) {
 			case IMAGE_FORMAT_R32F:
 			case IMAGE_FORMAT_R8:
@@ -28,20 +28,20 @@ namespace HBE {
 	}
 
 
-	Texture *Texture::load(const std::string &path, IMAGE_FORMAT format, IMAGE_FLAGS flags) {
+	Image *Image::load(const std::string &path, IMAGE_FORMAT format, IMAGE_FLAGS flags) {
 		FILE *file = fopen((RESOURCE_PATH + path).c_str(), "rb");
 
 		if (file == nullptr) {
 			Log::error("Failed to open file: " + path);
 		}
-		TextureInfo info{};
-		Texture *texture;
+		ImageInfo info{};
+		Image *texture;
 		int32_t width, height;
 		unsigned char *buffer;
 
 		stbi_set_flip_vertically_on_load(true);
 		int nb_channels;
-		int expected_channels = Texture::getFormatNumberOfChannels(format);
+		int expected_channels = Image::getFormatNumberOfChannels(format);
 		buffer = stbi_load_from_file(file, &width, &height, &nb_channels, expected_channels);
 
 		if (nb_channels != expected_channels) {

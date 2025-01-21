@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core.h"
-#include "Texture.h"
+#include "Image.h"
 
 namespace HBE {
     typedef uint32_t TEXEL_BUFFER_FLAGS;

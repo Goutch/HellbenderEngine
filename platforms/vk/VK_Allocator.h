@@ -7,7 +7,7 @@
 #include "set"
 #include "string"
 #include "queue"
-#include "core/resource/Texture.h"
+#include "core/resource/Image.h"
 
 namespace HBE
 {
@@ -155,11 +155,11 @@ namespace HBE
 		void update(VK_Image& image, const void* data, uint32_t width, uint32_t depth, uint32_t height);
 
 		void updateRegions(VK_Image& image, const void* data, uint32_t data_texel_count,
-		                   TextureRegionUpdateInfo* update_infos, uint32_t update_count);
+		                   ImageRegionUpdateInfo* update_infos, uint32_t update_count);
 
 		void freeStagingBuffers(uint32_t frame);
 
-		static void cmdBarrierTransitionImageLayout(VK_CommandPool* command_pool, VK_Image* image,
+		void cmdBarrierTransitionImageLayout(VK_CommandPool* command_pool, VK_Image* image,
 		                                            VkImageLayout new_layout);
 
 		VK_Fence* blitImage(VK_Image& src, VK_Image& dest);

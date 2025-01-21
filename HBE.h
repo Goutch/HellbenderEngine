@@ -13,7 +13,7 @@
 #include "core/resource/ComputePipeline.h"
 #include "core/resource/ComputeInstance.h"
 #include "core/resource/Mesh.h"
-#include "core/resource/Texture.h"
+#include "core/resource/Image.h"
 #include "core/resource/Model.h"
 #include "core/resource/RenderTarget.h"
 #include "core/resource/RasterizationPipelineInstance.h"

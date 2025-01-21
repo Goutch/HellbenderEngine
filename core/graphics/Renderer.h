@@ -12,7 +12,7 @@ namespace HBE {
 
 	class RenderTarget;
 
-	class Texture;
+	class Image;
 
 	class Mesh;
 
@@ -31,6 +31,8 @@ namespace HBE {
 	class RaytracingPipelineInstance;
 
 	class RenderGraph;
+
+	class ComputeInstance;
 
 	typedef uint32_t DRAW_CMD_FLAGS;
 	enum DRAW_CMD_FLAG {
@@ -73,9 +75,9 @@ namespace HBE {
 		const RenderTarget *render_target;
 		RenderGraph *render_graph;
 		uint32_t layer_mask;
-		RASTERIZE_CMD_FLAGS flags;
 		mat4 view;
 		mat4 projection;
+		RASTERIZE_CMD_FLAGS flags;
 	};
 
 	struct TraceRaysCmdInfo {
@@ -86,9 +88,16 @@ namespace HBE {
 	};
 
 	struct PresentCmdInfo {
-		Texture **images;
+		Image **images;
 		uint32_t image_count;
 		PRESENT_CMD_FLAGS flags;
+	};
+
+	struct ComputeDispatchCmdInfo {
+		ComputeInstance *pipeline_instance;
+		uint32_t size_x;
+		uint32_t size_y;
+		uint32_t size_z;
 	};
 
 	class Renderer {
@@ -102,6 +111,8 @@ namespace HBE {
 		virtual void traceRays(TraceRaysCmdInfo &trace_rays_cmd_info) = 0;
 
 		virtual void present(PresentCmdInfo &present_cmd_info) = 0;
+
+		virtual void computeDispatch(ComputeDispatchCmdInfo &compute_dispatch_cmd_info) = 0;
 
 		virtual void beginFrame() = 0;
 

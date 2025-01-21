@@ -1,7 +1,7 @@
 #pragma once
 
 #include <queue>
-#include "core/resource/Texture.h"
+#include "core/resource/Image.h"
 #include "VK_Device.h"
 #include "vulkan/vulkan.h"
 #include "VK_Allocator.h"
@@ -16,7 +16,7 @@ namespace HBE {
 
 	class VK_Semaphore;
 
-	class VK_Image : public Texture {
+	class VK_Image : public Image {
 		VkImage handle = VK_NULL_HANDLE;
 		VK_Device *device;
 		VkImageLayout layout;
@@ -25,7 +25,7 @@ namespace HBE {
 		std::vector<VkImageView> image_views;
 		VkSampler sampler_handle = VK_NULL_HANDLE;
 
-		TextureInfo info;
+		ImageInfo info;
 
 		VkFormat vk_format;
 		Allocation allocation;
@@ -35,14 +35,14 @@ namespace HBE {
 		uint32_t mip_levels;
 		static uint32_t current_id;
 	public:
-		VK_Image(VK_Device *device, const TextureInfo &info);
+		VK_Image(VK_Device *device, const ImageInfo &info);
 		~VK_Image();
 		uint32_t getWidth() const override;
 		uint32_t getHeight() const override;
 		uint32_t getDepth() const override;
 		vec3u getSize() const override;
 		void update(const void *data,IMAGE_FORMAT format) override;
-		void updateRegion(const void *data, uint32_t data_texel_count, TextureRegionUpdateInfo* update_info, uint32_t update_count) override;
+		void updateRegion(const void *data, uint32_t data_texel_count, ImageRegionUpdateInfo* update_info, uint32_t update_count) override;
 
 		const VkSampler& getSampler() const;
 		const VkImage& getHandle() const;

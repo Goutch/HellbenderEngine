@@ -25,17 +25,20 @@ namespace HBE {
 	struct ShaderInfo {
 		SHADER_STAGE stage = SHADER_STAGE_NONE;
 		std::string path = "";
+		std::string entry_point = "main";
 	};
 
 	class HB_API Shader : public Resource {
+	protected:
+		vec3i workgroup_size;
 	public:
 		virtual SHADER_STAGE getStage() const = 0;
 
 		virtual ~Shader() = default;
 
-	public:
 		static void getSource(const std::string &path, std::string &buffer);
 
+		vec3i getWorkgroupSize();
 	};
 }
 

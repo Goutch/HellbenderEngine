@@ -390,7 +390,7 @@ namespace HBE {
 		return pipeline_layout->getDescriptorBinding(name);
 	}
 
-	void VK_PipelineDescriptors::setTextureArray(uint32_t binding, Texture **textures, uint32_t texture_count, int32_t frame, int32_t mip_level) {
+	void VK_PipelineDescriptors::setTextureArray(uint32_t binding, Image **textures, uint32_t texture_count, int32_t frame, int32_t mip_level) {
 
 		HB_ASSERT(frame < int32_t(MAX_FRAMES_IN_FLIGHT), "Frame index out of range");
 		const VkDescriptorSetLayoutBinding &binding_info = pipeline_layout->getDescriptorBindings()[binding];
@@ -446,7 +446,7 @@ namespace HBE {
 		}
 	}
 
-	void VK_PipelineDescriptors::setTexture(uint32_t binding, const Texture *texture, int32_t frame, uint32_t mip_level) {
+	void VK_PipelineDescriptors::setTexture(uint32_t binding, const Image *texture, int32_t frame, uint32_t mip_level) {
 
 		HB_ASSERT(frame < int32_t(MAX_FRAMES_IN_FLIGHT), "Frame index out of range");
 		VK_Image *vk_texture = (VK_Image *) texture;

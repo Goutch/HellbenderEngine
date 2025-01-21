@@ -11,6 +11,7 @@
 namespace HBE {
 	VK_ComputePipeline::VK_ComputePipeline(VK_Renderer *renderer, const ComputePipelineInfo &info) {
 		this->renderer = renderer;
+		this->workgroup_size = info.compute_shader->getWorkgroupSize();
 		const VK_Shader *vk_shader = dynamic_cast<VK_Shader *>(info.compute_shader);
 		layout = new VK_PipelineLayout(renderer->getDevice(), &vk_shader, 1, info.flags & COMPUTE_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR);
 
@@ -46,6 +47,8 @@ namespace HBE {
 		return handle;
 	}
 
-
+	const vec3i &VK_ComputePipeline::getWorkgroupSize() const {
+		return workgroup_size;
+	}
 }
 

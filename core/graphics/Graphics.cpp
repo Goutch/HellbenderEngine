@@ -63,7 +63,6 @@ namespace HBE {
 		renderer->traceRays(trace_rays_cmd_info);
 	}
 
-
 	uint32_t Graphics::getCurrentFrame() {
 		return renderer->getCurrentFrame();
 	}
@@ -88,6 +87,9 @@ namespace HBE {
 		return limits;
 	}
 
+	void Graphics::computeDispatch(ComputeDispatchCmdInfo &compute_dispatch_cmd_info) {
+		renderer->computeDispatch(compute_dispatch_cmd_info);
+	}
 }
 
 

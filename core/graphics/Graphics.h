@@ -28,7 +28,7 @@ namespace HBE {
 
 	class RenderTarget;
 
-	class Texture;
+	class Image;
 
 	using namespace utils;
 
@@ -54,6 +54,8 @@ namespace HBE {
 		static void traceRays(TraceRaysCmdInfo &trace_rays_cmd_info);
 
 		static void present(PresentCmdInfo &present_cmd_info);
+
+		static void computeDispatch(ComputeDispatchCmdInfo &compute_dispatch_cmd_info);
 
 		static RenderTarget *getDefaultRenderTarget();
 

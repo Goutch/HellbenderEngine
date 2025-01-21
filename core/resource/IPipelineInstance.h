@@ -5,7 +5,7 @@
 #include "Core.h"
 
 namespace HBE {
-	class Texture;
+	class Image;
 
 	class StorageBuffer;
 
@@ -20,10 +20,10 @@ namespace HBE {
 		virtual void setUniform(uint32_t binding, const void *data, int32_t frame = -1) = 0;
 		virtual void setUniform(const std::string &name, const void *data, int32_t frame = -1) = 0;
 
-		virtual void setTexture(uint32_t binding, const Texture *texture, int32_t frame = -1, uint32_t mip_level = 0) = 0;
-		virtual void setTextureArray(uint32_t binding, Texture **texture, uint32_t texture_count, int32_t frame = -1, uint32_t mip_level = 0) = 0;
-		virtual void setTexture(const std::string &name, const Texture *texture, int32_t frame = -1, uint32_t mip_level = 0) = 0;
-		virtual void setTextureArray(const std::string &name, Texture **texture, uint32_t texture_count, int32_t frame = -1, uint32_t mip_level = 0) = 0;
+		virtual void setImage(uint32_t binding, const Image *texture, int32_t frame = -1, uint32_t mip_level = 0) = 0;
+		virtual void setImageArray(uint32_t binding, Image **texture, uint32_t texture_count, int32_t frame = -1, uint32_t mip_level = 0) = 0;
+		virtual void setImage(const std::string &name, const Image *texture, int32_t frame = -1, uint32_t mip_level = 0) = 0;
+		virtual void setImageArray(const std::string &name, Image **texture, uint32_t texture_count, int32_t frame = -1, uint32_t mip_level = 0) = 0;
 
 		virtual void setStorageBuffer(uint32_t binding, StorageBuffer *buffer, size_t count, size_t offset, int32_t frame) = 0;
 		virtual void setStorageBufferArray(uint32_t binding, StorageBuffer **buffers, uint32_t count, int32_t frame = -1) = 0;

@@ -5,13 +5,13 @@
 #include "RasterizationPipeline.h"
 #include "Mesh.h"
 #include "RasterizationPipelineInstance.h"
-#include "Texture.h"
+#include "Image.h"
 #include "core/utility/GLTFLoader.h"
 #include "core/resource/raytracing/AccelerationStructure.h"
 
 namespace HBE {
 	Model::~Model() {
-		for (Texture *texture: resources.textures) {
+		for (Image *texture: resources.textures) {
 			delete texture;
 		}
 		for (std::vector<Mesh *> meshes: resources.meshes) {

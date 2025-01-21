@@ -69,7 +69,7 @@ namespace HBE {
 		default_text_pipeline_instance = Resources::createRasterizationPipelineInstance(text_pipeline_instance_info);
 
 		default_text_pipeline_instance->setUniform("material", &DEFAULT_TEXT_COLOR);
-		default_text_pipeline_instance->setTexture("mtsdf", default_font->getTextureAtlas());
+		default_text_pipeline_instance->setImage("mtsdf", default_font->getTextureAtlas());
 	}
 
 	void LabelSystem::drawSceneNode(RenderGraph *graph, SceneNode &node) {

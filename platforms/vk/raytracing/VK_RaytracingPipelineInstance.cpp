@@ -37,7 +37,7 @@ namespace HBE {
 		descriptors->setUniform(binding, data, frame);
 	}
 
-	void VK_RaytracingPipelineInstance::setTexture(uint32_t binding, const Texture *texture, int32_t frame, uint32_t mip_level) {
+	void VK_RaytracingPipelineInstance::setImage(uint32_t binding, const Image *texture, int32_t frame, uint32_t mip_level) {
 		descriptors->setTexture(binding, texture, mip_level, frame);
 	}
 
@@ -45,15 +45,15 @@ namespace HBE {
 		descriptors->setUniform(descriptors->getBinding(name), data, frame);
 	}
 
-	void VK_RaytracingPipelineInstance::setTexture(const std::string &name, const Texture *texture, int32_t frame, uint32_t mip_level) {
+	void VK_RaytracingPipelineInstance::setImage(const std::string &name, const Image *texture, int32_t frame, uint32_t mip_level) {
 		descriptors->setTexture(descriptors->getBinding(name), texture, frame, mip_level);
 	}
 
-	void VK_RaytracingPipelineInstance::setTextureArray(const std::string &name, Texture **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) {
+	void VK_RaytracingPipelineInstance::setImageArray(const std::string &name, Image **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) {
 		descriptors->setTextureArray(descriptors->getBinding(name), texture, texture_count, frame, mip_level);
 	}
 
-	void VK_RaytracingPipelineInstance::setTextureArray(uint32_t binding, Texture **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) {
+	void VK_RaytracingPipelineInstance::setImageArray(uint32_t binding, Image **texture, uint32_t texture_count, int32_t frame, uint32_t mip_level) {
 		descriptors->setTextureArray(binding, texture, texture_count, mip_level, frame);
 	}
 

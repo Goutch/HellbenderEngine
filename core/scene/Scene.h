@@ -88,7 +88,7 @@ namespace HBE {
 
 		bool isActive();
 
-		virtual Texture *getMainCameraTexture();
+		virtual Image *getMainCameraTexture();
 
 		Scene();
 

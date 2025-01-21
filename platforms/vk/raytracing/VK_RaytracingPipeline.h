@@ -44,14 +44,23 @@ namespace HBE {
 		mutable bool is_bound = false;
 	public:
 		VK_RaytracingPipeline(VK_Renderer *renderer, const RaytracingPipelineInfo &info);
+
 		~VK_RaytracingPipeline() override;
+
 		void bind() const;
+
 		void unbind() const;
+
 		const VkStridedDeviceAddressRegionKHR &getRaygenShaderBindingTable() const;
+
 		const VkStridedDeviceAddressRegionKHR &getMissShaderBindingTable() const;
+
 		const VkStridedDeviceAddressRegionKHR &getHitShaderBindingTable() const;
+
 		const VkStridedDeviceAddressRegionKHR &getCallableShaderBindingTable() const;
+
 		const VK_PipelineLayout *getPipelineLayout() const;
+
 	private:
 		void createShaderBindingTable(const RaytracingPipelineInfo &info);
 	};

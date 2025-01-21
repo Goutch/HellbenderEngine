@@ -42,4 +42,8 @@ namespace HBE {
 			Log::error("failed to read file " + path + "\n" + e.what());
 		}
 	}
+
+	vec3i Shader::getWorkgroupSize() {
+		return workgroup_size;
+	}
 }

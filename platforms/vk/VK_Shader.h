@@ -32,6 +32,7 @@ namespace HBE {
 	};
 
 	class VK_Shader : public Shader {
+		ShaderInfo info;
 	private:
 		const VK_Device *device;
 		VkShaderModule handle = VK_NULL_HANDLE;
@@ -61,7 +62,7 @@ namespace HBE {
 		VkShaderStageFlagBits getVkStage() const;
 
 	private:
-		void load(const std::string &path);
+		void load();
 
 		void setSource(const std::vector<uint32_t> &spirv);
 

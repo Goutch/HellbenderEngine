@@ -6,7 +6,7 @@
 #include "vector"
 #include "map"
 #include "Resource.h"
-#include "core/resource/Texture.h"
+#include "core/resource/Image.h"
 #include "core/resource/raytracing/AccelerationStructure.h"
 
 namespace HBE {
@@ -16,7 +16,7 @@ namespace HBE {
 
 	class Mesh;
 
-	class Texture;
+	class Image;
 
 	typedef uint32_t MODEL_FLAGS;
 
@@ -89,7 +89,7 @@ namespace HBE {
 		size_t channels = 0;
 		IMAGE_FORMAT format = IMAGE_FORMAT_RGBA8;
 		size_t bits_per_channels = 0;
-		TextureSamplerInfo sampler_info = {};
+		ImageSamplerInfo sampler_info = {};
 	};
 
 	struct ModelPrimitiveData {
@@ -119,7 +119,7 @@ namespace HBE {
 	struct ModelResources {
 		//todo: flatten meshes
 		std::vector<std::vector<Mesh *>> meshes;
-		std::vector<Texture *> textures;
+		std::vector<Image *> textures;
 		std::vector<RasterizationPipelineInstance *> materials;
 		std::vector<MeshAccelerationStructure *> acceleration_structures;
 		std::vector<AccelerationStructureInstance> acceleration_structure_instances;
@@ -183,9 +183,9 @@ namespace HBE {
 
 		virtual Mesh *createMesh(const ModelPrimitiveData &data, ModelInfo info) = 0;
 
-		virtual Texture *createTexture(const ModelTextureData &data) = 0;
+		virtual Image *createTexture(const ModelTextureData &data) = 0;
 
-		virtual RasterizationPipelineInstance *createMaterial(const ModelMaterialData &materialData, Texture **textures) = 0;
+		virtual RasterizationPipelineInstance *createMaterial(const ModelMaterialData &materialData, Image **textures) = 0;
 
 		//Raytracing
 		virtual MeshAccelerationStructure *createMeshAccelerationStructure(Mesh *mesh, int mesh_index) { return nullptr; };

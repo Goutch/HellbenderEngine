@@ -27,7 +27,7 @@ namespace HBE {
 
 	class RenderTarget;
 
-	class Texture;
+	class Image;
 
 	struct VariableDescriptorSet {
 		uint32_t binding;
@@ -76,9 +76,9 @@ namespace HBE {
 
 		void setUniform(uint32_t binding, const void *data, int32_t frame);
 
-		void setTexture(uint32_t binding, const Texture *texture, int32_t frame, uint32_t mip_level);
+		void setTexture(uint32_t binding, const Image *texture, int32_t frame, uint32_t mip_level);
 
-		void setTextureArray(uint32_t binding, Texture **textures, uint32_t texture_count, int32_t frame, int32_t mip_level);
+		void setTextureArray(uint32_t binding, Image **textures, uint32_t texture_count, int32_t frame, int32_t mip_level);
 
 		void setTexelBuffer(uint32_t binding, const TexelBuffer *buffer, int32_t frame);
 

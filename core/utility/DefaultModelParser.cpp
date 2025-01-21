@@ -1,7 +1,7 @@
 #include "core/resource/RasterizationPipelineInstance.h"
 #include "DefaultModelParser.h"
 #include "core/resource/Resources.h"
-#include "core/resource/Texture.h"
+#include "core/resource/Image.h"
 #include "core/resource/Mesh.h"
 #include "core/resource/Model.h"
 
@@ -86,7 +86,7 @@ namespace HBE {
 	}
 
 	RasterizationPipelineInstance *DefaultModelParser::createMaterial(const ModelMaterialData &materialData,
-	                                                                  HBE::Texture **textures) {
+	                                                                  HBE::Image **textures) {
 		RasterizationPipelineInstanceInfo instance_info{};
 		instance_info.rasterization_pipeline = materialData.double_sided
 		                                 ? parser_info.graphic_pipeline_2_sided
@@ -97,27 +97,27 @@ namespace HBE {
 
 		auto texture_type_it = parser_info.texture_names.find(MODEL_TEXTURE_TYPE_ALBEDO);
 		if (texture_type_it != parser_info.texture_names.end() && materialData.albedo_texture != -1)
-			instance_ptr->setTexture(texture_type_it->second, textures[materialData.albedo_texture]);
+			instance_ptr->setImage(texture_type_it->second, textures[materialData.albedo_texture]);
 		texture_type_it = parser_info.texture_names.find(MODEL_TEXTURE_TYPE_METALLIC_ROUGHNESS);
 		if (texture_type_it != parser_info.texture_names.end() && materialData.metallic_roughness_texture != -1)
-			instance_ptr->setTexture(texture_type_it->second, textures[materialData.metallic_roughness_texture]);
+			instance_ptr->setImage(texture_type_it->second, textures[materialData.metallic_roughness_texture]);
 		texture_type_it = parser_info.texture_names.find(MODEL_TEXTURE_TYPE_EMMISIVE);
 		if (texture_type_it != parser_info.texture_names.end() && materialData.emmisive_texture != -1)
-			instance_ptr->setTexture(texture_type_it->second, textures[materialData.emmisive_texture]);
+			instance_ptr->setImage(texture_type_it->second, textures[materialData.emmisive_texture]);
 		texture_type_it = parser_info.texture_names.find(MODEL_TEXTURE_TYPE_NORMAL);
 		if (texture_type_it != parser_info.texture_names.end() && materialData.normal_texture != -1)
-			instance_ptr->setTexture(texture_type_it->second, textures[materialData.normal_texture]);
+			instance_ptr->setImage(texture_type_it->second, textures[materialData.normal_texture]);
 		texture_type_it = parser_info.texture_names.find(MODEL_TEXTURE_TYPE_OCCLUSION);
 		if (texture_type_it != parser_info.texture_names.end() && materialData.occlusion_texture != -1)
-			instance_ptr->setTexture(texture_type_it->second, textures[materialData.occlusion_texture]);
+			instance_ptr->setImage(texture_type_it->second, textures[materialData.occlusion_texture]);
 
 		instance_ptr->setUniform(parser_info.material_property_name, &materialData.properties);
 
 		return instance_ptr;
 	}
 
-	Texture *DefaultModelParser::createTexture(const ModelTextureData &data) {
-		TextureInfo texture_info{};
+	Image *DefaultModelParser::createTexture(const ModelTextureData &data) {
+		ImageInfo texture_info{};
 		texture_info.width = data.width;
 		texture_info.height = data.height;
 		texture_info.data = data.data;
