@@ -95,9 +95,9 @@ namespace HBE {
 
 	struct ComputeDispatchCmdInfo {
 		ComputeInstance *pipeline_instance;
-		uint32_t size_x;
-		uint32_t size_y;
-		uint32_t size_z;
+		uint32_t size_x = 1;
+		uint32_t size_y = 1;
+		uint32_t size_z = 1;
 	};
 
 	class Renderer {

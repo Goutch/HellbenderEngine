@@ -168,6 +168,7 @@ namespace HBE {
 	}
 
 	uint32_t VK_PipelineLayout::getDescriptorBinding(const std::string &name) const {
+		HB_ASSERT(descriptor_name_to_binding.find(name) != descriptor_name_to_binding.end(), "No descriptor is named:" + name);
 		return descriptor_name_to_binding.find(name)->second;
 	}
 
