@@ -92,19 +92,15 @@ namespace HBE {
 
 		if (type.basetype == spirv_cross::SPIRType::Struct) {
 			size = glsl.get_declared_struct_size(type);
-			if (type.member_types.size() > 0) {
-				const spirv_cross::SPIRType &last_member_type = glsl.get_type(type.member_types.back());
-				if (last_member_type.array.size() == 1 && last_member_type.array[0] == 0) {
-					variable_size = true;
-				}
-			}
+			//	if (type.member_types.size() > 0) {
+			//		const spirv_cross::SPIRType &last_member_type = glsl.get_type(type.member_types.back());
+			//		if (last_member_type.array.size() == 1 && last_member_type.array[0] == 0) {
+			//			variable_size = true;
+			//		}
+			//	}
 		}
 
-		if (!type.array.
-
-				empty()
-
-				) {
+		if (!type.array.empty()) {
 			descriptor_count = type.array[0];
 			if (descriptor_count <= 0) {
 				variable_size = true;
@@ -113,11 +109,7 @@ namespace HBE {
 		spirv_cross::TypeID parent_type_id = type.parent_type;
 		while (parent_type_id != 0) {
 			spirv_cross::SPIRType parent_type = glsl.get_type(parent_type_id);
-			if (!parent_type.array.
-
-					empty()
-
-					) {
+			if (!parent_type.array.empty()) {
 				descriptor_count = parent_type.array[0];
 				if (descriptor_count <= 0) {
 					variable_size = true;
