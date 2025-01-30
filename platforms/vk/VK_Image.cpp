@@ -129,7 +129,7 @@ namespace HBE {
 			info.data_format = format;
 			info.flags = IMAGE_FLAG_NO_SAMPLER;
 			info.data = data;
-			VK_Image *temp_image = (VK_Image *) Resources::createTexture(info);
+			VK_Image *temp_image = (VK_Image *) Resources::createImage(info);
 
 			StagingAllocation staging_allocation = {};
 			staging_allocation.allocation = temp_image->allocation;

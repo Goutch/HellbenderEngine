@@ -125,7 +125,7 @@ namespace HBE {
 		texture_info.format = data.format;
 		texture_info.flags = IMAGE_FLAG_NONE;
 		texture_info.sampler_info = data.sampler_info;
-		return Resources::createTexture(texture_info);
+		return Resources::createImage(texture_info);
 	}
 
 	MeshAccelerationStructure *DefaultModelParser::createMeshAccelerationStructure(Mesh *mesh, int mesh_index) {
