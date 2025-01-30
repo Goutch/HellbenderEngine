@@ -74,7 +74,7 @@ namespace HBE {
 
 		virtual Shader *createShader(const ShaderInfo &info) const = 0;
 
-		virtual Image *createTexture(const ImageInfo &info) const = 0;
+		virtual Image *createImage(const ImageInfo &info) const = 0;
 
 		virtual Mesh *createMesh(const MeshInfo &info) const = 0;
 

@@ -13,7 +13,7 @@ namespace HBE {
         VK_ResourceFactory(VK_Renderer *renderer);
 		RasterizationPipeline *createRasterizationPipeline(const RasterizationPipelineInfo &info) const override;
 		Shader *createShader(const ShaderInfo &info) const override;
-		Image *createTexture(const ImageInfo &info) const override;
+		Image *createImage(const ImageInfo &info) const override;
 		Mesh *createMesh(const MeshInfo &info) const override;
 		ComputePipeline *createComputePipeline(const ComputePipelineInfo &info) const override;
 		RenderTarget *createRenderTarget(const RenderTargetInfo &info) const override;

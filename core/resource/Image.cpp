@@ -4,6 +4,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 
 #include "stb_image.h"
+#include "core/utility/Log.h"
 #include "Resources.h"
 
 namespace HBE {
@@ -56,7 +57,7 @@ namespace HBE {
 		info.format = format;
 		info.flags = flags;
 		info.data = buffer;
-		texture = Resources::createTexture(info, path);
+		texture = Resources::createImage(info, path);
 		stbi_image_free(buffer);
 		stbi_set_flip_vertically_on_load(true);
 		fclose(file);

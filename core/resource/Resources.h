@@ -127,9 +127,9 @@ namespace HBE {
 
 		static ComputePipeline *createComputePipeline(const ComputePipelineInfo &info);
 
-		static Image *createTexture(const ImageInfo &info, const std::string &name);
+		static Image *createImage(const ImageInfo &info, const std::string &name);
 
-		static Image *createTexture(const ImageInfo &info);
+		static Image *createImage(const ImageInfo &info);
 
 		static RenderTarget *createRenderTarget(const RenderTargetInfo &info);
 

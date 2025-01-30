@@ -35,7 +35,6 @@ set(CORE_FILES
         Configs.h
         HBETypes.h
 
-        core/resource/Texture.h
         core/resource/Model.cpp
         core/resource/Model.h
         core/resource/Mesh.cpp
@@ -48,7 +47,7 @@ set(CORE_FILES
         core/resource/ComputePipeline.h
         core/resource/Resources.h
         core/resource/Resources.cpp
-        core/resource/Texture.cpp
+        core/resource/Image.cpp
         core/resource/RasterizationPipelineInstance.h
         core/resource/ComputeInstance.h
         core/resource/IPipelineInstance.h

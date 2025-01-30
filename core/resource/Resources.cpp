@@ -73,14 +73,14 @@ namespace HBE {
 		return factory->createComputePipeline(info);
 	}
 
-	Image *Resources::createTexture(const ImageInfo &info, const std::string &name) {
-		auto t = factory->createTexture(info);
+	Image *Resources::createImage(const ImageInfo &info, const std::string &name) {
+		auto t = factory->createImage(info);
 		add(name, t);
 		return t;
 	}
 
-	Image *Resources::createTexture(const ImageInfo &info) {
-		return factory->createTexture(info);
+	Image *Resources::createImage(const ImageInfo &info) {
+		return factory->createImage(info);
 	}
 
 
