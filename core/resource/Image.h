@@ -104,6 +104,7 @@ namespace HBE {
 		uint32_t width = 1;
 		uint32_t height = 1;
 		uint32_t depth = 1;
+
 		bool generate_mip_maps = false;
 		IMAGE_FORMAT format = IMAGE_FORMAT_RGBA32F;
 		IMAGE_FORMAT data_format = IMAGE_FORMAT_UNDEFINED;
@@ -136,6 +137,6 @@ namespace HBE {
 
 		static int getFormatNumberOfChannels(IMAGE_FORMAT format);
 
-		static Image *load(const std::string &path, IMAGE_FORMAT format, IMAGE_FLAGS flags);
+		static Image *load(const std::string &path, ImageInfo& info);
 	};
 }
