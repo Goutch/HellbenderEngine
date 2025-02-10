@@ -20,7 +20,7 @@ namespace HBE {
 		mat4 projection = mat4(1.0f);
 		float fov = 70.0f;
 		float far = 1000.0f;
-		float near = 0.001f;
+		float near = 0.1f;
 		bool active = true;
 		uint32_t layer_mask = UINT32_MAX;
 

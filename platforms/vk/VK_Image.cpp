@@ -179,7 +179,6 @@ namespace HBE {
 
 		desired_layout = chooseLayout();
 
-
 		VkImageType type;
 		VkImageViewType view_type;
 		if (height == 1 && depth == 1) {
@@ -192,7 +191,6 @@ namespace HBE {
 			type = VK_IMAGE_TYPE_3D;
 			view_type = VK_IMAGE_VIEW_TYPE_3D;
 		}
-
 
 		vk_format = VK_Utils::getVkFormat(info.format);
 		byte_per_pixel = VK_Utils::getFormatStride(info.format);
@@ -240,7 +238,6 @@ namespace HBE {
 		vkGetImageMemoryRequirements(device->getHandle(), handle, &requirements);
 		this->allocation = device->getAllocator()->alloc(requirements, ALLOC_FLAG_NONE);
 		vkBindImageMemory(device->getHandle(), handle, allocation.block->memory, allocation.offset);
-
 
 		if (info.data != nullptr) {
 			//image data is set right now

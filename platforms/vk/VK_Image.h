@@ -52,11 +52,10 @@ namespace HBE {
 		VkImageLayout getImageLayout() const;
 		VkImageLayout getDesiredLayout() const;
 		uint32_t bytePerPixel() const;
-
 		void setImageLayout(VkImageLayout layout);
+
 	private:
 		VkImageLayout chooseLayout();
-
 	};
 }
 

@@ -59,11 +59,13 @@ namespace HBE
 		info.width = width;
 		info.height = height;
 		info.data = buffer;
-		texture = Resources::createImage(info, path);
+		info.data_format = info.format;
+		texture = Resources::createImage(info);
 		stbi_image_free(buffer);
 		stbi_set_flip_vertically_on_load(true);
 		fclose(file);
 		info.data = nullptr;
 		return texture;
 	}
+
 }
