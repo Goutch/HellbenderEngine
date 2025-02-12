@@ -137,8 +137,7 @@ set(CORE_FILES
         core/utility/DefaultModelParser.h
 
 
-        core/math/SignedDistance.h
-        )
+)
 set(VK_FILES
         platforms/vk/VK_Renderer.cpp
         platforms/vk/VK_Instance.cpp

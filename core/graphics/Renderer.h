@@ -81,7 +81,6 @@ namespace HBE {
 	};
 
 	struct TraceRaysCmdInfo {
-		const RootAccelerationStructure *root_acceleration_structure;
 		RaytracingPipelineInstance *pipeline_instance;
 		vec2i resolution;
 		TRACE_RAYS_CMD_FLAGS flags;

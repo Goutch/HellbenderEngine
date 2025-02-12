@@ -37,7 +37,7 @@ namespace HBE
 
 		if (file == nullptr)
 		{
-			Log::error("Failed to open file: " + path);
+			Log::error("Failed to open file: " + (RESOURCE_PATH + path));
 		}
 		Image* texture;
 		int32_t width, height;
