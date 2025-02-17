@@ -25,7 +25,7 @@ namespace HBE {
 	struct ShaderInfo {
 		SHADER_STAGE stage = SHADER_STAGE_NONE;
 		std::string path = "";
-		std::string entry_point = "main";
+		std::string preamble = "";
 	};
 
 	class HB_API Shader : public Resource {

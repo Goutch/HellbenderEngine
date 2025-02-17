@@ -11,8 +11,8 @@ namespace HBE {
 		                        size_t size,
 		                        std::vector<uint32_t> &spirv,
 		                        SHADER_STAGE type,
-		                        const std::string &string,
-		                        const std::string &entry_point);
+		                        const std::string &shader_path,
+		                        const std::string &preamble);
 	};
 
 }

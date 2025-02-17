@@ -75,7 +75,7 @@ namespace HBE {
 		std::string source;
 		getSource(info.path, source);
 		std::vector<uint32_t> spirv;
-		ShaderCompiler::GLSLToSpirV(source.c_str(), source.size(), spirv, stage, info.path, info.entry_point);
+		ShaderCompiler::GLSLToSpirV(source.c_str(), source.size(), spirv, stage, info.path, info.preamble);
 		setSource(spirv);
 	}
 
@@ -294,7 +294,7 @@ namespace HBE {
 		}
 		if (this->stage == SHADER_STAGE_COMPUTE) {
 			// Get the entry point.
-			auto entry_point = glsl.get_entry_point(info.entry_point, spv::ExecutionModelGLCompute);
+			auto entry_point = glsl.get_entry_point(info.preamble, spv::ExecutionModelGLCompute);
 			// Get the workgroup size.
 			workgroup_size.x = entry_point.workgroup_size.x;
 			workgroup_size.y = entry_point.workgroup_size.y;

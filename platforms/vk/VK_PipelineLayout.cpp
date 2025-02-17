@@ -97,7 +97,7 @@ namespace HBE {
 	}
 
 	void VK_PipelineLayout::mergeDescriptorStages(VK_DescriptorInfo &merged_descriptor, VK_DescriptorInfo &old_descriptor, VK_DescriptorInfo &new_descriptor) {
-		HB_ASSERT(old_descriptor.name == new_descriptor.name, "Uniforms have different names:" + old_descriptor.name + " and " + new_descriptor.name);
+		HB_ASSERT(old_descriptor.name=="" || new_descriptor.name == "" || old_descriptor.name == new_descriptor.name, "Uniforms have different names:" + old_descriptor.name + " and " + new_descriptor.name);
 		HB_ASSERT(old_descriptor.size == new_descriptor.size, "Uniform \"" + old_descriptor.name = "\" Binding#" + std::to_string(old_descriptor.layout_binding.binding) + " has different sizes");
 		HB_ASSERT(old_descriptor.layout_binding.descriptorType == new_descriptor.layout_binding.descriptorType,
 		          "Uniform \"" + old_descriptor.name = "\" Binding#" + std::to_string(old_descriptor.layout_binding.binding) + " has different types");

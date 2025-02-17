@@ -250,10 +250,10 @@ namespace HBE {
 
 //https://lxjk.github.io/2020/03/10/Translate-GLSL-to-SPIRV-for-Vulkan-at-Runtime.html
 	void ShaderCompiler::GLSLToSpirV(const char *source, size_t size,
-									 std::vector<uint32_t> &spirv,
-									 SHADER_STAGE type,
-									 const std::string &shader_path,
-									 const std::string &entry_point) {
+	                                 std::vector<uint32_t> &spirv,
+	                                 SHADER_STAGE type,
+	                                 const std::string &shader_path,
+	                                 const std::string &preamble) {
 		Log::status("Compiling shader at: " + shader_path);
 #ifndef GLSLANG_C
 		glslang::InitializeProcess();
@@ -325,9 +325,9 @@ namespace HBE {
 			shader.setEnvClient(glslang::EShClient::EShClientVulkan, vulkan_version);
 			shader.setEnvTarget(glslang::EShTargetSpv, spirv_target);
 			shader.setStringsWithLengths(source_ptr, &lenght, 1);
-			shader.setSourceEntryPoint(entry_point.c_str());
-			shader.setEntryPoint(entry_point.c_str());
+			shader.setPreamble(preamble.c_str());
 			shader.getIntermediate()->setSource(glslang::EShSourceGlsl);
+			//shader.setAutoMapBindings(true);
 			//shader.getIntermediate()->setSourceFile(shader_path.c_str());
 			//shader.getIntermediate()->setEntryPointName("main");
 
@@ -351,6 +351,7 @@ namespace HBE {
 			{
 				glslang::TProgram program;
 				program.addShader(&shader);
+				//program.mapIO(); //auto bindings
 				//program.buildReflection(EShReflectionDefault);
 				//program.getIntermediate(stage)->addSourceText(source, size);
 				if (!program.link(message)) {
@@ -363,9 +364,9 @@ namespace HBE {
 				options.stripDebugInfo = false;
 				options.disableOptimizer = true;
 #else
-				options.generateDebugInfo=false;
-				options.stripDebugInfo=true;
-				options.disableOptimizer=false;
+				options.generateDebugInfo = false;
+				options.stripDebugInfo = true;
+				options.disableOptimizer = false;
 #endif
 				glslang::GlslangToSpv(*program.getIntermediate(stage), spirv, &options);
 
