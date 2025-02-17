@@ -294,7 +294,7 @@ namespace HBE {
 		}
 		if (this->stage == SHADER_STAGE_COMPUTE) {
 			// Get the entry point.
-			auto entry_point = glsl.get_entry_point(info.preamble, spv::ExecutionModelGLCompute);
+			auto entry_point = glsl.get_entry_point("main", spv::ExecutionModelGLCompute);
 			// Get the workgroup size.
 			workgroup_size.x = entry_point.workgroup_size.x;
 			workgroup_size.y = entry_point.workgroup_size.y;
