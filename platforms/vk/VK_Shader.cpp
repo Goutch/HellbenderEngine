@@ -16,6 +16,7 @@ namespace HBE {
 		this->info = info;
 		this->device = device;
 		this->stage = info.stage;
+		HB_ASSERT(info.stage != SHADER_STAGE_NONE, "Shader stage not set");
 		switch (info.stage) {
 			case SHADER_STAGE::SHADER_STAGE_COMPUTE:
 				vk_stage = VK_SHADER_STAGE_COMPUTE_BIT;

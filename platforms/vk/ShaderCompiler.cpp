@@ -327,13 +327,12 @@ namespace HBE {
 			shader.setStringsWithLengths(source_ptr, &lenght, 1);
 			shader.setPreamble(preamble.c_str());
 			shader.getIntermediate()->setSource(glslang::EShSourceGlsl);
-			//shader.setAutoMapBindings(true);
-			//shader.getIntermediate()->setSourceFile(shader_path.c_str());
-			//shader.getIntermediate()->setEntryPointName("main");
 
+			//shader.setAutoMapBindings(true);
+			shader.getIntermediate()->setSourceFile(shader_path.c_str());
 #ifdef DEBUG_MODE
-			//shader.getIntermediate()->addSourceText(source, size);
-			//shader.getIntermediate()->setSourceFile((RESOURCE_PATH + shader_path).c_str());
+			shader.getIntermediate()->addSourceText(source, size);
+			shader.getIntermediate()->setSourceFile((RESOURCE_PATH + shader_path).c_str());
 #endif
 			HBE_Includer includer(shader_path);
 			EShMessages message = static_cast<EShMessages>(EShMessages::EShMsgVulkanRules | EShMessages::EShMsgSpvRules);
