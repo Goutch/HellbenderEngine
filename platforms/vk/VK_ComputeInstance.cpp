@@ -18,6 +18,7 @@ namespace HBE {
 		descriptors = new VK_PipelineDescriptors(renderer, *layout);
 		this->pipeline = compute_pipeline;
 		fence = new VK_Fence(*renderer->getDevice());
+		this->renderer = renderer;
 	}
 
 	VK_ComputeInstance::~VK_ComputeInstance() {

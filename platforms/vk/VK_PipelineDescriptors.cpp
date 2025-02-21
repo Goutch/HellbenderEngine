@@ -34,7 +34,7 @@ namespace HBE {
 				uniform_buffers[frame][binding] = new VK_Buffer(device,
 				                                                descriptor_sizes[binding],
 				                                                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-				                                                ALLOC_FLAG_MAPPABLE);
+				                                                ALLOC_FLAG_NONE);
 			}
 		}
 		createDescriptorPool(descriptor_pool);

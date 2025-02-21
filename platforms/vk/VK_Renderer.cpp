@@ -124,7 +124,11 @@ namespace HBE {
 		const VK_ComputePipeline *vk_pipeline = dynamic_cast<const VK_ComputePipeline *>(compute_dispatch_cmd_info.pipeline_instance->getComputePipeline());
 		vkCmdBindPipeline(command_pool->getCurrentBuffer(), VK_PIPELINE_BIND_POINT_COMPUTE, vk_pipeline->getHandle());
 		compute_dispatch_cmd_info.pipeline_instance->bind();
-		vkCmdDispatch(command_pool->getCurrentBuffer(), compute_dispatch_cmd_info.size_x, compute_dispatch_cmd_info.size_y, compute_dispatch_cmd_info.size_z);
+		ivec3 workgroup_size = vk_pipeline->getWorkgroupSize();
+		vkCmdDispatch(command_pool->getCurrentBuffer(),
+		              ceil(compute_dispatch_cmd_info.size_x / workgroup_size.x),
+		              ceil(compute_dispatch_cmd_info.size_y / workgroup_size.y),
+		              ceil(compute_dispatch_cmd_info.size_z / workgroup_size.z));
 		compute_dispatch_cmd_info.pipeline_instance->unbind();
 		HB_PROFILE_END("ComputeDispatch");
 	}
