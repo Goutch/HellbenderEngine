@@ -21,11 +21,12 @@ namespace HBE
 
 	typedef uint32_t MEMORY_TYPE_FLAGS;
 
-	struct UniformBufferMemoryInfo
+	struct UniformMemoryInfo
 	{
 		std::string name;
-		uint32_t binding = 1; //used if name is empty or not found
-		MEMORY_TYPE_FLAGS preferred_memory_type;
+		uint32_t binding = 0; //used if name is empty or not found
+		bool use_per_frame_buffer = true;
+		MEMORY_TYPE_FLAGS preferred_memory_type = MEMORY_TYPE_FLAG_GPU_LOCAL;
 	};
 
 	class HB_API IPipelineInstance : public Resource

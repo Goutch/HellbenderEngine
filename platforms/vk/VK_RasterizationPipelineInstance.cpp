@@ -12,6 +12,7 @@ namespace HBE
 		this->vk_pipeline = graphic_pipeline;
 		descriptors = new VK_PipelineDescriptors(renderer,
 		                                         *layout,
+		                                         info.preferred_memory_type_flags,
 		                                         info.uniform_memory_type_infos,
 		                                         info.uniform_memory_type_info_count,
 		                                         pipeline->getFlags() & RASTERIZATION_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR);

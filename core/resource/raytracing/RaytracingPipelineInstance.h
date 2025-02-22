@@ -21,7 +21,8 @@ namespace HBE
 	{
 		RaytracingPipeline* raytracing_pipeline = nullptr;
 		RAYTRACING_PIPELINE_INSTANCE_FLAGS flags = RAYTRACING_PIPELINE_INSTANCE_FLAG_NONE;
-		UniformBufferMemoryInfo* uniform_memory_type_infos; //optional, specify memory type for specific uniform buffers
+		MEMORY_TYPE_FLAGS preferred_memory_type_flags = MEMORY_TYPE_FLAG_GPU_LOCAL;
+		UniformMemoryInfo* uniform_memory_type_infos; //optional, specify memory type for specific uniform buffers
 		uint32_t uniform_memory_type_info_count = 0;
 	};
 

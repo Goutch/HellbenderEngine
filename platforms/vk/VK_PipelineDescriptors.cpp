@@ -20,7 +20,8 @@ namespace HBE
 {
 	VK_PipelineDescriptors::VK_PipelineDescriptors(VK_Renderer* renderer,
 	                                               const VK_PipelineLayout& layout,
-	                                               UniformBufferMemoryInfo* uniform_memory_type_infos,
+	                                               MEMORY_TYPE_FLAGS preferred_memory_type_flags,
+	                                               UniformMemoryInfo* uniform_memory_type_infos,
 	                                               uint32_t uniform_memory_type_info_count,
 	                                               bool empty_descriptor_allowed)
 	{
