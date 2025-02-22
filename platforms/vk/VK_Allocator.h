@@ -2,7 +2,6 @@
 
 #include "vulkan/vulkan.h"
 #include "vector"
-#include "list"
 #include "unordered_map"
 #include "set"
 #include "string"
