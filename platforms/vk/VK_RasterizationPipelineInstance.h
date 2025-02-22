@@ -9,19 +9,19 @@ namespace HBE {
 
 	class VK_Renderer;
 
-	class VK_GraphicPipeline;
+	class VK_RasterizationPipeline;
 
 	class StorageBuffer;
 
-	class VK_GraphicPipelineInstance : public RasterizationPipelineInstance {
+	class VK_RasterizationPipelineInstance : public RasterizationPipelineInstance {
 		VK_PipelineDescriptors *descriptors;
 		RasterizationPipeline *pipeline;
-		VK_GraphicPipeline *vk_pipeline;
+		VK_RasterizationPipeline *vk_pipeline;
 
 		bool bound = false;
 	public:
-		VK_GraphicPipelineInstance(VK_Renderer *renderer, const RasterizationPipelineInstanceInfo &info);
-		~VK_GraphicPipelineInstance() override;
+		VK_RasterizationPipelineInstance(VK_Renderer *renderer, const RasterizationPipelineInstanceInfo &info);
+		~VK_RasterizationPipelineInstance() override;
 
 		//---------------------------IPipelineInstance Implementation---------------------------
 		void bind() const override;
@@ -46,7 +46,7 @@ namespace HBE {
 		void setTexelBufferArray(uint32_t binding, TexelBuffer **buffers, uint32_t count, int32_t frame) override;
 
 		const RasterizationPipeline *getGraphicPipeline() const override;
-		VK_GraphicPipeline *getVkGraphicPipeline();
+		VK_RasterizationPipeline *getVkGraphicPipeline();
 
 	};
 }

@@ -14,6 +14,8 @@ namespace HBE {
 	struct ComputeInstanceInfo {
 		ComputePipeline *compute_pipeline;
 		COMPUTE_INSTANCE_FLAGS flags = COMPUTE_INSTANCE_FLAG_NONE;
+		UniformBufferMemoryInfo* uniform_memory_type_infos; //optional, specify memory type for specific uniform buffers
+		uint32_t uniform_memory_type_info_count = 0;
 	};
 
 	class HB_API ComputeInstance : public IPipelineInstance {

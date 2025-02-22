@@ -1,5 +1,5 @@
 #include "VK_ResourceFactory.h"
-#include "VK_GraphicPipeline.h"
+#include "VK_RasterizationPipeline.h"
 #include "VK_Renderer.h"
 #include "VK_Device.h"
 #include "VK_Image.h"
@@ -8,7 +8,7 @@
 #include "VK_Shader.h"
 #include "VK_RenderPass.h"
 #include "VK_ComputePipeline.h"
-#include "VK_GraphicPipelineInstance.h"
+#include "VK_RasterizationPipelineInstance.h"
 #include "VK_ComputeInstance.h"
 #include "raytracing/VK_TopLevelAccelerationStructure.h"
 #include "raytracing/VK_AABBBottomLevelAccelerationStructure.h"
@@ -25,7 +25,7 @@ namespace HBE {
 	}
 
 	RasterizationPipeline *VK_ResourceFactory::createRasterizationPipeline(const RasterizationPipelineInfo &info) const {
-		return new VK_GraphicPipeline(renderer->getDevice(), renderer, info);
+		return new VK_RasterizationPipeline(renderer->getDevice(), renderer, info);
 	}
 
 	Shader *VK_ResourceFactory::createShader(const ShaderInfo &info) const {
@@ -58,7 +58,7 @@ namespace HBE {
 	}
 
 	RasterizationPipelineInstance *VK_ResourceFactory::createRasterizationPipelineInstance(const RasterizationPipelineInstanceInfo &info) const {
-		return new VK_GraphicPipelineInstance(renderer, info);
+		return new VK_RasterizationPipelineInstance(renderer, info);
 	}
 
 	ComputeInstance *VK_ResourceFactory::createComputeInstance(const ComputeInstanceInfo &info) const {

@@ -3,14 +3,18 @@
 #include "Core.h"
 #include "../Shader.h"
 
-namespace HBE {
+namespace HBE
+{
 	typedef uint32_t RAYTRACING_PIPELINE_FLAGS;
-	enum RAYTRACING_PIPELINE_FLAG {
+
+	enum RAYTRACING_PIPELINE_FLAG
+	{
 		RAYTRACING_PIPELINE_FLAG_NONE = 0,
 		RAYTRACING_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR = 1
 	};
 
-	struct RaytracingShaderGroup {
+	struct RaytracingShaderGroup
+	{
 		int32_t closest_hit_shader_index = -1;
 		///Optionnal
 		int32_t any_hit_shader_index = -1;
@@ -18,16 +22,17 @@ namespace HBE {
 		int32_t intersection_shader_index = -1;
 	};
 
-	struct RaytracingPipelineInfo {
-		Shader *raygen_shader;
+	struct RaytracingPipelineInfo
+	{
+		Shader* raygen_shader;
 
-		Shader **miss_shaders;
+		Shader** miss_shaders;
 		uint32_t miss_shader_count;
 		///Any hit and intersection shaders and closest hit
-		Shader **hit_shaders;
+		Shader** hit_shaders;
 		uint32_t hit_shader_count;
 
-		RaytracingShaderGroup *shader_groups;
+		RaytracingShaderGroup* shader_groups;
 		uint32_t shader_group_count;
 
 		uint32_t max_recursion_depth = 1;
@@ -35,7 +40,8 @@ namespace HBE {
 		RAYTRACING_PIPELINE_FLAGS flags = RAYTRACING_PIPELINE_FLAG_NONE;
 	};
 
-	class HB_API RaytracingPipeline : public Resource {
-
+	class HB_API RaytracingPipeline : public Resource
+	{
+		virtual RAYTRACING_PIPELINE_FLAGS getFlags() const = 0;
 	};
 }

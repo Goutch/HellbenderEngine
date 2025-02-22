@@ -8,6 +8,7 @@
 
 #include "array"
 #include "map"
+#include "core/resource/IPipelineInstance.h"
 #include "core/resource/TexelBuffer.h"
 
 namespace HBE {
@@ -17,7 +18,7 @@ namespace HBE {
 
 	class VK_Renderer;
 
-	class VK_GraphicPipeline;
+	class VK_RasterizationPipeline;
 
 	class VK_ComputePipeline;
 
@@ -58,7 +59,11 @@ namespace HBE {
 
 		mutable bool bound = false;
 	public:
-		VK_PipelineDescriptors(VK_Renderer *renderer, const VK_PipelineLayout &layout, bool empty_descriptor_allowed = false);
+		VK_PipelineDescriptors(VK_Renderer *renderer,
+			const VK_PipelineLayout &layout,
+			UniformBufferMemoryInfo *uniform_memory_type_infos,
+			uint32_t uniform_memory_type_info_count,
+			bool empty_descriptor_allowed = false);
 
 		~VK_PipelineDescriptors();
 

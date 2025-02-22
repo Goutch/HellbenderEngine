@@ -11,7 +11,7 @@ namespace HBE {
 
 	class VK_Swapchain;
 
-	class VK_GraphicPipeline;
+	class VK_RasterizationPipeline;
 
 	class VK_CommandPool;
 

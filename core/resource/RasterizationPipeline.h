@@ -6,7 +6,8 @@
 #include "glm/glm.hpp"
 #include "Resource.h"
 
-namespace HBE {
+namespace HBE
+{
 	class Shader;
 
 	class Image;
@@ -16,7 +17,9 @@ namespace HBE {
 	class RenderTarget;
 
 	typedef uint32_t RASTERIZATION_PIPELINE_FLAGS;
-	enum RASTERIZATION_PIPELINE_FLAG {
+
+	enum RASTERIZATION_PIPELINE_FLAG
+	{
 		RASTERIZATION_PIPELINE_FLAG_NONE = 0,
 		RASTERIZATION_PIPELINE_FLAG_CULL_BACK = 1 << 0,
 		RASTERIZATION_PIPELINE_FLAG_CULL_FRONT = 1 << 1,
@@ -25,18 +28,20 @@ namespace HBE {
 		RASTERIZATION_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR = 1 << 4,
 	};
 
-	struct RasterizationPipelineInfo {
-		const Shader *vertex_shader = nullptr;
-		const Shader *fragment_shader = nullptr;
-		const Shader *geometry_shader = nullptr;
-		const VertexAttributeInfo *attribute_infos = nullptr;
-		const RenderTarget *render_target = nullptr;
+	struct RasterizationPipelineInfo
+	{
+		const Shader* vertex_shader = nullptr;
+		const Shader* fragment_shader = nullptr;
+		const Shader* geometry_shader = nullptr;
+		const VertexAttributeInfo* attribute_infos = nullptr;
+		const RenderTarget* render_target = nullptr;
 		uint32_t attribute_info_count = 0;
 		VERTEX_TOPOLOGY topology = VERTEX_TOPOLOGY_TRIANGLE;
 		RASTERIZATION_PIPELINE_FLAGS flags = RASTERIZATION_PIPELINE_FLAG_NONE;
 	};
 
-	class HB_API RasterizationPipeline : public Resource {
+	class HB_API RasterizationPipeline : public Resource
+	{
 	public:
 		virtual ~RasterizationPipeline() = default;
 
@@ -44,10 +49,10 @@ namespace HBE {
 
 		virtual void unbind() const = 0;
 
-		virtual void pushConstant(const std::string &name, const void *data) const = 0;
+		virtual void pushConstant(const std::string& name, const void* data) const = 0;
 
-		bool isCompatible(VertexAttributeInfo *attribute_infos, uint32_t attribute_info_count) const;
+		bool isCompatible(VertexAttributeInfo* attribute_infos, uint32_t attribute_info_count) const;
+
+		virtual RASTERIZATION_PIPELINE_FLAGS getFlags() const = 0;
 	};
-
-
 }

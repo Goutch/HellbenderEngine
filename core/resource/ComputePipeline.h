@@ -3,7 +3,8 @@
 #include "Core.h"
 #include "Resource.h"
 
-namespace HBE {
+namespace HBE
+{
 	class Shader;
 
 	class Image;
@@ -13,23 +14,29 @@ namespace HBE {
 	class RenderTarget;
 
 	typedef uint32_t COMPUTE_PIPELINE_FLAG;
-	enum COMPUTE_PIPELINE_FLAGS {
+
+	enum COMPUTE_PIPELINE_FLAGS
+	{
 		COMPUTE_PIPELINE_FLAG_NONE = 0,
 		COMPUTE_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR = 1,
 	};
-	struct ComputePipelineInfo {
-		Shader *compute_shader;
-		COMPUTE_PIPELINE_FLAG flags = COMPUTE_PIPELINE_FLAG_NONE;
+
+	struct ComputePipelineInfo
+	{
+		Shader* compute_shader;
+		COMPUTE_PIPELINE_FLAGS flags = COMPUTE_PIPELINE_FLAG_NONE;
 	};
 
-	class HB_API ComputePipeline : public Resource {
+	class HB_API ComputePipeline : public Resource
+	{
 	protected:
 		vec3i workgroup_size;
+
 	public:
-		virtual const vec3i &getWorkgroupSize() const = 0;
+		virtual const vec3i& getWorkgroupSize() const = 0;
 
 		virtual ~ComputePipeline() = default;
 
-
+		virtual COMPUTE_PIPELINE_FLAGS getFlags() const = 0;
 	};
 }

@@ -1,6 +1,6 @@
 #include <core/graphics/Graphics.h>
 #include <core/resource/Resources.h>
-#include "VK_GraphicPipeline.h"
+#include "VK_RasterizationPipeline.h"
 #include "core/graphics/Window.h"
 #include "VK_PipelineLayout.h"
 #include "VK_Renderer.h"
@@ -10,27 +10,30 @@
 #include "algorithm"
 #include "VK_Fence.h"
 
-namespace HBE {
-
-	VK_GraphicPipeline::VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const RasterizationPipelineInfo &info, VkRenderPass render_pass) {
+namespace HBE
+{
+	VK_RasterizationPipeline::VK_RasterizationPipeline(VK_Device* device, VK_Renderer* renderer, const RasterizationPipelineInfo& info, VkRenderPass render_pass)
+	{
 		this->info = info;
 		this->render_pass = render_pass;
 		createRenderPass(device, renderer);
 	}
 
 
-	VK_GraphicPipeline::VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const RasterizationPipelineInfo &info) {
+	VK_RasterizationPipeline::VK_RasterizationPipeline(VK_Device* device, VK_Renderer* renderer, const RasterizationPipelineInfo& info)
+	{
 		this->info = info;
 		createRenderPass(device, renderer);
 	}
 
-	void VK_GraphicPipeline::createRenderPass(VK_Device *device, VK_Renderer *renderer) {
+	void VK_RasterizationPipeline::createRenderPass(VK_Device* device, VK_Renderer* renderer)
+	{
 		this->device = device;
 		this->renderer = renderer;
 		this->binding_infos = std::vector<VertexAttributeInfo>(info.attribute_infos, info.attribute_infos + info.attribute_info_count);
 
-		const VK_Shader *vk_vertex = (dynamic_cast<const VK_Shader *>(info.vertex_shader));
-		const VK_Shader *vk_frag = (dynamic_cast<const VK_Shader *>(info.fragment_shader));
+		const VK_Shader* vk_vertex = (dynamic_cast<const VK_Shader*>(info.vertex_shader));
+		const VK_Shader* vk_frag = (dynamic_cast<const VK_Shader*>(info.fragment_shader));
 		shaders.emplace_back(vk_vertex);
 		shaders.emplace_back(vk_frag);
 		VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
@@ -55,12 +58,13 @@ namespace HBE {
 
 		std::vector<VkVertexInputBindingDescription> binding_descriptions;
 		binding_descriptions.resize(info.attribute_info_count);
-		for (size_t i = 0; i < info.attribute_info_count; ++i) {
+		for (size_t i = 0; i < info.attribute_info_count; ++i)
+		{
 			binding_descriptions[i].binding = info.attribute_infos[i].location;
 			binding_descriptions[i].inputRate =
-					(info.attribute_infos[i].flags & VERTEX_ATTRIBUTE_FLAG_PER_INSTANCE) == VERTEX_ATTRIBUTE_FLAG_PER_INSTANCE ?
-					VK_VERTEX_INPUT_RATE_INSTANCE :
-					VK_VERTEX_INPUT_RATE_VERTEX;
+				(info.attribute_infos[i].flags & VERTEX_ATTRIBUTE_FLAG_PER_INSTANCE) == VERTEX_ATTRIBUTE_FLAG_PER_INSTANCE
+					? VK_VERTEX_INPUT_RATE_INSTANCE
+					: VK_VERTEX_INPUT_RATE_VERTEX;
 			binding_descriptions[i].stride = info.attribute_infos[i].size;
 		}
 		vertexInputInfo.vertexBindingDescriptionCount = binding_descriptions.size();
@@ -73,10 +77,14 @@ namespace HBE {
 		attribute_descriptions.resize(vertex_inputs.size());
 		uint32_t offset = 0;
 		uint32_t binding = 0;
-		if (!binding_descriptions.empty()) {
-			for (size_t i = 0; i < vertex_inputs.size(); ++i) {
-				for (size_t j = 0; j < binding_descriptions.size() - 1; ++j) {
-					if (binding == binding_descriptions[j].binding && offset == binding_descriptions[j].stride) {
+		if (!binding_descriptions.empty())
+		{
+			for (size_t i = 0; i < vertex_inputs.size(); ++i)
+			{
+				for (size_t j = 0; j < binding_descriptions.size() - 1; ++j)
+				{
+					if (binding == binding_descriptions[j].binding && offset == binding_descriptions[j].stride)
+					{
 						offset = 0;
 						binding = binding_descriptions[j + 1].binding;
 						break;
@@ -87,7 +95,6 @@ namespace HBE {
 				attribute_descriptions[i].offset = offset;
 				attribute_descriptions[i].binding = binding;
 				offset += vertex_inputs[i].size;
-
 			}
 			vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attribute_descriptions.size());
 			vertexInputInfo.pVertexAttributeDescriptions = attribute_descriptions.data();
@@ -97,12 +104,13 @@ namespace HBE {
 		VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
 		inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 
-		switch (info.topology) {
-			case VERTEX_TOPOLOGY_TRIANGLE:
-				inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-				break;
-			case VERTEX_TOPOLOGY_LINE:
-				inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
+		switch (info.topology)
+		{
+		case VERTEX_TOPOLOGY_TRIANGLE:
+			inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+			break;
+		case VERTEX_TOPOLOGY_LINE:
+			inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
 		}
 		inputAssembly.primitiveRestartEnable = VK_FALSE;
 		//-------------------Viewports and scissors--------------------
@@ -111,15 +119,15 @@ namespace HBE {
 		Graphics::getWindow()->getSize(width, height);
 		VkViewport viewport{};
 		viewport.x = 0.0f;
-		viewport.y = (float) height;
-		viewport.width = (float) width;
-		viewport.height = (float) -height;
+		viewport.y = (float)height;
+		viewport.width = (float)width;
+		viewport.height = (float)-height;
 		viewport.minDepth = 0.0f;
 		viewport.maxDepth = 1.0f;
 
 		VkRect2D scissor{};
 		scissor.offset = {0, 0};
-		scissor.extent = VkExtent2D{(uint32_t) width, (uint32_t) height};
+		scissor.extent = VkExtent2D{(uint32_t)width, (uint32_t)height};
 
 		VkPipelineViewportStateCreateInfo viewportState{};
 		viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -138,9 +146,11 @@ namespace HBE {
 		rasterizer.frontFace = (info.flags & RASTERIZATION_PIPELINE_FLAG_FRONT_COUNTER_CLOCKWISE) ? VK_FRONT_FACE_COUNTER_CLOCKWISE : VK_FRONT_FACE_CLOCKWISE;
 		rasterizer.cullMode = VK_CULL_MODE_NONE;
 		rasterizer.cullMode |= (info.flags & RASTERIZATION_PIPELINE_FLAG_CULL_BACK) == RASTERIZATION_PIPELINE_FLAG_CULL_BACK
-		                       ? VK_CULL_MODE_BACK_BIT : VK_CULL_MODE_NONE;
+			                       ? VK_CULL_MODE_BACK_BIT
+			                       : VK_CULL_MODE_NONE;
 		rasterizer.cullMode |= (info.flags & RASTERIZATION_PIPELINE_FLAG_CULL_FRONT) == RASTERIZATION_PIPELINE_FLAG_CULL_FRONT
-		                       ? VK_CULL_MODE_FRONT_BIT : VK_CULL_MODE_NONE;
+			                       ? VK_CULL_MODE_FRONT_BIT
+			                       : VK_CULL_MODE_NONE;
 		rasterizer.depthBiasEnable = VK_FALSE;
 		rasterizer.depthBiasConstantFactor = 0.0f; // Optional
 		rasterizer.depthBiasClamp = 0.0f; // Optional
@@ -157,8 +167,8 @@ namespace HBE {
 
 		VkPipelineColorBlendAttachmentState colorBlendAttachment{};
 		colorBlendAttachment.colorWriteMask =
-				VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
-				VK_COLOR_COMPONENT_A_BIT;
+			VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
+			VK_COLOR_COMPONENT_A_BIT;
 		colorBlendAttachment.blendEnable = VK_TRUE;
 		colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
 		colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
@@ -179,8 +189,8 @@ namespace HBE {
 		colorBlending.blendConstants[3] = 0.0f; // Optional
 
 		VkDynamicState dynamicStates[] = {
-				VK_DYNAMIC_STATE_VIEWPORT,
-				VK_DYNAMIC_STATE_SCISSOR,
+			VK_DYNAMIC_STATE_VIEWPORT,
+			VK_DYNAMIC_STATE_SCISSOR,
 		};
 
 		VkPipelineDynamicStateCreateInfo dynamicState{};
@@ -191,7 +201,7 @@ namespace HBE {
 		VkPipelineDepthStencilStateCreateInfo depthStencil{};
 		depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
 		depthStencil.depthTestEnable =
-				(info.flags & RASTERIZATION_PIPELINE_FLAG_NO_DEPTH_TEST) == RASTERIZATION_PIPELINE_FLAG_NO_DEPTH_TEST ? VK_FALSE : VK_TRUE;
+			(info.flags & RASTERIZATION_PIPELINE_FLAG_NO_DEPTH_TEST) == RASTERIZATION_PIPELINE_FLAG_NO_DEPTH_TEST ? VK_FALSE : VK_TRUE;
 		depthStencil.depthWriteEnable = VK_TRUE;
 		depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
 		depthStencil.depthBoundsTestEnable = VK_FALSE;
@@ -222,12 +232,15 @@ namespace HBE {
 
 		pipelineInfo.pDepthStencilState = &depthStencil;
 
-		if (render_pass == VK_NULL_HANDLE) {
-			const VK_RenderPass *render_pass = info.render_target == nullptr ?
-			                                   dynamic_cast<const VK_RenderPass *>(Graphics::getDefaultRenderTarget()) :
-			                                   dynamic_cast<const VK_RenderPass *>(info.render_target);
+		if (render_pass == VK_NULL_HANDLE)
+		{
+			const VK_RenderPass* render_pass = info.render_target == nullptr
+				                                   ? dynamic_cast<const VK_RenderPass*>(Graphics::getDefaultRenderTarget())
+				                                   : dynamic_cast<const VK_RenderPass*>(info.render_target);
 			pipelineInfo.renderPass = render_pass->getHandle();
-		} else {
+		}
+		else
+		{
 			pipelineInfo.renderPass = render_pass;
 		}
 		pipelineInfo.subpass = 0;
@@ -236,44 +249,55 @@ namespace HBE {
 		pipelineInfo.basePipelineIndex = -1; // Optional
 
 		if (vkCreateGraphicsPipelines(device->getHandle(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &handle) !=
-		    VK_SUCCESS) {
+			VK_SUCCESS)
+		{
 			Log::error("failed to create graphics pipeline!");
 		}
 	}
 
+	RASTERIZATION_PIPELINE_FLAGS VK_RasterizationPipeline::getFlags() const
+	{
+		return info.flags;
+	}
 
-	VK_GraphicPipeline::~VK_GraphicPipeline() {
+
+	VK_RasterizationPipeline::~VK_RasterizationPipeline()
+	{
 		if (handle != VK_NULL_HANDLE)
 			vkDestroyPipeline(device->getHandle(), handle, nullptr);
 		if (layout != nullptr)
 			delete layout;
 	}
 
-	void VK_GraphicPipeline::bind() const {
+	void VK_RasterizationPipeline::bind() const
+	{
 		if (is_bound) return;
 		vkCmdBindPipeline(renderer->getCommandPool()->getCurrentBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, handle);
 		is_bound = true;
 	}
 
-	void VK_GraphicPipeline::unbind() const {
+	void VK_RasterizationPipeline::unbind() const
+	{
 		is_bound = false;
 	}
 
-	void VK_GraphicPipeline::pushConstant(const std::string &name, const void *data) const {
+	void VK_RasterizationPipeline::pushConstant(const std::string& name, const void* data) const
+	{
 		layout->pushConstant(renderer->getCommandPool()->getCurrentBuffer(), name, data);
 	}
 
-	void VK_GraphicPipeline::createPipelineLayout() {
+	void VK_RasterizationPipeline::createPipelineLayout()
+	{
 		layout = new VK_PipelineLayout(device, shaders.data(), shaders.size(), info.flags & RASTERIZATION_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR);
 	}
 
-	bool VK_GraphicPipeline::bound() {
+	bool VK_RasterizationPipeline::bound()
+	{
 		return is_bound;
 	}
 
-	const VK_PipelineLayout *VK_GraphicPipeline::getPipelineLayout() const {
+	const VK_PipelineLayout* VK_RasterizationPipeline::getPipelineLayout() const
+	{
 		return layout;
 	}
-
-
 }

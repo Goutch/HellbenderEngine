@@ -1,4 +1,3 @@
-
 #include "VK_ComputePipeline.h"
 #include "VK_Renderer.h"
 #include "VK_Device.h"
@@ -8,11 +7,14 @@
 #include "VK_CommandPool.h"
 #include "VK_Fence.h"
 
-namespace HBE {
-	VK_ComputePipeline::VK_ComputePipeline(VK_Renderer *renderer, const ComputePipelineInfo &info) {
+namespace HBE
+{
+	VK_ComputePipeline::VK_ComputePipeline(VK_Renderer* renderer, const ComputePipelineInfo& info)
+	{
 		this->renderer = renderer;
+		this->info = info;
 		this->workgroup_size = info.compute_shader->getWorkgroupSize();
-		const VK_Shader *vk_shader = dynamic_cast<VK_Shader *>(info.compute_shader);
+		const VK_Shader* vk_shader = dynamic_cast<VK_Shader*>(info.compute_shader);
 		layout = new VK_PipelineLayout(renderer->getDevice(), &vk_shader, 1, info.flags & COMPUTE_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR);
 
 		VkPipelineShaderStageCreateInfo stage{};
@@ -26,29 +28,36 @@ namespace HBE {
 		create_info.stage = stage;
 
 		if (vkCreateComputePipelines(renderer->getDevice()->getHandle(), VK_NULL_HANDLE, 1, &create_info, nullptr,
-		                             &handle) != VK_SUCCESS) {
+		                             &handle) != VK_SUCCESS)
+		{
 			Log::error("Failed to create compute pipeline");
 		}
 	}
 
-
-	VK_ComputePipeline::~VK_ComputePipeline() {
+	VK_ComputePipeline::~VK_ComputePipeline()
+	{
 		vkDestroyPipeline(renderer->getDevice()->getHandle(), handle, nullptr);
 		delete layout;
-
 	}
 
 
-	const VK_PipelineLayout *VK_ComputePipeline::getPipelineLayout() const {
+	const VK_PipelineLayout* VK_ComputePipeline::getPipelineLayout() const
+	{
 		return layout;
 	}
 
-	VkPipeline VK_ComputePipeline::getHandle() const {
+	VkPipeline VK_ComputePipeline::getHandle() const
+	{
 		return handle;
 	}
 
-	const vec3i &VK_ComputePipeline::getWorkgroupSize() const {
+	const vec3i& VK_ComputePipeline::getWorkgroupSize() const
+	{
 		return workgroup_size;
 	}
-}
 
+	COMPUTE_PIPELINE_FLAGS VK_ComputePipeline::getFlags() const
+	{
+		return info.flags;
+	}
+}

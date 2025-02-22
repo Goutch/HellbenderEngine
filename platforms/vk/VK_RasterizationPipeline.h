@@ -19,7 +19,7 @@ namespace HBE {
 
 	class VK_PipelineLayout;
 
-	class VK_GraphicPipeline : public RasterizationPipeline {
+	class VK_RasterizationPipeline : public RasterizationPipeline {
 		VkPipeline handle = VK_NULL_HANDLE;
 		VK_PipelineLayout *layout = nullptr;
 
@@ -33,12 +33,12 @@ namespace HBE {
 		mutable bool is_bound = false;
 
 	public:
-		VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const RasterizationPipelineInfo &info, VkRenderPass render_pass);
-		VK_GraphicPipeline(VK_Device *device, VK_Renderer *renderer, const RasterizationPipelineInfo &info);
+		VK_RasterizationPipeline(VK_Device *device, VK_Renderer *renderer, const RasterizationPipelineInfo &info, VkRenderPass render_pass);
+		VK_RasterizationPipeline(VK_Device *device, VK_Renderer *renderer, const RasterizationPipelineInfo &info);
 
 		void pushConstant(const std::string &name, const void *data) const override;
 
-		~VK_GraphicPipeline() override;
+		~VK_RasterizationPipeline() override;
 
 		void bind() const override;
 
@@ -51,5 +51,7 @@ namespace HBE {
 		const VK_PipelineLayout *getPipelineLayout() const;
 
 		void createRenderPass(VK_Device *device, VK_Renderer *renderer);
+
+		RASTERIZATION_PIPELINE_FLAGS getFlags() const override;
 	};
 }

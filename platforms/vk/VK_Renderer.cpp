@@ -19,11 +19,11 @@
 #include "VK_Allocator.h"
 #include "VK_Mesh.h"
 
-#include "VK_GraphicPipeline.h"
+#include "VK_RasterizationPipeline.h"
 #include "core/graphics/Graphics.h"
 #include "core/utility/Profiler.h"
 #include "VK_PipelineDescriptors.h"
-#include "VK_GraphicPipelineInstance.h"
+#include "VK_RasterizationPipelineInstance.h"
 #include "raytracing/VK_RaytracingPipelineInstance.h"
 #include "core/graphics/RenderGraph.h"
 #include "platforms/vk/VK_ComputePipeline.h"
@@ -505,12 +505,12 @@ namespace HBE {
 		pipeline_info.vertex_shader = vert;
 		pipeline_info.fragment_shader = frag;
 		pipeline_info.attribute_info_count = 0;
-		screen_pipeline = new VK_GraphicPipeline(device, this, pipeline_info, swapchain->getRenderPass());
+		screen_pipeline = new VK_RasterizationPipeline(device, this, pipeline_info, swapchain->getRenderPass());
 		Resources::add("DEFAULT_SCREEN_PIPELINE", screen_pipeline);
 
 		RasterizationPipelineInstanceInfo screen_pipeline_instance_info{};
 		screen_pipeline_instance_info.rasterization_pipeline = screen_pipeline;
-		screen_pipeline_instance = new VK_GraphicPipelineInstance(this, screen_pipeline_instance_info);
+		screen_pipeline_instance = new VK_RasterizationPipelineInstance(this, screen_pipeline_instance_info);
 		Resources::add("DEFAULT_SCREEN_PIPELINE_INSTANCE", screen_pipeline_instance);
 	}
 

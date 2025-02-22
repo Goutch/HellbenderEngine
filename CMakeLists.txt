@@ -154,8 +154,8 @@ set(VK_FILES
         platforms/vk/VK_Swapchain.h
         platforms/vk/VK_Surface.cpp
         platforms/vk/VK_Surface.h
-        platforms/vk/VK_GraphicPipeline.cpp
-        platforms/vk/VK_GraphicPipeline.h
+        platforms/vk/VK_RasterizationPipeline.cpp
+        platforms/vk/VK_RasterizationPipeline.h
         platforms/vk/VK_Shader.cpp
         platforms/vk/VK_Shader.h
         platforms/vk/VK_ResourceFactory.cpp
@@ -188,8 +188,8 @@ set(VK_FILES
         platforms/vk/VK_PipelineLayout.h
         platforms/vk/VK_PipelineDescriptors.cpp
         platforms/vk/VK_PipelineDescriptors.h
-        platforms/vk/VK_GraphicPipelineInstance.cpp
-        platforms/vk/VK_GraphicPipelineInstance.h
+		platforms/vk/VK_RasterizationPipelineInstance.cpp
+		platforms/vk/VK_RasterizationPipelineInstance.h
         platforms/vk/VK_ComputeInstance.cpp
         platforms/vk/VK_ComputeInstance.h
         platforms/vk/raytracing/VK_TopLevelAccelerationStructure.cpp
