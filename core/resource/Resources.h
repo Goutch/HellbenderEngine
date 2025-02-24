@@ -27,7 +27,7 @@ namespace HBE {
 
 	class Model;
 
-	class RenderTarget;
+	class RasterizationTarget;
 
 	class RasterizationPipelineInstance;
 
@@ -131,9 +131,9 @@ namespace HBE {
 
 		static Image *createImage(const ImageInfo &info);
 
-		static RenderTarget *createRenderTarget(const RenderTargetInfo &info);
+		static RasterizationTarget *createRenderTarget(const RenderTargetInfo &info);
 
-		static RenderTarget *createRenderTarget(const RenderTargetInfo &info, const std::string &name);
+		static RasterizationTarget *createRenderTarget(const RenderTargetInfo &info, const std::string &name);
 
 		static RasterizationPipelineInstance *createRasterizationPipelineInstance(const RasterizationPipelineInstanceInfo &info, const std::string &name);
 

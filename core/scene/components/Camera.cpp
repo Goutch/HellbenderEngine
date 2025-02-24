@@ -8,12 +8,12 @@ namespace HBE {
 		return static_cast<float>(res.x) / static_cast<float>(res.y);
 	}
 
-	void Camera::calculateProjection(RenderTarget *render_target) {
+	void Camera::calculateProjection(RasterizationTarget *render_target) {
 		projection = glm::perspective<float>(glm::radians(fov), aspectRatio(), near, far);
 		projection[1] = -projection[1];
 	}
 
-	void Camera::setRenderTarget(RenderTarget *render_target) {
+	void Camera::setRenderTarget(RasterizationTarget *render_target) {
 		if (render_target != nullptr)
 			render_target->onResolutionChange.unsubscribe(this);
 		this->render_target = render_target;
@@ -22,7 +22,7 @@ namespace HBE {
 		calculateProjection(render_target);
 	}
 
-	RenderTarget *Camera::getRenderTarget() {
+	RasterizationTarget *Camera::getRenderTarget() {
 		return render_target;
 	}
 

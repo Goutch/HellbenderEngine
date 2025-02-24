@@ -10,7 +10,7 @@ namespace HBE {
 
 	class VK_Device;
 
-	class RenderTarget;
+	class RasterizationTarget;
 
 	class Image;
 

@@ -15,7 +15,7 @@
 #include "core/resource/Mesh.h"
 #include "core/resource/Image.h"
 #include "core/resource/Model.h"
-#include "core/resource/RenderTarget.h"
+#include "core/resource/RasterizationTarget.h"
 #include "core/resource/RasterizationPipelineInstance.h"
 #include "core/resource/ComputeInstance.h"
 #include "core/resource/StorageBuffer.h"
@@ -45,7 +45,7 @@
 #include "core/graphics/Graphics.h"
 #include "core/graphics/Window.h"
 #include "core/graphics/RenderGraph.h"
-#include "core/resource/RenderTarget.h"
+#include "core/resource/RasterizationTarget.h"
 
 #include "core/input/Input.h"
 #include "core/math/Plane.h"

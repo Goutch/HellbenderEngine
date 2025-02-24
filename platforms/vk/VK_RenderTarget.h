@@ -1,10 +1,10 @@
 
 #pragma once
 
-#include "core/resource/RenderTarget.h"
+#include "core/resource/RasterizationTarget.h"
 
 namespace HBE {
-	class VK_RenderTarget :public RenderTarget{
+	class VK_RenderTarget :public RasterizationTarget{
 
 	};
 }

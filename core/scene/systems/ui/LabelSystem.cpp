@@ -26,7 +26,7 @@ namespace HBE {
 		delete default_text_frag_shader;
 	}
 
-	LabelSystem::LabelSystem(Scene *scene, RenderTarget *render_target) : System(scene) {
+	LabelSystem::LabelSystem(Scene *scene, RasterizationTarget *render_target) : System(scene) {
 		scene->onAttach<LabelComponent>().subscribe(this, &LabelSystem::onAttachLabel);
 		scene->onDetach<LabelComponent>().subscribe(this, &LabelSystem::onDetachLabel);
 		scene->onPrepareRenderGraphOrdered.subscribe(this, &LabelSystem::drawSceneNode);
@@ -57,7 +57,7 @@ namespace HBE {
 		RasterizationPipelineInfo text_pipeline_info{};
 		text_pipeline_info.vertex_shader = default_text_vert_shader;
 		text_pipeline_info.fragment_shader = default_text_frag_shader;
-		text_pipeline_info.render_target = render_target;
+		text_pipeline_info.rasterization_target = render_target;
 		text_pipeline_info.attribute_info_count = 1;
 		text_pipeline_info.attribute_infos = &VERTEX_ATTRIBUTE_INFO_POSITION3D_UV_INTERLEAVED;
 		text_pipeline_info.flags = RASTERIZATION_PIPELINE_FLAG_NO_DEPTH_TEST;
@@ -65,7 +65,7 @@ namespace HBE {
 
 		RasterizationPipelineInstanceInfo text_pipeline_instance_info{};
 		text_pipeline_instance_info.rasterization_pipeline = default_text_pipeline;
-		text_pipeline_instance_info.flags = GRAPHIC_PIPELINE_INSTANCE_FLAG_NONE;
+		text_pipeline_instance_info.flags = RASTERIZATION_PIPELINE_INSTANCE_FLAG_NONE;
 		default_text_pipeline_instance = Resources::createRasterizationPipelineInstance(text_pipeline_instance_info);
 
 		default_text_pipeline_instance->setUniform("material", &DEFAULT_TEXT_COLOR);

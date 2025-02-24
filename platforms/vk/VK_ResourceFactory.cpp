@@ -44,7 +44,7 @@ namespace HBE {
 		return new VK_ComputePipeline(renderer, info);
 	}
 
-	RenderTarget *VK_ResourceFactory::createRenderTarget(const RenderTargetInfo &info) const {
+	RasterizationTarget *VK_ResourceFactory::createRenderTarget(const RenderTargetInfo &info) const {
 		//use dynamic rendering if the device supports it
 		if(renderer->getDevice()->getPhysicalDevice().getEnabledExtensionFlags() & EXTENSION_FLAG_DYNAMIC_RENDERING)
 		{

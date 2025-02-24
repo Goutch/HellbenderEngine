@@ -11,7 +11,7 @@ namespace HBE
 
 	class ComputeBuffer;
 
-	class RenderTarget;
+	class RasterizationTarget;
 
 	typedef uint32_t COMPUTE_PIPELINE_FLAG;
 

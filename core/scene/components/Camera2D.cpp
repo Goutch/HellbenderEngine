@@ -1,7 +1,7 @@
 #include "Camera2D.h"
 #include "glm/gtc/matrix_transform.hpp"
 namespace HBE{
-	void Camera2D::calculateProjection(RenderTarget *render_target) {
+	void Camera2D::calculateProjection(RasterizationTarget *render_target) {
 		float aspect_ratio = aspectRatio();
 		if (zoom_ratio < 0.1)
 			zoom_ratio = 0.1;
@@ -18,7 +18,7 @@ namespace HBE{
 		setRenderTarget(other.render_target);
 	}
 
-	void Camera2D::setRenderTarget(RenderTarget *render_target) {
+	void Camera2D::setRenderTarget(RasterizationTarget *render_target) {
 		if (render_target != nullptr)
 			render_target->onResolutionChange.unsubscribe(this);
 		this->render_target = render_target;
@@ -27,7 +27,7 @@ namespace HBE{
 		calculateProjection(render_target);
 	}
 
-	RenderTarget *Camera2D::getRenderTarget() {
+	RasterizationTarget *Camera2D::getRenderTarget() {
 		return render_target;
 	}
 

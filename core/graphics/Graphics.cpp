@@ -1,7 +1,7 @@
 
 #include "Graphics.h"
 #include <core/utility/Log.h>
-#include <core/resource/RenderTarget.h>
+#include <core/resource/RasterizationTarget.h>
 #include <Configs.h>
 #include <core/resource/Model.h>
 #include "Renderer.h"
@@ -38,7 +38,7 @@ namespace HBE {
 		delete window;
 	}
 
-	RenderTarget *Graphics::getDefaultRenderTarget() {
+	RasterizationTarget *Graphics::getDefaultRenderTarget() {
 		return renderer->getDefaultRenderTarget();
 	}
 

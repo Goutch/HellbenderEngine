@@ -27,7 +27,7 @@ namespace HBE
 
 	class RasterizationPipelineInstance;
 
-	class RenderTarget;
+	class RasterizationTarget;
 
 	class Image;
 

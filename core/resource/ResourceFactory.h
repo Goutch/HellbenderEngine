@@ -26,7 +26,7 @@ namespace HBE {
 
 	struct ComputePipelineInfo;
 
-	class RenderTarget;
+	class RasterizationTarget;
 
 	struct RenderTargetInfo;
 
@@ -80,7 +80,7 @@ namespace HBE {
 
 		virtual ComputePipeline *createComputePipeline(const ComputePipelineInfo &info) const = 0;
 
-		virtual RenderTarget *createRenderTarget(const RenderTargetInfo &info) const = 0;
+		virtual RasterizationTarget *createRenderTarget(const RenderTargetInfo &info) const = 0;
 
 		virtual RasterizationPipelineInstance *createRasterizationPipelineInstance(const RasterizationPipelineInstanceInfo &info) const = 0;
 

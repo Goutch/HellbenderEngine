@@ -12,7 +12,7 @@
 #include "core/resource/RasterizationPipelineInstance.h"
 
 namespace HBE {
-	ButtonSystem::ButtonSystem(Scene *scene, RenderTarget *render_target) : System(scene) {
+	ButtonSystem::ButtonSystem(Scene *scene, RasterizationTarget *render_target) : System(scene) {
 		scene->onAttach<ButtonComponent>().subscribe(this, &ButtonSystem::onAttachButton);
 		scene->onDetach<ButtonComponent>().subscribe(this, &ButtonSystem::onDettachButton);
 		Input::onMouseLeftClickDown.subscribe(this, &ButtonSystem::onLeftClick);
@@ -34,7 +34,7 @@ namespace HBE {
 		RasterizationPipelineInfo button_pipeline_info{};
 		button_pipeline_info.vertex_shader = button_vert_shader;
 		button_pipeline_info.fragment_shader = button_frag_shader;
-		button_pipeline_info.render_target = render_target;
+		button_pipeline_info.rasterization_target = render_target;
 		button_pipeline_info.attribute_info_count = 1;
 		button_pipeline_info.attribute_infos = &VERTEX_ATTRIBUTE_INFO_POSITION3D_UV_INTERLEAVED;
 		button_pipeline_info.flags = RASTERIZATION_PIPELINE_FLAG_NO_DEPTH_TEST;
@@ -43,7 +43,7 @@ namespace HBE {
 
 		RasterizationPipelineInstanceInfo button_pipeline_instance_info{};
 		button_pipeline_instance_info.rasterization_pipeline = button_pipeline;
-		button_pipeline_instance_info.flags = GRAPHIC_PIPELINE_INSTANCE_FLAG_NONE;
+		button_pipeline_instance_info.flags = RASTERIZATION_PIPELINE_INSTANCE_FLAG_NONE;
 
 
 		default_button_pipeline_instance = Resources::createRasterizationPipelineInstance(button_pipeline_instance_info);

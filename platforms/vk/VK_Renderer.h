@@ -52,8 +52,8 @@ namespace HBE {
 		std::array<FrameState, MAX_FRAMES_IN_FLIGHT> frames;
 		std::vector<VK_Fence *> images_in_flight_fences;
 
-		RenderTarget *main_render_target = nullptr;
-		RenderTarget *ui_render_target = nullptr;
+		RasterizationTarget *main_render_target = nullptr;
+		RasterizationTarget *ui_render_target = nullptr;
 		RasterizationPipeline *screen_pipeline = nullptr;
 		RasterizationPipelineInstance *screen_pipeline_instance = nullptr;
 		bool windowResized = false;
@@ -70,9 +70,9 @@ namespace HBE {
 		void waitCurrentFrame() override;
 		void waitLastFrame() override;
 
-		RenderTarget *getDefaultRenderTarget() override;
+		RasterizationTarget *getDefaultRenderTarget() override;
 
-		RenderTarget *getUIRenderTarget() override;
+		RasterizationTarget *getUIRenderTarget() override;
 
 		void beginFrame() override;
 

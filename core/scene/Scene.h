@@ -8,7 +8,7 @@
 #include "core/graphics/RenderGraph.h"
 
 #include "core/graphics/Graphics.h"
-#include "core/resource/RenderTarget.h"
+#include "core/resource/RasterizationTarget.h"
 #include "Application.h"
 
 #include "core/scene/Entity.h"
@@ -97,6 +97,8 @@ namespace HBE {
 		virtual void update(float delta_t);
 
 		virtual void draw();
+
+		virtual void present();
 
 		virtual void render();
 

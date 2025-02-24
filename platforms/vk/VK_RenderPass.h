@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/resource/RenderTarget.h>
+#include <core/resource/RasterizationTarget.h>
 #include "vulkan/vulkan.h"
 #include "vector"
 #include "VK_Image.h"
@@ -15,7 +15,7 @@ namespace HBE {
 
 	class VK_Fence;
 
-	class VK_RenderPass : public RenderTarget {
+	class VK_RenderPass : public RasterizationTarget {
 		VkRenderPass handle = VK_NULL_HANDLE;
 		uint32_t width = 0, height = 0;
 		vec4 clear_color = vec4(0.f, 0.f, 0.f, 1.f);

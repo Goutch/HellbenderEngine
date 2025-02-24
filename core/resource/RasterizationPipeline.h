@@ -14,7 +14,7 @@ namespace HBE
 
 	class MeshLayout;
 
-	class RenderTarget;
+	class RasterizationTarget;
 
 	typedef uint32_t RASTERIZATION_PIPELINE_FLAGS;
 
@@ -34,7 +34,7 @@ namespace HBE
 		const Shader* fragment_shader = nullptr;
 		const Shader* geometry_shader = nullptr;
 		const VertexAttributeInfo* attribute_infos = nullptr;
-		const RenderTarget* render_target = nullptr;
+		const RasterizationTarget* rasterization_target = nullptr;
 		uint32_t attribute_info_count = 0;
 		VERTEX_TOPOLOGY topology = VERTEX_TOPOLOGY_TRIANGLE;
 		RASTERIZATION_PIPELINE_FLAGS flags = RASTERIZATION_PIPELINE_FLAG_NONE;

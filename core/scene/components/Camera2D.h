@@ -1,7 +1,7 @@
 #pragma once
 #include "Core.h"
 #include "HBETypes.h"
-#include "core/resource/RenderTarget.h"
+#include "core/resource/RasterizationTarget.h"
 namespace HBE
 {
 	struct HB_API Camera2D {
@@ -28,17 +28,17 @@ namespace HBE
 
 		float aspectRatio();
 
-		void setRenderTarget(RenderTarget *render_target);
+		void setRenderTarget(RasterizationTarget *render_target);
 
-		RenderTarget *getRenderTarget();
+		RasterizationTarget *getRenderTarget();
 
 	private:
-		RenderTarget *render_target = nullptr;
+		RasterizationTarget *render_target = nullptr;
 		float zoom_ratio = 10.0f;
 		float near = -1000;
 		float far = 1000;
 
-		void calculateProjection(RenderTarget *render_target);
+		void calculateProjection(RasterizationTarget *render_target);
 	};
 
 }

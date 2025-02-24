@@ -5,7 +5,7 @@
 #pragma once
 #include "Core.h"
 #include "HBETypes.h"
-#include "core/resource/RenderTarget.h"
+#include "core/resource/RasterizationTarget.h"
 namespace HBE{
 	struct HB_API PixelCamera {
 			PixelCamera() {};
@@ -18,9 +18,9 @@ namespace HBE{
 
 			float aspectRatio();
 
-			void setRenderTarget(RenderTarget *render_target);
+			void setRenderTarget(RasterizationTarget *render_target);
 
-			RenderTarget *getRenderTarget();
+			RasterizationTarget *getRenderTarget();
 
 			void setNearPlane(float near);
 
@@ -31,10 +31,10 @@ namespace HBE{
 			float getFarPlane();
 
 			private:
-			RenderTarget *render_target = nullptr;
+			RasterizationTarget *render_target = nullptr;
 			float near = -1000;
 			float far = 1000;
 
-			void calculateProjection(RenderTarget *render_target);
+			void calculateProjection(RasterizationTarget *render_target);
 	};
 }

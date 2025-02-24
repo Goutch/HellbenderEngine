@@ -6,7 +6,7 @@
 
 #include "Core.h"
 #include "HBETypes.h"
-#include "core/resource/RenderTarget.h"
+#include "core/resource/RasterizationTarget.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
@@ -24,9 +24,9 @@ namespace HBE {
 		bool active = true;
 		uint32_t layer_mask = UINT32_MAX;
 
-		void setRenderTarget(RenderTarget *render_target);
+		void setRenderTarget(RasterizationTarget *render_target);
 
-		RenderTarget *getRenderTarget();
+		RasterizationTarget *getRenderTarget();
 
 		float aspectRatio();
 
@@ -43,9 +43,9 @@ namespace HBE {
 		float getFarPlane();
 
 	private:
-		RenderTarget *render_target = nullptr;
+		RasterizationTarget *render_target = nullptr;
 
-		void calculateProjection(RenderTarget *render_target);
+		void calculateProjection(RasterizationTarget *render_target);
 	};
 
 }

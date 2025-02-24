@@ -69,6 +69,10 @@ namespace HBE {
 		}
 	}
 
+	void Scene::present()
+	{
+	}
+
 	void Scene::render() {
 		if (is_active) {
 			onRender.invoke(&render_graph);
@@ -224,6 +228,7 @@ namespace HBE {
 		Application::onDraw.subscribe(this, &Scene::draw);
 		Application::onRender.subscribe(this, &Scene::render);
 		Application::onUpdate.subscribe(this, &Scene::update);
+		Application::onPresent.subscribe(this, &Scene::present);
 		Graphics::onFrameChange.subscribe(this, &Scene::onFrameChange);
 
 	}

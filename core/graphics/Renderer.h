@@ -10,7 +10,7 @@
 
 namespace HBE {
 
-	class RenderTarget;
+	class RasterizationTarget;
 
 	class Image;
 
@@ -72,7 +72,7 @@ namespace HBE {
 	};
 
 	struct RasterizeCmdInfo {
-		const RenderTarget *render_target;
+		const RasterizationTarget *render_target;
 		RenderGraph *render_graph;
 		uint32_t layer_mask;
 		mat4 view;
@@ -117,9 +117,9 @@ namespace HBE {
 
 		virtual void endFrame() = 0;
 
-		virtual RenderTarget *getDefaultRenderTarget() = 0;
+		virtual RasterizationTarget *getDefaultRenderTarget() = 0;
 
-		virtual RenderTarget *getUIRenderTarget() = 0;
+		virtual RasterizationTarget *getUIRenderTarget() = 0;
 
 		virtual const ResourceFactory *getResourceFactory() const = 0;
 

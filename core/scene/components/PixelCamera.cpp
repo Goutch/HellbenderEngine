@@ -10,7 +10,7 @@ namespace HBE{
 		setRenderTarget(other.render_target);
 	}
 
-	void PixelCamera::setRenderTarget(RenderTarget *render_target) {
+	void PixelCamera::setRenderTarget(RasterizationTarget *render_target) {
 		if (render_target != nullptr)
 			render_target->onResolutionChange.unsubscribe(this);
 		this->render_target = render_target;
@@ -20,11 +20,11 @@ namespace HBE{
 
 	}
 
-	RenderTarget *PixelCamera::getRenderTarget() {
+	RasterizationTarget *PixelCamera::getRenderTarget() {
 		return render_target;
 	}
 
-	void PixelCamera::calculateProjection(RenderTarget *render_target) {
+	void PixelCamera::calculateProjection(RasterizationTarget *render_target) {
 		projection = glm::ortho(0.0f,
 								static_cast<float>(render_target->getResolution().x),
 								static_cast<float>(render_target->getResolution().y),

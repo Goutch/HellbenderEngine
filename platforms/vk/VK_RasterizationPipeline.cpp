@@ -234,9 +234,9 @@ namespace HBE
 
 		if (render_pass == VK_NULL_HANDLE)
 		{
-			const VK_RenderPass* render_pass = info.render_target == nullptr
+			const VK_RenderPass* render_pass = info.rasterization_target == nullptr
 				                                   ? dynamic_cast<const VK_RenderPass*>(Graphics::getDefaultRenderTarget())
-				                                   : dynamic_cast<const VK_RenderPass*>(info.render_target);
+				                                   : dynamic_cast<const VK_RenderPass*>(info.rasterization_target);
 			pipelineInfo.renderPass = render_pass->getHandle();
 		}
 		else

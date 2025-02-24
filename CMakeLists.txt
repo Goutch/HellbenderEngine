@@ -51,7 +51,7 @@ set(CORE_FILES
         core/resource/RasterizationPipelineInstance.h
         core/resource/ComputeInstance.h
         core/resource/IPipelineInstance.h
-        core/resource/RenderTarget.h
+		core/resource/RasterizationTarget.h
         core/resource/raytracing/RaytracingPipeline.h
         core/resource/raytracing/RaytracingPipelineInstance.h
         core/resource/TexelBuffer.h

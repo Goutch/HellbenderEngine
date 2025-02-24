@@ -9,7 +9,7 @@
 using namespace utils;
 namespace HBE {
 
-	class RenderTarget;
+	class RasterizationTarget;
 
 	class RasterizationPipelineInstance;
 
@@ -68,7 +68,7 @@ namespace HBE {
 
 	public:
 
-		ButtonSystem(Scene *scene, RenderTarget *render_target);
+		ButtonSystem(Scene *scene, RasterizationTarget *render_target);
 
 		~ButtonSystem();
 

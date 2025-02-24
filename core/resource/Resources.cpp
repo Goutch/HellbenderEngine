@@ -6,7 +6,7 @@
 #include "core/resource/Mesh.h"
 #include "core/resource/Image.h"
 #include "core/resource/Model.h"
-#include "core/resource/RenderTarget.h"
+#include "core/resource/RasterizationTarget.h"
 #include "core/resource/RasterizationPipelineInstance.h"
 #include "core/resource/ComputeInstance.h"
 #include "core/resource/raytracing/AccelerationStructure.h"
@@ -84,11 +84,11 @@ namespace HBE {
 	}
 
 
-	RenderTarget *Resources::createRenderTarget(const RenderTargetInfo &info) {
+	RasterizationTarget *Resources::createRenderTarget(const RenderTargetInfo &info) {
 		return factory->createRenderTarget(info);
 	}
 
-	RenderTarget *Resources::createRenderTarget(const RenderTargetInfo &info, const std::string &name) {
+	RasterizationTarget *Resources::createRenderTarget(const RenderTargetInfo &info, const std::string &name) {
 		auto rt = factory->createRenderTarget(info);
 		add(name, rt);
 		return rt;

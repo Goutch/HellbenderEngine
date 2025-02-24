@@ -442,11 +442,11 @@ namespace HBE {
 		return current_frame;
 	}
 
-	RenderTarget *VK_Renderer::getUIRenderTarget() {
+	RasterizationTarget *VK_Renderer::getUIRenderTarget() {
 		return ui_render_target;
 	}
 
-	RenderTarget *VK_Renderer::getDefaultRenderTarget() {
+	RasterizationTarget *VK_Renderer::getDefaultRenderTarget() {
 		return main_render_target;
 	}
 

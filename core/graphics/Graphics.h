@@ -10,7 +10,7 @@
 namespace HBE {
 	class Renderer;
 
-	class RenderTarget;
+	class RasterizationTarget;
 
 	class RasterizationPipeline;
 
@@ -26,7 +26,7 @@ namespace HBE {
 
 	class RootAccelerationStructure;
 
-	class RenderTarget;
+	class RasterizationTarget;
 
 	class Image;
 
@@ -57,7 +57,7 @@ namespace HBE {
 
 		static void computeDispatch(ComputeDispatchCmdInfo &compute_dispatch_cmd_info);
 
-		static RenderTarget *getDefaultRenderTarget();
+		static RasterizationTarget *getDefaultRenderTarget();
 
 		static void terminate();
 

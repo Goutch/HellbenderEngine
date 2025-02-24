@@ -16,7 +16,7 @@ namespace HBE {
 
 	class Shader;
 
-	class RenderTarget;
+	class RasterizationTarget;
 
 	class RenderGraph;
 
@@ -59,7 +59,7 @@ namespace HBE {
 		RasterizationPipeline *default_text_pipeline = nullptr;
 		RasterizationPipelineInstance *default_text_pipeline_instance = nullptr;
 	public:
-		LabelSystem(Scene *scene, RenderTarget *render_target);
+		LabelSystem(Scene *scene, RasterizationTarget *render_target);
 
 		void drawSceneNode(RenderGraph *graph, SceneNode &node);
 
