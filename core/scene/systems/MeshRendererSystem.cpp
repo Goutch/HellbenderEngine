@@ -33,8 +33,7 @@ namespace HBE {
 						push_constant_info.data = &world_mat;
 						draw_cmd.push_constants_count = 1;
 						draw_cmd.push_constants = &push_constant_info;
-						mat4 world_matrix = transform.world();
-						push_constant_info.data = &world_matrix;
+						push_constant_info.data = &world_mat;
 					}
 					draw_cmd.mesh = mesh_renderer.mesh;
 					draw_cmd.pipeline_instance = mesh_renderer.pipeline_instance;
@@ -46,7 +45,6 @@ namespace HBE {
 				} else {
 					Log::warning("Mesh renderer does not have a material and/or a mesh assigned");
 				}
-
 			}
 		}
 
@@ -75,8 +73,6 @@ namespace HBE {
 				push_constant_info.data = &world_mat;
 				draw_cmd.push_constants_count = 1;
 				draw_cmd.push_constants = &push_constant_info;
-				mat4 world_matrix = transform->world();
-				push_constant_info.data = &world_matrix;
 			}
 
 
