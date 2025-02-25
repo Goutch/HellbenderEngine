@@ -22,7 +22,8 @@ namespace HBE
 		                                         info.preferred_memory_type_flags,
 		                                         info.uniform_memory_type_infos,
 		                                         info.uniform_memory_type_info_count,
-		                                         pipeline->getFlags() & COMPUTE_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR);;
+		                                         info.
+		                                         compute_pipeline->getFlags() & COMPUTE_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR);;
 
 		fence = new VK_Fence(*renderer->getDevice());
 		this->renderer = renderer;

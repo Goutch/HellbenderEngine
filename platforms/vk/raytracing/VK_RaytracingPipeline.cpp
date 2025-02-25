@@ -159,17 +159,17 @@ namespace HBE
 		raygen_shader_binding_table_buffer = new VK_Buffer(device, shaderHandleStorage.data(),
 		                                                   handleSize,
 		                                                   buffer_usage_flags,
-		                                                   ALLOC_FLAG_NONE);
+		                                                   info.preferred_shader_binding_table_memory_type_flags);
 		offset += handleSizeAligned;
 		miss_shader_binding_table_buffer = new VK_Buffer(device, shaderHandleStorage.data() + offset,
 		                                                 handleSize * info.miss_shader_count,
 		                                                 buffer_usage_flags,
-		                                                 ALLOC_FLAG_NONE);
+		                                                 info.preferred_shader_binding_table_memory_type_flags);
 		offset += handleSizeAligned * info.miss_shader_count;
 		hit_shader_binding_table_buffer = new VK_Buffer(device, shaderHandleStorage.data() + offset,
 		                                                handleSize * info.shader_group_count,
 		                                                buffer_usage_flags,
-		                                                ALLOC_FLAG_NONE);
+		                                                info.preferred_shader_binding_table_memory_type_flags);
 
 		raygen_shader_binding_table_address.deviceAddress = raygen_shader_binding_table_buffer->getDeviceAddress().deviceAddress;
 		raygen_shader_binding_table_address.stride = handleSizeAligned;

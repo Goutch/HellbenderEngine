@@ -7,6 +7,7 @@
 #include "string"
 #include "queue"
 #include "core/resource/Image.h"
+#include "core/graphics/Allocator.h"
 
 namespace HBE
 {
@@ -24,20 +25,13 @@ namespace HBE
 
 	struct Block;
 
-	typedef uint32_t ALLOC_FLAGS;
-
-	enum ALLOC_FLAG
-	{
-		ALLOC_FLAG_NONE = 0,
-		ALLOC_FLAG_MAPPABLE = 1,
-	};
 
 	struct Allocation
 	{
 		VkDeviceSize size = 0;
 		VkDeviceSize offset = 0;
 		Block* block;
-		ALLOC_FLAGS flags = ALLOC_FLAG_NONE;
+		MEMORY_TYPE_FLAGS flags = MEMORY_TYPE_FLAG_NONE;
 		uint32_t id = 0;
 		uint32_t heap_index = 0;
 
@@ -58,7 +52,7 @@ namespace HBE
 		Allocation(VkDeviceSize size,
 		           VkDeviceSize offset,
 		           Block* block,
-		           ALLOC_FLAGS flags,
+		           MEMORY_TYPE_FLAGS flags,
 		           uint32_t id,
 		           uint32_t heap_index) :
 			size(size),
@@ -102,7 +96,6 @@ namespace HBE
 		VK_CommandPool* command_pool;
 		VK_Device* device;
 
-		//todo: change to heaps
 		struct MemoryHeapInfo
 		{
 			VkDeviceSize max_size;
@@ -137,7 +130,7 @@ namespace HBE
 
 		~VK_Allocator();
 
-		virtual Allocation alloc(VkMemoryRequirements memory_requirement, ALLOC_FLAGS flags = ALLOC_FLAG_NONE);
+		virtual Allocation alloc(VkMemoryRequirements memory_requirement, MEMORY_TYPE_FLAGS flags = MEMORY_TYPE_FLAG_NONE);
 
 		void free(const Allocation& allocation);
 
@@ -159,14 +152,14 @@ namespace HBE
 		void freeStagingBuffers(uint32_t frame);
 
 		void cmdBarrierTransitionImageLayout(VK_CommandPool* command_pool, VK_Image* image,
-		                                            VkImageLayout new_layout);
+		                                     VkImageLayout new_layout);
 
 		VK_Fence* blitImage(VK_Image& src, VK_Image& dest);
 
 		void destroyStagingAllocation(const StagingAllocation& allocation);
 
 	private:
-		uint32_t findMemoryTypeIndex(VkMemoryRequirements memory_requirement, ALLOC_FLAGS flags);
+		uint32_t findMemoryTypeIndex(VkMemoryRequirements memory_requirement, MEMORY_TYPE_FLAGS flags);
 
 		std::string memoryTypeToString(const uint32_t mem_type);
 

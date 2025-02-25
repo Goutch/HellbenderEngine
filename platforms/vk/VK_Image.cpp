@@ -236,7 +236,7 @@ namespace HBE {
 #endif
 		VkMemoryRequirements requirements;
 		vkGetImageMemoryRequirements(device->getHandle(), handle, &requirements);
-		this->allocation = device->getAllocator()->alloc(requirements, ALLOC_FLAG_NONE);
+		this->allocation = device->getAllocator()->alloc(requirements, MEMORY_TYPE_FLAG_NONE);
 		vkBindImageMemory(device->getHandle(), handle, allocation.block->memory, allocation.offset);
 
 		if (info.data != nullptr) {

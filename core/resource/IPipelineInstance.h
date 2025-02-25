@@ -12,20 +12,11 @@ namespace HBE
 
 	class TexelBuffer;
 
-	enum MEMORY_TYPE_FLAG
-	{
-		MEMORY_TYPE_FLAG_NONE = 0,
-		MEMORY_TYPE_FLAG_GPU_LOCAL = 1 << 0,
-		MEMORY_TYPE_FLAG_MAPPABLE = 1 << 1,
-	};
-
-	typedef uint32_t MEMORY_TYPE_FLAGS;
 
 	struct UniformMemoryInfo
 	{
 		std::string name;
 		uint32_t binding = 0; //used if name is empty or not found
-		bool use_per_frame_buffer = true;
 		MEMORY_TYPE_FLAGS preferred_memory_type = MEMORY_TYPE_FLAG_GPU_LOCAL;
 	};
 

@@ -9,15 +9,10 @@
 namespace HBE {
 
 	VK_StorageBuffer::VK_StorageBuffer(VK_Device *device, const StorageBufferInfo &info) {
-
-		ALLOC_FLAGS flags = ALLOC_FLAG_NONE;
-		if ((info.flags & STORAGE_BUFFER_FLAG_MAPPABLE) != 0) {
-			flags |= ALLOC_FLAG_MAPPABLE;
-		}
 		count = info.count;
 		stride = info.stride;
 		size = stride * count;
-		buffer = new VK_Buffer(device, static_cast<VkDeviceSize>(size), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, flags);
+		buffer = new VK_Buffer(device, static_cast<VkDeviceSize>(size), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, info.preferred_memory_type_flags);
 	}
 
 	VK_StorageBuffer::~VK_StorageBuffer() {

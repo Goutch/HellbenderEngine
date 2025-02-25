@@ -50,7 +50,7 @@ namespace HBE {
 		buffer = new VK_Buffer(device,
 							   accelerationStructureBuildSizesInfo.accelerationStructureSize,
 							   VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
-							   ALLOC_FLAG_NONE);
+							   info.preferred_memory_type_flags);
 
 
 		VkAccelerationStructureCreateInfoKHR accelerationStructureCreateInfo{};
@@ -64,7 +64,7 @@ namespace HBE {
 		VK_Buffer scratchBuffer = VK_Buffer(device,
 											accelerationStructureBuildSizesInfo.buildScratchSize,
 											VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
-											ALLOC_FLAG_NONE);
+											MEMORY_TYPE_FLAG_MAPPABLE);
 
 
 		VkAccelerationStructureBuildGeometryInfoKHR accelerationBuildGeometryInfo{};

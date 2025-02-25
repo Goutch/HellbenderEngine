@@ -12,7 +12,6 @@ namespace HBE
 	enum COMPUTE_INSTANCE_FLAG
 	{
 		COMPUTE_INSTANCE_FLAG_NONE = 0,
-		GRAPHIC_INSTANCE_FLAG_EMPTY_DESCRIPTOR_ALLOWED = 1,
 	};
 
 	struct ComputeInstanceInfo
@@ -22,6 +21,7 @@ namespace HBE
 		MEMORY_TYPE_FLAGS preferred_memory_type_flags = MEMORY_TYPE_FLAG_GPU_LOCAL;
 		UniformMemoryInfo* uniform_memory_type_infos; //optional, specify memory type for specific uniform buffers
 		uint32_t uniform_memory_type_info_count = 0;
+		bool use_per_frame_uniform_buffers = true;
 	};
 
 	class HB_API ComputeInstance : public IPipelineInstance

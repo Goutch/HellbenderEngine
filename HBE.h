@@ -7,6 +7,7 @@
 #include "Core.h"
 #include "HBETypes.h"
 
+
 #include "core/resource/Resources.h"
 #include "core/resource/Shader.h"
 #include "core/resource/RasterizationPipeline.h"
@@ -46,6 +47,7 @@
 #include "core/graphics/Window.h"
 #include "core/graphics/RenderGraph.h"
 #include "core/resource/RasterizationTarget.h"
+#include "core/graphics/Allocator.h"
 
 #include "core/input/Input.h"
 #include "core/math/Plane.h"

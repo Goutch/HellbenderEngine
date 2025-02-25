@@ -212,7 +212,8 @@ set(VK_FILES
         platforms/vk/VK_RenderTarget.cpp
         platforms/vk/VK_RenderTarget.h
         platforms/vk/VK_DynamicRenderTarget.cpp
-        platforms/vk/VK_DynamicRenderTarget.h)
+        platforms/vk/VK_DynamicRenderTarget.h
+        core/graphics/Allocator.h)
 
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")

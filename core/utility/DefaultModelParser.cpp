@@ -91,7 +91,6 @@ namespace HBE {
 		instance_info.rasterization_pipeline = materialData.double_sided
 		                                 ? parser_info.graphic_pipeline_2_sided
 		                                 : parser_info.graphic_pipeline;
-		instance_info.flags = RASTERIZATION_PIPELINE_INSTANCE_FLAG_EMPTY_DESCRIPTOR_ALLOWED;
 
 		RasterizationPipelineInstance *instance_ptr = Resources::createRasterizationPipelineInstance(instance_info);
 

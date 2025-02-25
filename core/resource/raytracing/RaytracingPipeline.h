@@ -38,6 +38,7 @@ namespace HBE
 		uint32_t max_recursion_depth = 1;
 
 		RAYTRACING_PIPELINE_FLAGS flags = RAYTRACING_PIPELINE_FLAG_NONE;
+		MEMORY_TYPE_FLAGS preferred_shader_binding_table_memory_type_flags = MEMORY_TYPE_FLAG_GPU_LOCAL;
 	};
 
 	class HB_API RaytracingPipeline : public Resource

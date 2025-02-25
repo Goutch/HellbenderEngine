@@ -32,6 +32,16 @@ namespace HBE
 		const std::vector<VkDeviceSize> descriptor_sizes = pipeline_layout->getDescriptorSizes();
 		const std::vector<VkDescriptorSetLayoutBinding> descriptor_bindings = pipeline_layout->getDescriptorBindings();
 
+		std::unordered_map<uint32_t, UniformMemoryInfo> binding_memory_type_map;
+		for (uint32_t i = 0; i < uniform_memory_type_info_count; ++i)
+		{
+			if (uniform_memory_type_infos[i].name != "")
+			{
+				uniform_memory_type_infos[i].binding = pipeline_layout->getDescriptorBinding(uniform_memory_type_infos[i].name);
+			}
+			binding_memory_type_map.emplace(uniform_memory_type_infos[i].binding, uniform_memory_type_infos[i]);
+		}
+
 		for (uint32_t frame = 0; frame < MAX_FRAMES_IN_FLIGHT; ++frame)
 		{
 			uniform_buffers[frame].resize(descriptor_bindings.size(), nullptr);
@@ -39,11 +49,21 @@ namespace HBE
 			{
 				if (descriptor_bindings[binding].descriptorType != VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
 					continue;
+				MEMORY_TYPE_FLAGS alloc_flags;
+				auto binding_memory_type_it = binding_memory_type_map.find(binding);
+				if (binding_memory_type_it != binding_memory_type_map.end())
+				{
+					alloc_flags = binding_memory_type_it->second.preferred_memory_type;
+				}
+				else
+				{
+					alloc_flags = preferred_memory_type_flags;
+				}
 
 				uniform_buffers[frame][binding] = new VK_Buffer(device,
 				                                                descriptor_sizes[binding],
 				                                                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-				                                                ALLOC_FLAG_NONE);
+				                                                alloc_flags);
 			}
 		}
 		createDescriptorPool(descriptor_pool);

@@ -65,7 +65,6 @@ namespace HBE
 		mutable bool bound = false;
 
 	public:
-
 		VK_PipelineDescriptors(VK_Renderer* renderer,
 		                       const VK_PipelineLayout& layout,
 		                       MEMORY_TYPE_FLAGS preferred_memory_type_flags,
