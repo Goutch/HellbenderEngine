@@ -36,7 +36,7 @@ namespace HBE
 		const VertexAttributeInfo* attribute_infos = nullptr;
 		const RasterizationTarget* rasterization_target = nullptr;
 		uint32_t attribute_info_count = 0;
-		VERTEX_TOPOLOGY topology = VERTEX_TOPOLOGY_TRIANGLE;
+		VERTEX_TOPOLOGY topology = VERTEX_TOPOLOGY_TRIANGLE_LIST;
 		RASTERIZATION_PIPELINE_FLAGS flags = RASTERIZATION_PIPELINE_FLAG_NONE;
 	};
 

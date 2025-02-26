@@ -18,10 +18,20 @@ namespace HBE {
 		MESH_FLAG_GENERATE_ATTRIBUTE_STORAGE_BUFFER = 1 << 1,
 	};
 
+	enum MESH_TOPOLOGY {
+		MESH_TOPOLOGY_TRIANGLE_LIST,
+		MESH_TOPOLOGY_TRIANGLE_STRIP,
+		MESH_TOPOLOGY_TRIANGLE_FAN,
+		MESH_TOPOLOGY_LINE_LIST,
+		MESH_TOPOLOGY_LINE_STRIP,
+		MESH_TOPOLOGY_POINT_LIST,
+	};
+
 	struct MeshInfo {
 		const VertexAttributeInfo *attribute_infos = nullptr;
 		size_t attribute_info_count = 0;
 		MESH_FLAGS flags = MESH_FLAG_NONE;
+		MESH_TOPOLOGY topology = MESH_TOPOLOGY_TRIANGLE_LIST;
 	};
 
 	class HB_API Mesh : public Resource {

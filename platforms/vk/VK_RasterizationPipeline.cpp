@@ -103,15 +103,7 @@ namespace HBE
 
 		VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
 		inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-
-		switch (info.topology)
-		{
-		case VERTEX_TOPOLOGY_TRIANGLE:
-			inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-			break;
-		case VERTEX_TOPOLOGY_LINE:
-			inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
-		}
+		inputAssembly.topology = static_cast<VkPrimitiveTopology>(info.topology);
 		inputAssembly.primitiveRestartEnable = VK_FALSE;
 		//-------------------Viewports and scissors--------------------
 
