@@ -31,7 +31,6 @@ namespace HBE {
 		const VertexAttributeInfo *attribute_infos = nullptr;
 		size_t attribute_info_count = 0;
 		MESH_FLAGS flags = MESH_FLAG_NONE;
-		MESH_TOPOLOGY topology = MESH_TOPOLOGY_TRIANGLE_LIST;
 	};
 
 	class HB_API Mesh : public Resource {

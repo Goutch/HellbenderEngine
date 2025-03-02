@@ -2,7 +2,6 @@
 
 #include "Core.h"
 #include "core/resource/Mesh.h"
-
 namespace HBE {
 	typedef uint32_t VERTEX_FLAGS;
 	enum VERTEX_FLAG {
@@ -19,6 +18,7 @@ namespace HBE {
 		static void createQuad(Mesh &mesh, float size_x, float size_y, VERTEX_FLAGS flags, PIVOT pivot = PIVOT_CENTER);
 
 		static void createCube(Mesh &mesh, float size_x, float size_y, float size_z, VERTEX_FLAGS flags);
+		static void createRoundedRectTriangleFan(Mesh& mesh, float size_x, float size_y, float radius, uint32_t subdivision_count, VERTEX_FLAGS flags, PIVOT pivot);
 
 		static Mesh* createText(
 							   const std::string &text,
