@@ -272,30 +272,36 @@ namespace HBE
 
 	void Geometry::createRoundedRectTriangleFan(Mesh& mesh, float size_x, float size_y, float radius, uint32_t subdivision_count, VERTEX_FLAGS flags, PIVOT pivot)
 	{
+		uint32_t points_per_corner = subdivision_count + 1;
 		vec2 pivot_offset = getPivotOffset(pivot) * vec2(size_x, size_y);
 		std::vector<vec2> positions;
-		std::vector<vec2> uvs;
-		std::vector<vec3> normals;
 		float angle_step = (0.5f * M_PI) / subdivision_count;
 		vec2 min(-size_x / 2.0f, -size_y / 2.0f);
 		vec2 max(size_x / 2.0f, size_y / 2.0f);
 		vec2 centers[4] = {
-			vec2(max.x - radius, min.y + radius),
-			vec2(min.x + radius, min.y + radius),
-			vec2(min.x + radius, max.y - radius),
 			vec2(max.x - radius, max.y - radius),
+			vec2(min.x + radius, max.y - radius),
+			vec2(min.x + radius, min.y + radius),
+			vec2(max.x - radius, min.y + radius),
 		};
-		positions.push_back(pivot_offset);
-		positions.reserve(subdivision_count * 4);
-		for (int i = 0; i < subdivision_count * 4; i++)
+
+		positions.reserve(2+ ((subdivision_count + 1) * 4));
+		float angle = 0.0f;
+		for (int center_index = 0; center_index < 4; center_index++)
 		{
-			uint32_t center_index = floor(i / static_cast<float>(subdivision_count));
-			float angle = angle_step * i;
-			vec2 point = radius * vec2(cos(angle), sin(angle));
-			point += centers[center_index];
-			point += pivot_offset;
-			positions.emplace_back(point);
+			positions.push_back(pivot_offset +
+				centers[center_index] +
+				(vec2(cos(angle), sin(angle)) * radius));
+			for (int i = 0; i < subdivision_count; i++)
+			{
+				angle += angle_step;
+				vec2 point = radius * vec2(cos(angle), sin(angle));
+				point += centers[center_index];
+				point += pivot_offset;
+				positions.emplace_back(point);
+			}
 		}
+
 		mesh.setBuffer(0, positions.data(), positions.size());
 	}
 
