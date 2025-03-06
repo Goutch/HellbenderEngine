@@ -270,11 +270,10 @@ namespace HBE
 		mesh.setVertexIndices(indices.data(), indices.size());
 	}
 
-	void Geometry::createRoundedRectTriangleFan(Mesh& mesh, float size_x, float size_y, float radius, uint32_t subdivision_count, VERTEX_FLAGS flags, PIVOT pivot)
+	void Geometry::getRoundedRectanglePoints(std::vector<vec2>& points, float size_x, float size_y, float radius, uint32_t subdivision_count, VERTEX_FLAGS flags, PIVOT pivot)
 	{
-		uint32_t points_per_corner = subdivision_count + 1;
 		vec2 pivot_offset = getPivotOffset(pivot) * vec2(size_x, size_y);
-		std::vector<vec2> positions;
+
 		float angle_step = (0.5f * M_PI) / subdivision_count;
 		vec2 min(-size_x / 2.0f, -size_y / 2.0f);
 		vec2 max(size_x / 2.0f, size_y / 2.0f);
@@ -285,11 +284,11 @@ namespace HBE
 			vec2(max.x - radius, min.y + radius),
 		};
 
-		positions.reserve(2+ ((subdivision_count + 1) * 4));
+		points.reserve(1 + ((subdivision_count + 1) * 4));
 		float angle = 0.0f;
 		for (int center_index = 0; center_index < 4; center_index++)
 		{
-			positions.push_back(pivot_offset +
+			points.push_back(pivot_offset +
 				centers[center_index] +
 				(vec2(cos(angle), sin(angle)) * radius));
 			for (int i = 0; i < subdivision_count; i++)
@@ -298,11 +297,37 @@ namespace HBE
 				vec2 point = radius * vec2(cos(angle), sin(angle));
 				point += centers[center_index];
 				point += pivot_offset;
-				positions.emplace_back(point);
+				points.emplace_back(point);
 			}
 		}
+	}
 
+	void Geometry::createRoundedRectTriangleFan(Mesh& mesh, float size_x, float size_y, float radius, uint32_t subdivision_count, VERTEX_FLAGS flags, PIVOT pivot)
+	{
+		std::vector<vec2> positions;
+		getRoundedRectanglePoints(positions, size_x, size_y, radius, subdivision_count, flags, pivot);
 		mesh.setBuffer(0, positions.data(), positions.size());
+	}
+
+	void Geometry::createRoundedRectOutlineTriangleStrip(Mesh& mesh, float size_x, float size_y, float radius, float width, uint32_t subdivision_count, VERTEX_FLAGS flags,
+	                                                     PIVOT pivot)
+	{
+		float half_width = width / 2.0f;
+		std::vector<vec2> inner_positions;
+		std::vector<vec2> outer_positions;
+		getRoundedRectanglePoints(outer_positions, size_x, size_y, radius, subdivision_count, flags, pivot);
+		getRoundedRectanglePoints(inner_positions, size_x - width, size_y - width, radius - half_width, subdivision_count, flags, pivot);
+
+		std::vector<vec2> vertex_positions;
+		for (int i = 0; i < inner_positions.size(); i++)
+		{
+			vertex_positions.push_back(inner_positions[i]);
+			vertex_positions.push_back(outer_positions[i]);
+		}
+		vertex_positions.push_back(inner_positions[0]);
+		vertex_positions.push_back(outer_positions[0]);
+
+		mesh.setBuffer(0, vertex_positions.data(), vertex_positions.size());
 	}
 
 
@@ -469,6 +494,7 @@ namespace HBE
 		mesh.setVertexIndices(index_buffer.data(), index_buffer.size());
 		//}
 	}
+
 
 	Mesh* Geometry::createText(const std::string& text,
 	                           Font& font,
