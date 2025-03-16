@@ -1,27 +1,37 @@
-
 #pragma once
 
 #include "Core.h"
+#include "core/scene/Entity.h"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/gtc/quaternion.hpp"
 #include "glm/glm.hpp"
+#include "Event.h"
 
 using namespace glm;
-namespace HBE {
-	struct HB_API Transform {
+using namespace utils;
+
+namespace HBE
+{
+	struct HB_API Transform
+	{
+		friend class TransformSystem;
 		friend class Scene;
+		friend class HierarchySystem;
+
 	private:
-		Transform *parent = nullptr;
+		Entity entity;
 		mat4 world_mat = mat4(1.0f);
 		mat4 local_mat = mat4(1.0f);
-	public:
 		bool is_dirty = false;
+	public:
 
-		const mat4 &local() const;
+		const mat4& local() const;
 
-		void setLocal(const mat4 &local);
+		void setDirty();
 
-		const mat4 &world();
+		void setLocal(const mat4& local);
+
+		const mat4& world();
 
 		void translate(vec3 translation);
 

@@ -1,17 +1,27 @@
 #pragma once
 
+#include <core/resource/raytracing/AccelerationStructure.h>
+#include <core/resource/raytracing/AccelerationStructure.h>
+
 #include "Core.h"
 #include "HBETypes.h"
+#include "core/scene/Entity.h"
 
-namespace HBE {
-	struct HB_API Transform2D {
+namespace HBE
+{
+	struct HB_API Transform2D
+	{
 	private:
-		mat3 local = mat3(1.0f);
-		Transform2D *parent = nullptr;
-	public:
-		mat3 world() const;
+		Entity entity;
+		mat3 local_mat = mat3(1.0f);
+		mat3 world_mat = mat3(1.0f);
+		bool is_dirty = true;
 
-		vec2 worldPosition() const;
+	public:
+		void setDirty();
+		mat3& world();
+
+		vec2 worldPosition();
 
 		void translate(vec2 translation);
 
@@ -25,12 +35,10 @@ namespace HBE {
 
 		void setRotaton(float rotation);
 
-		float worldRotation() const;
+		float worldRotation();
 
 		void setScale(vec2 s);
 
 		vec2 scale() const;
 	};
-
-
 }

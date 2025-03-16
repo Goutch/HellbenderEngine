@@ -30,7 +30,6 @@
 #include "core/scene/Entity.h"
 #include "core/scene/Scene.h"
 #include "core/scene/System.h"
-#include "core/scene/components/EntityState.h"
 #include "core/scene/components/ModelRenderer.h"
 #include "core/scene/components/Camera.h"
 #include "core/scene/components/Camera2D.h"

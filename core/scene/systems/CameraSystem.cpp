@@ -4,7 +4,7 @@
 #include "core/scene/components/Camera.h"
 #include "core/scene/components/Camera2D.h"
 #include "core/scene/components/PixelCamera.h"
-#include "core/scene/components/EntityState.h"
+#include "core/scene/components/HierachyNode.h"
 
 namespace HBE {
 	CameraSystem::CameraSystem(Scene *scene) : System(scene) {
@@ -48,14 +48,14 @@ namespace HBE {
 	void CameraSystem::render(RenderGraph *render_graph) {
 		HB_PROFILE_BEGIN("CameraRender");
 		HB_PROFILE_BEGIN("CameraRenderGroup");
-		auto group = scene->group<EntityState, Transform, Camera>();
-		auto group_2D = scene->group<EntityState, Transform, Camera2D>();
-		auto group_pixel = scene->group<EntityState, Transform, PixelCamera>();
+		auto group = scene->group<HierarchyNode, Transform, Camera>();
+		auto group_2D = scene->group<HierarchyNode, Transform, Camera2D>();
+		auto group_pixel = scene->group<HierarchyNode, Transform, PixelCamera>();
 		RasterizeCmdInfo render_cmd_info{};
 		render_cmd_info.render_graph = render_graph;
 		HB_PROFILE_END("CameraRenderGroup");
-		for (auto [handle, state, transform, camera]: group) {
-			if (state.state == ENTITY_STATE_INACTIVE) {
+		for (auto [handle, node, transform, camera]: group) {
+			if (!node.isActiveInHierarchy()) {
 				continue;
 			}
 			if (camera.active) {
@@ -66,8 +66,8 @@ namespace HBE {
 				Graphics::rasterize(render_cmd_info);
 			}
 		}
-		for (auto [handle, state, transform, camera]: group_2D) {
-			if (state.state == ENTITY_STATE_INACTIVE) {
+		for (auto [handle, node, transform, camera]: group_2D) {
+			if (!node.isActiveInHierarchy()) {
 				continue;
 			}
 			if (camera.active) {
@@ -78,8 +78,8 @@ namespace HBE {
 				Graphics::rasterize(render_cmd_info);
 			}
 		}
-		for (auto [handle, state, transform, camera]: group_pixel) {
-			if (state.state == ENTITY_STATE_INACTIVE) {
+		for (auto [handle, node, transform, camera]: group_pixel) {
+			if (!node.isActiveInHierarchy()) {
 				continue;
 			}
 			if (camera.active) {

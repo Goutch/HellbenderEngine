@@ -9,8 +9,6 @@
 #include "core/resource/Resources.h"
 
 namespace HBE {
-	const Mesh *Graphics::DEFAULT_CUBE = nullptr;
-	const Mesh *Graphics::DEFAULT_QUAD = nullptr;
 	Event<uint32_t> Graphics::onFrameChange;
 	Event<uint32_t, uint32_t> Graphics::onSwapchainResized;
 	Renderer *Graphics::renderer = nullptr;
@@ -32,8 +30,6 @@ namespace HBE {
 	}
 
 	void Graphics::terminate() {
-		delete DEFAULT_QUAD;
-		delete DEFAULT_CUBE;
 		delete renderer;
 		delete window;
 	}

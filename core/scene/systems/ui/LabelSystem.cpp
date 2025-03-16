@@ -1,4 +1,3 @@
-
 #include "LabelSystem.h"
 #include "core/scene/systems/MeshRendererSystem.h"
 #include "core/resource/Shader.h"
@@ -7,18 +6,23 @@
 #include "core/resource/RasterizationPipelineInstance.h"
 #include "core/scene/components/Transform.h"
 #include "core/scene/Scene.h"
+#include "core/scene/components/HierachyNode.h"
 #include "core/utility/Geometry.h"
 
-namespace HBE {
-	void LabelSystem::onAttachLabel(Entity label) {
-		LabelComponent *label_component = label.get<LabelComponent>();
+namespace HBE
+{
+	void TextSystem::onAttachLabel(Entity text_entity)
+	{
+		TextComponent* text_component = text_entity.get<TextComponent>();
 
-		label_component->pipeline_instance = default_text_pipeline_instance;
-		label_component->font = default_font;
-		label_component->height = 40;
+		text_component->pipeline_instance = default_text_pipeline_instance;
+		text_component->font = default_font;
+		text_component->height = 40;
+
 	}
 
-	LabelSystem::~LabelSystem() {
+	TextSystem::~TextSystem()
+	{
 		delete default_font;
 		delete default_text_pipeline_instance;
 		delete default_text_pipeline;
@@ -26,11 +30,10 @@ namespace HBE {
 		delete default_text_frag_shader;
 	}
 
-	LabelSystem::LabelSystem(Scene *scene, RasterizationTarget *render_target) : System(scene) {
-		scene->onAttach<LabelComponent>().subscribe(this, &LabelSystem::onAttachLabel);
-		scene->onDetach<LabelComponent>().subscribe(this, &LabelSystem::onDetachLabel);
-		scene->onPrepareRenderGraphOrdered.subscribe(this, &LabelSystem::drawSceneNode);
-
+	TextSystem::TextSystem(Scene* scene, RasterizationTarget* render_target) : System(scene)
+	{
+		scene->onAttach<TextComponent>().subscribe(this, &TextSystem::onAttachLabel);
+		scene->onDetach<TextComponent>().subscribe(this, &TextSystem::onDetachLabel);
 		std::string characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{};':\",./<>?\\|`~";
 		FontInfo font_info{};
 		font_info.path = "fonts/Roboto-Regular.ttf";
@@ -72,24 +75,40 @@ namespace HBE {
 		default_text_pipeline_instance->setImage("mtsdf", default_font->getTextureAtlas());
 	}
 
-	void LabelSystem::drawSceneNode(RenderGraph *graph, SceneNode &node) {
-		if (node.entity.has<LabelComponent>()) {
-			LabelComponent *label_component = node.entity.get<LabelComponent>();
+	void TextSystem::onDetachLabel(Entity label)
+	{
+		TextComponent* label_component = label.get<TextComponent>();
+		if (label_component->mesh != nullptr)
+		{
+			Graphics::waitLastFrame();
+			delete label_component->mesh;
+			label_component->mesh = nullptr;
+		}
+	}
 
-			if (!label_component->active ||
-			    label_component->mesh == nullptr ||
-			    label_component->pipeline_instance == nullptr) {
-				return;
+	void TextSystem::onPrepareRenderGraph(RenderGraph* render_graph)
+	{
+		HB_PROFILE_BEGIN("TextComponentDraw");
+		auto group = scene->group<HierarchyNode, HierarchyNode, Transform, TextComponent>();
+
+		for (auto [handle,node, state, transform, text_component] : group)
+		{
+			if (!text_component.active ||
+				text_component.mesh == nullptr ||
+				text_component.pipeline_instance == nullptr ||
+				node.isActiveInHierarchy())
+			{
+				continue;
 			}
-			HB_ASSERT(label_component->pipeline_instance != nullptr, "graphic pipeline instance is not set");
-			Transform *transform = node.entity.get<Transform>();
+			HB_ASSERT(text_component.pipeline_instance != nullptr, "graphic pipeline instance is not set");
+
 			DrawCmdInfo cmd{};
-			cmd.mesh = label_component->mesh;
-			cmd.pipeline_instance = label_component->pipeline_instance;
-			cmd.order_in_layer = node.getHierarchyOrder();
+			cmd.mesh = text_component.mesh;
+			cmd.pipeline_instance = text_component.pipeline_instance;
+			cmd.order_in_layer = node.getGlobalIndex();
 			LabelPushConstant push_constant{};
-			push_constant.text_height = label_component->height;
-			push_constant.world_matrix = transform->world();
+			push_constant.text_height = text_component.height;
+			push_constant.world_matrix = transform.world();
 
 			PushConstantInfo push_constant_info{};
 			push_constant_info.name = "constants";
@@ -98,31 +117,26 @@ namespace HBE {
 			cmd.push_constants = &push_constant_info;
 			cmd.push_constants_count = 1;
 			cmd.flags = DRAW_CMD_FLAG_ORDERED;
-			cmd.layer = label_component->layer;
+			cmd.layer = text_component.layer;
 
-			graph->add(cmd);
+			render_graph->add(cmd);
 		}
+		HB_PROFILE_END("TextComponentDraw");
 	}
 
-	void LabelSystem::onDetachLabel(Entity label) {
-		LabelComponent *label_component = label.get<LabelComponent>();
-		if (label_component->mesh != nullptr) {
-			Graphics::waitLastFrame();
-			delete label_component->mesh;
-			label_component->mesh = nullptr;
-		}
-	}
-
-	void LabelComponent::setText(const std::string &text) {
+	void TextComponent::setText(const std::string& text)
+	{
 		this->text = text;
 		HB_ASSERT(font != nullptr, "Font is not set");
-		if (text.length() == 0 && mesh != nullptr) {
+		if (text.length() == 0 && mesh != nullptr)
+		{
 			Graphics::waitLastFrame();
 			delete mesh;
 			mesh = nullptr;
 			return;
 		}
-		if (mesh != nullptr) {
+		if (mesh != nullptr)
+		{
 			Geometry::updateText(*mesh,
 			                     text,
 			                     *font,
@@ -132,7 +146,9 @@ namespace HBE {
 			                     anchor,
 			                     size.x,
 			                     size.y);
-		} else {
+		}
+		else
+		{
 			mesh = Geometry::createText(text,
 			                            *font,
 			                            1.0f,
@@ -144,14 +160,13 @@ namespace HBE {
 		}
 	}
 
-	const std::string &LabelComponent::getText() const {
+	const std::string& TextComponent::getText() const
+	{
 		return text;
 	}
 
-	vec2 LabelComponent::getSize() const {
+	vec2 TextComponent::getSize() const
+	{
 		return size;
 	}
-
-
 }
-

@@ -48,8 +48,6 @@ namespace HBE {
 
 		entity_handle getHandle() const;
 
-		Entity getParent() const;
-
 		int operator==(const Entity &other) const;
 
 

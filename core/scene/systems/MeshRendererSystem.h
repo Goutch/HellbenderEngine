@@ -14,7 +14,7 @@ namespace HBE {
 
 	class RenderGraph;
 
-	class SceneNode;
+	class HierarchyNode;
 
 	struct HB_API MeshRenderer {
 		Mesh *mesh = nullptr;
@@ -32,10 +32,7 @@ namespace HBE {
 
 		~MeshRendererSystem();
 
-		void onPrepareRenderGraph(RenderGraph *render_graph);
-
-	private :
-		void onPrepareRenderGraphOrdered(RenderGraph *render_graph, SceneNode &node);
+		void onDraw(RenderGraph *render_graph);
 	};
 }
 

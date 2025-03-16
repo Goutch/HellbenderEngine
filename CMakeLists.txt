@@ -121,9 +121,7 @@ set(CORE_FILES
         core/scene/components/Camera2D.cpp
         core/scene/components/Camera.cpp
         core/scene/components/Transform.cpp
-        core/scene/components/EntityState.cpp
-        core/scene/components/EntityState.h
-        core/scene/components/CameraController.cpp
+		core/scene/components/CameraController.cpp
         core/scene/ecs/Component.h
 
         core/utility/Log.cpp
@@ -213,7 +211,11 @@ set(VK_FILES
         platforms/vk/VK_RenderTarget.h
         platforms/vk/VK_DynamicRenderTarget.cpp
         platforms/vk/VK_DynamicRenderTarget.h
-        core/graphics/Allocator.h)
+        core/graphics/Allocator.h
+        core/scene/systems/ui/LayoutSystem.cpp
+        core/scene/systems/ui/LayoutSystem.h
+        core/scene/systems/HierarchySystem.cpp
+        core/scene/systems/HierarchySystem.h)
 
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
@@ -341,7 +343,11 @@ message("#------------------------------------HBE-------------------------------
 include_directories(.)
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}
-        ${VK_FILES})
+        ${VK_FILES}
+        core/scene/components/HierachyNode.cpp
+        core/scene/components/HierachyNode.h
+        core/scene/systems/TransformSystem.cpp
+        core/scene/systems/TransformSystem.h)
 
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
