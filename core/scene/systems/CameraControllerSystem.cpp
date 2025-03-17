@@ -5,9 +5,9 @@
 #include "core/scene/components/CameraController.h"
 #include "core/scene/components/Camera.h"
 #include "core/scene/components/Camera2D.h"
+#include "core/scene/components/HierachyNode.h"
 #include "core/scene/components/PixelCamera.h"
 #include "core/scene/components/Transform.h"
-#include "core/scene/components/EntityState.h"
 
 namespace HBE {
 	CameraControllerSystem::CameraControllerSystem(Scene *scene) : System(scene) {
@@ -20,10 +20,10 @@ namespace HBE {
 	void CameraControllerSystem::update(float delta_t) {
 		HB_PROFILE_BEGIN("CameraControllerUpdate");
 		HB_PROFILE_BEGIN("CameraControllerUpdateGroup");
-		auto group = scene->group<EntityState, Transform, Camera, CameraController>();
+		auto group = scene->group<HierarchyNode, Transform, Camera, CameraController>();
 		HB_PROFILE_END("CameraControllerUpdateGroup");
-		for (auto [handle, state, transform, camera, controller]: group) {
-			if (state.state == ENTITY_STATE_INACTIVE) {
+		for (auto [handle, node, transform, camera, controller]: group) {
+			if (!node.isActiveInHierarchy()) {
 				continue;
 			}
 			float max_pitch_radian = glm::radians(controller.max_pitch);

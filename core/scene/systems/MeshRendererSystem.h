@@ -13,9 +13,6 @@ namespace HBE {
 	class RasterizationPipelineInstance;
 
 	class RenderGraph;
-
-	class SceneNode;
-
 	struct HB_API MeshRenderer {
 		Mesh *mesh = nullptr;
 		RasterizationPipelineInstance *pipeline_instance = nullptr;
@@ -32,10 +29,7 @@ namespace HBE {
 
 		~MeshRendererSystem();
 
-		void onPrepareRenderGraph(RenderGraph *render_graph);
-
-	private :
-		void onPrepareRenderGraphOrdered(RenderGraph *render_graph, SceneNode &node);
+		void onDraw(RenderGraph *render_graph);
 	};
 }
 

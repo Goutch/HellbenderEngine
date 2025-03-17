@@ -13,7 +13,7 @@ namespace HBE {
 
 	class RenderGraph;
 
-	class SceneNode;
+	struct HierarchyNode;
 
 	struct UIPanel {
 		RasterizationPipelineInstance *pipeline_instance = nullptr;
@@ -30,11 +30,10 @@ namespace HBE {
 			vec2 size;
 		};
 	public:
-		void onDrawSceneNode(RenderGraph *graph, SceneNode &node);
-
 		UIPanelSystem(Scene *scene);
 
 		~UIPanelSystem();
+		void draw(RenderGraph* graph);
 
 	private:
 		Mesh *anchor_meshes[9];

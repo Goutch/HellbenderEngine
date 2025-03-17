@@ -16,18 +16,19 @@
 #include "ComponentPool.h"
 #include "ComponentTypeRegistry.h"
 
-namespace HBE {
-
-	class HB_API Registry {
-
+namespace HBE
+{
+	class HB_API Registry
+	{
 		uint32_t current_handle = 0;
 		std::queue<entity_handle> inactive;
-		std::vector<RegistryPage *> pages = std::vector<RegistryPage *>();
+		std::vector<RegistryPage*> pages = std::vector<RegistryPage*>();
 		std::vector<ComponentTypeInfo> types;
 		std::bitset<REGISTRY_MAX_COMPONENT_TYPES> initialized_types;
 
 
-		inline size_t getPage(entity_handle handle) {
+		inline size_t getPage(entity_handle handle)
+		{
 			return (handle - (handle % REGISTRY_PAGE_SIZE)) / REGISTRY_PAGE_SIZE;
 		}
 
@@ -38,10 +39,14 @@ namespace HBE {
 
 		~Registry();
 
-		template<typename Component>
-		void initType(size_t signature_bit) {
-			if (!initialized_types.test(signature_bit)) {
-				ComponentTypeInfo info = ComponentTypeInfo{signature_bit, sizeof(Component), typeName<Component>()};
+		template <typename Component>
+		void initType(size_t signature_bit)
+		{
+			if (!initialized_types.test(signature_bit))
+			{
+				const char* component_name = typeid(Component).name();
+				Log::debug("init type " + (component_name + (" with signature bit " + std::to_string(signature_bit))));
+				ComponentTypeInfo info = ComponentTypeInfo{signature_bit, sizeof(Component), component_name};
 				if (types.size() <= signature_bit)
 					types.resize(signature_bit + 1);
 				types[signature_bit] = info;
@@ -51,16 +56,19 @@ namespace HBE {
 
 		entity_handle create();
 
-		void group(std::vector<entity_handle> &entities, size_t signature_bit);
+		void group(std::vector<entity_handle>& entities, size_t signature_bit);
 
 		std::bitset<REGISTRY_MAX_COMPONENT_TYPES>& getSignature(entity_handle handle);
 
-		template<typename ... Components>
-		Group<Components...> group() {
+		template <typename... Components>
+		Group<Components...> group()
+		{
 			constexpr size_t size = sizeof...(Components);
 			size_t signature_bits[size] = {type_registry.getSignatureBit<Components>()...};
-			for (int i = 0; i < size; ++i) {
-				if (!initialized_types.test(signature_bits[i])) {
+			for (int i = 0; i < size; ++i)
+			{
+				if (!initialized_types.test(signature_bits[i]))
+				{
 					return Group<Components...>(pages);
 				}
 			}
@@ -68,10 +76,11 @@ namespace HBE {
 			return Group<Components...>(pages, ts);
 		};
 
-		bool has(entity_handle handle, size_t signature_bit) {
+		bool has(entity_handle handle, size_t signature_bit)
+		{
 			HB_ASSERT(valid(handle), "Entity does not exist");
 			auto page = pages[getPage(handle)];
-			RawComponentPool *raw_pool = page->getRawPool(signature_bit);
+			RawComponentPool* raw_pool = page->getRawPool(signature_bit);
 
 			if (raw_pool != nullptr)
 				return raw_pool->has(handle);
@@ -79,8 +88,9 @@ namespace HBE {
 				return false;
 		}
 
-		template<typename Component>
-		bool has(entity_handle handle) {
+		template <typename Component>
+		bool has(entity_handle handle)
+		{
 			size_t signature_bit = type_registry.getSignatureBit<Component>();
 			initType<Component>(signature_bit);
 
@@ -89,30 +99,37 @@ namespace HBE {
 			return has(handle, signature_bit);
 		}
 
-		template<typename Component>
-		Component *get(entity_handle handle) {
+		template <typename Component>
+		Component* get(entity_handle handle)
+		{
 			size_t signature_bit = type_registry.getSignatureBit<Component>();
+
+
 			initType<Component>(signature_bit);
+
 			HB_ASSERT(initialized_types.test(signature_bit), "component" + typeName<Component>() + " is not initialized");
 			HB_ASSERT(has<Component>(handle),
-					  std::string("tried to get component ") + typeName<Component>() + "with signature bit " + std::to_string(type_registry.getSignatureBit<Component>()) + " in entity#" +
-					  std::to_string(handle) +
-					  std::string(" but has<") + typeName<Component>() + ">(" + std::to_string(handle) +
-					  ") == false");
+			          std::string("tried to get component ") + typeName<Component>() + "with signature bit " + std::to_string(type_registry.getSignatureBit<Component>()) +
+			          " in entity#" +
+			          std::to_string(handle) +
+			          std::string(" but has<") + typeName<Component>() + ">(" + std::to_string(handle) +
+			          ") == false");
 
 			return pages[getPage(handle)]->getRawPool(signature_bit)->template getAs<Component>(handle);
 		}
 
-		template<typename Component>
-		Component &get(entity_handle handle, size_t signature_bit) {
+		template <typename Component>
+		Component& get(entity_handle handle, size_t signature_bit)
+		{
 			HB_ASSERT(signature_bit < REGISTRY_MAX_COMPONENT_TYPES, "component bit is too large");
 			initType<Component>(signature_bit);
 			HB_ASSERT(initialized_types.test(signature_bit), "component " + typeName<Component>() + " is not initialized");
 			HB_ASSERT(has<Component>(handle),
-					  std::string("tried to get component ") + typeName<Component>() + "with signature bit " + std::to_string(type_registry.getSignatureBit<Component>()) + " in entity#" +
-					  std::to_string(handle) +
-					  std::string(" but has<") + typeName<Component>() + ">(" + std::to_string(handle) +
-					  ") == false");
+			          std::string("tried to get component ") + typeName<Component>() + "with signature bit " + std::to_string(type_registry.getSignatureBit<Component>()) +
+			          " in entity#" +
+			          std::to_string(handle) +
+			          std::string(" but has<") + typeName<Component>() + ">(" + std::to_string(handle) +
+			          ") == false");
 
 			return pages[getPage(handle)]->getRawPool(signature_bit)->template getAs<Component>(handle);
 		}
@@ -122,16 +139,18 @@ namespace HBE {
 
 		bool valid(entity_handle handle);
 
-		template<typename Component>
-		Component *attach(entity_handle handle) {
+		template <typename Component>
+		Component* attach(entity_handle handle)
+		{
 			const size_t signature_bit = type_registry.getSignatureBit<Component>();
 			initType<Component>(signature_bit);
 			size_t page = getPage(handle);
 			return pages[page]->attach<Component>(handle, types[signature_bit]);
 		}
 
-		template<typename Component>
-		void detach(entity_handle handle) {
+		template <typename Component>
+		void detach(entity_handle handle)
+		{
 			const size_t signature_bit = type_registry.getSignatureBit<Component>();
 			initType<Component>(signature_bit);
 			size_t page = getPage(handle);

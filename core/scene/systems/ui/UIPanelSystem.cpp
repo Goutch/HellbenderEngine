@@ -6,12 +6,13 @@
 #include "core/scene/systems/MeshRendererSystem.h"
 #include "core/scene/Scene.h"
 #include "core/resource/Resources.h"
+#include "core/scene/components/HierachyNode.h"
 #include "core/utility/Geometry.h"
 
-namespace HBE {
-	UIPanelSystem::UIPanelSystem(Scene *scene) : System(scene) {
-		std::list<SceneNode> nodes = scene->getSceneNodes();
-
+namespace HBE
+{
+	UIPanelSystem::UIPanelSystem(Scene* scene) : System(scene)
+	{
 		MeshInfo quad_info = MeshInfo{&VERTEX_ATTRIBUTE_INFO_POSITION3D_UV_INTERLEAVED, 1, MESH_FLAG_NONE};
 
 		anchor_meshes[PIVOT_TOP_LEFT] = Resources::createMesh(quad_info);
@@ -34,31 +35,34 @@ namespace HBE {
 		Geometry::createQuad(*anchor_meshes[PIVOT_BOTTOM_CENTER], 1, 1, VERTEX_FLAG_UV, PIVOT_BOTTOM_CENTER);
 		Geometry::createQuad(*anchor_meshes[PIVOT_BOTTOM_RIGHT], 1, 1, VERTEX_FLAG_UV, PIVOT_BOTTOM_RIGHT);
 
-		scene->onPrepareRenderGraphOrdered.subscribe(this, &UIPanelSystem::onDrawSceneNode);
-
+		scene->onDraw.subscribe(this, &UIPanelSystem::draw);
 	}
 
-	UIPanelSystem::~UIPanelSystem() {
-		for (int i = 0; i < 9; i++) {
+	UIPanelSystem::~UIPanelSystem()
+	{
+		for (int i = 0; i < 9; i++)
+		{
 			delete anchor_meshes[i];
 		}
 	}
 
 
-	void UIPanelSystem::onDrawSceneNode(RenderGraph *graph, SceneNode &node) {
-		if (node.entity.has<UIPanel>()) {
-			UIPanel *panel = node.entity.get<UIPanel>();
-			if (!panel->active || !panel->pipeline_instance) {
+	void UIPanelSystem::draw(RenderGraph* graph)
+	{
+		Group<HierarchyNode, Transform, UIPanel> group = scene->group<HierarchyNode, Transform, UIPanel>();
+		for (auto [entity_handle,node, transform, panel] : group)
+		{
+			if (!panel.active || !panel.pipeline_instance)
+			{
 				return;
 			}
-			Transform *transform = node.entity.get<Transform>();
 			DrawCmdInfo cmd{};
-			cmd.mesh = anchor_meshes[panel->anchor];
-			cmd.pipeline_instance = panel->pipeline_instance;
-			cmd.order_in_layer = node.getHierarchyOrder();
+			cmd.mesh = anchor_meshes[panel.anchor];
+			cmd.pipeline_instance = panel.pipeline_instance;
+			cmd.order_in_layer = node.getGlobalIndex();
 			PanelPushConstant push_constant{};
-			push_constant.size = panel->size;
-			push_constant.world_matrix = transform->world();
+			push_constant.size = panel.size;
+			push_constant.world_matrix = transform.world();
 
 
 			PushConstantInfo push_constant_info{};
@@ -68,7 +72,7 @@ namespace HBE {
 			cmd.push_constants = &push_constant_info;
 			cmd.push_constants_count = 1;
 			cmd.flags = DRAW_CMD_FLAG_ORDERED;
-			cmd.layer = panel->layer;
+			cmd.layer = panel.layer;
 
 			graph->add(cmd);
 		}

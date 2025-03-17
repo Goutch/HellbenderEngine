@@ -10,6 +10,7 @@
 #include "core/input/Input.h"
 #include "core/resource/RasterizationPipeline.h"
 #include "core/resource/RasterizationPipelineInstance.h"
+#include "core/scene/components/HierachyNode.h"
 
 namespace HBE {
 	ButtonSystem::ButtonSystem(Scene *scene, RasterizationTarget *render_target) : System(scene) {
@@ -86,7 +87,7 @@ namespace HBE {
 		//background_renderer->active = true;
 
 		button->label_entity = scene->createEntity3D();
-		LabelComponent *label_component = button->label_entity.attach<LabelComponent>();
+		TextComponent *label_component = button->label_entity.attach<TextComponent>();
 		label_component->height = 40;
 
 		scene->setParent(button->label_entity, entity);
@@ -100,9 +101,9 @@ namespace HBE {
 	}
 
 	void ButtonSystem::onLeftClick(vec2 position) {
-		auto group = scene->group<EntityState, Transform, UIPanel, ButtonComponent>();
-		for (auto [e, s, t, p, b]: group) {
-			if (!scene->isActiveInHierarchy(e))
+		auto group = scene->group<HierarchyNode, Transform, UIPanel, ButtonComponent>();
+		for (auto [e, node, t, p, b]: group) {
+			if (!node.isActiveInHierarchy())
 				continue;
 
 			vec2 min = vec2(t.worldPosition()) - (p.size / 2.0f);
@@ -126,9 +127,9 @@ namespace HBE {
 
 	void ButtonSystem::onUpdate(float delta) {
 		vec2 position = Input::getMousePosition();
-		auto group = scene->group<EntityState, Transform, UIPanel, ButtonComponent>();
-		for (auto [e, s, t, p, b]: group) {
-			if (!scene->isActiveInHierarchy(e))
+		auto group = scene->group<HierarchyNode, Transform, UIPanel, ButtonComponent>();
+		for (auto [e, node, t, p, b]: group) {
+			if (!node.isActiveInHierarchy())
 				continue;
 
 			vec2 world_position = vec2(t.worldPosition());
@@ -148,22 +149,22 @@ namespace HBE {
 	}
 
 	void ButtonComponent::setTextHeight(float height) {
-		LabelComponent *label_component = label_entity.get<LabelComponent>();
+		TextComponent *label_component = label_entity.get<TextComponent>();
 		label_component->height = height;
 	}
 
 	void ButtonComponent::setText(const std::string &text) {
-		LabelComponent *label_component = label_entity.get<LabelComponent>();
+		TextComponent *label_component = label_entity.get<TextComponent>();
 		label_component->setText(text);
 	}
 
 	void ButtonComponent::setFont(Font *font) {
-		LabelComponent *label_component = label_entity.get<LabelComponent>();
+		TextComponent *label_component = label_entity.get<TextComponent>();
 		label_component->font = font;
 	}
 
 	const std::string &ButtonComponent::getText(){
-		const LabelComponent *label_component = label_entity.get<LabelComponent>();
+		const TextComponent *label_component = label_entity.get<TextComponent>();
 		return label_component->getText();
 	}
 }

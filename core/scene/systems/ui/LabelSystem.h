@@ -20,10 +20,10 @@ namespace HBE {
 
 	class RenderGraph;
 
-	class SceneNode;
+	struct  HierarchyNode;
 
-	struct HB_API LabelComponent {
-		friend class LabelSystem;
+	struct HB_API TextComponent {
+		friend class TextSystem;
 
 		bool active = true;
 		int layer = 0;
@@ -46,7 +46,7 @@ namespace HBE {
 		vec2 size;
 	};
 
-	class HB_API LabelSystem : public System {
+	class HB_API TextSystem : public System {
 		struct LabelPushConstant {
 			mat4 world_matrix;
 			float text_height;
@@ -59,15 +59,16 @@ namespace HBE {
 		RasterizationPipeline *default_text_pipeline = nullptr;
 		RasterizationPipelineInstance *default_text_pipeline_instance = nullptr;
 	public:
-		LabelSystem(Scene *scene, RasterizationTarget *render_target);
+		TextSystem(Scene *scene, RasterizationTarget *render_target);
 
-		void drawSceneNode(RenderGraph *graph, SceneNode &node);
+		void drawSceneNode(RenderGraph *graph, HierarchyNode &node);
 
-		~LabelSystem() override;
+		~TextSystem() override;
 
 		void onDetachLabel(Entity label);
+		void onPrepareRenderGraph(RenderGraph* render_graph);
 
-		void onAttachLabel(Entity label);
+		void onAttachLabel(Entity text_entity);
 	};
 }
 

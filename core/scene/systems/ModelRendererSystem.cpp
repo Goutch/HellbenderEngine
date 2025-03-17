@@ -1,11 +1,11 @@
 
 #include "ModelRendererSystem.h"
 #include "core/scene/Scene.h"
-#include "core/scene/components/EntityState.h"
+#include "core/scene/components/HierachyNode.h"
 
 namespace HBE {
 	ModelRendererSystem::ModelRendererSystem(Scene *scene) : System(scene) {
-		scene->onPrepareRenderGraph.subscribe(this, &ModelRendererSystem::draw);
+		scene->onDraw.subscribe(this, &ModelRendererSystem::draw);
 	}
 
 	void drawNode(RenderGraph *render_graph, Model &model, const ModelNode &node, mat4 parent_transform) {
@@ -40,15 +40,15 @@ namespace HBE {
 
 		HB_PROFILE_BEGIN("ModelRendererUpdate");
 		HB_PROFILE_BEGIN("ModelRendererUpdateGroup");
-		auto group = scene->group<EntityState, Transform, ModelRenderer>();
+		auto group = scene->group<HierarchyNode, Transform, ModelRenderer>();
 		HB_PROFILE_END("ModelRendererUpdateGroup");
-		for (auto [handle, state, transform, model_renderer]: group) {
+		for (auto [handle, node, transform, model_renderer]: group) {
 
-			if (!model_renderer.active || state.state == ENTITY_STATE_INACTIVE)
+			if (!node.isActiveInHierarchy())
 				continue;
 
-			for (const ModelNode &node: model_renderer.model->getNodes()) {
-				drawNode(render_graph, *model_renderer.model, node, transform.world());
+			for (const ModelNode &model_node: model_renderer.model->getNodes()) {
+				drawNode(render_graph, *model_renderer.model, model_node, transform.world());
 			}
 		}
 
@@ -57,6 +57,6 @@ namespace HBE {
 	}
 
 	ModelRendererSystem::~ModelRendererSystem() {
-		scene->onPrepareRenderGraph.unsubscribe(this);
+		scene->onDraw.unsubscribe(this);
 	}
 }
