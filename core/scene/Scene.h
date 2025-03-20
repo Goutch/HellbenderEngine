@@ -128,7 +128,7 @@ namespace HBE
 		template <typename Component>
 		Event<Entity>& onDetach();
 
-		//sceneHierachy
+		//sceneHierarchy
 
 		void setParent(Entity entity, Entity parent = {});
 

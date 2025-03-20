@@ -6,7 +6,7 @@
 
 #include <core/scene/Scene.h>
 
-#include "core/scene/components/HierachyNode.h"
+#include "core/scene/components/HierarchyNode.h"
 #include "core/scene/ecs/ComponentPool.h"
 
 namespace HBE

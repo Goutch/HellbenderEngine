@@ -5,7 +5,7 @@
 #include "core/scene/components/CameraController.h"
 #include "core/scene/components/Camera.h"
 #include "core/scene/components/Camera2D.h"
-#include "core/scene/components/HierachyNode.h"
+#include "core/scene/components/HierarchyNode.h"
 #include "core/scene/components/PixelCamera.h"
 #include "core/scene/components/Transform.h"
 

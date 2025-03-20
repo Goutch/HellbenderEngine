@@ -3,7 +3,7 @@
 #include "Scene.h"
 #include "Entity.h"
 #include "vector"
-#include "components/HierachyNode.h"
+#include "components/HierarchyNode.h"
 #include "core/scene/systems/CameraSystem.h"
 #include "core/scene/systems/CameraControllerSystem.h"
 #include "core/scene/systems/ModelRendererSystem.h"

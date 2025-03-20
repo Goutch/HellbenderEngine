@@ -6,7 +6,7 @@
 #include "core/resource/RasterizationPipelineInstance.h"
 #include "core/scene/components/Transform.h"
 #include "core/scene/Scene.h"
-#include "core/scene/components/HierachyNode.h"
+#include "core/scene/components/HierarchyNode.h"
 #include "core/utility/Geometry.h"
 
 namespace HBE

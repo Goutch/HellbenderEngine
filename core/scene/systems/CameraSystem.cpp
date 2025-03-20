@@ -4,7 +4,7 @@
 #include "core/scene/components/Camera.h"
 #include "core/scene/components/Camera2D.h"
 #include "core/scene/components/PixelCamera.h"
-#include "core/scene/components/HierachyNode.h"
+#include "core/scene/components/HierarchyNode.h"
 
 namespace HBE {
 	CameraSystem::CameraSystem(Scene *scene) : System(scene) {

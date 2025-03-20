@@ -6,7 +6,7 @@
 #include "core/scene/systems/MeshRendererSystem.h"
 #include "core/scene/Scene.h"
 #include "core/resource/Resources.h"
-#include "core/scene/components/HierachyNode.h"
+#include "core/scene/components/HierarchyNode.h"
 #include "core/utility/Geometry.h"
 
 namespace HBE

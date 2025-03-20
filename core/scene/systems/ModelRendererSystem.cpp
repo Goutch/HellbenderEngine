@@ -1,7 +1,7 @@
 
 #include "ModelRendererSystem.h"
 #include "core/scene/Scene.h"
-#include "core/scene/components/HierachyNode.h"
+#include "core/scene/components/HierarchyNode.h"
 
 namespace HBE {
 	ModelRendererSystem::ModelRendererSystem(Scene *scene) : System(scene) {

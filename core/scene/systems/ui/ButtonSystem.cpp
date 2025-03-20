@@ -10,7 +10,7 @@
 #include "core/input/Input.h"
 #include "core/resource/RasterizationPipeline.h"
 #include "core/resource/RasterizationPipelineInstance.h"
-#include "core/scene/components/HierachyNode.h"
+#include "core/scene/components/HierarchyNode.h"
 
 namespace HBE {
 	ButtonSystem::ButtonSystem(Scene *scene, RasterizationTarget *render_target) : System(scene) {

@@ -2,11 +2,15 @@
 // Created by username on 3/7/2025.
 //
 
-#include "HierachyNode.h"
+#include "HierarchyNode.h"
 #include "core/scene/Scene.h"
 
 namespace HBE
 {
+	HierarchyNode::HierarchyNode()
+	{
+	}
+
 	HierarchyNode::HierarchyNode(Entity entity)
 	{
 		this->entity = entity;

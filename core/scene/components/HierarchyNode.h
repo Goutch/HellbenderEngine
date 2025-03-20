@@ -2,7 +2,6 @@
 #include <glm/fwd.hpp>
 
 #include "HBE/core/scene/Entity.h"
-#include "HBETypes.h"
 
 namespace HBE
 {
@@ -13,7 +12,7 @@ namespace HBE
 		Entity entity;
 		entity_handle parent = NULL_ENTITY_HANDLE;
 		std::vector<entity_handle> children;
-		HierarchyNode() = default;
+		HierarchyNode();
 		explicit HierarchyNode(Entity entity);
 		HierarchyNode(HierarchyNode&& other) noexcept;
 
@@ -39,4 +38,5 @@ namespace HBE
 		bool is_active_in_hierarchy = true;
 		bool active_in_hierarchy_dirty = true;
 	};
+
 }

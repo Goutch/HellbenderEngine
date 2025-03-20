@@ -1,6 +1,6 @@
 #include "Transform2D.h"
 #include <core/scene/Scene.h>
-#include "HierachyNode.h"
+#include "HierarchyNode.h"
 
 namespace HBE
 {

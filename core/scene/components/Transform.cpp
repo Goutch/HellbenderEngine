@@ -2,7 +2,7 @@
 
 #include <core/scene/Scene.h>
 
-#include "HierachyNode.h"
+#include "HierarchyNode.h"
 
 namespace HBE
 {
