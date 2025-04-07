@@ -337,9 +337,10 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/openal-soft/")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/openal-soft/include)
 
 message("#------------------------------------LIBSNDFILE------------------------------------")
-set (BUILD_PROGRAMS FALSE)
-set (BUILD_EXAMPLES FALSE)
-set (ENABLE_CPACK FALSE)
+set (BUILD_PROGRAMS OFF)
+set (BUILD_EXAMPLES OFF)
+set (ENABLE_CPACK OFF)
+set (BUILD_TESTING OFF)
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libsndfile/")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libsndfile/include)
 
