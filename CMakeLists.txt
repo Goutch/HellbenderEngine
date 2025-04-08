@@ -341,8 +341,7 @@ message("#------------------------------------LIBSNDFILE------------------------
 set (BUILD_PROGRAMS FALSE)
 set (BUILD_EXAMPLES FALSE)
 set (ENABLE_CPACK FALSE)
-set (BUILD_TESTING FALSE)
-set (BUILD_TESTING FALSE)
+set(BUILD_TESTING OFF CACHE BOOL "Set LibSNDFile test to Off")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libsndfile/")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libsndfile/include)
 
