@@ -334,6 +334,21 @@ set_property(TARGET msdfgen-ext PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<
 message("#------------------------------------OPENAL SOFT -----------------------------------")
 
 set(LIBTYPE STATIC)
+
+set(ALSOFT_DLOPEN OFF CACHE BOOL "Check for the dlopen API for loading optional libs" )
+set(ALSOFT_WERROR OFF CACHE BOOL "Treat compile warnings as errors")
+set(ALSOFT_UTILS OFF CACHE BOOL "Build utility programs")
+set(ALSOFT_NO_CONFIG_UTIL OFF CACHE BOOL "Disable building the alsoft-config utility")
+set(ALSOFT_EXAMPLES OFF CACHE BOOL "Build example programs")
+set(ALSOFT_TESTS OFF CACHE BOOL "Build test programs")
+set(ALSOFT_INSTALL OFF CACHE BOOL "Install main library")
+set(ALSOFT_INSTALL_CONFIG  OFF CACHE BOOL "Install alsoft.conf sample configuration file")
+set(ALSOFT_INSTALL_HRTF_DATA OFF CACHE BOOL"Install HRTF data files")
+set(ALSOFT_INSTALL_AMBDEC_PRESETS OFF CACHE BOOL "Install AmbDec preset files")
+set(ALSOFT_INSTALL_EXAMPLES OFF CACHE BOOL "Install example programs (alplay, alstream, ...)")
+set(ALSOFT_INSTALL_UTILS OFF CACHE BOOL "Install utility programs (openal-info, alsoft-config, ...)")
+set(ALSOFT_UPDATE_BUILD_VERSION OFF CACHE BOOL "Update git build version info")
+
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/openal-soft/")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/openal-soft/include)
 
