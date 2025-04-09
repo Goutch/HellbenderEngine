@@ -293,7 +293,7 @@ message("#------------------------------TINYGLTF--------------------------------
 set(TINYGLTF_HEADER_ONLY ON CACHE INTERNAL "" FORCE)
 set(TINYGLTF_INSTALL OFF CACHE INTERNAL "" FORCE)
 set(TINYGLTF_NO_INCLUDE_STB_IMAGE ON CACHE INTERNAL "" FORCE)
-
+set(TINYGLTF_BUILD_LOADER_EXAMPLE OFF CACHE BOOL "Build loader_example(load glTF and dump infos)" FORCE)
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf)
 set_property(TARGET tinygltf PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
