@@ -200,7 +200,7 @@ namespace HBE
 	void Transform::setDirty()
 	{
 		is_dirty = true;
-		if (entity.has<HierarchyNode>())
+		if (entity.valid() && entity.has<HierarchyNode>())
 		{
 			HierarchyNode* node = entity.get<HierarchyNode>();
 
