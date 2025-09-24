@@ -81,7 +81,7 @@ namespace HBE
 		VK_Buffer scratchBuffer = VK_Buffer(device,
 		                                    accelerationStructureBuildSizesInfo.buildScratchSize,
 		                                    VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
-		                                    MEMORY_TYPE_FLAG_MAPPABLE);
+		                                    MEMORY_TYPE_FLAG_GPU_LOCAL);
 
 		VkAccelerationStructureBuildGeometryInfoKHR accelerationBuildGeometryInfo{};
 		accelerationBuildGeometryInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
