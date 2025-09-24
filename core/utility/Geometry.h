@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Samples/Menu/MenuScene.h>
-
 #include "Core.h"
 #include "core/resource/Mesh.h"
 
