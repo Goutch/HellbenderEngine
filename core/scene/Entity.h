@@ -49,7 +49,7 @@ namespace HBE {
 		entity_handle getHandle() const;
 
 		int operator==(const Entity &other) const;
-
+		int operator!=(const Entity &other) const;
 
 	};
 }
