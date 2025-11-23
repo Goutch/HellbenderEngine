@@ -6,6 +6,7 @@
 #include "set"
 #include "string"
 #include "queue"
+#include "VK_Mesh.h"
 #include "core/resource/Image.h"
 #include "core/graphics/Allocator.h"
 
@@ -24,7 +25,6 @@ namespace HBE
 	class VK_Renderer;
 
 	struct Block;
-
 
 	struct Allocation
 	{

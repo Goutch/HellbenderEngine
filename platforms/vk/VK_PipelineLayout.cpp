@@ -103,9 +103,21 @@ namespace HBE
 			std::vector<VK_PushConstantInfo> stage_push_constants = shaders[i]->getPushConstants();
 			for (int j = 0; j < stage_push_constants.size(); ++j)
 			{
-				pipeline_push_constants.emplace_back(stage_push_constants[j]);
-				push_constants_ranges.emplace_back(stage_push_constants[j].push_constant_range);
-				push_constant_name_to_index.emplace(stage_push_constants[j].name, pipeline_push_constants.size() - 1);
+				Log::message("merge push constant:" + stage_push_constants[j].name);
+				if (push_constant_name_to_index.find(stage_push_constants[j].name) == push_constant_name_to_index.end())
+				{
+					pipeline_push_constants.emplace_back(stage_push_constants[j]);
+					push_constants_ranges.emplace_back(stage_push_constants[j].push_constant_range);
+					push_constant_name_to_index.emplace(stage_push_constants[j].name, pipeline_push_constants.size() - 1);
+					continue;
+				}
+				uint32_t index = push_constant_name_to_index[stage_push_constants[j].name];
+				HB_ASSERT(pipeline_push_constants[index].push_constant_range.offset==stage_push_constants[j].push_constant_range.offset,
+				          "Push constant \"" + stage_push_constants[j].name + "\" has different offset");
+				HB_ASSERT(pipeline_push_constants[index].push_constant_range.size == stage_push_constants[j].push_constant_range.size,
+				          "Push constant \"" + stage_push_constants[j].name + "\" has different size");
+				push_constants_ranges[index].stageFlags |= stage_push_constants[j].push_constant_range.stageFlags;
+				pipeline_push_constants[index].push_constant_range.stageFlags |= stage_push_constants[j].push_constant_range.stageFlags;
 			}
 		}
 	}

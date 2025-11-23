@@ -13,7 +13,7 @@ namespace HBE {
 
 	class RenderGraph;
 
-	struct HierarchyNode;
+	struct Node3D;
 
 	struct UIPanel {
 		RasterizationPipelineInstance *pipeline_instance = nullptr;

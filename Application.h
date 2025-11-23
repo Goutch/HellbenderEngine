@@ -8,8 +8,6 @@ using namespace utils;
 namespace HBE {
 	class Window;
 
-	class Scene;
-
 	typedef uint32_t VULKAN_REQUIRED_EXTENSION_FLAGS;
 	enum VULKAN_REQUIRED_EXTENSIONS_FLAG {
 		VULKAN_REQUIRED_EXTENSION_NONE = 0,

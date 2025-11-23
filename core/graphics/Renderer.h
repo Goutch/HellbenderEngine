@@ -8,8 +8,8 @@
 #include <string>
 #include "GraphicLimits.h"
 
-namespace HBE {
-
+namespace HBE
+{
 	class RasterizationTarget;
 
 	class Image;
@@ -35,93 +35,110 @@ namespace HBE {
 	class ComputeInstance;
 
 	typedef uint32_t DRAW_CMD_FLAGS;
-	enum DRAW_CMD_FLAG {
+
+	enum DRAW_CMD_FLAG
+	{
 		DRAW_CMD_FLAG_NONE = 0,
 		DRAW_CMD_FLAG_ORDERED = 1 << 0,
 	};
+
 	typedef uint32_t RASTERIZE_CMD_FLAGS;
-	enum RASTERIZE_CMD_FLAG {
+
+	enum RASTERIZE_CMD_FLAG
+	{
 		RASTERIZE_CMD_FLAG_NONE = 0,
 		RASTERIZE_CMD_FLAG_INVERSE_Y = 1 << 0,
 	};
+
 	typedef uint32_t TRACE_RAYS_CMD_FLAGS;
-	enum TRACE_RAYS_CMD_FLAG {
+
+	enum TRACE_RAYS_CMD_FLAG
+	{
 		TRACE_RAYS_CMD_FLAG_NONE = 0,
 	};
 
 	typedef uint32_t PRESENT_CMD_FLAGS;
-	enum PRESENT_CMD_FLAG {
+
+	enum PRESENT_CMD_FLAG
+	{
 		PRESENT_CMD_FLAG_NONE = 0,
 	};
 
-	struct PushConstantInfo {
+	struct PushConstantInfo
+	{
 		std::string name;
 		//array of 128bytes max
-		void *data;
+		const void* data;
 		uint32_t size;
 	};
 
-	struct DrawCmdInfo {
-		const Mesh *mesh = nullptr;
-		RasterizationPipelineInstance *pipeline_instance = nullptr;
+	struct DrawCmdInfo
+	{
+		const Mesh* mesh = nullptr;
+		RasterizationPipelineInstance* pipeline_instance = nullptr;
 		uint32_t layer = 0;
-		uint32_t order_in_layer = 0;//ignored if ordered flag is not set
+		uint32_t order_in_layer = 0; //ignored if ordered flag is not set
 		uint32_t push_constants_count = 0;
-		PushConstantInfo *push_constants = nullptr;
+		PushConstantInfo* push_constants = nullptr;
 		DRAW_CMD_FLAGS flags = DRAW_CMD_FLAG_NONE;
 	};
 
-	struct RasterizeCmdInfo {
-		const RasterizationTarget *render_target;
-		RenderGraph *render_graph;
+	struct RasterizeCmdInfo
+	{
+		const RasterizationTarget* render_target;
+		RenderGraph* render_graph;
 		uint32_t layer_mask;
 		mat4 view;
 		mat4 projection;
 		RASTERIZE_CMD_FLAGS flags;
 	};
 
-	struct TraceRaysCmdInfo {
-		RaytracingPipelineInstance *pipeline_instance;
+	struct TraceRaysCmdInfo
+	{
+		RaytracingPipelineInstance* pipeline_instance;
 		vec2i resolution;
 		TRACE_RAYS_CMD_FLAGS flags;
 	};
 
-	struct PresentCmdInfo {
-		Image **images;
+	struct PresentCmdInfo
+	{
+		Image** images;
 		uint32_t image_count;
 		PRESENT_CMD_FLAGS flags;
 	};
 
-	struct ComputeDispatchCmdInfo {
-		ComputeInstance *pipeline_instance;
+	struct ComputeDispatchCmdInfo
+	{
+		ComputeInstance* pipeline_instance;
 		uint32_t size_x = 1;
 		uint32_t size_y = 1;
 		uint32_t size_z = 1;
 	};
 
-	class Renderer {
+	class Renderer
+	{
 	public:
-		static Renderer *create();
+		static Renderer* create();
 
 		virtual ~Renderer() = default;
 
-		virtual void rasterize(RasterizeCmdInfo &rasterize_cmd_info) = 0;
+		virtual void rasterize(RasterizeCmdInfo& rasterize_cmd_info) = 0;
 
-		virtual void traceRays(TraceRaysCmdInfo &trace_rays_cmd_info) = 0;
+		virtual void traceRays(TraceRaysCmdInfo& trace_rays_cmd_info) = 0;
 
-		virtual void present(PresentCmdInfo &present_cmd_info) = 0;
+		virtual void present(PresentCmdInfo& present_cmd_info) = 0;
 
-		virtual void computeDispatch(ComputeDispatchCmdInfo &compute_dispatch_cmd_info) = 0;
+		virtual void computeDispatch(ComputeDispatchCmdInfo& compute_dispatch_cmd_info) = 0;
 
 		virtual void beginFrame() = 0;
 
 		virtual void endFrame() = 0;
 
-		virtual RasterizationTarget *getDefaultRenderTarget() = 0;
+		virtual RasterizationTarget* getDefaultRenderTarget() = 0;
 
-		virtual RasterizationTarget *getUIRenderTarget() = 0;
+		virtual RasterizationTarget* getUIRenderTarget() = 0;
 
-		virtual const ResourceFactory *getResourceFactory() const = 0;
+		virtual const ResourceFactory* getResourceFactory() const = 0;
 
 		virtual void createDefaultResources() = 0;
 

@@ -2,7 +2,7 @@
 
 #include <core/scene/Scene.h>
 
-#include "HierarchyNode.h"
+#include "Node3D.h"
 
 namespace HBE {
 	void Transform::translate(vec3 translation) {
@@ -105,12 +105,16 @@ namespace HBE {
 		setDirty();
 	}
 
-	const mat4 &Transform::world() {
-		if (entity != Entity::NULL_ENTITY && entity.has<HierarchyNode>()) {
-			HierarchyNode *node = entity.get<HierarchyNode>();
-			if (entity.getScene()->valid(node->parent)) {
-				Transform *parent = entity.getScene()->get<Transform>(node->parent);
-				if (is_dirty) {
+	const mat4& Transform::world()
+	{
+		if (entity.valid() && entity.has<Node3D>())
+		{
+			Node3D* node = entity.get<Node3D>();
+			if (entity.getScene()->valid(node->parent))
+			{
+				Transform* parent = entity.getScene()->get<Transform>(node->parent);
+				if (is_dirty)
+				{
 					is_dirty = false;
 					world_mat = parent->world() * local_mat;
 				}
@@ -125,10 +129,12 @@ namespace HBE {
 		return glm::quat_cast(local_mat);
 	}
 
-	quat Transform::worldRotation() {
-		HierarchyNode *node = entity.get<HierarchyNode>();
-		if (entity.getScene()->valid(node->parent)) {
-			Transform *parent = entity.getScene()->get<Transform>(node->parent);
+	quat Transform::worldRotation()
+	{
+		Node3D* node = entity.get<Node3D>();
+		if (entity.getScene()->valid(node->parent))
+		{
+			Transform* parent = entity.getScene()->get<Transform>(node->parent);
 			return rotation() * parent->worldRotation();
 		}
 		return rotation();
@@ -165,8 +171,9 @@ namespace HBE {
 
 	void Transform::setDirty() {
 		is_dirty = true;
-		if (entity.valid() && entity.has<HierarchyNode>()) {
-			HierarchyNode *node = entity.get<HierarchyNode>();
+		if (entity.has<Node3D>())
+		{
+			Node3D* node = entity.get<Node3D>();
 
 			for (entity_handle child: node->children) {
 				Transform *child_transform = entity.getScene()->get<Transform>(child);

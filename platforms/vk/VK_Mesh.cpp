@@ -150,10 +150,13 @@ namespace HBE
 
 	VK_Mesh::~VK_Mesh()
 	{
+		//todo: use allocator delete queue9
+		VK_Allocator* allocator = device->getAllocator();
 		for (size_t i = 0; i < attributes_locations.size(); ++i)
 		{
 			for (size_t j = 0; j < buffers[i].size(); ++j)
 			{
+
 				if (buffers[i][j])
 					delete buffers[i][j];
 			}

@@ -5,7 +5,7 @@
 #include "core/scene/components/CameraController.h"
 #include "core/scene/components/Camera.h"
 #include "core/scene/components/Camera2D.h"
-#include "core/scene/components/HierarchyNode.h"
+#include "core/scene/components/Node3D.h"
 #include "core/scene/components/PixelCamera.h"
 #include "core/scene/components/Transform.h"
 
@@ -20,7 +20,7 @@ namespace HBE {
 	void CameraControllerSystem::update(float delta_t) {
 		HB_PROFILE_BEGIN("CameraControllerUpdate");
 		HB_PROFILE_BEGIN("CameraControllerUpdateGroup");
-		auto group = scene->group<HierarchyNode, Transform, Camera, CameraController>();
+		auto group = scene->group<Node3D, Transform, Camera, CameraController>();
 		HB_PROFILE_END("CameraControllerUpdateGroup");
 		for (auto [handle, node, transform, camera, controller]: group) {
 			if (!node.isActiveInHierarchy()) {

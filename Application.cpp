@@ -5,7 +5,6 @@
 #include "GLFW/glfw3.h"
 #include <core/graphics/Window.h>
 #include "core/utility/Profiler.h"
-#include "core/scene/Scene.h"
 #include "core/audio/Audio.h"
 #include <thread>
 

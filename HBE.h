@@ -37,11 +37,11 @@
 #include "core/scene/components/CameraController.h"
 #include "core/scene/components/Transform2D.h"
 #include "core/scene/components/Transform.h"
-#include "core/scene/components/HierarchyNode.h"
+#include "core/scene/components/Node3D.h"
 #include "core/scene/systems/ui/UIPanelSystem.h"
 #include "core/scene/systems/ui/ButtonSystem.h"
 #include "core/scene/systems/ui/TextBoxSystem.h"
-#include "core/scene/systems/ui/LabelSystem.h"
+#include "core/scene/systems/ui/TextSystem.h"
 
 #include "core/graphics/Graphics.h"
 #include "core/graphics/Window.h"

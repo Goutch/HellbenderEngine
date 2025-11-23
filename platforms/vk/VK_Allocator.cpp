@@ -9,6 +9,7 @@
 #include "VK_Utils.h"
 #include "core/graphics/Graphics.h"
 
+//todo: create allocation delete queue that are deleted when the resource is unused, the last used frame should be stored by the object using the resource in the function bind or similar.
 namespace HBE {
 	VkMemoryPropertyFlags memoryTypeFlagToVkMemoryPropertyFlag(MEMORY_TYPE_FLAGS flags) {
 		VkMemoryPropertyFlags properties = 0;
@@ -604,6 +605,7 @@ namespace HBE {
 		VkFormatProperties dest_format_properties;
 		vkGetPhysicalDeviceFormatProperties(device->getPhysicalDevice().getHandle(), src.getVkFormat(),
 		                                    &src_format_properties);
+
 		vkGetPhysicalDeviceFormatProperties(device->getPhysicalDevice().getHandle(), dest.getVkFormat(),
 		                                    &dest_format_properties);
 

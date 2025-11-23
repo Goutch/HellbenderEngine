@@ -10,7 +10,7 @@
 #include "core/input/Input.h"
 #include "core/resource/RasterizationPipeline.h"
 #include "core/resource/RasterizationPipelineInstance.h"
-#include "core/scene/components/HierarchyNode.h"
+#include "core/scene/components/Node3D.h"
 
 namespace HBE {
 	ButtonSystem::ButtonSystem(Scene *scene, RasterizationTarget *render_target) : System(scene) {
@@ -101,7 +101,7 @@ namespace HBE {
 	}
 
 	void ButtonSystem::onLeftClick(vec2 position) {
-		auto group = scene->group<HierarchyNode, Transform, UIPanel, ButtonComponent>();
+		auto group = scene->group<Node3D, Transform, UIPanel, ButtonComponent>();
 		for (auto [e, node, t, p, b]: group) {
 			if (!node.isActiveInHierarchy())
 				continue;
@@ -127,7 +127,7 @@ namespace HBE {
 
 	void ButtonSystem::onUpdate(float delta) {
 		vec2 position = Input::getMousePosition();
-		auto group = scene->group<HierarchyNode, Transform, UIPanel, ButtonComponent>();
+		auto group = scene->group<Node3D, Transform, UIPanel, ButtonComponent>();
 		for (auto [e, node, t, p, b]: group) {
 			if (!node.isActiveInHierarchy())
 				continue;

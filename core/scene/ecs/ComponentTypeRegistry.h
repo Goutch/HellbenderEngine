@@ -8,11 +8,12 @@
 #include "core/scene/components/Camera.h"
 #include "core/scene/components/PixelCamera.h"
 #include "core/scene/components/CameraController.h"
+#include "core/scene/components/Node2D.h"
 #include "core/scene/components/Transform2D.h"
 #include "core/scene/systems/ui/UIPanelSystem.h"
 #include "core/scene/systems/ui/ButtonSystem.h"
 #include "core/scene/systems/ui/TextBoxSystem.h"
-#include "core/scene/systems/ui/LabelSystem.h"
+#include "core/scene/systems/ui/TextSystem.h"
 
 namespace HBE
 {
@@ -31,7 +32,14 @@ namespace HBE
 		}
 
 		template <>
-		size_t getSignatureBit<HierarchyNode>()
+		size_t getSignatureBit<Node3D>()
+		{
+			static const size_t bit = current_bit++;
+			return bit;
+		}
+
+		template <>
+		size_t getSignatureBit<Node2D>()
 		{
 			static const size_t bit = current_bit++;
 			return bit;

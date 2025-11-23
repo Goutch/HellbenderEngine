@@ -18,7 +18,8 @@
 #include "core/scene/components/Camera2D.h"
 #include "core/scene/components/PixelCamera.h"
 #include "core/scene/components/ModelRenderer.h"
-#include "systems/HierarchySystem.h"
+#include "systems/Node2DSystem.h"
+#include "systems/Node3DSystem.h"
 
 
 namespace HBE
@@ -32,6 +33,26 @@ namespace HBE
 	class CameraControllerSystem;
 
 	class System;
+	typedef uint32_t SCENE_SYSTEMS_FLAGS;
+
+	enum SCENE_SYSTEMS_FLAG
+	{
+		SCENE_INITIALIZE_SYSTEMS_FLAG_NONE = 0,
+		SCENE_INITIALIZE_SYSTEMS_FLAG_NODE_3D_SYSTEM = 1 << 0,
+		SCENE_INITIALIZE_SYSTEMS_FLAG_TRANSFORM_SYSTEM = 1 << 1,
+		SCENE_INITIALIZE_SYSTEMS_FLAG_CAMERA_SYSTEM = 1 << 1,
+		SCENE_INITIALIZE_SYSTEMS_FLAG_CAMERA_CONTROLLER_SYSTEM = 1 << 2,
+		SCENE_INITIALIZE_SYSTEMS_FLAG_MODEL_RENDERER_SYSTEM = 1 << 3,
+		SCENE_INITIALIZE_SYSTEMS_FLAG_MESH_RENDERER_SYSTEM = 1 << 4,
+		SCENE_INITIALIZE_SYSTEM_FLAG_ALL = UINT32_MAX,
+	};
+
+	struct SceneInfo
+	{
+		SCENE_SYSTEMS_FLAGS initialized_systems_flags = SCENE_INITIALIZE_SYSTEMS_FLAG_NODE_3D_SYSTEM |
+			SCENE_INITIALIZE_SYSTEMS_FLAG_TRANSFORM_SYSTEM |
+			SCENE_INITIALIZE_SYSTEMS_FLAG_CAMERA_SYSTEM;
+	};
 
 	class HB_API Scene
 	{
@@ -43,8 +64,9 @@ namespace HBE
 		Event<Scene*> onSceneDeactivate;
 
 	private:
-		TransformSystem* transform_system;
-		HierarchySystem* hierarchy_system;
+		TransformSystem* transform_system = nullptr;
+		Node3DSystem* node3D_system = nullptr;
+		Node2DSystem* node2D_system = nullptr;
 		std::vector<System*> systems;
 		bool is_active = true;
 		Registry registry;
@@ -64,8 +86,7 @@ namespace HBE
 		bool isActive();
 
 		virtual Image* getMainCameraTexture();
-
-		Scene();
+		Scene(SceneInfo info = {});
 
 		virtual ~Scene();
 
@@ -134,19 +155,19 @@ namespace HBE
 
 		void setParent(entity_handle entity, entity_handle parent);
 
-		const std::list<HierarchyNode>& getChildren(Entity entity);
+		const std::list<Node3D>& getChildren(Entity entity);
 
 		void printSceneHierarchy();
 
 	private:
 		void onAttachTransform(Entity entity);
 
-		void setChildrenDirty(HierarchyNode* node);
+		void setChildrenDirty(Node3D* node);
 
 		void onFrameChange(uint32_t frame);
 
 
-		void drawNode(RenderGraph* render_graph, HierarchyNode& node, int& count);
+		void drawNode(RenderGraph* render_graph, Node3D& node, int& count);
 	};
 
 	template <typename Component>

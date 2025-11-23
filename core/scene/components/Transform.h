@@ -16,7 +16,7 @@ namespace HBE
 	{
 		friend class TransformSystem;
 		friend class Scene;
-		friend class HierarchySystem;
+		friend class Node3DSystem;
 
 	private:
 		Entity entity;

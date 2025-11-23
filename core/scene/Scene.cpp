@@ -3,14 +3,16 @@
 #include "Scene.h"
 #include "Entity.h"
 #include "vector"
-#include "components/HierarchyNode.h"
+#include "components/Node3D.h"
 #include "core/scene/systems/CameraSystem.h"
 #include "core/scene/systems/CameraControllerSystem.h"
 #include "core/scene/systems/ModelRendererSystem.h"
 #include "core/scene/systems/MeshRendererSystem.h"
+#include "systems/Node3DSystem.h"
 #include "systems/TransformSystem.h"
 
-namespace HBE {
+namespace HBE
+{
 	const Entity Entity::NULL_ENTITY = Entity();
 
 	Entity Scene::getCameraEntity() {
@@ -20,55 +22,69 @@ namespace HBE {
 	void Scene::destroyEntity(entity_handle entity) {
 		if (!valid(entity)) return;
 
-		HierarchyNode *node = get<HierarchyNode>(entity);
-		for (int32_t i = node->children.size() - 1; i >= 0; --i) {
-			HierarchyNode *child_node = get<HierarchyNode>(node->children[i]);
+		Node3D* node = get<Node3D>(entity);
+		for (int32_t i = node->children.size() - 1; i >= 0; --i)
+		{
+			Node3D* child_node = get<Node3D>(node->children[i]);
 			child_node->local_index = node->children.size() - 1;
 			destroyEntity(node->children[i]);
 		}
 		std::bitset<REGISTRY_MAX_COMPONENT_TYPES> signature = registry.getSignature(entity);
 
-		for (auto e: detach_events) {
-			if (signature.test(e.first)) {
+		for (auto e : detach_events)
+		{
+			if (signature.test(e.first))
+			{
 				e.second.invoke(Entity(entity, this));
 			}
 		}
 		registry.destroy(entity);
 	}
 
-	void Scene::setCameraEntity(Entity camera) {
+	void Scene::setCameraEntity(Entity camera)
+	{
 		main_camera_entity = camera;
 	}
 
 
-	void Scene::update(float delta_t) {
-		if (is_active) {
+	void Scene::update(float delta_t)
+	{
+		if (is_active)
+		{
 			onUpdate.invoke(delta_t);
-			hierarchy_system->updateNodeIndices();
+			node3D_system->updateNodeIndices();
 		}
 	}
 
-	void Scene::draw() {
-		if (is_active) {
+	void Scene::draw()
+	{
+		if (is_active)
+		{
 			onDraw.invoke(&render_graph);
 		}
 	}
 
-	void Scene::present() {
+	void Scene::present()
+	{
 	}
 
-	void Scene::render() {
-		if (is_active) {
+	void Scene::render()
+	{
+		if (is_active)
+		{
 			onRender.invoke(&render_graph);
 		}
 	}
 
-	Scene::~Scene() {
+	Scene::~Scene()
+	{
 		Graphics::getDefaultRenderTarget()->onResolutionChange.unsubscribe(this);
-		for (auto event: detach_events) {
+		for (auto event : detach_events)
+		{
 			std::vector<entity_handle> entities;
 			registry.group(entities, event.first);
-			for (unsigned int entitie: entities) {
+			for (entity_handle entity : entities)
+			{
 				event.second.invoke(Entity(entitie, this));
 			}
 		}
@@ -81,22 +97,27 @@ namespace HBE {
 		Application::onUpdate.unsubscribe(this);
 	}
 
-	bool Scene::valid(entity_handle handle) {
+	bool Scene::valid(entity_handle handle)
+	{
 		return registry.valid(handle);
 	}
 
 
-	bool Scene::has(entity_handle handle, size_t signature_bit) {
+	bool Scene::has(entity_handle handle, size_t signature_bit)
+	{
 		return registry.has(handle, signature_bit);
 	}
 
 
-	const std::vector<entity_handle> &Scene::getRootNodes() const {
-		return hierarchy_system->getRootNodes();
+	const std::vector<entity_handle>& Scene::getRootNodes() const
+	{
+		return node3D_system->getRootNodes();
 	}
 
-	void Scene::setActive(bool active) {
-		if (active != is_active) {
+	void Scene::setActive(bool active)
+	{
+		if (active != is_active)
+		{
 			if (active)
 				onSceneActivate.invoke(this);
 			else
@@ -105,41 +126,50 @@ namespace HBE {
 		is_active = active;
 	}
 
-	bool Scene::isActive() {
+	bool Scene::isActive()
+	{
 		return is_active;
 	}
 
-	void Scene::onFrameChange(uint32_t frame) {
+	void Scene::onFrameChange(uint32_t frame)
+	{
 		render_graph.clear();
 	}
 
-	bool Entity::valid() {
+	bool Entity::valid()
+	{
 		return scene != nullptr && scene->valid(handle);
 	}
 
-	entity_handle Entity::getHandle() const {
+	entity_handle Entity::getHandle() const
+	{
 		return handle;
 	}
 
-	Entity::Entity(const Entity &other) {
+	Entity::Entity(const Entity& other)
+	{
 		this->handle = other.handle;
 		this->scene = other.scene;
 	}
 
-	Entity::Entity(entity_handle handle, Scene *scene) {
+	Entity::Entity(entity_handle handle, Scene* scene)
+	{
 		this->handle = handle;
 		this->scene = scene;
 	}
 
-	bool Entity::has(size_t sigature_bit) {
+	bool Entity::has(size_t sigature_bit)
+	{
 		return scene->has(handle, sigature_bit);
 	}
 
-	Scene *Entity::getScene() {
+	Scene* Entity::getScene()
+	{
 		return scene;
 	}
 
-	void Entity::destroy() {
+	void Entity::destroy()
+	{
 		scene->destroyEntity(handle);
 	}
 
@@ -155,15 +185,29 @@ namespace HBE {
 		systems.push_back(system);
 	}
 
-	Scene::Scene() {
-		transform_system = new TransformSystem(this);
-		hierarchy_system = new HierarchySystem(this);
-		systems.reserve(5);
-		systems.push_back(hierarchy_system);
-		systems.push_back(new CameraSystem(this));
-		systems.push_back(new CameraControllerSystem(this));
-		systems.push_back(new ModelRendererSystem(this));
-		systems.push_back(new MeshRendererSystem(this));
+	Scene::Scene(SceneInfo info)
+	{
+		if (info.initialized_systems_flags & SCENE_INITIALIZE_SYSTEMS_FLAG_TRANSFORM_SYSTEM)
+		{
+			Log::warning("Transform System disabled, it is mandatory for Transform.world() function to work properly");
+			transform_system = new TransformSystem(this);
+			addSystem(transform_system);
+		}
+		if (info.initialized_systems_flags & SCENE_INITIALIZE_SYSTEMS_FLAG_NODE_3D_SYSTEM)
+		{
+			Log::warning("Hierarchy System disabled, it is mandatory for Transform.world() function to work properly");
+			node3D_system = new Node3DSystem(this);
+			addSystem(node3D_system);
+		}
+
+		if (info.initialized_systems_flags & SCENE_INITIALIZE_SYSTEMS_FLAG_CAMERA_SYSTEM)
+			addSystem(new CameraSystem(this));
+		if (info.initialized_systems_flags & SCENE_INITIALIZE_SYSTEMS_FLAG_CAMERA_CONTROLLER_SYSTEM)
+			addSystem(new CameraControllerSystem(this));
+		if (info.initialized_systems_flags & SCENE_INITIALIZE_SYSTEMS_FLAG_MODEL_RENDERER_SYSTEM)
+			addSystem(new ModelRendererSystem(this));
+		if (info.initialized_systems_flags & SCENE_INITIALIZE_SYSTEMS_FLAG_MESH_RENDERER_SYSTEM)
+			addSystem(new MeshRendererSystem(this));
 
 		Application::onDraw.subscribe(this, &Scene::draw);
 		Application::onRender.subscribe(this, &Scene::render);
@@ -180,26 +224,29 @@ namespace HBE {
 		return e;
 	}
 
-	Entity Scene::createEntity3D() {
+	Entity Scene::createEntity3D()
+	{
+		HB_ASSERT(node3D_system != nullptr,"Node3D system is not initialized, node3D components will not work properly");
 		Entity e = createEntity();
-
-		attach<Transform>(e.getHandle());
+		Node3D* node = attach<Node3D>(e.getHandle());
+		node->entity = e;
 		return e;
 	}
 
-	Entity Scene::createEntity2D() {
-		Entity e = createEntity();
-
-		attach<Transform2D>(e.getHandle());
-		return e;
+	Entity Scene::createEntity2D()
+	{
+		HB_ASSERT(node2D_system != nullptr,"Node2D system is not initialized, node3D components will not work properly");
+		Log::warning("Entity2D is not implemented yet");
+		return createEntity();
 	}
 
 	void Scene::setParent(Entity entity, Entity parent) {
 		setParent(entity.getHandle(), parent.getHandle());
 	}
 
-	void Scene::setParent(entity_handle entity, entity_handle parent) {
-		hierarchy_system->setParent(entity, parent);
+	void Scene::setParent(entity_handle entity, entity_handle parent)
+	{
+		node3D_system->setParent(entity, parent);
 	}
 
 	Image *Scene::getMainCameraTexture() {

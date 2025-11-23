@@ -1,4 +1,4 @@
-#include "LabelSystem.h"
+#include "TextSystem.h"
 #include "core/scene/systems/MeshRendererSystem.h"
 #include "core/resource/Shader.h"
 #include "core/resource/Resources.h"
@@ -6,7 +6,7 @@
 #include "core/resource/RasterizationPipelineInstance.h"
 #include "core/scene/components/Transform.h"
 #include "core/scene/Scene.h"
-#include "core/scene/components/HierarchyNode.h"
+#include "core/scene/components/Node3D.h"
 #include "core/utility/Geometry.h"
 
 namespace HBE
@@ -18,7 +18,6 @@ namespace HBE
 		text_component->pipeline_instance = default_text_pipeline_instance;
 		text_component->font = default_font;
 		text_component->height = 40;
-
 	}
 
 	TextSystem::~TextSystem()
@@ -89,9 +88,9 @@ namespace HBE
 	void TextSystem::onPrepareRenderGraph(RenderGraph* render_graph)
 	{
 		HB_PROFILE_BEGIN("TextComponentDraw");
-		auto group = scene->group<HierarchyNode, HierarchyNode, Transform, TextComponent>();
+		auto group = scene->group<Node3D, Transform, TextComponent>();
 
-		for (auto [handle,node, state, transform, text_component] : group)
+		for (auto [handle,node, transform, text_component] : group)
 		{
 			if (!text_component.active ||
 				text_component.mesh == nullptr ||

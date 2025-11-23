@@ -20,7 +20,7 @@ namespace HBE {
 
 	class RenderGraph;
 
-	struct  HierarchyNode;
+	struct  Node3D;
 
 	struct HB_API TextComponent {
 		friend class TextSystem;
@@ -61,7 +61,7 @@ namespace HBE {
 	public:
 		TextSystem(Scene *scene, RasterizationTarget *render_target);
 
-		void drawSceneNode(RenderGraph *graph, HierarchyNode &node);
+		void drawSceneNode(RenderGraph *graph, Node3D &node);
 
 		~TextSystem() override;
 

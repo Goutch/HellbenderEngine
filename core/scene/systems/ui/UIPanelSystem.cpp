@@ -6,7 +6,7 @@
 #include "core/scene/systems/MeshRendererSystem.h"
 #include "core/scene/Scene.h"
 #include "core/resource/Resources.h"
-#include "core/scene/components/HierarchyNode.h"
+#include "core/scene/components/Node3D.h"
 #include "core/utility/Geometry.h"
 
 namespace HBE
@@ -49,7 +49,7 @@ namespace HBE
 
 	void UIPanelSystem::draw(RenderGraph* graph)
 	{
-		Group<HierarchyNode, Transform, UIPanel> group = scene->group<HierarchyNode, Transform, UIPanel>();
+		Group<Node3D, Transform, UIPanel> group = scene->group<Node3D, Transform, UIPanel>();
 		for (auto [entity_handle,node, transform, panel] : group)
 		{
 			if (!panel.active || !panel.pipeline_instance)

@@ -1,17 +1,17 @@
 #include "Transform2D.h"
 #include <core/scene/Scene.h>
-#include "HierarchyNode.h"
+#include "Node3D.h"
 
 namespace HBE
 {
-	struct HierarchyNode;
+	struct Node3D;
 
 	void Transform2D::setDirty()
 	{
 		is_dirty = true;
-		if (entity.has<HierarchyNode>())
+		if (entity.has<Node3D>())
 		{
-			HierarchyNode* node = entity.get<HierarchyNode>();
+			Node3D* node = entity.get<Node3D>();
 
 			for (entity_handle child : node->children)
 			{
@@ -23,9 +23,9 @@ namespace HBE
 
 	mat3& Transform2D::world()
 	{
-		if (entity.has<HierarchyNode>())
+		if (entity.has<Node3D>())
 		{
-			HierarchyNode* node = entity.get<HierarchyNode>();
+			Node3D* node = entity.get<Node3D>();
 			if (entity.getScene()->valid(node->parent))
 			{
 				Transform2D* parent = entity.getScene()->get<Transform2D>(node->parent);

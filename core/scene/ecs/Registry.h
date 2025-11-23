@@ -18,6 +18,9 @@
 
 namespace HBE
 {
+	template <typename... Components>
+	class Group;
+
 	class HB_API Registry
 	{
 		uint32_t current_handle = 0;
@@ -61,7 +64,7 @@ namespace HBE
 		std::bitset<REGISTRY_MAX_COMPONENT_TYPES>& getSignature(entity_handle handle);
 
 		template <typename... Components>
-		Group<Components...> group()
+		typename Group<Components...> group()
 		{
 			constexpr size_t size = sizeof...(Components);
 			size_t signature_bits[size] = {type_registry.getSignatureBit<Components>()...};
