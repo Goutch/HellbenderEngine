@@ -3,7 +3,7 @@
 
 #include "cstring"
 #include "array"
-
+#include "VK_Utils.h"
 namespace HBE
 {
 	VK_Buffer::VK_Buffer(VK_Device* device,
@@ -36,6 +36,7 @@ namespace HBE
 
 	VK_Buffer::~VK_Buffer()
 	{
+		Log::debug("Delete buffer " + VK_Utils::handleToString(handle));
 		if (allocated())
 		{
 			vkDestroyBuffer(device->getHandle(), handle, nullptr);
@@ -110,10 +111,8 @@ namespace HBE
 			Log::error("failed to create buffer!");
 		}
 
-#ifdef PRINT_BUFFER_CREATION
-		void* handle_ptr = handle;
-		printf("create buffer:%p\n",handle_ptr);
-#endif
+		Log::debug("Created buffer " + VK_Utils::handleToString(handle));
+
 		VkMemoryRequirements requirements;
 		vkGetBufferMemoryRequirements(device->getHandle(), handle, &requirements);
 		requirements.alignment = std::max(requirements.alignment, custom_alignment);

@@ -1,7 +1,9 @@
 #pragma once
 
 #include "core/utility/Log.h"
-
+#include <string>
+#include <cinttypes>   // for PRIx64
+#include <cstdio>      // for snprintf
 namespace HBE {
 	class VK_Utils {
 	public:
@@ -22,6 +24,17 @@ namespace HBE {
 			}
 		}
 
+
+	template <typename T>
+	static std::string handleToString(T handle)
+	{
+		uint64_t value = reinterpret_cast<uint64_t>(handle);
+
+		char buf[32];
+		std::snprintf(buf, sizeof(buf), "0x%016" PRIx64, value);
+
+		return std::string(buf);
+	}
 		static std::string samplerFilterTypeToString(IMAGE_SAMPLER_FILTER_TYPE filter) {
 			switch (filter) {
 				case IMAGE_SAMPLER_FILTER_TYPE_NEAREST:

@@ -232,7 +232,7 @@ namespace HBE {
 			Log::error("failed to create image!");
 		}
 #ifdef DEBUG_MODE
-		Log::debug(std::to_string((uint64_t) handle) + "|Created image#" + std::to_string(id) + "format " + formatToString(info.format));
+		Log::debug( "Created image#" + std::to_string(id) + " handle: " + VK_Utils::handleToString(handle) + " format " + formatToString(info.format));
 #endif
 		VkMemoryRequirements requirements;
 		vkGetImageMemoryRequirements(device->getHandle(), handle, &requirements);
@@ -319,14 +319,14 @@ namespace HBE {
 			}
 
 			Log::debug(
-					"Create sampler with mode:" + VK_Utils::samplerModeToString(info.sampler_info.address_mode) +
+					"Created sampler "+VK_Utils::handleToString(sampler_handle)+" with mode:" + VK_Utils::samplerModeToString(info.sampler_info.address_mode) +
 					" | filter:" + VK_Utils::samplerFilterTypeToString(info.sampler_info.filter));
 		}
 	}
 
 
 	VK_Image::~VK_Image() {
-		Log::debug(std::to_string((uint64_t) handle) + "|Delete image#" + std::to_string(id));
+		Log::debug(std::to_string((uint64_t) handle) + "|Delete image#" + std::to_string(id) + "handle: " + VK_Utils::handleToString(handle));
 		if (sampler_handle != VK_NULL_HANDLE) {
 			vkDestroySampler(device->getHandle(), sampler_handle, nullptr);
 		}
