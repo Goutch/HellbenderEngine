@@ -13,6 +13,7 @@
 
 #include "core/scene/Entity.h"
 #include "core/scene/components/Transform.h"
+#include "core/scene/systems/TransformSystem.h"
 #include "core/scene/components/Transform2D.h"
 #include "core/scene/components/Camera.h"
 #include "core/scene/components/Camera2D.h"

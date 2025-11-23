@@ -85,7 +85,7 @@ namespace HBE
 			registry.group(entities, event.first);
 			for (entity_handle entity : entities)
 			{
-				event.second.invoke(Entity(entitie, this));
+				event.second.invoke(Entity(entity, this));
 			}
 		}
 
@@ -218,9 +218,6 @@ namespace HBE
 
 	Entity Scene::createEntity() {
 		Entity e = Entity(registry.create(), this);
-
-		HierarchyNode *node = attach<HierarchyNode>(e.getHandle());
-		node->entity = e;
 		return e;
 	}
 

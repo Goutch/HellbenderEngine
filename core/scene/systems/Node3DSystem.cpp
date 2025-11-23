@@ -31,7 +31,7 @@ namespace HBE
 			parent_node->children.erase(parent_node->children.begin() + node->getLocalIndex());
 		}
 		for (int i = node->getLocalIndex() + 1; i < root_nodes.size(); ++i) {
-			scene->get<HierarchyNode>(root_nodes[i])->local_index--;
+			scene->get<Node3D>(root_nodes[i])->local_index--;
 		}
 		root_nodes.erase(root_nodes.begin() + node->getLocalIndex());
 
