@@ -132,7 +132,7 @@ namespace HBE {
 	quat Transform::worldRotation()
 	{
 		Node3D* node = entity.get<Node3D>();
-		if (entity.getScene()->valid(node->parent))
+		if (entity.valid() && entity.getScene()->valid(node->parent))
 		{
 			Transform* parent = entity.getScene()->get<Transform>(node->parent);
 			return rotation() * parent->worldRotation();
@@ -171,7 +171,7 @@ namespace HBE {
 
 	void Transform::setDirty() {
 		is_dirty = true;
-		if (entity.has<Node3D>())
+		if (entity.valid() && entity.has<Node3D>())
 		{
 			Node3D* node = entity.get<Node3D>();
 
