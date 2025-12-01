@@ -138,6 +138,8 @@ set(CORE_FILES
 		core/utility/GLTFLoader.h
 		core/utility/DefaultModelParser.cpp
 		core/utility/DefaultModelParser.h
+		core/scene/ecs/SubGroupIterator.cpp
+		core/scene/ecs/SubGroupIterator.h
 
 
 )

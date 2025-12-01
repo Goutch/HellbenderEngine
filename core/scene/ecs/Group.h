@@ -35,7 +35,7 @@ namespace HBE
 			empty = pages.size() == 0;
 		}
 
-		typename std::vector<SubGroup<Components...>> split()
+		std::vector<SubGroup<Components...>> split()
 		{
 			std::vector<SubGroup<Components...>> sub_groups;
 			for (auto page : pages)
@@ -45,13 +45,13 @@ namespace HBE
 			return sub_groups;
 		}
 
-		typename GroupIterator<Components...> begin()
+		GroupIterator<Components...> begin()
 		{
 			if (empty)return GroupIterator<Components...>(pages);
 			else return GroupIterator<Components...>(pages, types, false);
 		};
 
-		typename GroupIterator<Components...> end()
+		GroupIterator<Components...> end()
 		{
 			if (empty)return GroupIterator<Components...>(pages);
 			else return GroupIterator<Components...>(pages, types, true);
