@@ -38,6 +38,7 @@
 #include "core/scene/components/Transform2D.h"
 #include "core/scene/components/Transform.h"
 #include "core/scene/components/Node3D.h"
+#include "core/scene/components/EntityState.h"
 #include "core/scene/systems/ui/UIPanelSystem.h"
 #include "core/scene/systems/ui/ButtonSystem.h"
 #include "core/scene/systems/ui/TextBoxSystem.h"

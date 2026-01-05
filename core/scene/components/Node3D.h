@@ -1,7 +1,7 @@
 #pragma once
 #include <glm/fwd.hpp>
 
-#include "HBE/core/scene/Entity.h"
+#include "core/scene/Entity.h"
 
 namespace HBE
 {

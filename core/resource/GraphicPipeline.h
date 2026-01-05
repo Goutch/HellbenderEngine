@@ -9,8 +9,6 @@
 namespace HBE {
 	class Shader;
 
-	class Texture;
-
 	class MeshLayout;
 
 	class RenderTarget;

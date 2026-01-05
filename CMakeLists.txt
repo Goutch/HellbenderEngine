@@ -43,7 +43,6 @@ set(CORE_FILES
 		core/resource/Shader.h
 		core/resource/ResourceFactory.h
 		core/resource/Resource.h
-		core/resource/RaterizationPipeline.h
 		core/resource/ComputePipeline.h
 		core/resource/Resources.h
 		core/resource/Resources.cpp
