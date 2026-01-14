@@ -59,7 +59,26 @@ namespace HBE {
 
         bool valid(entity_handle handle);
 
-      template<typename Component>
+        template<typename T>
+        struct is_valid_component {
+        private:
+            template<typename T>
+            static auto test(int) -> decltype(
+                (void) T::COMPONENT_HASH, // checks existence of Key
+                (void) T::COMPONENT_NAME, // checks existence of Name
+                std::true_type{}
+            );
+
+            template<typename>
+            static std::false_type test(...);
+
+        public:
+            static constexpr bool value = decltype(test<T>(0))::value;
+        };
+
+
+
+        template<typename Component>
         void initType(uint32_t typeIndex) {
             if (!initialized_types.test(typeIndex)) {
                 ComponentTypeInfo info = ComponentTypeInfo{
@@ -70,8 +89,10 @@ namespace HBE {
                 initialized_types.set(typeIndex);
             }
         }
+
         template<typename ComponentType>
         uint32_t getTypeIndex() {
+            static_assert(is_valid_component<ComponentType>::value, "Component structs must have COMPONENT_IDS(Type) macro inside the struct!");
             //global cache for this type T, keep the index of the type per registry id.
             static std::array<uint32_t, MAX_REGISTRIES> cache = [] {
                 std::array<uint32_t, MAX_REGISTRIES> a{};
@@ -90,8 +111,6 @@ namespace HBE {
             initType<ComponentType>(index);
             return cache[registry_id];
         }
-
-
 
 
         template<typename... Components>
@@ -155,6 +174,7 @@ namespace HBE {
 
             return pages[getPage(handle)]->getRawPool(type_index)->template getAs<Component>(handle);
         }
+
         template<typename Component>
         Component *attach(entity_handle handle) {
             uint32_t type_index = getTypeIndex<Component>();
