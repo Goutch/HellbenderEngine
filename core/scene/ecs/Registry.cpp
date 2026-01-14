@@ -28,6 +28,7 @@ namespace HBE {
     uint32_t Registry::findValidRegistryIndex() {
         for (int i = 0; i < free_registry_ids.size(); ++i) {
             if (free_registry_ids[i] == true) {
+                free_registry_ids[i] = false;
                 return i;
             }
         }
