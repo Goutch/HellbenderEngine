@@ -34,7 +34,7 @@ namespace HBE {
 		Component *get();
 
 		template<typename Component>
-		Component *get(size_t signature_bit);
+		Component *get(uint32_t type_index);
 
 		template<typename Component>
 		void detach();
@@ -42,7 +42,7 @@ namespace HBE {
 		template<typename Component>
 		bool has();
 
-		bool has(size_t signature_bit);
+		bool has(uint32_t type_index);
 
 		bool valid();
 

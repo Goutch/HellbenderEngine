@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 #include "Core.h"
 #include "queue"
 #include "list"
@@ -14,150 +16,158 @@
 #include "core/utility/Profiler.h"
 #include "Group.h"
 #include "ComponentPool.h"
-#include "ComponentTypeRegistry.h"
+#include "Component.h"
 
-namespace HBE
-{
-	template <typename... Components>
-	class Group;
+namespace HBE {
+    template<typename... Components>
+    class Group;
 
-	class HB_API Registry
-	{
-		uint32_t current_handle = 0;
-		std::queue<entity_handle> inactive;
-		std::vector<RegistryPage*> pages = std::vector<RegistryPage*>();
-		std::vector<ComponentTypeInfo> types;
-		std::bitset<REGISTRY_MAX_COMPONENT_TYPES> initialized_types;
+    class HB_API Registry {
+        static const uint32_t MAX_REGISTRIES = 256;
+        static const uint32_t INVALID_TYPE_INDEX = std::numeric_limits<uint32_t>::max();
+        static std::array<bool, MAX_REGISTRIES> free_registry_ids;
+        uint32_t registry_id;
+        uint32_t current_type_bit = 0;
+        uint32_t current_handle = 0;
+        std::queue<entity_handle> inactive;
+        std::vector<RegistryPage *> pages = std::vector<RegistryPage *>();
+        std::vector<ComponentTypeInfo> types;
+        std::bitset<REGISTRY_MAX_COMPONENT_TYPES> initialized_types;
+        std::map<uint64_t, uint32_t> component_hash_to_id;
 
+        std::vector<uint32_t *> component_types_id_caches;
 
-		inline size_t getPage(entity_handle handle)
-		{
-			return (handle - (handle % REGISTRY_PAGE_SIZE)) / REGISTRY_PAGE_SIZE;
-		}
+    private:
+        size_t getPage(entity_handle handle);
 
-	public:
-		ComponentTypeRegistry type_registry;
+    public:
+        uint32_t generateTypeIndex(uint64_t component_hash, const char *component_name);
 
-		Registry() = default;
+        uint32_t findValidRegistryIndex();
 
-		~Registry();
+        Registry();
 
-		template <typename Component>
-		void initType(size_t signature_bit)
-		{
-			if (!initialized_types.test(signature_bit))
-			{
-				const char* component_name = typeid(Component).name();
-				Log::debug("init type " + (component_name + (" with signature bit " + std::to_string(signature_bit))));
-				ComponentTypeInfo info = ComponentTypeInfo{signature_bit, sizeof(Component), component_name};
-				if (types.size() <= signature_bit)
-					types.resize(signature_bit + 1);
-				types[signature_bit] = info;
-				initialized_types.set(signature_bit);
-			}
-		}
+        ~Registry();
 
-		entity_handle create();
+        entity_handle create();
 
-		void group(std::vector<entity_handle>& entities, size_t signature_bit);
+        void group(std::vector<entity_handle> &entities, size_t type_index);
 
-		std::bitset<REGISTRY_MAX_COMPONENT_TYPES>& getSignature(entity_handle handle);
+        std::bitset<REGISTRY_MAX_COMPONENT_TYPES> &getSignature(entity_handle handle);
 
-		template <typename... Components>
-		typename Group<Components...> group()
-		{
-			constexpr size_t size = sizeof...(Components);
-			size_t signature_bits[size] = {type_registry.getSignatureBit<Components>()...};
-			for (int i = 0; i < size; ++i)
-			{
-				if (!initialized_types.test(signature_bits[i]))
-				{
-					return Group<Components...>(pages);
-				}
-			}
-			ComponentTypeInfo ts[size] = {types[type_registry.getSignatureBit<Components>()]...};
-			return Group<Components...>(pages, ts);
-		};
+        void destroy(entity_handle handle);
 
-		bool has(entity_handle handle, size_t signature_bit)
-		{
-			HB_ASSERT(valid(handle), "Entity does not exist");
-			auto page = pages[getPage(handle)];
-			RawComponentPool* raw_pool = page->getRawPool(signature_bit);
+        bool valid(entity_handle handle);
 
-			if (raw_pool != nullptr)
-				return raw_pool->has(handle);
-			else
-				return false;
-		}
+      template<typename Component>
+        void initType(uint32_t typeIndex) {
+            if (!initialized_types.test(typeIndex)) {
+                ComponentTypeInfo info = ComponentTypeInfo{
+                    typeIndex, sizeof(Component), Component::COMPONENT_NAME, Component::COMPONENT_HASH
+                };
 
-		template <typename Component>
-		bool has(entity_handle handle)
-		{
-			size_t signature_bit = type_registry.getSignatureBit<Component>();
-			initType<Component>(signature_bit);
+                types.push_back(info);
+                initialized_types.set(typeIndex);
+            }
+        }
+        template<typename ComponentType>
+        uint32_t getTypeIndex() {
+            //global cache for this type T, keep the index of the type per registry id.
+            static std::array<uint32_t, MAX_REGISTRIES> cache = [] {
+                std::array<uint32_t, MAX_REGISTRIES> a{};
+                a.fill(INVALID_TYPE_INDEX);
+                return a;
+            }();
 
-			HB_ASSERT(valid(handle), "Entity does not exist");
-			HB_ASSERT(initialized_types.test(signature_bit), "component " + typeName<Component>() + " is not initialized");
-			return has(handle, signature_bit);
-		}
+            uint32_t index = cache[registry_id];
+            if (index != INVALID_TYPE_INDEX)
+                return index;
 
-		template <typename Component>
-		Component* get(entity_handle handle)
-		{
-			size_t signature_bit = type_registry.getSignatureBit<Component>();
+            //first dll/exe use this component type
+            index = generateTypeIndex(ComponentType::COMPONENT_HASH, ComponentType::COMPONENT_NAME);
+            component_types_id_caches.emplace_back(&cache[registry_id]);
+            cache[registry_id] = index;
+            initType<ComponentType>(index);
+            return cache[registry_id];
+        }
 
 
-			initType<Component>(signature_bit);
-
-			HB_ASSERT(initialized_types.test(signature_bit), "component" + typeName<Component>() + " is not initialized");
-			HB_ASSERT(has<Component>(handle),
-			          std::string("tried to get component ") + typeName<Component>() + "with signature bit " + std::to_string(type_registry.getSignatureBit<Component>()) +
-			          " in entity#" +
-			          std::to_string(handle) +
-			          std::string(" but has<") + typeName<Component>() + ">(" + std::to_string(handle) +
-			          ") == false");
-
-			return pages[getPage(handle)]->getRawPool(signature_bit)->template getAs<Component>(handle);
-		}
-
-		template <typename Component>
-		Component& get(entity_handle handle, size_t signature_bit)
-		{
-			HB_ASSERT(signature_bit < REGISTRY_MAX_COMPONENT_TYPES, "component bit is too large");
-			initType<Component>(signature_bit);
-			HB_ASSERT(initialized_types.test(signature_bit), "component " + typeName<Component>() + " is not initialized");
-			HB_ASSERT(has<Component>(handle),
-			          std::string("tried to get component ") + typeName<Component>() + "with signature bit " + std::to_string(type_registry.getSignatureBit<Component>()) +
-			          " in entity#" +
-			          std::to_string(handle) +
-			          std::string(" but has<") + typeName<Component>() + ">(" + std::to_string(handle) +
-			          ") == false");
-
-			return pages[getPage(handle)]->getRawPool(signature_bit)->template getAs<Component>(handle);
-		}
 
 
-		void destroy(entity_handle handle);
+        template<typename... Components>
+        typename Group<Components...> group() {
+            constexpr size_t size = sizeof...(Components);
+            size_t signature_bits[size] = {getTypeIndex<Components>()...};
+            for (int i = 0; i < size; ++i) {
+                if (!initialized_types.test(signature_bits[i])) {
+                    return Group<Components...>(pages);
+                }
+            }
+            ComponentTypeInfo ts[size] = {types[getTypeIndex<Components>()]...};
+            return Group<Components...>(pages, ts);
+        };
 
-		bool valid(entity_handle handle);
+        bool has(entity_handle handle, size_t signature_bit) {
+            HB_ASSERT(valid(handle), "Entity does not exist");
+            auto page = pages[getPage(handle)];
+            RawComponentPool *raw_pool = page->getRawPool(signature_bit);
 
-		template <typename Component>
-		Component* attach(entity_handle handle)
-		{
-			const size_t signature_bit = type_registry.getSignatureBit<Component>();
-			initType<Component>(signature_bit);
-			size_t page = getPage(handle);
-			return pages[page]->attach<Component>(handle, types[signature_bit]);
-		}
+            if (raw_pool != nullptr)
+                return raw_pool->has(handle);
+            else
+                return false;
+        }
 
-		template <typename Component>
-		void detach(entity_handle handle)
-		{
-			const size_t signature_bit = type_registry.getSignatureBit<Component>();
-			initType<Component>(signature_bit);
-			size_t page = getPage(handle);
-			pages[page]->detach(handle, types[signature_bit]);
-		}
-	};
+        template<typename Component>
+        bool has(entity_handle handle) {
+            HB_ASSERT(valid(handle), "Entity does not exist");
+            HB_ASSERT(initialized_types.test(getTypeIndex<Component>()),
+                      std::string("component ") + Component::COMPONENT_NAME + " is not initialized");
+
+            return has(handle, getTypeIndex<Component>());
+        }
+
+        template<typename Component>
+        Component *get(entity_handle handle) {
+            HB_ASSERT(initialized_types.test(getTypeIndex<Component>()),
+                      std::string("component") + Component::COMPONENT_NAME + " is not initialized");
+            HB_ASSERT(has<Component>(handle),
+                      std::string("tried to get component ") + Component::COMPONENT_NAME + "with signature bit " + std::
+                      to_string(getTypeIndex<Component>()) +
+                      " in entity#" +
+                      std::to_string(handle) +
+                      std::string(" but has<") + Component::COMPONENT_NAME + ">(" + std::to_string(handle) +
+                      ") == false");
+
+            return pages[getPage(handle)]->getRawPool(getTypeIndex<Component>())->template getAs<Component>(handle);
+        }
+
+        template<typename Component>
+        Component &get(entity_handle handle, size_t type_index) {
+            HB_ASSERT(type_index < REGISTRY_MAX_COMPONENT_TYPES, "component bit is too large");
+            HB_ASSERT(has<Component>(handle),
+                      std::string("tried to get component ") + Component::COMPONENT_NAME + "with signature bit " + std::
+                      to_string(getTypeIndex<Component>()) +
+                      " in entity#" +
+                      std::to_string(handle) +
+                      std::string(" but has<") + Component::COMPONENT_NAME + ">(" + std::to_string(handle) +
+                      ") == false");
+
+            return pages[getPage(handle)]->getRawPool(type_index)->template getAs<Component>(handle);
+        }
+        template<typename Component>
+        Component *attach(entity_handle handle) {
+            uint32_t type_index = getTypeIndex<Component>();
+            size_t page = getPage(handle);
+            return pages[page]->attach<Component>(handle, types[type_index]);
+        }
+
+        template<typename Component>
+        void detach(entity_handle handle) {
+            uint32_t type_index = getTypeIndex<Component>();
+
+            size_t page = getPage(handle);
+            pages[page]->detach(handle, types[type_index]);
+        }
+    };
 }

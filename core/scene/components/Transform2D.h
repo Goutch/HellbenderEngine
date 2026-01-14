@@ -6,39 +6,42 @@
 #include "Core.h"
 #include "HBETypes.h"
 #include "core/scene/Entity.h"
+#include "core/scene/ecs/Component.h"
 
-namespace HBE
-{
-	struct HB_API Transform2D
-	{
-	private:
-		Entity entity;
-		mat3 local_mat = mat3(1.0f);
-		mat3 world_mat = mat3(1.0f);
-		bool is_dirty = true;
+namespace HBE {
 
-	public:
-		void setDirty();
-		mat3& world();
 
-		vec2 worldPosition();
+    struct HB_API Transform2D {
+        COMPONENT_IDS(Transform2D)
+    private:
+        Entity entity;
+        mat3 local_mat = mat3(1.0f);
+        mat3 world_mat = mat3(1.0f);
+        bool is_dirty = true;
 
-		void translate(vec2 translation);
+    public:
+        void setDirty();
 
-		vec2 position();
+        mat3 &world();
 
-		void setPosition(vec2 pos);
+        vec2 worldPosition();
 
-		float rotation() const;
+        void translate(vec2 translation);
 
-		void rotate(float rotation);
+        vec2 position();
 
-		void setRotaton(float rotation);
+        void setPosition(vec2 pos);
 
-		float worldRotation();
+        float rotation() const;
 
-		void setScale(vec2 s);
+        void rotate(float rotation);
 
-		vec2 scale() const;
-	};
+        void setRotaton(float rotation);
+
+        float worldRotation();
+
+        void setScale(vec2 s);
+
+        vec2 scale() const;
+    };
 }

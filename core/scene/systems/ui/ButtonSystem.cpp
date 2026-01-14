@@ -1,4 +1,6 @@
 #include "ButtonSystem.h"
+
+#include "TextSystem.h"
 #include "UIPanelSystem.h"
 #include "core/scene/Scene.h"
 #include "core/input/Input.h"

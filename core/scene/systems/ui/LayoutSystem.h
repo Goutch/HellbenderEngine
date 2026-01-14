@@ -8,8 +8,10 @@
 
 namespace HBE
 {
+
 	struct HB_API LayoutElement
 	{
+		COMPONENT_IDS(LayoutElement)
 		entity_handle root;
 		PIVOT pivot = PIVOT_CENTER;
 		float width = 0;

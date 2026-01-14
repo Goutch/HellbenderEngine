@@ -10,7 +10,7 @@ namespace HBE
 		std::vector<RegistryPage*>& pages;
 		std::vector<entity_handle> entities;
 		std::tuple<ComponentPool<Components>...> current_pools;
-		ComponentTypeInfo types[sizeof...(Components)];
+		ComponentTypeInfo group_types[sizeof...(Components)];
 		std::bitset<REGISTRY_MAX_COMPONENT_TYPES> signature;
 		size_t current_entity = 0;
 		size_t current_page = 0;
@@ -20,7 +20,7 @@ namespace HBE
 		template <std::size_t index, typename Component>
 		void replacePools()
 		{
-			std::get<index>(current_pools) = ComponentPool<Component>(*pages[current_page]->getRawPool(types[index].signature_bit));
+			std::get<index>(current_pools) = ComponentPool<Component>(*pages[current_page]->getRawPool(group_types[index].index));
 		}
 
 		template <typename... Parms>
@@ -70,8 +70,8 @@ namespace HBE
 
 			for (size_t i = 0; i < sizeof...(Components); i++)
 			{
-				this->types[i] = types[i];
-				signature.set(types[i].signature_bit);
+				this->group_types[i] = types[i];
+				signature.set(types[i].index);
 			}
 
 			if (isEnd)current_page = pages.size();
@@ -128,7 +128,7 @@ namespace HBE
 			RawComponentPool* raw_pools[sizeof...(Components)];
 			for (size_t i = 0; i < sizeof...(Components); ++i)
 			{
-				raw_pools[i] = pages[current_page]->getRawPool(types[i].signature_bit);
+				raw_pools[i] = pages[current_page]->getRawPool(group_types[i].index);
 				if (raw_pools[i] == nullptr)
 				{
 					entities.clear();
@@ -149,7 +149,7 @@ namespace HBE
 				if (i == min_size_index)
 					continue;
 				size_t entity_count = entities.size();
-				for (size_t j = 0; j < entity_count; ++j)
+				for (size_t j = 0; j < entity_count-1; j++)
 				{
 					while (!raw_pools[i]->has(entities[j]))
 					{

@@ -2,6 +2,7 @@
 #include <glm/fwd.hpp>
 
 #include "core/scene/Entity.h"
+#include "core/scene/ecs/Component.h"
 
 namespace HBE
 {
@@ -10,8 +11,10 @@ namespace HBE
     /**
 	 * @brief A node in the scene hierarchy that contains a 3D transform.
 	 */
+
 	struct HB_API Node3D
 	{
+		COMPONENT_IDS(Node3D)
 		friend class Scene;
 		friend class Node3DSystem;
 		Entity entity;

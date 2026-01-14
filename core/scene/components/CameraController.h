@@ -6,9 +6,11 @@
 
 #include "Core.h"
 #include "HBETypes.h"
+#include "core/scene/ecs/Component.h"
 
 namespace HBE {
 	struct HB_API CameraController {
+		COMPONENT_IDS(CameraController)
 		float base_speed = 10.0f;
 		float current_speed = 10.0f;
 		float sensibility = 1.0f;

@@ -7,45 +7,50 @@
 #include "Core.h"
 #include "HBETypes.h"
 #include "core/resource/RasterizationTarget.h"
+#include "core/scene/ecs/Component.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "glm/gtc/quaternion.hpp"
+
 namespace HBE {
-	struct HB_API Camera {
-		Camera() {};
+    struct HB_API Camera {
+        COMPONENT_IDS(Camera)
 
-		Camera(const Camera &other);
+        Camera() {
+        };
 
-		mat4 projection = mat4(1.0f);
-		float fov = 70.0f;
-		float far = 1000.0f;
-		float near = 0.1f;
-		bool active = true;
-		uint32_t layer_mask = UINT32_MAX;
+        Camera(const Camera &other);
 
-		void setRenderTarget(RasterizationTarget *render_target);
+        mat4 projection = mat4(1.0f);
+        float fov = 70.0f;
+        float far = 1000.0f;
+        float near = 0.1f;
+        bool active = true;
+        uint32_t layer_mask = UINT32_MAX;
 
-		RasterizationTarget *getRenderTarget();
+        void setRenderTarget(RasterizationTarget *render_target);
 
-		float aspectRatio();
+        RasterizationTarget *getRenderTarget();
 
-		void setFOV(float fov);
+        float aspectRatio();
 
-		float getFOV();
+        void setFOV(float fov);
 
-		void setNearPlane(float near);
+        float getFOV();
 
-		void setFarPlane(float far);
+        void setNearPlane(float near);
 
-		float getNearPlane();
+        void setFarPlane(float far);
 
-		float getFarPlane();
+        float getNearPlane();
 
-	private:
-		RasterizationTarget *render_target = nullptr;
+        float getFarPlane();
 
-		void calculateProjection(RasterizationTarget *render_target);
-	};
+    private
+    :
+        RasterizationTarget *render_target = nullptr;
 
+        void calculateProjection(RasterizationTarget *render_target);
+    };
 }

@@ -1,45 +1,48 @@
-
 #pragma once
 
 #include "core/scene/System.h"
 #include "core/scene/Entity.h"
 #include "Core.h"
 #include "HBETypes.h"
+#include "core/scene/ecs/Component.h"
 
 using namespace HBE;
+
 namespace HBE {
-	class Font;
+    class Font;
 
-	struct HB_API TextBoxComponent {
-		friend class TextBoxSystem;
 
-		Entity entity;
+    struct HB_API TextBoxComponent {
+        COMPONENT_IDS(TextBoxComponent)
+        friend class TextBoxSystem;
 
-		void setSize(vec2 size);
+        Entity entity;
 
-		void setTextHeight(float height);
+        void setSize(vec2 size);
 
-		void setHintText(const std::string &hint);
+        void setTextHeight(float height);
 
-	private :
-		std::string hint_text;
-		bool is_hint_visible = true;
-	};
+        void setHintText(const std::string &hint);
 
-	class HB_API TextBoxSystem : public System {
-	private:
-		float cursor_blink_t = 0;
-		Entity active_textbox_entity;
-	public:
-		TextBoxSystem(Scene *scene);
+    private :
+        std::string hint_text;
+        bool is_hint_visible = true;
+    };
 
-		void onAttachTextBox(Entity text_box);
+    class HB_API TextBoxSystem : public System {
+    private:
+        float cursor_blink_t = 0;
+        Entity active_textbox_entity;
 
-		void onTextBoxClicked(Entity button);
+    public:
+        TextBoxSystem(Scene *scene);
 
-		void onUpdate(float delta);
+        void onAttachTextBox(Entity text_box);
 
-		void onCharacterPressed(char character);
-	};
+        void onTextBoxClicked(Entity button);
 
+        void onUpdate(float delta);
+
+        void onCharacterPressed(char character);
+    };
 }

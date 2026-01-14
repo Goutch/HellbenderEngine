@@ -6,6 +6,7 @@
 #include "core/scene/Entity.h"
 #include "HBETypes.h"
 #include "core/resource/Mesh.h"
+#include "core/scene/ecs/Component.h"
 
 namespace HBE {
 	class Font;
@@ -22,7 +23,9 @@ namespace HBE {
 
 	struct  Node3D;
 
+
 	struct HB_API TextComponent {
+		COMPONENT_IDS(TextComponent)
 		friend class TextSystem;
 
 		bool active = true;

@@ -4,6 +4,7 @@
 #include "HBETypes.h"
 #include "core/scene/System.h"
 #include "core/scene/Entity.h"
+#include "core/scene/ecs/Component.h"
 
 using namespace HBE;
 namespace HBE {
@@ -15,7 +16,9 @@ namespace HBE {
 
 	struct Node3D;
 
+
 	struct UIPanel {
+		COMPONENT_IDS(UIPanel)
 		RasterizationPipelineInstance *pipeline_instance = nullptr;
 		PIVOT anchor = PIVOT_CENTER;
 		int layer = 0;

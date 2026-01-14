@@ -6,14 +6,17 @@
 #include "glm/gtc/quaternion.hpp"
 #include "glm/glm.hpp"
 #include "Event.h"
+#include "core/scene/ecs/Component.h"
 
 using namespace glm;
 using namespace utils;
 
 namespace HBE
 {
+
 	struct HB_API Transform
 	{
+		COMPONENT_IDS(Transform)
 		friend class TransformSystem;
 		friend class Scene;
 		friend class Node3DSystem;

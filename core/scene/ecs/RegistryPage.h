@@ -42,17 +42,17 @@ namespace HBE {
 			size_t i = handleToIndex(handle);
 			HB_ASSERT(valid_entities[i], "Enitty#" + std::to_string(handle) + "is not valid");
 
-			components_of_entity[i].set(type.signature_bit);
+			components_of_entity[i].set(type.index);
 
-			if (component_pages.size() <= type.signature_bit) {
-				component_pages.resize(type.signature_bit + 1, nullptr);
+			if (component_pages.size() <= type.index) {
+				component_pages.resize(type.index + 1, nullptr);
 			}
-			if (component_pages[type.signature_bit] == nullptr) {
-				component_pages[type.signature_bit] = new RawComponentPool(type, offset);
-				components_signature.set(type.signature_bit, true);
+			if (component_pages[type.index] == nullptr) {
+				component_pages[type.index] = new RawComponentPool(type, offset);
+				components_signature.set(type.index, true);
 			}
 			Component component{};
-			char *raw_ptr = component_pages[type.signature_bit]->getMemory(handle);
+			char *raw_ptr = component_pages[type.index]->getMemory(handle);
 			Component *ptr = new(raw_ptr) Component{};
 			return ptr;
 		};
@@ -60,17 +60,17 @@ namespace HBE {
 		void detach(entity_handle handle, ComponentTypeInfo &type) {
 			size_t i = handleToIndex(handle);
 
-			components_of_entity[i].set(type.signature_bit, false);
+			components_of_entity[i].set(type.index, false);
 			if (valid_entities[i]) {
-				if (component_pages[type.signature_bit] == nullptr) {
+				if (component_pages[type.index] == nullptr) {
 					return;
 				}
-				RawComponentPool *raw_pool = component_pages[type.signature_bit];
+				RawComponentPool *raw_pool = component_pages[type.index];
 				raw_pool->detach(handle);
 				if (raw_pool->handles.size() == 0) {
-					components_signature.set(raw_pool->info.signature_bit, false);
+					components_signature.set(raw_pool->info.index, false);
 
-					component_pages[type.signature_bit] = nullptr;
+					component_pages[type.index] = nullptr;
 					delete raw_pool;
 
 				}

@@ -5,6 +5,7 @@
 #include "core/scene/Entity.h"
 #include "core/scene/System.h"
 #include "Event.h"
+#include "core/scene/ecs/Component.h"
 
 using namespace utils;
 namespace HBE {
@@ -27,7 +28,9 @@ namespace HBE {
 		float borderWidth;
 	};
 
+
 	struct HB_API ButtonComponent {
+		COMPONENT_IDS(ButtonComponent)
 		Entity entity;
 		Entity label_entity;
 		ButtonMaterial material_properties;

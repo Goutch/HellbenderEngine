@@ -6,8 +6,12 @@
 #include "Core.h"
 #include "HBETypes.h"
 #include "core/resource/RasterizationTarget.h"
+#include "core/scene/ecs/Component.h"
+
 namespace HBE{
+
 	struct HB_API PixelCamera {
+		COMPONENT_IDS(PixelCamera);
 			PixelCamera() {};
 
 			PixelCamera(const PixelCamera &other);

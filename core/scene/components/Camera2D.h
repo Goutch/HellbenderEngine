@@ -2,9 +2,12 @@
 #include "Core.h"
 #include "HBETypes.h"
 #include "core/resource/RasterizationTarget.h"
+#include "core/scene/ecs/Component.h"
+
 namespace HBE
 {
 	struct HB_API Camera2D {
+		COMPONENT_IDS(Camera2D)
 		Camera2D() {};
 
 		Camera2D(const Camera2D &other);

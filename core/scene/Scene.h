@@ -186,8 +186,8 @@ namespace HBE {
 	}
 
 	template<typename Component>
-	Component *Entity::get(size_t signature_bit) {
-		return scene->get<Component>(handle, signature_bit);
+	Component *Entity::get(uint32_t type_index) {
+		return scene->get<Component>(handle, type_index);
 	}
 
 	template<typename Component>
@@ -220,20 +220,20 @@ namespace HBE {
 	Component *Scene::attach(entity_handle handle) {
 		Component *component = registry.attach<Component>(handle);
 		Entity e = Entity(handle, this);
-		size_t bit = registry.type_registry.getSignatureBit<Component>();
-		if (attach_events.find(bit) != attach_events.end())
-			attach_events[bit].invoke(e);
+		uint32_t index = registry.getTypeIndex<Component>();
+		if (attach_events.find(index) != attach_events.end())
+			attach_events[index].invoke(e);
 		return component;
 	};
 
 
 	template<typename Component>
 	Component *Scene::attach(entity_handle handle, Component &component) {
-		size_t hash = registry.type_registry.getSignatureBit<Component>();
+		uint32_t index= registry.getTypeIndex<Component>();
 		Component &component_ref = registry.attach<Component>(handle, component);
 
-		if (attach_events.find(hash) != attach_events.end())
-			attach_events[hash].invoke(Entity(handle, this));
+		if (attach_events.find(index) != attach_events.end())
+			attach_events[index].invoke(Entity(handle, this));
 		return component_ref;
 	};
 
@@ -245,34 +245,33 @@ namespace HBE {
 
 	template<typename Component>
 	void Scene::detach(entity_handle handle) {
-		size_t bit = registry.type_registry.getSignatureBit<Component>();
+		uint32_t index= registry.getTypeIndex<Component>();
 
-		if (detach_events.find(bit) != detach_events.end())
-			detach_events[bit].invoke(Entity(handle, this));
+		if (detach_events.find(index) != detach_events.end())
+			detach_events[index].invoke(Entity(handle, this));
 		registry.detach<Component>(handle);
 	};
 
 	template<typename Component>
 	Event<Entity> &Scene::onAttach() {
-		size_t bit = registry.type_registry.getSignatureBit<Component>();
-		registry.initType<Component>(bit);
-		if (attach_events.find(bit) == attach_events.end()) {
-			attach_events.emplace(bit, Event<Entity>());
+		uint32_t index = registry.getTypeIndex<Component>();
+		if (attach_events.find(index) == attach_events.end()) {
+			attach_events.emplace(index, Event<Entity>());
 		}
-		return attach_events[bit];
+		return attach_events[index];
 	};
 
 	template<typename Component>
 	Event<Entity> &Scene::onDetach() {
-		size_t bit = registry.type_registry.getSignatureBit<Component>();
-		if (detach_events.find(bit) == detach_events.end()) {
-			detach_events.emplace(bit, Event<Entity>());
+		uint32_t index = registry.getTypeIndex<Component>();
+		if (detach_events.find(index) == detach_events.end()) {
+			detach_events.emplace(index, Event<Entity>());
 		}
-		return detach_events[bit];
+		return detach_events[index];
 	}
 
 	template<typename Component>
 	size_t Scene::getComponentSignatureBit() {
-		return registry.type_registry.getSignatureBit<Component>();
+		return registry.getTypeIndex<Component>();
 	}
 }
