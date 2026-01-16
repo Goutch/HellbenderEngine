@@ -14,7 +14,7 @@ namespace HBE {
 
 	class RenderGraph;
 
-	struct Node3D;
+	struct Node;
 
 
 	struct UIPanel {

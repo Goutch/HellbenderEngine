@@ -19,7 +19,7 @@ namespace HBE
 		//update Positions
 	}
 
-	void LayoutSystem::updateSizes(Node3D* node)
+	void LayoutSystem::updateSizes(Node* node)
 	{
 	}
 

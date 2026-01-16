@@ -23,7 +23,7 @@ namespace HBE
 	public:
 		LayoutSystem(Scene* scene);
 		void update(float delta);
-		void updateSizes(Node3D* node);
+		void updateSizes(Node* node);
 		~LayoutSystem();
 	};
 }

@@ -2,7 +2,7 @@
 
 #include <core/scene/Scene.h>
 
-#include "Node3D.h"
+#include "Node.h"
 
 namespace HBE {
 	void Transform::translate(vec3 translation) {
@@ -107,9 +107,9 @@ namespace HBE {
 
 	const mat4& Transform::world()
 	{
-		if (entity.valid() && entity.has<Node3D>())
+		if (entity.valid() && entity.has<Node>())
 		{
-			Node3D* node = entity.get<Node3D>();
+			Node* node = entity.get<Node>();
 			if (entity.getScene()->valid(node->parent))
 			{
 				Transform* parent = entity.getScene()->get<Transform>(node->parent);
@@ -131,7 +131,7 @@ namespace HBE {
 
 	quat Transform::worldRotation()
 	{
-		Node3D* node = entity.get<Node3D>();
+		Node* node = entity.get<Node>();
 		if (entity.valid() && entity.getScene()->valid(node->parent))
 		{
 			Transform* parent = entity.getScene()->get<Transform>(node->parent);
@@ -171,9 +171,9 @@ namespace HBE {
 
 	void Transform::setDirty() {
 		is_dirty = true;
-		if (entity.valid() && entity.has<Node3D>())
+		if (entity.valid() && entity.has<Node>())
 		{
-			Node3D* node = entity.get<Node3D>();
+			Node* node = entity.get<Node>();
 
 			for (entity_handle child: node->children) {
 				Transform *child_transform = entity.getScene()->get<Transform>(child);

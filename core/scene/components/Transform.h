@@ -19,7 +19,7 @@ namespace HBE
 		COMPONENT_IDS(Transform)
 		friend class TransformSystem;
 		friend class Scene;
-		friend class Node3DSystem;
+		friend class NodeSystem;
 
 	private:
 		Entity entity;

@@ -4,7 +4,7 @@
 #include "core/scene/components/Camera.h"
 #include "core/scene/components/Camera2D.h"
 #include "core/scene/components/PixelCamera.h"
-#include "core/scene/components/Node3D.h"
+#include "core/scene/components/Node.h"
 
 namespace HBE {
 	CameraSystem::CameraSystem(Scene *scene) : System(scene) {
@@ -48,9 +48,9 @@ namespace HBE {
 	void CameraSystem::render(RenderGraph *render_graph) {
 		HB_PROFILE_BEGIN("CameraRender");
 		HB_PROFILE_BEGIN("CameraRenderGroup");
-		auto group = scene->group<Node3D, Transform, Camera>();
-		auto group_2D = scene->group<Node3D, Transform, Camera2D>();
-		auto group_pixel = scene->group<Node3D, Transform, PixelCamera>();
+		auto group = scene->group<Node, Transform, Camera>();
+		auto group_2D = scene->group<Node, Transform, Camera2D>();
+		auto group_pixel = scene->group<Node, Transform, PixelCamera>();
 		RasterizeCmdInfo render_cmd_info{};
 		render_cmd_info.render_graph = render_graph;
 		HB_PROFILE_END("CameraRenderGroup");

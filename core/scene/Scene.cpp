@@ -4,12 +4,12 @@
 #include "Entity.h"
 #include "vector"
 #include "components/EntityState.h"
-#include "components/Node3D.h"
+#include "components/Node.h"
 #include "core/scene/systems/CameraSystem.h"
 #include "core/scene/systems/CameraControllerSystem.h"
 #include "core/scene/systems/ModelRendererSystem.h"
 #include "core/scene/systems/MeshRendererSystem.h"
-#include "systems/Node3DSystem.h"
+#include "systems/NodeSystem.h"
 #include "systems/TransformSystem.h"
 
 namespace HBE {
@@ -22,9 +22,9 @@ namespace HBE {
     void Scene::destroyEntity(entity_handle entity) {
         if (!valid(entity)) return;
 
-        Node3D *node = get<Node3D>(entity);
+        Node *node = get<Node>(entity);
         for (int32_t i = node->children.size() - 1; i >= 0; --i) {
-            Node3D *child_node = get<Node3D>(node->children[i]);
+            Node *child_node = get<Node>(node->children[i]);
             child_node->local_index = node->children.size() - 1;
             destroyEntity(node->children[i]);
         }
@@ -46,7 +46,7 @@ namespace HBE {
     void Scene::update(float delta_t) {
         if (is_active) {
             onUpdate.invoke(delta_t);
-            node3D_system->updateNodeIndices();
+            node_system->updateNodeIndices();
         }
     }
 
@@ -94,7 +94,7 @@ namespace HBE {
 
 
     const std::vector<entity_handle> &Scene::getRootNodes() const {
-        return node3D_system->getRootNodes();
+        return node_system->getRootNodes();
     }
 
     void Scene::setActive(bool active) {
@@ -166,11 +166,11 @@ namespace HBE {
             Log::warning("Transform System disabled, it is mandatory for Transform.world() function to work properly");
         }
 
-        if (info.initialized_systems_flags & SCENE_INITIALIZE_SYSTEMS_FLAG_NODE_3D_SYSTEM) {
-            node3D_system = new Node3DSystem(this);
-            addSystem(node3D_system);
+        if (info.initialized_systems_flags & SCENE_INITIALIZE_SYSTEMS_FLAG_NODE_SYSTEM) {
+            node_system = new NodeSystem(this);
+            addSystem(node_system);
         } else {
-            Log::warning("Node3D System disabled, it is mandatory for Transform.world() function to work properly");
+            Log::warning("Node System disabled, it is mandatory for Transform.world() function to work properly");
         }
 
         if (info.initialized_systems_flags & SCENE_INITIALIZE_SYSTEMS_FLAG_CAMERA_SYSTEM)
@@ -196,19 +196,27 @@ namespace HBE {
     }
 
     Entity Scene::createEntity3D() {
-        HB_ASSERT(node3D_system != nullptr,
-                  "Node3D system is not initialized, node3D components will not work properly");
         Entity e = createEntity();
-        Node3D *node = attach<Node3D>(e.getHandle());
-        node->entity = e;
+        HB_ASSERT(node_system != nullptr,
+                  "Node system is not initialized, node3D components will not work properly");
+        e.attach<Node>();
+        HB_ASSERT(transform_system != nullptr,
+                  "Transform system is not initialized, transform.world() function will not work properly");
+        e.attach<Transform>();
+
+
         return e;
     }
 
     Entity Scene::createEntity2D() {
-        HB_ASSERT(node2D_system != nullptr,
-                  "Node2D system is not initialized, node3D components will not work properly");
-        Log::warning("Entity2D is not implemented yet");
-        return createEntity();
+        Entity e = createEntity();
+        HB_ASSERT(node_system != nullptr,
+                  "Node system is not initialized, node2D components will not work properly");
+        e.attach<Node>();
+        HB_ASSERT(transform_system != nullptr,
+                  "Transform system is not initialized, transform.world() function will not work properly");
+        e.attach<Transform2D>();
+        return e;
     }
 
     void Scene::setParent(Entity entity, Entity parent) {
@@ -216,7 +224,7 @@ namespace HBE {
     }
 
     void Scene::setParent(entity_handle entity, entity_handle parent) {
-        node3D_system->setParent(entity, parent);
+        node_system->setParent(entity, parent);
     }
 
     Image *Scene::getMainCameraTexture() {

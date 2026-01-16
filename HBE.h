@@ -37,7 +37,7 @@
 #include "core/scene/components/CameraController.h"
 #include "core/scene/components/Transform2D.h"
 #include "core/scene/components/Transform.h"
-#include "core/scene/components/Node3D.h"
+#include "core/scene/components/Node.h"
 #include "core/scene/components/MeshRenderer.h"
 
 #include "core/scene/systems/ui/UIPanelSystem.h"

@@ -103,8 +103,7 @@ set(CORE_FILES
         core/scene/systems/ui/TextBoxSystem.cpp
         core/scene/systems/MeshRendererSystem.cpp
         core/scene/systems/ModelRendererSystem.cpp
-        core/scene/systems/Node3DSystem.cpp
-        core/scene/systems/Node2DSystem.cpp
+        core/scene/systems/NodeSystem.cpp
         core/scene/systems/ui/TextSystem.cpp
         core/scene/systems/TransformSystem.cpp
         core/scene/components/Transform.h
@@ -121,8 +120,7 @@ set(CORE_FILES
         core/scene/components/Camera.cpp
         core/scene/components/Transform.cpp
         core/scene/components/CameraController.cpp
-        core/scene/components/Node2D.cpp
-        core/scene/components/Node3D.cpp
+        core/scene/components/Node.cpp
         core/scene/ecs/Component.h
 
         core/utility/Log.cpp
@@ -217,10 +215,6 @@ set(VK_FILES
         platforms/vk/VK_DynamicRenderTarget.cpp
         platforms/vk/VK_DynamicRenderTarget.h
         core/graphics/Allocator.h
-        core/scene/components/Node2D.cpp
-        core/scene/components/Node2D.h
-        core/scene/systems/Node2DSystem.cpp
-        core/scene/systems/Node2DSystem.h
         core/scene/ecs/GroupIterator.cpp
         core/scene/ecs/GroupIterator.h
         core/scene/ecs/SubGroup.cpp

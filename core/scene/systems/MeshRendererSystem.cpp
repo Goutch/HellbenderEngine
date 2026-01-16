@@ -4,7 +4,7 @@
 #include <core/scene/Scene.h>
 #include <core/graphics/RenderGraph.h>
 #include "core/scene/components/Transform.h"
-#include "core/scene/components/Node3D.h"
+#include "core/scene/components/Node.h"
 #include "core/scene/components/MeshRenderer.h"
 
 namespace HBE {
@@ -15,7 +15,7 @@ namespace HBE {
     void MeshRendererSystem::onDraw(RenderGraph *render_graph) {
         HB_PROFILE_BEGIN("MeshRendererDraw");
         DrawCmdInfo draw_cmd{};
-        auto group = scene->group<Node3D, Transform, MeshRenderer>();
+        auto group = scene->group<Node, Transform, MeshRenderer>();
         uint cached_push_constants_count = 0;
         PushConstantInfo *push_constant_infos = nullptr;
         for (auto [handle,node,transform, mesh_renderer]: group) {

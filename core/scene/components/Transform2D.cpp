@@ -1,17 +1,17 @@
 #include "Transform2D.h"
 #include <core/scene/Scene.h>
-#include "Node3D.h"
+#include "Node.h"
 
 namespace HBE
 {
-	struct Node3D;
+	struct Node;
 
 	void Transform2D::setDirty()
 	{
 		is_dirty = true;
-		if (entity.has<Node3D>())
+		if (entity.has<Node>())
 		{
-			Node3D* node = entity.get<Node3D>();
+			Node* node = entity.get<Node>();
 
 			for (entity_handle child : node->children)
 			{
@@ -23,9 +23,9 @@ namespace HBE
 
 	mat3& Transform2D::world()
 	{
-		if (entity.has<Node3D>())
+		if (entity.has<Node>())
 		{
-			Node3D* node = entity.get<Node3D>();
+			Node* node = entity.get<Node>();
 			if (entity.getScene()->valid(node->parent))
 			{
 				Transform2D* parent = entity.getScene()->get<Transform2D>(node->parent);

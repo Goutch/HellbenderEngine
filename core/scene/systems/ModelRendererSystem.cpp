@@ -1,6 +1,6 @@
 #include "ModelRendererSystem.h"
 #include "core/scene/Scene.h"
-#include "core/scene/components/Node3D.h"
+#include "core/scene/components/Node.h"
 
 namespace HBE
 {
@@ -47,7 +47,7 @@ namespace HBE
 	{
 		HB_PROFILE_BEGIN("ModelRendererUpdate");
 		HB_PROFILE_BEGIN("ModelRendererUpdateGroup");
-		auto group = scene->group<Node3D, Transform, ModelRenderer>();
+		auto group = scene->group<Node, Transform, ModelRenderer>();
 		HB_PROFILE_END("ModelRendererUpdateGroup");
 		for (auto [handle, node, transform, model_renderer] : group)
 		{

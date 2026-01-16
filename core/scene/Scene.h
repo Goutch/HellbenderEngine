@@ -19,8 +19,7 @@
 #include "core/scene/components/Camera2D.h"
 #include "core/scene/components/PixelCamera.h"
 #include "core/scene/components/ModelRenderer.h"
-#include "systems/Node2DSystem.h"
-#include "systems/Node3DSystem.h"
+#include "systems/NodeSystem.h"
 
 
 namespace HBE {
@@ -38,7 +37,7 @@ namespace HBE {
 
 	enum SCENE_SYSTEMS_FLAG :uint32_t {
 		SCENE_INITIALIZE_SYSTEMS_FLAG_NONE = 0,
-		SCENE_INITIALIZE_SYSTEMS_FLAG_NODE_3D_SYSTEM = 1 << 0,
+		SCENE_INITIALIZE_SYSTEMS_FLAG_NODE_SYSTEM = 1 << 0,
 		SCENE_INITIALIZE_SYSTEMS_FLAG_TRANSFORM_SYSTEM = 1 << 1,
 		SCENE_INITIALIZE_SYSTEMS_FLAG_CAMERA_SYSTEM = 1 << 1,
 		SCENE_INITIALIZE_SYSTEMS_FLAG_CAMERA_CONTROLLER_SYSTEM = 1 << 2,
@@ -61,8 +60,7 @@ namespace HBE {
 
 	private:
 		TransformSystem *transform_system = nullptr;
-		Node3DSystem *node3D_system = nullptr;
-		Node2DSystem *node2D_system = nullptr;
+		NodeSystem *node_system = nullptr;
 		std::vector<System *> systems;
 		bool is_active = true;
 		Registry registry;
@@ -153,19 +151,19 @@ namespace HBE {
 
 		void setParent(entity_handle entity, entity_handle parent);
 
-		const std::list<Node3D> &getChildren(Entity entity);
+		const std::list<Node> &getChildren(Entity entity);
 
 		void printSceneHierarchy();
 
 	private:
 		void onAttachTransform(Entity entity);
 
-		void setChildrenDirty(Node3D *node);
+		void setChildrenDirty(Node *node);
 
 		void onFrameChange(uint32_t frame);
 
 
-		void drawNode(RenderGraph *render_graph, Node3D &node, int &count);
+		void drawNode(RenderGraph *render_graph, Node &node, int &count);
 	};
 
 	template<typename Component>
@@ -181,7 +179,7 @@ namespace HBE {
 	template<typename Component>
 	Component *Entity::get() {
 		HB_ASSERT(scene->valid(handle), "Entity does not exist");
-		HB_ASSERT(scene->has<Component>(handle), std::string("Entity#") + std::to_string(handle) + " does not have component " + typeid(Component).name());
+		HB_ASSERT(scene->has<Component>(handle), std::string("Entity#") + std::to_string(handle) + " does not have component " + Component::COMPONENT_NAME);
 		return scene->get<Component>(handle);
 	}
 
