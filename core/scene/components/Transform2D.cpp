@@ -26,9 +26,9 @@ namespace HBE
 		if (entity.has<Node>())
 		{
 			Node* node = entity.get<Node>();
-			if (entity.getScene()->valid(node->parent))
+			if (entity.getScene()->valid(node->getParentHandle()))
 			{
-				Transform2D* parent = entity.getScene()->get<Transform2D>(node->parent);
+				Transform2D* parent = entity.getScene()->get<Transform2D>(node->getParentHandle());
 				if (is_dirty)
 				{
 					is_dirty = false;

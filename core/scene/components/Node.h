@@ -16,8 +16,14 @@ namespace HBE {
         COMPONENT_IDS(Node3D)
         friend class Scene;
         friend class NodeSystem;
-        Entity entity;
+
+    protected:
         entity_handle parent = NULL_ENTITY_HANDLE;
+        Scene *scene = nullptr;
+
+    public:
+        Entity entity;
+
         std::vector<entity_handle> children;
 
         Node();
@@ -33,6 +39,14 @@ namespace HBE {
         uint32_t getGlobalIndex() const;
 
         bool hasParent() const;
+
+        void setParent(Entity entity);
+
+        void setParent(entity_handle entity);
+
+        entity_handle getParentHandle();
+
+        Entity getParent();
 
         bool isActive() const;
 

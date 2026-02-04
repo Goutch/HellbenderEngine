@@ -110,9 +110,9 @@ namespace HBE {
 		if (entity.valid() && entity.has<Node>())
 		{
 			Node* node = entity.get<Node>();
-			if (entity.getScene()->valid(node->parent))
+			if (entity.getScene()->valid(node->getParentHandle()))
 			{
-				Transform* parent = entity.getScene()->get<Transform>(node->parent);
+				Transform* parent = entity.getScene()->get<Transform>(node->getParentHandle());
 				if (is_dirty)
 				{
 					is_dirty = false;
@@ -132,9 +132,9 @@ namespace HBE {
 	quat Transform::worldRotation()
 	{
 		Node* node = entity.get<Node>();
-		if (entity.valid() && entity.getScene()->valid(node->parent))
+		if (entity.valid() && entity.getScene()->valid(node->getParentHandle()))
 		{
-			Transform* parent = entity.getScene()->get<Transform>(node->parent);
+			Transform* parent = entity.getScene()->get<Transform>(node->getParentHandle());
 			return rotation() * parent->worldRotation();
 		}
 		return rotation();

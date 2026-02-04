@@ -199,7 +199,9 @@ namespace HBE {
         Entity e = createEntity();
         HB_ASSERT(node_system != nullptr,
                   "Node system is not initialized, node3D components will not work properly");
-        e.attach<Node>();
+        Node node = Node(e);
+        e.attach<Node>(node);;
+
         HB_ASSERT(transform_system != nullptr,
                   "Transform system is not initialized, transform.world() function will not work properly");
         e.attach<Transform>();

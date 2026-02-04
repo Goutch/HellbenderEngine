@@ -77,7 +77,6 @@ namespace HBE {
         };
 
 
-
         template<typename Component>
         void initType(uint32_t typeIndex) {
             if (!initialized_types.test(typeIndex)) {
@@ -92,7 +91,8 @@ namespace HBE {
 
         template<typename ComponentType>
         uint32_t getTypeIndex() {
-            static_assert(is_valid_component<ComponentType>::value, "Component structs must have COMPONENT_IDS(Type) macro inside the struct!");
+            static_assert(is_valid_component<ComponentType>::value,
+                          "Component structs must have COMPONENT_IDS(Type) macro inside the struct!");
             //global cache for this type T, keep the index of the type per registry id.
             static std::array<uint32_t, MAX_REGISTRIES> cache = [] {
                 std::array<uint32_t, MAX_REGISTRIES> a{};
@@ -180,6 +180,13 @@ namespace HBE {
             uint32_t type_index = getTypeIndex<Component>();
             size_t page = getPage(handle);
             return pages[page]->attach<Component>(handle, types[type_index]);
+        }
+
+        template<typename Component>
+        Component *attach(entity_handle handle,const Component &component) {
+            Component *component_ptr = attach<Component>(handle);
+            memcpy(component_ptr, &component, sizeof(Component));
+            return component_ptr;
         }
 
         template<typename Component>

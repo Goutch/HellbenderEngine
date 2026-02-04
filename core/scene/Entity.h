@@ -28,7 +28,7 @@ namespace HBE {
 		Component *attach();
 
 		template<typename Component>
-		Component *attach(Component &component);
+		Component *attach(const Component &component);
 
 		template<typename Component>
 		Component *get();

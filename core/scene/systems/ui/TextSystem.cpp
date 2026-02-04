@@ -11,7 +11,7 @@
 
 namespace HBE {
     void TextSystem::onAttachLabel(Entity text_entity) {
-        TextComponent *text_component = text_entity.get<TextComponent>();
+        TextRenderer *text_component = text_entity.get<TextRenderer>();
 
         text_component->pipeline_instance = default_text_pipeline_instance;
         text_component->font = default_font;
@@ -27,8 +27,8 @@ namespace HBE {
     }
 
     TextSystem::TextSystem(Scene *scene, RasterizationTarget *render_target) : System(scene) {
-        scene->onAttach<TextComponent>().subscribe(this, &TextSystem::onAttachLabel);
-        scene->onDetach<TextComponent>().subscribe(this, &TextSystem::onDetachLabel);
+        scene->onAttach<TextRenderer>().subscribe(this, &TextSystem::onAttachLabel);
+        scene->onDetach<TextRenderer>().subscribe(this, &TextSystem::onDetachLabel);
         scene->onDraw.subscribe(this, &TextSystem::onPrepareRenderGraph);
         std::string characters =
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{};':\",./<>?\\|`~";
@@ -73,7 +73,7 @@ namespace HBE {
     }
 
     void TextSystem::onDetachLabel(Entity label) {
-        TextComponent *label_component = label.get<TextComponent>();
+        TextRenderer *label_component = label.get<TextRenderer>();
         if (label_component->mesh != nullptr) {
             Graphics::waitLastFrame();
             delete label_component->mesh;
@@ -83,7 +83,7 @@ namespace HBE {
 
     void TextSystem::onPrepareRenderGraph(RenderGraph *render_graph) {
         HB_PROFILE_BEGIN("TextComponentDraw");
-        auto group = scene->group<Node, Transform, TextComponent>();
+        auto group = scene->group<Node, Transform, TextRenderer>();
 
         for (auto [handle,node, transform, text_component]: group) {
             if (!text_component.active ||
@@ -116,7 +116,7 @@ namespace HBE {
         HB_PROFILE_END("TextComponentDraw");
     }
 
-    void TextComponent::setText(const std::string &text) {
+    void TextRenderer::setText(const std::string &text) {
         this->text = text;
         HB_ASSERT(font != nullptr, "Font is not set");
         if (text.length() == 0 && mesh != nullptr) {
@@ -147,11 +147,11 @@ namespace HBE {
         }
     }
 
-    const std::string &TextComponent::getText() const {
+    const std::string &TextRenderer::getText() const {
         return text;
     }
 
-    vec2 TextComponent::getSize() const {
+    vec2 TextRenderer::getSize() const {
         return size;
     }
 }

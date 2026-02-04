@@ -86,11 +86,10 @@ namespace HBE {
 
 		UIPanel *background_renderer = entity.attach<UIPanel>();
 		background_renderer->pipeline_instance = default_button_pipeline_instance;
-		//background_renderer->active = true;
 
 		button->label_entity = scene->createEntity3D();
-		TextComponent *label_component = button->label_entity.attach<TextComponent>();
-		label_component->height = 40;
+		TextRenderer *text_component = button->label_entity.attach<TextRenderer>();
+		text_component->height = 40;
 
 		scene->setParent(button->label_entity, entity);
 
@@ -151,22 +150,22 @@ namespace HBE {
 	}
 
 	void ButtonComponent::setTextHeight(float height) {
-		TextComponent *label_component = label_entity.get<TextComponent>();
+		TextRenderer *label_component = label_entity.get<TextRenderer>();
 		label_component->height = height;
 	}
 
 	void ButtonComponent::setText(const std::string &text) {
-		TextComponent *label_component = label_entity.get<TextComponent>();
+		TextRenderer *label_component = label_entity.get<TextRenderer>();
 		label_component->setText(text);
 	}
 
 	void ButtonComponent::setFont(Font *font) {
-		TextComponent *label_component = label_entity.get<TextComponent>();
+		TextRenderer *label_component = label_entity.get<TextRenderer>();
 		label_component->font = font;
 	}
 
 	const std::string &ButtonComponent::getText(){
-		const TextComponent *label_component = label_entity.get<TextComponent>();
+		const TextRenderer *label_component = label_entity.get<TextRenderer>();
 		return label_component->getText();
 	}
 }

@@ -50,6 +50,9 @@ namespace HBE {
 		SCENE_SYSTEMS_FLAGS initialized_systems_flags = SCENE_INITIALIZE_SYSTEMS_FLAG_ALL;
 	};
 
+	/**
+	 * Represent a collection of systems and entities
+	 */
 	class HB_API Scene {
 	public:
 		Event<RenderGraph *> onRender; //render camera render targets
@@ -127,7 +130,7 @@ namespace HBE {
 		Component *attach(entity_handle handle);
 
 		template<typename Component>
-		Component *attach(entity_handle handle, Component &component);
+		Component *attach(entity_handle handle,const Component &component);
 
 		template<typename Component>
 		bool has(entity_handle handle);
@@ -167,7 +170,7 @@ namespace HBE {
 	};
 
 	template<typename Component>
-	Component *Entity::attach(Component &component) {
+	Component *Entity::attach(const Component &component) {
 		return scene->attach<Component>(handle, component);
 	}
 
@@ -226,13 +229,13 @@ namespace HBE {
 
 
 	template<typename Component>
-	Component *Scene::attach(entity_handle handle, Component &component) {
+	Component *Scene::attach(entity_handle handle,const Component &component) {
 		uint32_t index= registry.getTypeIndex<Component>();
-		Component &component_ref = registry.attach<Component>(handle, component);
+		Component *component_ptr = registry.attach<Component>(handle, component);
 
 		if (attach_events.find(index) != attach_events.end())
 			attach_events[index].invoke(Entity(handle, this));
-		return component_ref;
+		return component_ptr;
 	};
 
 	template<typename Component>

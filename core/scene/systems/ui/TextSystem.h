@@ -24,7 +24,7 @@ namespace HBE {
 	struct  Node;
 
 
-	struct HB_API TextComponent {
+	struct HB_API TextRenderer {
 		COMPONENT_IDS(TextComponent)
 		friend class TextSystem;
 

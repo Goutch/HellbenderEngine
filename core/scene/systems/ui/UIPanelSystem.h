@@ -27,6 +27,9 @@ namespace HBE {
 	};
 
 
+	/**
+	 * Draw anchored quads
+	 */
 	class HB_API UIPanelSystem : public System {
 		struct PanelPushConstant {
 			mat4 world_matrix;
@@ -40,8 +43,6 @@ namespace HBE {
 
 	private:
 		Mesh *anchor_meshes[9];
-
-
 	};
 
 
