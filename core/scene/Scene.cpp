@@ -68,7 +68,13 @@ namespace HBE {
     Scene::~Scene() {
         Graphics::getDefaultRenderTarget()->onResolutionChange.unsubscribe(this);
 
-		registry.destroyAll();
+        for (const auto& event: detach_events) {
+            RawVector<entity_handle> handle_buffer;
+            registry.getAllEntitiesWith(event.first, handle_buffer);
+            for (entity_handle handle: handle_buffer) {
+                event.second.invoke(Entity(handle, this));
+            }
+        }
 
         for (int i = 0; i < systems.size(); ++i) {
             delete systems[i];

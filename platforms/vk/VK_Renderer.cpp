@@ -139,6 +139,18 @@ namespace HBE {
 		HB_PROFILE_END("ComputeDispatch");
 	}
 
+	Fence * VK_Renderer::getLastFrameFence() {
+		int32_t index = current_image-1;
+		if (index<0) {
+			index = images_in_flight_fences.size()-1;
+		}
+		return images_in_flight_fences[index];
+	}
+
+	Fence * VK_Renderer::getCurrentFrameFence() {
+		return images_in_flight_fences[current_image];
+	}
+
 	VK_Renderer::~VK_Renderer() {
 		window->onSizeChange.unsubscribe(this);
 		Application::onWindowClosed.unsubscribe(this);
@@ -153,9 +165,13 @@ namespace HBE {
 
 
 		delete factory;
-		delete command_pool;
 		delete swapchain;
+
+		//process destroy requests before deleting command pool since destroy request might wait on its fences.
+		device->getAllocator()->processFreeRequests(0);
+		delete command_pool;
 		delete device;
+
 		delete physical_device;
 		delete surface;
 		delete instance;

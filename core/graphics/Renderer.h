@@ -14,6 +14,7 @@ namespace HBE
 
 	class Image;
 
+	class Fence;
 	class Mesh;
 
 	class Framebuffer;
@@ -133,6 +134,10 @@ namespace HBE
 		virtual void beginFrame() = 0;
 
 		virtual void endFrame() = 0;
+
+		virtual Fence* getLastFrameFence() = 0;
+
+		virtual Fence* getCurrentFrameFence() = 0 ;
 
 		virtual RasterizationTarget* getDefaultRenderTarget() = 0;
 

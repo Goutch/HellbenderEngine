@@ -75,8 +75,8 @@ namespace HBE {
 		Scene(Scene &scene) = delete;
 
 		Entity main_camera_entity;
-		std::unordered_map<size_t, Event<Entity>> attach_events;
-		std::unordered_map<size_t, Event<Entity>> detach_events;
+		std::unordered_map<uint32_t, Event<Entity>> attach_events;
+		std::unordered_map<uint32_t, Event<Entity>> detach_events;
 
 	public:
 		void setActive(bool active);

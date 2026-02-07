@@ -15,7 +15,7 @@ namespace HBE {
 	class Group {
 		Registry *registry;
 		RawVector<ArchetypeData<Components...>> pools_data;
-		RawVector<EntityRef> *page_entity_references;
+		RawVector<entity_handle> *page_entity_handles;
 		size_t page_count = 0;
 	public:
 
@@ -47,7 +47,7 @@ namespace HBE {
 				pools_data.add(archetype_data);
 			}
 
-			page_entity_references = new RawVector<EntityRef>[pages.size()];
+			page_entity_handles = new RawVector<entity_handle>[pages.size()];
 			page_count = pages.size();
 
 			for (uint32_t i = 0; i < pages.size(); ++i) {
@@ -69,7 +69,7 @@ namespace HBE {
 					}
 				}
 				//create the list of entity indices for this page
-				page_entity_references[i].reserve(min_size_pool->handles.size());
+				page_entity_handles[i].reserve(min_size_pool->handles.size());
 				RawVector<entity_handle> &handles = min_size_pool->handles;
 
 				for (int j = 0; j < handles.size(); ++j) {
@@ -77,10 +77,10 @@ namespace HBE {
 					entity_handle handle = handles[j];
 					std::bitset<REGISTRY_MAX_COMPONENT_TYPES> entity_signature = page->getSignature(handle);
 					if ((entity_signature & required_signature) == required_signature) {
-						page_entity_references[i].add({page->handleToIndex(handle), handle});
+						page_entity_handles[i].add(handle);
 					}
 				}
-				if (!page_entity_references[i].empty()) {
+				if (!page_entity_handles[i].empty()) {
 					empty = false;
 				}
 			}
@@ -91,15 +91,15 @@ namespace HBE {
 		}
 
 		~Group() {
-			delete[] page_entity_references;
+			delete[] page_entity_handles;
 		};
 
 		GroupIterator<Components...> begin() {
-			return GroupIterator<Components...>(pools_data, page_entity_references, page_count);
+			return GroupIterator<Components...>(pools_data, page_entity_handles, page_count);
 		};
 
 		GroupIterator<Components...> end() {
-			return GroupIterator<Components...>(pools_data, page_entity_references, page_count, page_count, static_cast<size_t>(0));
+			return GroupIterator<Components...>(pools_data, page_entity_handles, page_count, page_count, static_cast<size_t>(0));
 		}
 	};
 }

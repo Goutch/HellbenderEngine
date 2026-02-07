@@ -214,7 +214,8 @@ set(VK_FILES
         core/graphics/Allocator.h
         core/scene/ecs/Group/GroupIterator.cpp
         core/scene/ecs/Group/ArchetypeData.h
-        core/scene/ecs/Registry/ECSTypes.h)
+        core/scene/ecs/Registry/ECSTypes.h
+        core/graphics/Fence.h)
 
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")

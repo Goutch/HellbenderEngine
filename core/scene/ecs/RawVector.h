@@ -95,6 +95,20 @@ namespace HBE {
 			}
 		}
 
+		void addRange(T* data,uint32_t count) {
+			if (count == 0)
+				return;
+
+			reserve(size() + count);
+
+			memcpy(
+				m_data + m_count,
+				data,
+				count * sizeof(T)
+			);
+
+			m_count += count;
+		}
 
 		void reserve(size_t new_capacity) {
 			if (new_capacity <= m_capacity)

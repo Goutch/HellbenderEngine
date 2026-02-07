@@ -111,6 +111,9 @@ namespace HBE {
 
 		void computeDispatch(ComputeDispatchCmdInfo &compute_dispatch_cmd_info) override;
 
+		Fence * getLastFrameFence() override;
+
+		Fence * getCurrentFrameFence() override;
 
 	private:
 
