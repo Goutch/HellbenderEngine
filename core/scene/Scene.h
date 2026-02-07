@@ -2,7 +2,7 @@
 
 #include "Core.h"
 
-#include "core/scene/ecs/Registry.h"
+#include "core/scene/ecs/Registry/Registry.h"
 #include "unordered_map"
 
 #include "core/graphics/RenderGraph.h"
@@ -20,6 +20,7 @@
 #include "core/scene/components/PixelCamera.h"
 #include "core/scene/components/ModelRenderer.h"
 #include "systems/NodeSystem.h"
+#include "core/scene/ecs/Group/Group.h"
 
 
 namespace HBE {
@@ -35,7 +36,7 @@ namespace HBE {
 
 	typedef uint32_t SCENE_SYSTEMS_FLAGS;
 
-	enum SCENE_SYSTEMS_FLAG :uint32_t {
+	enum SCENE_SYSTEMS_FLAG : uint32_t {
 		SCENE_INITIALIZE_SYSTEMS_FLAG_NONE = 0,
 		SCENE_INITIALIZE_SYSTEMS_FLAG_NODE_SYSTEM = 1 << 0,
 		SCENE_INITIALIZE_SYSTEMS_FLAG_TRANSFORM_SYSTEM = 1 << 1,
@@ -115,7 +116,7 @@ namespace HBE {
 		template<typename... Components>
 		Group<Components...> group();
 
-		const std::vector<entity_handle> &getRootNodes() const;
+		const RawVector<entity_handle> &getRootNodes() const;
 
 		template<typename Component>
 		Component *get(entity_handle handle);
@@ -130,7 +131,7 @@ namespace HBE {
 		Component *attach(entity_handle handle);
 
 		template<typename Component>
-		Component *attach(entity_handle handle,const Component &component);
+		Component *attach(entity_handle handle, const Component &component);
 
 		template<typename Component>
 		bool has(entity_handle handle);
@@ -203,9 +204,8 @@ namespace HBE {
 
 	template<typename... Components>
 	Group<Components...> Scene::group() {
-		return registry.group<Components...>();
+		return Group<Components...>(&registry);
 	}
-
 
 	template<typename Component>
 	Component *Scene::get(entity_handle handle) {
@@ -229,8 +229,8 @@ namespace HBE {
 
 
 	template<typename Component>
-	Component *Scene::attach(entity_handle handle,const Component &component) {
-		uint32_t index= registry.getTypeIndex<Component>();
+	Component *Scene::attach(entity_handle handle, const Component &component) {
+		uint32_t index = registry.getTypeIndex<Component>();
 		Component *component_ptr = registry.attach<Component>(handle, component);
 
 		if (attach_events.find(index) != attach_events.end())
@@ -246,7 +246,7 @@ namespace HBE {
 
 	template<typename Component>
 	void Scene::detach(entity_handle handle) {
-		uint32_t index= registry.getTypeIndex<Component>();
+		uint32_t index = registry.getTypeIndex<Component>();
 
 		if (detach_events.find(index) != detach_events.end())
 			detach_events[index].invoke(Entity(handle, this));

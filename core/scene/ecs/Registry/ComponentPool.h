@@ -12,7 +12,8 @@
 #include "typeinfo"
 #include "core/utility/Log.h"
 #include "algorithm"
-
+#include "core/scene/ecs/RawVector.h"
+#include "ECSTypes.h"
 #ifndef REGISTRY_PAGE_SIZE
 #define REGISTRY_PAGE_SIZE 1024
 #endif
@@ -22,13 +23,11 @@
 #define NULL_ENTITY_HANDLE UINT64_MAX
 
 namespace HBE {
-    typedef uint64_t entity_handle;
 
     struct ComponentTypeInfo {
 
         uint32_t index;
         size_t size;
-        std::string name;
         uint64_t hash;
 
         bool operator==(const ComponentTypeInfo &other) const {
@@ -41,7 +40,7 @@ namespace HBE {
         ComponentTypeInfo info;
         char *data;
         bool valid[REGISTRY_PAGE_SIZE];
-        std::vector<entity_handle> handles;
+        RawVector<entity_handle> handles;
         size_t offset;
 
         RawComponentPool(RawComponentPool &&other);

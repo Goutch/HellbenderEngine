@@ -78,14 +78,13 @@ set(CORE_FILES
         core/audio/Audio.cpp
         core/audio/Audio.h
 
-        core/scene/ecs/Registry.h
-        core/scene/ecs/Registry.cpp
-        core/scene/ecs/ComponentPool.cpp
-        core/scene/ecs/ComponentPool.h
-        core/scene/ecs/Group.cpp
-        core/scene/ecs/Group.h
-        core/scene/ecs/RegistryPage.cpp
-        core/scene/ecs/RegistryPage.h
+        core/scene/ecs/Registry/Registry.cpp
+        core/scene/ecs/Registry/ComponentPool.cpp
+        core/scene/ecs/Registry/ComponentPool.h
+        core/scene/ecs/Group/Group.cpp
+        core/scene/ecs/Group/Group.h
+        core/scene/ecs/Registry/RegistryPage.cpp
+        core/scene/ecs/Registry/RegistryPage.h
         core/scene/ecs/Component.h
         core/scene/Entity.h
         core/scene/Scene.cpp
@@ -132,8 +131,6 @@ set(CORE_FILES
         core/utility/GLTFLoader.h
         core/utility/DefaultModelParser.cpp
         core/utility/DefaultModelParser.h
-        core/scene/ecs/SubGroupIterator.cpp
-        core/scene/ecs/SubGroupIterator.h
         core/scene/components/MeshRenderer.cpp
         core/scene/components/MeshRenderer.h
 
@@ -215,10 +212,9 @@ set(VK_FILES
         platforms/vk/VK_DynamicRenderTarget.cpp
         platforms/vk/VK_DynamicRenderTarget.h
         core/graphics/Allocator.h
-        core/scene/ecs/GroupIterator.cpp
-        core/scene/ecs/GroupIterator.h
-        core/scene/ecs/SubGroup.cpp
-        core/scene/ecs/SubGroup.h)
+        core/scene/ecs/Group/GroupIterator.cpp
+        core/scene/ecs/Group/ArchetypeData.h
+        core/scene/ecs/Registry/ECSTypes.h)
 
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
@@ -366,7 +362,8 @@ message("#------------------------------------HBE-------------------------------
 include_directories(.)
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}
-        ${VK_FILES})
+        ${VK_FILES}
+        core/scene/ecs/Component.cpp)
 
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")

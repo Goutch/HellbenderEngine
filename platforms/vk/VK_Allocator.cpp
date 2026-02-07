@@ -399,6 +399,7 @@ namespace HBE {
 
     void VK_Allocator::processFreeRequests(uint32_t frame) {
         HB_PROFILE_BEGIN("processFreeRequests");
+
         for (int i = delete_queue.size() - 1; i >= 0; i--) {
             FreeRequest request = delete_queue[i];
             //check fence status

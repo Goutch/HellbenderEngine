@@ -67,13 +67,8 @@ namespace HBE {
 
     Scene::~Scene() {
         Graphics::getDefaultRenderTarget()->onResolutionChange.unsubscribe(this);
-        for (auto event: detach_events) {
-            std::vector<entity_handle> entities;
-            registry.group(entities, event.first);
-            for (entity_handle entity: entities) {
-                event.second.invoke(Entity(entity, this));
-            }
-        }
+
+		registry.destroyAll();
 
         for (int i = 0; i < systems.size(); ++i) {
             delete systems[i];
@@ -93,7 +88,7 @@ namespace HBE {
     }
 
 
-    const std::vector<entity_handle> &Scene::getRootNodes() const {
+    const RawVector<entity_handle> &Scene::getRootNodes() const {
         return node_system->getRootNodes();
     }
 

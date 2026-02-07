@@ -15,10 +15,10 @@ namespace HBE {
         this->scene = entity.getScene();
     }
 
-    Node::Node(Node &&other) noexcept {
-        parent = other.parent;
-        children = std::move(other.children);
-    }
+    //Node::Node(Node &&other) noexcept {
+    //    parent = other.parent;
+    //    children = std::move(other.children);
+    //}
 
     uint32_t Node::getDepth() const {
         return depth;

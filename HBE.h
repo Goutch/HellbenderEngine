@@ -39,6 +39,7 @@
 #include "core/scene/components/Transform.h"
 #include "core/scene/components/Node.h"
 #include "core/scene/components/MeshRenderer.h"
+#include "core/scene/ecs/RawVector.h"
 
 #include "core/scene/systems/ui/UIPanelSystem.h"
 #include "core/scene/systems/ui/ButtonSystem.h"

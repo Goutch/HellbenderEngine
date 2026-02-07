@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Core.h"
-#include "ecs/ComponentPool.h"
+#include "ecs/Registry/Registry.h"
+#include "core/scene/ecs/Registry/ECSTypes.h"
 
 namespace HBE {
 	class Scene;

@@ -150,6 +150,11 @@ namespace HBE {
 			delete frames[i].finished_semaphore;
 		}
 		vkDestroySampler(device->getHandle(), default_sampler, VK_NULL_HANDLE);
+
+		delete main_render_target;
+		delete ui_render_target;
+		delete screen_pipeline;
+		delete screen_pipeline_instance;
 		delete factory;
 		delete command_pool;
 		delete swapchain;

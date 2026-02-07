@@ -45,13 +45,14 @@ namespace HBE {
 		VK_Swapchain *swapchain;
 		VK_CommandPool *command_pool;
 
-		VkSampler default_sampler;
+
 
 		uint32_t current_frame = 0;
 		uint32_t current_image = 0;
 		std::array<FrameState, MAX_FRAMES_IN_FLIGHT> frames;
 		std::vector<VK_Fence *> images_in_flight_fences;
 
+		VkSampler default_sampler;
 		RasterizationTarget *main_render_target = nullptr;
 		RasterizationTarget *ui_render_target = nullptr;
 		RasterizationPipeline *screen_pipeline = nullptr;

@@ -1,65 +1,69 @@
 #pragma once
+
 #include <glm/fwd.hpp>
 
 #include "Transform2D.h"
 #include "core/scene/Entity.h"
 #include "core/scene/ecs/Component.h"
+#include "core/scene/ecs/RawVector.h"
 
 namespace HBE {
-    class Transform;
+	class Transform;
 
-    /**
+	/**
 	 * @brief A node in the scene hierarchy that contains a 3D transform.
 	 */
 
-    struct HB_API Node {
-        COMPONENT_IDS(Node3D)
-        friend class Scene;
-        friend class NodeSystem;
+	struct HB_API Node {
+		COMPONENT_IDS(Node)
 
-    protected:
-        entity_handle parent = NULL_ENTITY_HANDLE;
-        Scene *scene = nullptr;
+		friend class Scene;
 
-    public:
-        Entity entity;
+		friend class NodeSystem;
 
-        std::vector<entity_handle> children;
+	protected:
+		entity_handle parent = NULL_ENTITY_HANDLE;
+		Scene *scene = nullptr;
 
-        Node();
+	public:
+		Entity entity;
 
-        explicit Node(Entity entity);
+		RawVector<entity_handle> children;
 
-        Node(Node &&other) noexcept;
+		Node();
 
-        uint32_t getDepth() const;
+		explicit Node(Entity entity);
 
-        uint32_t getLocalIndex() const;
+		//Node(Node &&other) noexcept;
 
-        uint32_t getGlobalIndex() const;
+		uint32_t getDepth() const;
 
-        bool hasParent() const;
+		uint32_t getLocalIndex() const;
 
-        void setParent(Entity entity);
+		uint32_t getGlobalIndex() const;
 
-        void setParent(entity_handle entity);
+		bool hasParent() const;
 
-        entity_handle getParentHandle();
+		void setParent(Entity entity);
 
-        Entity getParent();
+		void setParent(entity_handle entity);
 
-        bool isActive() const;
+		entity_handle getParentHandle();
 
-        bool isActiveInHierarchy();
+		Entity getParent();
 
-    private:
-        uint32_t depth = 0;
-        uint32_t local_index;
-        uint32_t global_index;
-        bool global_index_dirty = true;
+		bool isActive() const;
 
-        bool is_active = true;
-        bool is_active_in_hierarchy = true;
-        bool active_in_hierarchy_dirty = true;
-    };
+		bool isActiveInHierarchy();
+
+	private:
+		uint32_t depth = 0;
+		uint32_t local_index;
+		uint32_t global_index;
+		bool global_index_dirty = true;
+
+		bool is_active = true;
+		bool is_active_in_hierarchy = true;
+		bool active_in_hierarchy_dirty = true;
+	};
 }

@@ -1,13 +1,15 @@
 #pragma once
 
+#include <map>
 #include "Core.h"
 #include "ComponentPool.h"
 #include "bitset"
-#include "list"
+#include "unordered_map"
+#include "core/scene/ecs/RawVector.h"
 
 namespace HBE {
 	class HB_API RegistryPage {
-		std::vector<RawComponentPool *> component_pages;
+		RawVector<RawComponentPool *> component_pools;
 		std::bitset<REGISTRY_MAX_COMPONENT_TYPES> components_of_entity[REGISTRY_PAGE_SIZE];
 	public:
 		size_t offset;
@@ -30,7 +32,7 @@ namespace HBE {
 		}
 
 		RawComponentPool *getRawPool(size_t bit) {
-			return bit < component_pages.size() ? component_pages[bit] : nullptr;
+			return bit < component_pools.size() ? component_pools[bit] : nullptr;
 		}
 
 		std::bitset<REGISTRY_MAX_COMPONENT_TYPES> &getSignature(entity_handle handle) {
@@ -44,33 +46,48 @@ namespace HBE {
 
 			components_of_entity[i].set(type.index);
 
-			if (component_pages.size() <= type.index) {
-				component_pages.resize(type.index + 1, nullptr);
+			if (component_pools.size() <= type.index) {
+				component_pools.resize(type.index + 1, nullptr);
 			}
-			if (component_pages[type.index] == nullptr) {
-				component_pages[type.index] = new RawComponentPool(type, offset);
+			if (component_pools[type.index] == nullptr) {
+				component_pools[type.index] = new RawComponentPool(type, offset);
 				components_signature.set(type.index, true);
 			}
 			Component component{};
-			char *raw_ptr = component_pages[type.index]->getMemory(handle);
+			char *raw_ptr = component_pools[type.index]->getMemory(handle);
 			Component *ptr = new(raw_ptr) Component{};
 			return ptr;
 		};
+
+		void destroyAll() {
+			for (int i = 0; i<component_pools.size(); ++i) {
+				if(component_pools[i]==nullptr) continue;
+				for (int j = 0; j < component_pools[i]->handles.size(); ++j) {
+					component_pools[i]->detach(component_pools[i]->handles[j]);
+				}
+				for (int j = 0; j < REGISTRY_PAGE_SIZE; ++j) {
+					valid_entities[j] = false;
+				}
+
+				component_pools[i]->handles.clear();
+
+			}
+		}
 
 		void detach(entity_handle handle, ComponentTypeInfo &type) {
 			size_t i = handleToIndex(handle);
 
 			components_of_entity[i].set(type.index, false);
 			if (valid_entities[i]) {
-				if (component_pages[type.index] == nullptr) {
+				if (component_pools[type.index] == nullptr) {
 					return;
 				}
-				RawComponentPool *raw_pool = component_pages[type.index];
+				RawComponentPool *raw_pool = component_pools[type.index];
 				raw_pool->detach(handle);
 				if (raw_pool->handles.size() == 0) {
 					components_signature.set(raw_pool->info.index, false);
 
-					component_pages[type.index] = nullptr;
+					component_pools[type.index] = nullptr;
 					delete raw_pool;
 
 				}
@@ -84,10 +101,10 @@ namespace HBE {
 		void setInvalid(entity_handle handle) {
 			size_t i = handleToIndex(handle);
 			std::list<size_t> obsolete_types_hash;
-			for (int bit = 0; bit < component_pages.size(); ++bit) {
-				RawComponentPool *raw_pool = component_pages[bit];
-				if (raw_pool != nullptr && component_pages[bit]->has(handle)) {
-					detach(handle, component_pages[bit]->info);
+			for (int bit = 0; bit < component_pools.size(); ++bit) {
+				RawComponentPool *raw_pool = component_pools[bit];
+				if (raw_pool != nullptr && component_pools[bit]->has(handle)) {
+					detach(handle, component_pools[bit]->info);
 				}
 			}
 			components_of_entity[i].reset();
@@ -97,6 +114,7 @@ namespace HBE {
 		bool valid(entity_handle handle) {
 			return valid_entities[handle - offset];
 		}
+
 
 	};
 }

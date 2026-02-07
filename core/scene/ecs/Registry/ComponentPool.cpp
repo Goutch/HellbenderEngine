@@ -4,7 +4,7 @@
 
 #include "ComponentPool.h"
 
-namespace HBE{
+namespace HBE {
 	RawComponentPool::RawComponentPool(RawComponentPool &&other) {
 		data = other.data;
 		memcpy(valid, other.valid, REGISTRY_PAGE_SIZE * sizeof(bool));
@@ -12,7 +12,7 @@ namespace HBE{
 		offset = other.offset;
 	}
 
-	RawComponentPool::RawComponentPool(ComponentTypeInfo info, size_t offset)  : info(info) {
+	RawComponentPool::RawComponentPool(ComponentTypeInfo info, size_t offset) : info(info) {
 		data = static_cast<char *>(malloc(info.size * REGISTRY_PAGE_SIZE));
 
 
@@ -21,7 +21,7 @@ namespace HBE{
 		this->offset = offset;
 	}
 
-	RawComponentPool::~RawComponentPool()  {
+	RawComponentPool::~RawComponentPool() {
 		delete[] data;
 	}
 
@@ -40,7 +40,12 @@ namespace HBE{
 		if (valid[i]) {
 			memset(data + (i * info.size), 0, info.size);
 			valid[i] = false;
-			handles.erase(std::find(handles.begin(), handles.end(), handle));
+			for (int j = handles.size() - 1; j <= 0; --j) {
+				if (handles[j] == handle) {
+					handles.erase(j);
+					break;
+				}
+			}
 			std::sort(handles.begin(), handles.end());
 		}
 	}
