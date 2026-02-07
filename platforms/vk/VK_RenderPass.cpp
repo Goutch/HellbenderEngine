@@ -249,7 +249,6 @@ namespace HBE
 			}
 		}
 
-
 		if (has_depth_attachment)
 		{
 			depth_images.resize(MAX_FRAMES_IN_FLIGHT);
