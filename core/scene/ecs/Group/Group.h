@@ -15,7 +15,7 @@ namespace HBE {
 	class Group {
 		Registry *registry;
 		RawVector<ArchetypeData<Components...>> pools_data;
-		RawVector<uint32_t> *page_entity_indices;
+		RawVector<EntityRef> *page_entity_references;
 		size_t page_count = 0;
 	public:
 
@@ -30,7 +30,7 @@ namespace HBE {
 			pools_data.reserve(pages.size());
 
 			std::bitset<REGISTRY_MAX_COMPONENT_TYPES> required_signature = 0;
-			for (uint32_t i = 0; i < pages.size(); ++i) {
+			for (uint32_t i = 0; i < sizeof...(Components); ++i) {
 				required_signature.set(types[i].index, true);
 			}
 			for (uint32_t i = 0; i < pages.size(); ++i) {
@@ -47,30 +47,29 @@ namespace HBE {
 				pools_data.add(archetype_data);
 			}
 
-			page_entity_indices = new RawVector<uint32_t>[pages.size()];
+			page_entity_references = new RawVector<EntityRef>[pages.size()];
 			page_count = pages.size();
 
 			for (uint32_t i = 0; i < pages.size(); ++i) {
 				RegistryPage *page = pages[i];
 
 				//skip if there is no matching components in this page
-				if ((page->components_signature & required_signature) == required_signature)
+				if ((page->components_signature & required_signature) != required_signature)
 					continue;
 
 
 				//find the pool with the least entities
-				uint32_t min_size_index = 0;
+				RawComponentPool *min_size_pool = nullptr;
 				uint32_t min_size = UINT32_MAX;
 				for (uint32_t j = 0; j < sizeof ...(Components); ++j) {
-					if (pages[i]->getRawPool(types[j].index)->handles.size() < min_size) {
-						min_size_index = j;
+					RawComponentPool* pool = pages[i]->getRawPool(types[j].index);
+					if (pool->handles.size() < min_size) {
+						min_size_pool = pool;
+						min_size = min_size_pool->handles.size();
 					}
 				}
-
 				//create the list of entity indices for this page
-				RawComponentPool *min_size_pool = page->getRawPool(min_size_index);
-
-				page_entity_indices[i].reserve(min_size_pool->handles.size());
+				page_entity_references[i].reserve(min_size_pool->handles.size());
 				RawVector<entity_handle> &handles = min_size_pool->handles;
 
 				for (int j = 0; j < handles.size(); ++j) {
@@ -78,10 +77,10 @@ namespace HBE {
 					entity_handle handle = handles[j];
 					std::bitset<REGISTRY_MAX_COMPONENT_TYPES> entity_signature = page->getSignature(handle);
 					if ((entity_signature & required_signature) == required_signature) {
-						page_entity_indices[i].add(page->handleToIndex(handle));
+						page_entity_references[i].add({page->handleToIndex(handle), handle});
 					}
 				}
-				if (!page_entity_indices[i].empty()) {
+				if (!page_entity_references[i].empty()) {
 					empty = false;
 				}
 			}
@@ -92,15 +91,15 @@ namespace HBE {
 		}
 
 		~Group() {
-			delete[] page_entity_indices;
+			delete[] page_entity_references;
 		};
 
 		GroupIterator<Components...> begin() {
-			return GroupIterator<Components...>(pools_data, page_entity_indices, page_count);
+			return GroupIterator<Components...>(pools_data, page_entity_references, page_count);
 		};
 
 		GroupIterator<Components...> end() {
-			return GroupIterator<Components...>(pools_data, page_entity_indices, page_count, page_count, static_cast<size_t>(0));
+			return GroupIterator<Components...>(pools_data, page_entity_references, page_count, page_count, static_cast<size_t>(0));
 		}
 	};
 }
