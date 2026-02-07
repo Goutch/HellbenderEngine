@@ -64,8 +64,6 @@ namespace HBE {
 	public:
 		TextSystem(Scene *scene, RasterizationTarget *render_target);
 
-		void drawSceneNode(RenderGraph *graph, Node &node);
-
 		~TextSystem() override;
 
 		void onDetachLabel(Entity label);

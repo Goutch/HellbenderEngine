@@ -87,7 +87,6 @@ namespace HBE {
 		UIPanel *background_renderer = entity.attach<UIPanel>();
 		background_renderer->pipeline_instance = default_button_pipeline_instance;
 
-		button->label_entity = scene->createEntity3D();
 		TextRenderer *text_component = button->label_entity.attach<TextRenderer>();
 		text_component->height = 40;
 

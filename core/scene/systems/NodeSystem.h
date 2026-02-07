@@ -4,7 +4,7 @@
 #include "core/scene/Entity.h"
 #include "core/scene/System.h"
 #include "core/scene/ecs/RawVector.h"
-
+#include "dependencies/utils-collection/Event.h"
 namespace HBE {
 	struct Node;
 
@@ -13,7 +13,6 @@ namespace HBE {
 		RawVector<entity_handle> root_nodes;
 		bool dirty = false;
 		uint32_t node_count = 0;
-
 	public:
 		NodeSystem(Scene *scene);
 
@@ -32,8 +31,9 @@ namespace HBE {
 		bool isActiveInHierarchy(entity_handle entity);
 
 	private:
+
 		void setDirty(Node *node);
 
-		void updateNodeIndices(RawVector<entity_handle>& nodes, uint32_t global_index, uint32_t depth);
+		void updateNodeIndices(RawVector<entity_handle> &nodes, uint32_t& global_index, uint32_t depth);
 	};
 }

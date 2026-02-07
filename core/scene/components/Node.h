@@ -20,7 +20,15 @@ namespace HBE {
 		friend class Scene;
 
 		friend class NodeSystem;
+	private:
+		uint32_t depth = 0;
+		uint32_t local_index;
+		uint32_t global_index;
+		bool global_index_dirty = true;
 
+		bool is_active = true;
+		bool is_active_in_hierarchy = true;
+		bool active_in_hierarchy_dirty = true;
 	protected:
 		entity_handle parent = NULL_ENTITY_HANDLE;
 		Scene *scene = nullptr;
@@ -56,14 +64,6 @@ namespace HBE {
 
 		bool isActiveInHierarchy();
 
-	private:
-		uint32_t depth = 0;
-		uint32_t local_index;
-		uint32_t global_index;
-		bool global_index_dirty = true;
 
-		bool is_active = true;
-		bool is_active_in_hierarchy = true;
-		bool active_in_hierarchy_dirty = true;
 	};
 }

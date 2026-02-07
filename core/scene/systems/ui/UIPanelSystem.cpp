@@ -9,10 +9,8 @@
 #include "core/scene/components/Node.h"
 #include "core/utility/Geometry.h"
 
-namespace HBE
-{
-	UIPanelSystem::UIPanelSystem(Scene* scene) : System(scene)
-	{
+namespace HBE {
+	UIPanelSystem::UIPanelSystem(Scene *scene) : System(scene) {
 		MeshInfo quad_info = MeshInfo{&VERTEX_ATTRIBUTE_INFO_POSITION3D_UV_INTERLEAVED, 1, MESH_FLAG_NONE};
 
 		anchor_meshes[PIVOT_TOP_LEFT] = Resources::createMesh(quad_info);
@@ -38,22 +36,17 @@ namespace HBE
 		scene->onDraw.subscribe(this, &UIPanelSystem::draw);
 	}
 
-	UIPanelSystem::~UIPanelSystem()
-	{
-		for (int i = 0; i < 9; i++)
-		{
+	UIPanelSystem::~UIPanelSystem() {
+		for (int i = 0; i < 9; i++) {
 			delete anchor_meshes[i];
 		}
 	}
 
 
-	void UIPanelSystem::draw(RenderGraph* graph)
-	{
+	void UIPanelSystem::draw(RenderGraph *graph) {
 		Group<Node, Transform, UIPanel> group = scene->group<Node, Transform, UIPanel>();
-		for (auto [entity_handle,node, transform, panel] : group)
-		{
-			if (!panel.active || !panel.pipeline_instance)
-			{
+		for (auto [entity_handle, node, transform, panel]: group) {
+			if (!panel.active || !panel.pipeline_instance) {
 				return;
 			}
 			DrawCmdInfo cmd{};
@@ -73,6 +66,7 @@ namespace HBE
 			cmd.push_constants_count = 1;
 			cmd.flags = DRAW_CMD_FLAG_ORDERED;
 			cmd.layer = panel.layer;
+			cmd.order_in_layer = node.getGlobalIndex();
 
 			graph->add(cmd);
 		}

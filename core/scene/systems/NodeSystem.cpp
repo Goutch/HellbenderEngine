@@ -14,8 +14,11 @@ namespace HBE {
 	}
 
 	void NodeSystem::updateNodeIndices() {
-		if (dirty)
-			updateNodeIndices(root_nodes, 0, 0);
+		if (dirty) {
+			uint32_t global_index = 0;
+			updateNodeIndices(root_nodes, global_index, 0);
+		}
+
 	}
 
 	void NodeSystem::onDetachNode(Entity entity) {
@@ -104,14 +107,13 @@ namespace HBE {
 		node_count++;
 	}
 
-	void NodeSystem::updateNodeIndices(RawVector<entity_handle>& nodes, uint32_t global_index, uint32_t depth) {
+	void NodeSystem::updateNodeIndices(RawVector<entity_handle> &nodes, uint32_t &global_index, uint32_t depth) {
 		uint32_t local_index = 0;
 		for (entity_handle node_entity: nodes) {
 			Node *node = scene->get<Node>(node_entity);
-			updateNodeIndices(node->children, global_index, depth + 1);
-
-			node->local_index = local_index;
 			node->global_index = global_index;
+			updateNodeIndices(node->children, global_index, depth + 1);
+			node->local_index = local_index;
 			global_index++;
 			local_index++;
 		}
