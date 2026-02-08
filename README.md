@@ -56,7 +56,6 @@ For samples take a look at the sample repository [HellbenderSamples](https://git
 - [ ] 2D transform component
 - [ ] Model animations support (low prio)
 - [ ] ECS
-  - [ ] Multithreading support
   - [ ] Archetype caching
 - [ ] UI library
   - [ ] UIThemes

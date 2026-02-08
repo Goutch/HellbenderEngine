@@ -213,7 +213,7 @@ set(VK_FILES
         platforms/vk/VK_DynamicRenderTarget.h
         core/graphics/Allocator.h
         core/scene/ecs/Group/GroupIterator.cpp
-        core/scene/ecs/Group/ArchetypeData.h
+        core/scene/ecs/Group/PageDataArchetype.h
         core/scene/ecs/Registry/ECSTypes.h
         core/graphics/Fence.h
 )

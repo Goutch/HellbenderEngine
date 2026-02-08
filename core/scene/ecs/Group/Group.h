@@ -6,7 +6,7 @@
 #include "core/scene/ecs/Registry/Registry.h"
 #include "GroupIterator.h"
 #include "core/scene/ecs/RawVector.h"
-#include "core/scene/ecs/Group/ArchetypeData.h"
+#include "core/scene/ecs/Group/PageDataArchetype.h"
 
 namespace HBE {
     template<typename... Components>
@@ -15,8 +15,8 @@ namespace HBE {
     template<typename... Components>
     class Group {
         Registry *registry;
-        RawVector<ArchetypeData<Components...> > pools_data;
-        RawVector<entity_handle> *page_entity_handles;
+        RawVector<PageDataArchetype<Components...>> pages_data; //Each PageDataArchetype contain a void* of each Components types
+        RawVector<entity_handle> *page_entity_handles;// Each vector is the entities in a page
         size_t page_count = 0;
 
     public:
@@ -26,14 +26,14 @@ namespace HBE {
             registry->getComponentsTypeInfo<Components...>(types);
 
             RawVector<RegistryPage *> &pages = registry->getPages();
-            pools_data.reserve(pages.size());
+            pages_data.reserve(pages.size());
 
             std::bitset<REGISTRY_MAX_COMPONENT_TYPES> required_signature = 0;
             for (uint32_t i = 0; i < sizeof...(Components); ++i) {
                 required_signature.set(types[i].index, true);
             }
             for (uint32_t i = 0; i < pages.size(); ++i) {
-                ArchetypeData<Components...> archetype_data{};
+                PageDataArchetype<Components...> archetype_data{};
 
                 for (int j = 0; j < sizeof...(Components); ++j) {
                     RawComponentPool *pool = pages[i]->getRawPool(types[j].index);
@@ -43,7 +43,8 @@ namespace HBE {
                         archetype_data.set(j, nullptr);
                     }
                 }
-                pools_data.add(archetype_data);
+                archetype_data.page_offset = i * REGISTRY_PAGE_SIZE;
+                pages_data.add(archetype_data);
             }
 
             page_entity_handles = new RawVector<entity_handle>[pages.size()];
@@ -105,7 +106,7 @@ namespace HBE {
         }
 
         template<typename Func>
-        void forEachParallel(Func &&func, uint32_t thread_count = std::thread::hardware_concurrency()) {
+        void forEachParallel(Func &&func, uint32_t thread_count = 8) {
             std::atomic<size_t> nextPage{0};
             auto worker = [&]() {
                 while (true) {
@@ -117,16 +118,15 @@ namespace HBE {
                     if (page_entities.size() == 0)
                         continue;
 
-                    ArchetypeData<Components...>& archetype_data = pools_data[page_index];
+                    PageDataArchetype<Components...> &archetype_data = pages_data[page_index];
 
-                    for (uint32_t i = 0;  i< page_entities.size(); ++i) {
+                    for (uint32_t i = 0; i < page_entities.size(); ++i) {
                         entity_handle handle = page_entities[i];
                         std::apply(
                             [&](entity_handle e, Components &... comps) {
                                 func(e, comps...);
                             },
-                            archetype_data.createTuple(handle, handle - (page_index * REGISTRY_PAGE_SIZE),
-                                                       std::index_sequence_for<Components...>{})
+                            archetype_data.createTuple(handle)
                         );
                     }
                 }
@@ -144,11 +144,11 @@ namespace HBE {
 
 
         GroupIterator<Components...> begin() {
-            return GroupIterator<Components...>(pools_data, page_entity_handles, page_count);
+            return GroupIterator<Components...>(pages_data, page_entity_handles, page_count);
         };
 
         GroupIterator<Components...> end() {
-            return GroupIterator<Components...>(pools_data, page_entity_handles, page_count, page_count,
+            return GroupIterator<Components...>(pages_data, page_entity_handles, page_count, page_count,
                                                 static_cast<size_t>(0));
         }
     };
