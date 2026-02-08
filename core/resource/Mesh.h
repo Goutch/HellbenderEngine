@@ -44,7 +44,7 @@ namespace HBE {
 		uint32_t index_count = 0;
 		uint32_t instance_count = 1;
 		INDICES_TYPE indices_type = INDICES_TYPE_NONE;
-		std::unordered_map<uint32_t, VertexAttributeInfo> attributes_locations;
+		std::vector<VertexAttributeInfo> attributes_locations;
 	public:
 		void load(std::string path);
 

@@ -16,7 +16,7 @@ For samples take a look at the sample repository [HellbenderSamples](https://git
 - **I want to do ray tracing.**
 
 # Features
-#### HB Graphics library:
+#### HB Graphics:
 - Rasterization Pipeline
   - Ordered rendering for transparency and UI
   - Unordered rendering for 3D opaque objects
@@ -28,29 +28,44 @@ For samples take a look at the sample repository [HellbenderSamples](https://git
     - Fonts
 - Compute shaders
 - Shader reflection with SPIRV-Cross
-- Ray tracing pipeline shaders
+- Ray tracing pipeline
 	- miss
 	- closest hit
 	- any hit
 	- intersection
+
+#### HB ECS
+- Entity Grouping per components
+- Systems
+- Scene (Container for Systems and Entities)
+- OnAttach/OnDetach Component Events
+- Update/Draw/Render Events
+- Included Components
+  - Camera (perspective)
+  - Camera2D (orthographic)
+  - CameraController
+  - MeshRenderer
+  - ModelRenderer
+  - TextRenderer
+  - UIPanel
 #### Other
-- Optionnal Scene/ECS architecture
-	- Camera (perspective)
-	- Camera2D (orthographic)
-	- CameraController
-	- MeshRenderer
-    - ModelRenderer
 - Sounds
-- Event system
-- keyboard and mouse input handling
+- Keyboard and Mouse input handling
 
 #### TODO :
+- [ ] 2D transform component
+- [ ] Model animations support (low prio)
+- [ ] Mesh buffer update instead of recreation
+- [ ] ECS
+  - [ ] Multithreading support
+  - [ ] Archetype caching
+- [ ] UI library
+  - [ ] UIThemes
+  - [ ] Buttons
+  - [ ] Labels
+  - [ ] Panels
+- [ ] Resources rework, use handles instead of pointers
 - [ ] Documentation
-- [x] Model loading 
-- [ ] Model animations support
-- [x] Support for Multiple descriptor sets
-- [ ] ECS multithreading support
-
 ### Wiki
 - [Home](https://github.com/Goutch/HellbenderEngine/wiki)
 

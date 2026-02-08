@@ -11,7 +11,6 @@ namespace HBE {
 	enum VERTEX_ATTRIBUTE_FLAG {
 		VERTEX_ATTRIBUTE_FLAG_NONE = 0,
 		VERTEX_ATTRIBUTE_FLAG_PER_INSTANCE = 1 << 0,/// Disable device local memory and skip staging buffer. May result in slower read in shader.
-		VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS = 1 << 1,
 	};
 	enum VERTEX_TOPOLOGY {
 		VERTEX_TOPOLOGY_POINT_LIST = 0,
@@ -28,7 +27,8 @@ namespace HBE {
 	};
 
 	struct VertexAttributeInfo {
-		uint32_t location = 0;
+		//max value invalid
+		uint32_t location = std::numeric_limits<uint32_t>::max();
 		uint32_t size = 0;
 		VERTEX_ATTRIBUTE_FLAGS flags = VERTEX_ATTRIBUTE_FLAG_NONE;
 		MEMORY_TYPE_FLAGS preferred_memory_type_flags = MEMORY_TYPE_FLAG_GPU_LOCAL;

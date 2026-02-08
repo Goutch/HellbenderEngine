@@ -21,11 +21,11 @@ namespace HBE
 		VK_Device* device = nullptr;
 		VK_Renderer* renderer = nullptr;
 		VK_Buffer* indices_buffer = nullptr;
-		mutable std::unordered_map<uint32_t, std::vector<VK_Buffer*>> buffers;
+		mutable std::vector<VK_Buffer*> buffers;
 		VkBufferUsageFlags extra_usages = 0;
 		mutable bool bound = false;
 		MeshInfo info;
-		std::unordered_map<uint32_t, StorageBuffer*> storage_buffers;
+		std::vector<StorageBuffer*> storage_buffers;
 		StorageBuffer* indices_storage_buffer = nullptr;
 
 	public:
@@ -43,7 +43,7 @@ namespace HBE
 
 		void setInstanceBuffer(uint32_t location, const void* data, size_t count) override;
 
-		const VK_Buffer* getBuffer(uint32_t binding, uint32_t frame = 0) const;
+		const VK_Buffer* getBuffer(uint32_t binding) const;
 
 		const VK_Buffer* getIndicesBuffer() const;
 

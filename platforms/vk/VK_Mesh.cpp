@@ -22,24 +22,27 @@ namespace HBE {
             this->extra_usages |= VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
         }
 
+        uint32_t max_location = 0;
         for (size_t i = 0; i < info.attribute_info_count; ++i) {
-            size_t number_of_buffers = (info.attribute_infos[i].flags & VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) != 0
-                                           ? MAX_FRAMES_IN_FLIGHT
-                                           : 1;
-            buffers.emplace(info.attribute_infos[i].location, std::vector<VK_Buffer *>(number_of_buffers, nullptr));
-            attributes_locations.emplace(info.attribute_infos[i].location, info.attribute_infos[i]);
+            if (info.attribute_infos[i].location > max_location)
+                max_location = info.attribute_infos[i].location;
+        }
+        buffers.resize(max_location, nullptr);
+        attributes_locations.resize(max_location, {});
+
+        for (size_t i = 0; i < info.attribute_info_count; ++i) {
+            uint32_t location = info.attribute_infos[i].location;
+            buffers[location] = nullptr;
+            attributes_locations[location] = info.attribute_infos[i];
         }
     }
 
     void VK_Mesh::setBuffer(uint32_t location, const void *vertices, size_t count) {
+        HB_ASSERT(location<=attributes_locations.size() &&
+                  attributes_locations[location].location!=::std::numeric_limits<uint32_t>::max(),
+                  "Trying to set buffer at a location that were not included in the attribute infos");
+
         this->vertex_count = count;
-        if (count == 0) return;
-        auto it = buffers.find(location);
-        if (it == buffers.end()) {
-            Log::warning(
-                "Trying to set a mesh buffer at location#" + std::to_string(location) + " but no such location exists");
-            return;
-        }
         if (count == 0) {
             Log::warning("Trying to set a mesh buffer with vertex count = 0");
             return;
@@ -47,127 +50,70 @@ namespace HBE {
         VertexAttributeInfo &attribute_info = attributes_locations[location];
         VkDeviceSize buffer_size = attribute_info.size * count;
 
-        if ((attribute_info.flags & VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) == VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) {
-            if (buffers[location][renderer->getCurrentFrame()]) {
+        //check if a new buffer is required
+        if (buffers[location] && buffer_size != buffers[location]->getSize()) {
+            FreeRequest free_request{};
+            free_request.buffer = buffers[location];
+            free_request.fence = static_cast<VK_Fence *>(Graphics::getRenderer()->getCurrentFrameFence())->
+                    getHandle();
+            device->getAllocator()->freeLater(free_request);
+            buffers[location] = nullptr;
+            if (storage_buffers[location] != nullptr) {
                 FreeRequest free_request{};
-                free_request.buffer = buffers[location][renderer->getCurrentFrame()];
-                VK_Fence* fence = static_cast<VK_Fence*>(Graphics::getRenderer()->getCurrentFrameFence());
-                free_request.fence = fence!= nullptr ? fence->getHandle() : nullptr;
-                device->getAllocator()->freeLater(free_request);
+                free_request.storage_buffer = storage_buffers[location];
+                free_request.fence = static_cast<VK_Fence *>(Graphics::getRenderer()->getCurrentFrameFence())->
+                        getHandle();
             }
-            buffers[location][renderer->getCurrentFrame()] = new VK_Buffer(device,
-                                                                           vertices,
-                                                                           buffer_size,
-                                                                           VK_BUFFER_USAGE_VERTEX_BUFFER_BIT |
-                                                                           extra_usages,
-                                                                           (attribute_info.
-                                                                               preferred_memory_type_flags));
-            if (info.flags & MESH_FLAG_GENERATE_ATTRIBUTE_STORAGE_BUFFER) {
-                auto it = storage_buffers.find(location);
-                if (it != storage_buffers.end()) {
-                    FreeRequest free_request{};
-                    free_request.storage_buffer = it->second;
-                    VK_Fence* fence = static_cast<VK_Fence*>(Graphics::getRenderer()->getCurrentFrameFence());
-                    free_request.fence = fence!= nullptr ? fence->getHandle() : nullptr;
-                    device->getAllocator()->freeLater(free_request);
-                    it->second = new VK_StorageBuffer(device, buffers[location][renderer->getCurrentFrame()],
-                                                      attribute_info.size, count, false);
-                } else {
-                    storage_buffers[location] = new VK_StorageBuffer(
-                        device, buffers[location][renderer->getCurrentFrame()], attribute_info.size, count, false);
-                }
-            }
-        } else {
-            //todo: add to delete queue instead of waiting and deleting immediately
-            if (buffers[location][0]) {
-                FreeRequest free_request{};
-                free_request.buffer = buffers[location][0];
-                free_request.fence = static_cast<VK_Fence*>(Graphics::getRenderer()->getCurrentFrameFence())->getHandle();
-                device->getAllocator()->freeLater(free_request);
-            }
-            buffers[location][0] = new VK_Buffer(device,
-                                                 vertices,
-                                                 buffer_size,
-                                                 VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
-                                                 attribute_info.preferred_memory_type_flags);
+        }
 
+        if (buffers[location] != nullptr) {
+            buffers[location]->update(vertices, buffer_size);
+        } else {
+            buffers[location] = new VK_Buffer(device,
+                                              vertices,
+                                              buffer_size,
+                                              VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
+                                              attribute_info.preferred_memory_type_flags);
             if (info.flags & MESH_FLAG_GENERATE_ATTRIBUTE_STORAGE_BUFFER) {
-                auto it = storage_buffers.find(location);
-                if (it != storage_buffers.end()) {
-                    FreeRequest free_request{};
-                    free_request.storage_buffer = it->second;
-                    free_request.fence = static_cast<VK_Fence*>(Graphics::getRenderer()->getCurrentFrameFence())->getHandle();
-                    it->second = new VK_StorageBuffer(device, buffers[location][0], attribute_info.size, count, false);
-                } else {
-                    storage_buffers[location] = new VK_StorageBuffer(device, buffers[location][0], attribute_info.size,
-                                                                     count, false);
-                }
+                if (storage_buffers.size() < location)
+                    storage_buffers.resize(location, nullptr);
+                storage_buffers[location] = new VK_StorageBuffer(device, buffers[location], attribute_info.size,
+                                                                 count, false);
             }
         }
     }
 
 
     void VK_Mesh::setInstanceBuffer(uint32_t location, const void *data, size_t count) {
+        HB_ASSERT(location<=attributes_locations.size() &&
+                  attributes_locations[location].location!=::std::numeric_limits<uint32_t>::max(),
+                  "Trying to set buffer at a location that were not included in the attribute infos");
         this->instance_count = count;
-        if (count == 0) return;
-        HB_ASSERT(buffers.find(location) != buffers.end(),
-                  "Trying to set an instance buffer at a location that were not included in the attribute infos");
-        VertexAttributeInfo &binding_info = attributes_locations[location];
-        VkDeviceSize buffer_size = binding_info.size * count;
-
-        if ((binding_info.flags & VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) == VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) {
-            if (buffers[location][renderer->getCurrentFrame()]) {
-                FreeRequest request;
-                request.buffer = buffers[location][renderer->getCurrentFrame()];
-                VK_Fence* fence = static_cast<VK_Fence*>(Graphics::getRenderer()->getCurrentFrameFence());
-                request.fence = fence!= nullptr ? fence->getHandle() : nullptr;
-                //do not wait for anything and free the buffer at the end of frame.
-                device->getAllocator()->freeLater(request);
-            }
-            buffers[location][renderer->getCurrentFrame()] = new VK_Buffer(device,
-                                                                           data,
-                                                                           buffer_size,
-                                                                           VK_BUFFER_USAGE_VERTEX_BUFFER_BIT |
-                                                                           extra_usages,
-                                                                           binding_info.preferred_memory_type_flags);
-        } else {
-            if (buffers[location][0]) {
-                FreeRequest request;
-                request.buffer = buffers[location][0];
-                VK_Fence* fence = static_cast<VK_Fence*>(Graphics::getRenderer()->getCurrentFrameFence());
-                request.fence = fence!= nullptr ? fence->getHandle() : nullptr;
-                //do not wait for anything and free the buffer at the end of frame.
-                device->getAllocator()->freeLater(request);
-            }
-
-            buffers[location][0] = new VK_Buffer(device,
-                                                 data,
-                                                 buffer_size,
-                                                 VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages,
-                                                 binding_info.preferred_memory_type_flags);
+        if (count == 0) {
+            Log::warning("Trying to set a mesh buffer with instance count = 0");
+            return;
         }
+        setBuffer(location, data, count);
     }
 
     VK_Mesh::~VK_Mesh() {
         VK_Allocator *allocator = device->getAllocator();
-        for (size_t i = 0; i < attributes_locations.size(); ++i) {
-            for (size_t j = 0; j < buffers[i].size(); ++j) {
-                if (buffers[i][j]) {
-                    FreeRequest free_request{};
-                    free_request.buffer = buffers[i][j];
-                    VK_Fence* fence = static_cast<VK_Fence*>(Graphics::getRenderer()->getCurrentFrameFence());
-                    free_request.fence = fence!= nullptr ? fence->getHandle() : nullptr;
-                    allocator->freeLater(free_request);
-                }
-                buffers[i][j] = nullptr;
+        for (size_t i = 0; i < buffers.size(); ++i) {
+            if (buffers[i]) {
+                FreeRequest free_request{};
+                free_request.buffer = buffers[i];
+                VK_Fence *fence = static_cast<VK_Fence *>(Graphics::getRenderer()->getCurrentFrameFence());
+                free_request.fence = fence != nullptr ? fence->getHandle() : nullptr;
+                allocator->freeLater(free_request);
             }
+            buffers[i] = nullptr;
         }
         buffers.clear();
         if (indices_buffer) {
             FreeRequest free_request{};
             free_request.buffer = indices_buffer;
-            VK_Fence* fence = static_cast<VK_Fence*>(Graphics::getRenderer()->getCurrentFrameFence());
-            free_request.fence = fence!= nullptr ? fence->getHandle() : nullptr;
+            VK_Fence *fence = static_cast<VK_Fence *>(Graphics::getRenderer()->getCurrentFrameFence());
+            free_request.fence = fence != nullptr ? fence->getHandle() : nullptr;
             allocator->freeLater(free_request);
             indices_buffer = nullptr;
         }
@@ -175,16 +121,16 @@ namespace HBE {
         if (indices_storage_buffer) {
             FreeRequest free_request{};
             free_request.storage_buffer = indices_storage_buffer;
-            VK_Fence* fence = static_cast<VK_Fence*>(Graphics::getRenderer()->getCurrentFrameFence());
-            free_request.fence = fence!= nullptr ? fence->getHandle() : nullptr;
+            VK_Fence *fence = static_cast<VK_Fence *>(Graphics::getRenderer()->getCurrentFrameFence());
+            free_request.fence = fence != nullptr ? fence->getHandle() : nullptr;
             allocator->freeLater(free_request);
             indices_storage_buffer = nullptr;
         }
-        for (auto &it: storage_buffers) {
+        for (uint32_t i; i < storage_buffers.size(); i++) {
             FreeRequest free_request{};
-            free_request.storage_buffer = it.second;
-            VK_Fence* fence = static_cast<VK_Fence*>(Graphics::getRenderer()->getCurrentFrameFence());
-            free_request.fence = fence!= nullptr ? fence->getHandle() : nullptr;
+            free_request.storage_buffer = storage_buffers[i];
+            VK_Fence *fence = static_cast<VK_Fence *>(Graphics::getRenderer()->getCurrentFrameFence());
+            free_request.fence = fence != nullptr ? fence->getHandle() : nullptr;
             allocator->freeLater(free_request);
         }
         storage_buffers.clear();
@@ -194,8 +140,8 @@ namespace HBE {
         if (indices_buffer) {
             FreeRequest free_request{};
             free_request.buffer = indices_buffer;
-            VK_Fence* fence = static_cast<VK_Fence*>(Graphics::getRenderer()->getCurrentFrameFence());
-            free_request.fence = fence!= nullptr ? fence->getHandle() : nullptr;
+            VK_Fence *fence = static_cast<VK_Fence *>(Graphics::getRenderer()->getCurrentFrameFence());
+            free_request.fence = fence != nullptr ? fence->getHandle() : nullptr;
             device->getAllocator()->freeLater(free_request);
         }
         VkDeviceSize buffer_size = element_size * count;
@@ -211,8 +157,8 @@ namespace HBE {
             if (indices_storage_buffer) {
                 FreeRequest free_request{};
                 free_request.storage_buffer = indices_storage_buffer;
-                VK_Fence* fence = static_cast<VK_Fence*>(Graphics::getRenderer()->getCurrentFrameFence());
-                free_request.fence = fence!= nullptr ? fence->getHandle() : nullptr;
+                VK_Fence *fence = static_cast<VK_Fence *>(Graphics::getRenderer()->getCurrentFrameFence());
+                free_request.fence = fence != nullptr ? fence->getHandle() : nullptr;
                 device->getAllocator()->freeLater(free_request);
             }
             indices_storage_buffer = new VK_StorageBuffer(device, indices_buffer, element_size, count, false);
@@ -235,25 +181,20 @@ namespace HBE {
             return;
         bound = true;
 
-        HB_ASSERT(buffers.size() <= 16, "Too many mesh buffers : buffers.size() > 32");
+        HB_ASSERT(buffers.size() <= 16, "Too many mesh buffers : buffers.size() > 16");
         VkBuffer flat_buffers[16];
         VkDeviceSize offsets[16];
 
-        int i = 0;
+        int buffer_count = 0;
         for (auto buffer: buffers) {
-            if ((attributes_locations.at(buffer.first).flags & VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) ==
-                VERTEX_ATTRIBUTE_FLAG_MULTIPLE_BUFFERS) {
-                flat_buffers[i] = buffer.second[renderer->getCurrentFrame()]->getHandle();
-            } else {
-                flat_buffers[i] = buffer.second[0]->getHandle();
-            }
-            offsets[i] = 0;
-            i++;
+            flat_buffers[buffer_count] = buffer->getHandle();
+            offsets[buffer_count] = 0;
+            buffer_count++;
         }
 
         vkCmdBindVertexBuffers(command_pool->getCurrentBuffer(),
                                0,
-                               buffers.size(),
+                               buffer_count,
                                flat_buffers,
                                offsets);
         if (indices_type != INDICES_TYPE_NONE) {
@@ -268,8 +209,8 @@ namespace HBE {
         bound = false;
     }
 
-    const VK_Buffer *VK_Mesh::getBuffer(uint32_t binding, uint32_t frame) const {
-        return buffers.at(binding).at(frame);
+    const VK_Buffer *VK_Mesh::getBuffer(uint32_t binding) const {
+        return buffers.at(binding);
     }
 
     const VK_Buffer *VK_Mesh::getIndicesBuffer() const {
@@ -280,12 +221,12 @@ namespace HBE {
         HB_ASSERT(info.flags & MESH_FLAG_GENERATE_ATTRIBUTE_STORAGE_BUFFER,
                   "Trying to get a storage buffer from a mesh that does not have the flag MESH_FLAG_GENERATE_ATTRIBUTE_STORAGE_BUFFER");
 
-        auto it = storage_buffers.find(location);
-        HB_ASSERT(it != storage_buffers.end(),
+        auto storageBuffer = storage_buffers[location];
+        HB_ASSERT(storageBuffer != nullptr,
                   "Trying to get a storage buffer from a mesh that does not have an attribute at location:" + std::
                   to_string(location));
 
-        return it->second;
+        return storageBuffer;
     }
 
     StorageBuffer *VK_Mesh::getIndicesStorageBuffer() const {
