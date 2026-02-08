@@ -112,9 +112,9 @@ namespace HBE {
 		for (entity_handle node_entity: nodes) {
 			Node *node = scene->get<Node>(node_entity);
 			node->global_index = global_index;
+			global_index++;
 			updateNodeIndices(node->children, global_index, depth + 1);
 			node->local_index = local_index;
-			global_index++;
 			local_index++;
 		}
 	}
