@@ -1,5 +1,7 @@
 #pragma once
 
+#include <thread>
+
 #include "Core.h"
 #include "core/scene/ecs/Registry/Registry.h"
 #include "GroupIterator.h"
@@ -7,99 +9,147 @@
 #include "core/scene/ecs/Group/ArchetypeData.h"
 
 namespace HBE {
+    template<typename... Components>
+    class GroupIterator;
 
-	template<typename... Components>
-	class GroupIterator;
+    template<typename... Components>
+    class Group {
+        Registry *registry;
+        RawVector<ArchetypeData<Components...> > pools_data;
+        RawVector<entity_handle> *page_entity_handles;
+        size_t page_count = 0;
 
-	template<typename... Components>
-	class Group {
-		Registry *registry;
-		RawVector<ArchetypeData<Components...>> pools_data;
-		RawVector<entity_handle> *page_entity_handles;
-		size_t page_count = 0;
-	public:
+    public:
+        Group(Registry *registry) : registry(registry) {
+            bool empty = true;
+            ComponentTypeInfo types[sizeof ...(Components)];
+            registry->getComponentsTypeInfo<Components...>(types);
 
+            RawVector<RegistryPage *> &pages = registry->getPages();
+            pools_data.reserve(pages.size());
 
-		Group(Registry *registry) : registry(registry) {
+            std::bitset<REGISTRY_MAX_COMPONENT_TYPES> required_signature = 0;
+            for (uint32_t i = 0; i < sizeof...(Components); ++i) {
+                required_signature.set(types[i].index, true);
+            }
+            for (uint32_t i = 0; i < pages.size(); ++i) {
+                ArchetypeData<Components...> archetype_data{};
 
-			bool empty = true;
-			ComponentTypeInfo types[sizeof ...(Components)];
-			registry->getComponentsTypeInfo<Components...>(types);
+                for (int j = 0; j < sizeof...(Components); ++j) {
+                    RawComponentPool *pool = pages[i]->getRawPool(types[j].index);
+                    if (pool != nullptr) {
+                        archetype_data.set(j, reinterpret_cast<void *>(pool->data));
+                    } else {
+                        archetype_data.set(j, nullptr);
+                    }
+                }
+                pools_data.add(archetype_data);
+            }
 
-			RawVector<RegistryPage *> &pages = registry->getPages();
-			pools_data.reserve(pages.size());
+            page_entity_handles = new RawVector<entity_handle>[pages.size()];
+            page_count = pages.size();
 
-			std::bitset<REGISTRY_MAX_COMPONENT_TYPES> required_signature = 0;
-			for (uint32_t i = 0; i < sizeof...(Components); ++i) {
-				required_signature.set(types[i].index, true);
-			}
-			for (uint32_t i = 0; i < pages.size(); ++i) {
-				ArchetypeData<Components...> archetype_data{};
+            for (uint32_t i = 0; i < pages.size(); ++i) {
+                RegistryPage *page = pages[i];
 
-				for (int j = 0; j < sizeof...(Components); ++j) {
-					RawComponentPool *pool = pages[i]->getRawPool(types[j].index);
-					if (pool != nullptr) {
-						archetype_data.set(j, reinterpret_cast<void *>(pool->data));
-					} else {
-						archetype_data.set(j, nullptr);
-					}
-				}
-				pools_data.add(archetype_data);
-			}
-
-			page_entity_handles = new RawVector<entity_handle>[pages.size()];
-			page_count = pages.size();
-
-			for (uint32_t i = 0; i < pages.size(); ++i) {
-				RegistryPage *page = pages[i];
-
-				//skip if there is no matching components in this page
-				if ((page->components_signature & required_signature) != required_signature)
-					continue;
+                //skip if there is no matching components in this page
+                if ((page->components_signature & required_signature) != required_signature)
+                    continue;
 
 
-				//find the pool with the least entities
-				RawComponentPool *min_size_pool = nullptr;
-				uint32_t min_size = UINT32_MAX;
-				for (uint32_t j = 0; j < sizeof ...(Components); ++j) {
-					RawComponentPool* pool = pages[i]->getRawPool(types[j].index);
-					if (pool->handles.size() < min_size) {
-						min_size_pool = pool;
-						min_size = min_size_pool->handles.size();
-					}
-				}
-				//create the list of entity indices for this page
-				page_entity_handles[i].reserve(min_size_pool->handles.size());
-				RawVector<entity_handle> &handles = min_size_pool->handles;
+                //find the pool with the least entities
+                RawComponentPool *min_size_pool = nullptr;
+                uint32_t min_size = UINT32_MAX;
+                for (uint32_t j = 0; j < sizeof ...(Components); ++j) {
+                    RawComponentPool *pool = pages[i]->getRawPool(types[j].index);
+                    if (pool->handles.size() < min_size) {
+                        min_size_pool = pool;
+                        min_size = min_size_pool->handles.size();
+                    }
+                }
+                //create the list of entity indices for this page
+                page_entity_handles[i].reserve(min_size_pool->handles.size());
+                RawVector<entity_handle> &handles = min_size_pool->handles;
 
-				for (int j = 0; j < handles.size(); ++j) {
+                for (int j = 0; j < handles.size(); ++j) {
+                    entity_handle handle = handles[j];
+                    std::bitset<REGISTRY_MAX_COMPONENT_TYPES> entity_signature = page->getSignature(handle);
+                    if ((entity_signature & required_signature) == required_signature) {
+                        page_entity_handles[i].add(handle);
+                    }
+                }
+                if (!page_entity_handles[i].empty()) {
+                    empty = false;
+                }
+            }
 
-					entity_handle handle = handles[j];
-					std::bitset<REGISTRY_MAX_COMPONENT_TYPES> entity_signature = page->getSignature(handle);
-					if ((entity_signature & required_signature) == required_signature) {
-						page_entity_handles[i].add(handle);
-					}
-				}
-				if (!page_entity_handles[i].empty()) {
-					empty = false;
-				}
-			}
+            if (empty) {
+                page_count = 0;
+            }
+        }
 
-			if (empty) {
-				page_count = 0;
-			}
-		}
+        ~Group() {
+            delete[] page_entity_handles;
+        };
 
-		~Group() {
-			delete[] page_entity_handles;
-		};
+        template<typename Func>
+        void forEach(Func &&func) {
+            for (auto it = begin(); it != end(); ++it) {
+                std::apply(
+                    [&](entity_handle e, Components &... comps) {
+                        func(e, comps...);
+                    },
+                    *it
+                );
+            }
+        }
 
-		GroupIterator<Components...> begin() {
-			return GroupIterator<Components...>(pools_data, page_entity_handles, page_count);
-		};
+        template<typename Func>
+        void forEachParallel(Func &&func, uint32_t thread_count = std::thread::hardware_concurrency()) {
+            std::atomic<size_t> nextPage{0};
+            auto worker = [&]() {
+                while (true) {
+                    size_t page_index = nextPage.fetch_add(1, std::memory_order_relaxed);
+                    if (page_index >= page_count)
+                        break;
 
-		GroupIterator<Components...> end() {
-			return GroupIterator<Components...>(pools_data, page_entity_handles, page_count, page_count, static_cast<size_t>(0));
-		}
-	};
+                    RawVector<entity_handle> &page_entities = page_entity_handles[page_index];
+                    if (page_entities.size() == 0)
+                        continue;
+
+                    ArchetypeData<Components...>& archetype_data = pools_data[page_index];
+
+                    for (uint32_t i = 0;  i< page_entities.size(); ++i) {
+                        entity_handle handle = page_entities[i];
+                        std::apply(
+                            [&](entity_handle e, Components &... comps) {
+                                func(e, comps...);
+                            },
+                            archetype_data.createTuple(handle, handle - (page_index * REGISTRY_PAGE_SIZE),
+                                                       std::index_sequence_for<Components...>{})
+                        );
+                    }
+                }
+            };
+
+            std::vector<std::thread> threads;
+            threads.reserve(thread_count);
+
+            for (size_t i = 0; i < thread_count; ++i)
+                threads.emplace_back(worker);
+
+            for (auto &t: threads)
+                t.join();
+        }
+
+
+        GroupIterator<Components...> begin() {
+            return GroupIterator<Components...>(pools_data, page_entity_handles, page_count);
+        };
+
+        GroupIterator<Components...> end() {
+            return GroupIterator<Components...>(pools_data, page_entity_handles, page_count, page_count,
+                                                static_cast<size_t>(0));
+        }
+    };
 }

@@ -215,7 +215,8 @@ set(VK_FILES
         core/scene/ecs/Group/GroupIterator.cpp
         core/scene/ecs/Group/ArchetypeData.h
         core/scene/ecs/Registry/ECSTypes.h
-        core/graphics/Fence.h)
+        core/graphics/Fence.h
+)
 
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
