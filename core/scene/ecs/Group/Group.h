@@ -12,11 +12,17 @@ namespace HBE {
     template<typename... Components>
     class GroupIterator;
 
+    enum GROUP_THREAD_ALLOCATION_TYPE {
+        GROUP_THREAD_ALLOCATION_TYPE_PER_ENTITY,
+        GROUP_THREAD_ALLOCATION_TYPE_PER_PAGE, //one thread per REGISTRY_PAGE_SIZE entities
+    };
+
     template<typename... Components>
     class Group {
         Registry *registry;
-        RawVector<PageDataArchetype<Components...>> pages_data; //Each PageDataArchetype contain a void* of each Components types
-        RawVector<entity_handle> *page_entity_handles;// Each vector is the entities in a page
+        RawVector<PageDataArchetype<Components...> > pages_data;
+        //Each PageDataArchetype contain a void* of each Components types
+        RawVector<entity_handle> *page_entity_handles; // Each vector is the entities in a page
         size_t page_count = 0;
 
     public:
@@ -105,20 +111,92 @@ namespace HBE {
             }
         }
 
+        /**
+         * Each entity is processes individually by threads, used when entity count is low.
+         */
         template<typename Func>
-        void forEachParallel(Func &&func, uint32_t thread_count = 8) {
-            std::atomic<size_t> nextPage{0};
-            auto worker = [&]() {
+        void forEachEntityParallel(Func &&func, uint32_t thread_count = std::thread::hardware_concurrency()) {
+            struct AtomicIteratorState {
+                uint32_t page_index;
+                uint32_t entity_index;
+
+                uint64_t pack() const {
+                    return (static_cast<uint64_t>(page_index) << 32) | entity_index;
+                }
+
+                static AtomicIteratorState unpack(uint64_t v) {
+                    return {static_cast<uint32_t>(v >> 32), static_cast<uint32_t>(v & 0xFFFFFFFF)};
+                }
+            };
+            std::atomic<uint64_t> iteration_state{0};
+            auto entity_worker = [&]() {
                 while (true) {
-                    size_t page_index = nextPage.fetch_add(1, std::memory_order_relaxed);
+                    uint64_t old_raw = iteration_state.load(std::memory_order_relaxed);
+                    uint64_t new_raw = old_raw;
+                    AtomicIteratorState new_state;
+                    AtomicIteratorState old_state;
+                    do {
+                        old_state = AtomicIteratorState::unpack(old_raw);
+                        new_state = old_state;
+
+                        new_state.entity_index++;
+
+                        while (new_state.entity_index >= page_entity_handles[new_state.page_index].size()) {
+                            new_state.entity_index = 0;
+                            new_state.page_index++;
+                            if (new_state.page_index >= page_count) {
+                                return;
+                            }
+                        }
+                        old_raw = old_state.pack();
+                        new_raw = new_state.pack();
+                        //try to set state to new if it was never changed,
+                        // on success set the state
+                        // of fail set the old
+                    } while (!iteration_state.compare_exchange_weak(old_raw,
+                                                                    new_raw,
+                                                                    std::memory_order_acquire,
+                                                                    std::memory_order_relaxed));
+
+                    entity_handle current_handle = page_entity_handles[new_state.page_index][new_state.
+                        entity_index];
+                    std::apply([&](entity_handle handle, Components &... comps) {
+                                   func(handle, comps...);
+                               },
+                               pages_data[new_state.page_index].createTuple(current_handle)
+                    );
+                }
+            };
+
+            std::vector<std::thread> threads;
+            threads.reserve(thread_count);
+
+            for (size_t i = 0; i < thread_count; ++i)
+                threads.emplace_back(entity_worker);
+
+            for (auto &t: threads)
+                t.join();
+        }
+
+        /**
+         * Each thread process (REGISTRY_PAGE_SIZE) entities. Good for system that process thread_count*REGISTRY_PAGE_SIZE or more.
+         */
+        template<typename Func>
+        void forEachPageParallel(Func &&func, uint32_t thread_count = std::thread::hardware_concurrency()) {
+            std::atomic<size_t> page_index{0};
+
+            auto page_worker = [&]() {
+                while (true) {
+                    size_t assigned_page_index = page_index.fetch_add(1, std::memory_order_relaxed);
+
                     if (page_index >= page_count)
                         break;
 
-                    RawVector<entity_handle> &page_entities = page_entity_handles[page_index];
+                    RawVector<entity_handle> &page_entities = page_entity_handles[assigned_page_index];
                     if (page_entities.size() == 0)
                         continue;
 
-                    PageDataArchetype<Components...> &archetype_data = pages_data[page_index];
+                    PageDataArchetype<Components...> &archetype_data = pages_data[assigned_page_index];
 
                     for (uint32_t i = 0; i < page_entities.size(); ++i) {
                         entity_handle handle = page_entities[i];
@@ -136,7 +214,7 @@ namespace HBE {
             threads.reserve(thread_count);
 
             for (size_t i = 0; i < thread_count; ++i)
-                threads.emplace_back(worker);
+                threads.emplace_back(page_worker);
 
             for (auto &t: threads)
                 t.join();
