@@ -55,7 +55,6 @@ For samples take a look at the sample repository [HellbenderSamples](https://git
 #### TODO :
 - [ ] 2D transform component
 - [ ] Model animations support (low prio)
-- [ ] Mesh buffer update instead of recreation
 - [ ] ECS
   - [ ] Multithreading support
   - [ ] Archetype caching
