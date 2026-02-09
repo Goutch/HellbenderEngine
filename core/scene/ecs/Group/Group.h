@@ -160,11 +160,7 @@ namespace HBE {
 
                     entity_handle current_handle = page_entity_handles[new_state.page_index][new_state.
                         entity_index];
-                    std::apply([&](entity_handle handle, Components &... comps) {
-                                   func(handle, comps...);
-                               },
-                               pages_data[new_state.page_index].createTuple(current_handle)
-                    );
+                    pages_data[new_state.page_index].call(current_handle, func);
                 }
             };
 
@@ -189,7 +185,7 @@ namespace HBE {
                 while (true) {
                     size_t assigned_page_index = page_index.fetch_add(1, std::memory_order_relaxed);
 
-                    if (page_index >= page_count)
+                    if (assigned_page_index >= page_count)
                         break;
 
                     RawVector<entity_handle> &page_entities = page_entity_handles[assigned_page_index];
@@ -199,13 +195,7 @@ namespace HBE {
                     PageDataArchetype<Components...> &archetype_data = pages_data[assigned_page_index];
 
                     for (uint32_t i = 0; i < page_entities.size(); ++i) {
-                        entity_handle handle = page_entities[i];
-                        std::apply(
-                            [&](entity_handle e, Components &... comps) {
-                                func(e, comps...);
-                            },
-                            archetype_data.createTuple(handle)
-                        );
+                        archetype_data.call(page_entities[i], func);
                     }
                 }
             };
