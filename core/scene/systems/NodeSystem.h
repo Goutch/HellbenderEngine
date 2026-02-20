@@ -13,7 +13,7 @@ namespace HBE {
 		RawVector<entity_handle> root_nodes;
 		bool dirty = false;
 		uint32_t node_count = 0;
-		event_subscription_id attach_subscription_id = 0;
+		event_subscription_id attach_subscription_id ;
 		event_subscription_id detach_subscription_id;
 	public:
 		NodeSystem(Scene *scene);
