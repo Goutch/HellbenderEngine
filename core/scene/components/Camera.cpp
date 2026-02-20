@@ -18,7 +18,7 @@ namespace HBE {
 			render_target->onResolutionChange.unsubscribe(render_target_resize_subscription_id);
 		this->render_target = render_target;
 
-		render_target_resize_subscription_id = render_target->onResolutionChange.subscribe(this, &Camera::calculateProjection);
+		render_target->onResolutionChange.subscribe(render_target_resize_subscription_id, this, &Camera::calculateProjection);
 		calculateProjection(render_target);
 	}
 

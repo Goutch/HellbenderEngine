@@ -9,10 +9,10 @@
 namespace HBE {
 	CameraSystem::CameraSystem(Scene *scene) : System(scene) {
 		this->scene = scene;
-		scene->onRender.subscribe(this, &CameraSystem::render);
-		scene->onAttach<Camera>().subscribe(this, &CameraSystem::onCameraAttached);
-		scene->onAttach<Camera2D>().subscribe(this, &CameraSystem::onCamera2DAttached);
-		scene->onAttach<PixelCamera>().subscribe(this, &CameraSystem::onPixelCameraAttached);
+		scene->onRender.subscribe(on_render_subscription_id,this, &CameraSystem::render);
+		scene->onAttach<Camera>().subscribe(on_attach_3D_subscription_id,this, &CameraSystem::onCameraAttached);
+		scene->onAttach<Camera2D>().subscribe(on_attach_2D_subscription_id,this, &CameraSystem::onCamera2DAttached);
+		scene->onAttach<PixelCamera>().subscribe(on_attach_pixel_subscription_id,this, &CameraSystem::onPixelCameraAttached);
 	}
 
 	void CameraSystem::onCameraAttached(Entity entity) {
@@ -94,7 +94,7 @@ namespace HBE {
 	}
 
 	CameraSystem::~CameraSystem() {
-		scene->onRender.unsubscribe(this);
-		scene->onAttach<Camera>().unsubscribe(this);
+		 scene->onRender.unsubscribe(on_render_subscription_id);
+		 scene->onAttach<Camera>().unsubscribe(on_attach_subscription_id);
 	}
 }
