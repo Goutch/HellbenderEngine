@@ -84,7 +84,7 @@ namespace HBE {
     class VK_Allocator {
     protected:
         const VkDeviceSize BLOCK_SIZE = 1024 * 1024 * 128; // = 128mb
-
+	    event_subscription_id on_frame_change_subscription_id;
         VK_CommandPool *command_pool;
         VK_Device *device;
 
@@ -160,6 +160,7 @@ namespace HBE {
         FreeRequest createTempStagingBuffer(const void *data, size_t size);
 
         void generateMipmaps(VK_Image &image);
+
 
     };
 }

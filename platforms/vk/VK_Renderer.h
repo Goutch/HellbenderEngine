@@ -60,7 +60,9 @@ namespace HBE {
 		bool windowResized = false;
 		bool frame_presented = false;
 
-
+		event_subscription_id vertical_sync_changed_subscription_id;
+		event_subscription_id window_closed_subscription_id;
+		event_subscription_id window_size_changed_subscription_id;
 	public:
 		void rasterize(RasterizeCmdInfo &render_cmd_info) override;
 
@@ -118,6 +120,8 @@ namespace HBE {
 	private:
 
 		void createDefaultResources() override;
+
+
 	};
 }
 

@@ -59,9 +59,9 @@ namespace HBE {
 
 		images_in_flight_fences.resize(swapchain->getImagesCount(), nullptr);
 
-		Application::onWindowClosed.subscribe(this, &VK_Renderer::onWindowClosed);
-		Configs::onVerticalSyncChange.subscribe(this, &VK_Renderer::reCreateSwapchain);
-		window->onSizeChange.subscribe(this, &VK_Renderer::onWindowSizeChange);
+		Application::onWindowClosed.subscribe(window_closed_subscription_id,this, &VK_Renderer::onWindowClosed);
+		Configs::onVerticalSyncChange.subscribe(vertical_sync_changed_subscription_id,this, &VK_Renderer::reCreateSwapchain);
+		window->onSizeChange.subscribe(window_size_changed_subscription_id,this, &VK_Renderer::onWindowSizeChange);
 	}
 
 
@@ -152,9 +152,9 @@ namespace HBE {
 	}
 
 	VK_Renderer::~VK_Renderer() {
-		window->onSizeChange.unsubscribe(this);
-		Application::onWindowClosed.unsubscribe(this);
-		Configs::onVerticalSyncChange.unsubscribe(this);
+		Application::onWindowClosed.unsubscribe(window_closed_subscription_id);
+		Configs::onVerticalSyncChange.unsubscribe(vertical_sync_changed_subscription_id);
+		window->onSizeChange.unsubscribe(window_size_changed_subscription_id);
 		device->wait();
 		Resources::destroyAll();
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {

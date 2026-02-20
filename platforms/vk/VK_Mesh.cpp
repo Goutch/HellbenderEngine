@@ -126,7 +126,7 @@ namespace HBE {
 			allocator->freeLater(free_request);
 			indices_storage_buffer = nullptr;
 		}
-		for (uint32_t i; i < storage_buffers.size(); i++) {
+		for (uint32_t i = 0; i < storage_buffers.size(); i++) {
 			FreeRequest free_request{};
 			free_request.storage_buffer = storage_buffers[i];
 			VK_Fence *fence = static_cast<VK_Fence *>(Graphics::getRenderer()->getCurrentFrameFence());

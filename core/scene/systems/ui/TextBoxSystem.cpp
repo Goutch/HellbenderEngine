@@ -32,9 +32,10 @@ namespace HBE {
 	}
 
 	TextBoxSystem::TextBoxSystem(Scene *scene) : System(scene) {
-		scene->onAttach<TextBoxComponent>().subscribe(this, &TextBoxSystem::onAttachTextBox);
-		scene->onUpdate.subscribe(this, &TextBoxSystem::onUpdate);
-		Input::onCharDown.subscribe(this, &TextBoxSystem::onCharacterPressed);
+		scene->onAttach<TextBoxComponent>().subscribe(on_attach_sub_id, this, &TextBoxSystem::onAttachTextBox);
+		scene->onDetach<TextBoxComponent>().subscribe(on_detach_sub_id, this, &TextBoxSystem::onDetachTextBox);
+		scene->onUpdate.subscribe(on_update_sub_id, this, &TextBoxSystem::onUpdate);
+		Input::onCharDown.subscribe(on_char_down_sub_id, this, &TextBoxSystem::onCharacterPressed);
 	}
 
 	void TextBoxSystem::onCharacterPressed(char character) {
@@ -57,7 +58,12 @@ namespace HBE {
 		}
 		text_box.get<TextBoxComponent>()->entity = text_box;
 
-		button_component->onButtonClicked.subscribe(this, &TextBoxSystem::onTextBoxClicked);
+		button_component->onButtonClicked.subscribe(button_component->system_clicked_subscription_id, this, &TextBoxSystem::onTextBoxClicked);
+	}
+
+	void TextBoxSystem::onDetachTextBox(Entity text_box) {
+		ButtonComponent *button_component = text_box.get<ButtonComponent>();
+		button_component->onButtonClicked.unsubscribe(button_component->system_clicked_subscription_id);
 	}
 
 	void TextBoxSystem::onTextBoxClicked(Entity button) {
@@ -81,6 +87,13 @@ namespace HBE {
 
 		cursor_blink_t = 0;
 	}
+
+	TextBoxSystem::~TextBoxSystem() {
+		scene->onAttach<TextBoxComponent>().unsubscribe(on_attach_sub_id);
+		scene->onUpdate.unsubscribe(on_update_sub_id);
+		Input::onCharDown.unsubscribe(on_char_down_sub_id);
+	}
+
 
 	void TextBoxComponent::setSize(vec2 size) {
 		ButtonComponent *buttonComponent = entity.get<ButtonComponent>();

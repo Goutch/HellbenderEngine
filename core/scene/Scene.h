@@ -65,6 +65,7 @@ namespace HBE {
 		event_subscription_id update_subscription_id;
 		event_subscription_id render_subscription_id;
 		event_subscription_id present_subscription_id;
+		event_subscription_id frame_change_subscription_id;
 	private:
 		TransformSystem *transform_system = nullptr;
 		NodeSystem *node_system = nullptr;
@@ -170,6 +171,8 @@ namespace HBE {
 		void onFrameChange(uint32_t frame);
 
 		void drawNode(RenderGraph *render_graph, Node &node, int &count);
+
+
 	};
 
 	template<typename Component>

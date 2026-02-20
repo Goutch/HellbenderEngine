@@ -33,10 +33,11 @@ namespace HBE {
 		Geometry::createQuad(*anchor_meshes[PIVOT_BOTTOM_CENTER], 1, 1, VERTEX_FLAG_UV, PIVOT_BOTTOM_CENTER);
 		Geometry::createQuad(*anchor_meshes[PIVOT_BOTTOM_RIGHT], 1, 1, VERTEX_FLAG_UV, PIVOT_BOTTOM_RIGHT);
 
-		scene->onDraw.subscribe(this, &UIPanelSystem::draw);
+		scene->onDraw.subscribe(on_draw_subscription_id, this, &UIPanelSystem::draw);
 	}
 
 	UIPanelSystem::~UIPanelSystem() {
+		scene->onDraw.unsubscribe(on_draw_subscription_id);
 		for (int i = 0; i < 9; i++) {
 			delete anchor_meshes[i];
 		}

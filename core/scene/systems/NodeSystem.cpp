@@ -9,8 +9,13 @@
 
 namespace HBE {
 	NodeSystem::NodeSystem(Scene *scene) : System(scene) {
-		scene->onAttach<Node>().subscribe(this, &NodeSystem::onAttachNode);
-		scene->onDetach<Node>().subscribe(this, &NodeSystem::onDetachNode);
+		scene->onAttach<Node>().subscribe(attach_subscription_id, this, &NodeSystem::onAttachNode);
+		scene->onDetach<Node>().subscribe(detach_subscription_id, this, &NodeSystem::onDetachNode);
+	}
+
+	NodeSystem::~NodeSystem() {
+		scene->onAttach<Node>().unsubscribe(attach_subscription_id);
+		scene->onDetach<Node>().unsubscribe(detach_subscription_id);
 	}
 
 	void NodeSystem::updateNodeIndices() {
@@ -118,4 +123,5 @@ namespace HBE {
 			local_index++;
 		}
 	}
+
 }

@@ -180,11 +180,11 @@ namespace HBE {
 		if (info.initialized_systems_flags & SCENE_INITIALIZE_SYSTEMS_FLAG_MESH_RENDERER_SYSTEM)
 			addSystem(new MeshRendererSystem(this));
 
-		draw_subscription_id = Application::onDraw.subscribe(this, &Scene::draw);
-		render_subscription_id = Application::onRender.subscribe(this, &Scene::render);
-		update_subscription_id = Application::onUpdate.subscribe(this, &Scene::update);
-		Application::onPresent.subscribe(this, &Scene::present);
-		Graphics::onFrameChange.subscribe(this, &Scene::onFrameChange);
+		Application::onDraw.subscribe(draw_subscription_id,this, &Scene::draw);
+		Application::onRender.subscribe(render_subscription_id ,this, &Scene::render);
+		Application::onUpdate.subscribe(update_subscription_id,this, &Scene::update);
+		Application::onPresent.subscribe(present_subscription_id,this, &Scene::present);
+		Graphics::onFrameChange.subscribe(frame_change_subscription_id,this, &Scene::onFrameChange);
 	}
 
 	Entity Scene::createEntity() {

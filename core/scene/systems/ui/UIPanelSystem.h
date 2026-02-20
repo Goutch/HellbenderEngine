@@ -5,6 +5,7 @@
 #include "core/scene/System.h"
 #include "core/scene/Entity.h"
 #include "core/scene/ecs/Component.h"
+#include "Event.h"
 
 using namespace HBE;
 namespace HBE {
@@ -35,14 +36,17 @@ namespace HBE {
 			mat4 world_matrix;
 			vec2 size;
 		};
+		event_subscription_id on_draw_subscription_id;
 	public:
 		UIPanelSystem(Scene *scene);
 
 		~UIPanelSystem();
-		void draw(RenderGraph* graph);
+
+		void draw(RenderGraph *graph);
 
 	private:
 		Mesh *anchor_meshes[9];
+
 	};
 
 

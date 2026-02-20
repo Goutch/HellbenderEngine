@@ -153,6 +153,8 @@ namespace HBE {
 
     static VkSamplerAddressMode adressModeToVKAddressMode(IMAGE_SAMPLER_ADDRESS_MODE adress_mode) {
         switch (adress_mode) {
+	        default:
+				Log::warning("Unknown address mode, using repeat as default");
             case IMAGE_SAMPLER_ADDRESS_MODE_REPEAT:
                 return VK_SAMPLER_ADDRESS_MODE_REPEAT;
             case IMAGE_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT:
@@ -164,6 +166,7 @@ namespace HBE {
             case IMAGE_SAMPLER_ADDRESS_MODE_MIRROR_CLAMP_TO_EDGE:
                 return VK_SAMPLER_ADDRESS_MODE_MIRROR_CLAMP_TO_EDGE;
         }
+
     }
 
 

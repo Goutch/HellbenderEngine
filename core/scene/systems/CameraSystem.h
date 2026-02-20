@@ -28,6 +28,7 @@ namespace HBE {
 
 		void onPixelCameraAttached(Entity entity);
 
+
 	};
 }
 

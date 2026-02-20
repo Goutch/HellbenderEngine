@@ -5,44 +5,54 @@
 #include "Core.h"
 #include "HBETypes.h"
 #include "core/scene/ecs/Component.h"
+#include "Event.h"
 
 using namespace HBE;
 
 namespace HBE {
-    class Font;
+	class Font;
 
 
-    struct HB_API TextBoxComponent {
-        COMPONENT_IDS(TextBoxComponent)
-        friend class TextBoxSystem;
+	struct HB_API TextBoxComponent {
+		COMPONENT_IDS(TextBoxComponent)
 
-        Entity entity;
+		friend class TextBoxSystem;
 
-        void setSize(vec2 size);
+		Entity entity;
 
-        void setTextHeight(float height);
+		void setSize(vec2 size);
 
-        void setHintText(const std::string &hint);
+		void setTextHeight(float height);
 
-    private :
-        std::string hint_text;
-        bool is_hint_visible = true;
-    };
+		void setHintText(const std::string &hint);
 
-    class HB_API TextBoxSystem : public System {
-    private:
-        float cursor_blink_t = 0;
-        Entity active_textbox_entity;
+	private :
+		std::string hint_text;
+		bool is_hint_visible = true;
+	};
 
-    public:
-        TextBoxSystem(Scene *scene);
+	class HB_API TextBoxSystem : public System {
+	private:
+		float cursor_blink_t = 0;
+		Entity active_textbox_entity;
 
-        void onAttachTextBox(Entity text_box);
+		event_subscription_id on_detach_sub_id;
+		event_subscription_id on_attach_sub_id;
+		event_subscription_id on_update_sub_id;
+		event_subscription_id on_char_down_sub_id;
 
-        void onTextBoxClicked(Entity button);
+	public:
+		TextBoxSystem(Scene *scene);
+		~TextBoxSystem();
+		void onAttachTextBox(Entity text_box);
+		void onDetachTextBox(Entity text_box);
+		void onTextBoxClicked(Entity button);
 
-        void onUpdate(float delta);
+		void onUpdate(float delta);
 
-        void onCharacterPressed(char character);
-    };
+		void onCharacterPressed(char character);
+
+
+
+	};
 }

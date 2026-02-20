@@ -59,11 +59,12 @@ namespace HBE {
 		}
 		createDescriptorPool(descriptor_pool);
 		createDescriptorWrites(descriptor_pool);
-		Graphics::onFrameChange.subscribe(this, &VK_PipelineDescriptors::onFrameChange);
+		Graphics::onFrameChange.subscribe(on_frame_changle_subscription_id, this, &VK_PipelineDescriptors::onFrameChange);
 	}
 
 
 	VK_PipelineDescriptors::~VK_PipelineDescriptors() {
+		Graphics::onFrameChange.unsubscribe(on_frame_changle_subscription_id);
 		for (const auto &buffers_per_frame: uniform_buffers) {
 			for (auto b: buffers_per_frame) {
 				delete b;

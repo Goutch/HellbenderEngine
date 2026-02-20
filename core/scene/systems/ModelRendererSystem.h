@@ -8,11 +8,13 @@
 #include "core/scene/components/ModelRenderer.h"
 namespace HBE {
 	class ModelRendererSystem : public System {
-		event_subscription_id model_renderer_attach_subscription_id;
+		event_subscription_id on_draw_subcription_id;
 	public:
 		ModelRendererSystem(Scene* scene);
 		~ModelRendererSystem();
 		void draw(RenderGraph* render_graph);
+
+
 	};
 
 }

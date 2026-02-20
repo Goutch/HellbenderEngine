@@ -19,6 +19,9 @@ namespace HBE {
 	}
 
 	TextSystem::~TextSystem() {
+		scene->onAttach<TextRenderer>().unsubscribe(on_attach_subscription_id);
+		scene->onDetach<TextRenderer>().unsubscribe(on_detach_subscription_id);
+		scene->onDraw.unsubscribe(on_draw_subscription_id);
 		delete default_font;
 		delete default_text_pipeline_instance;
 		delete default_text_pipeline;
@@ -27,9 +30,9 @@ namespace HBE {
 	}
 
 	TextSystem::TextSystem(Scene *scene, RasterizationTarget *render_target) : System(scene) {
-		scene->onAttach<TextRenderer>().subscribe(this, &TextSystem::onAttachLabel);
-		scene->onDetach<TextRenderer>().subscribe(this, &TextSystem::onDetachLabel);
-		scene->onDraw.subscribe(this, &TextSystem::onPrepareRenderGraph);
+		scene->onAttach<TextRenderer>().subscribe(on_attach_subscription_id, this, &TextSystem::onAttachLabel);
+		scene->onDetach<TextRenderer>().subscribe(on_detach_subscription_id, this, &TextSystem::onDetachLabel);
+		scene->onDraw.subscribe(on_draw_subscription_id, this, &TextSystem::onPrepareRenderGraph);
 
 		std::string characters =
 				"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{};':\",./<>?\\|`~";

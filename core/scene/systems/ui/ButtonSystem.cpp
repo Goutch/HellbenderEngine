@@ -16,10 +16,10 @@
 
 namespace HBE {
 	ButtonSystem::ButtonSystem(Scene *scene, RasterizationTarget *render_target) : System(scene) {
-		attach_button_subscription_id = scene->onAttach<ButtonComponent>().subscribe(this, &ButtonSystem::onAttachButton);
-		detach_button_subscription_id = scene->onDetach<ButtonComponent>().subscribe(this, &ButtonSystem::onDettachButton);
-		left_click_subscription_id = Input::onMouseLeftClickDown.subscribe(this, &ButtonSystem::onLeftClick);
-		update_subscription_id = scene->onUpdate.subscribe(this, &ButtonSystem::onUpdate);
+		scene->onAttach<ButtonComponent>().subscribe(attach_button_subscription_id, this, &ButtonSystem::onAttachButton);
+		scene->onDetach<ButtonComponent>().subscribe(detach_button_subscription_id, this, &ButtonSystem::onDettachButton);
+		Input::onMouseLeftClickDown.subscribe(left_click_subscription_id, this, &ButtonSystem::onLeftClick);
+		scene->onUpdate.subscribe(update_subscription_id, this, &ButtonSystem::onUpdate);
 		//region ---------------------------------------------button pipelines---------------------------------------------
 		ShaderInfo button_frag_shader_info{};
 		ShaderInfo button_vert_shader_info{};

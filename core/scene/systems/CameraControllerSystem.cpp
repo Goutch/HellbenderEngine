@@ -11,9 +11,9 @@
 
 namespace HBE {
 	CameraControllerSystem::CameraControllerSystem(Scene *scene) : System(scene) {
-		update_subscription_id = scene->onUpdate.subscribe(this, &CameraControllerSystem::update);
-		detach_subscription_id = scene->onDetach<CameraController>().subscribe(this, &CameraControllerSystem::onDetach);
-		attach_subscription_id = scene->onAttach<CameraController>().subscribe(this, &CameraControllerSystem::onAttach);
+		scene->onUpdate.subscribe(update_subscription_id, this, &CameraControllerSystem::update);
+		scene->onDetach<CameraController>().subscribe(detach_subscription_id, this, &CameraControllerSystem::onDetach);
+		scene->onAttach<CameraController>().subscribe(attach_subscription_id, this, &CameraControllerSystem::onAttach);
 	}
 
 	void CameraControllerSystem::update(float delta_t) {

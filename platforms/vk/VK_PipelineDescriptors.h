@@ -63,7 +63,7 @@ namespace HBE
 		std::queue<std::pair<uint32_t, VkDescriptorPool>> old_descriptor_pools;
 
 		mutable bool bound = false;
-
+		event_subscription_id on_frame_changle_subscription_id;
 	public:
 		VK_PipelineDescriptors(VK_Renderer* renderer,
 		                       const VK_PipelineLayout& layout,
@@ -109,5 +109,7 @@ namespace HBE
 		void createDescriptorPool(DescriptorPool& pool);
 
 		void createVariableSizeDescriptors(uint32_t binding, VkDescriptorType descriptor_type, uint32_t count, int32_t frame);
+
+
 	};
 }

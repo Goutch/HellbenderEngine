@@ -7,7 +7,7 @@
 #include "HBETypes.h"
 #include "core/resource/Mesh.h"
 #include "core/scene/ecs/Component.h"
-
+#include "Event.h"
 namespace HBE {
 	class Font;
 
@@ -54,7 +54,9 @@ namespace HBE {
 			mat4 world_matrix;
 			float text_height;
 		};
-
+		event_subscription_id on_attach_subscription_id;
+		event_subscription_id on_detach_subscription_id;
+		event_subscription_id on_draw_subscription_id;
 		const vec4 DEFAULT_TEXT_COLOR = vec4(1, 1, 1, 1);
 		Font *default_font = nullptr;
 		Shader *default_text_frag_shader = nullptr;
@@ -70,6 +72,8 @@ namespace HBE {
 		void onPrepareRenderGraph(RenderGraph* render_graph);
 
 		void onAttachLabel(Entity text_entity);
+
+
 	};
 }
 

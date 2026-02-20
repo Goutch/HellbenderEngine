@@ -34,11 +34,16 @@ namespace HBE {
 		Entity label_entity;
 		ButtonMaterial material_properties;
 		Event<Entity> onButtonClicked;
+		event_subscription_id system_clicked_subscription_id;
 
 		void setSize(vec2 size);
+
 		void setText(const std::string &text);
+
 		void setFont(Font *font);
-		const std::string& getText();
+
+		const std::string &getText();
+
 		void setTextHeight(float height);
 	};
 
@@ -85,7 +90,6 @@ namespace HBE {
 		void onDettachButton(Entity e);
 
 		void onLeftClick(vec2 position);
-
 
 
 	};
