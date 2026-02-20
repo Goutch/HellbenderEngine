@@ -6,7 +6,7 @@ namespace HBE
 {
 	ModelRendererSystem::ModelRendererSystem(Scene* scene) : System(scene)
 	{
-		scene->onDraw.subscribe(this, &ModelRendererSystem::draw);
+		model_renderer_attach_subscription_id =scene->onDraw.subscribe(this, &ModelRendererSystem::draw);
 	}
 
 	void drawNode(RenderGraph* render_graph, Model& model, const ModelNode& node, mat4 parent_transform)
@@ -66,6 +66,6 @@ namespace HBE
 
 	ModelRendererSystem::~ModelRendererSystem()
 	{
-		scene->onDraw.unsubscribe(this);
+		scene->onDraw.unsubscribe(model_renderer_attach_subscription_id);
 	}
 }

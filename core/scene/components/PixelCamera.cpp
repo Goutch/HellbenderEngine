@@ -12,10 +12,10 @@ namespace HBE{
 
 	void PixelCamera::setRenderTarget(RasterizationTarget *render_target) {
 		if (render_target != nullptr)
-			render_target->onResolutionChange.unsubscribe(this);
+			render_target->onResolutionChange.unsubscribe(render_target_resize_subscription_id);
 		this->render_target = render_target;
 
-		render_target->onResolutionChange.subscribe(this, &PixelCamera::calculateProjection);
+		render_target_resize_subscription_id = render_target->onResolutionChange.subscribe(this, &PixelCamera::calculateProjection,0);
 		calculateProjection(render_target);
 
 	}

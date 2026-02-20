@@ -21,7 +21,7 @@ namespace HBE {
         };
 
         Camera(const Camera &other);
-
+		event_subscription_id render_target_resize_subscription_id ;
         mat4 projection = mat4(1.0f);
         float fov = 70.0f;
         float far = 1000.0f;

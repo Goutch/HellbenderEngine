@@ -61,7 +61,10 @@ namespace HBE {
 		Event<float> onUpdate;
 		Event<Scene *> onSceneActivate;
 		Event<Scene *> onSceneDeactivate;
-
+		event_subscription_id draw_subscription_id;
+		event_subscription_id update_subscription_id;
+		event_subscription_id render_subscription_id;
+		event_subscription_id present_subscription_id;
 	private:
 		TransformSystem *transform_system = nullptr;
 		NodeSystem *node_system = nullptr;
@@ -75,8 +78,8 @@ namespace HBE {
 		Scene(Scene &scene) = delete;
 
 		Entity main_camera_entity;
-		std::unordered_map<uint32_t, Event<Entity>> attach_events;
-		std::unordered_map<uint32_t, Event<Entity>> detach_events;
+		std::array<Event<Entity>, REGISTRY_MAX_COMPONENT_TYPES> attach_events;
+		std::array<Event<Entity>, REGISTRY_MAX_COMPONENT_TYPES> detach_events;
 
 	public:
 		void setActive(bool active);
@@ -166,7 +169,6 @@ namespace HBE {
 
 		void onFrameChange(uint32_t frame);
 
-
 		void drawNode(RenderGraph *render_graph, Node &node, int &count);
 	};
 
@@ -220,10 +222,9 @@ namespace HBE {
 	template<typename Component>
 	Component *Scene::attach(entity_handle handle) {
 		Component *component = registry.attach<Component>(handle);
-		Entity e = Entity(handle, this);
 		uint32_t index = registry.getTypeIndex<Component>();
-		if (attach_events.find(index) != attach_events.end())
-			attach_events[index].invoke(e);
+		if (attach_events[index].listenerCount() > 0)
+			attach_events[index].invoke(Entity(handle, this));
 		return component;
 	};
 
@@ -232,8 +233,7 @@ namespace HBE {
 	Component *Scene::attach(entity_handle handle, const Component &component) {
 		uint32_t index = registry.getTypeIndex<Component>();
 		Component *component_ptr = registry.attach<Component>(handle, component);
-
-		if (attach_events.find(index) != attach_events.end())
+		if (attach_events[index].listenerCount() > 0)
 			attach_events[index].invoke(Entity(handle, this));
 		return component_ptr;
 	};
@@ -243,12 +243,10 @@ namespace HBE {
 		return registry.has<Component>(handle);
 	}
 
-
 	template<typename Component>
 	void Scene::detach(entity_handle handle) {
 		uint32_t index = registry.getTypeIndex<Component>();
-
-		if (detach_events.find(index) != detach_events.end())
+		if (detach_events[index].listenerCount() > 0)
 			detach_events[index].invoke(Entity(handle, this));
 		registry.detach<Component>(handle);
 	};
@@ -256,18 +254,12 @@ namespace HBE {
 	template<typename Component>
 	Event<Entity> &Scene::onAttach() {
 		uint32_t index = registry.getTypeIndex<Component>();
-		if (attach_events.find(index) == attach_events.end()) {
-			attach_events.emplace(index, Event<Entity>());
-		}
 		return attach_events[index];
 	};
 
 	template<typename Component>
 	Event<Entity> &Scene::onDetach() {
 		uint32_t index = registry.getTypeIndex<Component>();
-		if (detach_events.find(index) == detach_events.end()) {
-			detach_events.emplace(index, Event<Entity>());
-		}
 		return detach_events[index];
 	}
 

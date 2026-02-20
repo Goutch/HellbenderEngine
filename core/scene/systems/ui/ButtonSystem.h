@@ -4,10 +4,9 @@
 #include "HBETypes.h"
 #include "core/scene/Entity.h"
 #include "core/scene/System.h"
-#include "Event.h"
+#include "dependencies/utils-collection/Event.h"
 #include "core/scene/ecs/Component.h"
 
-using namespace utils;
 namespace HBE {
 
 	class RasterizationTarget;
@@ -56,8 +55,10 @@ namespace HBE {
 		const float DEFAULT_BUTTON_BORDER_WIDTH = 3;
 
 		const vec4 DEFAULT_TEXT_COLOR = vec4(1, 1, 1, 1);
-
-
+		event_subscription_id update_subscription_id;
+		event_subscription_id left_click_subscription_id;
+		event_subscription_id attach_button_subscription_id;
+		event_subscription_id detach_button_subscription_id;
 		ButtonMaterial default_button_material;
 		ButtonMaterial default_button_material_hover;
 		ButtonMaterial default_button_material_pressed;
@@ -84,5 +85,8 @@ namespace HBE {
 		void onDettachButton(Entity e);
 
 		void onLeftClick(vec2 position);
+
+
+
 	};
 }

@@ -2,12 +2,13 @@
 #include "Core.h"
 #include "HBETypes.h"
 #include "core/scene/System.h"
-#include "core/utility/Profiler.h"
+#include "dependencies/utils-collection/Profiler.h"
 #include "core/graphics/Graphics.h"
 #include "core/resource/Model.h"
 #include "core/scene/components/ModelRenderer.h"
 namespace HBE {
 	class ModelRendererSystem : public System {
+		event_subscription_id model_renderer_attach_subscription_id;
 	public:
 		ModelRendererSystem(Scene* scene);
 		~ModelRendererSystem();

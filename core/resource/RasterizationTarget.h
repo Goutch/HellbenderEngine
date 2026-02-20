@@ -3,9 +3,8 @@
 #include <core/resource/Resource.h>
 #include "Core.h"
 #include "Image.h"
-#include "Event.h"
+#include "dependencies/utils-collection/Event.h"
 
-using namespace utils;
 namespace HBE {
 	class Framebuffer;
 

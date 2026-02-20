@@ -2,7 +2,6 @@
 
 #include "Core.h"
 #include <thread>
-#include "Function.h"
 #include <future>
 #include "core/utility/Log.h"
 

@@ -30,8 +30,6 @@ namespace HBE {
 
 	class Image;
 
-	using namespace utils;
-
 	class HB_API Graphics {
 		static Renderer *renderer;
 		static Window *window;

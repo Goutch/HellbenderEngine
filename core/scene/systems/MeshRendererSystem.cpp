@@ -1,6 +1,6 @@
 #include "MeshRendererSystem.h"
 #include "core/graphics/Graphics.h"
-#include "core/utility/Profiler.h"
+#include "dependencies/utils-collection/Profiler.h"
 #include <core/scene/Scene.h>
 #include <core/graphics/RenderGraph.h>
 #include "core/scene/components/Transform.h"
@@ -9,7 +9,7 @@
 
 namespace HBE {
     MeshRendererSystem::MeshRendererSystem(Scene *scene) : System(scene) {
-        scene->onDraw.subscribe(this, &MeshRendererSystem::onDraw);
+	    on_draw_subscription_id = scene->onDraw.subscribe(this, &MeshRendererSystem::onDraw);
     }
 
     void MeshRendererSystem::onDraw(RenderGraph *render_graph) {
@@ -62,6 +62,6 @@ namespace HBE {
 
 
     MeshRendererSystem::~MeshRendererSystem() {
-        scene->onDraw.unsubscribe(this);
+        scene->onDraw.unsubscribe(on_draw_subscription_id);
     }
 }

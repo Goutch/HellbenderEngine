@@ -20,6 +20,7 @@ namespace HBE{
 			mat4 projection = mat4(1.0f);
 			uint32_t layer_mask = UINT32_MAX;
 
+			event_subscription_id render_target_resize_subscription_id;
 			float aspectRatio();
 
 			void setRenderTarget(RasterizationTarget *render_target);

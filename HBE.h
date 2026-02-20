@@ -39,7 +39,6 @@
 #include "core/scene/components/Transform.h"
 #include "core/scene/components/Node.h"
 #include "core/scene/components/MeshRenderer.h"
-#include "core/scene/ecs/RawVector.h"
 
 #include "core/scene/systems/ui/UIPanelSystem.h"
 #include "core/scene/systems/ui/ButtonSystem.h"
@@ -60,17 +59,14 @@
 
 #include "core/utility/Log.h"
 #include "core/utility/Geometry.h"
-#include "core/utility/Profiler.h"
+#include "dependencies/utils-collection/Profiler.h"
 #include "core/utility/DefaultModelParser.h"
-#include "Random.h"
-#include "Event.h"
-#include "Timer.h"
+#include "dependencies/utils-collection/Random.h"
+#include "dependencies/utils-collection/Event.h"
+#include "dependencies/utils-collection/Timer.h"
 
 
 #include <glm/glm.hpp>
 #include "glm/gtx/quaternion.hpp"
 
 #include "core/math/fixed.h"
-
-
-using namespace utils;

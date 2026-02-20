@@ -5,15 +5,13 @@
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/gtc/quaternion.hpp"
 #include "glm/glm.hpp"
-#include "Event.h"
+#include "dependencies/utils-collection/Event.h"
 #include "core/scene/ecs/Component.h"
 
 using namespace glm;
-using namespace utils;
 
 namespace HBE
 {
-
 	struct HB_API Transform
 	{
 		COMPONENT_IDS(Transform)

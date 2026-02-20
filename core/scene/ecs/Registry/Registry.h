@@ -13,11 +13,11 @@
 #include <cstring>
 #include "algorithm"
 #include "string"
-#include "core/utility/Profiler.h"
+#include "dependencies/utils-collection/Profiler.h"
 #include "RegistryPage.h"
 #include "ComponentPool.h"
 #include "core/scene/ecs//Component.h"
-#include "core/scene/ecs/RawVector.h"
+#include "dependencies/utils-collection/RawVector.h"
 #include "ECSTypes.h"
 
 namespace HBE {
@@ -36,7 +36,6 @@ namespace HBE {
         RawVector<ComponentTypeInfo> types;
         std::bitset<REGISTRY_MAX_COMPONENT_TYPES> initialized_types;
         std::map<uint64_t, uint32_t> component_hash_to_id;
-
         std::vector<uint32_t *> component_types_id_caches;
 
         size_t getPage(entity_handle handle);

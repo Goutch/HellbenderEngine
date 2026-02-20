@@ -126,7 +126,7 @@ set(CORE_FILES
         core/utility/Geometry.cpp
         core/utility/Geometry.h
         core/utility/Profiler.cpp
-        core/utility/Profiler.h
+        dependencies/utils-collection/Profiler.h
         core/utility/GLTFLoader.cpp
         core/utility/GLTFLoader.h
         core/utility/DefaultModelParser.cpp

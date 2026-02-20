@@ -5,7 +5,7 @@
 #include "Core.h"
 #include "core/scene/ecs/Registry/Registry.h"
 #include "GroupIterator.h"
-#include "core/scene/ecs/RawVector.h"
+#include "dependencies/utils-collection/RawVector.h"
 #include "core/scene/ecs/Group/PageDataArchetype.h"
 
 namespace HBE {

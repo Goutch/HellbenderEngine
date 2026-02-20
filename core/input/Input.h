@@ -3,9 +3,8 @@
 #include "Core.h"
 #include "queue"
 #include "HBETypes.h"
-#include "Event.h"
+#include "dependencies/utils-collection/Event.h"
 struct GLFWwindow;
-using namespace utils;
 namespace HBE {
 
 	enum KEY {

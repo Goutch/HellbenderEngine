@@ -1,6 +1,6 @@
 #include "CameraControllerSystem.h"
 #include "core/input/Input.h"
-#include "core/utility/Profiler.h"
+#include "dependencies/utils-collection/Profiler.h"
 #include "Application.h"
 #include "core/scene/components/CameraController.h"
 #include "core/scene/components/Camera.h"
@@ -11,10 +11,9 @@
 
 namespace HBE {
 	CameraControllerSystem::CameraControllerSystem(Scene *scene) : System(scene) {
-		scene->onUpdate.subscribe(this, &CameraControllerSystem::update);
-		Event<Entity> &e = scene->onDetach<CameraController>();
-		e.subscribe(this, &CameraControllerSystem::onDetach);
-		e.subscribe(this, &CameraControllerSystem::onAttach);
+		update_subscription_id = scene->onUpdate.subscribe(this, &CameraControllerSystem::update);
+		detach_subscription_id = scene->onDetach<CameraController>().subscribe(this, &CameraControllerSystem::onDetach);
+		attach_subscription_id = scene->onAttach<CameraController>().subscribe(this, &CameraControllerSystem::onAttach);
 	}
 
 	void CameraControllerSystem::update(float delta_t) {
@@ -154,7 +153,9 @@ namespace HBE {
 	}
 
 	CameraControllerSystem::~CameraControllerSystem() {
-		scene->onUpdate.unsubscribe(this);
+		scene->onUpdate.unsubscribe(update_subscription_id);
+		scene->onDetach<CameraController>().unsubscribe(detach_subscription_id);
+		scene->onAttach<CameraController>().unsubscribe(attach_subscription_id);
 	}
 
 	void CameraControllerSystem::onAttach(Entity entity) {

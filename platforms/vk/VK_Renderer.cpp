@@ -21,7 +21,7 @@
 
 #include "VK_RasterizationPipeline.h"
 #include "core/graphics/Graphics.h"
-#include "core/utility/Profiler.h"
+#include "dependencies/utils-collection/Profiler.h"
 #include "VK_PipelineDescriptors.h"
 #include "VK_RasterizationPipelineInstance.h"
 #include "raytracing/VK_RaytracingPipelineInstance.h"

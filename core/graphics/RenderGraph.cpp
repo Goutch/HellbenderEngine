@@ -10,7 +10,7 @@
 #include "core/resource/RasterizationPipelineInstance.h"
 #include "core/resource/RasterizationPipeline.h"
 #include "core/graphics/Renderer.h"
-#include "core/utility/Profiler.h"
+#include "dependencies/utils-collection/Profiler.h"
 
 namespace HBE {
 	RenderGraph::RenderGraph() {

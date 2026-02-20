@@ -5,7 +5,7 @@
 #include "Transform2D.h"
 #include "core/scene/Entity.h"
 #include "core/scene/ecs/Component.h"
-#include "core/scene/ecs/RawVector.h"
+#include "dependencies/utils-collection/RawVector.h"
 
 namespace HBE {
 	class Transform;

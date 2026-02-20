@@ -12,7 +12,7 @@
 #include "VK_StorageBuffer.h"
 #include "core/graphics/Graphics.h"
 #include "VK_TexelBuffer.h"
-#include "core/utility/Profiler.h"
+#include "dependencies/utils-collection/Profiler.h"
 #include "VK_TexelBuffer.h"
 #include "Application.h"
 

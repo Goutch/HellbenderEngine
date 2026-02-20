@@ -2,7 +2,7 @@
 #include "core/utility/Log.h"
 #include "VK_Device.h"
 #include "VK_Swapchain.h"
-#include "core/utility/Profiler.h"
+#include "dependencies/utils-collection/Profiler.h"
 
 namespace HBE {
 	HBE::VK_CommandPool::~VK_CommandPool() {

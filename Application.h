@@ -2,9 +2,8 @@
 #pragma once
 
 #include "Core.h"
-#include "Event.h"
-#include "Timer.h"
-using namespace utils;
+#include "dependencies/utils-collection/Event.h"
+#include "dependencies/utils-collection/Timer.h"
 namespace HBE {
 	class Window;
 

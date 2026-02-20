@@ -12,6 +12,7 @@ namespace HBE
 
 		Camera2D(const Camera2D &other);
 
+		event_subscription_id render_target_resize_subscription_id ;
 		bool active = true;
 		mat4 projection = mat4(1.0f);
 

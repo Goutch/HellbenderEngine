@@ -1,9 +1,8 @@
 #pragma once
 
-#include "Event.h"
+#include "dependencies/utils-collection/Event.h"
 #include "Core.h"
 #include <string>
-using namespace utils;
 namespace HBE {
 	class HB_API Configs {
 	private:

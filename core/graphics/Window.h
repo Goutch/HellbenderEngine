@@ -1,11 +1,10 @@
 #pragma once
 
 #include "Core.h"
-#include "Event.h"
+#include "dependencies/utils-collection/Event.h"
 #include "HBETypes.h"
 
 struct GLFWwindow;
-using namespace utils;
 namespace HBE {
 	class HB_API Window {
 	protected:
