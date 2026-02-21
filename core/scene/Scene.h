@@ -61,11 +61,6 @@ namespace HBE {
 		Event<float> onUpdate;
 		Event<Scene *> onSceneActivate;
 		Event<Scene *> onSceneDeactivate;
-		event_subscription_id draw_subscription_id;
-		event_subscription_id update_subscription_id;
-		event_subscription_id render_subscription_id;
-		event_subscription_id present_subscription_id;
-		event_subscription_id frame_change_subscription_id;
 	private:
 		TransformSystem *transform_system = nullptr;
 		NodeSystem *node_system = nullptr;
@@ -73,7 +68,11 @@ namespace HBE {
 		bool is_active = true;
 		Registry registry;
 		RenderGraph render_graph;
-
+		event_subscription_id draw_subscription_id;
+		event_subscription_id update_subscription_id;
+		event_subscription_id render_subscription_id;
+		event_subscription_id present_subscription_id;
+		event_subscription_id frame_change_subscription_id;
 		Scene(const Scene &scene) = delete;
 
 		Scene(Scene &scene) = delete;

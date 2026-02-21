@@ -53,6 +53,7 @@ For samples take a look at the sample repository [HellbenderSamples](https://git
 - Keyboard and Mouse input handling
 
 #### TODO :
+- [ ] Fix vram leak when resizing window or changing the vsync
 - [ ] 2D transform component
 - [ ] Model animations support (low prio)
 - [ ] ECS
