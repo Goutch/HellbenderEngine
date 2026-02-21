@@ -67,6 +67,7 @@ namespace HBE {
 
 	Scene::~Scene() {
 		for (int i = 0; i < detach_events.size(); i++) {
+			if (detach_events[i].listenerCount() == 0) continue;
 			RawVector<entity_handle> handle_buffer;
 			registry.getAllEntitiesWith(i, handle_buffer);
 			for (entity_handle handle: handle_buffer) {
@@ -180,11 +181,11 @@ namespace HBE {
 		if (info.initialized_systems_flags & SCENE_INITIALIZE_SYSTEMS_FLAG_MESH_RENDERER_SYSTEM)
 			addSystem(new MeshRendererSystem(this));
 
-		Application::onDraw.subscribe(draw_subscription_id,this, &Scene::draw);
-		Application::onRender.subscribe(render_subscription_id ,this, &Scene::render);
-		Application::onUpdate.subscribe(update_subscription_id,this, &Scene::update);
-		Application::onPresent.subscribe(present_subscription_id,this, &Scene::present);
-		Graphics::onFrameChange.subscribe(frame_change_subscription_id,this, &Scene::onFrameChange);
+		Application::onDraw.subscribe(draw_subscription_id, this, &Scene::draw);
+		Application::onRender.subscribe(render_subscription_id, this, &Scene::render);
+		Application::onUpdate.subscribe(update_subscription_id, this, &Scene::update);
+		Application::onPresent.subscribe(present_subscription_id, this, &Scene::present);
+		Graphics::onFrameChange.subscribe(frame_change_subscription_id, this, &Scene::onFrameChange);
 	}
 
 	Entity Scene::createEntity() {
