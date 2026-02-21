@@ -63,7 +63,10 @@ For samples take a look at the sample repository [HellbenderSamples](https://git
   - [ ] Buttons
   - [ ] Labels
   - [ ] Panels
-- [ ] Resources rework, use handles instead of pointers
+- [ ] Resources rework
+  - [ ] Use Handles instead of pointers
+  - [ ] Add Shader hot reloading
+  - [ ] Combine RasterizationPipeline with RasterizationPipelineInstance etc by creating the pipeline internally?
 - [ ] Documentation
 ### Wiki
 - [Home](https://github.com/Goutch/HellbenderEngine/wiki)
