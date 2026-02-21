@@ -28,6 +28,8 @@ namespace HBE {
 				max_location = info.attribute_infos[i].location;
 		}
 		buffers.resize(max_location + 1, nullptr);
+		if (info.flags & MESH_FLAG_GENERATE_ATTRIBUTE_STORAGE_BUFFER)
+			storage_buffers.resize(max_location + 1, nullptr);
 		attributes_locations.resize(max_location + 1, {});
 
 		for (size_t i = 0; i < info.attribute_info_count; ++i) {
