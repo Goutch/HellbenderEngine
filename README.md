@@ -60,13 +60,17 @@ For samples take a look at the sample repository [HellbenderSamples](https://git
   - [ ] Archetype caching
 - [ ] UI library
   - [ ] UIThemes
+  - [ ] Layout system
   - [ ] Buttons
   - [ ] Labels
   - [ ] Panels
-- [ ] Resources rework
-  - [ ] Use Handles instead of pointers
-  - [ ] Add Shader hot reloading
-  - [ ] Combine RasterizationPipeline with RasterizationPipelineInstance etc by creating the pipeline internally?
+- [ ] Engine API rework
+  - [ ] Resources
+    - [ ] Use Handles instead of pointers, better for serialization
+    - [ ] Add Shader hot reloading
+    - [ ] Combine Shader,RasterizationPipeline and RasterizationPipelineInstance etc by creating the pipeline internally
+    - [ ] Support slang maybe in the future.
+  - [ ] Remove all static types like Graphics Inputs Application and add a context object that has all of them inside.
 - [ ] Documentation
 ### Wiki
 - [Home](https://github.com/Goutch/HellbenderEngine/wiki)
