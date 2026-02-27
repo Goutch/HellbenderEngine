@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include "Log.h"
 #include "iostream"
-#include "Application.h"
+#include "HBE/core/Application.h"
 
 namespace HBE {
 	uint32_t Log::log_flags = ERROR | STATUS | WARNING | MESSAGE | DEBUG ;

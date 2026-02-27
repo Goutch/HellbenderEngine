@@ -4,7 +4,7 @@
 
 #define GLFW_INCLUDE_VULKAN
 
-#include "Configs.h"
+#include "HBE/core/Configs.h"
 #include "VK_Window.h"
 #include "VK_Instance.h"
 #include "VK_PhysicalDevice.h"
@@ -15,7 +15,7 @@
 #include "VK_RenderPass.h"
 #include "VK_CommandPool.h"
 #include "VK_Fence.h"
-#include "Application.h"
+#include "HBE/core/Application.h"
 #include "VK_Allocator.h"
 #include "VK_Mesh.h"
 

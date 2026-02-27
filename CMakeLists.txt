@@ -28,11 +28,11 @@ endif ()
 
 set(CORE_FILES
         HBE.h
-        Application.cpp
-        Application.h
-        Configs.cpp
+        core/Application.cpp
+        core/Application.h
+        core/Configs.cpp
         Core.h
-        Configs.h
+        core/Configs.h
         HBETypes.h
 
         core/resource/Model.cpp

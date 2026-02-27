@@ -6,7 +6,7 @@
 #include "VK_Device.h"
 #include "VK_PhysicalDevice.h"
 #include "VK_RenderPass.h"
-#include "Configs.h"
+#include "HBE/core/Configs.h"
 
 namespace HBE {
 

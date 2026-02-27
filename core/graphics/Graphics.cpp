@@ -2,7 +2,7 @@
 #include "Graphics.h"
 #include <core/utility/Log.h>
 #include <core/resource/RasterizationTarget.h>
-#include <Configs.h>
+#include "HBE/core/Configs.h"
 #include <core/resource/Model.h>
 #include "Renderer.h"
 #include "Window.h"

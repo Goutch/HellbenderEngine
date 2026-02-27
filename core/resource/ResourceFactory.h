@@ -1,8 +1,8 @@
 #pragma once
 
-
+#include "dependencies/utils-collection/HandleContainer.h"
 #include "Core.h"
-#include "AudioClip.h"
+
 
 namespace HBE {
 
@@ -66,7 +66,10 @@ namespace HBE {
 
 	class TexelBuffer;
 
+	struct ImageHandle;
+
 	class HB_API ResourceFactory {
+		HandleContainer<ImageInfo> handle_container;
 	public:
 		virtual ~ResourceFactory() = default;
 
@@ -74,7 +77,7 @@ namespace HBE {
 
 		virtual Shader *createShader(const ShaderInfo &info) const = 0;
 
-		virtual Image *createImage(const ImageInfo &info) const = 0;
+		virtual ImageHandle createImage(const ImageInfo &info) const = 0;
 
 		virtual Mesh *createMesh(const MeshInfo &info) const = 0;
 

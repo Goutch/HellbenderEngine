@@ -3,10 +3,10 @@
 #include "VK_Instance.h"
 #include "vector"
 #include "core/utility/Log.h"
-#include "Configs.h"
+#include "HBE/core/Configs.h"
 #include "GLFW/glfw3.h"
 #include "VK_ValidationLayers.h"
-#include "Application.h"
+#include "HBE/core/Application.h"
 
 namespace HBE {
 

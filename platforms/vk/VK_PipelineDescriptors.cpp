@@ -14,7 +14,7 @@
 #include "VK_TexelBuffer.h"
 #include "dependencies/utils-collection/Profiler.h"
 #include "VK_TexelBuffer.h"
-#include "Application.h"
+#include "HBE/core/Application.h"
 
 namespace HBE {
 	VK_PipelineDescriptors::VK_PipelineDescriptors(VK_Renderer *renderer,

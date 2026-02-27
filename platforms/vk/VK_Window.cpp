@@ -2,10 +2,10 @@
 #include "VK_Window.h"
 #include "GLFW/glfw3.h"
 #include "core/utility/Log.h"
-#include "Configs.h"
+#include "HBE/core/Configs.h"
 #include "core/graphics/Graphics.h"
 #include "VK_RenderPass.h"
-#include "Application.h"
+#include "HBE/core/Application.h"
 #include "stb_image.h"
 #include "stdio.h"
 

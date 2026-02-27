@@ -3,7 +3,7 @@
 #include "core/graphics/Graphics.h"
 #include "core/input/Input.h"
 #include "GLFW/glfw3.h"
-#include <core/graphics/Window.h>
+#include "HBE/core/graphics/Window.h"
 #include "dependencies/utils-collection/Profiler.h"
 #include "core/audio/Audio.h"
 #include <thread>

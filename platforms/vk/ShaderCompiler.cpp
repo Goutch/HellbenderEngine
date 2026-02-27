@@ -16,7 +16,7 @@
 #include "SPIRV/GlslangToSpv.h"
 #include "ShaderCompiler.h"
 #include "core/utility/Log.h"
-#include "Application.h"
+#include "HBE/core/Application.h"
 
 namespace HBE {
 #ifdef GLSLANG_C

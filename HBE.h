@@ -2,8 +2,8 @@
 #define _USE_MATH_DEFINES
 
 #include "Core.h"
-#include "Configs.h"
-#include "Application.h"
+#include "HBE/core/Configs.h"
+#include "HBE/core/Application.h"
 #include "Core.h"
 #include "HBETypes.h"
 

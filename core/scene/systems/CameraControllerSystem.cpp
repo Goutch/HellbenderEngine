@@ -1,7 +1,7 @@
 #include "CameraControllerSystem.h"
 #include "core/input/Input.h"
 #include "dependencies/utils-collection/Profiler.h"
-#include "Application.h"
+#include "HBE/core/Application.h"
 #include "core/scene/components/CameraController.h"
 #include "core/scene/components/Camera.h"
 #include "core/scene/components/Camera2D.h"

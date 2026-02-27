@@ -9,7 +9,7 @@
 
 #include "core/graphics/Graphics.h"
 #include "core/resource/RasterizationTarget.h"
-#include "Application.h"
+#include "HBE/core/Application.h"
 
 #include "core/scene/Entity.h"
 #include "core/scene/components/Transform.h"
