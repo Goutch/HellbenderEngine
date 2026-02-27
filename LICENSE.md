@@ -1,4 +1,4 @@
-MIT NON-AI License
+NON-AI Open Source License
 
 Copyright (c) 2026, Gabriel Bouchard
 
