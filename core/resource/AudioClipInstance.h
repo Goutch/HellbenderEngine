@@ -26,7 +26,7 @@ namespace HBE {
 	//	- AUDIO_CLIP_INSTANCE_STATE_STOPPED
 	/// </summary>
 
-	class HB_API AudioClipInstance : public Resource {
+	class HB_API AudioClipInstance  {
 		friend class Resources;
 
 		uint32_t source;
@@ -38,7 +38,7 @@ namespace HBE {
 		AudioClipInstance(AudioClipInstanceInfo info);
 
 	public :
-		~AudioClipInstance() override;
+		~AudioClipInstance();
 
 		void play();
 		void pause();

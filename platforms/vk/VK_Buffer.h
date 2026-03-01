@@ -1,55 +1,60 @@
 #pragma once
-
 #include "vulkan/vulkan.h"
 #include "core/utility/Log.h"
-#include "VK_Allocator.h"
+#include "core/resource/Allocator.h"
+#include "VK_Types.h"
 
-namespace HBE {
-	class VK_Device;
+namespace HBE
+{
+    class VK_Allocator;
+    class VK_Device;
 
-	struct Allocation;
+    class VK_Context;
 
-	class VK_Buffer {
-	private:
-		VK_Device *device;
-		VkBuffer handle;
-		Allocation allocation;
-		VkDeviceSize size = 0;
-	public:
-		VK_Buffer &operator=(const VK_Buffer &) = delete;
+    struct BufferInfo
+    {
+        void* data = nullptr;
+        uint64_t size = 0;
+        MEMORY_TYPE_FLAGS memory_type_flags = MEMORY_TYPE_FLAG_GPU_LOCAL;
+        VkBufferUsageFlags usage = 0;
+        AllocatorHandle optional_allocator{};
+        uint64_t optional_custom_alignment = 0;
+    };
 
-		VK_Buffer(const VK_Buffer &) = delete;
+    class VK_Buffer
+    {
+        VK_Allocator* allocator;
+        VK_Device* device;
+        VkBuffer handle = VK_NULL_HANDLE;
+        Allocation allocation;
+        VkDeviceSize size = 0;
 
-		VK_Buffer(VK_Device *device);
+    public:
+        void alloc(VK_Context* context, BufferInfo& info);
+        void release();
 
-		VK_Buffer(VK_Device *device, const void *data, VkDeviceSize size, VkBufferUsageFlags usage, MEMORY_TYPE_FLAGS flags = MEMORY_TYPE_FLAG_NONE, VkDeviceSize custom_alignment = 0);
 
-		VK_Buffer(VK_Device *device, VkDeviceSize size, VkBufferUsageFlags usage, MEMORY_TYPE_FLAGS flags = MEMORY_TYPE_FLAG_NONE, VkDeviceSize custom_alignment = 0);
+        VK_Buffer(VK_Buffer&) = delete;
+        VK_Buffer& operator=(const VK_Buffer&) = delete;
+        VK_Buffer(VK_Buffer&&) noexcept;
+        VK_Buffer() noexcept = default;
+        VK_Buffer& operator=(VK_Buffer&&) noexcept;
 
-		~VK_Buffer();
+        void reset();
 
-		void alloc(VkDeviceSize size, VkBufferUsageFlags usage, MEMORY_TYPE_FLAGS flags = MEMORY_TYPE_FLAG_NONE, VkDeviceSize custom_alignment = 0);
+        void update(const void* data);
+        VkBuffer getHandle() const;
 
-		void alloc(const void *data, VkDeviceSize size, VkBufferUsageFlags usage, MEMORY_TYPE_FLAGS flags = MEMORY_TYPE_FLAG_NONE, VkDeviceSize custom_alignment = 0);
+        void copy(VK_Buffer* other);
 
-		void update(const void *data);
+        const Allocation& getAllocation() const;
 
-		void update(const void *data, VkDeviceSize size, VkDeviceSize offset = 0);
+        VkDeviceSize getSize() const;
 
-		VkBuffer getHandle() const;
+        VkDeviceOrHostAddressConstKHR getDeviceAddress() const;
 
-		void copy(VK_Buffer *other);
+        void map(void* data);
 
-		const Allocation &getAllocation() const;
-
-		VkDeviceSize getSize() const;
-
-		VkDeviceOrHostAddressConstKHR getDeviceAddress() const;
-
-		void map(void *data);
-
-		bool allocated();
-	};
-
+        bool allocated();
+    };
 }
-

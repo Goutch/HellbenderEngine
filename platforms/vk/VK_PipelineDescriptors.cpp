@@ -7,6 +7,7 @@
 #include "VK_RenderPass.h"
 #include "VK_Renderer.h"
 #include "VK_CommandPool.h"
+#include "VK_Context.h"
 #include "raytracing/VK_TopLevelAccelerationStructure.h"
 #include "VK_StorageBuffer.h"
 #include "VK_TexelBuffer.h"
@@ -15,15 +16,14 @@
 
 namespace HBE
 {
-    VK_PipelineDescriptors::VK_PipelineDescriptors(VK_Renderer* renderer,
+    VK_PipelineDescriptors::VK_PipelineDescriptors(VK_Context* context,
                                                    const VK_PipelineLayout& layout,
                                                    MEMORY_TYPE_FLAGS preferred_memory_type_flags,
                                                    UniformMemoryInfo* uniform_memory_type_infos,
                                                    uint32_t uniform_memory_type_info_count,
                                                    bool empty_descriptor_allowed)
     {
-        this->renderer = renderer;
-        this->device = renderer->getDevice();
+        this->context = context;
         this->pipeline_layout = &layout;
         this->empty_descriptor_allowed = empty_descriptor_allowed;
         const std::vector<VkDeviceSize> descriptor_sizes = pipeline_layout->getDescriptorSizes();
@@ -41,26 +41,28 @@ namespace HBE
 
         for (uint32_t frame = 0; frame < MAX_FRAMES_IN_FLIGHT; ++frame)
         {
-            uniform_buffers[frame].resize(descriptor_bindings.size(), nullptr);
+            uniform_buffers[frame].resize(descriptor_bindings.size());
             for (size_t binding = 0; binding < descriptor_bindings.size(); ++binding)
             {
                 if (descriptor_bindings[binding].descriptorType != VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
                     continue;
-                MEMORY_TYPE_FLAGS alloc_flags;
+
+                BufferInfo buffer_info = {};
+
                 auto binding_memory_type_it = binding_memory_type_map.find(binding);
                 if (binding_memory_type_it != binding_memory_type_map.end())
                 {
-                    alloc_flags = binding_memory_type_it->second.preferred_memory_type;
+                    buffer_info.memory_type_flags = binding_memory_type_it->second.preferred_memory_type;
                 }
                 else
                 {
-                    alloc_flags = preferred_memory_type_flags;
+                    buffer_info.memory_type_flags = preferred_memory_type_flags;
                 }
 
-                uniform_buffers[frame][binding] = new VK_Buffer(device,
-                                                                descriptor_sizes[binding],
-                                                                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-                                                                alloc_flags);
+
+                buffer_info.size = descriptor_sizes[binding];
+                buffer_info.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+                uniform_buffers[frame][binding].alloc(context, buffer_info);
             }
         }
         createDescriptorPool(descriptor_pool);
@@ -72,14 +74,14 @@ namespace HBE
     VK_PipelineDescriptors::~VK_PipelineDescriptors()
     {
         Application::instance->onFrameEnd.unsubscribe(on_frame_change_subscription_id);
-        for (const auto& buffers_per_frame : uniform_buffers)
+        for (std::vector<VK_Buffer>& buffers_per_frame : uniform_buffers)
         {
-            for (auto b : buffers_per_frame)
+            for (VK_Buffer& b : buffers_per_frame)
             {
-                delete b;
+                b.release();
             }
         }
-        vkDestroyDescriptorPool(device->getHandle(), descriptor_pool.handle, nullptr);
+        vkDestroyDescriptorPool(context->device.getHandle(), descriptor_pool.handle, nullptr);
     }
 
     void VK_PipelineDescriptors::resetPool(DescriptorPool& pool)
@@ -248,7 +250,7 @@ namespace HBE
         poolInfo.poolSizeCount = poolSizes.size();
         poolInfo.pPoolSizes = poolSizes.data();
         poolInfo.maxSets = descriptor_set_layouts.size();
-        if (vkCreateDescriptorPool(device->getHandle(), &poolInfo, nullptr, &pool.handle) != VK_SUCCESS)
+        if (vkCreateDescriptorPool(context->device.getHandle(), &poolInfo, nullptr, &pool.handle) != VK_SUCCESS)
         {
             Log::error("failed to create descriptor pool!");
         }
@@ -270,7 +272,7 @@ namespace HBE
         }
 
 
-        if (vkAllocateDescriptorSets(device->getHandle(), &allocInfo, pool.descriptor_set_handles.data()) != VK_SUCCESS)
+        if (vkAllocateDescriptorSets(context->device.getHandle(), &allocInfo, pool.descriptor_set_handles.data()) != VK_SUCCESS)
         {
             Log::error("failed to allocate descriptor sets!");
         }
@@ -306,7 +308,7 @@ namespace HBE
                 descriptor_set_copy_infos.emplace_back(copy);
             }
         }
-        vkUpdateDescriptorSets(device->getHandle(), 0, nullptr, descriptor_set_copy_infos.size(), descriptor_set_copy_infos.data());
+        vkUpdateDescriptorSets(context->device.getHandle(), 0, nullptr, descriptor_set_copy_infos.size(), descriptor_set_copy_infos.data());
     }
 
     void VK_PipelineDescriptors::createDescriptorWrites(DescriptorPool& pool)
@@ -358,13 +360,13 @@ namespace HBE
                         continue;
                     }
                     VkDescriptorBufferInfo buffer_info = {};
-                    buffer_info.buffer = uniform_buffers[frame_index][descriptor_writes[i].dstBinding]->getHandle();
+                    buffer_info.buffer = uniform_buffers[frame_index][descriptor_writes[i].dstBinding].getHandle();
                     buffer_info.offset = 0;
-                    buffer_info.range = uniform_buffers[frame_index][descriptor_writes[i].dstBinding]->getSize();
+                    buffer_info.range = uniform_buffers[frame_index][descriptor_writes[i].dstBinding].getSize();
                     uniform_buffer_infos[i] = buffer_info;
                     descriptor_writes[i].pBufferInfo = &uniform_buffer_infos[i];
                 }
-                vkUpdateDescriptorSets(device->getHandle(), descriptor_writes.size(), descriptor_writes.data(), 0, nullptr);
+                vkUpdateDescriptorSets(context->device.getHandle(), descriptor_writes.size(), descriptor_writes.data(), 0, nullptr);
             }
         }
     }
@@ -406,7 +408,7 @@ namespace HBE
                 copyDescriptorSets(descriptor_pool, temp_descriptor_pool, i);
             }
 
-            old_descriptor_pools.emplace(renderer->getCurrentFrameIndex(), descriptor_pool.handle);
+            old_descriptor_pools.emplace(context->renderer.getCurrentFrameIndex(), descriptor_pool.handle);
 
             descriptor_pool.handle = temp_descriptor_pool.handle;
             descriptor_pool.variable_descriptor_sets = std::move(temp_descriptor_pool.variable_descriptor_sets);
@@ -418,8 +420,8 @@ namespace HBE
     void VK_PipelineDescriptors::bind() const
     {
         if (bound) return;
-        VkCommandBuffer command_buffer = renderer->getCommandPool()->getCurrentBuffer();
-        int frame = renderer->getCurrentFrameIndex();
+        VkCommandBuffer command_buffer = context->renderer.getCommandPool()->getCurrentBuffer();
+        uint32_t frame = context->renderer.getCurrentFrameIndex();
 
         uint32_t descriptor_set_count = pipeline_layout->getDescriptorSetLayoutHandles().size();
         uint32_t offset = descriptor_set_count * frame;
@@ -499,7 +501,7 @@ namespace HBE
                     image_infos[i].sampler = vk_texture[index]->getSampler();
                 }
                 write_descriptor_set.pImageInfo = image_infos.data();
-                vkUpdateDescriptorSets(device->getHandle(),
+                vkUpdateDescriptorSets(context->device.getHandle(),
                                        1,
                                        &write_descriptor_set,
                                        0,
@@ -520,7 +522,7 @@ namespace HBE
                 image_infos[i].sampler = vk_texture[index]->getSampler();
             }
             write_descriptor_set.pImageInfo = image_infos.data();
-            vkUpdateDescriptorSets(device->getHandle(),
+            vkUpdateDescriptorSets(context->device.getHandle(),
                                    1,
                                    &write_descriptor_set,
                                    0,
@@ -546,7 +548,7 @@ namespace HBE
                 image_info.sampler = vk_texture->getSampler();
                 image_info.imageLayout = vk_texture->getImageLayout();
                 descriptor_pool.writes[i][binding].pImageInfo = &image_info;
-                vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_pool.writes[i][binding], 0, nullptr);
+                vkUpdateDescriptorSets(context->device.getHandle(), 1, &descriptor_pool.writes[i][binding], 0, nullptr);
             }
         }
         else
@@ -556,7 +558,7 @@ namespace HBE
             image_info.sampler = vk_texture->getSampler();
             image_info.imageLayout = vk_texture->getImageLayout();
             descriptor_pool.writes[frame][binding].pImageInfo = &image_info;
-            vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_pool.writes[frame][binding], 0, nullptr);
+            vkUpdateDescriptorSets(context->device.getHandle(), 1, &descriptor_pool.writes[frame][binding], 0, nullptr);
         }
     }
 
@@ -570,12 +572,12 @@ namespace HBE
             for (int frame_i = 0; frame_i < MAX_FRAMES_IN_FLIGHT; ++frame_i)
             {
                 //todo: add all copy commands to a single command buffer and submit once
-                uniform_buffers[frame_i][binding]->update(data);
+                uniform_buffers[frame_i][binding].update(data);
             }
         }
         else
         {
-            uniform_buffers[frame][binding]->update(data);
+            uniform_buffers[frame][binding].update(data);
         }
     }
 
@@ -601,7 +603,7 @@ namespace HBE
 
                 descriptor_pool.writes[i][binding].pNext = &accelerationStructureInfo;
 
-                vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_pool.writes[i][binding], 0, nullptr);
+                vkUpdateDescriptorSets(context->device.getHandle(), 1, &descriptor_pool.writes[i][binding], 0, nullptr);
             }
         }
         else
@@ -615,7 +617,7 @@ namespace HBE
             accelerationStructureInfo.pAccelerationStructures = &acceleration_structure_handle;
 
             descriptor_pool.writes[frame][binding].pNext = &accelerationStructureInfo;
-            vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_pool.writes[frame][binding], 0, nullptr);
+            vkUpdateDescriptorSets(context->device.getHandle(), 1, &descriptor_pool.writes[frame][binding], 0, nullptr);
         }
     }
 
@@ -647,14 +649,14 @@ namespace HBE
             {
                 descriptor_pool.writes[i][binding].descriptorCount = count;
                 descriptor_pool.writes[i][binding].pBufferInfo = buffer_infos.data();
-                vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_pool.writes[i][binding], 0, nullptr);
+                vkUpdateDescriptorSets(context->device.getHandle(), 1, &descriptor_pool.writes[i][binding], 0, nullptr);
             }
         }
         else
         {
             descriptor_pool.writes[frame][binding].pBufferInfo = buffer_infos.data();
             descriptor_pool.writes[frame][binding].descriptorCount = count;
-            vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_pool.writes[frame][binding], 0, nullptr);
+            vkUpdateDescriptorSets(context->device.getHandle(), 1, &descriptor_pool.writes[frame][binding], 0, nullptr);
         }
     }
 
@@ -675,13 +677,13 @@ namespace HBE
             for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
             {
                 descriptor_pool.writes[i][binding].pBufferInfo = &buffer_info;
-                vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_pool.writes[i][binding], 0, nullptr);
+                vkUpdateDescriptorSets(context->device.getHandle(), 1, &descriptor_pool.writes[i][binding], 0, nullptr);
             }
         }
         else
         {
             descriptor_pool.writes[frame][binding].pBufferInfo = &buffer_info;
-            vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_pool.writes[frame][binding], 0, nullptr);
+            vkUpdateDescriptorSets(context->device.getHandle(), 1, &descriptor_pool.writes[frame][binding], 0, nullptr);
         }
     }
 
@@ -698,13 +700,13 @@ namespace HBE
             for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
             {
                 descriptor_pool.writes[i][binding].pTexelBufferView = &vk_texel_buffer->getView();
-                vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_pool.writes[i][binding], 0, nullptr);
+                vkUpdateDescriptorSets(context->device.getHandle(), 1, &descriptor_pool.writes[i][binding], 0, nullptr);
             }
         }
         else
         {
             descriptor_pool.writes[frame][binding].pTexelBufferView = &vk_texel_buffer->getView();
-            vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_pool.writes[frame][binding], 0, nullptr);
+            vkUpdateDescriptorSets(context->device.getHandle(), 1, &descriptor_pool.writes[frame][binding], 0, nullptr);
         }
     }
 
@@ -735,14 +737,14 @@ namespace HBE
                 {
                     descriptor_pool.writes[i][binding].descriptorCount = buffer_views.size();
                     descriptor_pool.writes[i][binding].pTexelBufferView = buffer_views.data();
-                    vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_pool.writes[i][binding], 0, nullptr);
+                    vkUpdateDescriptorSets(context->device.getHandle(), 1, &descriptor_pool.writes[i][binding], 0, nullptr);
                 }
             }
             else
             {
                 descriptor_pool.writes[frame][binding].descriptorCount = buffer_views.size();
                 descriptor_pool.writes[frame][binding].pTexelBufferView = buffer_views.data();
-                vkUpdateDescriptorSets(device->getHandle(), 1, &descriptor_pool.writes[frame][binding], 0, nullptr);
+                vkUpdateDescriptorSets(context->device.getHandle(), 1, &descriptor_pool.writes[frame][binding], 0, nullptr);
             }
         }
     }
@@ -751,7 +753,7 @@ namespace HBE
     {
         while (!old_descriptor_pools.empty() && old_descriptor_pools.front().first == frame)
         {
-            vkDestroyDescriptorPool(device->getHandle(), old_descriptor_pools.front().second, nullptr);
+            vkDestroyDescriptorPool(context->device.getHandle(), old_descriptor_pools.front().second, nullptr);
             old_descriptor_pools.pop();
         }
     }

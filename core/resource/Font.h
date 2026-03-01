@@ -5,38 +5,38 @@
 #include "Core.h"
 #include "unordered_map"
 
-namespace HBE {
+namespace HBE
+{
     class Image;
 
-    struct FontInfo {
+    struct FontInfo
+    {
         std::string path;
-        const char *characters;
+        const char* characters;
         uint32_t characters_count;
         uint32_t glyph_resolution = 32;
     };
 
-    struct Glyph {
+    struct Glyph
+    {
         vec2 size;
         vec2 uv_min;
         vec2 uv_max;
         vec2 offset;
     };
 
-    class HB_API Font : public Resource {
-        friend class Resources;
-
+    class HB_API Font
+    {
         std::unordered_map<char, Glyph> characters_glyphs;
-        Image *atlas;
-    public:
-        Font(const FontInfo &info);
+        Image* atlas;
 
+    public:
+        explicit Font(const FontInfo& info);
 
         ~Font();
 
-        Image *getTextureAtlas();
+        Image* getTextureAtlas();
 
         Glyph getCharacterGlyph(char character);
-
     };
 }
-

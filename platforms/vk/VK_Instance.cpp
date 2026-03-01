@@ -27,12 +27,12 @@ namespace HBE
         VkInstanceCreateInfo create_info{};
         create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         create_info.pApplicationInfo = &vk_app_info;
+
         std::vector<const char*> required_extensions;
 
         getRequiredExtensions(required_extensions);
 
         std::vector<const char*> extensions{};
-
 
         Log::message("Looking for required vulkan extensions:");
         if (!checkExtensionsSupported(required_extensions))
@@ -47,6 +47,7 @@ namespace HBE
 
 
         VkValidationFeaturesEXT validationFeaturesExt{};
+        validationFeaturesExt.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
         if (validation_enabled)
         {
             if (!validation_layers.checkValidationLayerSupport())

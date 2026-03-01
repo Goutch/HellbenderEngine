@@ -1,9 +1,7 @@
 #include "VK_Image.h"
 #include "VK_Buffer.h"
+#include "VK_Context.h"
 #include "VK_Renderer.h"
-#include "VK_CommandPool.h"
-#include "VK_Fence.h"
-#include "VK_Semaphore.h"
 #include "VK_Utils.h"
 #include "core/Application.h"
 
@@ -142,16 +140,16 @@ namespace HBE
             info.data = data;
             VK_Image* temp_image = (VK_Image*)Application::instance->getContext()->createImage(info);
 
-            FreeRequest staging_allocation = {};
+            ReleaseRequest staging_allocation = {};
             staging_allocation.allocation = temp_image->allocation;
             staging_allocation.vk_image = temp_image->getHandle();
-            staging_allocation.fence = device->getAllocator()->blitImage(*temp_image, *this)->getHandle();
+            staging_allocation.fence = context->allocator.blitImage(*temp_image, *this)->getHandle();
             //do not wait for blit to finish, delete the staging buffer later.
-            device->getAllocator()->freeLater(staging_allocation);
+            context->allocator.releaseLater(staging_allocation);
         }
         else
         {
-            device->getAllocator()->update(*this, data, width, depth, height);
+            context->allocator.update(*this, data, width, depth, height);
         }
     }
 
@@ -159,7 +157,7 @@ namespace HBE
     void VK_Image::updateRegion(const void* data, uint32_t data_texel_count, ImageRegionUpdateInfo* update_info,
                                 uint32_t update_count)
     {
-        device->getAllocator()->updateRegions(*this, data, data_texel_count, update_info, update_count);
+        context->allocator.updateRegions(*this, data, data_texel_count, update_info, update_count);
     }
 
 
@@ -182,10 +180,44 @@ namespace HBE
         }
     }
 
-
-    VK_Image::VK_Image(VK_Device* device, const ImageInfo& info)
+    VK_Image::VK_Image(VK_Image&& other)noexcept
     {
-        this->device = device;
+        this->handle = other.handle;
+        this->width = other.width;
+        this->height = other.height;
+        this->depth = other.depth;
+        this->context = other.context;
+        this->layout = other.layout;
+        this->desired_layout = other.desired_layout;
+        this->image_views = other.image_views;
+        this->image_view_count = other.image_view_count;
+        this->sampler_handle = other.sampler_handle;
+        this->info = other.info;
+        this->vk_format = other.vk_format;
+        this->allocation = other.allocation;
+        this->byte_per_pixel = other.byte_per_pixel;
+        this->mip_levels = other.mip_levels;
+
+        other.handle = VK_NULL_HANDLE;
+        other.width = 1;
+        other.height = 1;
+        other.depth = 1;
+        other.context = nullptr;
+        other.layout = VK_IMAGE_LAYOUT_UNDEFINED;
+        other.desired_layout = VK_IMAGE_LAYOUT_UNDEFINED;
+        other.image_views = nullptr;
+        other.image_view_count = 0;
+        other.sampler_handle = VK_NULL_HANDLE;
+        other.info = {};
+        other.vk_format = VK_FORMAT_UNDEFINED;
+        other.allocation = {};
+        other.byte_per_pixel = 0;
+        other.mip_levels = 0;
+    }
+
+    void VK_Image::alloc(VK_Context* context, const ImageInfo& info)
+    {
+        this->context = context;
         this->width = info.width;
         this->height = info.height;
         this->depth = info.depth;
@@ -234,10 +266,10 @@ namespace HBE
         imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
         imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
-        std::vector<uint32_t> queues = {device->getQueue(QUEUE_FAMILY_GRAPHICS).getFamilyIndex()};
-        if (device->hasQueue(QUEUE_FAMILY_TRANSFER))device->getQueue(QUEUE_FAMILY_TRANSFER).getFamilyIndex();
-        if (device->hasQueue(QUEUE_FAMILY_COMPUTE)) device->getQueue(QUEUE_FAMILY_COMPUTE).getFamilyIndex();
-
+        std::vector<uint32_t> queues = {context->device.getQueue(QUEUE_FAMILY_GRAPHICS).getFamilyIndex()};
+        //if (context->device.hasQueue(QUEUE_FAMILY_TRANSFER))context->device.getQueue(QUEUE_FAMILY_TRANSFER).getFamilyIndex();
+        //if (context->device.hasQueue(QUEUE_FAMILY_COMPUTE)) context->device.getQueue(QUEUE_FAMILY_COMPUTE).getFamilyIndex();
+        //
         imageInfo.sharingMode = queues.size() > 1 ? VK_SHARING_MODE_CONCURRENT : VK_SHARING_MODE_EXCLUSIVE;
         imageInfo.pQueueFamilyIndices = queues.data();
         imageInfo.queueFamilyIndexCount = queues.size();
@@ -251,7 +283,7 @@ namespace HBE
                                ? VK_IMAGE_USAGE_STORAGE_BIT
                                : 0;
         imageInfo.usage |= (info.generate_mip_maps ? VK_IMAGE_USAGE_TRANSFER_SRC_BIT : 0);
-        if (vkCreateImage(device->getHandle(), &imageInfo, nullptr, &handle) != VK_SUCCESS)
+        if (vkCreateImage(context->device.getHandle(), &imageInfo, nullptr, &handle) != VK_SUCCESS)
         {
             Log::error("failed to create image!");
         }
@@ -261,9 +293,9 @@ namespace HBE
             formatToString(info.format));
 #endif
         VkMemoryRequirements requirements;
-        vkGetImageMemoryRequirements(device->getHandle(), handle, &requirements);
-        this->allocation = device->getAllocator()->alloc(requirements, MEMORY_TYPE_FLAG_NONE);
-        vkBindImageMemory(device->getHandle(), handle, allocation.block->memory, allocation.offset);
+        vkGetImageMemoryRequirements(context->device.getHandle(), handle, &requirements);
+        this->allocation = context->allocator.alloc(requirements, MEMORY_TYPE_FLAG_NONE);
+        vkBindImageMemory(context->device.getHandle(), handle, allocation.block->memory, allocation.offset);
 
         if (info.data != nullptr)
         {
@@ -275,12 +307,12 @@ namespace HBE
             info.flags & IMAGE_FLAG_SHADER_WRITE)
         {
             //image data will be set in the shader
-            device->getAllocator()->setImageLayout(this, desired_layout);
+            context->allocator.setImageLayout(this, desired_layout);
         }
         else
         {
             //image data must be set from a user setTexture(void *data) call
-            device->getAllocator()->setImageLayout(this, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+            context->allocator.setImageLayout(this, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
         }
 
         //image view
@@ -304,7 +336,7 @@ namespace HBE
             viewInfo.subresourceRange.baseArrayLayer = 0;
             viewInfo.subresourceRange.layerCount = 1;
 
-            if (vkCreateImageView(device->getHandle(), &viewInfo, nullptr, &image_views[i]) != VK_SUCCESS)
+            if (vkCreateImageView(context->device.getHandle(), &viewInfo, nullptr, &image_views[i]) != VK_SUCCESS)
             {
                 Log::error("failed to create texture image view!");
             }
@@ -321,7 +353,7 @@ namespace HBE
                                         ? VK_FILTER_NEAREST
                                         : VK_FILTER_LINEAR; //If the object is further from the camera
             VkFormatProperties format_properties;
-            vkGetPhysicalDeviceFormatProperties(device->getPhysicalDevice().getHandle(), vk_format, &format_properties);
+            vkGetPhysicalDeviceFormatProperties(context->physical_device.getHandle(), vk_format, &format_properties);
             if ((format_properties.linearTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT) == 0)
             {
                 samplerInfo.magFilter = VK_FILTER_NEAREST;
@@ -335,8 +367,8 @@ namespace HBE
             samplerInfo.addressModeV = adressModeToVKAddressMode(info.sampler_info.address_mode);
             samplerInfo.addressModeW = adressModeToVKAddressMode(info.sampler_info.address_mode);
 
-            samplerInfo.anisotropyEnable = device->getPhysicalDevice().getFeatures().samplerAnisotropy;
-            samplerInfo.maxAnisotropy = device->getPhysicalDevice().getProperties().limits.maxSamplerAnisotropy;
+            samplerInfo.anisotropyEnable = context->physical_device.getFeatures().samplerAnisotropy;
+            samplerInfo.maxAnisotropy = context->physical_device.getProperties().limits.maxSamplerAnisotropy;
 
             samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
             samplerInfo.unnormalizedCoordinates = VK_FALSE;
@@ -353,7 +385,7 @@ namespace HBE
                 samplerInfo.mipLodBias = 0.0f; // Optional
             }
 
-            if (vkCreateSampler(device->getHandle(), &samplerInfo, nullptr, &sampler_handle) != VK_SUCCESS)
+            if (vkCreateSampler(context->device.getHandle(), &samplerInfo, nullptr, &sampler_handle) != VK_SUCCESS)
             {
                 Log::error("failed to create texture sampler!");
             }
@@ -365,28 +397,28 @@ namespace HBE
         }
     }
 
-
-    VK_Image::~VK_Image()
+    void VK_Image::release()
     {
         Log::debug(std::to_string((uint64_t)handle) + "|Delete image handle: " +
             VK_Utils::handleToString(handle));
         if (sampler_handle != VK_NULL_HANDLE)
         {
-            vkDestroySampler(device->getHandle(), sampler_handle, nullptr);
+            vkDestroySampler(context->device.getHandle(), sampler_handle, nullptr);
         }
         for (int i = 0; i < image_view_count; ++i)
         {
-            vkDestroyImageView(device->getHandle(), image_views[i], nullptr);
+            vkDestroyImageView(context->device.getHandle(), image_views[i], nullptr);
         }
         delete[] image_views;
         image_views = nullptr;
 
         if (handle != VK_NULL_HANDLE)
         {
-            vkDestroyImage(device->getHandle(), handle, nullptr);
+            vkDestroyImage(context->device.getHandle(), handle, nullptr);
         }
-        device->getAllocator()->free(allocation);
+        context->allocator.free(allocation);
     }
+
 
     const VkSampler& VK_Image::getSampler() const
     {

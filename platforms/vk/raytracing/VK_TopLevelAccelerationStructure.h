@@ -6,13 +6,13 @@ namespace HBE {
 	class VK_Device;
 
 	class VK_TopLevelAccelerationStructure : public RootAccelerationStructure {
-		VK_Device *device;
+		VK_Context *context;
 		VkAccelerationStructureKHR handle;
-		VK_Buffer *buffer;
+		VK_Buffer buffer;
 		VkDeviceOrHostAddressConstKHR address{};
 	public:
-		VK_TopLevelAccelerationStructure(VK_Device *device,const  RootAccelerationStructureInfo& info);
-		~VK_TopLevelAccelerationStructure() override;
+		VK_TopLevelAccelerationStructure(VK_Context *context,const  RootAccelerationStructureInfo& info);
+		~VK_TopLevelAccelerationStructure();
 		VkDeviceOrHostAddressConstKHR getDeviceAddress() const;
 		const VkAccelerationStructureKHR getHandle() const;
 	};

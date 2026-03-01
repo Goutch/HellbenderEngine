@@ -3,6 +3,7 @@
 #include "core/resource/RasterizationPipelineInstance.h"
 
 namespace HBE {
+	class VK_Context;
 	class VK_PipelineDescriptors;
 
 	class RasterizationPipeline;
@@ -20,8 +21,8 @@ namespace HBE {
 
 		bool bound = false;
 	public:
-		VK_RasterizationPipelineInstance(VK_Renderer *renderer, const RasterizationPipelineInstanceInfo &info);
-		~VK_RasterizationPipelineInstance() override;
+		VK_RasterizationPipelineInstance(VK_Context *context, const RasterizationPipelineInstanceInfo &info);
+		~VK_RasterizationPipelineInstance();
 
 		//---------------------------IPipelineInstance Implementation---------------------------
 		void bind() const override;

@@ -20,7 +20,7 @@ namespace HBE
 		MEMORY_TYPE_FLAGS preferred_memory_type = MEMORY_TYPE_FLAG_GPU_LOCAL;
 	};
 
-	class HB_API IPipelineInstance : public Resource
+	class HB_API IPipelineInstance
 	{
 	public:
 		virtual void bind() const = 0;

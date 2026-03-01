@@ -17,7 +17,7 @@ namespace HBE
         mutable int32_t current = 0;
         int32_t last_summited = 0;
         VkCommandPool handle;
-        VK_Device* device;
+        VK_Context* context;
         std::vector<VkCommandBuffer> command_buffers;
         std::vector<VK_Fence> fences;
 
@@ -28,7 +28,7 @@ namespace HBE
         void reset(uint32_t i);
 
     public:
-        void init(VK_Device& device, uint32_t command_buffers_count, const VK_Queue& queue);
+        void init(VK_Context* context, uint32_t command_buffers_count, const VK_Queue& queue);
         void release();
         VK_CommandPool() = default;
         VK_CommandPool(const VK_CommandPool&) = delete;

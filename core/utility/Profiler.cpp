@@ -1,5 +1,7 @@
 #include "Profiler.h"
 
+#include "Log.h"
+
 namespace HBE {
 	std::stack<Profile> Profiler::profile_stack;
 	std::unordered_map<std::string, ProfileGraphNode *> Profiler::nodes;

@@ -24,11 +24,10 @@ namespace HBE
     {
         VkDevice handle;
         std::unordered_map<QUEUE_FAMILY, VK_Queue> queues;
-        VK_PhysicalDevice* physical_device;
-        VK_Allocator* allocator;
+        VK_Context* context;
 
     public:
-        void init(VK_PhysicalDevice& physical_device);
+        void init(VK_Context* context);
         void release();
         VK_Device() = default;
         void operator =(VK_Device&) = delete;
@@ -36,12 +35,9 @@ namespace HBE
         VK_Device(VK_Device&) = delete;
         VkDevice getHandle() const;
         ~VK_Device() = default;
-        VK_PhysicalDevice& getPhysicalDevice() const;
-
 
         VK_Queue& getQueue(QUEUE_FAMILY family);
         bool hasQueue(QUEUE_FAMILY family);
-        VK_Allocator* getAllocator();
 
         void wait();
 

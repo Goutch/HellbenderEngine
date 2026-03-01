@@ -1,120 +1,159 @@
 #include "VK_Buffer.h"
 #include "VK_Device.h"
-
-#include "cstring"
-#include "array"
+#include "VK_Context.h"
 #include "VK_Utils.h"
 
-namespace HBE {
-	VK_Buffer::VK_Buffer(VK_Device *device,
-	                     VkDeviceSize size,
-	                     VkBufferUsageFlags usage,
-	                     MEMORY_TYPE_FLAGS flags,
-	                     VkDeviceSize custom_alignment) {
-		this->device = device;
-		alloc(size, usage, flags, custom_alignment);
-	}
+namespace HBE
+{
+    VkBuffer VK_Buffer::getHandle() const
+    {
+        return handle;
+    }
 
-	VK_Buffer::VK_Buffer(VK_Device *device) {
-		this->device = device;
-	}
+    void VK_Buffer::alloc(VK_Context* context, BufferInfo& info)
+    {
+        this->device = &context->device;
 
-	VK_Buffer::VK_Buffer(VK_Device *device, const void *data, VkDeviceSize size, VkBufferUsageFlags usage,
-	                     MEMORY_TYPE_FLAGS flags, VkDeviceSize custom_alignment) : VK_Buffer(
-			device, size, usage, flags,
-			custom_alignment) {
-		update(data);
-	}
+        if (context->allocator.valid(info.optional_allocator))
+        {
+            Log::error("allocators are not yet implemented");
+        }
+        else
+        {
+            this->allocator = &context->allocator;
+        }
 
+        if (info.size <= 0)
+            return;
+        this->size = info.size;
+        std::vector<uint32_t> queues = {device->getQueue(QUEUE_FAMILY_GRAPHICS).getFamilyIndex()};
 
-	VkBuffer VK_Buffer::getHandle() const {
-		return handle;
-	}
+        VkBufferCreateInfo bufferInfo{};
+        bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+        bufferInfo.size = size;
+        bufferInfo.usage = info.memory_type_flags & MEMORY_TYPE_FLAG_MAPPABLE ? info.usage : info.usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+        bufferInfo.sharingMode = queues.size() > 1 ? VK_SHARING_MODE_CONCURRENT : VK_SHARING_MODE_EXCLUSIVE;
+        bufferInfo.queueFamilyIndexCount = queues.size();
+        bufferInfo.pQueueFamilyIndices = queues.data();
 
-	VK_Buffer::~VK_Buffer() {
+        if (vkCreateBuffer(device->getHandle(), &bufferInfo, nullptr, &handle) != VK_SUCCESS)
+        {
+            Log::error("failed to create buffer!");
+        }
 #ifdef DEBUG_MODE
-		Log::debug("Delete buffer " + VK_Utils::handleToString(handle));
+        Log::debug("Created buffer " + VK_Utils::handleToString(handle));
 #endif
-		if (allocated()) {
-			device->getAllocator()->free(allocation);
-			vkDestroyBuffer(device->getHandle(), handle, nullptr);
-		}
-	}
+        VkMemoryRequirements requirements;
+        vkGetBufferMemoryRequirements(device->getHandle(), handle, &requirements);
+        requirements.alignment = std::max(requirements.alignment, info.optional_custom_alignment);
 
-	void VK_Buffer::copy(VK_Buffer *other) {
-		device->getAllocator()->copy(other->getHandle(), this->getHandle(), size);
-	}
+        this->allocation = allocator->alloc(requirements, info.memory_type_flags);
+        vkBindBufferMemory(device->getHandle(), handle, allocation.block->memory, allocation.offset);
 
-	VkDeviceSize VK_Buffer::getSize() const {
-		return size;
-	}
+        if (info.data != nullptr)
+        {
+            update(info.data);
+        }
+    }
 
-	const Allocation &VK_Buffer::getAllocation() const {
-		return allocation;
-	}
-
-	void VK_Buffer::update(const void *data) {
-		device->getAllocator()->update(*this, data, size);
-	}
-
-	VkDeviceOrHostAddressConstKHR VK_Buffer::getDeviceAddress() const {
-		VkBufferDeviceAddressInfo bufferDeviceAddressInfo{};
-		bufferDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
-		bufferDeviceAddressInfo.buffer = handle;
-
-		VkDeviceOrHostAddressConstKHR buffer_address{};
-		buffer_address.deviceAddress = device->vkGetBufferDeviceAddressKHR(
-				device->getHandle(), &bufferDeviceAddressInfo);
-		return buffer_address;
-	}
-
-	void VK_Buffer::map(void *data) {
-		if (allocation.flags | MEMORY_TYPE_FLAG_MAPPABLE) {
-			vkMapMemory(device->getHandle(), allocation.block->memory, allocation.offset, allocation.size, 0, &data);
-		} else {
-			Log::error("Buffer is not mappable");
-		}
-	}
-
-	void VK_Buffer::update(const void *data, VkDeviceSize size, VkDeviceSize offset) {
-		device->getAllocator()->update(*this, data, size, offset);
-	}
-
-	void VK_Buffer::alloc(VkDeviceSize size, VkBufferUsageFlags usage, MEMORY_TYPE_FLAGS flags,
-	                      VkDeviceSize custom_alignment) {
-		HB_ASSERT(size > 0, "Buffer size must be greater than 0");
-		this->size = size;
-		std::vector<uint32_t> queues = {device->getQueue(QUEUE_FAMILY_GRAPHICS).getFamilyIndex()};
-
-		VkBufferCreateInfo bufferInfo{};
-		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		bufferInfo.size = size;
-		bufferInfo.usage = flags & MEMORY_TYPE_FLAG_MAPPABLE ? usage : usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-		bufferInfo.sharingMode = queues.size() > 1 ? VK_SHARING_MODE_CONCURRENT : VK_SHARING_MODE_EXCLUSIVE;
-		bufferInfo.queueFamilyIndexCount = queues.size();
-		bufferInfo.pQueueFamilyIndices = queues.data();
-
-		if (vkCreateBuffer(device->getHandle(), &bufferInfo, nullptr, &handle) != VK_SUCCESS) {
-			Log::error("failed to create buffer!");
-		}
+    void VK_Buffer::release()
+    {
 #ifdef DEBUG_MODE
-		Log::debug("Created buffer " + VK_Utils::handleToString(handle));
+        Log::debug("Delete buffer " + VK_Utils::handleToString(handle));
 #endif
-		VkMemoryRequirements requirements;
-		vkGetBufferMemoryRequirements(device->getHandle(), handle, &requirements);
-		requirements.alignment = std::max(requirements.alignment, custom_alignment);
+        HB_ASSERT(allocated(), "VK_Buffer is not allocated and you are trying to release it");
+        allocator->free(allocation);
+        vkDestroyBuffer(device->getHandle(), handle, nullptr);
+    }
 
-		this->allocation = device->getAllocator()->alloc(requirements, flags);
-		vkBindBufferMemory(device->getHandle(), handle, allocation.block->memory, allocation.offset);
-	}
+    VK_Buffer::VK_Buffer(VK_Buffer&& other) noexcept
+    {
+        this->allocator = other.allocator;
+        this->device = other.device;
+        this->handle = other.handle;
+        this->size = other.size;
+        this->allocation = other.allocation;
 
-	bool VK_Buffer::allocated() {
-		return size > 0;
-	}
+        this->size = other.size;
 
-	void VK_Buffer::alloc(const void *data, VkDeviceSize size, VkBufferUsageFlags usage, MEMORY_TYPE_FLAGS flags,
-	                      VkDeviceSize custom_alignment) {
-		alloc(size, usage, flags, custom_alignment);
-		update(data);
-	}
+        other.handle = VK_NULL_HANDLE;
+        other.size = 0;
+        other.allocation = {};
+        other.device = nullptr;
+        other.allocator = nullptr;
+    }
+
+    VK_Buffer& VK_Buffer::operator=(VK_Buffer&& other) noexcept
+    {
+        this->allocator = other.allocator;
+        this->device = other.device;
+        this->handle = other.handle;
+        this->size = other.size;
+        this->allocation = other.allocation;
+        this->size = other.size;
+
+        other.handle = VK_NULL_HANDLE;
+        other.size = 0;
+        other.allocation = {};
+        other.device = nullptr;
+        other.allocator = nullptr;
+        return *this;
+    }
+
+
+    void VK_Buffer::copy(VK_Buffer* other)
+    {
+        allocator->copy(other->getHandle(), this->getHandle(), size);
+    }
+
+    VkDeviceSize VK_Buffer::getSize() const
+    {
+        return size;
+    }
+
+    const Allocation& VK_Buffer::getAllocation() const
+    {
+        return allocation;
+    }
+
+    void VK_Buffer::update(const void* data)
+    {
+        allocator->update(*this, data, size);
+    }
+
+    VkDeviceOrHostAddressConstKHR VK_Buffer::getDeviceAddress() const
+    {
+        VkBufferDeviceAddressInfo bufferDeviceAddressInfo{};
+        bufferDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
+        bufferDeviceAddressInfo.buffer = handle;
+
+        VkDeviceOrHostAddressConstKHR buffer_address{};
+        buffer_address.deviceAddress = device->vkGetBufferDeviceAddressKHR(
+            device->getHandle(), &bufferDeviceAddressInfo);
+        return buffer_address;
+    }
+
+    void VK_Buffer::map(void* data)
+    {
+        if (allocation.flags | MEMORY_TYPE_FLAG_MAPPABLE)
+        {
+            vkMapMemory(device->getHandle(), allocation.block->memory, allocation.offset, allocation.size, 0, &data);
+        }
+        else
+        {
+            Log::error("Buffer is not mappable");
+        }
+    }
+
+    bool VK_Buffer::allocated()
+    {
+        return size > 0;
+    }
+
+    void VK_Buffer::reset()
+    {
+        allocation = {};
+        handle = VK_NULL_HANDLE;
+        size = 0;
+    }
 }

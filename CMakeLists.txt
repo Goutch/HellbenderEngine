@@ -127,7 +127,6 @@ set(CORE_FILES
         core/utility/DefaultModelParser.h
         core/scene/components/MeshRenderer.cpp
         core/scene/components/MeshRenderer.h
-        core/graphics/Allocator.h
         core/scene/ecs/Group/GroupIterator.cpp
         core/scene/ecs/Group/PageDataArchetype.h
         core/scene/ecs/Registry/ECSTypes.h
@@ -209,6 +208,9 @@ set(VK_FILES
         platforms/vk/VK_DynamicRenderTarget.h
         platforms/vk/VK_Context.cpp
         platforms/vk/VK_Context.h
+        core/resource/Allocator.h
+        core/resource/Allocator.cpp
+        platforms/vk/VK_Types.h
 )
 
 
@@ -342,7 +344,6 @@ set(ALSOFT_INSTALL_UTILS OFF CACHE BOOL "Install utility programs (openal-info, 
 #set(ALSOFT_UPDATE_BUILD_VERSION OFF CACHE BOOL "Update git build version info")
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/openal-soft/")
-
 message("#------------------------------------LIBSNDFILE------------------------------------")
 set(BUILD_PROGRAMS OFF CACHE BOOL "")
 set(BUILD_EXAMPLES OFF CACHE BOOL "")
@@ -366,11 +367,11 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE HB_BUILD)
 
 target_include_directories(${PROJECT_NAME}
         PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}"
-        PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm/"
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm/"
         PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb/"
         PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf/"
-        PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/utils-collection"
-        PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/utils-collection/data-structure"
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/utils-collection"
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/utils-collection/data-structure"
         PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/"
         PRIVATE "${FREETYPE_INCLUDE_DIRS}")
 
@@ -397,7 +398,7 @@ set(MSDFGEN_LIBS
         msdfgen-all
         msdf-atlas-gen)
 set(OPENAL_LIBS
-        OpenAL)
+        OpenAL::OpenAL)
 set(SNDFILE_LIBS
         sndfile)
 
@@ -411,7 +412,7 @@ set(HBE_LIBS
         ${OPENAL_LIBS}
         ${SNDFILE_LIBS})
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} PUBLIC
         ${HBE_LIBS})
 
 if (NOT DEFINED HBE_OUTPUT_DIR)

@@ -109,8 +109,6 @@ namespace HBE
                     hbe_glyph.offset *= scale;
                     characters_glyphs.emplace(unicode, hbe_glyph);
                 }
-
-                // Cleanup
                 msdfgen::destroyFont(font);
             }
             msdfgen::deinitializeFreetype(ft);

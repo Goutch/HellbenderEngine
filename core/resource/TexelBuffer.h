@@ -20,7 +20,7 @@ namespace HBE
 		MEMORY_TYPE_FLAGS preferred_memory_type_flags = MEMORY_TYPE_FLAG_GPU_LOCAL;
 	};
 
-	class HB_API TexelBuffer : public Resource
+	class HB_API TexelBuffer
 	{
 	public:
 		virtual void update(const void* data) = 0;

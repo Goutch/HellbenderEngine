@@ -41,7 +41,7 @@ namespace HBE
 		MEMORY_TYPE_FLAGS preferred_shader_binding_table_memory_type_flags = MEMORY_TYPE_FLAG_GPU_LOCAL;
 	};
 
-	class HB_API RaytracingPipeline : public Resource
+	class HB_API RaytracingPipeline
 	{
 		virtual RAYTRACING_PIPELINE_FLAGS getFlags() const = 0;
 	};

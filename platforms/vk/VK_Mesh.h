@@ -5,6 +5,7 @@
 #include "vulkan/vulkan.h"
 #include "set"
 #include "VK_CommandPool.h"
+#include "VK_StorageBuffer.h"
 #include "core/resource/StorageBuffer.h"
 
 namespace HBE
@@ -17,20 +18,16 @@ namespace HBE
 
     class VK_Mesh : public Mesh
     {
-        VK_CommandPool* command_pool;
-        VK_Device* device = nullptr;
-        VK_Renderer* renderer = nullptr;
-        VK_Buffer* indices_buffer = nullptr;
-        mutable std::vector<VK_Buffer*> buffers;
+        VK_Context* context = nullptr;
+
+        std::vector<VK_Buffer> buffers;
         VkBufferUsageFlags extra_usages = 0;
         mutable bool bound = false;
         MeshInfo info;
-        std::vector<StorageBuffer*> storage_buffers;
-        StorageBuffer* indices_storage_buffer = nullptr;
+        VK_Buffer indices_buffer{};
 
     public:
-        VK_Mesh(VK_Renderer* renderer, const MeshInfo& info);
-
+        VK_Mesh(VK_Context* context, const MeshInfo& info);
         ~VK_Mesh() override;
 
         void setVertexIndices(const uint32_t* data, size_t count) override;
@@ -43,13 +40,9 @@ namespace HBE
 
         void setInstanceBuffer(uint32_t location, const void* data, size_t count) override;
 
-        const VK_Buffer* getBuffer(uint32_t binding) const;
+        const VK_Buffer& getBuffer(uint32_t binding) const;
 
-        const VK_Buffer* getIndicesBuffer() const;
-
-        StorageBuffer* getIndicesStorageBuffer() const override;
-
-        StorageBuffer* getAttributeStorageBuffer(uint32_t location) const override;
+        const VK_Buffer& getIndicesBuffer() const;
 
         void bind() const override;
 

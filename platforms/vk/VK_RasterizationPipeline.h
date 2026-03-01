@@ -7,51 +7,51 @@
 #include "VK_Image.h"
 #include "VK_Shader.h"
 #include "unordered_map"
+#include "VK_PipelineLayout.h"
 
-namespace HBE {
-	class VK_Device;
+namespace HBE
+{
+    class VK_Device;
 
-	class VK_RenderPass;
+    class VK_RenderPass;
 
-	class VK_Renderer;
+    class VK_Renderer;
 
-	class VK_Buffer;
+    class VK_Buffer;
 
-	class VK_PipelineLayout;
+    class VK_PipelineLayout;
 
-	class VK_RasterizationPipeline : public RasterizationPipeline {
-		VkPipeline handle = VK_NULL_HANDLE;
-		VK_PipelineLayout *layout = nullptr;
+    class VK_RasterizationPipeline : public RasterizationPipeline
+    {
+        VkPipeline handle = VK_NULL_HANDLE;
+        VK_PipelineLayout layout;
+        VK_Context* context = nullptr;
+        std::vector<const VK_Shader*> shaders;
+        std::vector<VertexAttributeInfo> binding_infos;
+        RasterizationPipelineInfo info;
 
-		VK_Device *device = nullptr;
-		VK_Renderer *renderer = nullptr;
-		std::vector<const VK_Shader *> shaders;
-		VkRenderPass render_pass = VK_NULL_HANDLE;
-		std::vector<VertexAttributeInfo> binding_infos;
-		RasterizationPipelineInfo info;
+        mutable bool is_bound = false;
 
-		mutable bool is_bound = false;
+    public:
+        VK_RasterizationPipeline() = default;
+        ~VK_RasterizationPipeline() = default;
+        VK_RasterizationPipeline(VK_RasterizationPipeline&) = delete;
+        VK_RasterizationPipeline& operator=(VK_RasterizationPipeline&) = delete;
+        void init(VK_Context* context,const RasterizationPipelineInfo& info);
+        void release();
+        void pushConstant(const std::string& name, const void* data) const override;
 
-	public:
-		VK_RasterizationPipeline(VK_Device *device, VK_Renderer *renderer, const RasterizationPipelineInfo &info, VkRenderPass render_pass);
-		VK_RasterizationPipeline(VK_Device *device, VK_Renderer *renderer, const RasterizationPipelineInfo &info);
+        void bind() const override;
 
-		void pushConstant(const std::string &name, const void *data) const override;
+        void unbind() const override;
 
-		~VK_RasterizationPipeline() override;
+        void createPipelineLayout();
 
-		void bind() const override;
+        bool bound();
 
-		void unbind() const override;
+        const VK_PipelineLayout& getPipelineLayout() const;
 
-		void createPipelineLayout();
 
-		bool bound();
-
-		const VK_PipelineLayout *getPipelineLayout() const;
-
-		void init(VK_Device *device, VK_Renderer *renderer);
-
-		RASTERIZATION_PIPELINE_FLAGS getFlags() const override;
-	};
+        RASTERIZATION_PIPELINE_FLAGS getFlags() const override;
+    };
 }

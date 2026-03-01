@@ -4,28 +4,15 @@
 #include "VK_Renderer.h"
 #include "VK_RenderPass.h"
 #include "VK_CommandPool.h"
+#include "VK_Context.h"
+#include "VK_Device.h"
 #include "core/Application.h"
 
 namespace HBE
 {
-    VK_RasterizationPipeline::VK_RasterizationPipeline(VK_Device* device, VK_Renderer* renderer, const RasterizationPipelineInfo& info, VkRenderPass render_pass)
+    void VK_RasterizationPipeline::init(VK_Context* context, const RasterizationPipelineInfo& info)
     {
-        this->info = info;
-        this->render_pass = render_pass;
-        init(device, renderer);
-    }
-
-
-    VK_RasterizationPipeline::VK_RasterizationPipeline(VK_Device* device, VK_Renderer* renderer, const RasterizationPipelineInfo& info)
-    {
-        this->info = info;
-        init(device, renderer);
-    }
-
-    void VK_RasterizationPipeline::init(VK_Device* device, VK_Renderer* renderer)
-    {
-        this->device = device;
-        this->renderer = renderer;
+        this->context = context;
         this->binding_infos = std::vector<VertexAttributeInfo>(info.attribute_infos, info.attribute_infos + info.attribute_info_count);
 
         const VK_Shader* vk_vertex = (dynamic_cast<const VK_Shader*>(info.vertex_shader));
@@ -216,27 +203,20 @@ namespace HBE
         pipelineInfo.pColorBlendState = &colorBlending;
         pipelineInfo.pDynamicState = &dynamicState; // Optional
         pipelineInfo.pTessellationState = VK_NULL_HANDLE;
-        pipelineInfo.layout = layout->getHandle();
+        pipelineInfo.layout = layout.getHandle();
 
         pipelineInfo.pDepthStencilState = &depthStencil;
 
-        if (render_pass == VK_NULL_HANDLE)
-        {
-            const VK_RenderPass* render_pass = info.rasterization_target == nullptr
-                                                   ? dynamic_cast<const VK_RenderPass*>(Application::instance->getContext()->getRenderer()->getDefaultRenderTarget())
-                                                   : dynamic_cast<const VK_RenderPass*>(info.rasterization_target);
-            pipelineInfo.renderPass = render_pass->getHandle();
-        }
-        else
-        {
-            pipelineInfo.renderPass = render_pass;
-        }
+        const VkRenderPass& render_pass = info.rasterization_target == nullptr
+                                              ? context->swapchain.getRenderPass()
+                                              : dynamic_cast<const VK_RenderPass*>(info.rasterization_target)->getHandle();
+        pipelineInfo.renderPass = render_pass;
         pipelineInfo.subpass = 0;
 
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
         pipelineInfo.basePipelineIndex = -1; // Optional
 
-        if (vkCreateGraphicsPipelines(device->getHandle(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &handle) !=
+        if (vkCreateGraphicsPipelines(context->device.getHandle(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &handle) !=
             VK_SUCCESS)
         {
             Log::error("failed to create graphics pipeline!");
@@ -248,19 +228,10 @@ namespace HBE
         return info.flags;
     }
 
-
-    VK_RasterizationPipeline::~VK_RasterizationPipeline()
-    {
-        if (handle != VK_NULL_HANDLE)
-            vkDestroyPipeline(device->getHandle(), handle, nullptr);
-        if (layout != nullptr)
-            delete layout;
-    }
-
     void VK_RasterizationPipeline::bind() const
     {
         if (is_bound) return;
-        vkCmdBindPipeline(renderer->getCommandPool()->getCurrentBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, handle);
+        vkCmdBindPipeline(context->renderer.getCommandPool()->getCurrentBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, handle);
         is_bound = true;
     }
 
@@ -269,14 +240,21 @@ namespace HBE
         is_bound = false;
     }
 
+    void VK_RasterizationPipeline::release()
+    {
+        if (handle != VK_NULL_HANDLE)
+            vkDestroyPipeline(context->device.getHandle(), handle, nullptr);
+        layout.release();
+    }
+
     void VK_RasterizationPipeline::pushConstant(const std::string& name, const void* data) const
     {
-        layout->pushConstant(renderer->getCommandPool()->getCurrentBuffer(), name, data);
+        layout.pushConstant(context->renderer.getCommandPool()->getCurrentBuffer(), name, data);
     }
 
     void VK_RasterizationPipeline::createPipelineLayout()
     {
-        layout = new VK_PipelineLayout(device, shaders.data(), shaders.size(), info.flags & RASTERIZATION_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR);
+        layout.init(context, shaders.data(), shaders.size(), info.flags & RASTERIZATION_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR);
     }
 
     bool VK_RasterizationPipeline::bound()
@@ -284,7 +262,7 @@ namespace HBE
         return is_bound;
     }
 
-    const VK_PipelineLayout* VK_RasterizationPipeline::getPipelineLayout() const
+    const VK_PipelineLayout& VK_RasterizationPipeline::getPipelineLayout() const
     {
         return layout;
     }

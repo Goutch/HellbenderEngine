@@ -6,15 +6,15 @@
 
 namespace HBE
 {
-    class VK_Device;
+    class VK_Context;
 
     class VK_Fence : public Fence
     {
-        VK_Device* device = nullptr;
+        VK_Context* context = nullptr;
         VkFence handle = VK_NULL_HANDLE;
 
     public:
-        void init(VK_Device& device);
+        void init(VK_Context* context);
         void release();
         VK_Fence() = default;
         VK_Fence(VK_Fence&& other) noexcept;

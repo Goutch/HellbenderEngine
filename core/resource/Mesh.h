@@ -2,7 +2,6 @@
 
 #include "Core.h"
 #include <vector>
-#include "glm/glm.hpp"
 #include "Resource.h"
 #include "unordered_map"
 #include "string"
@@ -15,7 +14,7 @@ namespace HBE {
 	enum MESH_FLAG {
 		MESH_FLAG_NONE = 0,
 		MESH_FLAG_USED_IN_RAYTRACING = 1 << 0,
-		MESH_FLAG_GENERATE_ATTRIBUTE_STORAGE_BUFFER = 1 << 1,
+		MESH_FLAG_USED_AS_STORAGE_BUFFER = 1 << 1,
 	};
 
 	enum MESH_TOPOLOGY {
@@ -33,7 +32,7 @@ namespace HBE {
 		MESH_FLAGS flags = MESH_FLAG_NONE;
 	};
 
-	class HB_API Mesh : public Resource {
+	class HB_API Mesh  {
 	protected:
 		enum INDICES_TYPE {
 			INDICES_TYPE_NONE,
@@ -75,10 +74,6 @@ namespace HBE {
 		virtual void bind() const = 0;
 
 		virtual void unbind() const = 0;
-
-		virtual StorageBuffer *getAttributeStorageBuffer(uint32_t location) const = 0;
-
-		virtual StorageBuffer *getIndicesStorageBuffer() const = 0;
 	};
 }
 

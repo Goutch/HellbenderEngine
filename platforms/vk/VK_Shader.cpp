@@ -6,15 +6,16 @@
 #include "spirv_cross_c.h"
 #include "VK_CommandPool.h"
 #include "spirv_glsl.hpp"
+#include "VK_Context.h"
 
 namespace HBE {
 	VK_Shader::~VK_Shader() {
-		vkDestroyShaderModule(device->getHandle(), handle, nullptr);
+		vkDestroyShaderModule(context->device.getHandle(), handle, nullptr);
 	}
 
-	VK_Shader::VK_Shader(const VK_Device *device, const ShaderInfo &info) {
+	VK_Shader::VK_Shader(VK_Context *context, const ShaderInfo &info) {
 		this->info = info;
-		this->device = device;
+		this->context = context;
 		this->stage = info.stage;
 		HB_ASSERT(info.stage != SHADER_STAGE_NONE, "Shader stage not set");
 		switch (info.stage) {
@@ -58,7 +59,7 @@ namespace HBE {
 		createInfo.codeSize = spirv.size() * sizeof(uint32_t);
 		createInfo.pCode = reinterpret_cast<const uint32_t *>(spirv.data());
 
-		if (vkCreateShaderModule(device->getHandle(), &createInfo, nullptr, &handle) != VK_SUCCESS) {
+		if (vkCreateShaderModule(context->device.getHandle(), &createInfo, nullptr, &handle) != VK_SUCCESS) {
 			Log::error("failed to create shader module!");
 		}
 		reflect(spirv);
@@ -172,7 +173,7 @@ namespace HBE {
 
 //does what the relect_c function does but with the c++ api
 	void VK_Shader::reflect(const std::vector<uint32_t> &spirv) {
-		VkPhysicalDeviceLimits limits = device->getPhysicalDevice().getProperties().limits;
+		VkPhysicalDeviceLimits limits = context->physical_device.getProperties().limits;
 		spirv_cross::CompilerGLSL glsl(std::move(spirv));
 		spirv_cross::ShaderResources resources = glsl.get_shader_resources();
 		auto used_variables = glsl.get_active_interface_variables();
@@ -180,7 +181,7 @@ namespace HBE {
 		//----------------------------------------------UNIFORM BUFFERS------------------------------------------------
 		for (auto &ub: resources.uniform_buffers) {
 			size_t size = glsl.get_declared_struct_size(glsl.get_type(ub.base_type_id));
-			HB_ASSERT(size <= device->getPhysicalDevice().getProperties().limits.maxUniformBufferRange, "Uniform buffer size is too big!");
+			HB_ASSERT(size <= context->physical_device.getProperties().limits.maxUniformBufferRange, "Uniform buffer size is too big!");
 
 			VK_DescriptorInfo uniform_info = generateDescriptorInfo(vk_stage, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, glsl, ub, limits);
 			uniforms.emplace_back(uniform_info);
@@ -201,7 +202,7 @@ namespace HBE {
 				//continue;
 			}
 			size_t size = glsl.get_declared_struct_size(glsl.get_type(sb.base_type_id));
-			HB_ASSERT(size <= device->getPhysicalDevice().getProperties().limits.maxStorageBufferRange, "Storage buffer size is too big!");
+			HB_ASSERT(size <= context->physical_device.getProperties().limits.maxStorageBufferRange, "Storage buffer size is too big!");
 			VK_DescriptorInfo uniform_info = generateDescriptorInfo(vk_stage, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, glsl, sb, limits);
 			uniforms.emplace_back(uniform_info);
 		}
@@ -234,7 +235,7 @@ namespace HBE {
 		//----------------------------------------------PUSH CONSTANTS------------------------------------------------
 		for (auto &pc: resources.push_constant_buffers) {
 			size_t size = glsl.get_declared_struct_size(glsl.get_type(pc.base_type_id));
-			HB_ASSERT(size <= device->getPhysicalDevice().getProperties().limits.maxPushConstantsSize, "Push constant size is too big!");
+			HB_ASSERT(size <= context->physical_device.getProperties().limits.maxPushConstantsSize, "Push constant size is too big!");
 			std::string name = glsl.get_name(pc.id);
 
 			VK_PushConstantInfo push_constant_info{};

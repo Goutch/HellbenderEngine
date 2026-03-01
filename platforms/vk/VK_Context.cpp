@@ -30,11 +30,12 @@ namespace HBE
         instance.init(info);
         surface.init(instance, Application::instance->getWindow()->getHandle());
         physical_device.init(instance, surface);
-        device.init(physical_device);
-        allocator.init(device);
-        swapchain.init(device, surface);
-        renderer.init(device, swapchain);
+        device.init(this);
+        allocator.init(this);
+        swapchain.init(this);
 
+
+        renderer.init(this);
         graphic_limits = renderer.getLimits();
     }
 
@@ -42,6 +43,7 @@ namespace HBE
     {
         return &renderer;
     }
+
 
     VK_Context::~VK_Context()
     {
@@ -61,78 +63,87 @@ namespace HBE
 
     Image* VK_Context::createImage(const ImageInfo& info)
     {
-        return new VK_Image(&device, info);
+        VK_Image* image = new VK_Image();
+        image->alloc(this, info);
+        return image;
     }
 
     RasterizationPipeline* VK_Context::createRasterizationPipeline(const RasterizationPipelineInfo& info)
     {
-        return new VK_RasterizationPipeline(&device, &renderer, info);
+        if (info.rasterization_target == nullptr)
+            info.rasterization_target = dynamic_cast<RasterizationTarget*>(renderer.getDefaultRenderTarget());
+        VK_RasterizationPipeline* raster = new VK_RasterizationPipeline();
+        raster->init(this, info);
+        return raster;
     }
 
     Shader* VK_Context::createShader(const ShaderInfo& info)
     {
-        return new VK_Shader(&device, info);
+        return new VK_Shader(this, info);
     }
 
     Mesh* VK_Context::createMesh(const MeshInfo& info)
     {
-        return new VK_Mesh(&renderer, info);
+        return new VK_Mesh(this, info);
     }
 
     ComputePipeline* VK_Context::createComputePipeline(const ComputePipelineInfo& info)
     {
-        return new VK_ComputePipeline(&renderer, info);
+        return new VK_ComputePipeline(this, info);
     }
 
     RasterizationTarget* VK_Context::createRenderTarget(const RenderTargetInfo& info)
     {
-        return new VK_RenderPass(&renderer, info);
+        return new VK_RenderPass(this, info);
     }
 
     RasterizationPipelineInstance* VK_Context::createRasterizationPipelineInstance(const RasterizationPipelineInstanceInfo& info)
     {
-        return new VK_RasterizationPipelineInstance(&renderer, info);
+        return new VK_RasterizationPipelineInstance(this, info);
     }
 
     ComputeInstance* VK_Context::createComputeInstance(const ComputeInstanceInfo& info)
     {
-        return new VK_ComputeInstance(&renderer, info);
+        return new VK_ComputeInstance(this, info);
     }
 
     RootAccelerationStructure* VK_Context::createRootAccelerationStructure(const RootAccelerationStructureInfo& info)
     {
-        return new VK_TopLevelAccelerationStructure(&device, info);
+        return new VK_TopLevelAccelerationStructure(this, info);
     }
 
     AABBAccelerationStructure* VK_Context::createAABBAccelerationStructure(const AABBAccelerationStructureInfo& info)
     {
-        return new VK_AABBBottomLevelAccelerationStructure(&device, info);
+        return new VK_AABBBottomLevelAccelerationStructure(this, info);
     }
 
     MeshAccelerationStructure* VK_Context::createMeshAccelerationStructure(const MeshAccelerationStructureInfo& info)
     {
-        return new VK_MeshBottomLevelAccelerationStructure(&device, info);
+        return new VK_MeshBottomLevelAccelerationStructure(this, info);
     }
 
     RaytracingPipeline* VK_Context::createRaytracingPipeline(const RaytracingPipelineInfo& info)
     {
-        return new VK_RaytracingPipeline(&renderer, info);
+        return new VK_RaytracingPipeline(this, info);
     }
 
     RaytracingPipelineInstance* VK_Context::createRaytracingPipelineInstance(const RaytracingPipelineInstanceInfo& info)
     {
-        return new VK_RaytracingPipelineInstance(renderer, info);
+        return new VK_RaytracingPipelineInstance(this, info);
     }
 
     StorageBuffer* VK_Context::createStorageBuffer(const StorageBufferInfo& info)
     {
-        return new VK_StorageBuffer(&device, info);
+        //todo fix this.
+        return nullptr; //new VK_StorageBuffer(this, info);
     }
 
 
     TexelBuffer* VK_Context::createTexelBuffer(const TexelBufferInfo& info)
     {
-        return new VK_TexelBuffer(&device, info);
+        VK_TexelBuffer* texel_buffer = new VK_TexelBuffer();;
+        texel_buffer->alloc(this, info);
+        return texel_buffer;
     }
 
     Font* VK_Context::createFont(const FontInfo& font_info) const

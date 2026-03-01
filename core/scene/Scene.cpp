@@ -282,16 +282,16 @@ namespace HBE
         {
             if (main_camera_entity.valid() && (main_camera_entity.has<Camera>()))
             {
-                return main_camera_entity.get<Camera>()->getRenderTarget()->getFramebufferTexture(
+                return &main_camera_entity.get<Camera>()->getRenderTarget()->getFramebufferTexture(
                     Application::instance->getContext()->getRenderer()->getCurrentFrameIndex());
             }
             if (main_camera_entity.valid() && (main_camera_entity.has<Camera2D>()))
             {
-                return main_camera_entity.get<Camera2D>()->getRenderTarget()->getFramebufferTexture(Application::instance->getContext()->getRenderer()->getCurrentFrameIndex());
+                return &main_camera_entity.get<Camera2D>()->getRenderTarget()->getFramebufferTexture(Application::instance->getContext()->getRenderer()->getCurrentFrameIndex());
             }
             if (main_camera_entity.valid() && (main_camera_entity.has<PixelCamera>()))
             {
-                return main_camera_entity.get<PixelCamera>()->getRenderTarget()->getFramebufferTexture(
+                return &main_camera_entity.get<PixelCamera>()->getRenderTarget()->getFramebufferTexture(
                     Application::instance->getContext()->getRenderer()->getCurrentFrameIndex());
             }
         }

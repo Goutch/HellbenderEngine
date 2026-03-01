@@ -27,7 +27,7 @@ namespace HBE
 		COMPUTE_PIPELINE_FLAGS flags = COMPUTE_PIPELINE_FLAG_NONE;
 	};
 
-	class HB_API ComputePipeline : public Resource
+	class HB_API ComputePipeline
 	{
 	protected:
 		vec3i workgroup_size;

@@ -1,4 +1,6 @@
 #include "VK_CommandPool.h"
+
+#include "VK_Context.h"
 #include "core/utility/Log.h"
 #include "VK_Device.h"
 #include "VK_Swapchain.h"
@@ -6,9 +8,10 @@
 #include "VK_Queue.h"
 namespace HBE
 {
-    void VK_CommandPool::init(VK_Device& device, uint32_t command_buffers_count, const VK_Queue& queue)
+
+    void VK_CommandPool::init(VK_Context* context, uint32_t command_buffers_count, const VK_Queue& queue)
     {
-        this->device = &device;
+        this->context = context;
 
         VkCommandPoolCreateInfo poolInfo{};
         poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -18,7 +21,7 @@ namespace HBE
             VkCommandPoolCreateFlagBits::VK_COMMAND_POOL_CREATE_TRANSIENT_BIT;
 
 
-        if (vkCreateCommandPool(device.getHandle(), &poolInfo, nullptr, &handle) != VK_SUCCESS)
+        if (vkCreateCommandPool(context->device.getHandle(), &poolInfo, nullptr, &handle) != VK_SUCCESS)
         {
             Log::error("failed to create command pool!");
         }
@@ -33,7 +36,7 @@ namespace HBE
             fence.release();
         }
         fences.clear();
-        vkDestroyCommandPool(device->getHandle(), handle, nullptr);
+        vkDestroyCommandPool(context->device.getHandle(), handle, nullptr);
     }
 
     void HBE::VK_CommandPool::clear()
@@ -45,7 +48,7 @@ namespace HBE
         }
         fences.clear();
 
-        vkFreeCommandBuffers(device->getHandle(), handle, static_cast<uint32_t>(command_buffers.size()),
+        vkFreeCommandBuffers(context->device.getHandle(), handle, static_cast<uint32_t>(command_buffers.size()),
                              command_buffers.data());
         command_buffers.clear();
     }
@@ -57,7 +60,7 @@ namespace HBE
         for (int i = 0; i < count; ++i)
         {
             fences.emplace_back();
-            fences[i].init(*device);
+            fences[i].init(context);
         }
         command_buffers.resize(count);
         VkCommandBufferAllocateInfo allocInfo{};
@@ -66,7 +69,7 @@ namespace HBE
         allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
         allocInfo.commandBufferCount = static_cast<uint32_t>(command_buffers.size());
 
-        if (vkAllocateCommandBuffers(device->getHandle(), &allocInfo, command_buffers.data()) != VK_SUCCESS)
+        if (vkAllocateCommandBuffers(context->device.getHandle(), &allocInfo, command_buffers.data()) != VK_SUCCESS)
         {
             Log::error("failed to allocate command buffers!");
         }

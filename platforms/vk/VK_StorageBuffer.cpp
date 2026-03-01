@@ -6,47 +6,32 @@
 #include "vulkan/vulkan.h"
 #include "VK_Buffer.h"
 
-namespace HBE {
+namespace HBE
+{
+    VK_StorageBuffer::VK_StorageBuffer(VK_Buffer& buffer, uint32_t size, uint32_t stride, uint32_t count): buffer(buffer)
+    {
+        this->count = count;
+        this->stride = stride;
+        this->size = stride * count;
+    }
 
-	VK_StorageBuffer::VK_StorageBuffer(VK_Device *device, const StorageBufferInfo &info) {
-		count = info.count;
-		stride = info.stride;
-		size = stride * count;
-		buffer = new VK_Buffer(device, static_cast<VkDeviceSize>(size), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, info.preferred_memory_type_flags);
-	}
+    void VK_StorageBuffer::update(const void* data)
+    {
+        buffer.update(data);
+    }
 
-	VK_StorageBuffer::~VK_StorageBuffer() {
-		if (this->deleteOnDestruction)
-			delete buffer;
-	}
+    uint32_t VK_StorageBuffer::getStride() const
+    {
+        return stride;
+    }
 
-	void VK_StorageBuffer::update(const void *data) {
-		buffer->update(data);
-	}
+    VK_Buffer& VK_StorageBuffer::getBuffer() const
+    {
+        return buffer;
+    }
 
-	const VK_Buffer &VK_StorageBuffer::getBuffer() const {
-		return *buffer;
-	}
-
-	uint32_t VK_StorageBuffer::getStride() const {
-		return stride;
-	}
-
-	uint32_t VK_StorageBuffer::getCount() const {
-		return count;
-	}
-
-	void VK_StorageBuffer::update(const void *data, size_t size, size_t offset) {
-		buffer->update(data, static_cast<VkDeviceSize>(size * stride), static_cast<VkDeviceSize>(offset * stride));
-	}
-
-	VK_StorageBuffer::VK_StorageBuffer(VK_Device *device, VK_Buffer *buffer, uint32_t stride, uint32_t count, bool deleteOnDestruction) {
-		this->buffer = buffer;
-		this->stride = stride;
-		this->count = count;
-		this->size = stride * count;
-		this->deleteOnDestruction = deleteOnDestruction;
-	}
-
+    uint32_t VK_StorageBuffer::getCount() const
+    {
+        return count;
+    }
 }
-

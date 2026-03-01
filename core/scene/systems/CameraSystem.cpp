@@ -75,7 +75,7 @@ namespace HBE {
 				render_cmd_info.projection = camera.projection;
 				render_cmd_info.view = glm::inverse(transform.world());
 				render_cmd_info.layer_mask = camera.layer_mask;
-				Application::instance->getContext()->getRenderer()->rasterize(render_cmd_info);
+				context->getRenderer()->rasterize(render_cmd_info);
 			}
 		}
 		for (auto [handle, node, transform, camera]: group_pixel) {

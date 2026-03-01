@@ -7,6 +7,7 @@
 
 namespace HBE
 {
+    class VK_Context;
     class VK_Surface;
     class VK_PhysicalDevice;
 
@@ -20,9 +21,7 @@ namespace HBE
     {
         VkSwapchainKHR handle{};
 
-        VK_Device* device = nullptr;
-        VK_Surface* surface = nullptr;
-        VK_PhysicalDevice* physical_device = nullptr;
+        VK_Context* context = nullptr;
 
         uint32_t image_count;
         std::vector<VkImage> images;
@@ -33,7 +32,7 @@ namespace HBE
         VkFormat format;
 
     public:
-        void init(VK_Device& device, VK_Surface& surface);
+        void init(VK_Context* context);
         void release();
 
         VK_Swapchain() = default;

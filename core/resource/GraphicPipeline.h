@@ -34,7 +34,7 @@ namespace HBE {
 		GRAPHIC_PIPELINE_FLAGS flags = GRAPHIC_PIPELINE_FLAG_NONE;
 	};
 
-	class HB_API GraphicPipeline : public Resource {
+	class HB_API GraphicPipeline  {
 	public:
 		virtual ~GraphicPipeline() = default;
 

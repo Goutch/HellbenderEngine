@@ -34,13 +34,13 @@ namespace HBE
 		const Shader* fragment_shader = nullptr;
 		const Shader* geometry_shader = nullptr;
 		const VertexAttributeInfo* attribute_infos = nullptr;
-		const RasterizationTarget* rasterization_target = nullptr;
+		RasterizationTarget* rasterization_target = nullptr;
 		uint32_t attribute_info_count = 0;
 		VERTEX_TOPOLOGY topology = VERTEX_TOPOLOGY_TRIANGLE_LIST;
 		RASTERIZATION_PIPELINE_FLAGS flags = RASTERIZATION_PIPELINE_FLAG_NONE;
 	};
 
-	class HB_API RasterizationPipeline : public Resource
+	class HB_API RasterizationPipeline
 	{
 	public:
 		virtual ~RasterizationPipeline() = default;

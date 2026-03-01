@@ -26,9 +26,9 @@ namespace HBE
         Input input;
 
         ApplicationInfo info;
-        Timer* time;
-        int fps_counter;
-        float fps_timer;
+        Timer time;
+        int fps_counter = 0;
+        float fps_timer = 0.0f;
 
     public:
         static Application* instance;

@@ -3,6 +3,8 @@
 //
 
 #include "VK_Surface.h"
+
+#include "VK_Instance.h"
 #include "core/utility/Log.h"
 #include "GLFW/glfw3.h"
 
@@ -15,7 +17,7 @@ namespace HBE
 
     void VK_Surface::init(VK_Instance& instance, GLFWwindow* window_handle)
     {
-        this->instance_handle = instance_handle;
+        this->instance_handle = instance.getHandle();
         if (glfwCreateWindowSurface(instance_handle, window_handle, nullptr, &handle) != VK_SUCCESS)
         {
             Log::error("Failed to create window surface");

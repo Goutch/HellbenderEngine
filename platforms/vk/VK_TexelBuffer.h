@@ -1,26 +1,31 @@
 #pragma once
 
 #include <core/resource/TexelBuffer.h>
+
+#include "VK_Buffer.h"
 #include "vulkan/vulkan.h"
 
-namespace HBE {
-	class VK_Device;
+namespace HBE
+{
+    class VK_Context;
 
-	class VK_Buffer;
+    class VK_TexelBuffer : public TexelBuffer
+    {
+        VK_Context* context;
+        uint32_t count;
+        VkBufferView view;
+        VK_Buffer buffer;
 
-	class VK_TexelBuffer : public TexelBuffer {
-		VK_Device *device;
-		uint32_t count;
-		VkBufferView view;
-		VK_Buffer *buffer;
-	public:
-		VK_TexelBuffer(VK_Device *device, const TexelBufferInfo &info);
+    public:
+        VK_TexelBuffer() = default;
+        ~VK_TexelBuffer() final = default;
 
-		void update(const void *data) override;
+        TexelBuffer& operator =(TexelBuffer& other) = delete;
+        VK_TexelBuffer(TexelBuffer& other) = delete;
+        void alloc(VK_Context* context, const TexelBufferInfo& info);
+        void release();
+        void update(const void* data) final;
 
-		const VkBufferView &getView() const;
-
-		~VK_TexelBuffer() override;
-	};
+        const VkBufferView& getView() const;
+    };
 }
-

@@ -4,29 +4,29 @@
 
 #include "VK_ComputeInstance.h"
 #include "VK_ComputePipeline.h"
-#include "VK_Renderer.h"
 #include "VK_PipelineDescriptors.h"
 #include "VK_Fence.h"
 #include "VK_Device.h"
 #include "VK_CommandPool.h"
+#include "VK_Context.h"
 
 namespace HBE
 {
-    VK_ComputeInstance::VK_ComputeInstance(VK_Renderer* renderer, const ComputeInstanceInfo& info)
+    VK_ComputeInstance::VK_ComputeInstance(VK_Context* context, const ComputeInstanceInfo& info)
     {
+        this->context = context;
         const VK_ComputePipeline* compute_pipeline = dynamic_cast<const VK_ComputePipeline*>(info.compute_pipeline);
-        const VK_PipelineLayout* layout = compute_pipeline->getPipelineLayout();
+        const VK_PipelineLayout& layout = compute_pipeline->getPipelineLayout();
         this->pipeline = compute_pipeline;
-        descriptors = new VK_PipelineDescriptors(renderer,
-                                                 *layout,
+        descriptors = new VK_PipelineDescriptors(context,
+                                                 layout,
                                                  info.preferred_memory_type_flags,
                                                  info.uniform_memory_type_infos,
                                                  info.uniform_memory_type_info_count,
                                                  info.
                                                  compute_pipeline->getFlags() & COMPUTE_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR);;
 
-        fence.init(*renderer->getDevice());
-        this->renderer = renderer;
+        fence.init(context);
     }
 
     VK_ComputeInstance::~VK_ComputeInstance()
@@ -76,7 +76,7 @@ namespace HBE
                                            uint32_t size_z)
     {
         fence.wait();
-        VK_Device* device = renderer->getDevice();
+        VK_Device* device = &context->device;
 
         VK_Queue& queue = device->hasQueue(QUEUE_FAMILY_COMPUTE) ? device->getQueue(QUEUE_FAMILY_COMPUTE) : device->getQueue(QUEUE_FAMILY_GRAPHICS);
         queue.beginCommand();
@@ -84,7 +84,7 @@ namespace HBE
         const VkCommandBuffer& command_buffer = queue.getCommandPool()->getCurrentBuffer();
         vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline->getHandle());
 
-        descriptors->bind(command_buffer, renderer->getCurrentFrameIndex());
+        descriptors->bind(command_buffer, context->renderer.getCurrentFrameIndex());
         vkCmdDispatch(command_buffer,
                       static_cast<uint32_t>(ceil(pipeline->getWorkgroupSize().x / float(size_x))),
                       static_cast<uint32_t>(ceil(pipeline->getWorkgroupSize().y / float(size_y))),

@@ -25,13 +25,14 @@ namespace HBE
     {
     private:
         VkQueue handle;
-        VkDevice device_handle;
+        VK_Context* context;
         VK_CommandPool command_pool;
         uint32_t family_index;
         QUEUE_FAMILY queue_family;
 
     public:
-        VK_Queue(VK_Device* device, QUEUE_FAMILY family, uint32_t family_index);
+        VK_Queue(VK_Queue&& other) noexcept;
+        VK_Queue(VK_Context* context, QUEUE_FAMILY family, uint32_t family_index);
 
         ~VK_Queue();
 

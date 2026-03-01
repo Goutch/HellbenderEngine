@@ -118,7 +118,7 @@ namespace HBE {
 		vec3u size;
 	};
 
-	class HB_API Image : public Resource {
+	class HB_API Image  {
 	public:
 		virtual ~Image() = default;
 

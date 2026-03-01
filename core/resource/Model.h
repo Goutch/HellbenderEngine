@@ -140,7 +140,7 @@ namespace HBE {
 	};
 
 
-	class HB_API Model : public Resource {
+	class HB_API Model  {
 		friend class Resources;
 
 		ModelInfo info;

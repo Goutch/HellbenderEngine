@@ -3,12 +3,14 @@
 #include "vector"
 #include "set"
 #include "VK_Allocator.h"
+#include "VK_Context.h"
 
 namespace HBE
 {
-    void VK_Device::init(VK_PhysicalDevice& physical_device)
+    void VK_Device::init(VK_Context* context)
     {
-        this->physical_device = &physical_device;
+        this->context = context;
+        VK_PhysicalDevice& physical_device = context->physical_device;
         QueueFamilyIndices indices = physical_device.getQueueFamilyIndices();
 
         std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
@@ -102,18 +104,17 @@ namespace HBE
         {
             Log::error("Failed to create logical device");
         }
-        queues.try_emplace(QUEUE_FAMILY_GRAPHICS, this, QUEUE_FAMILY_GRAPHICS, indices.graphics_family.value());
-        queues.try_emplace(QUEUE_FAMILY_PRESENT, this, QUEUE_FAMILY_PRESENT, indices.present_family.value());
+        queues.try_emplace(QUEUE_FAMILY_GRAPHICS, context, QUEUE_FAMILY_GRAPHICS, indices.graphics_family.value());
+        queues.try_emplace(QUEUE_FAMILY_PRESENT, context, QUEUE_FAMILY_PRESENT, indices.present_family.value());
         if (indices.compute_family.has_value())
-            queues.try_emplace(QUEUE_FAMILY_COMPUTE, this, QUEUE_FAMILY_COMPUTE, indices.compute_family.value());
+            queues.try_emplace(QUEUE_FAMILY_COMPUTE, context, QUEUE_FAMILY_COMPUTE, indices.compute_family.value());
         if (indices.transfer_family.has_value())
-            queues.try_emplace(QUEUE_FAMILY_TRANSFER, this, QUEUE_FAMILY_TRANSFER, indices.transfer_family.value());
+            queues.try_emplace(QUEUE_FAMILY_TRANSFER, context, QUEUE_FAMILY_TRANSFER, indices.transfer_family.value());
         initFunctionPointers();
     }
 
     void VK_Device::release()
     {
-        delete allocator;
         queues.clear();
         vkDestroyDevice(handle, nullptr);
     }
@@ -123,21 +124,9 @@ namespace HBE
         return handle;
     }
 
-
-    VK_PhysicalDevice& VK_Device::getPhysicalDevice() const
-    {
-        return *physical_device;
-    }
-
     void VK_Device::wait()
     {
         vkDeviceWaitIdle(handle);
-    }
-
-
-    VK_Allocator* VK_Device::getAllocator()
-    {
-        return allocator;
     }
 
     VK_Queue& VK_Device::getQueue(QUEUE_FAMILY family)

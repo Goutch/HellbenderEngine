@@ -34,7 +34,7 @@ namespace HBE
             VK_Semaphore* image_available_semaphore;
         };
 
-        uint32_t current_frame = 0;
+        uint32_t current_frame_index = 0;
         uint32_t current_image = 0;
         std::array<FrameState, MAX_FRAMES_IN_FLIGHT> frames;
         std::vector<VK_Fence*> images_in_flight_fences;
@@ -52,11 +52,10 @@ namespace HBE
         event_subscription_id window_size_changed_subscription_id;
 
         VK_CommandPool command_pool;
-        VK_Device* device = nullptr;
-        VK_Swapchain* swapchain = nullptr;
+        VK_Context* context = nullptr;
 
     public:
-        void init(VK_Device& device, VK_Swapchain& swapchain);
+        void init(VK_Context* context);
         void release();
 
         VK_Renderer() = default;
@@ -84,8 +83,6 @@ namespace HBE
 
         VK_CommandPool* getCommandPool();
 
-        VK_Device* getDevice();
-
         uint32_t getFrameCount() const override;
 
         void onWindowClosed();
@@ -93,8 +90,6 @@ namespace HBE
         void onWindowSizeChange(Window* window);
 
         void reCreateSwapChain();
-
-        const VK_Swapchain& getSwapChain() const;
 
         uint32_t getCurrentFrameIndex() const override;
 

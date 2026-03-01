@@ -4,14 +4,14 @@
 
 namespace HBE
 {
-	VK_RasterizationPipelineInstance::VK_RasterizationPipelineInstance(VK_Renderer* renderer, const RasterizationPipelineInstanceInfo& info)
+	VK_RasterizationPipelineInstance::VK_RasterizationPipelineInstance(VK_Context* context, const RasterizationPipelineInstanceInfo& info)
 	{
 		VK_RasterizationPipeline* graphic_pipeline = dynamic_cast<VK_RasterizationPipeline*>(info.rasterization_pipeline);
-		const VK_PipelineLayout* layout = graphic_pipeline->getPipelineLayout();
+		const VK_PipelineLayout& layout = graphic_pipeline->getPipelineLayout();
 		this->pipeline = info.rasterization_pipeline;
 		this->vk_pipeline = graphic_pipeline;
-		descriptors = new VK_PipelineDescriptors(renderer,
-		                                         *layout,
+		descriptors = new VK_PipelineDescriptors(context,
+		                                         layout,
 		                                         info.preferred_memory_type_flags,
 		                                         info.uniform_memory_type_infos,
 		                                         info.uniform_memory_type_info_count,

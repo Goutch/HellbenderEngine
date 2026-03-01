@@ -28,7 +28,7 @@ namespace HBE {
 		std::string preamble = "";
 	};
 
-	class HB_API Shader : public Resource {
+	class HB_API Shader  {
 	protected:
 		vec3i workgroup_size;
 	public:

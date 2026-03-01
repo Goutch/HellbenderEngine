@@ -6,6 +6,7 @@
 #include "VK_Fence.h"
 
 namespace HBE {
+	class VK_Context;
 	class VK_Renderer;
 
 	class VK_PipelineDescriptors;
@@ -22,11 +23,11 @@ namespace HBE {
 	public:
 
 	private:
-		VK_Renderer *renderer;
+		VK_Context *context;
 		VK_Fence fence;
 	public:
-		VK_ComputeInstance(VK_Renderer *renderer, const ComputeInstanceInfo &info);
-		~VK_ComputeInstance() override;
+		VK_ComputeInstance(VK_Context *context, const ComputeInstanceInfo &info);
+		~VK_ComputeInstance();
 
 
 		void dispatchAsync(uint32_t size_x, uint32_t size_y, uint32_t size_z) override;

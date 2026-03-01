@@ -7,16 +7,25 @@
 #include "core/utility/Log.h"
 #include "VK_Device.h"
 #include "VK_CommandPool.h"
+#include "VK_Context.h"
 
 namespace HBE
 {
-    VK_Queue::VK_Queue(VK_Device* device, QUEUE_FAMILY family, uint32_t family_index)
+    VK_Queue::VK_Queue(VK_Queue&& other) noexcept
     {
-        this->device_handle = device->getHandle();
-        vkGetDeviceQueue(device_handle, family_index, 0, &handle);
+        this->handle = other.handle;
+        this->context = other.context;
+        this->family_index = other.family_index;
+        this->queue_family = other.queue_family;
+    }
+
+    VK_Queue::VK_Queue(VK_Context* context, QUEUE_FAMILY family, uint32_t family_index)
+    {
+        this->context = context;
+        vkGetDeviceQueue(context->device.getHandle(), family_index, 0, &handle);
         this->family_index = family_index;
         this->queue_family = family;
-        command_pool.init(*device, 1, *this);
+        command_pool.init(context, 1, *this);
     }
 
 

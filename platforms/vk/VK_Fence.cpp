@@ -1,17 +1,19 @@
 #include "vulkan/vulkan.h"
 #include "VK_Fence.h"
+
+#include "VK_Context.h"
 #include "VK_Device.h"
 #include "core/utility/Log.h"
 
 namespace HBE
 {
-    void VK_Fence::init(VK_Device& device)
+    void VK_Fence::init(VK_Context* context)
     {
-        this->device = &device;
+        this->context = context;
         VkFenceCreateInfo fenceInfo{};
         fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
         fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-        if (vkCreateFence(device.getHandle(), &fenceInfo, nullptr, &handle) != VK_SUCCESS)
+        if (vkCreateFence(context->device.getHandle(), &fenceInfo, nullptr, &handle) != VK_SUCCESS)
         {
             Log::error("failed to create fence!");
         }
@@ -19,7 +21,7 @@ namespace HBE
 
     void VK_Fence::release()
     {
-        vkDestroyFence(device->getHandle(), handle, nullptr);
+        vkDestroyFence(context->device.getHandle(), handle, nullptr);
     }
 
     const VkFence& VK_Fence::getHandle() const
@@ -31,13 +33,13 @@ namespace HBE
     {
         handle = other.handle;
         other.handle = VK_NULL_HANDLE;
-        device = other.device;
-        device = nullptr;
+        context = other.context;
+        other.context = nullptr;
     }
 
     void VK_Fence::wait() const
     {
-        if (vkWaitForFences(device->getHandle(), 1, &handle, VK_TRUE, UINT64_MAX) == VK_TIMEOUT)
+        if (vkWaitForFences(context->device.getHandle(), 1, &handle, VK_TRUE, UINT64_MAX) == VK_TIMEOUT)
         {
             Log::error("Timeout");
         }
@@ -45,11 +47,11 @@ namespace HBE
 
     void VK_Fence::reset() const
     {
-        vkResetFences(device->getHandle(), 1, &handle);
+        vkResetFences(context->device.getHandle(), 1, &handle);
     }
 
     bool VK_Fence::isSet() const
     {
-        return vkGetFenceStatus(device->getHandle(), handle) == VK_SUCCESS;
+        return vkGetFenceStatus(context->device.getHandle(), handle) == VK_SUCCESS;
     }
 }

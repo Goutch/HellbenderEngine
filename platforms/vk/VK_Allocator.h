@@ -5,10 +5,10 @@
 #include "unordered_map"
 #include "set"
 #include "string"
-#include "queue"
+#include "VK_Image.h"
 #include "VK_Mesh.h"
 #include "core/resource/Image.h"
-#include "core/graphics/Allocator.h"
+#include "core/resource/Allocator.h"
 
 namespace HBE
 {
@@ -24,49 +24,6 @@ namespace HBE
     class VK_Image;
 
     class VK_Renderer;
-
-    struct Block;
-
-    struct Allocation
-    {
-        VkDeviceSize size = 0;
-        VkDeviceSize offset = 0;
-        Block* block;
-        MEMORY_TYPE_FLAGS flags = MEMORY_TYPE_FLAG_NONE;
-        uint32_t id = 0;
-        uint32_t heap_index = 0;
-
-        Allocation()
-        {
-        };
-
-        Allocation(const Allocation& other)
-        {
-            this->size = other.size;
-            this->offset = other.offset;
-            this->block = other.block;
-            this->flags = other.flags;
-            this->id = other.id;
-            this->heap_index = other.heap_index;
-        }
-
-        Allocation(VkDeviceSize size,
-                   VkDeviceSize offset,
-                   Block* block,
-                   MEMORY_TYPE_FLAGS flags,
-                   uint32_t id,
-                   uint32_t heap_index) : size(size),
-                                          offset(offset),
-                                          block(block),
-                                          flags(flags),
-                                          id(id),
-                                          heap_index(heap_index)
-        {
-        }
-
-        bool operator<(const Allocation& other) const { return offset < other.offset; }
-    };
-
     struct Block
     {
         VkDeviceSize size;
@@ -78,14 +35,11 @@ namespace HBE
         VkDeviceSize remaining;
     };
 
-    struct FreeRequest
+    struct ReleaseRequest
     {
         Allocation allocation;
         VkBuffer vk_buffer = VK_NULL_HANDLE;
         VkImage vk_image = VK_NULL_HANDLE;
-        Image* image = nullptr;
-        VK_Buffer* buffer = nullptr;
-        StorageBuffer* storage_buffer = nullptr;
         VkFence fence = VK_NULL_HANDLE;
     };
 
@@ -97,7 +51,6 @@ namespace HBE
         const VkDeviceSize BLOCK_SIZE = 1024 * 1024 * 128; // = 128mb
         event_subscription_id on_frame_change_subscription_id;
         VK_CommandPool command_pool;
-        VK_Device* device;
 
         struct MemoryHeapInfo
         {
@@ -126,10 +79,10 @@ namespace HBE
 
         std::vector<Block> staging_blocks;
 
-        std::vector<FreeRequest> delete_queue;
+        std::vector<ReleaseRequest> delete_queue;
 
     public:
-        void init(VK_Device& device);
+        void init(VK_Context* context);
         void release();
 
         VK_Allocator() = default;
@@ -164,7 +117,10 @@ namespace HBE
 
         VK_Fence* blitImage(VK_Image& src, VK_Image& dest);
 
-        void freeLater(const FreeRequest& allocation);
+
+        void releaseLater(const ReleaseRequest& allocation);
+
+        bool valid(AllocatorHandle allocator);
 
     private:
         uint32_t findMemoryTypeIndex(VkMemoryRequirements memory_requirement, MEMORY_TYPE_FLAGS flags);
@@ -173,7 +129,7 @@ namespace HBE
 
         std::string allocToString(const Allocation& alloc);
 
-        FreeRequest createTempStagingBuffer(const void* data, size_t size);
+        ReleaseRequest createTempStagingBuffer(const void* data, size_t size);
 
         void generateMipmaps(VK_Image& image);
     };

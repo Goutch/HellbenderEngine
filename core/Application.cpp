@@ -31,11 +31,13 @@ namespace HBE
         input.init(*window);
 
         onInit.invoke();
+
+        context->getRenderer()->createDefaultResources();
     }
 
     void Application::run()
     {
-        time = new Timer();
+        time.reset();
         Timer update_clock = Timer();
         float delta_t = 0.0f;
         uint64_t frames = 0;
@@ -82,7 +84,6 @@ namespace HBE
         context->getRenderer()->waitLastFrame();
         onWindowClosed.invoke();
         onQuit.invoke();
-        delete time;
     }
 
     Input* Application::getInput()
@@ -104,6 +105,7 @@ namespace HBE
     {
         delete window;
         delete context;
+        instance = nullptr;
         Profiler::printAverange();
     }
 
@@ -114,11 +116,7 @@ namespace HBE
 
     float Application::getTime()
     {
-        if (time)
-        {
-            return time->ns() * NANOSECONDS_TO_SECONDS;
-        }
-        return 0;
+        return time.ns() * NANOSECONDS_TO_SECONDS;
     }
 
     void Application::printFPS(float delta)

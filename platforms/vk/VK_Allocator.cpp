@@ -43,13 +43,13 @@ namespace HBE
     }
 
 
-    void VK_Allocator::init(VK_Device& device)
+    void VK_Allocator::init(VK_Context* context)
     {
-        this->device = &device;
-        this->command_pool.init(device, 8, device.getQueue(QUEUE_FAMILY_GRAPHICS));
+        this->context = context;
+        this->command_pool.init(context, 8, context->device.getQueue(QUEUE_FAMILY_GRAPHICS));
 
         Application::instance->onFrameEnd.subscribe(on_frame_change_subscription_id, this, &VK_Allocator::processFreeRequests);
-        memory_properties = &device.getPhysicalDevice().getMemoryProperties();
+        memory_properties = &context->physical_device.getMemoryProperties();
         for (int i = 0; i < memory_properties->memoryHeapCount; ++i)
         {
             memory_heaps.push_back({
@@ -113,19 +113,19 @@ namespace HBE
 
     void VK_Allocator::release()
     {
-        device->wait();
+        context->device.wait();
         processFreeRequests(0);
         command_pool.release();
         for (auto& it : blocks)
         {
             for (Block* block : it.second)
             {
-                vkFreeMemory(device->getHandle(), block->memory, nullptr);
+                vkFreeMemory(context->device.getHandle(), block->memory, nullptr);
             }
         }
         for (auto pooled_block : block_cache)
         {
-            vkFreeMemory(device->getHandle(), pooled_block.second->memory, nullptr);
+            vkFreeMemory(context->device.getHandle(), pooled_block.second->memory, nullptr);
             delete pooled_block.second;
         }
         Application::instance->onFrameEnd.unsubscribe(on_frame_change_subscription_id);
@@ -153,7 +153,7 @@ namespace HBE
 
     std::string VK_Allocator::memoryTypeToString(const uint32_t mem_type_index)
     {
-        VkMemoryPropertyFlags flags = device->getPhysicalDevice().getMemoryProperties().memoryTypes[mem_type_index].
+        VkMemoryPropertyFlags flags = context->physical_device.getMemoryProperties().memoryTypes[mem_type_index].
             propertyFlags;
         std::string type;
         bool need_separator = false;
@@ -193,7 +193,7 @@ namespace HBE
             " at position " + std::to_string(alloc.offset) + " in block " + std::to_string(alloc.block->index);
     }
 
-    FreeRequest VK_Allocator::createTempStagingBuffer(const void* data, size_t size)
+    ReleaseRequest VK_Allocator::createTempStagingBuffer(const void* data, size_t size)
     {
         VkBufferCreateInfo staging_buffer_info{};
         staging_buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -201,23 +201,23 @@ namespace HBE
         staging_buffer_info.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
         staging_buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
         VkBuffer buffer;
-        if (vkCreateBuffer(device->getHandle(), &staging_buffer_info, nullptr, &buffer) != VK_SUCCESS)
+        if (vkCreateBuffer(context->device.getHandle(), &staging_buffer_info, nullptr, &buffer) != VK_SUCCESS)
         {
             Log::error("failed to create buffer!");
         }
 
         VkMemoryRequirements requirements;
-        vkGetBufferMemoryRequirements(device->getHandle(), buffer, &requirements);
+        vkGetBufferMemoryRequirements(context->device.getHandle(), buffer, &requirements);
 
         Allocation staging_alloc = alloc(requirements, MEMORY_TYPE_FLAG_MAPPABLE);
 
-        vkBindBufferMemory(device->getHandle(), buffer, staging_alloc.block->memory, staging_alloc.offset);
-        auto staging_buffer = FreeRequest{staging_alloc, buffer};
+        vkBindBufferMemory(context->device.getHandle(), buffer, staging_alloc.block->memory, staging_alloc.offset);
+        auto staging_buffer = ReleaseRequest{staging_alloc, buffer};
         void* staging_buffer_data;
-        vkMapMemory(device->getHandle(), staging_buffer.allocation.block->memory, staging_buffer.allocation.offset,
+        vkMapMemory(context->device.getHandle(), staging_buffer.allocation.block->memory, staging_buffer.allocation.offset,
                     staging_buffer.allocation.size, 0, &staging_buffer_data);
         memcpy(staging_buffer_data, data, size);
-        vkUnmapMemory(device->getHandle(), staging_buffer.allocation.block->memory);
+        vkUnmapMemory(context->device.getHandle(), staging_buffer.allocation.block->memory);
         return staging_buffer;
     }
 
@@ -227,19 +227,19 @@ namespace HBE
         if (alloc.flags & MEMORY_TYPE_FLAG_MAPPABLE)
         {
             void* buffer_data;
-            vkMapMemory(device->getHandle(), alloc.block->memory, alloc.offset + offset, alloc.size, 0, &buffer_data);
+            vkMapMemory(context->device.getHandle(), alloc.block->memory, alloc.offset + offset, alloc.size, 0, &buffer_data);
             size_t copy_size = size;
             memcpy(buffer_data, data, copy_size);
-            vkUnmapMemory(device->getHandle(), alloc.block->memory);
+            vkUnmapMemory(context->device.getHandle(), alloc.block->memory);
         }
         else
         {
             HB_PROFILE_BEGIN("VK_Allocator::update - non mappable buffer");
-            FreeRequest staging_buffer = createTempStagingBuffer(data, size);
+            ReleaseRequest staging_buffer = createTempStagingBuffer(data, size);
             HB_PROFILE_BEGIN("VK_Allocator::update - copy to non mappable buffer");
             staging_buffer.fence = copy(staging_buffer.vk_buffer, buffer.getHandle(), size, offset)->getHandle();
             HB_PROFILE_END("VK_Allocator::update - copy to non mappable buffer");
-            freeLater(staging_buffer);
+            releaseLater(staging_buffer);
             HB_PROFILE_END("VK_Allocator::update - non mappable buffer");
         }
     }
@@ -251,7 +251,7 @@ namespace HBE
 
         command_pool.begin();
 
-        FreeRequest staging_buffer = createTempStagingBuffer(data, data_texel_count * image.bytePerPixel());
+        ReleaseRequest staging_buffer = createTempStagingBuffer(data, data_texel_count * image.bytePerPixel());
         staging_buffer.fence = command_pool.getCurrentFence().getHandle();
         cmdBarrierTransitionImageLayout(&command_pool, &image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
         for (int i = 0; i < update_count; ++i)
@@ -296,7 +296,7 @@ namespace HBE
         }
 
         command_pool.end();
-        command_pool.submit(device->getQueue(QUEUE_FAMILY_GRAPHICS));
+        command_pool.submit(context->device.getQueue(QUEUE_FAMILY_GRAPHICS));
 
 
         delete regions_copy_infos;
@@ -420,7 +420,7 @@ namespace HBE
                                   ? VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT
                                   : 0;
             allocInfo.pNext = &flagsInfo;
-            if (vkAllocateMemory(device->getHandle(), &allocInfo, nullptr, &block->memory) != VK_SUCCESS)
+            if (vkAllocateMemory(context->device.getHandle(), &allocInfo, nullptr, &block->memory) != VK_SUCCESS)
             {
                 size_t total_memory = 0;
                 for (auto& block : blocks)
@@ -462,32 +462,20 @@ namespace HBE
 
         for (int i = delete_queue.size() - 1; i >= 0; i--)
         {
-            FreeRequest request = delete_queue[i];
+            ReleaseRequest request = delete_queue[i];
             //check fence status
-            if ((request.fence != VK_NULL_HANDLE && vkGetFenceStatus(device->getHandle(), request.fence) ==
+            if ((request.fence != VK_NULL_HANDLE && vkGetFenceStatus(context->device.getHandle(), request.fence) ==
                 VK_NOT_READY))
                 continue;
 
-            if (request.buffer != nullptr)
-            {
-                delete request.buffer;
-            }
-            if (request.storage_buffer != nullptr)
-            {
-                delete request.storage_buffer;
-            }
-            if (request.image != nullptr)
-            {
-                delete request.image;
-            }
             if (request.vk_buffer != VK_NULL_HANDLE)
             {
-                vkDestroyBuffer(device->getHandle(), request.vk_buffer, nullptr);
+                vkDestroyBuffer(context->device.getHandle(), request.vk_buffer, nullptr);
                 free(request.allocation);
             }
             if (request.vk_image != VK_NULL_HANDLE)
             {
-                vkDestroyImage(device->getHandle(), request.vk_image, nullptr);
+                vkDestroyImage(context->device.getHandle(), request.vk_image, nullptr);
                 free(request.allocation);
             }
             delete_queue.erase(delete_queue.begin() + i);
@@ -522,7 +510,7 @@ namespace HBE
         dest_barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
         dest_barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
         dest_barrier.pNext = nullptr;
-        int raytracingFlag = ((device->getPhysicalDevice().getEnabledExtensionFlags() &
+        int raytracingFlag = ((context->physical_device.getEnabledExtensionFlags() &
                                  EXTENSION_FLAG_RAY_TRACING_PIPELINE) != 0)
                                  ? VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR |
                                  VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR
@@ -550,7 +538,7 @@ namespace HBE
 
         //todo use transfer queue
         //todo do not submit, add the ability to do multiple copies in the same command buffer before submitting
-        return &command_pool.submit(device->getQueue(QUEUE_FAMILY_GRAPHICS));
+        return &command_pool.submit(context->device.getQueue(QUEUE_FAMILY_GRAPHICS));
     }
 
     void VK_Allocator::cmdBarrierTransitionImageLayout(VK_CommandPool* command_pool, VK_Image* image, VkImageLayout new_layout)
@@ -626,7 +614,7 @@ namespace HBE
             break;
         case VK_IMAGE_LAYOUT_GENERAL:
             {
-                uint32_t extra_source_stage = (device->getPhysicalDevice().getEnabledExtensionFlags() &
+                uint32_t extra_source_stage = (context->physical_device.getEnabledExtensionFlags() &
                                                   EXTENSION_FLAG_RAY_TRACING_PIPELINE) != 0
                                                   ? VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR
                                                   : 0;
@@ -705,10 +693,10 @@ namespace HBE
     {
         VkFormatProperties src_format_properties;
         VkFormatProperties dest_format_properties;
-        vkGetPhysicalDeviceFormatProperties(device->getPhysicalDevice().getHandle(), src.getVkFormat(),
+        vkGetPhysicalDeviceFormatProperties(context->physical_device.getHandle(), src.getVkFormat(),
                                             &src_format_properties);
 
-        vkGetPhysicalDeviceFormatProperties(device->getPhysicalDevice().getHandle(), dest.getVkFormat(),
+        vkGetPhysicalDeviceFormatProperties(context->physical_device.getHandle(), dest.getVkFormat(),
                                             &dest_format_properties);
 
         if (src_format_properties.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT &&
@@ -738,7 +726,7 @@ namespace HBE
             cmdBarrierTransitionImageLayout(&command_pool, &dest, dest.getDesiredLayout());
 
             command_pool.end();
-            return &command_pool.submit(device->getQueue(QUEUE_FAMILY_GRAPHICS));
+            return &command_pool.submit(context->device.getQueue(QUEUE_FAMILY_GRAPHICS));
         }
         else
         {
@@ -747,15 +735,20 @@ namespace HBE
         return nullptr;
     }
 
-    void VK_Allocator::freeLater(const FreeRequest& allocation)
+    void VK_Allocator::releaseLater(const ReleaseRequest& allocation)
     {
         delete_queue.push_back(allocation);
+    }
+
+    bool VK_Allocator::valid(AllocatorHandle allocator)
+    {
+        return false;
     }
 
     void VK_Allocator::generateMipmaps(VK_Image& image)
     {
         VkFormatProperties format_properties;
-        vkGetPhysicalDeviceFormatProperties(device->getPhysicalDevice().getHandle(), image.getVkFormat(),
+        vkGetPhysicalDeviceFormatProperties(context->physical_device.getHandle(), image.getVkFormat(),
                                             &format_properties);
 
         if (format_properties.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT)
@@ -880,7 +873,7 @@ namespace HBE
 
 
         command_pool.end();
-        return &command_pool.submit(device->getQueue(QUEUE_FAMILY_GRAPHICS));
+        return &command_pool.submit(context->device.getQueue(QUEUE_FAMILY_GRAPHICS));
     }
 
     VK_Fence* VK_Allocator::copy(VK_Image* src, VkImageLayout src_end_layout, VK_Image* dest,
@@ -916,7 +909,7 @@ namespace HBE
         cmdBarrierTransitionImageLayout(&command_pool, dest, dst_end_layout);
         cmdBarrierTransitionImageLayout(&command_pool, src, src_end_layout);
         command_pool.end();
-        return &command_pool.submit(device->getQueue(QUEUE_FAMILY_GRAPHICS));
+        return &command_pool.submit(context->device.getQueue(QUEUE_FAMILY_GRAPHICS));
     }
 
     void VK_Allocator::free(const Allocation& allocation)
@@ -940,7 +933,7 @@ namespace HBE
                 }
                 else
                 {
-                    vkFreeMemory(device->getHandle(), allocation.block->memory, nullptr);
+                    vkFreeMemory(context->device.getHandle(), allocation.block->memory, nullptr);
                     delete block;
                 }
                 for (; it != blocks[heap_index].end(); ++it)
@@ -961,6 +954,6 @@ namespace HBE
         command_pool.begin();
         VK_Allocator::cmdBarrierTransitionImageLayout(&command_pool, image, newLayout);
         command_pool.end();
-        command_pool.submit(device->getQueue(QUEUE_FAMILY_GRAPHICS));
+        command_pool.submit(context->device.getQueue(QUEUE_FAMILY_GRAPHICS));
     }
 }
