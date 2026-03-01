@@ -1,5 +1,4 @@
 #include "Model.h"
-#include "Resources.h"
 #include "map"
 
 #include "RasterizationPipeline.h"

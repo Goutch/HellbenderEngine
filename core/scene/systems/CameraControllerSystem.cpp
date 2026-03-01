@@ -1,7 +1,7 @@
 #include "CameraControllerSystem.h"
 #include "core/input/Input.h"
 #include "dependencies/utils-collection/Profiler.h"
-#include "HBE/core/Application.h"
+#include "core/Application.h"
 #include "core/scene/components/CameraController.h"
 #include "core/scene/components/Camera.h"
 #include "core/scene/components/Camera2D.h"
@@ -31,8 +31,8 @@ namespace HBE {
 			float width = static_cast<float>(resolution.x);
 			float height = static_cast<float>(resolution.y);
 
-			vec2 mouse_pos = Input::getMousePosition();
-			Input::setCursorPosition(resolution.x / 2.0, resolution.y / 2.0f);
+			vec2 mouse_pos = Application::instance->getInput()->getMousePosition();
+			Application::instance->getInput()->setCursorPosition(resolution.x / 2.0, resolution.y / 2.0f);
 
 			float fov = glm::radians(camera.fov);
 			vec2 mouse_delta;
@@ -55,25 +55,25 @@ namespace HBE {
 			transform.rotate(vec3(controller.current_pitch, 0, 0));
 
 			vec3 translation = vec3(0);
-			if (Input::getKey(KEY_S)) {
+			if (Application::instance->getInput()->getKey(KEY_S)) {
 				translation.z += 1;
 			}
-			if (Input::getKey(KEY_W)) {
+			if (Application::instance->getInput()->getKey(KEY_W)) {
 				translation.z = -1;
 			}
-			if (Input::getKey(KEY_D)) {
+			if (Application::instance->getInput()->getKey(KEY_D)) {
 				translation.x += 1;
 			}
-			if (Input::getKey(KEY_A)) {
+			if (Application::instance->getInput()->getKey(KEY_A)) {
 				translation.x = -1;
 			}
-			if (Input::getKey(KEY_SPACE)) {
+			if (Application::instance->getInput()->getKey(KEY_SPACE)) {
 				translation.y += 1;
 			}
-			if (Input::getKey(KEY_LEFT_CONTROL)) {
+			if (Application::instance->getInput()->getKey(KEY_LEFT_CONTROL)) {
 				translation.y = -1;
 			}
-			if (Input::getKey(KEY_LEFT_SHIFT)) {
+			if (Application::instance->getInput()->getKey(KEY_LEFT_SHIFT)) {
 				controller.acceleration_time += delta_t * controller.acceleration;
 				//controller.acceleration_time = glm::min(controller.acceleration_time, 1.0f);
 				controller.current_speed = std::lerp(controller.base_speed, controller.max_speed, controller.acceleration_time);
@@ -88,25 +88,25 @@ namespace HBE {
 		auto group2D = scene->group<Transform, Camera2D, CameraController>();
 		for (auto [handle, transform, camera, controller]: group2D) {
 			vec3 translation = vec3(0);
-			if (Input::getKey(KEY_EQUAL)) {
+			if (Application::instance->getInput()->getKey(KEY_EQUAL)) {
 				camera.setZoomRatio(camera.getZoomRatio() + (delta_t));
 			}
-			if (Input::getKey(KEY_MINUS)) {
+			if (Application::instance->getInput()->getKey(KEY_MINUS)) {
 				camera.setZoomRatio(camera.getZoomRatio() - (delta_t));
 			}
-			if (Input::getKey(KEY_D)) {
+			if (Application::instance->getInput()->getKey(KEY_D)) {
 				translation.x += 1;
 			}
-			if (Input::getKey(KEY_A)) {
+			if (Application::instance->getInput()->getKey(KEY_A)) {
 				translation.x = -1;
 			}
-			if (Input::getKey(KEY_W)) {
+			if (Application::instance->getInput()->getKey(KEY_W)) {
 				translation.y += 1;
 			}
-			if (Input::getKey(KEY_S)) {
+			if (Application::instance->getInput()->getKey(KEY_S)) {
 				translation.y = -1;
 			}
-			if (Input::getKey(KEY_LEFT_SHIFT)) {
+			if (Application::instance->getInput()->getKey(KEY_LEFT_SHIFT)) {
 				controller.acceleration_time += delta_t * controller.acceleration;
 				controller.acceleration_time = glm::min(controller.acceleration_time, 1.0f);
 				controller.current_speed = std::lerp(controller.base_speed, controller.max_speed, controller.acceleration_time);
@@ -122,22 +122,22 @@ namespace HBE {
 		for (auto [handle, transform, camera, controller]: group_pixel) {
 			float boost = 1.0f;
 			vec3 translation = vec3(0);
-			if (Input::getKey(KEY_LEFT_SHIFT)) {
+			if (Application::instance->getInput()->getKey(KEY_LEFT_SHIFT)) {
 				boost = 10.0f;
 			}
-			if (Input::getKey(KEY_D)) {
+			if (Application::instance->getInput()->getKey(KEY_D)) {
 				translation.x += 1;
 			}
-			if (Input::getKey(KEY_A)) {
+			if (Application::instance->getInput()->getKey(KEY_A)) {
 				translation.x = -1;
 			}
-			if (Input::getKey(KEY_W)) {
+			if (Application::instance->getInput()->getKey(KEY_W)) {
 				translation.y += 1;
 			}
-			if (Input::getKey(KEY_S)) {
+			if (Application::instance->getInput()->getKey(KEY_S)) {
 				translation.y = -1;
 			}
-			if (Input::getKey(KEY_LEFT_SHIFT)) {
+			if (Application::instance->getInput()->getKey(KEY_LEFT_SHIFT)) {
 				controller.acceleration_time += delta_t * controller.acceleration;
 				controller.acceleration_time = glm::min(controller.acceleration_time, 1.0f);
 				controller.current_speed = std::lerp(controller.base_speed, controller.max_speed, controller.acceleration_time);
@@ -159,11 +159,11 @@ namespace HBE {
 	}
 
 	void CameraControllerSystem::onAttach(Entity entity) {
-		Input::setCursorVisible(false);
+		Application::instance->getInput()->setCursorVisible(false);
 	}
 
 	void CameraControllerSystem::onDetach(Entity entity) {
-		Input::setCursorVisible(true);
+		Application::instance->getInput()->setCursorVisible(true);
 		CameraController *c = entity.get<CameraController>();
 		Transform *t = entity.get<Transform>();
 		t->rotate(vec3(-c->current_pitch, 0, 0));

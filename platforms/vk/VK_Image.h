@@ -16,12 +16,12 @@ namespace HBE {
 
 	class VK_Semaphore;
 
-	struct VK_ImageData {
+	class VK_Image : public Image {
 		VkImage handle = VK_NULL_HANDLE;
 		VK_Device *device;
 		VkImageLayout layout;
 		VkImageLayout desired_layout;
-		VkImageView *image_views;
+		VkImageView *image_views = nullptr;
 		uint32_t image_view_count;
 		VkSampler sampler_handle = VK_NULL_HANDLE;
 		ImageInfo info;
@@ -30,10 +30,6 @@ namespace HBE {
 		uint32_t width = 1, height = 1, depth = 1;
 		uint32_t byte_per_pixel;
 		uint32_t mip_levels;
-	};
-
-	class VK_Image : public Image {
-
 	public:
 		VK_Image(VK_Device *device, const ImageInfo &info);
 

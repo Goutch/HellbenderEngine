@@ -1,60 +1,60 @@
 #pragma once
 
 #include "vulkan/vulkan.h"
-#include "vector"
+#include "VK_CommandPool.h"
 
-namespace HBE {
-	class VK_Device;
+namespace HBE
+{
+    class VK_Device;
 
-	class VK_Fence;
+    class VK_Fence;
 
-	class VK_CommandPool;
+    class VK_CommandPool;
 
-	class VK_Fence;
+    class VK_Fence;
 
-	enum QUEUE_FAMILY {
-		QUEUE_FAMILY_GRAPHICS,
-		QUEUE_FAMILY_COMPUTE,
-		QUEUE_FAMILY_PRESENT,
-		QUEUE_FAMILY_TRANSFER,
-	};
+    enum QUEUE_FAMILY
+    {
+        QUEUE_FAMILY_GRAPHICS,
+        QUEUE_FAMILY_COMPUTE,
+        QUEUE_FAMILY_PRESENT,
+        QUEUE_FAMILY_TRANSFER,
+    };
 
-	class VK_Queue {
-	private:
-		VkQueue handle;
-		VkDevice device_handle;
-		VK_CommandPool *command_pool = nullptr;
-		uint32_t family_index;
-		QUEUE_FAMILY queue_family;
-	public:
-		VK_Queue(VK_Device *device, QUEUE_FAMILY family, uint32_t family_index);
+    class VK_Queue
+    {
+    private:
+        VkQueue handle;
+        VkDevice device_handle;
+        VK_CommandPool command_pool;
+        uint32_t family_index;
+        QUEUE_FAMILY queue_family;
 
-		~VK_Queue();
+    public:
+        VK_Queue(VK_Device* device, QUEUE_FAMILY family, uint32_t family_index);
 
-		const VkQueue &getHandle() const;
+        ~VK_Queue();
 
-		void wait() const;
+        const VkQueue& getHandle() const;
 
-		void beginCommand();
+        void wait() const;
 
-		void endCommand();
+        void beginCommand();
 
-		VK_Fence &submitCommand();
+        void endCommand();
 
-		uint32_t getFamilyIndex() const;
+        VK_Fence& submitCommand();
 
-		VK_CommandPool *getCommandPool();
+        uint32_t getFamilyIndex() const;
 
-		void submit(VkCommandBuffer const &command_buffer,
-					VkFence fence = VK_NULL_HANDLE,
-					VkSemaphore *wait = nullptr,
-					VkPipelineStageFlags *wait_stage = nullptr,
-					uint32_t wait_count = 0,
-					VkSemaphore *signal = nullptr,
-					uint32_t signal_count = 0) const;
+        VK_CommandPool* getCommandPool();
 
-	};
+        void submit(VkCommandBuffer const& command_buffer,
+                    VkFence fence = VK_NULL_HANDLE,
+                    VkSemaphore* wait = nullptr,
+                    VkPipelineStageFlags* wait_stage = nullptr,
+                    uint32_t wait_count = 0,
+                    VkSemaphore* signal = nullptr,
+                    uint32_t signal_count = 0) const;
+    };
 }
-
-
-

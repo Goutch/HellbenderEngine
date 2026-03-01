@@ -14,14 +14,14 @@ namespace HBE {
 				cursor_blink_t = 0;
 			}
 
-			if (Input::getKeyDown(KEY_BACKSPACE)) {
+			if (Application::instance->getInput()->getKeyDown(KEY_BACKSPACE)) {
 				std::string current_text = button_component->getText();
 				if (!current_text.empty()) {
 					current_text.pop_back();
 					button_component->setText(current_text);
 				}
 			}
-			if (Input::getKeyDown(KEY_ENTER)) {
+			if (Application::instance->getInput()->getKeyDown(KEY_ENTER)) {
 				active_textbox_entity = Entity::NULL_ENTITY;
 				if (button_component->getText().empty()) {
 					button_component->setText(textbox_component->hint_text);
@@ -35,7 +35,7 @@ namespace HBE {
 		scene->onAttach<TextBoxComponent>().subscribe(on_attach_sub_id, this, &TextBoxSystem::onAttachTextBox);
 		scene->onDetach<TextBoxComponent>().subscribe(on_detach_sub_id, this, &TextBoxSystem::onDetachTextBox);
 		scene->onUpdate.subscribe(on_update_sub_id, this, &TextBoxSystem::onUpdate);
-		Input::onCharDown.subscribe(on_char_down_sub_id, this, &TextBoxSystem::onCharacterPressed);
+		Application::instance->getInput()->onCharDown.subscribe(on_char_down_sub_id, this, &TextBoxSystem::onCharacterPressed);
 	}
 
 	void TextBoxSystem::onCharacterPressed(char character) {
@@ -91,7 +91,7 @@ namespace HBE {
 	TextBoxSystem::~TextBoxSystem() {
 		scene->onAttach<TextBoxComponent>().unsubscribe(on_attach_sub_id);
 		scene->onUpdate.unsubscribe(on_update_sub_id);
-		Input::onCharDown.unsubscribe(on_char_down_sub_id);
+		Application::instance->getInput()->onCharDown.unsubscribe(on_char_down_sub_id);
 	}
 
 

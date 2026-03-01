@@ -5,8 +5,6 @@
 #include "core/graphics/Allocator.h"
 
 namespace HBE {
-
-
 	typedef uint32_t VERTEX_ATTRIBUTE_FLAGS;
 	enum VERTEX_ATTRIBUTE_FLAG {
 		VERTEX_ATTRIBUTE_FLAG_NONE = 0,

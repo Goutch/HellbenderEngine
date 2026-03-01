@@ -27,10 +27,10 @@ namespace HBE {
 
         std::unordered_map<char, Glyph> characters_glyphs;
         Image *atlas;
-    private:
+    public:
         Font(const FontInfo &info);
 
-    public:
+
         ~Font();
 
         Image *getTextureAtlas();

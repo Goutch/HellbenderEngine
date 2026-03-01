@@ -41,11 +41,8 @@ set(CORE_FILES
         core/resource/Mesh.h
         core/resource/Shader.cpp
         core/resource/Shader.h
-        core/resource/ResourceFactory.h
         core/resource/Resource.h
         core/resource/ComputePipeline.h
-        core/resource/Resources.h
-        core/resource/Resources.cpp
         core/resource/Image.cpp
         core/resource/RasterizationPipelineInstance.h
         core/resource/ComputeInstance.h
@@ -64,9 +61,6 @@ set(CORE_FILES
 
         core/graphics/Window.h
         core/graphics/Renderer.h
-        core/graphics/Graphics.cpp
-        core/graphics/Graphics.h
-        core/graphics/Renderer.cpp
         core/graphics/Window.cpp
         core/graphics/RenderGraph.cpp
         core/graphics/RenderGraph.h
@@ -133,7 +127,11 @@ set(CORE_FILES
         core/utility/DefaultModelParser.h
         core/scene/components/MeshRenderer.cpp
         core/scene/components/MeshRenderer.h
-
+        core/graphics/Allocator.h
+        core/scene/ecs/Group/GroupIterator.cpp
+        core/scene/ecs/Group/PageDataArchetype.h
+        core/scene/ecs/Registry/ECSTypes.h
+        core/graphics/Fence.h
 
 )
 set(VK_FILES
@@ -156,8 +154,6 @@ set(VK_FILES
         platforms/vk/VK_RasterizationPipeline.h
         platforms/vk/VK_Shader.cpp
         platforms/vk/VK_Shader.h
-        platforms/vk/VK_ResourceFactory.cpp
-        platforms/vk/VK_ResourceFactory.h
         platforms/vk/VK_Image.cpp
         platforms/vk/VK_Image.h
         platforms/vk/VK_Mesh.h
@@ -211,15 +207,11 @@ set(VK_FILES
         platforms/vk/VK_RenderTarget.h
         platforms/vk/VK_DynamicRenderTarget.cpp
         platforms/vk/VK_DynamicRenderTarget.h
-        core/graphics/Allocator.h
-        core/scene/ecs/Group/GroupIterator.cpp
-        core/scene/ecs/Group/PageDataArchetype.h
-        core/scene/ecs/Registry/ECSTypes.h
-        core/graphics/Fence.h
+        platforms/vk/VK_Context.cpp
+        platforms/vk/VK_Context.h
 )
 
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/utils-collection/")
 #------------------------------------VULKAN------------------------------------
 find_package(Vulkan REQUIRED)
@@ -326,7 +318,7 @@ set(MSDF_ATLAS_GEN_BUILD_STANDALONE FALSE)
 set(MSDF_ATLAS_GEN_MSDFGEN_EXTERNAL FALSE)
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/msdf-atlas-gen/")
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/msdf-atlas-gen/include)
+#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/msdf-atlas-gen/include)
 set_property(TARGET msdf-atlas-gen PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 set_property(TARGET msdfgen-core PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 set_property(TARGET msdfgen-ext PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
@@ -350,7 +342,6 @@ set(ALSOFT_INSTALL_UTILS OFF CACHE BOOL "Install utility programs (openal-info, 
 #set(ALSOFT_UPDATE_BUILD_VERSION OFF CACHE BOOL "Update git build version info")
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/openal-soft/")
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/openal-soft/include)
 
 message("#------------------------------------LIBSNDFILE------------------------------------")
 set(BUILD_PROGRAMS OFF CACHE BOOL "")
@@ -361,11 +352,9 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libsndfile/")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libsndfile/include)
 
 message("#------------------------------------HBE------------------------------------")
-include_directories(.)
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}
-        ${VK_FILES}
-        core/scene/ecs/Component.cpp)
+        ${VK_FILES})
 
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
@@ -376,12 +365,14 @@ endif ()
 target_compile_definitions(${PROJECT_NAME} PRIVATE HB_BUILD)
 
 target_include_directories(${PROJECT_NAME}
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm/"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb/"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf/"
-        PUBLIC "${FREETYPE_INCLUDE_DIRS}"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/utils-collection")
+        PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}"
+        PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm/"
+        PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb/"
+        PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf/"
+        PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/utils-collection"
+        PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/utils-collection/data-structure"
+        PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/"
+        PRIVATE "${FREETYPE_INCLUDE_DIRS}")
 
 
 set(GLSLANG_LIBS

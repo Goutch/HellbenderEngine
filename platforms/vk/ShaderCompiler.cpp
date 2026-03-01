@@ -16,7 +16,7 @@
 #include "SPIRV/GlslangToSpv.h"
 #include "ShaderCompiler.h"
 #include "core/utility/Log.h"
-#include "HBE/core/Application.h"
+#include "core/Application.h"
 
 namespace HBE {
 #ifdef GLSLANG_C
@@ -307,7 +307,7 @@ namespace HBE {
 			int lenght = source_str.size();
 
 			glslang::EshTargetClientVersion vulkan_version;
-			switch (Application::getInfo().vulkan_version) {
+			switch (Application::instance->getInfo().context_info.vulkan_version) {
 				case VULKAN_VERSION_1_0:
 					vulkan_version = glslang::EShTargetVulkan_1_0;
 					break;

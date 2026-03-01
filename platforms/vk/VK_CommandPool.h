@@ -3,21 +3,23 @@
 #include "vector"
 #include "vulkan/vulkan.h"
 #include "VK_Fence.h"
-#include "VK_Queue.h"
 #include "memory"
 
-namespace HBE {
+namespace HBE
+{
     class VK_Device;
 
     class VK_Swapchain;
+    class VK_Queue;
 
-    class VK_CommandPool {
+    class VK_CommandPool
+    {
         mutable int32_t current = 0;
         int32_t last_summited = 0;
         VkCommandPool handle;
-        VK_Device &device;
+        VK_Device* device;
         std::vector<VkCommandBuffer> command_buffers;
-        std::vector<VK_Fence *> fences;
+        std::vector<VK_Fence> fences;
 
         void begin(uint32_t i) const;
 
@@ -26,17 +28,19 @@ namespace HBE {
         void reset(uint32_t i);
 
     public:
-        ~VK_CommandPool();
-
-        VK_CommandPool(VK_Device &device, int command_buffers_count, const VK_Queue &queue);
-
+        void init(VK_Device& device, uint32_t command_buffers_count, const VK_Queue& queue);
+        void release();
+        VK_CommandPool() = default;
+        VK_CommandPool(const VK_CommandPool&) = delete;
+        VK_CommandPool& operator=(const VK_CommandPool&) = delete;
+        ~VK_CommandPool() = default;
         void begin() const;
 
         void end() const;
 
-        const std::vector<VkCommandBuffer> &getBuffers() const;
+        const std::vector<VkCommandBuffer>& getBuffers() const;
 
-        const VkCommandBuffer &getCurrentBuffer() const;
+        const VkCommandBuffer& getCurrentBuffer() const;
 
         void clear();
 
@@ -46,17 +50,17 @@ namespace HBE {
 
         void waitAll();
 
-        const VkCommandPool &getHandle() const;
+        VkCommandPool getHandle() const;
 
-        VK_Fence &submit(HBE::QUEUE_FAMILY queue, VkSemaphore *wait = nullptr,
-                         VkPipelineStageFlags *wait_stage = nullptr,
+        VK_Fence& submit(VK_Queue& queue, VkSemaphore* wait = nullptr,
+                         VkPipelineStageFlags* wait_stage = nullptr,
                          uint32_t wait_count = 0,
-                         VkSemaphore *signal = nullptr,
+                         VkSemaphore* signal = nullptr,
                          uint32_t signal_count = 0);
 
 
-        VK_Fence &getCurrentFence();
+        VK_Fence& getCurrentFence();
 
-        VK_Fence &getLastFence();
+        VK_Fence& getLastFence();
     };
 }

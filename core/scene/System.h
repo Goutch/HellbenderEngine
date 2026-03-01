@@ -2,14 +2,20 @@
 
 #include "Core.h"
 
-namespace HBE {
-	class Scene;
-	class HB_API System {
-	protected:
-		Scene *scene;
-	public:
-		virtual ~System() = default;
+namespace HBE
+{
+    class Context;
+    class Scene;
 
-		System(Scene *scene);
-	};
+    class HB_API System
+    {
+    protected:
+        Context* context;
+        Scene* scene;
+
+    public:
+        virtual ~System() = default;
+
+        System(Scene* scene);
+    };
 }

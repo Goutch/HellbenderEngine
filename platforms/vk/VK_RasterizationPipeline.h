@@ -50,7 +50,7 @@ namespace HBE {
 
 		const VK_PipelineLayout *getPipelineLayout() const;
 
-		void createRenderPass(VK_Device *device, VK_Renderer *renderer);
+		void init(VK_Device *device, VK_Renderer *renderer);
 
 		RASTERIZATION_PIPELINE_FLAGS getFlags() const override;
 	};

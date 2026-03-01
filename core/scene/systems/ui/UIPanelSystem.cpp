@@ -5,7 +5,6 @@
 #include "UIPanelSystem.h"
 #include "core/scene/systems/MeshRendererSystem.h"
 #include "core/scene/Scene.h"
-#include "core/resource/Resources.h"
 #include "core/scene/components/Node.h"
 #include "core/utility/Geometry.h"
 
@@ -13,15 +12,15 @@ namespace HBE {
 	UIPanelSystem::UIPanelSystem(Scene *scene) : System(scene) {
 		MeshInfo quad_info = MeshInfo{&VERTEX_ATTRIBUTE_INFO_POSITION3D_UV_INTERLEAVED, 1, MESH_FLAG_NONE};
 
-		anchor_meshes[PIVOT_TOP_LEFT] = Resources::createMesh(quad_info);
-		anchor_meshes[PIVOT_TOP_CENTER] = Resources::createMesh(quad_info);
-		anchor_meshes[PIVOT_TOP_RIGHT] = Resources::createMesh(quad_info);
-		anchor_meshes[PIVOT_CENTER_LEFT] = Resources::createMesh(quad_info);
-		anchor_meshes[PIVOT_CENTER] = Resources::createMesh(quad_info);
-		anchor_meshes[PIVOT_CENTER_RIGHT] = Resources::createMesh(quad_info);
-		anchor_meshes[PIVOT_BOTTOM_LEFT] = Resources::createMesh(quad_info);
-		anchor_meshes[PIVOT_BOTTOM_CENTER] = Resources::createMesh(quad_info);
-		anchor_meshes[PIVOT_BOTTOM_RIGHT] = Resources::createMesh(quad_info);
+		anchor_meshes[PIVOT_TOP_LEFT] = Application::instance->getContext()->createMesh(quad_info);
+		anchor_meshes[PIVOT_TOP_CENTER] = Application::instance->getContext()->createMesh(quad_info);
+		anchor_meshes[PIVOT_TOP_RIGHT] = Application::instance->getContext()->createMesh(quad_info);
+		anchor_meshes[PIVOT_CENTER_LEFT] = Application::instance->getContext()->createMesh(quad_info);
+		anchor_meshes[PIVOT_CENTER] = Application::instance->getContext()->createMesh(quad_info);
+		anchor_meshes[PIVOT_CENTER_RIGHT] = Application::instance->getContext()->createMesh(quad_info);
+		anchor_meshes[PIVOT_BOTTOM_LEFT] = Application::instance->getContext()->createMesh(quad_info);
+		anchor_meshes[PIVOT_BOTTOM_CENTER] = Application::instance->getContext()->createMesh(quad_info);
+		anchor_meshes[PIVOT_BOTTOM_RIGHT] = Application::instance->getContext()->createMesh(quad_info);
 
 		Geometry::createQuad(*anchor_meshes[PIVOT_TOP_LEFT], 1, 1, VERTEX_FLAG_UV, PIVOT_TOP_LEFT);
 		Geometry::createQuad(*anchor_meshes[PIVOT_TOP_CENTER], 1, 1, VERTEX_FLAG_UV, PIVOT_TOP_CENTER);

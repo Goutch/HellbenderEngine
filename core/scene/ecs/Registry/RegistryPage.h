@@ -5,7 +5,7 @@
 #include "ComponentPool.h"
 #include "bitset"
 #include "unordered_map"
-#include "dependencies/utils-collection/RawVector.h"
+#include "../../../../dependencies/utils-collection/data-structure/RawVector.h"
 
 namespace HBE {
 	class HB_API RegistryPage {

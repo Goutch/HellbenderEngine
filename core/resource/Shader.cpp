@@ -1,6 +1,5 @@
 
 #include "Shader.h"
-#include "core/resource/ResourceFactory.h"
 #include "core/utility/Log.h"
 #include "fstream"
 

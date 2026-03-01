@@ -18,7 +18,7 @@ namespace HBE {
 	void CameraSystem::onCameraAttached(Entity entity) {
 		Camera *camera = entity.get<Camera>();
 		if (camera->getRenderTarget() == nullptr)
-			camera->setRenderTarget(Graphics::getDefaultRenderTarget());
+			camera->setRenderTarget(Application::instance->getContext()->getRenderer()->getDefaultRenderTarget());
 
 		if (!scene->getCameraEntity().valid()) {
 			scene->setCameraEntity(entity);
@@ -28,7 +28,7 @@ namespace HBE {
 	void CameraSystem::onCamera2DAttached(Entity entity) {
 		Camera2D *camera = entity.get<Camera2D>();
 		if (camera->getRenderTarget() == nullptr)
-			camera->setRenderTarget(Graphics::getDefaultRenderTarget());
+			camera->setRenderTarget(Application::instance->getContext()->getRenderer()->getDefaultRenderTarget());
 
 		if (!scene->getCameraEntity().valid()) {
 			scene->setCameraEntity(entity);
@@ -38,7 +38,7 @@ namespace HBE {
 	void CameraSystem::onPixelCameraAttached(Entity entity) {
 		PixelCamera *camera = entity.get<PixelCamera>();
 		if (camera->getRenderTarget() == nullptr)
-			camera->setRenderTarget(Graphics::getDefaultRenderTarget());
+			camera->setRenderTarget(Application::instance->getContext()->getRenderer()->getDefaultRenderTarget());
 
 		if (!scene->getCameraEntity().valid()) {
 			scene->setCameraEntity(entity);
@@ -63,7 +63,7 @@ namespace HBE {
 				render_cmd_info.projection = camera.projection;
 				render_cmd_info.view = glm::inverse(transform.world());
 				render_cmd_info.layer_mask = camera.layer_mask;
-				Graphics::rasterize(render_cmd_info);
+				Application::instance->getContext()->getRenderer()->rasterize(render_cmd_info);
 			}
 		}
 		for (auto [handle, node, transform, camera]: group_2D) {
@@ -75,7 +75,7 @@ namespace HBE {
 				render_cmd_info.projection = camera.projection;
 				render_cmd_info.view = glm::inverse(transform.world());
 				render_cmd_info.layer_mask = camera.layer_mask;
-				Graphics::rasterize(render_cmd_info);
+				Application::instance->getContext()->getRenderer()->rasterize(render_cmd_info);
 			}
 		}
 		for (auto [handle, node, transform, camera]: group_pixel) {
@@ -87,7 +87,7 @@ namespace HBE {
 				render_cmd_info.projection = camera.projection;
 				render_cmd_info.view = glm::inverse(transform.world());
 				render_cmd_info.layer_mask = camera.layer_mask;
-				Graphics::rasterize(render_cmd_info);
+				Application::instance->getContext()->getRenderer()->rasterize(render_cmd_info);
 			}
 		}
 		HB_PROFILE_END("CameraRender");

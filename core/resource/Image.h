@@ -3,7 +3,6 @@
 #include "Core.h"
 #include <string>
 #include "Resource.h"
-#include "core/Context.h"
 
 namespace HBE {
 	enum IMAGE_FORMAT : int {
@@ -119,28 +118,24 @@ namespace HBE {
 		vec3u size;
 	};
 
-	typedef Handle ImageHandle;
-
-	class HB_API Image {
-		ImageHandle handle;
-		Context *context;
+	class HB_API Image : public Resource {
 	public:
-		Image(Context *contex, ImageHandle handle);
+		virtual ~Image() = default;
 
-		uint32_t getWidth() const;
+		virtual uint32_t getWidth() const = 0;
 
-		uint32_t getHeight() const;
+		virtual uint32_t getHeight() const = 0;
 
-		uint32_t getDepth() const;
+		virtual uint32_t getDepth() const = 0;
 
-		vec3u getSize() const;
+		virtual vec3u getSize() const = 0;
 
-		void update(const void *data, IMAGE_FORMAT format);
+		virtual void update(const void *data, IMAGE_FORMAT format) = 0;
 
-		void updateRegion(const void *data, uint32_t data_texel_count, ImageRegionUpdateInfo *update_infos, uint32_t update_count);
+		virtual void updateRegion(const void *data, uint32_t data_texel_count, ImageRegionUpdateInfo *update_infos,uint32_t update_count) = 0;
 
-		int getFormatNumberOfChannels(IMAGE_FORMAT format);
+		static int getFormatNumberOfChannels(IMAGE_FORMAT format);
 
-		ImageHandle load(const std::string &path, ImageInfo &info);
+		static Image *load(const std::string &path, ImageInfo& info);
 	};
 }

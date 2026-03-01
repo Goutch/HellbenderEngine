@@ -2,7 +2,6 @@
 #include "VK_Device.h"
 #include "algorithm"
 #include "VK_Image.h"
-#include "core/resource/Resources.h"
 #include "VK_RenderPass.h"
 #include "VK_DescriptorSetLayout.h"
 

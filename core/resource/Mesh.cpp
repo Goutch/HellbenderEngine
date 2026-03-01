@@ -1,5 +1,4 @@
 #include "Mesh.h"
-#include "core/resource/ResourceFactory.h"
 
 namespace HBE {
 	uint32_t Mesh::getVertexCount() const {

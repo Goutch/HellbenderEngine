@@ -1,5 +1,4 @@
 #include "MeshRendererSystem.h"
-#include "core/graphics/Graphics.h"
 #include "dependencies/utils-collection/Profiler.h"
 #include <core/scene/Scene.h>
 #include <core/graphics/RenderGraph.h>

@@ -21,8 +21,6 @@ namespace HBE
 
 	class Window;
 
-	class ResourceFactory;
-
 	class RasterizationPipeline;
 
 	class RasterizationPipelineInstance;
@@ -119,8 +117,6 @@ namespace HBE
 	class Renderer
 	{
 	public:
-		static Renderer* create();
-
 		virtual ~Renderer() = default;
 
 		virtual void rasterize(RasterizeCmdInfo& rasterize_cmd_info) = 0;
@@ -143,13 +139,11 @@ namespace HBE
 
 		virtual RasterizationTarget* getUIRenderTarget() = 0;
 
-		virtual const ResourceFactory* getResourceFactory() const = 0;
-
 		virtual void createDefaultResources() = 0;
 
 		virtual uint32_t getFrameCount() const = 0;
 
-		virtual uint32_t getCurrentFrame() const = 0;
+		virtual uint32_t getCurrentFrameIndex() const = 0;
 
 		virtual void waitCurrentFrame() = 0;
 

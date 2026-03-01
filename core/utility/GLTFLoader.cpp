@@ -5,8 +5,6 @@
 #define TINYGLTF_IMPLEMENTATION
 
 #include "tiny_gltf.h"
-#include "core/resource/Model.h"
-#include "core/resource/Image.h"
 #include "core/scene/components/Transform.h"
 
 namespace HBE {

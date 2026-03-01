@@ -2,36 +2,38 @@
 
 #include <vector>
 #include "Core.h"
+#include "VK_ValidationLayers.h"
 #include "vulkan/vulkan.h"
 
+namespace HBE
+{
+    struct ContextInfo;
 
-namespace HBE {
-	class VK_ValidationLayers;
-
-	class VK_Instance {
-		VkInstance handle;
+    class VK_Instance
+    {
 #ifdef DEBUG_MODE
-		const bool ENABLE_VALIDATION_LAYERS = true;
+        const bool ENABLE_VALIDATION_LAYERS = true;
 #else
-		const bool ENABLE_VALIDATION_LAYERS = false;
+        const bool ENABLE_VALIDATION_LAYERS = false;
 #endif
-		bool validation_enabled = ENABLE_VALIDATION_LAYERS;
-		VK_ValidationLayers *validation_layers = nullptr;
-		std::vector<VkValidationFeatureEnableEXT> ENABLED_VALIDATION_FEATURES{
-				VK_VALIDATION_FEATURE_ENABLE_SYNCHRONIZATION_VALIDATION_EXT,
-				VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT,
-				VK_VALIDATION_FEATURE_ENABLE_DEBUG_PRINTF_EXT,
-		};
-	public:
-		VK_Instance();
+        bool validation_enabled = ENABLE_VALIDATION_LAYERS;
+        VK_ValidationLayers validation_layers;
+        VkInstance handle{};
 
-		~VK_Instance();
 
-		VkInstance getHandle() const;
+    public:
+        void init(ContextInfo& context_info);
+        void release();
+        VK_Instance() = default;
+        ~VK_Instance() = default;
+        VK_Instance(const VK_Instance&) = delete;
+        VK_Instance& operator=(const VK_Instance&) = delete;
 
-	private:
-		void getRequiredExtensions(std::vector<const char *> &required_extensions);
+        VkInstance getHandle() const;
 
-		bool checkExtensionsSupported(std::vector<const char *> &required_extensions);
-	};
+    private:
+        void getRequiredExtensions(std::vector<const char*>& required_extensions);
+
+        bool checkExtensionsSupported(std::vector<const char*>& required_extensions);
+    };
 }

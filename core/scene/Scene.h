@@ -7,9 +7,8 @@
 
 #include "core/graphics/RenderGraph.h"
 
-#include "core/graphics/Graphics.h"
 #include "core/resource/RasterizationTarget.h"
-#include "HBE/core/Application.h"
+#include "core/Application.h"
 
 #include "core/scene/Entity.h"
 #include "core/scene/components/Transform.h"
@@ -167,7 +166,7 @@ namespace HBE {
 
 		void setChildrenDirty(Node *node);
 
-		void onFrameChange(uint32_t frame);
+		void onFrameEnd(uint64_t frame);
 
 		void drawNode(RenderGraph *render_graph, Node &node, int &count);
 

@@ -4,23 +4,27 @@
 #include "dependencies/utils-collection/Event.h"
 #include "core/graphics/Fence.h"
 
-namespace HBE {
-	class VK_Device;
+namespace HBE
+{
+    class VK_Device;
 
-	class VK_Fence : public Fence {
+    class VK_Fence : public Fence
+    {
+        VK_Device* device = nullptr;
+        VkFence handle = VK_NULL_HANDLE;
 
-		VkDevice device_handle = VK_NULL_HANDLE;
-		VkFence handle = VK_NULL_HANDLE;
+    public:
+        void init(VK_Device& device);
+        void release();
+        VK_Fence() = default;
+        VK_Fence(VK_Fence&& other) noexcept;
+        VK_Fence(VK_Fence& other) = delete;
+        VK_Fence& operator=(VK_Fence& other) = delete;
 
-	public:
-		VK_Fence(const VK_Device &device);
-		VK_Fence(const VK_Fence &&other);
-		~VK_Fence();
-		void wait() const override;
-		void reset() const;
-		bool isSet() const;
-		const VkFence &getHandle() const;
-	};
-
+        ~VK_Fence() = default;
+        void wait() const override;
+        void reset() const;
+        bool isSet() const;
+        const VkFence& getHandle() const;
+    };
 }
-

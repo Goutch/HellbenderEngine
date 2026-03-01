@@ -4,7 +4,6 @@
 #include "UIPanelSystem.h"
 #include "core/scene/Scene.h"
 #include "core/input/Input.h"
-#include "core/resource/Resources.h"
 #include "core/utility/Geometry.h"
 #include "core/resource/Mesh.h"
 #include "core/resource/Font.h"
@@ -20,7 +19,7 @@ namespace HBE {
                 subscribe(attach_button_subscription_id, this, &ButtonSystem::onAttachButton);
         scene->onDetach<ButtonComponent>().subscribe(detach_button_subscription_id, this,
                                                      &ButtonSystem::onDettachButton);
-        Input::onMouseLeftClickDown.subscribe(left_click_subscription_id, this, &ButtonSystem::onLeftClick);
+        Application::instance->getInput()->onMouseLeftClickDown.subscribe(left_click_subscription_id, this, &ButtonSystem::onLeftClick);
         scene->onUpdate.subscribe(update_subscription_id, this, &ButtonSystem::onUpdate);
         //region ---------------------------------------------button pipelines---------------------------------------------
         ShaderInfo button_frag_shader_info{};
@@ -32,8 +31,8 @@ namespace HBE {
         button_frag_shader_info.path = "shaders/defaults/ui/Button.frag";
         button_frag_shader_info.stage = SHADER_STAGE_FRAGMENT;
 
-        button_vert_shader = Resources::createShader(button_vert_shader_info);
-        button_frag_shader = Resources::createShader(button_frag_shader_info);
+        button_vert_shader = Application::instance->getContext()->createShader(button_vert_shader_info);
+        button_frag_shader = Application::instance->getContext()->createShader(button_frag_shader_info);
 
         RasterizationPipelineInfo button_pipeline_info{};
         button_pipeline_info.vertex_shader = button_vert_shader;
@@ -42,7 +41,7 @@ namespace HBE {
         button_pipeline_info.attribute_info_count = 1;
         button_pipeline_info.attribute_infos = &VERTEX_ATTRIBUTE_INFO_POSITION3D_UV_INTERLEAVED;
         button_pipeline_info.flags = RASTERIZATION_PIPELINE_FLAG_NO_DEPTH_TEST;
-        button_pipeline = Resources::createRasterizationPipeline(button_pipeline_info);
+        button_pipeline = Application::instance->getContext()->createRasterizationPipeline(button_pipeline_info);
 
 
         RasterizationPipelineInstanceInfo button_pipeline_instance_info{};
@@ -51,10 +50,10 @@ namespace HBE {
 
 
         default_button_pipeline_instance =
-                Resources::createRasterizationPipelineInstance(button_pipeline_instance_info);
-        default_button_hover_pipeline_instance = Resources::createRasterizationPipelineInstance(
+                Application::instance->getContext()->createRasterizationPipelineInstance(button_pipeline_instance_info);
+        default_button_hover_pipeline_instance = Application::instance->getContext()->createRasterizationPipelineInstance(
             button_pipeline_instance_info);
-        default_button_pressed_pipeline_instance = Resources::createRasterizationPipelineInstance(
+        default_button_pressed_pipeline_instance = Application::instance->getContext()->createRasterizationPipelineInstance(
             button_pipeline_instance_info);
 
 
@@ -113,7 +112,7 @@ namespace HBE {
             vec2 min = vec2(t.worldPosition()) - (p.size / 2.0f);
             vec2 max = vec2(t.worldPosition()) + (p.size / 2.0f);
             if (max.x > position.x && min.x < position.x && max.y > position.y && min.y < position.y) {
-                Input::onMouseLeftClick.consume();
+                Application::instance->getInput()->onMouseLeftClick.consume();
                 b.onButtonClicked.invoke(Entity(e, scene));
                 break;
             }
@@ -128,11 +127,11 @@ namespace HBE {
         delete button_vert_shader;
         delete button_frag_shader;
         scene->onUpdate.unsubscribe(update_subscription_id);
-        Input::onMouseLeftClickDown.unsubscribe(left_click_subscription_id);
+        Application::instance->getInput()->onMouseLeftClickDown.unsubscribe(left_click_subscription_id);
     }
 
     void ButtonSystem::onUpdate(float delta) {
-        vec2 position = Input::getMousePosition();
+        vec2 position = Application::instance->getInput()->getMousePosition();
         auto group = scene->group<Node, Transform, UIPanel, ButtonComponent>();
         for (auto [e, node, t, p, b]: group) {
             if (!node.isActiveInHierarchy())

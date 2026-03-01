@@ -3,6 +3,8 @@
 #include <core/resource/ComputeInstance.h>
 #include <string>
 
+#include "VK_Fence.h"
+
 namespace HBE {
 	class VK_Renderer;
 
@@ -21,7 +23,7 @@ namespace HBE {
 
 	private:
 		VK_Renderer *renderer;
-		VK_Fence *fence;
+		VK_Fence fence;
 	public:
 		VK_ComputeInstance(VK_Renderer *renderer, const ComputeInstanceInfo &info);
 		~VK_ComputeInstance() override;

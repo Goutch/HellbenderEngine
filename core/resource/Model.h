@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Core.h"
-#include "core/utility/Log.h"
 #include "string"
 #include "vector"
 #include "map"

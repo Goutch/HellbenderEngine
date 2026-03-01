@@ -63,7 +63,7 @@ namespace HBE
 		std::queue<std::pair<uint32_t, VkDescriptorPool>> old_descriptor_pools;
 
 		mutable bool bound = false;
-		event_subscription_id on_frame_changle_subscription_id;
+		event_subscription_id on_frame_change_subscription_id;
 	public:
 		VK_PipelineDescriptors(VK_Renderer* renderer,
 		                       const VK_PipelineLayout& layout,
@@ -73,7 +73,7 @@ namespace HBE
 		                       bool empty_descriptor_allowed = false);
 		~VK_PipelineDescriptors();
 
-		void onFrameChange(uint32_t frame);
+		void onFrameEnd(uint64_t frame);
 
 		void bind() const;
 
@@ -102,7 +102,7 @@ namespace HBE
 		void setStorageBufferArray(uint32_t binding, StorageBuffer** buffers, uint32_t count, int32_t frame);
 
 	private:
-		void copyDescriptorSets(DescriptorPool& from, DescriptorPool& to, int32_t frame);
+		void copyDescriptorSets(DescriptorPool& from, DescriptorPool& to, int64_t frame);
 
 		void createDescriptorWrites(DescriptorPool& pool);
 

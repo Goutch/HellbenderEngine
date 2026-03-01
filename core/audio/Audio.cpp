@@ -10,9 +10,7 @@
 #include "core/utility/Log.h"
 #include "string.h"
 namespace HBE {
-	ALCdevice *Audio::device = nullptr;
-	ALCcontext *Audio::context = nullptr;
-	std::vector<std::string> Audio::devices;
+
 
 	void Audio::init() {
 
@@ -20,8 +18,8 @@ namespace HBE {
 		if (device == nullptr) {
 			Log::error("Failed to initialize OpenAL audio device");
 		}
-		context = alcCreateContext(device, nullptr);
-		alcMakeContextCurrent(context);
+		audio_context = alcCreateContext(device, nullptr);
+		alcMakeContextCurrent(audio_context);
 		Log::status("Using audio device: " + getAudioDevices().front());
 	}
 
@@ -38,9 +36,9 @@ namespace HBE {
 		return devices;
 	}
 
-	void Audio::terminate() {
+	void Audio::release() {
 		alcMakeContextCurrent(nullptr);
-		alcDestroyContext(context);
+		alcDestroyContext(audio_context);
 		alcCloseDevice(device);
 	}
 
