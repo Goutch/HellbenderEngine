@@ -118,7 +118,17 @@ namespace HBE {
 		vec3u size;
 	};
 
-	class HB_API Image  {
+	using ImageHandle = Handle;
+
+	typedef void (*PFN_createImage)(ImageHandle);
+
+	typedef void (*PFN_releaseImage)(ImageHandle);
+
+	class ImageInterface {
+		PFN_createImage createImage;
+	};
+
+	class HB_API Image {
 	public:
 		virtual ~Image() = default;
 
@@ -132,10 +142,10 @@ namespace HBE {
 
 		virtual void update(const void *data, IMAGE_FORMAT format) = 0;
 
-		virtual void updateRegion(const void *data, uint32_t data_texel_count, ImageRegionUpdateInfo *update_infos,uint32_t update_count) = 0;
+		virtual void updateRegion(const void *data, uint32_t data_texel_count, ImageRegionUpdateInfo *update_infos, uint32_t update_count) = 0;
 
 		static int getFormatNumberOfChannels(IMAGE_FORMAT format);
 
-		static Image *load(const std::string &path, ImageInfo& info);
+		static Image *load(const std::string &path, ImageInfo &info);
 	};
 }
