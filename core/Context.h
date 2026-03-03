@@ -99,11 +99,12 @@ namespace HBE
 
     class HB_API Context
     {
+    public :
+        ImageInterface image_interface;
         //BufferInterface buffer_interface;
         //ImageInterface image_interface;
         //StorageBufferInterface storage_buffer_interface;
         //RasterizationPipelineInterface rasterization_pipeline_interface;
-    public:
         virtual ~Context() = default;
 
         virtual Renderer* getRenderer() =0;
