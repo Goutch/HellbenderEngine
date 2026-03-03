@@ -57,6 +57,7 @@ namespace HBE {
     }
 
     void Scene::present() {
+
     }
 
     void Scene::render() {

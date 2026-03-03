@@ -18,7 +18,7 @@ namespace HBE
     class VK_Semaphore;
     class VK_Allocator;
 
-    class VK_Image : public Image
+    class VK_Image
     {
         VkImage handle = VK_NULL_HANDLE;
         VK_Context* context = nullptr;
@@ -33,7 +33,6 @@ namespace HBE
         uint32_t width = 1, height = 1, depth = 1;
         uint32_t byte_per_pixel;
         uint32_t mip_levels;
-
     public:
         void alloc(VK_Context* context, const ImageInfo& info);
         void release();
@@ -43,17 +42,17 @@ namespace HBE
         VK_Image(VK_Image&& other)noexcept;
         VK_Image() = default;
         ~VK_Image() = default;
-        uint32_t getWidth() const override;
+        uint32_t getWidth() const;
 
-        uint32_t getHeight() const override;
+        uint32_t getHeight() const;
 
-        uint32_t getDepth() const override;
+        uint32_t getDepth() const;
 
-        vec3u getSize() const override;
+        vec3u getSize() const;
 
-        void update(const void* data, IMAGE_FORMAT format) override;
+        void update(const void* data, IMAGE_FORMAT format);
 
-        void updateRegion(const void* data, uint32_t data_texel_count, ImageRegionUpdateInfo* update_info, uint32_t update_count) override;
+        void updateRegion(const void* data, uint32_t data_texel_count, ImageRegionUpdateInfo* update_info, uint32_t update_count);
 
         const VkSampler& getSampler() const;
 

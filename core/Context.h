@@ -2,6 +2,8 @@
 #include "graphics/GraphicLimits.h"
 #include "resource/Font.h"
 #include "scene/systems/ui/TextSystem.h"
+#include "core/interface/ImageInterface.h"
+#include "data-structure/Handle.h"
 
 namespace HBE
 {
@@ -100,16 +102,15 @@ namespace HBE
     class HB_API Context
     {
     public :
-        ImageInterface image_interface;
-        //BufferInterface buffer_interface;
-        //ImageInterface image_interface;
-        //StorageBufferInterface storage_buffer_interface;
-        //RasterizationPipelineInterface rasterization_pipeline_interface;
+		//images functions
+	    PFN_createImage createImage = nullptr;
+	    PFN_releaseImage releaseImage = nullptr;
+	    PFN_updateImage updateImage = nullptr;
+	    PFN_getImageSize getImageSize = nullptr;
+
         virtual ~Context() = default;
 
         virtual Renderer* getRenderer() =0;
-
-        virtual Image* createImage(const ImageInfo& info) =0;
 
         virtual RasterizationPipeline* createRasterizationPipeline(const RasterizationPipelineInfo& info) = 0;
 
