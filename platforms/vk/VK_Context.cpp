@@ -23,10 +23,8 @@
 #include "raytracing/VK_RaytracingPipelineInstance.h"
 #include "raytracing/VK_TopLevelAccelerationStructure.h"
 
-namespace HBE
-{
-    VK_Context::VK_Context(ContextInfo& info)
-    {
+namespace HBE {
+    VK_Context::VK_Context(ContextInfo &info) {
         instance.init(info);
         surface.init(instance, Application::instance->getWindow()->getHandle());
         physical_device.init(instance, surface);
@@ -39,14 +37,15 @@ namespace HBE
         graphic_limits = renderer.getLimits();
     }
 
-    Renderer* VK_Context::getRenderer()
-    {
+    Renderer *VK_Context::getRenderer() {
         return &renderer;
     }
 
 
-    VK_Context::~VK_Context()
-    {
+    VK_Context::~VK_Context() {
+        renderer.release();
+        allocator.processFreeRequests(0);
+
         swapchain.release();
         allocator.release();
         device.release();
@@ -56,98 +55,81 @@ namespace HBE
         instance.release();
     }
 
-    GraphicLimits VK_Context::getGraphicLimits() const
-    {
+    GraphicLimits VK_Context::getGraphicLimits() const {
         return graphic_limits;
     }
 
-    Image* VK_Context::createImage(const ImageInfo& info)
-    {
-        VK_Image* image = new VK_Image();
+    Image *VK_Context::createImage(const ImageInfo &info) {
+        VK_Image *image = new VK_Image();
         image->alloc(this, info);
         return image;
     }
 
-    RasterizationPipeline* VK_Context::createRasterizationPipeline(const RasterizationPipelineInfo& info)
-    {
-        if (info.rasterization_target == nullptr)
-            info.rasterization_target = dynamic_cast<RasterizationTarget*>(renderer.getDefaultRenderTarget());
-        VK_RasterizationPipeline* raster = new VK_RasterizationPipeline();
+    RasterizationPipeline *VK_Context::createRasterizationPipeline(const RasterizationPipelineInfo &info) {
+        VK_RasterizationPipeline *raster = new VK_RasterizationPipeline();
         raster->init(this, info);
         return raster;
     }
 
-    Shader* VK_Context::createShader(const ShaderInfo& info)
-    {
+    Shader *VK_Context::createShader(const ShaderInfo &info) {
         return new VK_Shader(this, info);
     }
 
-    Mesh* VK_Context::createMesh(const MeshInfo& info)
-    {
+    Mesh *VK_Context::createMesh(const MeshInfo &info) {
         return new VK_Mesh(this, info);
     }
 
-    ComputePipeline* VK_Context::createComputePipeline(const ComputePipelineInfo& info)
-    {
+    ComputePipeline *VK_Context::createComputePipeline(const ComputePipelineInfo &info) {
         return new VK_ComputePipeline(this, info);
     }
 
-    RasterizationTarget* VK_Context::createRenderTarget(const RenderTargetInfo& info)
-    {
+    RasterizationTarget *VK_Context::createRenderTarget(const RenderTargetInfo &info) {
         return new VK_RenderPass(this, info);
     }
 
-    RasterizationPipelineInstance* VK_Context::createRasterizationPipelineInstance(const RasterizationPipelineInstanceInfo& info)
-    {
+    RasterizationPipelineInstance *VK_Context::createRasterizationPipelineInstance(
+        const RasterizationPipelineInstanceInfo &info) {
         return new VK_RasterizationPipelineInstance(this, info);
     }
 
-    ComputeInstance* VK_Context::createComputeInstance(const ComputeInstanceInfo& info)
-    {
+    ComputeInstance *VK_Context::createComputeInstance(const ComputeInstanceInfo &info) {
         return new VK_ComputeInstance(this, info);
     }
 
-    RootAccelerationStructure* VK_Context::createRootAccelerationStructure(const RootAccelerationStructureInfo& info)
-    {
+    RootAccelerationStructure *VK_Context::createRootAccelerationStructure(const RootAccelerationStructureInfo &info) {
         return new VK_TopLevelAccelerationStructure(this, info);
     }
 
-    AABBAccelerationStructure* VK_Context::createAABBAccelerationStructure(const AABBAccelerationStructureInfo& info)
-    {
+    AABBAccelerationStructure *VK_Context::createAABBAccelerationStructure(const AABBAccelerationStructureInfo &info) {
         return new VK_AABBBottomLevelAccelerationStructure(this, info);
     }
 
-    MeshAccelerationStructure* VK_Context::createMeshAccelerationStructure(const MeshAccelerationStructureInfo& info)
-    {
+    MeshAccelerationStructure *VK_Context::createMeshAccelerationStructure(const MeshAccelerationStructureInfo &info) {
         return new VK_MeshBottomLevelAccelerationStructure(this, info);
     }
 
-    RaytracingPipeline* VK_Context::createRaytracingPipeline(const RaytracingPipelineInfo& info)
-    {
+    RaytracingPipeline *VK_Context::createRaytracingPipeline(const RaytracingPipelineInfo &info) {
         return new VK_RaytracingPipeline(this, info);
     }
 
-    RaytracingPipelineInstance* VK_Context::createRaytracingPipelineInstance(const RaytracingPipelineInstanceInfo& info)
-    {
+    RaytracingPipelineInstance *
+    VK_Context::createRaytracingPipelineInstance(const RaytracingPipelineInstanceInfo &info) {
         return new VK_RaytracingPipelineInstance(this, info);
     }
 
-    StorageBuffer* VK_Context::createStorageBuffer(const StorageBufferInfo& info)
-    {
+    StorageBuffer *VK_Context::createStorageBuffer(const StorageBufferInfo &info) {
         //todo fix this.
         return nullptr; //new VK_StorageBuffer(this, info);
     }
 
 
-    TexelBuffer* VK_Context::createTexelBuffer(const TexelBufferInfo& info)
-    {
-        VK_TexelBuffer* texel_buffer = new VK_TexelBuffer();;
+    TexelBuffer *VK_Context::createTexelBuffer(const TexelBufferInfo &info) {
+        VK_TexelBuffer *texel_buffer = new VK_TexelBuffer();;
         texel_buffer->alloc(this, info);
         return texel_buffer;
     }
 
-    Font* VK_Context::createFont(const FontInfo& font_info) const
-    {
+    Font *VK_Context::createFont(const FontInfo &font_info) const {
         return new Font(font_info);
     }
 }

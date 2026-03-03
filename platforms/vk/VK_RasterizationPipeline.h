@@ -9,8 +9,7 @@
 #include "unordered_map"
 #include "VK_PipelineLayout.h"
 
-namespace HBE
-{
+namespace HBE {
     class VK_Device;
 
     class VK_RenderPass;
@@ -21,12 +20,11 @@ namespace HBE
 
     class VK_PipelineLayout;
 
-    class VK_RasterizationPipeline : public RasterizationPipeline
-    {
+    class VK_RasterizationPipeline : public RasterizationPipeline {
         VkPipeline handle = VK_NULL_HANDLE;
         VK_PipelineLayout layout;
-        VK_Context* context = nullptr;
-        std::vector<const VK_Shader*> shaders;
+        VK_Context *context = nullptr;
+        std::vector<const VK_Shader *> shaders;
         std::vector<VertexAttributeInfo> binding_infos;
         RasterizationPipelineInfo info;
 
@@ -34,12 +32,19 @@ namespace HBE
 
     public:
         VK_RasterizationPipeline() = default;
+
         ~VK_RasterizationPipeline() = default;
-        VK_RasterizationPipeline(VK_RasterizationPipeline&) = delete;
-        VK_RasterizationPipeline& operator=(VK_RasterizationPipeline&) = delete;
-        void init(VK_Context* context,const RasterizationPipelineInfo& info);
+
+        VK_RasterizationPipeline(VK_RasterizationPipeline &) = delete;
+
+        VK_RasterizationPipeline &operator=(VK_RasterizationPipeline &) = delete;
+
+        void init(VK_Context *context, const RasterizationPipelineInfo &info,
+                  VkRenderPass render_pass_overwrite = VK_NULL_HANDLE);
+
         void release();
-        void pushConstant(const std::string& name, const void* data) const override;
+
+        void pushConstant(const std::string &name, const void *data) const override;
 
         void bind() const override;
 
@@ -49,7 +54,7 @@ namespace HBE
 
         bool bound();
 
-        const VK_PipelineLayout& getPipelineLayout() const;
+        const VK_PipelineLayout &getPipelineLayout() const;
 
 
         RASTERIZATION_PIPELINE_FLAGS getFlags() const override;
