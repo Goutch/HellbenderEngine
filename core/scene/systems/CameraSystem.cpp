@@ -51,19 +51,19 @@ namespace HBE {
 		auto group = scene->group<Node, Transform, Camera>();
 		auto group_2D = scene->group<Node, Transform, Camera2D>();
 		auto group_pixel = scene->group<Node, Transform, PixelCamera>();
-		RasterizeCmdInfo render_cmd_info{};
-		render_cmd_info.render_graph = render_graph;
+		RasterizeCmdInfo raster_cmd_info{};
+		raster_cmd_info.render_graph = render_graph;
 		HB_PROFILE_END("CameraRenderGroup");
 		for (auto [handle, node, transform, camera]: group) {
 			if (!node.isActiveInHierarchy()) {
 				continue;
 			}
 			if (camera.active) {
-				render_cmd_info.render_target = camera.getRenderTarget();
-				render_cmd_info.projection = camera.projection;
-				render_cmd_info.view = glm::inverse(transform.world());
-				render_cmd_info.layer_mask = camera.layer_mask;
-				Application::instance->getContext()->getRenderer()->rasterize(render_cmd_info);
+				raster_cmd_info.render_target = camera.getRenderTarget();
+				raster_cmd_info.projection = camera.projection;
+				raster_cmd_info.view = glm::inverse(transform.world());
+				raster_cmd_info.layer_mask = camera.layer_mask;
+				Application::instance->getContext()->getRenderer()->rasterize(raster_cmd_info);
 			}
 		}
 		for (auto [handle, node, transform, camera]: group_2D) {
@@ -71,11 +71,11 @@ namespace HBE {
 				continue;
 			}
 			if (camera.active) {
-				render_cmd_info.render_target = camera.getRenderTarget();
-				render_cmd_info.projection = camera.projection;
-				render_cmd_info.view = glm::inverse(transform.world());
-				render_cmd_info.layer_mask = camera.layer_mask;
-				context->getRenderer()->rasterize(render_cmd_info);
+				raster_cmd_info.render_target = camera.getRenderTarget();
+				raster_cmd_info.projection = camera.projection;
+				raster_cmd_info.view = glm::inverse(transform.world());
+				raster_cmd_info.layer_mask = camera.layer_mask;
+				context->getRenderer()->rasterize(raster_cmd_info);
 			}
 		}
 		for (auto [handle, node, transform, camera]: group_pixel) {
@@ -83,11 +83,11 @@ namespace HBE {
 				continue;
 			}
 			if (camera.active) {
-				render_cmd_info.render_target = camera.getRenderTarget();
-				render_cmd_info.projection = camera.projection;
-				render_cmd_info.view = glm::inverse(transform.world());
-				render_cmd_info.layer_mask = camera.layer_mask;
-				Application::instance->getContext()->getRenderer()->rasterize(render_cmd_info);
+				raster_cmd_info.render_target = camera.getRenderTarget();
+				raster_cmd_info.projection = camera.projection;
+				raster_cmd_info.view = glm::inverse(transform.world());
+				raster_cmd_info.layer_mask = camera.layer_mask;
+				context->getRenderer()->rasterize(raster_cmd_info);
 			}
 		}
 		HB_PROFILE_END("CameraRender");

@@ -20,14 +20,13 @@ namespace HBE
 
     class VK_Image
     {
-        VkImage handle = VK_NULL_HANDLE;
+        VkImage handle;
         VK_Context* context = nullptr;
         VkImageLayout layout;
         VkImageLayout desired_layout;
         VkImageView* image_views = nullptr;
         uint32_t image_view_count;
-        VkSampler sampler_handle = VK_NULL_HANDLE;
-        ImageInfo info;
+        VkSampler sampler_handle;
         VkFormat vk_format;
         Allocation allocation;
         uint32_t width = 1, height = 1, depth = 1;
@@ -37,11 +36,9 @@ namespace HBE
         void alloc(VK_Context* context, const ImageInfo& info);
         void release();
 
-        VK_Image& operator=(const VK_Image&) = delete;
-        VK_Image(const VK_Image&) = delete;
-        VK_Image(VK_Image&& other)noexcept;
-        VK_Image() = default;
-        ~VK_Image() = default;
+        //VK_Image& operator=(const VK_Image&) = delete;
+        //VK_Image(VK_Image&& other)noexcept;
+
         uint32_t getWidth() const;
 
         uint32_t getHeight() const;

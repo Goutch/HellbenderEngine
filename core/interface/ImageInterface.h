@@ -1,5 +1,6 @@
 #pragma once
 #include "data-structure/Handle.h"
+
 namespace HBE {
     enum IMAGE_FORMAT : int {
         IMAGE_FORMAT_UNDEFINED = -1,
@@ -118,12 +119,11 @@ namespace HBE {
 
     using ImageHandle = hbe_handle_t;
 
-    typedef ImageHandle (*PFN_createImage)(const ImageInfo &info);
+    //typedef ImageHandle (*PFN_createImage)(void *context, const ImageInfo &info);
 
-    typedef void (*PFN_releaseImage)(ImageHandle);
+    typedef void (*PFN_releaseImage)(void *context, ImageHandle);
 
-    typedef void (*PFN_updateImage)(ImageHandle, const void *data);
+    typedef void (*PFN_updateImage)(void *context, ImageHandle, const void *data);
 
-    typedef vec3u (*PFN_getImageSize)(ImageHandle);
-
+    typedef vec3u (*PFN_getImageSize)(void *context, ImageHandle);
 }

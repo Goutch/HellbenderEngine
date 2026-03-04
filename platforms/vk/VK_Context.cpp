@@ -24,13 +24,14 @@
 #include "raytracing/VK_TopLevelAccelerationStructure.h"
 
 namespace HBE {
-    VK_Context::VK_Context(ContextInfo &info) {
+    VK_Context::VK_Context(ContextInfo &info,GraphicAPI& api) {
         instance.init(info);
         surface.init(instance, Application::instance->getWindow()->getHandle());
         physical_device.init(instance, surface);
         device.init(this);
         allocator.init(this);
         swapchain.init(this);
+
 
 
         renderer.init(this);

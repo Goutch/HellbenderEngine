@@ -9,7 +9,7 @@
 
 namespace HBE {
 	Image::Image(const ImageInfo &info) : context(*Application::instance->getContext()) {
-		this->handle = context->createImage(info);
+		this->handle = context.createImage(info);
 	}
 
 	vec3u Image::getSize() {

@@ -24,7 +24,7 @@ namespace HBE
         VkBufferUsageFlags extra_usages = 0;
         mutable bool bound = false;
         MeshInfo info;
-        VK_Buffer indices_buffer{};
+        VK_Buffer indices_buffer;
 
     public:
         VK_Mesh(VK_Context* context, const MeshInfo& info);

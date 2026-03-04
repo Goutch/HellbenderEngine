@@ -6,6 +6,8 @@
 #include "core/interface/ImageInterface.h"
 
 namespace HBE {
+	class Context;
+
 	class HB_API Image {
 		ImageHandle handle;
 		Context &context;

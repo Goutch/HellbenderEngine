@@ -20,7 +20,7 @@ namespace HBE
     class HB_API Application
     {
         Window* window = nullptr;
-        Context* context = nullptr;
+        Context context;
         //todo: change Input static class to here
         Audio audio;
         Input input;
