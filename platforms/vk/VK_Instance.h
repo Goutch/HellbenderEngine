@@ -22,7 +22,7 @@ namespace HBE
 
 
     public:
-        void init(ContextInfo& context_info);
+        void init(const ContextInfo& context_info);
         void release();
         VK_Instance() = default;
         ~VK_Instance() = default;

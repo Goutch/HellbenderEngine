@@ -254,7 +254,7 @@ namespace HBE
     }
 
 
-    const VkPhysicalDevice& VK_PhysicalDevice::getHandle() const
+    const inline  VkPhysicalDevice& VK_PhysicalDevice::getHandle() const
     {
         return handle;
     }

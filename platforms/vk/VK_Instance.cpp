@@ -8,7 +8,7 @@
 
 namespace HBE
 {
-    void VK_Instance::init(ContextInfo& context_info)
+    void VK_Instance::init(const ContextInfo& context_info)
     {
         const ApplicationInfo& app_info = Application::instance->getInfo();
         VkApplicationInfo vk_app_info{};

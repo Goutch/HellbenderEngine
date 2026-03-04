@@ -68,13 +68,13 @@ namespace HBE {
 		}
 		info.width = width;
 		info.height = height;
-		info.data = buffer;
+		info.optionnal_data = buffer;
 		info.data_format = info.format;
 		texture = context->createImage(info);
 		stbi_image_free(buffer);
 		stbi_set_flip_vertically_on_load(true);
 		fclose(file);
-		info.data = nullptr;
+		info.optionnal_data = nullptr;
 		return texture;
 	}
 	Image::Image(Image &&other)  noexcept {

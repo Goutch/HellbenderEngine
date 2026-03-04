@@ -85,7 +85,7 @@ namespace HBE
                 atlas_info.width = width;
                 atlas_info.height = height;
                 atlas_info.data_format = IMAGE_FORMAT_RGBA32F;
-                atlas_info.data = storage.pixels;
+                atlas_info.optionnal_data = storage.pixels;
 
 
                 atlas = Application::instance->getContext()->createImage(atlas_info);

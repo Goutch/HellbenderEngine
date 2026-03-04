@@ -132,7 +132,7 @@ namespace HBE
         ImageInfo texture_info{};
         texture_info.width = data.width;
         texture_info.height = data.height;
-        texture_info.data = data.data;
+        texture_info.optionnal_data = data.data;
         texture_info.data_format = data.format;
         texture_info.format = data.format;
         texture_info.flags = IMAGE_FLAG_NONE;

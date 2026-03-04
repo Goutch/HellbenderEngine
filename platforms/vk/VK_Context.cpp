@@ -24,7 +24,9 @@
 #include "raytracing/VK_TopLevelAccelerationStructure.h"
 
 namespace HBE {
-    VK_Context::VK_Context(ContextInfo &info,GraphicAPI& api) {
+
+    VK_Context::VK_Context(const ContextInfo& info, GraphicAPI& api)
+    {
         instance.init(info);
         surface.init(instance, Application::instance->getWindow()->getHandle());
         physical_device.init(instance, surface);
@@ -32,6 +34,11 @@ namespace HBE {
         allocator.init(this);
         swapchain.init(this);
 
+
+        api.createImage_ptr = reinterpret_cast<GraphicAPI::PFN_createImage>(&VK_Images::createImage);
+        api.releaseImage_ptr = reinterpret_cast<GraphicAPI::PFN_releaseImage>(&VK_Images::releaseImage);
+        api.getImageSize_ptr = reinterpret_cast<GraphicAPI::PFN_getImageSize>(&VK_Images::getImageSize);
+        api.updateImage_ptr = reinterpret_cast<GraphicAPI::PFN_updateImage>(&VK_Images::updateImage);
 
 
         renderer.init(this);
@@ -41,6 +48,8 @@ namespace HBE {
     Renderer *VK_Context::getRenderer() {
         return &renderer;
     }
+
+
 
 
     VK_Context::~VK_Context() {
@@ -58,12 +67,6 @@ namespace HBE {
 
     GraphicLimits VK_Context::getGraphicLimits() const {
         return graphic_limits;
-    }
-
-    Image *VK_Context::createImage(const ImageInfo &info) {
-        VK_Image *image = new VK_Image();
-        image->alloc(this, info);
-        return image;
     }
 
     RasterizationPipeline *VK_Context::createRasterizationPipeline(const RasterizationPipelineInfo &info) {

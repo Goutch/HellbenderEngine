@@ -121,7 +121,7 @@ namespace HBE
         void release();
         const QueueFamilyIndices& getQueueFamilyIndices() const;
 
-        const VkPhysicalDevice& getHandle() const;
+        inline VkPhysicalDevice getHandle() const;
 
 
         const std::vector<const char*>& getExtensions() const;

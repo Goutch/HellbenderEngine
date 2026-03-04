@@ -89,15 +89,8 @@ namespace HBE {
         IMAGE_FLAG_NO_SAMPLER = 1 << 3, // image2D in glsl accessed with imageLoad and imageStore.
     };
 
-    /**
-     * @param data can be nullptr
-     * @param width must be greater than 0
-     * @param height must be greater than 0
-     * @param depth must be greater than 0
-     * @param min_lod must be greater than 0
-     */
     struct ImageInfo {
-        const void *data = nullptr;
+        const void *optionnal_data = nullptr;
         uint32_t width = 1;
         uint32_t height = 1;
         uint32_t depth = 1;

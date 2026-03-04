@@ -137,7 +137,7 @@ namespace HBE
             info.format = format;
             info.data_format = format;
             info.flags = IMAGE_FLAG_NO_SAMPLER;
-            info.data = data;
+            info.optionnal_data = data;
             VK_Image* temp_image = (VK_Image*)Application::instance->getContext()->createImage(info);
 
             ReleaseRequest staging_allocation = {};
@@ -297,10 +297,10 @@ namespace HBE
         this->allocation = context->allocator.alloc(requirements, MEMORY_TYPE_FLAG_NONE);
         vkBindImageMemory(context->device.getHandle(), handle, allocation.block->memory, allocation.offset);
 
-        if (info.data != nullptr)
+        if (info.optionnal_data != nullptr)
         {
             //image data is set right now
-            update(info.data, info.data_format);
+            update(info.optionnal_data, info.data_format);
         }
         else if (info.flags & IMAGE_FLAG_RENDER_TARGET ||
             info.flags & IMAGE_FLAG_DEPTH ||
