@@ -34,11 +34,10 @@ namespace HBE {
         allocator.init(this);
         swapchain.init(this);
 
-
-        api.createImage_ptr = reinterpret_cast<GraphicAPI::PFN_createImage>(&VK_Images::createImage);
-        api.releaseImage_ptr = reinterpret_cast<GraphicAPI::PFN_releaseImage>(&VK_Images::releaseImage);
-        api.getImageSize_ptr = reinterpret_cast<GraphicAPI::PFN_getImageSize>(&VK_Images::getImageSize);
-        api.updateImage_ptr = reinterpret_cast<GraphicAPI::PFN_updateImage>(&VK_Images::updateImage);
+        api.createImage_ptr = &VK_Images::createImage;
+        api.releaseImage_ptr = &VK_Images::releaseImage;
+        api.getImageSize_ptr = &VK_Images::getImageSize;
+        api.updateImage_ptr = &VK_Images::updateImage;
 
 
         renderer.init(this);

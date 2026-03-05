@@ -14,15 +14,17 @@ namespace HBE {
 
     class VK_Context {
     public:
-        VK_Instance instance;
-        VK_Surface surface;
-        VK_PhysicalDevice physical_device;
-        VK_Device device;
-        VK_Allocator allocator;
-        VK_Swapchain swapchain;
-        VK_Renderer renderer;
-        GraphicLimits graphic_limits;
-        VK_Images images;
+        VK_Instance instance{};
+        VK_Surface surface{};
+        VK_PhysicalDevice physical_device{};
+        VK_Device device{};
+        VK_Allocator allocator{};
+        VK_Swapchain swapchain{};
+        VK_Renderer renderer{};
+        GraphicLimits graphic_limits{};
+
+        //resources
+        VK_Images images{};
 
         VK_Context(const ContextInfo &info, GraphicAPI &api);
 

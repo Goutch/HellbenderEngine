@@ -10,7 +10,7 @@ namespace HBE {
 
 	class HB_API Image {
 		ImageHandle handle;
-		Context &context;
+		Context *context = nullptr;
 	public:
 		Image(const ImageInfo &info);
 
@@ -26,8 +26,8 @@ namespace HBE {
 
 		void update(const void *data);
 
-		static int getFormatNumberOfChannels(IMAGE_FORMAT format);
+		void load(const std::string &path, ImageInfo &info);
 
-		static Image *load(const std::string &path, ImageInfo &info);
+		static int getFormatNumberOfChannels(IMAGE_FORMAT format);
 	};
 }

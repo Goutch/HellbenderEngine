@@ -7,6 +7,7 @@
 namespace HBE {
 	class ShaderCompiler {
 	public:
+		static void getSource(const std::string &path, std::string &buffer);
 		static void GLSLToSpirV(const char *source,
 		                        size_t size,
 		                        std::vector<uint32_t> &spirv,

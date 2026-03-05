@@ -2,16 +2,16 @@
 #include "data-structure/Handle.h"
 
 namespace HBE {
-    enum IMAGE_FORMAT : int {
-        IMAGE_FORMAT_UNDEFINED = -1,
-        IMAGE_FORMAT_R8 = 0,
-        IMAGE_FORMAT_RG8 = 1,
-        IMAGE_FORMAT_RGB8 = 2,
-        IMAGE_FORMAT_RGBA8 = 3,
-        IMAGE_FORMAT_R32F = 4,
-        IMAGE_FORMAT_RG32F = 5,
-        IMAGE_FORMAT_RGB32F = 6,
-        IMAGE_FORMAT_RGBA32F = 7,
+    enum IMAGE_FORMAT : uint8_t {
+        IMAGE_FORMAT_UNDEFINED = 0,
+        IMAGE_FORMAT_R8 = 1,
+        IMAGE_FORMAT_RG8 = 2,
+        IMAGE_FORMAT_RGB8 = 3,
+        IMAGE_FORMAT_RGBA8 = 4,
+        IMAGE_FORMAT_R32F = 5,
+        IMAGE_FORMAT_RG32F = 6,
+        IMAGE_FORMAT_RGB32F = 7,
+        IMAGE_FORMAT_RGBA32F = 8,
         IMAGE_FORMAT_DEPTH32F = 9,
         IMAGE_FORMAT_DEPTH32f_STENCIL8U = 10,
         IMAGE_FORMAT_DEPTH24f_STENCIL8U = 11,
@@ -54,18 +54,18 @@ namespace HBE {
         IMAGE_FORMAT_RGBA16_SNORM = 48,
     };
 
-    typedef uint32_t IMAGE_SAMPLER_FLAGS;
+    typedef uint8_t IMAGE_SAMPLER_FLAGS;
 
-    enum IMAGE_SAMPLER_FLAG {
+    enum IMAGE_SAMPLER_FLAG : uint8_t {
         IMAGE_SAMPLER_FLAG_NONE = 0,
     };
 
-    enum IMAGE_SAMPLER_FILTER_TYPE {
+    enum IMAGE_SAMPLER_FILTER_TYPE : uint8_t {
         IMAGE_SAMPLER_FILTER_TYPE_NEAREST = 0,
         IMAGE_SAMPLER_FILTER_TYPE_LINEAR = 1,
     };
 
-    enum IMAGE_SAMPLER_ADDRESS_MODE {
+    enum IMAGE_SAMPLER_ADDRESS_MODE : uint8_t {
         IMAGE_SAMPLER_ADDRESS_MODE_REPEAT = 0,
         IMAGE_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT = 1,
         IMAGE_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE = 2,
@@ -79,9 +79,9 @@ namespace HBE {
         IMAGE_SAMPLER_ADDRESS_MODE address_mode = IMAGE_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
     };
 
-    typedef uint32_t IMAGE_FLAGS;
+    typedef uint8_t IMAGE_FLAGS;
 
-    enum IMAGE_FLAG {
+    enum IMAGE_FLAG : uint8_t  {
         IMAGE_FLAG_NONE = 0,
         IMAGE_FLAG_SHADER_WRITE = 1 << 0,
         IMAGE_FLAG_RENDER_TARGET = 1 << 1,
@@ -90,7 +90,6 @@ namespace HBE {
     };
 
     struct ImageInfo {
-        const void *optionnal_data = nullptr;
         uint32_t width = 1;
         uint32_t height = 1;
         uint32_t depth = 1;
@@ -100,6 +99,7 @@ namespace HBE {
         IMAGE_FORMAT data_format = IMAGE_FORMAT_UNDEFINED;
         IMAGE_FLAGS flags = IMAGE_FLAG_NONE;
         ImageSamplerInfo sampler_info = {};
+        const void *optional_data = nullptr;
     };
 
     struct ImageRegionUpdateInfo {
@@ -111,12 +111,4 @@ namespace HBE {
     };
 
     using ImageHandle = hbe_handle_t;
-
-    //typedef ImageHandle (*PFN_createImage)(void *context, const ImageInfo &info);
-
-    typedef void (*PFN_releaseImage)(void *context, ImageHandle);
-
-    typedef void (*PFN_updateImage)(void *context, ImageHandle, const void *data);
-
-    typedef vec3u (*PFN_getImageSize)(void *context, ImageHandle);
 }

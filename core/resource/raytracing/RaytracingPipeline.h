@@ -22,6 +22,7 @@ namespace HBE
 		int32_t intersection_shader_index = -1;
 	};
 
+
 	struct RaytracingPipelineInfo
 	{
 		Shader* raygen_shader;

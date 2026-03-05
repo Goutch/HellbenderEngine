@@ -4,6 +4,7 @@
 #include "scene/systems/ui/TextSystem.h"
 #include "core/interface/ImageInterface.h"
 #include "data-structure/Handle.h"
+#include "interface/ShaderInterface.h"
 
 namespace HBE
 {
@@ -98,26 +99,32 @@ namespace HBE
     struct TexelBufferInfo;
 
     class TexelBuffer;
+
+#define CONTEXT_API_FUNC(ReturnType, FuncName, Params, Args)    \
+inline ReturnType FuncName(Params)                              \
+{                                                               \
+    return graphic_api.FuncName##_ptr(context_data, Args);      \
+}
+
+#define GRAPHIC_API_FUNC(ReturnType, FuncName, Params,Args)     \
+typedef ReturnType (*PFN_##FuncName)(void* contxt_ptr, Params); \
+PFN_##FuncName FuncName##_ptr = nullptr;
+
 #define FUNC_ARGS(...) __VA_ARGS__
 #define FUNC_PARAMS(...) __VA_ARGS__
-#define GRAPHIC_API_FUNC(ReturnType, FuncName, Params,Args)          \
-typedef ReturnType (*PFN_##FuncName)(void* ctx_data, Params);   \
-PFN_##FuncName FuncName##_ptr = nullptr;
-#define CONTEXT_API_FUNC(ReturnType, FuncName,Params, Args)\
-ReturnType FuncName##(Params) \
-{ \
-    return graphic_api.##FuncName##_ptr(context_data,Args);\
-}
+
 
     struct GraphicAPI
     {
         //images
-        GRAPHIC_API_FUNC(ImageHandle, createImage, FUNC_PARAMS(const ImageInfo& info), FUNC_ARGS(info));
-        GRAPHIC_API_FUNC(void, releaseImage, FUNC_PARAMS(ImageHandle handle), FUNC_ARGS(handle));
-        GRAPHIC_API_FUNC(void, updateImage, FUNC_PARAMS(ImageHandle handle, const void* data), FUNC_ARGS(handle,data));
-        GRAPHIC_API_FUNC(uvec3, getImageSize, FUNC_PARAMS(ImageHandle handle), FUNC_ARGS(handle));
+        GRAPHIC_API_FUNC(HBE_RESULT, createImage, FUNC_PARAMS(ImageHandle& handle,const ImageInfo& info), FUNC_ARGS(handle,info));
+        GRAPHIC_API_FUNC(HBE_RESULT, releaseImage, FUNC_PARAMS(ImageHandle handle), FUNC_ARGS(handle));
+        GRAPHIC_API_FUNC(HBE_RESULT, updateImage, FUNC_PARAMS(ImageHandle handle, const void* data), FUNC_ARGS(handle,data));
+        GRAPHIC_API_FUNC(HBE_RESULT, getImageSize, FUNC_PARAMS(ImageHandle handle,uvec3& size_ref), FUNC_ARGS(handle,size_ref));
 
-        //commands
+        GRAPHIC_API_FUNC(HBE_RESULT, createShader, FUNC_PARAMS(ShaderHandle& handle,const ShaderInfo& info), FUNC_ARGS(handle,info));
+        GRAPHIC_API_FUNC(HBE_RESULT, releaseShader, FUNC_PARAMS(ShaderHandle handle), FUNC_ARGS(handle));
+
     };
 
     class HB_API Context
@@ -129,12 +136,14 @@ ReturnType FuncName##(Params) \
 
         void init(const ContextInfo& info);
         void release();
-
         //images functions
-        CONTEXT_API_FUNC(ImageHandle, createImage, FUNC_PARAMS(const ImageInfo& info), FUNC_ARGS(info));
-        CONTEXT_API_FUNC(void, releaseImage, FUNC_PARAMS(ImageHandle handle), FUNC_ARGS(handle));
-        CONTEXT_API_FUNC(void, updateImage, FUNC_PARAMS(ImageHandle handle, const void* data), FUNC_ARGS(handle,data));
-        CONTEXT_API_FUNC(uvec3, getImageSize, FUNC_PARAMS(ImageHandle handle), FUNC_ARGS(handle));
+        CONTEXT_API_FUNC(HBE_RESULT, createImage, FUNC_PARAMS(ImageHandle& handle,const ImageInfo& info), FUNC_ARGS(handle,info))
+        CONTEXT_API_FUNC(HBE_RESULT, releaseImage, FUNC_PARAMS(ImageHandle handle), FUNC_ARGS(handle));
+        CONTEXT_API_FUNC(HBE_RESULT, updateImage, FUNC_PARAMS(ImageHandle handle, const void* data), FUNC_ARGS(handle,data));
+        CONTEXT_API_FUNC(HBE_RESULT, getImageSize, FUNC_PARAMS(ImageHandle handle,uvec3& size_ref), FUNC_ARGS(handle,size_ref));
+
+        CONTEXT_API_FUNC(HBE_RESULT, createShader, FUNC_PARAMS(ShaderHandle& handle,const ShaderInfo& info), FUNC_ARGS(handle,info));
+        CONTEXT_API_FUNC(HBE_RESULT, releaseShader, FUNC_PARAMS(ShaderHandle handle), FUNC_ARGS(handle));
 
         //Renderer* getRenderer();
 

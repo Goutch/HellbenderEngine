@@ -211,6 +211,7 @@ set(VK_FILES
         core/resource/Allocator.h
         core/resource/Allocator.cpp
         platforms/vk/VK_Types.h
+        platforms/vk/VK_Images.cpp
 )
 
 
