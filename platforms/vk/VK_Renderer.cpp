@@ -504,18 +504,15 @@ namespace HBE {
         render_target_info.flags = RENDER_TARGET_FLAG_COLOR_ATTACHMENT;
         ui_render_target = context->createRenderTarget(render_target_info);
 
-        ShaderInfo shader_info{};
-        shader_info.stage = SHADER_STAGE_VERTEX;
-        shader_info.path = "shaders/defaults/TexturedFullScreenTriangle.vert";
-        Shader *vert = context->createShader(shader_info);
+        Shader frag_shader;
+        frag_shader.loadGLSL("shaders/defaults/TexturedFullScreenTriangle.frag", SHADER_STAGE_FRAGMENT);
+        Shader vert_shader;
+        vert_shader.loadGLSL("shaders/defaults/TexturedFullScreenTriangle.vert", SHADER_STAGE_VERTEX);
 
-        shader_info.stage = SHADER_STAGE_FRAGMENT;
-        shader_info.path = "shaders/defaults/TexturedFullScreenTriangle.frag";
-        Shader *frag = context->createShader(shader_info);
 
         RasterizationPipelineInfo pipeline_info{};
-        pipeline_info.vertex_shader = vert;
-        pipeline_info.fragment_shader = frag;
+        pipeline_info.vertex_shader = vert_shader.getHandle();
+        pipeline_info.fragment_shader = frag_shader.getHandle();
         pipeline_info.attribute_info_count = 0;
 
         //ovewrite the renderpass so it is the swapchain

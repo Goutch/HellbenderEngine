@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Core.h"
-#include "string"
 #include "Resource.h"
 #include "core/interface/ShaderInterface.h"
 
@@ -9,6 +8,7 @@ namespace HBE {
     class HB_API Shader {
         ShaderHandle handle;
         Context *context = nullptr;
+
     public:
         Shader();
 
@@ -16,7 +16,11 @@ namespace HBE {
 
         ~Shader();
 
+        void loadGLSL(const char *path, SHADER_STAGE stage);
+
         void alloc(const ShaderInfo &info);
+
+        ShaderHandle getHandle();
 
         void release();
     };

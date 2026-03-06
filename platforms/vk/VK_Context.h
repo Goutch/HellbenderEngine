@@ -4,6 +4,7 @@
 #include "VK_Image.h"
 #include "VK_Images.h"
 #include "VK_Instance.h"
+#include "VK_Pipelines.h"
 #include "VK_Renderer.h"
 #include "VK_Surface.h"
 #include "VK_Swapchain.h"
@@ -25,6 +26,7 @@ namespace HBE {
 
         //resources
         VK_Images images{};
+        VK_Pipelines pipelines{};
 
         VK_Context(const ContextInfo &info, GraphicAPI &api);
 

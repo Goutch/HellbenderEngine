@@ -15,10 +15,9 @@ namespace HBE {
 
     struct ShaderInfo {
         SHADER_STAGE stage = SHADER_STAGE_NONE;
-        std::string path = "";
-        std::string preamble = "";
+        const uint32_t *spirv = nullptr;
+        uint32_t spirvLength = 0;
     };
+
     using ShaderHandle = Handle;
 }
-
-

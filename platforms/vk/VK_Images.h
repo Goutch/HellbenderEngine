@@ -14,6 +14,8 @@ namespace HBE {
         RawVector<ImageInfo> creation_infos;
 
     public:
+        void release();
+
         static inline HBE_RESULT createImage(void *context_ptr, ImageHandle &handle, const ImageInfo &info);
 
         static inline HBE_RESULT releaseImage(void *context_ptr, ImageHandle handle);

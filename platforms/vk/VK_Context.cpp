@@ -24,9 +24,7 @@
 #include "raytracing/VK_TopLevelAccelerationStructure.h"
 
 namespace HBE {
-
-    VK_Context::VK_Context(const ContextInfo& info, GraphicAPI& api)
-    {
+    VK_Context::VK_Context(const ContextInfo &info, GraphicAPI &api) {
         instance.init(info);
         surface.init(instance, Application::instance->getWindow()->getHandle());
         physical_device.init(instance, surface);
@@ -49,9 +47,10 @@ namespace HBE {
     }
 
 
-
-
     VK_Context::~VK_Context() {
+        pipelines.release();
+        images.release();
+
         renderer.release();
         allocator.processFreeRequests(0);
 

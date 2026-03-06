@@ -6,15 +6,15 @@
 
 namespace HBE
 {
-    typedef uint32_t VERTEX_ATTRIBUTE_FLAGS;
+    typedef uint8_t VERTEX_ATTRIBUTE_FLAGS;
 
-    enum VERTEX_ATTRIBUTE_FLAG
+    enum VERTEX_ATTRIBUTE_FLAG :uint8_t
     {
         VERTEX_ATTRIBUTE_FLAG_NONE = 0,
         VERTEX_ATTRIBUTE_FLAG_PER_INSTANCE = 1 << 0, /// Disable device local memory and skip staging buffer. May result in slower read in shader.
     };
 
-    enum VERTEX_TOPOLOGY
+    enum VERTEX_TOPOLOGY :uint8_t
     {
         VERTEX_TOPOLOGY_POINT_LIST = 0,
         VERTEX_TOPOLOGY_LINE_LIST = 1,

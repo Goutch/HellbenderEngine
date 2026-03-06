@@ -13,7 +13,7 @@ namespace HBE {
 		                        std::vector<uint32_t> &spirv,
 		                        SHADER_STAGE type,
 		                        const std::string &shader_path,
-		                        const std::string &preamble);
+		                        const std::string &preamble = "");
 	};
 
 }

@@ -198,7 +198,7 @@ namespace HBE {
     }
 
     void VK_Image::alloc(VK_Context *context, const ImageInfo &info) {
-        this->allocated = true;
+        this->m_allocated = true;
         this->context = context;
         this->width = info.width;
         this->height = info.height;
@@ -363,7 +363,7 @@ namespace HBE {
     }
 
     void VK_Image::release() {
-        this->allocated = false;
+        this->m_allocated = false;
         if (sampler_handle != VK_NULL_HANDLE) {
             vkDestroySampler(context->device.getHandle(), sampler_handle, nullptr);
         }
@@ -415,6 +415,10 @@ namespace HBE {
 
     void VK_Image::setImageLayout(VkImageLayout layout) {
         this->layout = layout;
+    }
+
+    bool VK_Image::allocated() {
+        return m_allocated;
     }
 
     vec3u VK_Image::getSize() const {

@@ -31,7 +31,7 @@ namespace HBE {
         uint32_t mip_levels;
         IMAGE_FORMAT format = IMAGE_FORMAT_UNDEFINED;
         IMAGE_FLAGS flags = IMAGE_FLAG_NONE;
-        bool allocated = false;
+        bool m_allocated = false;
         Allocation allocation{};
     public:
         VK_Image() = default;
@@ -72,6 +72,7 @@ namespace HBE {
 
         void setImageLayout(VkImageLayout layout);
 
+        bool allocated();
     private:
         VkImageLayout chooseLayout();
     };

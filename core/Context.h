@@ -4,38 +4,36 @@
 #include "scene/systems/ui/TextSystem.h"
 #include "core/interface/ImageInterface.h"
 #include "data-structure/Handle.h"
+#include "interface/ComputePipelineInterface.h"
+#include "interface/RasterizationPipelineInterface.h"
+#include "interface/RaytracingPipelineInterface.h"
 #include "interface/ShaderInterface.h"
 
-namespace HBE
-{
+namespace HBE {
     class Font;
     class Renderer;
 
-    enum GRAPHICS_API
-    {
+    enum GRAPHICS_API {
         GRAPHICS_API_NONE,
         GRAPHICS_API_VULKAN,
     };
 
     typedef uint32_t VULKAN_REQUIRED_EXTENSION_FLAGS;
 
-    enum VULKAN_REQUIRED_EXTENSIONS_FLAG
-    {
+    enum VULKAN_REQUIRED_EXTENSIONS_FLAG {
         VULKAN_REQUIRED_EXTENSION_NONE = 0,
         VULKAN_REQUIRED_EXTENSION_RTX = 1,
         VULKAN_REQUIRED_EXTENSION_DESCRIPTOR_INDEXING = 2,
     };
 
-    enum VULKAN_VERSION
-    {
+    enum VULKAN_VERSION {
         VULKAN_VERSION_1_0 = 0,
         VULKAN_VERSION_1_1 = 1,
         VULKAN_VERSION_1_2 = 2,
         VULKAN_VERSION_1_3 = 3,
     };
 
-    struct ContextInfo
-    {
+    struct ContextInfo {
         GRAPHICS_API api = GRAPHICS_API_VULKAN;
         VULKAN_REQUIRED_EXTENSION_FLAGS required_extension_flags = VULKAN_REQUIRED_EXTENSION_NONE;
         VULKAN_VERSION vulkan_version = VULKAN_VERSION_1_0;
@@ -114,42 +112,58 @@ PFN_##FuncName FuncName##_ptr = nullptr;
 #define FUNC_PARAMS(...) __VA_ARGS__
 
 
-    struct GraphicAPI
-    {
+    struct GraphicAPI {
         //images
         GRAPHIC_API_FUNC(HBE_RESULT, createImage, FUNC_PARAMS(ImageHandle& handle,const ImageInfo& info), FUNC_ARGS(handle,info));
         GRAPHIC_API_FUNC(HBE_RESULT, releaseImage, FUNC_PARAMS(ImageHandle handle), FUNC_ARGS(handle));
         GRAPHIC_API_FUNC(HBE_RESULT, updateImage, FUNC_PARAMS(ImageHandle handle, const void* data), FUNC_ARGS(handle,data));
         GRAPHIC_API_FUNC(HBE_RESULT, getImageSize, FUNC_PARAMS(ImageHandle handle,uvec3& size_ref), FUNC_ARGS(handle,size_ref));
 
+        //shaders
         GRAPHIC_API_FUNC(HBE_RESULT, createShader, FUNC_PARAMS(ShaderHandle& handle,const ShaderInfo& info), FUNC_ARGS(handle,info));
         GRAPHIC_API_FUNC(HBE_RESULT, releaseShader, FUNC_PARAMS(ShaderHandle handle), FUNC_ARGS(handle));
 
+        //raster pipeline
+        GRAPHIC_API_FUNC(HBE_RESULT, createRasterizationPipeline, FUNC_PARAMS(RasterizationPipelineHandle& handle,const RasterizationPipelineInfo& raster_pipeline_info), FUNC_ARGS(handle,raster_pipeline_info));
+        GRAPHIC_API_FUNC(HBE_RESULT, releaseRasterizationPipeline, FUNC_PARAMS(RasterizationPipelineHandle handle), FUNC_ARGS(handle));
+
+        //compute pipeline
+        GRAPHIC_API_FUNC(HBE_RESULT, createComputePipeline, FUNC_PARAMS(ComputePipelineHandle& handle,const ComputePipelineInfo& raster_pipeline_info), FUNC_ARGS(handle,raster_pipeline_info));
+        GRAPHIC_API_FUNC(HBE_RESULT, releaseComputePipeline, FUNC_PARAMS(ComputePipelineHandle handle), FUNC_ARGS(handle));
+
+        //raytracing pipeline
+        GRAPHIC_API_FUNC(HBE_RESULT, createRaytracingPipeline, FUNC_PARAMS(RaytracingPipelineHandle& handle,const RaytracingPipelineInfo& raster_pipeline_info), FUNC_ARGS(handle,raster_pipeline_info));
+        GRAPHIC_API_FUNC(HBE_RESULT, releaseRaytracingPipeline, FUNC_PARAMS(RaytracingPipelineHandle handle), FUNC_ARGS(handle));
+
     };
 
-    class HB_API Context
-    {
-        void* context_data = nullptr;
+    class HB_API Context {
+        void *context_data = nullptr;
         GRAPHICS_API current_api = GRAPHICS_API_NONE;
         GraphicAPI graphic_api{};
-    public :
 
-        void init(const ContextInfo& info);
+    public :
+        void init(const ContextInfo &info);
+
         void release();
+
         //images functions
         CONTEXT_API_FUNC(HBE_RESULT, createImage, FUNC_PARAMS(ImageHandle& handle,const ImageInfo& info), FUNC_ARGS(handle,info))
         CONTEXT_API_FUNC(HBE_RESULT, releaseImage, FUNC_PARAMS(ImageHandle handle), FUNC_ARGS(handle));
         CONTEXT_API_FUNC(HBE_RESULT, updateImage, FUNC_PARAMS(ImageHandle handle, const void* data), FUNC_ARGS(handle,data));
         CONTEXT_API_FUNC(HBE_RESULT, getImageSize, FUNC_PARAMS(ImageHandle handle,uvec3& size_ref), FUNC_ARGS(handle,size_ref));
 
-        CONTEXT_API_FUNC(HBE_RESULT, createShader, FUNC_PARAMS(ShaderHandle& handle,const ShaderInfo& info), FUNC_ARGS(handle,info));
-        CONTEXT_API_FUNC(HBE_RESULT, releaseShader, FUNC_PARAMS(ShaderHandle handle), FUNC_ARGS(handle));
+        CONTEXT_API_FUNC(HBE_RESULT, createRasterizationPipeline, FUNC_PARAMS(RasterizationPipelineHandle& handle,const RasterizationPipelineInfo& raster_pipeline_info), FUNC_ARGS(handle,raster_pipeline_info));
+        CONTEXT_API_FUNC(HBE_RESULT, releaseRasterizationPipeline, FUNC_PARAMS(RasterizationPipelineHandle handle), FUNC_ARGS(handle));
 
-        //Renderer* getRenderer();
+        CONTEXT_API_FUNC(HBE_RESULT, createComputePipeline, FUNC_PARAMS(ComputePipelineHandle& handle,const ComputePipelineInfo& raster_pipeline_info), FUNC_ARGS(handle,raster_pipeline_info));
+        CONTEXT_API_FUNC(HBE_RESULT, releaseComputePipeline, FUNC_PARAMS(ComputePipelineHandle handle), FUNC_ARGS(handle));
+
+        //raytracing pipeline
+        CONTEXT_API_FUNC(HBE_RESULT, createRaytracingPipeline, FUNC_PARAMS(RaytracingPipelineHandle& handle,const RaytracingPipelineInfo& raster_pipeline_info), FUNC_ARGS(handle,raster_pipeline_info));
+        CONTEXT_API_FUNC(HBE_RESULT, releaseRaytracingPipeline, FUNC_PARAMS(RaytracingPipelineHandle handle), FUNC_ARGS(handle));  //Renderer* getRenderer();
 
         // virtual RasterizationPipeline *createRasterizationPipeline(const RasterizationPipelineInfo &info) = 0;
-
-        // virtual Shader *createShader(const ShaderInfo &info) = 0;
 
         // virtual Mesh *createMesh(const MeshInfo &info) = 0;
 
