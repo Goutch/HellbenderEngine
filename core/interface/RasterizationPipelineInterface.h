@@ -25,7 +25,7 @@ namespace HBE {
         ShaderHandle vertex_shader = HBE_NULL_HANDLE;
         ShaderHandle fragment_shader = HBE_NULL_HANDLE;
         ShaderHandle geometry_shader = HBE_NULL_HANDLE;
-        VertexAttributeInfo *attribute_infos = nullptr;
+        const VertexAttributeInfo *attribute_infos = nullptr;
         RasterizationTarget *rasterization_target = nullptr;
         uint32_t attribute_info_count = 0;
         VERTEX_TOPOLOGY topology = VERTEX_TOPOLOGY_TRIANGLE_LIST;

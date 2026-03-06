@@ -1,11 +1,11 @@
-#include "VK_RasterizationPipeline.h"
+#include "../VK_RasterizationPipeline.h"
 #include "core/graphics/Window.h"
 #include "VK_PipelineLayout.h"
-#include "VK_Renderer.h"
-#include "VK_RenderPass.h"
-#include "VK_CommandPool.h"
-#include "VK_Context.h"
-#include "VK_Device.h"
+#include "../VK_Renderer.h"
+#include "../VK_RenderPass.h"
+#include "../VK_CommandPool.h"
+#include "../VK_Context.h"
+#include "../VK_Device.h"
 #include "core/Application.h"
 
 namespace HBE {

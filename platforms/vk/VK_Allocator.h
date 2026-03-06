@@ -5,7 +5,7 @@
 #include "unordered_map"
 #include "set"
 #include "string"
-#include "VK_Image.h"
+#include "resources/VK_Image.h"
 #include "VK_Mesh.h"
 #include "core/resource/Image.h"
 #include "core/resource/Allocator.h"

@@ -8,7 +8,7 @@
 
 #include "VK_ComputeInstance.h"
 #include "VK_ComputePipeline.h"
-#include "VK_RasterizationPipeline.h"
+#include "resources/VK_RasterizationPipeline.h"
 #include "VK_RasterizationPipelineInstance.h"
 #include "VK_RenderPass.h"
 #include "VK_RenderTarget.h"
@@ -85,7 +85,7 @@ namespace HBE {
         return new VK_ComputePipeline(this, info);
     }
 
-    RasterizationTarget *VK_Context::createRenderTarget(const RenderTargetInfo &info) {
+    RasterizationTarget *VK_Context::createRenderTarget(const RasterizationTargetInfo &info) {
         return new VK_RenderPass(this, info);
     }
 

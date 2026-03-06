@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IPipelineInstance.h"
+#include "PipelineInstance.h"
 #include "Core.h"
 
 namespace HBE
@@ -27,11 +27,6 @@ namespace HBE
 	class HB_API ComputeInstance : public IPipelineInstance
 	{
 	public:
-		virtual const ComputePipeline* getComputePipeline() const = 0;
-		virtual void dispatchAsync(uint32_t size_x,
-		                           uint32_t size_y,
-		                           uint32_t size_z) = 0;
-		virtual bool isDispatchFinished() = 0;
-		virtual void wait() = 0;
+
 	};
 }

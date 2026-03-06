@@ -11,9 +11,9 @@ namespace HBE
 
     class RasterizationPipeline;
 
-    typedef uint32_t RENDER_TARGET_FLAGS;
+    typedef uint8_t RENDER_TARGET_FLAGS;
 
-    enum RENDER_TARGET_FLAG
+    enum RENDER_TARGET_FLAG : uint8_t
     {
         RENDER_TARGET_FLAG_NONE = 0,
         RENDER_TARGET_FLAG_DEPTH_ATTACHMENT = 1,
@@ -23,14 +23,12 @@ namespace HBE
     };
 
 
-    struct RenderTargetInfo
+    struct RasterizationTargetInfo
     {
         uint32_t width = 0;
         uint32_t height = 0;
-
-        IMAGE_FORMAT format = IMAGE_FORMAT_RGBA32F;
         vec4 clear_color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-
+        IMAGE_FORMAT format = IMAGE_FORMAT_RGBA32F;
         RENDER_TARGET_FLAGS flags = RENDER_TARGET_FLAG_NONE;
     };
 

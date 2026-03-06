@@ -5,8 +5,8 @@
 #include "VK_RaytracingPipelineInstance.h"
 #include "VK_RaytracingPipeline.h"
 #include "../VK_Renderer.h"
-#include "../VK_PipelineLayout.h"
-#include "../VK_PipelineDescriptors.h"
+#include "../resources/VK_PipelineLayout.h"
+#include "../resources/VK_PipelineDescriptors.h"
 #include "VK_TopLevelAccelerationStructure.h"
 
 namespace HBE

@@ -5,12 +5,12 @@
 #include <string>
 #include <core/resource/StorageBuffer.h>
 #include "vulkan/vulkan.h"
-#include "VK_Buffer.h"
+#include "../VK_Buffer.h"
 
 #include "array"
 #include "Event.h"
 #include "map"
-#include "core/resource/IPipelineInstance.h"
+#include "core/resource/PipelineInstance.h"
 #include "core/resource/TexelBuffer.h"
 
 namespace HBE

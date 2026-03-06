@@ -2,15 +2,15 @@
 // Created by user on 8/14/2022.
 //
 
-#include "VK_PipelineDescriptors.h"
+#include "platforms/vk/resources//VK_PipelineDescriptors.h"
 #include "VK_PipelineLayout.h"
-#include "VK_RenderPass.h"
-#include "VK_Renderer.h"
-#include "VK_CommandPool.h"
-#include "VK_Context.h"
-#include "raytracing/VK_TopLevelAccelerationStructure.h"
-#include "VK_StorageBuffer.h"
-#include "VK_TexelBuffer.h"
+#include "platforms/vk/VK_RenderPass.h"
+#include "platforms/vk/VK_Renderer.h"
+#include "platforms/vk/VK_CommandPool.h"
+#include "platforms/vk/VK_Context.h"
+#include "platforms/vk/resources/raytracing/VK_TopLevelAccelerationStructure.h"
+#include "platforms/vk/VK_StorageBuffer.h"
+#include "platforms/vk/VK_TexelBuffer.h"
 #include "core/Application.h"
 #include "dependencies/utils-collection/Profiler.h"
 

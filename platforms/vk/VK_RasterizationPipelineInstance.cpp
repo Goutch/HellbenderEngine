@@ -1,6 +1,6 @@
 #include "VK_RasterizationPipelineInstance.h"
-#include "VK_PipelineDescriptors.h"
-#include "VK_RasterizationPipeline.h"
+#include "resources/VK_PipelineDescriptors.h"
+#include "resources/VK_RasterizationPipeline.h"
 
 namespace HBE
 {

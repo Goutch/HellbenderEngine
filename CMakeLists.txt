@@ -44,9 +44,8 @@ set(CORE_FILES
         core/resource/Resource.h
         core/resource/ComputePipeline.h
         core/resource/Image.cpp
-        core/resource/RasterizationPipelineInstance.h
         core/resource/ComputeInstance.h
-        core/resource/IPipelineInstance.h
+        core/resource/PipelineInstance.h
         core/resource/RasterizationTarget.h
         core/resource/raytracing/RaytracingPipeline.h
         core/resource/raytracing/RaytracingPipelineInstance.h
@@ -131,6 +130,7 @@ set(CORE_FILES
         core/scene/ecs/Group/PageDataArchetype.h
         core/scene/ecs/Registry/ECSTypes.h
         core/graphics/Fence.h
+        core/interface/RasterizationTargetInterface.h
 
 )
 set(VK_FILES
@@ -149,18 +149,18 @@ set(VK_FILES
         platforms/vk/VK_Swapchain.h
         platforms/vk/VK_Surface.cpp
         platforms/vk/VK_Surface.h
-        platforms/vk/VK_RasterizationPipeline.cpp
-        platforms/vk/VK_RasterizationPipeline.h
+        platforms/vk/resources/VK_RasterizationPipeline.cpp
+        platforms/vk/resources/VK_RasterizationPipeline.h
         platforms/vk/VK_Shader.cpp
         platforms/vk/VK_Shader.h
-        platforms/vk/VK_Image.cpp
-        platforms/vk/VK_Image.h
+        platforms/vk/resources/VK_Image.cpp
+        platforms/vk/resources/VK_Image.h
         platforms/vk/VK_Mesh.h
         platforms/vk/VK_Mesh.cpp
         platforms/vk/VK_RenderPass.cpp
         platforms/vk/VK_RenderPass.h
-        platforms/vk/ShaderCompiler.cpp
-        platforms/vk/ShaderCompiler.h
+        core/utility/ShaderCompiler.cpp
+        core/utility/ShaderCompiler.h
         platforms/vk/VK_Semaphore.cpp
         platforms/vk/VK_Semaphore.h
         platforms/vk/VK_Fence.cpp
@@ -177,24 +177,24 @@ set(VK_FILES
         platforms/vk/VK_Queue.h
         platforms/vk/VK_ComputePipeline.cpp
         platforms/vk/VK_ComputePipeline.h
-        platforms/vk/VK_PipelineLayout.cpp
-        platforms/vk/VK_PipelineLayout.h
-        platforms/vk/VK_PipelineDescriptors.cpp
-        platforms/vk/VK_PipelineDescriptors.h
+        platforms/vk/resources/VK_PipelineLayout.cpp
+        platforms/vk/resources/VK_PipelineLayout.h
+        platforms/vk/resources/VK_PipelineDescriptors.cpp
+        platforms/vk/resources/VK_PipelineDescriptors.h
         platforms/vk/VK_RasterizationPipelineInstance.cpp
         platforms/vk/VK_RasterizationPipelineInstance.h
         platforms/vk/VK_ComputeInstance.cpp
         platforms/vk/VK_ComputeInstance.h
-        platforms/vk/raytracing/VK_TopLevelAccelerationStructure.cpp
-        platforms/vk/raytracing/VK_TopLevelAccelerationStructure.h
-        platforms/vk/raytracing/VK_MeshBottomLevelAccelerationStructure.cpp
-        platforms/vk/raytracing/VK_MeshBottomLevelAccelerationStructure.h
-        platforms/vk/raytracing/VK_AABBBottomLevelAccelerationStructure.cpp
-        platforms/vk/raytracing/VK_MeshBottomLevelAccelerationStructure.cpp
-        platforms/vk/raytracing/VK_RaytracingPipeline.cpp
-        platforms/vk/raytracing/VK_RaytracingPipeline.h
-        platforms/vk/raytracing/VK_RaytracingPipelineInstance.cpp
-        platforms/vk/raytracing/VK_RaytracingPipelineInstance.h
+        platforms/vk/resources/raytracing/VK_TopLevelAccelerationStructure.cpp
+        platforms/vk/resources/raytracing/VK_TopLevelAccelerationStructure.h
+        platforms/vk/resources/raytracing/VK_MeshBottomLevelAccelerationStructure.cpp
+        platforms/vk/resources/raytracing/VK_MeshBottomLevelAccelerationStructure.h
+        platforms/vk/resources/raytracing/VK_AABBBottomLevelAccelerationStructure.cpp
+        platforms/vk/resources/raytracing/VK_MeshBottomLevelAccelerationStructure.cpp
+        platforms/vk/resources/raytracing/VK_RaytracingPipeline.cpp
+        platforms/vk/resources/raytracing/VK_RaytracingPipeline.h
+        platforms/vk/resources/raytracing/VK_RaytracingPipelineInstance.cpp
+        platforms/vk/resources/raytracing/VK_RaytracingPipelineInstance.h
         platforms/vk/VK_StorageBuffer.cpp
         platforms/vk/VK_StorageBuffer.h
         platforms/vk/VK_TexelBuffer.cpp
@@ -211,7 +211,11 @@ set(VK_FILES
         core/resource/Allocator.h
         core/resource/Allocator.cpp
         platforms/vk/VK_Types.h
-        platforms/vk/VK_Images.cpp
+        platforms/vk/resources/VK_Images.cpp
+        core/interface/AccelerationStructureInterface.h
+        core/interface/MeshInterface.h
+        core/resource/PipelineInstance.cpp
+        core/interface/PipelineInstanceInterface.h
 )
 
 

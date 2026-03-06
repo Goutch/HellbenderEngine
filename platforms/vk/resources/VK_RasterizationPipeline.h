@@ -5,7 +5,7 @@
 #include "vulkan/vulkan.h"
 #include "unordered_map"
 #include "VK_Image.h"
-#include "VK_Shader.h"
+#include "../VK_Shader.h"
 #include "unordered_map"
 #include "VK_PipelineLayout.h"
 
@@ -44,11 +44,11 @@ namespace HBE {
 
         void release();
 
-        void pushConstant(const std::string &name, const void *data) const override;
+        void pushConstant(const std::string &name, const void *data) const;
 
-        void bind() const override;
+        void bind() const;
 
-        void unbind() const override;
+        void unbind() const;
 
         void createPipelineLayout();
 
@@ -57,6 +57,6 @@ namespace HBE {
         const VK_PipelineLayout &getPipelineLayout() const;
 
 
-        RASTERIZATION_PIPELINE_FLAGS getFlags() const override;
+        RASTERIZATION_PIPELINE_FLAGS getFlags() const;
     };
 }

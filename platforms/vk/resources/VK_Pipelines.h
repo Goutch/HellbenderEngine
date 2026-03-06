@@ -1,8 +1,8 @@
 #pragma once
 #include "HandleProvider.h"
-#include "VK_ComputePipeline.h"
+#include "../VK_ComputePipeline.h"
 #include "VK_RasterizationPipeline.h"
-#include "raytracing/VK_RaytracingPipeline.h"
+#include "../raytracing/VK_RaytracingPipeline.h"
 
 namespace HBE {
     class Context;

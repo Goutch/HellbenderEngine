@@ -2,7 +2,7 @@
 #include "core/utility/Log.h"
 #include "fstream"
 #include "core/Application.h"
-#include "platforms/vk/ShaderCompiler.h"
+#include "../utility/ShaderCompiler.h"
 
 namespace HBE {
     Shader::Shader() : context(Application::instance->getContext()) {

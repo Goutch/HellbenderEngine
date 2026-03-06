@@ -2,7 +2,7 @@
 #include <algorithm>
 #include "VK_Allocator.h"
 #include "platforms/vk/VK_CommandPool.h"
-#include "platforms/vk/VK_Image.h"
+#include "resources/VK_Image.h"
 #include "platforms/vk/VK_Buffer.h"
 #include "cstring"
 #include "VK_Context.h"

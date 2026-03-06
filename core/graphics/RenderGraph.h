@@ -13,7 +13,7 @@ namespace HBE {
 	class Mesh;
 
 	class HB_API RenderGraph {
-#define MAP(T1, T2) std::unordered_map<T1,T2>
+		Context& context;
 		std::vector<DrawCmdInfo> render_cache;
 		std::vector<DrawCmdInfo> ordered_render_cache;
 
@@ -28,6 +28,7 @@ namespace HBE {
 
 	public:
 		RenderGraph();
+
 
 		~RenderGraph();
 

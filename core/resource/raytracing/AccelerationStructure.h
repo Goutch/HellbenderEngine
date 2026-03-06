@@ -2,6 +2,8 @@
 
 #include "Core.h"
 #include "../Resource.h"
+#include "core/interface/AccelerationStructureInterface.h"
+#include "core/interface/MeshInterface.h"
 #include "core/resource/Allocator.h"
 
 namespace HBE
@@ -21,7 +23,7 @@ namespace HBE
 
     struct MeshAccelerationStructureInfo
     {
-        Mesh* mesh;
+        MeshHandle mesh_handle;
         MEMORY_TYPE_FLAGS preferred_memory_type_flags = MEMORY_TYPE_FLAG_GPU_LOCAL;
     };
 
@@ -47,11 +49,11 @@ namespace HBE
 
     struct RootAccelerationStructureInfo
     {
-        AABBAccelerationStructure** aabb_acceleration_structures;
-        MeshAccelerationStructure** mesh_acceleration_structures;
+        AABBAccelerationStructureHandle* aabb_acceleration_structures;
+        MeshAccelerationStructureHandle* mesh_acceleration_structures;
+        AccelerationStructureInstance* instances;
         uint32_t aabb_acceleration_structure_count;
         uint32_t mesh_acceleration_structure_count;
-        AccelerationStructureInstance* instances;
         uint32_t instance_count;
         MEMORY_TYPE_FLAGS preferred_memory_type_flags = MEMORY_TYPE_FLAG_GPU_LOCAL;
     };

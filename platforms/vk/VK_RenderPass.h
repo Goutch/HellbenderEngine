@@ -3,7 +3,7 @@
 #include <core/resource/RasterizationTarget.h>
 #include "vulkan/vulkan.h"
 #include "vector"
-#include "VK_Image.h"
+#include "resources/VK_Image.h"
 
 
 namespace HBE
@@ -39,7 +39,7 @@ namespace HBE
     public:
         ~VK_RenderPass();
 
-        VK_RenderPass(VK_Context* context, const RenderTargetInfo& info);
+        VK_RenderPass(VK_Context* context, const RasterizationTargetInfo& info);
 
         void begin(const VkCommandBuffer& command_buffer, uint32_t i) const;
 

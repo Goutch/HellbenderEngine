@@ -5,7 +5,7 @@
 #include "VK_RaytracingPipeline.h"
 #include "vulkan/vulkan.h"
 #include "../VK_Renderer.h"
-#include "../VK_PipelineLayout.h"
+#include "../resources/VK_PipelineLayout.h"
 #include "../VK_Device.h"
 #include "../VK_Renderer.h"
 #include "../VK_CommandPool.h"

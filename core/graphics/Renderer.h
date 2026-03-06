@@ -7,6 +7,8 @@
 #include "dependencies/utils-collection/Event.h"
 #include <string>
 #include "GraphicLimits.h"
+#include "core/interface/MeshInterface.h"
+#include "core/resource/PipelineInstance.h"
 
 namespace HBE
 {
@@ -73,8 +75,8 @@ namespace HBE
 
 	struct DrawCmdInfo
 	{
-		const Mesh* mesh = nullptr;
-		RasterizationPipelineInstance* pipeline_instance = nullptr;
+		MeshHandle mesh = HBE_NULL_HANDLE;
+		PipelineInstanceHandle pipeline_instance = HBE_NULL_HANDLE;
 		uint32_t layer = 0;
 		uint32_t order_in_layer = 0; //ignored if ordered flag is not set
 		uint32_t push_constants_count = 0;

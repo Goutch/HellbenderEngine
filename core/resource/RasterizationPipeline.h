@@ -7,20 +7,26 @@
 #include "Resource.h"
 #include "core/interface/RasterizationPipelineInterface.h"
 
-namespace HBE {
+namespace HBE
+{
+    class PipelineInstance;
 
-
-    class HB_API RasterizationPipeline {
+    class HB_API RasterizationPipeline
+    {
         Context& context;
-        RasterizationPipelineHandle handle;
+        RasterizationPipelineHandle handle = HBE_NULL_HANDLE;
+
     public:
-        RasterizationPipeline(const RasterizationPipelineInfo& info);
+        RasterizationPipeline();
         ~RasterizationPipeline();
+        RasterizationPipeline(const RasterizationPipelineInfo& info);
+        void alloc(const RasterizationPipelineInfo& info);
+        void allocInstance(PipelineInstance& instance);
+        void release();
+        RasterizationPipelineHandle getHandle();
 
-        bool isCompatible(VertexAttributeInfo *attribute_infos, uint32_t attribute_info_count) const;
-
+        uint32_t getBinding(const char* name);
+        bool isCompatible(VertexAttributeInfo* attribute_infos, uint32_t attribute_info_count) const;
         RASTERIZATION_PIPELINE_FLAGS getFlags() const;
     };
-
-
 }

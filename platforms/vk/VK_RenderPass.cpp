@@ -9,7 +9,7 @@
 
 namespace HBE
 {
-    VK_RenderPass::VK_RenderPass(VK_Context* context, const RenderTargetInfo& info)
+    VK_RenderPass::VK_RenderPass(VK_Context* context, const RasterizationTargetInfo& info)
     {
         this->context = context;
         this->width = info.width;

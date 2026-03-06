@@ -1,6 +1,6 @@
 #include "VK_Images.h"
 #include "VK_Image.h"
-#include "VK_Context.h"
+#include "../VK_Context.h"
 #include "core/interface/ImageInterface.h"
 
 #define IMAGE_FUNCTION_HEADER \

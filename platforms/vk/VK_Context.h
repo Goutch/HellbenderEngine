@@ -1,10 +1,10 @@
 #pragma once
 #include "VK_Allocator.h"
 #include "VK_Device.h"
-#include "VK_Image.h"
-#include "VK_Images.h"
+#include "resources/VK_Image.h"
+#include "resources/VK_Images.h"
 #include "VK_Instance.h"
-#include "VK_Pipelines.h"
+#include "resources/VK_Pipelines.h"
 #include "VK_Renderer.h"
 #include "VK_Surface.h"
 #include "VK_Swapchain.h"
@@ -47,7 +47,7 @@ namespace HBE {
 
         ComputePipeline *createComputePipeline(const ComputePipelineInfo &info) final;
 
-        RasterizationTarget *createRenderTarget(const RenderTargetInfo &info) final;
+        RasterizationTarget *createRenderTarget(const RasterizationTargetInfo &info) final;
 
         RasterizationPipelineInstance *createRasterizationPipelineInstance(
             const RasterizationPipelineInstanceInfo &info) final;

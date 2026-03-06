@@ -4,9 +4,9 @@ SHADER_FUNC_HEADER //
 
 
 
-#include "VK_Pipelines.h"
+#include "../VK_Pipelines.h"
 
-#include "VK_Context.h"
+#include "../VK_Context.h"
 #include "dependencies/glfw/src/internal.h"
 #define SHADER_FUNC_HEADER \
 VK_Context& context = *static_cast<VK_Context*>(context_ptr);\

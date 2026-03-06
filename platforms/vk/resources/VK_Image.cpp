@@ -1,8 +1,8 @@
-#include "VK_Image.h"
-#include "VK_Buffer.h"
-#include "VK_Context.h"
-#include "VK_Renderer.h"
-#include "VK_Utils.h"
+#include "../VK_Image.h"
+#include "../VK_Buffer.h"
+#include "../VK_Context.h"
+#include "../VK_Renderer.h"
+#include "../VK_Utils.h"
 #include "core/Application.h"
 
 namespace HBE {

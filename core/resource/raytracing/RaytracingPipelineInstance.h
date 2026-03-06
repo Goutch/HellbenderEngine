@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core.h"
-#include "../IPipelineInstance.h"
+#include "../PipelineInstance.h"
 
 namespace HBE
 {

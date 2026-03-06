@@ -2,7 +2,7 @@
 
 #include "core/resource/raytracing/RaytracingPipeline.h"
 #include "platforms/vk/VK_Buffer.h"
-#include "platforms/vk/VK_PipelineLayout.h"
+#include "../resources/VK_PipelineLayout.h"
 #include "vulkan/vulkan.h"
 
 namespace HBE

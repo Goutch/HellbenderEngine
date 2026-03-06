@@ -1,4 +1,3 @@
-#include "core/resource/RasterizationPipelineInstance.h"
 #include "DefaultModelParser.h"
 
 #include "core/Application.h"
@@ -8,12 +7,12 @@
 
 namespace HBE
 {
-    DefaultModelParser::DefaultModelParser(DefaultModelParserInfo info)
+    DefaultModelParser::DefaultModelParser(DefaultModelParserInfo info) : context(*Application::instance->getContext())
     {
         this->parser_info = info;
     }
 
-    Mesh* DefaultModelParser::createMesh(const ModelPrimitiveData& data, const ModelInfo model_info)
+    MeshHandle DefaultModelParser::createMesh(const ModelPrimitiveData& data, const ModelInfo model_info)
     {
         std::vector<uint32_t> indices32;
         std::vector<uint16_t> indices16;
@@ -64,16 +63,17 @@ namespace HBE
 
         mesh_info.attribute_infos = attribute_infos.data();
         mesh_info.attribute_info_count = attribute_infos.size();
-        Mesh* mesh_ptr = Application::instance->getContext()->createMesh(mesh_info);
+        MeshHandle mesh_handle;
+        context.createMesh(mesh_handle, mesh_info);
         switch (data.indices.element_size)
         {
         case 2:
-            mesh_ptr->setVertexIndices(reinterpret_cast<const uint16_t*>(data.indices.data), data.indices.count);
+            context.setMeshVertexIndices16(mesh_handle, reinterpret_cast<const uint16_t*>(data.indices.data), data.indices.count);
             indices16 = std::vector<uint16_t>(reinterpret_cast<const uint16_t*>(data.indices.data),
                                               reinterpret_cast<const uint16_t*>(data.indices.data) + data.indices.count);
             break;
         case 4:
-            mesh_ptr->setVertexIndices(reinterpret_cast<const uint32_t*>(data.indices.data), data.indices.count);
+            context.setMeshVertexIndices(mesh_handle, reinterpret_cast<const uint32_t*>(data.indices.data), data.indices.count);
             indices32 = std::vector<uint32_t>(reinterpret_cast<const uint32_t*>(data.indices.data),
                                               reinterpret_cast<const uint32_t*>(data.indices.data) + data.indices.count);
             break;
@@ -81,34 +81,35 @@ namespace HBE
 
         if (position_it != data.buffers.end())
         {
-            mesh_ptr->setBuffer(0, position_it->second[0].data, position_it->second[0].count);
+            context.setMeshVertexBuffer(mesh_handle, 0, position_it->second[0].data, position_it->second[0].count);
         }
         if (uv_it != data.buffers.end())
         {
-            mesh_ptr->setBuffer(1, uv_it->second[0].data, uv_it->second[0].count);
+            context.setMeshVertexBuffer(mesh_handle, 1, uv_it->second[0].data, uv_it->second[0].count);
         }
         if (normal_it != data.buffers.end())
         {
-            mesh_ptr->setBuffer(2, normal_it->second[0].data, normal_it->second[0].count);
+            context.setMeshVertexBuffer(mesh_handle, 2, normal_it->second[0].data, normal_it->second[0].count);
         }
 
 
-        return mesh_ptr;
+        return mesh_handle;
     }
 
-    RasterizationPipelineInstance* DefaultModelParser::createMaterial(const ModelMaterialData& materialData,
-                                                                      HBE::Image** textures)
+    PipelineInstanceHandle DefaultModelParser::createMaterial(const ModelMaterialData& materialData,
+                                                              HBE::ImageHandle* textures)
     {
-        RasterizationPipelineInstanceInfo instance_info{};
-        instance_info.rasterization_pipeline = materialData.double_sided
+        PipelineInstanceHandle instance_handle;
+        PipelineInstanceInfo instance_info{};
+        instance_info.pipeline_handle = materialData.double_sided
                                                    ? parser_info.graphic_pipeline_2_sided
                                                    : parser_info.graphic_pipeline;
 
-        RasterizationPipelineInstance* instance_ptr = HBE::Application::instance->getContext()->createRasterizationPipelineInstance(instance_info);
+         context.createPipelineInstance(instance_handle,instance_info);
 
         auto texture_type_it = parser_info.texture_names.find(MODEL_TEXTURE_TYPE_ALBEDO);
         if (texture_type_it != parser_info.texture_names.end() && materialData.albedo_texture != -1)
-            instance_ptr->setImage(texture_type_it->second, textures[materialData.albedo_texture]);
+             context.setPipelineInstanceImage(texture_type_it->second, textures[materialData.albedo_texture]);
         texture_type_it = parser_info.texture_names.find(MODEL_TEXTURE_TYPE_METALLIC_ROUGHNESS);
         if (texture_type_it != parser_info.texture_names.end() && materialData.metallic_roughness_texture != -1)
             instance_ptr->setImage(texture_type_it->second, textures[materialData.metallic_roughness_texture]);

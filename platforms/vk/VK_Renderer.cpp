@@ -17,9 +17,9 @@
 #include "VK_Allocator.h"
 #include "VK_Mesh.h"
 
-#include "VK_RasterizationPipeline.h"
+#include "resources/VK_RasterizationPipeline.h"
 #include "dependencies/utils-collection/Profiler.h"
-#include "VK_PipelineDescriptors.h"
+#include "resources/VK_PipelineDescriptors.h"
 #include "VK_RasterizationPipelineInstance.h"
 #include "raytracing/VK_RaytracingPipelineInstance.h"
 #include "core/graphics/RenderGraph.h"
@@ -492,7 +492,7 @@ namespace HBE {
             Log::error("failed to create texture sampler!");
         }
 
-        RenderTargetInfo render_target_info{};
+        RasterizationTargetInfo render_target_info{};
         render_target_info.width = context->swapchain.getExtent().width;
         render_target_info.height = context->swapchain.getExtent().height;
         render_target_info.clear_color = vec4(0.f, 0.f, 0.f, 1.f);

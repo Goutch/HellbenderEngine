@@ -4,7 +4,7 @@
 #include "core/resource/Image.h"
 #include "vulkan/vulkan.h"
 #include "array"
-#include "VK_Types.h"
+#include "../VK_Types.h"
 
 namespace HBE {
     class VK_Context;

@@ -1,10 +1,10 @@
-#include "VK_PipelineLayout.h"
-#include "VK_Device.h"
+#include "../VK_PipelineLayout.h"
+#include "../VK_Device.h"
 #include "algorithm"
-#include "VK_Context.h"
+#include "../VK_Context.h"
 #include "VK_Image.h"
-#include "VK_RenderPass.h"
-#include "VK_DescriptorSetLayout.h"
+#include "../VK_RenderPass.h"
+#include "../VK_DescriptorSetLayout.h"
 
 namespace HBE
 {
@@ -89,8 +89,6 @@ namespace HBE
         other.pipeline_descriptors.clear();
         other.pipeline_push_constants.clear();
         other.push_constant_name_to_index.clear();
-
-
         other.handle = VK_NULL_HANDLE;
     }
 

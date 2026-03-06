@@ -4,7 +4,7 @@
 
 #include "VK_ComputeInstance.h"
 #include "VK_ComputePipeline.h"
-#include "VK_PipelineDescriptors.h"
+#include "resources/VK_PipelineDescriptors.h"
 #include "VK_Fence.h"
 #include "VK_Device.h"
 #include "VK_CommandPool.h"

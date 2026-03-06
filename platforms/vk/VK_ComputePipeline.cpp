@@ -2,7 +2,7 @@
 #include "VK_Renderer.h"
 #include "VK_Device.h"
 #include "VK_Shader.h"
-#include "VK_PipelineLayout.h"
+#include "resources/VK_PipelineLayout.h"
 #include "VK_Context.h"
 
 namespace HBE
