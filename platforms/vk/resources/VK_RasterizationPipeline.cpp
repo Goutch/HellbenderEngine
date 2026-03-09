@@ -9,6 +9,10 @@
 #include "core/Application.h"
 
 namespace HBE {
+
+	VK_RasterizationPipeline::VK_RasterizationPipeline(VK_RasterizationPipeline &&other) noexcept {
+		this->context = other.context;
+	}
 	void VK_RasterizationPipeline::init(VK_Context *context, const RasterizationPipelineInfo &info,
 	                                    VkRenderPass render_pass_overwrite) {
 		this->context = context;
@@ -267,4 +271,5 @@ namespace HBE {
 	const VK_PipelineLayout &VK_RasterizationPipeline::getPipelineLayout() const {
 		return layout;
 	}
+
 }

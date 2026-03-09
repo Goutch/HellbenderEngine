@@ -17,11 +17,11 @@
 #include "VK_ValidationLayers.h"
 #include "core/Application.h"
 #include "core/Configs.h"
-#include "raytracing/VK_AABBBottomLevelAccelerationStructure.h"
-#include "raytracing/VK_MeshBottomLevelAccelerationStructure.h"
-#include "raytracing/VK_RaytracingPipeline.h"
-#include "raytracing/VK_RaytracingPipelineInstance.h"
-#include "raytracing/VK_TopLevelAccelerationStructure.h"
+#include "resources/raytracing/VK_AABBBottomLevelAccelerationStructure.h"
+#include "resources/raytracing/VK_MeshBottomLevelAccelerationStructure.h"
+#include "resources/raytracing/VK_RaytracingPipeline.h"
+#include "resources/raytracing/VK_RaytracingPipelineInstance.h"
+#include "resources/raytracing/VK_TopLevelAccelerationStructure.h"
 
 namespace HBE {
     VK_Context::VK_Context(const ContextInfo &info, GraphicAPI &api) {
@@ -36,6 +36,10 @@ namespace HBE {
         api.releaseImage_ptr = &VK_Images::releaseImage;
         api.getImageSize_ptr = &VK_Images::getImageSize;
         api.updateImage_ptr = &VK_Images::updateImage;
+
+        api.createShader_ptr = &VK_Pipelines::createShader;
+        api.releaseShader_ptr = &VK_Pipelines::releaseShader;
+
 
 
         renderer.init(this);

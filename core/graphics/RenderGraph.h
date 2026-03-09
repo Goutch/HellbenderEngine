@@ -22,13 +22,13 @@ namespace HBE {
 		size_t current_pc_block_offset = 0;
 		std::vector<char *> push_constant_blocks;
 
+
 		static bool compareDrawCmd(const DrawCmdInfo &cmd1, const DrawCmdInfo &cmd2);
 
 		static bool compareDrawCmdOrdered(const DrawCmdInfo &cmd1, const DrawCmdInfo &cmd2);
 
 	public:
 		RenderGraph();
-
 
 		~RenderGraph();
 

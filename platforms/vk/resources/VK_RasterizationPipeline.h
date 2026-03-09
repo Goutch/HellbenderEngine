@@ -36,7 +36,7 @@ namespace HBE {
         ~VK_RasterizationPipeline() = default;
 
         VK_RasterizationPipeline(VK_RasterizationPipeline &) = delete;
-
+        VK_RasterizationPipeline(VK_RasterizationPipeline && other) noexcept;
         VK_RasterizationPipeline &operator=(VK_RasterizationPipeline &) = delete;
 
         void init(VK_Context *context, const RasterizationPipelineInfo &info,
@@ -59,4 +59,5 @@ namespace HBE {
 
         RASTERIZATION_PIPELINE_FLAGS getFlags() const;
     };
+
 }

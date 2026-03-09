@@ -13,6 +13,7 @@ namespace HBE {
 
         MeshHandle mesh = HBE_NULL_HANDLE;
         PipelineInstanceHandle pipeline_instance = HBE_NULL_HANDLE;
+        RasterizationPipelineHandle rasterization_pipeline = HBE_NULL_HANDLE;
         PushConstantInfo *push_constants = nullptr;
         uint32_t push_constants_count = 0;
         uint32_t layer = 0;

@@ -8,17 +8,15 @@
 #include "VK_StorageBuffer.h"
 #include "core/resource/StorageBuffer.h"
 
-namespace HBE
-{
+namespace HBE {
     class VK_Device;
 
     class VK_Buffer;
 
     class VK_Renderer;
 
-    class VK_Mesh : public Mesh
-    {
-        VK_Context* context = nullptr;
+    class VK_Mesh {
+        VK_Context *context = nullptr;
 
         std::vector<VK_Buffer> buffers;
         VkBufferUsageFlags extra_usages = 0;
@@ -27,25 +25,26 @@ namespace HBE
         VK_Buffer indices_buffer;
 
     public:
-        VK_Mesh(VK_Context* context, const MeshInfo& info);
-        ~VK_Mesh() override;
+        VK_Mesh(VK_Context *context, const MeshInfo &info);
 
-        void setVertexIndices(const uint32_t* data, size_t count) override;
+        ~VK_Mesh();
 
-        void setVertexIndices(const uint16_t* data, size_t count) override;
+        void setVertexIndices(const uint32_t *data, size_t count);
 
-        void setVertexIndices(const void* data, size_t count, size_t element_size);
+        void setVertexIndices(const uint16_t *data, size_t count);
 
-        void setBuffer(uint32_t location, const void* vertices, size_t count) override;
+        void setVertexIndices(const void *data, size_t count, size_t element_size);
 
-        void setInstanceBuffer(uint32_t location, const void* data, size_t count) override;
+        void setBuffer(uint32_t location, const void *vertices, size_t count);
 
-        const VK_Buffer& getBuffer(uint32_t binding) const;
+        void setInstanceBuffer(uint32_t location, const void *data, size_t count);
 
-        const VK_Buffer& getIndicesBuffer() const;
+        const VK_Buffer &getBuffer(uint32_t binding) const;
 
-        void bind() const override;
+        const VK_Buffer &getIndicesBuffer() const;
 
-        void unbind() const override;
+        void bind() const;
+
+        void unbind() const;
     };
 }

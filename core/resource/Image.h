@@ -12,21 +12,18 @@ namespace HBE {
 		ImageHandle handle;
 		Context *context = nullptr;
 	public:
-		Image(const ImageInfo &info);
-
-		Image(Image &&other);
-
+		explicit Image(const ImageInfo &info);
+		Image(Image &&other) noexcept;
+		Image(const Image &other) = delete;
 		~Image();
 
-		Image(const Image &other) = delete;
-
-		vec3u getSize();
-
+		void alloc(const ImageInfo &info);
 		void release();
+		vec3u getSize();
 
 		void update(const void *data);
 
-		void load(const std::string &path, ImageInfo &info);
+		void load(const char* path,IMAGE_FORMAT expected_format);
 
 		static int getFormatNumberOfChannels(IMAGE_FORMAT format);
 	};

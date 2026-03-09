@@ -7,6 +7,7 @@
 #include "TexelBuffer.h"
 #include "core/interface/AccelerationStructureInterface.h"
 #include "core/interface/PipelineInstanceInterface.h"
+#include "core/interface/RasterizationPipelineInterface.h"
 
 namespace HBE
 {

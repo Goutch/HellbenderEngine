@@ -163,7 +163,7 @@ namespace HBE {
     void VK_Renderer::rasterize(RasterizeCmdInfo &render_cmd_info) {
         HB_PROFILE_BEGIN("RenderPass");
 
-        const VK_RenderPass *render_pass = dynamic_cast<const VK_RenderPass *>(render_cmd_info.render_target);
+        const VK_RenderPass *render_pass = context.rasterization_target_handle;
 
         vec2i resolution = render_pass->getResolution();
         VkViewport viewport{};

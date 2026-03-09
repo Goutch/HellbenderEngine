@@ -1,5 +1,6 @@
 #pragma once
 #include "Handle.h"
+#include "Resource.h"
 #include "ShaderInterface.h"
 namespace HBE {
     class Shader;
@@ -31,6 +32,5 @@ namespace HBE {
         VERTEX_TOPOLOGY topology = VERTEX_TOPOLOGY_TRIANGLE_LIST;
         RASTERIZATION_PIPELINE_FLAGS flags = RASTERIZATION_PIPELINE_FLAG_NONE;
     };
-
     using RasterizationPipelineHandle = Handle;
 }

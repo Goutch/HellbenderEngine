@@ -47,8 +47,7 @@ namespace HBE {
 
         float getFarPlane();
 
-    private
-    :
+    private:
         RasterizationTarget *render_target = nullptr;
 
         void calculateProjection(RasterizationTarget *render_target);

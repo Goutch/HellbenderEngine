@@ -20,7 +20,9 @@ namespace HBE {
 		for (auto [handle, node, transform, mesh_renderer]: group) {
 			if (!mesh_renderer.active || !node.isActiveInHierarchy())
 				continue;
-			if (mesh_renderer.mesh && mesh_renderer.pipeline_instance) {
+			if (mesh_renderer.mesh &&
+				mesh_renderer.pipeline_instance != HBE_NULL_HANDLE &&
+				mesh_renderer.rasterization_pipeline != HBE_NULL_HANDLE) {
 				mat4 world_mat = transform.world();
 				uint32_t push_constants_count = mesh_renderer.push_constants_count + mesh_renderer.
 						use_transform_matrix_as_push_constant;
@@ -53,7 +55,7 @@ namespace HBE {
 				}
 				render_graph->add(draw_cmd);
 			} else {
-				Log::warning("Mesh renderer does not have a material and/or a mesh assigned");
+				Log::warning("Mesh renderer does not have a pipeline,pipeline instance and/or mesh assigned");
 			}
 		}
 		HB_PROFILE_END("MeshRendererDraw");

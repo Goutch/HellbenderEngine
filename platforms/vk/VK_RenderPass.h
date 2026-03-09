@@ -6,8 +6,7 @@
 #include "resources/VK_Image.h"
 
 
-namespace HBE
-{
+namespace HBE {
     class VK_Device;
 
     class VK_Swapchain;
@@ -16,16 +15,15 @@ namespace HBE
 
     class VK_Fence;
 
-    class VK_RenderPass : public RasterizationTarget
-    {
-        VK_Context* context;
+    class VK_RenderPass {
+        VK_Context *context;
         VkRenderPass handle = VK_NULL_HANDLE;
         uint32_t width = 0, height = 0;
         vec4 clear_color = vec4(0.f, 0.f, 0.f, 1.f);
         VkExtent2D extent;
 
-        std::vector<VK_Image> depth_images;
-        std::vector<VK_Image> images;
+        std::vector<ImageHandle> depth_images;
+        std::vector<ImageHandle> images;
         std::vector<VkFramebuffer> frame_buffers;
         uint32_t current_frame = 0;
         VkFormat vk_format;
@@ -37,32 +35,33 @@ namespace HBE
         bool clear_depth_enabled = false;
 
     public:
-        ~VK_RenderPass();
+        VK_RenderPass() = default;
 
-        VK_RenderPass(VK_Context* context, const RasterizationTargetInfo& info);
+        void alloc(VK_Context *context, const RasterizationTargetInfo &info);
 
-        void begin(const VkCommandBuffer& command_buffer, uint32_t i) const;
+        void release();
 
-        void end(const VkCommandBuffer& command_buffer) const;
+        void begin(const VkCommandBuffer &command_buffer, uint32_t i) const;
 
-        void setClearColor(vec4 color) override;
+        void end(const VkCommandBuffer &command_buffer) const;
 
-        const vec4& getClearColor() const override;
+        void setClearColor(vec4 color);
 
-        const VkRenderPass& getHandle() const;
-        Image& getFramebufferTexture(uint32_t index) final;
+        const vec4 &getClearColor() const;
 
-        const std::vector<VkFramebuffer>& getFrameBuffers() const;
+        const VkRenderPass &getHandle() const;
 
-        void setResolution(uint32_t width, uint32_t height) override;
+        ImageHandle getFramebufferTexture(uint32_t index);
 
-        vec2i getResolution() const override;
+        const std::vector<VkFramebuffer> &getFrameBuffers() const;
 
-        const VK_Image& getImage(uint32_t index);
+        void setResolution(uint32_t width, uint32_t height);
+
+        vec2i getResolution() const;
 
         void recreate();
 
-    protected:
-        virtual void createFramebuffers();
+    private:
+        void createFramebuffers();
     };
 }

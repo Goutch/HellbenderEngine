@@ -9,6 +9,7 @@
 #include "VK_Surface.h"
 #include "VK_Swapchain.h"
 #include "core/Context.h"
+#include "resources/VK_RasterizationTargets.h"
 
 namespace HBE {
     class Allocator;
@@ -27,6 +28,7 @@ namespace HBE {
         //resources
         VK_Images images{};
         VK_Pipelines pipelines{};
+        VK_RasterizationTargets rasterization_targets{};
 
         VK_Context(const ContextInfo &info, GraphicAPI &api);
 

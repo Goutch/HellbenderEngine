@@ -98,18 +98,19 @@ namespace HBE {
 	}
 
 	bool RenderGraph::compareDrawCmd(const DrawCmdInfo &cmd1, const DrawCmdInfo &cmd2) {
-		const RasterizationPipelineHandle *gp1 = cmd1.pipeline_instance.getGraphicPipeline();
-		const RasterizationPipelineHandle *gp2 = cmd2.pipeline_instance.getGraphicPipeline();
+		RasterizationPipelineHandle gp1 = HandleProvider::index(cmd1.rasterization_pipeline_handle);
+		RasterizationPipelineHandle gp2 = HandleProvider::index(cmd2.rasterization_pipeline_handle);
 		if (gp1 != gp2) {
 			return gp1 > gp2;
 		} else {
-			const RasterizationPipelineInstance *gpi1 = cmd1.pipeline_instance;
-			const RasterizationPipelineInstance *gpi2 = cmd2.pipeline_instance;
-			if (gpi1 != gpi2) {
-				return gpi1 > gpi2;
+
+			PipelineInstanceHandle pi1 = HandleProvider::index(cmd1.pipeline_instance);
+			PipelineInstanceHandle pi2 = HandleProvider::index(cmd2.pipeline_instance);
+			if (pi1 != pi2) {
+				return pi1 > pi2;
 			} else {
-				const Mesh *m1 = cmd1.mesh;
-				const Mesh *m2 = cmd2.mesh;
+				MeshHandle m1 = HandleProvider::index(cmd1.mesh);
+				MeshHandle m2 = HandleProvider::index(cmd2.mesh);
 				return m1 > m2;
 			}
 		}

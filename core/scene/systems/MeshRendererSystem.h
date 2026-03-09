@@ -20,7 +20,7 @@ namespace HBE
 
 	class MeshRendererSystem : public System
 	{
-		event_subscription_id on_draw_subscription_id;
+		event_subscription_id on_draw_subscription_id = HBE_NULL_HANDLE;
 	public:
 		MeshRendererSystem(Scene* scene);
 

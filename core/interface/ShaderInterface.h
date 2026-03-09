@@ -1,4 +1,6 @@
 #pragma once
+#include "stdint.h"
+#include "data-structure/Handle.h"
 namespace HBE {
     enum SHADER_STAGE : uint8_t {
         SHADER_STAGE_NONE,

@@ -9,7 +9,7 @@
 
 namespace HBE {
     Image::Image(const ImageInfo &info) : context(Application::instance->getContext()) {
-        this->handle = context->createImage(handle, info);
+        alloc(info);
     }
 
     vec3u Image::getSize() {
@@ -47,18 +47,20 @@ namespace HBE {
     }
 
 
-    void Image::load(const std::string &path, ImageInfo &info) {
-        FILE *file = fopen((RESOURCE_PATH + path).c_str(), "rb");
+    void Image::load(const char *path,IMAGE_FORMAT expected_format) {
+        std::string path_str = RESOURCE_PATH + std::string(path);
+
+        FILE *file = fopen(path_str.c_str(), "rb");
 
         if (file == nullptr) {
-            Log::error("Failed to open file: " + (RESOURCE_PATH + path));
+            Log::error("Failed to open file: " + path_str);
         }
         int32_t width, height;
         unsigned char *buffer;
 
         stbi_set_flip_vertically_on_load(true);
         int nb_channels;
-        int expected_channels = Image::getFormatNumberOfChannels(info.format);
+        int expected_channels = getFormatNumberOfChannels(expected_format);
         buffer = stbi_load_from_file(file, &width, &height, &nb_channels, expected_channels);
 
         if (nb_channels != expected_channels) {
@@ -67,12 +69,13 @@ namespace HBE {
                 to_string(nb_channels));
         }
         if (buffer == nullptr) {
-            Log::error("Failed to load texture: " + path);
+            Log::error("Failed to load texture: " + path_str);
         }
+        ImageInfo info{};
         info.width = width;
         info.height = height;
         info.optional_data = buffer;
-        info.data_format = info.format;
+        info.data_format = expected_format;
         context->createImage(handle, info);
         stbi_image_free(buffer);
         stbi_set_flip_vertically_on_load(true);
@@ -90,5 +93,8 @@ namespace HBE {
     Image::~Image() {
         if (handle != HBE_NULL_HANDLE)
             context->releaseImage(handle);
+    }
+
+    void Image::alloc(const ImageInfo &info) {
     }
 }

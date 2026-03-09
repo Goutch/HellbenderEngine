@@ -1,6 +1,8 @@
 #pragma once
 
 #include <array>
+#include <map>
+
 #include "vector"
 #include "vulkan/vulkan.h"
 #include "../VK_Shader.h"
@@ -21,6 +23,8 @@ namespace HBE
     {
         VkPipelineLayout handle = VK_NULL_HANDLE;
         VK_Context* context = nullptr;
+
+        //todo: reduce the number of vector, maybe just by putting them all in one struct
         std::vector<VkDescriptorSetLayout> descriptor_set_layout_handles;
         std::vector<VK_DescriptorSetLayout> descriptor_set_layouts;
         std::map<std::string, size_t> descriptor_name_to_binding;

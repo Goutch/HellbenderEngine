@@ -9,8 +9,26 @@
 
 namespace HBE
 {
-    VK_RenderPass::VK_RenderPass(VK_Context* context, const RasterizationTargetInfo& info)
+    VK_RenderPass::VK_RenderPass()
     {
+    }
+
+    void VK_RenderPass::recreate()
+    {
+        release();
+    }
+
+    void VK_RenderPass::setClearColor(vec4 color)
+    {
+        this->clear_color = color;
+    }
+
+    const vec4& VK_RenderPass::getClearColor() const
+    {
+        return clear_color;
+    }
+
+    void VK_RenderPass::alloc(VK_Context* context, const RasterizationTargetInfo& info) {
         this->context = context;
         this->width = info.width;
         this->height = info.height;
@@ -22,31 +40,6 @@ namespace HBE
         this->clear_color_enabled = info.flags & RENDER_TARGET_FLAG_CLEAR_COLOR;
         this->clear_depth_enabled = info.flags & RENDER_TARGET_FLAG_CLEAR_DEPTH;
         this->flags = info.flags;
-        recreate();
-    }
-
-    void VK_RenderPass::recreate()
-    {
-        if (handle != VK_NULL_HANDLE)
-        {
-            context->device.wait();
-            vkDestroyRenderPass(context->device.getHandle(), handle, nullptr);
-            for (auto framebuffer : frame_buffers)
-            {
-                vkDestroyFramebuffer(context->device.getHandle(), framebuffer, nullptr);
-            }
-            for (size_t i = 0; i < images.size(); ++i)
-            {
-                if (has_color_attachment)
-                    images[i].release();
-                if (has_depth_attachment)
-                    depth_images[i].release();
-            }
-
-            images.clear();
-            depth_images.clear();
-            frame_buffers.clear();
-        }
 
         VkRenderPassCreateInfo render_pass_info{};
         std::vector<VkSubpassDescription> subpass_descriptions;
@@ -139,30 +132,27 @@ namespace HBE
         createFramebuffers();
     }
 
-    void VK_RenderPass::setClearColor(vec4 color)
-    {
-        this->clear_color = color;
-    }
-
-    const vec4& VK_RenderPass::getClearColor() const
-    {
-        return clear_color;
-    }
-
-    VK_RenderPass::~VK_RenderPass()
-    {
-        for (size_t i = 0; i < images.size(); ++i)
+    void VK_RenderPass::release() {
+        if (handle != VK_NULL_HANDLE)
         {
-            if (has_color_attachment)
-                images[i].release();
-            if (has_depth_attachment)
-                depth_images[i].release();
+            context->device.wait();
+            vkDestroyRenderPass(context->device.getHandle(), handle, nullptr);
+            for (auto framebuffer : frame_buffers)
+            {
+                vkDestroyFramebuffer(context->device.getHandle(), framebuffer, nullptr);
+            }
+            for (size_t i = 0; i < images.size(); ++i)
+            {
+                if (has_color_attachment)
+                    images[i].release();
+                if (has_depth_attachment)
+                    depth_images[i].release();
+            }
+
+            images.clear();
+            depth_images.clear();
+            frame_buffers.clear();
         }
-        for (auto framebuffer : frame_buffers)
-        {
-            vkDestroyFramebuffer(context->device.getHandle(), framebuffer, nullptr);
-        }
-        vkDestroyRenderPass(context->device.getHandle(), handle, nullptr);
     }
 
     void VK_RenderPass::begin(const VkCommandBuffer& command_buffer, uint32_t i) const
@@ -307,19 +297,12 @@ namespace HBE
         this->height = height > 0 ? height : 1;
 
         recreate();
-        onResolutionChange.invoke(this);
     }
 
     vec2i VK_RenderPass::getResolution() const
     {
         return vec2i(width, height);
     }
-
-    const VK_Image& VK_RenderPass::getImage(uint32_t i)
-    {
-        return images[i];
-    }
-
     Image& VK_RenderPass::getFramebufferTexture(uint32_t index)
     {
         HB_ASSERT(index < images.size(), "Frame index out of bounds");

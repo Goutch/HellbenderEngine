@@ -8,6 +8,11 @@ SHADER_FUNC_HEADER //
 
 #include "../VK_Context.h"
 #include "dependencies/glfw/src/internal.h"
+
+#define RASTER_PIPELINE_FUNC_HEADER \
+VK_Context& context = *static_cast<VK_Context*>(context_ptr);\
+VK_Pipelines& pipelines = context.pipelines;\
+HandleProvider& provider = pipelines.rasterization_pipeline_handle_provider;
 #define SHADER_FUNC_HEADER \
 VK_Context& context = *static_cast<VK_Context*>(context_ptr);\
 VK_Pipelines& pipelines = context.pipelines;\
@@ -27,5 +32,19 @@ namespace HBE {
         provider.release(handle);
         pipelines.shader_data[provider.index(handle)].release();
         return HBE_RESULT_SUCCESS;
+    }
+
+    HBE_RESULT VK_Pipelines::createRasterizationPipeline(void *context_ptr, RasterizationPipelineHandle &handle, const RasterizationPipelineInfo &raster_pipeline_info) {
+        RASTER_PIPELINE_FUNC_HEADER
+        handle = provider.create();
+        pipelines.rasterization_pipelines_data.resize(provider.size());
+        pipelines.rasterization_pipelines_data[provider.index(handle)].alloc(raster_pipeline_info);
+    }
+
+    HBE_RESULT VK_Pipelines::releaseRasterizationPipeline(void *context_ptr, RasterizationPipelineHandle handle) {
+        RASTER_PIPELINE_FUNC_HEADER
+        if (!provider.valid(handle)) return HBE_RESULT_INVALID_HANDLE;
+        provider.release(handle);
+        pipelines.rasterization_pipelines_data[provider.index(handle)].release();
     }
 }
