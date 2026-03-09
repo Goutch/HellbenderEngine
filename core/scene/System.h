@@ -1,10 +1,9 @@
 #pragma once
 
 #include "Core.h"
-
+#include "core/Graphics.h"
 namespace HBE
 {
-    class Context;
     class Scene;
 
     class HB_API System

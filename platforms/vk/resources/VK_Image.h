@@ -1,7 +1,7 @@
 #pragma once
 
 #include <queue>
-#include "core/resource/Image.h"
+#include "core/interface/ImageInterface.h"
 #include "vulkan/vulkan.h"
 #include "array"
 #include "../VK_Types.h"

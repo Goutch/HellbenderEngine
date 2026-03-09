@@ -1,7 +1,7 @@
 #pragma once
 #include "vulkan/vulkan.h"
 #include "core/utility/Log.h"
-#include "core/resource/Allocator.h"
+#include "core/interface/AllocatorInterface.h"
 #include "VK_Types.h"
 
 namespace HBE

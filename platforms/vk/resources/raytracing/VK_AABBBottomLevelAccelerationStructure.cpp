@@ -8,7 +8,12 @@
 
 namespace HBE
 {
-    VK_AABBBottomLevelAccelerationStructure::VK_AABBBottomLevelAccelerationStructure(VK_Context* context, AABBAccelerationStructureInfo info)
+    VK_AABBBottomLevelAccelerationStructure::~VK_AABBBottomLevelAccelerationStructure()
+    {
+        release();
+    }
+
+    void VK_AABBBottomLevelAccelerationStructure::alloc(VK_Context* context, AABBAccelerationStructureInfo info)
     {
         this->context = context;
         HB_PROFILE_BEGIN("Build AABB Acceleration Structure");
@@ -121,11 +126,17 @@ namespace HBE
         HB_PROFILE_END("Build AABB Acceleration Structure");
     }
 
-    VK_AABBBottomLevelAccelerationStructure::~VK_AABBBottomLevelAccelerationStructure()
+    void VK_AABBBottomLevelAccelerationStructure::release()
     {
+        if (!allocated()) return;
         aabb_positions_buffer.release();
         buffer.release();
         context->device.vkDestroyAccelerationStructureKHR(context->device.getHandle(), handle, nullptr);
+    }
+
+    bool VK_AABBBottomLevelAccelerationStructure::allocated()
+    {
+        return handle != VK_NULL_HANDLE;
     }
 
     VkAccelerationStructureKHR VK_AABBBottomLevelAccelerationStructure::getHandle() const

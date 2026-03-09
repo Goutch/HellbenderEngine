@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/interface/AccelerationStructureInterface.h"
 #include "core/resource/raytracing/AccelerationStructure.h"
 
 namespace HBE {
@@ -11,7 +12,10 @@ namespace HBE {
 		VK_Buffer buffer;
 		VkDeviceOrHostAddressConstKHR address{};
 	public:
-		VK_TopLevelAccelerationStructure(VK_Context *context,const  RootAccelerationStructureInfo& info);
+		void alloc(VK_Context *context,const  RootAccelerationStructureInfo& info);
+		void release();
+		bool allocated();
+		VK_TopLevelAccelerationStructure() = default;
 		~VK_TopLevelAccelerationStructure();
 		VkDeviceOrHostAddressConstKHR getDeviceAddress() const;
 		const VkAccelerationStructureKHR getHandle() const;

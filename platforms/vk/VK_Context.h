@@ -1,20 +1,58 @@
 #pragma once
 #include "VK_Allocator.h"
 #include "VK_Device.h"
-#include "resources/VK_Image.h"
-#include "resources/VK_Images.h"
-#include "VK_Instance.h"
-#include "resources/VK_Pipelines.h"
 #include "VK_Renderer.h"
 #include "VK_Surface.h"
 #include "VK_Swapchain.h"
-#include "core/Context.h"
-#include "resources/VK_RasterizationTargets.h"
+#include "VK_Instance.h"
 
-namespace HBE {
+#include "resources/VK_Images.h"
+#include "resources/VK_PipelineInstance.h"
+#include "resources/VK_Pipelines.h"
+#include "resources/VK_RasterizationPipeline.h"
+#include "resources/VK_RasterizationTargets.h"
+#include "resources/raytracing/VK_AABBBottomLevelAccelerationStructure.h"
+#include "resources/raytracing/VK_MeshBottomLevelAccelerationStructure.h"
+#include "resources/raytracing/VK_RaytracingPipeline.h"
+#include "resources/raytracing/VK_TopLevelAccelerationStructure.h"
+
+#define VK_CONTEXT_CREATE_API_FUNC(ReturnType, FuncName, Params, Args,Collection)    \
+inline ReturnType FuncName(Params)\
+{                                           \
+        Collection.create();                \
+        Collection[handle].alloc(this,info);    \
+        return HBE_RESULT_SUCCESS;          \
+}
+#define VK_CONTEXT_RELEASE_API_FUNC(ReturnType, FuncName, Params, Args,Collection)    \
+inline ReturnType FuncName(Params)\
+{                                               \
+#ifdef DEBUG_MODE   \
+    if(!Collection.valid(handle)) return HBE_RESULT_INVALID_HANDLE; \
+   #endif \
+    Collection[handle].release();   \
+    Collection.release(handle);\
+    return HBE_RESULT_SUCCESS;\
+}
+
+#define VK_CONTEXT_MEMBER_CALL_API_FUNC(ReturnType, FuncName, Params, Args, Collection, MemberName, MemberArgs)    \
+inline ReturnType FuncName(Params)\
+{                       \
+#ifdef DEBUG_MODE                                                                   \
+    if(!Collection.valid(handle)) return HBE_RESULT_INVALID_HANDLE; \
+    #endif \
+        Collection[handle].##MemberName(MemberArgs);\
+    return HBE_RESULT_SUCCESS;\
+}
+#define FUNC_ARGS(...) __VA_ARGS__
+#define FUNC_PARAMS(...) __VA_ARGS__
+
+
+namespace HBE
+{
     class Allocator;
 
-    class VK_Context {
+    class VK_Context
+    {
     public:
         VK_Instance instance{};
         VK_Surface surface{};
@@ -26,50 +64,69 @@ namespace HBE {
         GraphicLimits graphic_limits{};
 
         //resources
-        VK_Images images{};
-        VK_Pipelines pipelines{};
-        VK_RasterizationTargets rasterization_targets{};
+        StableHandleContainer<VK_Image, 64> images;
+        StableHandleContainer<VK_Shader, 32> shaders;
+        StableHandleContainer<VK_Mesh, 64> meshes;
+        StableHandleContainer<VK_RasterizationPipeline, 16> rasterization_pipelines;
+        StableHandleContainer<VK_RaytracingPipeline, 16> raytracing_pipelines;
+        StableHandleContainer<VK_ComputePipeline, 16> compute_pipelines;
+        StableHandleContainer<VK_PipelineInstance, 64> pipeline_instances;
+        StableHandleContainer<VK_RenderPass, 16> rasterization_targets;
+        StableHandleContainer<VK_TopLevelAccelerationStructure, 16> root_acceleration_structures;
+        StableHandleContainer<VK_AABBBottomLevelAccelerationStructure, 16> aabb_acceleration_structures;
+        StableHandleContainer<VK_MeshBottomLevelAccelerationStructure, 16> mesh_acceleration_structures;
 
-        VK_Context(const ContextInfo &info, GraphicAPI &api);
+        HBE_RESULT init(const ContextInfo& info);
+        HBE_RESULT release();
 
-        ~VK_Context();
+        //general
+        VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createImage, FUNC_PARAMS(ImageHandle& handle,const ImageInfo& info), FUNC_ARGS(handle,info), images)
+        VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createMesh, FUNC_PARAMS(MeshHandle &handle,const MeshInfo& info), FUNC_ARGS(handle,info), meshes);
+        VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createPipelineInstance, FUNC_PARAMS(PipelineInstanceHandle& handle,const PipelineInstanceInfo& info), FUNC_ARGS(handle,info), pipeline_instances)
+        VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createShader, FUNC_PARAMS(ShaderHandle& handle,const ShaderInfo& info), FUNC_ARGS(handle,info), shaders);
+        VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createRasterizationTarget, FUNC_PARAMS(RasterizationTargetHandle &handle,const RasterizationTargetInfo& info), FUNC_ARGS(handle,info), rasterization_targets);
+        VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createRasterizationPipeline, FUNC_PARAMS(RasterizationPipelineHandle& handle,const RasterizationPipelineInfo& info), FUNC_ARGS(handle,info), rasterization_pipelines);
+        VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createComputePipeline, FUNC_PARAMS(ComputePipelineHandle& handle,const ComputePipelineInfo& info), FUNC_ARGS(handle,info), compute_pipelines);
+        VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createRaytracingPipeline, FUNC_PARAMS(RaytracingPipelineHandle& handle,const RaytracingPipelineInfo& info), FUNC_ARGS(handle,info), raytracing_pipelines);
+        VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createRootAccelerationStructure, FUNC_PARAMS(RootAccelerationStructureHandle& handle,const RootAccelerationStructureInfo& info), FUNC_ARGS(handle,info), root_acceleration_structures);
+        VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createAABBAccelerationStructure, FUNC_PARAMS(AABBAccelerationStructureHandle& handle,const AABBAccelerationStructureInfo& info), FUNC_ARGS(handle,info), aabb_acceleration_structures);
+        VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createMeshAccelerationStructure, FUNC_PARAMS(MeshAccelerationStructureHandle& handle,const MeshAccelerationStructureInfo& info), FUNC_ARGS(handle,info), mesh_acceleration_structures);
 
+        VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseImage, FUNC_PARAMS(ImageHandle handle), FUNC_ARGS(handle), images)
+        VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseMesh, FUNC_PARAMS(MeshHandle handle), FUNC_ARGS(handle), meshes);
+        VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releasePipelineInstance, FUNC_PARAMS(PipelineInstanceHandle handle), FUNC_ARGS(handle), pipeline_instances)
+        VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseShader, FUNC_PARAMS(ShaderHandle handle), FUNC_ARGS(handle), shaders)
+        VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseRasterizationTarget, FUNC_PARAMS(RasterizationTargetHandle handle), FUNC_ARGS(handle), rasterization_targets);
+        VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseRasterizationPipeline, FUNC_PARAMS(RasterizationPipelineHandle handle), FUNC_ARGS(handle), rasterization_pipelines);
+        VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseComputePipeline, FUNC_PARAMS(ComputePipelineHandle handle), FUNC_ARGS(handle), compute_pipelines);
+        VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseRaytracingPipeline, FUNC_PARAMS(RaytracingPipelineHandle handle), FUNC_ARGS(handle), rasterization_pipelines);
+        VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseRootAccelerationStructure, FUNC_PARAMS(RootAccelerationStructureHandle handle), FUNC_ARGS(handle), root_acceleration_structures);
+        VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseAABBAccelerationStructure, FUNC_PARAMS(AABBAccelerationStructureHandle handle), FUNC_ARGS(handle), aabb_acceleration_structures);
+        VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseMeshAccelerationStructure, FUNC_PARAMS(MeshAccelerationStructureHandle handle), FUNC_ARGS(handle), mesh_acceleration_structures);
 
-        Renderer *getRenderer() final;
+        //images
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, updateImage, FUNC_PARAMS(ImageHandle handle, const void* data), FUNC_ARGS(handle,data), images, update, FUNC_ARGS(data));
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, getImageSize, FUNC_PARAMS(ImageHandle handle,uvec3& size_ref), FUNC_ARGS(handle,size_ref), images, getSize, FUNC_ARGS());
 
-        GraphicLimits getGraphicLimits() const final;
+        //meshes
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setMeshVertexIndices16, FUNC_PARAMS(MeshHandle handle,const uint16_t *indices, size_t count), FUNC_ARGS(handle,indices,count), meshes, setVertexIndices, FUNC_ARGS(indices,count));
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setMeshVertexIndices, FUNC_PARAMS(MeshHandle handle,const uint32_t *indices, size_t count), FUNC_ARGS(handle,indices,count), meshes, setVertexIndices, FUNC_ARGS(indices,count));
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setMeshVertexBuffer, FUNC_PARAMS(MeshHandle handle,uint32_t location,const void *vertices, size_t count), FUNC_ARGS(handle,location,vertices,count), meshes, setBuffer, FUNC_ARGS(location,vertices,count));
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setMeshInstanceBuffer, FUNC_PARAMS(MeshHandle handle,uint32_t location,const void *buffer, size_t count), FUNC_ARGS(handle,location,buffer,count), meshes, setInstanceBuffer, FUNC_ARGS(location,buffer,count));
 
-        Image *createImage(const ImageInfo &info) final;
+        //pipeline instance
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceUniform, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, const void* data), FUNC_ARGS(handle,binding, data), pipeline_instances, setUniform, FUNC_ARGS(binding,data));
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceImage, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, ImageHandle image, uint32_t mip_level), FUNC_ARGS(handle,binding, image, mip_level));
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceImageArray, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, ImageHandle* images, uint32_t images_count, uint32_t mip_level), FUNC_ARGS(handle,binding, images, images_count, mip_level));
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceStorageBuffer, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, StorageBufferHandle buffer, size_t count, size_t offset, int32_t frame), FUNC_ARGS(handle,binding, buffer, count, offset, frame));
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceStorageBufferArray, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, StorageBufferHandle* buffers, uint32_t count), FUNC_ARGS(handle,binding, buffers, count));
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceTexelBuffer, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, TexelBufferHandle buffer), FUNC_ARGS(handle,binding, buffer));
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceTexelBufferArray, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, TexelBufferHandle* buffers, uint32_t count), FUNC_ARGS(handle,binding, buffers, count));
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceAccelerationStructure, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, RootAccelerationStructureHandle accelerationStructure), FUNC_ARGS(handle,binding, accelerationStructure));
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, getPipelineFromInstance, FUNC_PARAMS(PipelineInstanceHandle handle,Handle pipeline_handle), FUNC_ARGS(handle,pipeline_handle));
 
-        RasterizationPipeline *createRasterizationPipeline(const RasterizationPipelineInfo &info) final;
-
-        Shader *createShader(const ShaderInfo &info) final;
-
-        Mesh *createMesh(const MeshInfo &info) final;
-
-        ComputePipeline *createComputePipeline(const ComputePipelineInfo &info) final;
-
-        RasterizationTarget *createRenderTarget(const RasterizationTargetInfo &info) final;
-
-        RasterizationPipelineInstance *createRasterizationPipelineInstance(
-            const RasterizationPipelineInstanceInfo &info) final;
-
-        ComputeInstance *createComputeInstance(const ComputeInstanceInfo &info) final;
-
-        RootAccelerationStructure *createRootAccelerationStructure(const RootAccelerationStructureInfo &info) final;
-
-        AABBAccelerationStructure *createAABBAccelerationStructure(const AABBAccelerationStructureInfo &info) final;
-
-        MeshAccelerationStructure *createMeshAccelerationStructure(const MeshAccelerationStructureInfo &info) final;
-
-        RaytracingPipeline *createRaytracingPipeline(const RaytracingPipelineInfo &info) final;
-
-        RaytracingPipelineInstance *createRaytracingPipelineInstance(const RaytracingPipelineInstanceInfo &info) final;
-
-        StorageBuffer *createStorageBuffer(const StorageBufferInfo &info) final;
-
-        TexelBuffer *createTexelBuffer(const TexelBufferInfo &info) final;
-
-        Font *createFont(const FontInfo &font_info) const final;
+        //Rasterization Target
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, getRasterizationTargetResolution, FUNC_PARAMS(RasterizationTargetHandle handle,vec2u& resolution), FUNC_ARGS(handle,resolution));
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setRasterizationTargetResolution, FUNC_PARAMS(RasterizationTargetHandle handle,vec2u resolution), FUNC_ARGS(handle,resolution));
     };
 }

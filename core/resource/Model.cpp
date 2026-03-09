@@ -1,12 +1,9 @@
 #include "Model.h"
-#include "map"
 
 #include "RasterizationPipeline.h"
 #include "Mesh.h"
-#include "Image.h"
 #include "core/Application.h"
 #include "core/utility/GLTFLoader.h"
-#include "core/resource/raytracing/AccelerationStructure.h"
 
 namespace HBE
 {

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "core/resource/RasterizationPipelineInstance.h"
-
 namespace HBE {
 	class VK_Context;
 	class VK_PipelineDescriptors;
@@ -14,7 +12,7 @@ namespace HBE {
 
 	class StorageBuffer;
 
-	class VK_RasterizationPipelineInstance : public RasterizationPipelineInstance {
+	class VK_RasterizationPipelineInstance  {
 		VK_PipelineDescriptors *descriptors;
 		RasterizationPipeline *pipeline;
 		VK_RasterizationPipeline *vk_pipeline;

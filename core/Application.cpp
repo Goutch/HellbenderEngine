@@ -11,18 +11,21 @@
 #include "platforms/vk/VK_Window.h"
 #include "platforms/vk/VK_Context.h"
 
-namespace HBE {
-    Application *Application::instance = nullptr;
+namespace HBE
+{
+    Application* Application::instance = nullptr;
 
-    void Application::init(ApplicationInfo &info) {
+    void Application::init(ApplicationInfo& info)
+    {
         HB_ASSERT(instance == nullptr, "Application is a singleton, there can only be one instance");
         instance = this;
         Application::info = info;
 
-        switch (info.context_info.api) {
-            case GRAPHICS_API_VULKAN:
-                window = new VK_Window(info.window_info);
-                break;
+        switch (info.context_info.api)
+        {
+        case GRAPHICS_API_VULKAN:
+            window = new VK_Window(info.window_info);
+            break;
         }
         context.init(info.context_info);
         audio.init();
@@ -33,12 +36,14 @@ namespace HBE {
         context.getRenderer()->createDefaultResources();
     }
 
-    void Application::run() {
+    void Application::run()
+    {
         time.reset();
         Timer update_clock = Timer();
         float delta_t = 0.0f;
         uint64_t frames = 0;
-        while (!window->shouldClose()) {
+        while (!window->shouldClose())
+        {
             HB_PROFILE_BEGIN("TOTAL_FRAME");
             onFrameStart.invoke(frames);
             input.pollEvents();
@@ -47,22 +52,25 @@ namespace HBE {
             onUpdate.invoke(delta_t);
             HB_PROFILE_END("UPDATE");
 
-            if (!window->isMinimized()) {
+            if (!window->isMinimized())
+            {
                 HB_PROFILE_BEGIN("DRAW");
                 onDraw.invoke();
                 HB_PROFILE_END("DRAW");
 
 
                 HB_PROFILE_BEGIN("RENDER");
-                context->getRenderer()->beginFrame();
+                context.getRenderer()->beginFrame();
                 onRender.invoke();
                 HB_PROFILE_END("RENDER");
                 HB_PROFILE_BEGIN("PRESENT");
                 onPresent.invoke();
-                context->getRenderer()->endFrame();
+                context.getRenderer()->endFrame();
 
                 HB_PROFILE_END("PRESENT");
-            } else if (window->isMinimized()) {
+            }
+            else if (window->isMinimized())
+            {
                 std::this_thread::sleep_for(std::chrono::milliseconds(33));
             }
 
@@ -79,44 +87,53 @@ namespace HBE {
         onQuit.invoke();
     }
 
-    Input *Application::getInput() {
+    Input* Application::getInput()
+    {
         return &input;
     }
 
-    Window *Application::getWindow() {
+    Window* Application::getWindow()
+    {
         return window;
     }
 
-    Context *Application::getContext() {
-        return context;
+    Context* Application::getContext()
+    {
+        return &context;
     }
 
-    void Application::terminate() {
-        delete context;
+    void Application::terminate()
+    {
+        context.release();
         delete window;
         instance = nullptr;
         Profiler::printAverange();
     }
 
-    void Application::quit() {
+    void Application::quit()
+    {
         window->requestClose();
     }
 
-    float Application::getTime() {
+    float Application::getTime()
+    {
         return time.ns() * NANOSECONDS_TO_SECONDS;
     }
 
-    void Application::printFPS(float delta) {
+    void Application::printFPS(float delta)
+    {
         fps_counter++;
         fps_timer += delta;
-        if (fps_timer >= 1.0) {
+        if (fps_timer >= 1.0)
+        {
             Log::debug("fps:" + std::to_string(fps_counter) + "(" + std::to_string(1000.0 / fps_counter) + "ms)");
             fps_counter = 0;
             fps_timer = 0;
         }
     }
 
-    const ApplicationInfo &Application::getInfo() {
+    const ApplicationInfo& Application::getInfo()
+    {
         return info;
     }
 }

@@ -1,13 +1,15 @@
 #pragma once
 
 #include "Core.h"
+#include "HBETypes.h"
 #include "string"
 #include "vector"
 #include "map"
-#include "Resource.h"
-#include "core/resource/Image.h"
-#include "core/resource/raytracing/AccelerationStructure.h"
-#include "core/resource/PipelineInstance.h"
+#include "core/Graphics.h"
+#include "core/interface/AccelerationStructureInterface.h"
+#include "core/interface/ImageInterface.h"
+#include "core/interface/MeshInterface.h"
+#include "core/interface/PipelineInstanceInterface.h"
 namespace HBE {
 	class RasterizationPipelineInstance;
 

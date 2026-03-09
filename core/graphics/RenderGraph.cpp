@@ -1,13 +1,7 @@
-//
-// Created by User on 2/6/2023.
-//
 
 #include "RenderGraph.h"
-
 #include <algorithm>
-
 #include "core/Application.h"
-#include "core/resource/Mesh.h"
 #include "core/graphics/Renderer.h"
 #include "core/interface/RasterizationPipelineInterface.h"
 #include "core/utility/Log.h"

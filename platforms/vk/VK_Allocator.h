@@ -7,8 +7,7 @@
 #include "string"
 #include "resources/VK_Image.h"
 #include "VK_Mesh.h"
-#include "core/resource/Image.h"
-#include "core/resource/Allocator.h"
+#include "core/interface/ImageInterface.h"
 
 namespace HBE
 {

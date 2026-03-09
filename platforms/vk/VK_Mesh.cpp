@@ -11,34 +11,9 @@
 
 namespace HBE
 {
-    VK_Mesh::VK_Mesh(VK_Context* context, const MeshInfo& info)
+    VK_Mesh::VK_Mesh()
     {
-        this->info = info;
-        this->context = context;
-        if ((info.flags & MESH_FLAG_USED_IN_RAYTRACING) != 0)
-        {
-            this->extra_usages |= VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
-            this->extra_usages |= VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR;
-        }
-        if (info.flags & MESH_FLAG_USED_AS_STORAGE_BUFFER)
-        {
-            this->extra_usages |= VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
-        }
 
-        uint32_t max_location = 0;
-        for (size_t i = 0; i < info.attribute_info_count; ++i)
-        {
-            if (info.attribute_infos[i].location > max_location)
-                max_location = info.attribute_infos[i].location;
-        }
-        buffers.resize(max_location + 1);
-        attributes_locations.resize(max_location + 1, {});
-
-        for (size_t i = 0; i < info.attribute_info_count; ++i)
-        {
-            uint32_t location = info.attribute_infos[i].location;
-            attributes_locations[location] = info.attribute_infos[i];
-        }
     }
 
     void VK_Mesh::setBuffer(uint32_t location, const void* vertices, size_t count)
@@ -62,7 +37,7 @@ namespace HBE
             ReleaseRequest free_request{};
             free_request.vk_buffer = buffers[location].getHandle();
             free_request.allocation = buffers[location].getAllocation();
-            free_request.fence = dynamic_cast<VK_Fence&>(*Application::instance->getContext()->getRenderer()->getLastFrameFence()).getHandle();
+            free_request.fence = dynamic_cast<VK_Fence&>(*context->renderer->getLastFrameFence()).getHandle();
             context->allocator.releaseLater(free_request);
             buffers[location].reset();
         }
@@ -93,7 +68,37 @@ namespace HBE
         setBuffer(location, data, count);
     }
 
-    VK_Mesh::~VK_Mesh()
+    void VK_Mesh::alloc(VK_Context* context, const MeshInfo& info)
+    {
+        this->info = info;
+        this->context = context;
+        if ((info.flags & MESH_FLAG_USED_IN_RAYTRACING) != 0)
+        {
+            this->extra_usages |= VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
+            this->extra_usages |= VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR;
+        }
+        if (info.flags & MESH_FLAG_USED_AS_STORAGE_BUFFER)
+        {
+            this->extra_usages |= VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
+        }
+
+        uint32_t max_location = 0;
+        for (size_t i = 0; i < info.attribute_info_count; ++i)
+        {
+            if (info.attribute_infos[i].location > max_location)
+                max_location = info.attribute_infos[i].location;
+        }
+        buffers.resize(max_location + 1);
+        attributes_locations.resize(max_location + 1, {});
+
+        for (size_t i = 0; i < info.attribute_info_count; ++i)
+        {
+            uint32_t location = info.attribute_infos[i].location;
+            attributes_locations[location] = info.attribute_infos[i];
+        }
+    }
+
+    void VK_Mesh::release()
     {
         VK_Allocator* allocator = &context->allocator;
         for (size_t i = 0; i < buffers.size(); ++i)
@@ -120,6 +125,11 @@ namespace HBE
             allocator->releaseLater(free_request);
             indices_buffer.reset();
         }
+    }
+
+    VK_Mesh::~VK_Mesh()
+    {
+        release();
     }
 
     void VK_Mesh::setVertexIndices(const void* data, size_t count, size_t element_size)

@@ -1,6 +1,5 @@
 #include "Camera2D.h"
 #include "glm/gtc/matrix_transform.hpp"
-
 namespace HBE {
 	void Camera2D::calculateProjection(RasterizationTarget *render_target) {
 		float aspect_ratio = aspectRatio();
@@ -19,7 +18,7 @@ namespace HBE {
 		setRenderTarget(other.render_target);
 	}
 
-	void Camera2D::setRenderTarget(RasterizationTarget *render_target) {
+	void Camera2D::setRenderTarget(RasterizationTarget* render_target) {
 		if (render_target != nullptr)
 			render_target->onResolutionChange.unsubscribe(render_target_resize_subscription_id);
 		this->render_target = render_target;

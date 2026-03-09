@@ -41,7 +41,6 @@ set(CORE_FILES
         core/resource/Mesh.h
         core/resource/Shader.cpp
         core/resource/Shader.h
-        core/resource/Resource.h
         core/resource/ComputePipeline.h
         core/resource/Image.cpp
         core/resource/ComputeInstance.h
@@ -107,7 +106,6 @@ set(CORE_FILES
         core/scene/components/CameraController.h
         core/scene/components/Transform2D.cpp
         core/scene/components/PixelCamera.cpp
-        core/scene/components/ModelRenderer.cpp
         core/scene/components/Camera2D.cpp
         core/scene/components/Camera.cpp
         core/scene/components/Transform.cpp
@@ -124,7 +122,6 @@ set(CORE_FILES
         core/utility/GLTFLoader.h
         core/utility/DefaultModelParser.cpp
         core/utility/DefaultModelParser.h
-        core/scene/components/MeshRenderer.cpp
         core/scene/components/MeshRenderer.h
         core/scene/ecs/Group/GroupIterator.cpp
         core/scene/ecs/Group/PageDataArchetype.h
@@ -208,14 +205,18 @@ set(VK_FILES
         platforms/vk/VK_DynamicRenderTarget.h
         platforms/vk/VK_Context.cpp
         platforms/vk/VK_Context.h
-        core/resource/Allocator.h
-        core/resource/Allocator.cpp
         platforms/vk/VK_Types.h
         platforms/vk/resources/VK_Images.cpp
         core/interface/AccelerationStructureInterface.h
         core/interface/MeshInterface.h
         core/resource/PipelineInstance.cpp
         core/interface/PipelineInstanceInterface.h
+        core/resource/RasterizationTarget.cpp
+        core/Graphics.h
+        core/interface/AllocatorInterface.h
+        core/interface/BufferInterface.h
+        platforms/vk/resources/VK_PipelineInstance.cpp
+        platforms/vk/resources/VK_PipelineInstance.h
 )
 
 
@@ -223,7 +224,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/utils-collection/"
 #------------------------------------VULKAN------------------------------------
 find_package(Vulkan REQUIRED)
 if (VULKAN_FOUND)
-    add_compile_definitions(VULKAN_RENDERER)
+    add_compile_definitions(VULKAN_GRAPHICS)
     message("Found vulkan at ${Vulkan_INCLUDE_DIRS}")
 else ()
     message(FATAL_ERROR "Vulkan not found")

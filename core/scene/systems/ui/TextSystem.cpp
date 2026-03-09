@@ -4,7 +4,7 @@
 #include "core/scene/systems/MeshRendererSystem.h"
 #include "core/resource/Shader.h"
 #include "core/resource/RasterizationPipeline.h"
-#include "core/resource/RasterizationPipelineInstance.h"
+#include "core/interface/PipelineInstanceInterface.h"
 #include "core/scene/components/Transform.h"
 #include "core/scene/Scene.h"
 #include "core/scene/components/Node.h"
@@ -48,7 +48,7 @@ namespace HBE
         font_info.characters_count = characters.size();
         font_info.glyph_resolution = 64;
 
-        default_font = Application::instance->getContext()->createFont(font_info);
+        default_font.
 
         ShaderInfo text_frag_shader_info{};
         ShaderInfo text_vert_shader_info{};

@@ -9,10 +9,18 @@ namespace HBE
 {
     VK_ComputePipeline::VK_ComputePipeline(VK_Context* context, const ComputePipelineInfo& info)
     {
+        alloc(context, info);
+    }
+
+    VK_ComputePipeline::~VK_ComputePipeline()
+    {
+        release();
+    }
+
+    void VK_ComputePipeline::alloc(VK_Context* context, const ComputePipelineInfo& info)
+    {
         this->context = context;
-        this->info = info;
-        this->workgroup_size = info.compute_shader->getWorkgroupSize();
-        const VK_Shader* vk_shader = dynamic_cast<VK_Shader*>(info.compute_shader);
+        const VK_Shader* vk_shader = context->pipelines.getShader(info.compute_shader);
         layout.init(context, &vk_shader, 1, info.flags & COMPUTE_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR);
 
         VkPipelineShaderStageCreateInfo stage{};
@@ -32,10 +40,11 @@ namespace HBE
         }
     }
 
-    VK_ComputePipeline::~VK_ComputePipeline()
+    void VK_ComputePipeline::release()
     {
         vkDestroyPipeline(context->device.getHandle(), handle, nullptr);
         layout.release();
+        handle = VK_NULL_HANDLE;
     }
 
 
@@ -49,13 +58,8 @@ namespace HBE
         return handle;
     }
 
-    const vec3i& VK_ComputePipeline::getWorkgroupSize() const
+    bool VK_ComputePipeline::allocated()
     {
-        return workgroup_size;
-    }
-
-    COMPUTE_PIPELINE_FLAGS VK_ComputePipeline::getFlags() const
-    {
-        return info.flags;
+        return handle != VK_NULL_HANDLE;
     }
 }

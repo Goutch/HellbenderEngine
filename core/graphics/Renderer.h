@@ -2,15 +2,13 @@
 
 #include "Core.h"
 #include "HBETypes.h"
-#include "vector"
 #include "glm/glm.hpp"
-#include "dependencies/utils-collection/Event.h"
 #include <string>
 #include "GraphicLimits.h"
 #include "core/interface/MeshInterface.h"
 #include "core/interface/RasterizationPipelineInterface.h"
 #include "core/interface/RasterizationTargetInterface.h"
-#include "core/resource/PipelineInstance.h"
+#include "core/interface/PipelineInstanceInterface.h"
 
 namespace HBE {
     class RasterizationTarget;

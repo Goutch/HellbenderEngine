@@ -7,13 +7,14 @@
 
 namespace HBE
 {
-    VK_MeshBottomLevelAccelerationStructure::VK_MeshBottomLevelAccelerationStructure(VK_Context* context, MeshAccelerationStructureInfo info)
+    void VK_MeshBottomLevelAccelerationStructure::alloc(VK_Context* context, MeshAccelerationStructureInfo info)
     {
         this->context = context;
         HB_PROFILE_BEGIN("Build Mesh Acceleration Structure");
 
         //todo:initialize this
-        VK_Mesh* mesh = dynamic_cast<VK_Mesh*>(info.mesh);
+
+        VK_Mesh* mesh = context->meshes[info.mesh_handle];
         VkDeviceSize vertex_size = mesh->getAttributeElementSize(0);
 
         VkAccelerationStructureGeometryKHR accelerationStructureGeometry{};
@@ -112,10 +113,25 @@ namespace HBE
         HB_PROFILE_END("Build Mesh Acceleration Structure");
     }
 
-    VK_MeshBottomLevelAccelerationStructure::~VK_MeshBottomLevelAccelerationStructure()
+    void VK_MeshBottomLevelAccelerationStructure::release()
     {
+        if (allocated()) return;
         buffer.release();
         context->device.vkDestroyAccelerationStructureKHR(context->device.getHandle(), handle, nullptr);
+    }
+
+    bool VK_MeshBottomLevelAccelerationStructure::allocated()
+    {
+        return handle != VK_NULL_HANDLE;
+    }
+
+    VkAccelerationStructureKHR VK_MeshBottomLevelAccelerationStructure::getHandle() const
+    {
+        return handle;
+    }
+
+    VK_MeshBottomLevelAccelerationStructure::~VK_MeshBottomLevelAccelerationStructure()
+    {
     }
 
     VkDeviceOrHostAddressConstKHR VK_MeshBottomLevelAccelerationStructure::getDeviceAddress() const

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/interface/AccelerationStructureInterface.h"
 #include "core/resource/raytracing/AccelerationStructure.h"
 #include "platforms/vk/VK_Buffer.h"
 #include "vulkan/vulkan.h"
@@ -15,7 +16,10 @@ namespace HBE {
 		VK_Buffer buffer;
 		VkDeviceOrHostAddressConstKHR address;
 	public:
-		VK_MeshBottomLevelAccelerationStructure(VK_Context *context, MeshAccelerationStructureInfo info);
+		void alloc(VK_Context *context, MeshAccelerationStructureInfo info);
+		void release();
+		bool allocated();
+		VK_MeshBottomLevelAccelerationStructure() = default;
 		VkAccelerationStructureKHR getHandle() const;
 
 		~VK_MeshBottomLevelAccelerationStructure();

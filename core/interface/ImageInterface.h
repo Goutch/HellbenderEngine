@@ -1,4 +1,5 @@
 #pragma once
+#include "HBETypes.h"
 #include "data-structure/Handle.h"
 
 namespace HBE {

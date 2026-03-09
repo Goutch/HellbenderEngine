@@ -4,13 +4,17 @@
 #include "vector"
 #include "VK_AABBBottomLevelAccelerationStructure.h"
 #include "VK_MeshBottomLevelAccelerationStructure.h"
-#include "../VK_Device.h"
-#include "../VK_CommandPool.h"
 #include "platforms/vk/VK_Context.h"
 
 namespace HBE
 {
-    VK_TopLevelAccelerationStructure::VK_TopLevelAccelerationStructure(VK_Context* context, const RootAccelerationStructureInfo& info)
+
+    VkDeviceOrHostAddressConstKHR VK_TopLevelAccelerationStructure::getDeviceAddress() const
+    {
+        return address;
+    }
+
+    void VK_TopLevelAccelerationStructure::alloc(VK_Context* context, const RootAccelerationStructureInfo& info)
     {
         VK_Device* device = &context->device;
         HB_PROFILE_BEGIN("Build root Acceleration Structure");
@@ -154,15 +158,21 @@ namespace HBE
         HB_PROFILE_END("Build root Acceleration Structure");
     }
 
-    VkDeviceOrHostAddressConstKHR VK_TopLevelAccelerationStructure::getDeviceAddress() const
+    void VK_TopLevelAccelerationStructure::release()
     {
-        return address;
+        context->device.vkDestroyAccelerationStructureKHR(context->device.getHandle(), handle, nullptr);
+        buffer.release();
+        handle = VK_NULL_HANDLE;
+    }
+
+    bool VK_TopLevelAccelerationStructure::allocated()
+    {
+        handle != VK_NULL_HANDLE;
     }
 
     VK_TopLevelAccelerationStructure::~VK_TopLevelAccelerationStructure()
     {
-        context->device.vkDestroyAccelerationStructureKHR(context->device.getHandle(), handle, nullptr);
-        buffer.release();
+        release();
     }
 
     const VkAccelerationStructureKHR VK_TopLevelAccelerationStructure::getHandle() const

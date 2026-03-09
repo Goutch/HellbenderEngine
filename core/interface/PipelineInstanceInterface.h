@@ -1,4 +1,5 @@
 #pragma once
+#include "Handle.h"
 namespace HBE
 {
     typedef uint8_t PIPELINE_INSTANCE_FLAGS;

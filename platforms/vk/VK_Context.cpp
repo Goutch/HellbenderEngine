@@ -4,27 +4,12 @@
 
 #include "VK_Context.h"
 
-#include <thread>
-
-#include "VK_ComputeInstance.h"
-#include "VK_ComputePipeline.h"
-#include "resources/VK_RasterizationPipeline.h"
-#include "VK_RasterizationPipelineInstance.h"
-#include "VK_RenderPass.h"
-#include "VK_RenderTarget.h"
-#include "VK_StorageBuffer.h"
-#include "VK_TexelBuffer.h"
-#include "VK_ValidationLayers.h"
 #include "core/Application.h"
-#include "core/Configs.h"
-#include "resources/raytracing/VK_AABBBottomLevelAccelerationStructure.h"
-#include "resources/raytracing/VK_MeshBottomLevelAccelerationStructure.h"
-#include "resources/raytracing/VK_RaytracingPipeline.h"
-#include "resources/raytracing/VK_RaytracingPipelineInstance.h"
-#include "resources/raytracing/VK_TopLevelAccelerationStructure.h"
 
-namespace HBE {
-    VK_Context::VK_Context(const ContextInfo &info, GraphicAPI &api) {
+namespace HBE
+{
+    void VK_Context::init(const ContextInfo& info)
+    {
         instance.init(info);
         surface.init(instance, Application::instance->getWindow()->getHandle());
         physical_device.init(instance, surface);
@@ -32,32 +17,38 @@ namespace HBE {
         allocator.init(this);
         swapchain.init(this);
 
-        api.createImage_ptr = &VK_Images::createImage;
-        api.releaseImage_ptr = &VK_Images::releaseImage;
-        api.getImageSize_ptr = &VK_Images::getImageSize;
-        api.updateImage_ptr = &VK_Images::updateImage;
-
-        api.createShader_ptr = &VK_Pipelines::createShader;
-        api.releaseShader_ptr = &VK_Pipelines::releaseShader;
-
-
-
         renderer.init(this);
         graphic_limits = renderer.getLimits();
     }
 
-    Renderer *VK_Context::getRenderer() {
-        return &renderer;
+    template <typename T, uint32_t I>
+    void releaseStableHandleContainerObjects(StableHandleContainer<T, I>& container)
+    {
+        for (T& element : container)
+        {
+            if (element.allocated()) Log::warning("object was not released properly before destroying vulkan context");
+            element.release();
+        }
+        container.clear();
     }
 
-
-    VK_Context::~VK_Context() {
-        pipelines.release();
-        images.release();
-
-        renderer.release();
+    void VK_Context::release()
+    {
         allocator.processFreeRequests(0);
 
+        releaseStableHandleContainerObjects(images);
+        releaseStableHandleContainerObjects(shaders);
+        releaseStableHandleContainerObjects(meshes);
+        releaseStableHandleContainerObjects(rasterization_pipelines);
+        releaseStableHandleContainerObjects(raytracing_pipelines);
+        releaseStableHandleContainerObjects(compute_pipelines);
+        releaseStableHandleContainerObjects(pipeline_instances);
+        releaseStableHandleContainerObjects(rasterization_targets);
+        releaseStableHandleContainerObjects(root_acceleration_structures);
+        releaseStableHandleContainerObjects(aabb_acceleration_structures);
+        releaseStableHandleContainerObjects(mesh_acceleration_structures);
+
+        renderer.release();
         swapchain.release();
         allocator.release();
         device.release();
@@ -67,75 +58,4 @@ namespace HBE {
         instance.release();
     }
 
-    GraphicLimits VK_Context::getGraphicLimits() const {
-        return graphic_limits;
-    }
-
-    RasterizationPipeline *VK_Context::createRasterizationPipeline(const RasterizationPipelineInfo &info) {
-        VK_RasterizationPipeline *raster = new VK_RasterizationPipeline();
-        raster->init(this, info);
-        return raster;
-    }
-
-    Shader *VK_Context::createShader(const ShaderInfo &info) {
-        return new VK_Shader(this, info);
-    }
-
-    Mesh *VK_Context::createMesh(const MeshInfo &info) {
-        return new VK_Mesh(this, info);
-    }
-
-    ComputePipeline *VK_Context::createComputePipeline(const ComputePipelineInfo &info) {
-        return new VK_ComputePipeline(this, info);
-    }
-
-    RasterizationTarget *VK_Context::createRenderTarget(const RasterizationTargetInfo &info) {
-        return new VK_RenderPass(this, info);
-    }
-
-    RasterizationPipelineInstance *VK_Context::createRasterizationPipelineInstance(
-        const RasterizationPipelineInstanceInfo &info) {
-        return new VK_RasterizationPipelineInstance(this, info);
-    }
-
-    ComputeInstance *VK_Context::createComputeInstance(const ComputeInstanceInfo &info) {
-        return new VK_ComputeInstance(this, info);
-    }
-
-    RootAccelerationStructure *VK_Context::createRootAccelerationStructure(const RootAccelerationStructureInfo &info) {
-        return new VK_TopLevelAccelerationStructure(this, info);
-    }
-
-    AABBAccelerationStructure *VK_Context::createAABBAccelerationStructure(const AABBAccelerationStructureInfo &info) {
-        return new VK_AABBBottomLevelAccelerationStructure(this, info);
-    }
-
-    MeshAccelerationStructure *VK_Context::createMeshAccelerationStructure(const MeshAccelerationStructureInfo &info) {
-        return new VK_MeshBottomLevelAccelerationStructure(this, info);
-    }
-
-    RaytracingPipeline *VK_Context::createRaytracingPipeline(const RaytracingPipelineInfo &info) {
-        return new VK_RaytracingPipeline(this, info);
-    }
-
-    RaytracingPipelineInstance *
-    VK_Context::createRaytracingPipelineInstance(const RaytracingPipelineInstanceInfo &info) {
-        return new VK_RaytracingPipelineInstance(this, info);
-    }
-
-    StorageBuffer *VK_Context::createStorageBuffer(const StorageBufferInfo &info) {
-        //todo fix this.
-        return nullptr; //new VK_StorageBuffer(this, info);
-    }
-
-
-    TexelBuffer *VK_Context::createTexelBuffer(const TexelBufferInfo &info) {
-        VK_TexelBuffer *texel_buffer = new VK_TexelBuffer();;
-        texel_buffer->alloc(this, info);
-        return texel_buffer;
-    }
-
-    Font *VK_Context::createFont(const FontInfo &font_info) const {
-        return new Font(font_info);
-    }
 }

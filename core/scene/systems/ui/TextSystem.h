@@ -8,6 +8,8 @@
 #include "core/resource/Mesh.h"
 #include "core/scene/ecs/Component.h"
 #include "Event.h"
+#include "core/resource/RasterizationPipeline.h"
+
 namespace HBE {
 	class Font;
 
@@ -58,11 +60,11 @@ namespace HBE {
 		event_subscription_id on_detach_subscription_id;
 		event_subscription_id on_draw_subscription_id;
 		const vec4 DEFAULT_TEXT_COLOR = vec4(1, 1, 1, 1);
-		Font *default_font = nullptr;
-		Shader *default_text_frag_shader = nullptr;
-		Shader *default_text_vert_shader = nullptr;
-		RasterizationPipeline *default_text_pipeline = nullptr;
-		RasterizationPipelineInstance *default_text_pipeline_instance = nullptr;
+		Font default_font;
+		Shader default_text_frag_shader;
+		Shader default_text_vert_shader;
+		RasterizationPipeline default_text_pipeline;
+		PipelineInstance default_text_pipeline_instance;
 	public:
 		TextSystem(Scene *scene, RasterizationTarget *render_target);
 

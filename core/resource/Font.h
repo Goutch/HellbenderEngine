@@ -3,6 +3,7 @@
 #include <string>
 #include "Resource.h"
 #include "Core.h"
+#include "Image.h"
 #include "unordered_map"
 
 namespace HBE
@@ -27,13 +28,15 @@ namespace HBE
 
     class HB_API Font
     {
+        Context& context;
         std::unordered_map<char, Glyph> characters_glyphs;
-        Image* atlas;
+        Image atlas={};
 
     public:
         explicit Font(const FontInfo& info);
-
-        ~Font();
+        Font();
+        ~Font() = default;
+        void load(const FontInfo& info);
 
         Image* getTextureAtlas();
 

@@ -1,6 +1,5 @@
 #pragma once
 #include "Handle.h"
-#include "Resource.h"
 #include "ShaderInterface.h"
 namespace HBE {
     class Shader;

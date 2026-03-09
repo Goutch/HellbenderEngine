@@ -1,7 +1,7 @@
 #include "DefaultModelParser.h"
 
 #include "core/Application.h"
-#include "core/resource/Image.h"
+#include "core/interface/ImageInterface.h""
 #include "core/resource/Mesh.h"
 #include "core/resource/Model.h"
 

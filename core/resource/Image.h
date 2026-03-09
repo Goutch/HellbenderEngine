@@ -1,18 +1,16 @@
 #pragma once
 
 #include "Core.h"
-#include <string>
 #include "HBETypes.h"
 #include "core/interface/ImageInterface.h"
-
+#include "core/Graphics.h"
 namespace HBE {
-	class Context;
-
 	class HB_API Image {
 		ImageHandle handle;
-		Context *context = nullptr;
+		Context &context;
 	public:
 		explicit Image(const ImageInfo &info);
+		Image();
 		Image(Image &&other) noexcept;
 		Image(const Image &other) = delete;
 		~Image();

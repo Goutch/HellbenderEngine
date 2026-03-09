@@ -16,7 +16,6 @@
 #include "core/resource/Image.h"
 #include "core/resource/Model.h"
 #include "core/resource/RasterizationTarget.h"
-#include "core/resource/RasterizationPipelineInstance.h"
 #include "core/resource/ComputeInstance.h"
 #include "core/resource/StorageBuffer.h"
 #include "core/resource/raytracing/AccelerationStructure.h"

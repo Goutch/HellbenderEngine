@@ -517,7 +517,7 @@ namespace HBE {
 
         //ovewrite the renderpass so it is the swapchain
         auto vk_screen_pipeline = new VK_RasterizationPipeline();
-        vk_screen_pipeline->init(context, pipeline_info, context->swapchain.getRenderPass());
+        vk_screen_pipeline->alloc(context, pipeline_info, context->swapchain.getRenderPass());
         screen_pipeline = vk_screen_pipeline;
 
         RasterizationPipelineInstanceInfo screen_pipeline_instance_info{};

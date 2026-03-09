@@ -1,6 +1,7 @@
 #pragma once
 #include "Core.h"
 #include "HBETypes.h"
+#include "core/interface/RasterizationTargetInterface.h"
 #include "core/resource/RasterizationTarget.h"
 #include "core/scene/ecs/Component.h"
 
@@ -32,17 +33,17 @@ namespace HBE
 
 		float aspectRatio();
 
-		void setRenderTarget(RasterizationTarget *render_target);
+		void setRenderTarget(RasterizationTarget* render_target);
 
-		RasterizationTarget *getRenderTarget();
+		RasterizationTarget* getRenderTarget();
 
 	private:
-		RasterizationTarget *render_target = nullptr;
+		RasterizationTarget* render_target = nullptr;
 		float zoom_ratio = 10.0f;
 		float near = -1000;
 		float far = 1000;
 
-		void calculateProjection(RasterizationTarget *render_target);
+		void calculateProjection(RasterizationTarget* render_target);
 	};
 
 }

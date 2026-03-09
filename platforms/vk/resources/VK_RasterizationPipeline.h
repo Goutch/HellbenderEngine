@@ -20,7 +20,7 @@ namespace HBE {
 
     class VK_PipelineLayout;
 
-    class VK_RasterizationPipeline : public RasterizationPipeline {
+    class VK_RasterizationPipeline {
         VkPipeline handle = VK_NULL_HANDLE;
         VK_PipelineLayout layout;
         VK_Context *context = nullptr;
@@ -34,12 +34,13 @@ namespace HBE {
         VK_RasterizationPipeline() = default;
 
         ~VK_RasterizationPipeline() = default;
+        bool allocated();
 
         VK_RasterizationPipeline(VK_RasterizationPipeline &) = delete;
         VK_RasterizationPipeline(VK_RasterizationPipeline && other) noexcept;
         VK_RasterizationPipeline &operator=(VK_RasterizationPipeline &) = delete;
 
-        void init(VK_Context *context, const RasterizationPipelineInfo &info,
+        void alloc(VK_Context *context, const RasterizationPipelineInfo &info,
                   VkRenderPass render_pass_overwrite = VK_NULL_HANDLE);
 
         void release();
@@ -56,8 +57,7 @@ namespace HBE {
 
         const VK_PipelineLayout &getPipelineLayout() const;
 
-
+        VkPipeline getHandle();
         RASTERIZATION_PIPELINE_FLAGS getFlags() const;
     };
-
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core.h"
-#include "Resource.h"
+#include "core/Graphics.h"
 #include "core/interface/ShaderInterface.h"
 
 namespace HBE {

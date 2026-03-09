@@ -2,8 +2,8 @@
 #pragma once
 
 #include "Core.h"
-#include "Resource.h"
 #include "AudioClip.h"
+#include "HBETypes.h"
 
 namespace HBE {
 	struct AudioClipInstanceInfo {

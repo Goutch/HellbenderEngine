@@ -1,13 +1,14 @@
 #pragma once
 
-#include "Resource.h"
 #include "string"
 #include "Core.h"
-#include "StorageBuffer.h"
-#include "TexelBuffer.h"
 #include "core/interface/AccelerationStructureInterface.h"
 #include "core/interface/PipelineInstanceInterface.h"
 #include "core/interface/RasterizationPipelineInterface.h"
+#include "core/interface/BufferInterface.h"
+
+#include "core/Graphics.h"
+
 
 namespace HBE
 {

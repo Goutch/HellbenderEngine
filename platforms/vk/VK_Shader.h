@@ -2,7 +2,8 @@
 
 #include <vector>
 
-#include "core/resource/Shader.h"
+#include "HBETypes.h"
+#include "core/interface/ShaderInterface.h"
 #include "vulkan/vulkan.h"
 #include "string"
 #include "VK_Buffer.h"
@@ -64,7 +65,7 @@ namespace HBE {
         void alloc(VK_Context *context, const ShaderInfo &info);
 
         void release();
-
+        bool allocated();
     private:
         void setSource(const uint32_t *spirv, uint32_t size);
 

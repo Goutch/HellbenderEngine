@@ -17,7 +17,16 @@ namespace HBE
     const double maxCornerAngle = 3.0;
     const int number_of_channels = 4;
 
-    Font::Font(const FontInfo& info)
+    Font::Font(const FontInfo& info) : context(*Application::instance->getContext())
+    {
+        load(info);
+    }
+
+    Font::Font(): context(*Application::instance->getContext())
+    {
+    }
+
+    void Font::load(const FontInfo& info)
     {
         // Initialize instance of FreeType library
         if (msdfgen::FreetypeHandle* ft = msdfgen::initializeFreetype())
@@ -119,6 +128,7 @@ namespace HBE
     {
         delete atlas;
     }
+
 
     Image* Font::getTextureAtlas()
     {

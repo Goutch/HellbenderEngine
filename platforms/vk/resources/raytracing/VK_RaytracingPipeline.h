@@ -1,8 +1,10 @@
 #pragma once
 
-#include "core/resource/raytracing/RaytracingPipeline.h"
+#include <vector>
+
+#include "core/interface/RaytracingPipelineInterface.h"
 #include "platforms/vk/VK_Buffer.h"
-#include "../resources/VK_PipelineLayout.h"
+#include "platforms/vk/resources/VK_PipelineLayout.h"
 #include "vulkan/vulkan.h"
 
 namespace HBE
@@ -14,25 +16,19 @@ namespace HBE
 
     class VK_Device;
 
-    class VK_PipelineLayout;
-
     class VK_Shader;
 
-    class VK_RaytracingPipeline : public RaytracingPipeline
+    class VK_RaytracingPipeline
     {
         VK_Context* context = nullptr;
 
-        RaytracingPipelineInfo info;
         VkPipeline handle;
-        VK_Renderer* renderer;
         VK_PipelineLayout pipeline_layout{};
-
         VK_Buffer shader_binding_table_buffer{};
-
-        VK_Shader** any_hit_shaders;
+        ShaderHandle* any_hit_shaders;
         uint32_t any_hit_shader_count;
 
-        VK_Shader** intersection_shaders;
+        ShaderHandle* intersection_shaders;
         uint32_t intersection_shader_count;
 
         std::vector<VkRayTracingShaderGroupCreateInfoKHR> shader_groups{};
@@ -48,15 +44,18 @@ namespace HBE
         mutable bool is_bound = false;
 
     public:
+        VK_RaytracingPipeline() = default;
         VK_RaytracingPipeline(VK_Context* context, const RaytracingPipelineInfo& info);
-
         ~VK_RaytracingPipeline();
+        VK_RaytracingPipeline(const VK_RaytracingPipeline&) = delete;
+        VK_RaytracingPipeline& operator=(const VK_RaytracingPipeline&) = delete;
+        VK_RaytracingPipeline(VK_RaytracingPipeline&&);
 
         void bind() const;
 
         void unbind() const;
 
-        RAYTRACING_PIPELINE_FLAGS getFlags() const override;
+        RAYTRACING_PIPELINE_FLAGS getFlags() const;
 
         const VkStridedDeviceAddressRegionKHR& getRaygenShaderBindingTable() const;
 
@@ -67,6 +66,9 @@ namespace HBE
         const VkStridedDeviceAddressRegionKHR& getCallableShaderBindingTable() const;
 
         const VK_PipelineLayout& getPipelineLayout() const;
+        bool allocated();
+        void release();
+        void alloc(VK_Context* context, const RaytracingPipelineInfo& info);
 
     private:
         void createShaderBindingTable(const RaytracingPipelineInfo& info);

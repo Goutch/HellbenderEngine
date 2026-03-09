@@ -1,16 +1,16 @@
 #pragma once
 #include "HandleProvider.h"
 #include "../VK_ComputePipeline.h"
-#include "VK_RasterizationPipeline.h"
-#include "../raytracing/VK_RaytracingPipeline.h"
+#include "core/interface/RaytracingPipelineInterface.h"
 
-namespace HBE {
+namespace HBE
+{
     class VK_RaytracingPipeline;
-    struct RaytracingPipelineInfo;
-    class Context;
+    class VK_Context;
 
-    class VK_Pipelines {
-
+    class VK_Pipelines
+    {
+        VK_Context* context;
 
         HandleProvider shader_handle_provider;
         std::vector<VK_Shader> shader_data;
@@ -29,13 +29,18 @@ namespace HBE {
         RawVector<RaytracingPipelineInfo> raytracing_creation_infos;
 
     public:
-        static inline HBE_RESULT createShader(void *context_ptr, ShaderHandle &handle, const ShaderInfo &shader_info);
+        void init(VK_Context* context);
+        const VK_Shader* getShader(ShaderHandle handle) { return &shader_data[shader_handle_provider.index(handle)]; }
+        void release();
+        inline HBE_RESULT createShader(ShaderHandle& handle, const ShaderInfo& shader_info);
 
-        static inline HBE_RESULT releaseShader(void *context_ptr, ShaderHandle handle);
+        inline HBE_RESULT releaseShader(ShaderHandle handle);
 
-        static inline HBE_RESULT createRasterizationPipeline(void* context_ptr,RasterizationPipelineHandle& handle,const RasterizationPipelineInfo& raster_pipeline_info);
+        inline HBE_RESULT createRasterizationPipeline(RasterizationPipelineHandle& handle, const RasterizationPipelineInfo& raster_pipeline_info);
 
-        static inline HBE_RESULT releaseRasterizationPipeline(void* context_ptr,RasterizationPipelineHandle handle);
+        inline HBE_RESULT releaseRasterizationPipeline(RasterizationPipelineHandle handle);
+
+
+
     };
-
 }
