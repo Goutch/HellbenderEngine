@@ -1,12 +1,11 @@
 #pragma once
 
-#include "core/interface/AccelerationStructureInterface.h"
-#include "core/resource/raytracing/AccelerationStructure.h"
+#include "core/interface/ROOTAccelerationStructureInterface.h"
 
 namespace HBE {
 	class VK_Device;
 
-	class VK_TopLevelAccelerationStructure : public RootAccelerationStructure {
+	class VK_TopLevelAccelerationStructure {
 		VK_Context *context;
 		VkAccelerationStructureKHR handle;
 		VK_Buffer buffer;

@@ -2,7 +2,7 @@
 #include "Core.h"
 #include "core/Graphics.h"
 
-#include "core/interface/AccelerationStructureInterface.h"
+#include "core/interface/MeshAccelerationStructureInterface.h"
 #include "core/interface/PipelineInstanceInterface.h"
 #include "core/interface/RasterizationPipelineInterface.h"
 #include "core/interface/BufferInterface.h"

@@ -14,8 +14,8 @@ namespace HBE
 
         //todo:initialize this
 
-        VK_Mesh* mesh = context->meshes[info.mesh_handle];
-        VkDeviceSize vertex_size = mesh->getAttributeElementSize(0);
+        VK_Mesh& mesh = context->meshes[info.mesh_handle];
+        VkDeviceSize vertex_size = mesh.getAttributeElementSize(0);
 
         VkAccelerationStructureGeometryKHR accelerationStructureGeometry{};
         accelerationStructureGeometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
@@ -24,11 +24,11 @@ namespace HBE
         accelerationStructureGeometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
         accelerationStructureGeometry.geometry.triangles.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
         accelerationStructureGeometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
-        accelerationStructureGeometry.geometry.triangles.vertexData = mesh->getBuffer(0).getDeviceAddress();
-        accelerationStructureGeometry.geometry.triangles.maxVertex = mesh->getVertexCount();
+        accelerationStructureGeometry.geometry.triangles.vertexData = mesh.getBuffer(0).getDeviceAddress();
+        accelerationStructureGeometry.geometry.triangles.maxVertex = mesh.getVertexCount();
         accelerationStructureGeometry.geometry.triangles.vertexStride = vertex_size;
-        accelerationStructureGeometry.geometry.triangles.indexType = mesh->getIndicesSize() == sizeof(uint32_t) ? VK_INDEX_TYPE_UINT32 : VK_INDEX_TYPE_UINT16;
-        accelerationStructureGeometry.geometry.triangles.indexData = mesh->getIndicesBuffer().getDeviceAddress();
+        accelerationStructureGeometry.geometry.triangles.indexType = mesh.getIndicesSize() == sizeof(uint32_t) ? VK_INDEX_TYPE_UINT32 : VK_INDEX_TYPE_UINT16;
+        accelerationStructureGeometry.geometry.triangles.indexData = mesh.getIndicesBuffer().getDeviceAddress();
         accelerationStructureGeometry.geometry.triangles.transformData.deviceAddress = 0;
         accelerationStructureGeometry.geometry.triangles.transformData.hostAddress = nullptr;
 
@@ -40,7 +40,7 @@ namespace HBE
         accelerationStructureBuildGeometryInfo.geometryCount = 1;
         accelerationStructureBuildGeometryInfo.pGeometries = &accelerationStructureGeometry;
 
-        const uint32_t numTriangles = mesh->hasIndexBuffer() ? mesh->getIndexCount() / 3 : mesh->getVertexCount() / 3;
+        const uint32_t numTriangles = mesh.hasIndexBuffer() ? mesh.getIndexCount() / 3 : mesh.getVertexCount() / 3;
         VkAccelerationStructureBuildSizesInfoKHR accelerationStructureBuildSizesInfo{};
         accelerationStructureBuildSizesInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
 

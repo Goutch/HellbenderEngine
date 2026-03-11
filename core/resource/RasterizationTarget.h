@@ -21,6 +21,6 @@ namespace HBE
 
         void setResolution(vec2u);
         vec2u getResolution();
-        ImageHandle getFramebufferTexture(uint32_t frame_index);
+        ImageHandle getFramebufferTexture();
     };
 }

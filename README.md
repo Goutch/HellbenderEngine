@@ -55,7 +55,7 @@ For samples take a look at the sample repository [HellbenderSamples](https://git
 #### TODO :
 - [ ] Fix vram leak when resizing window or changing the vsync
 - [ ] 2D transform component
-- [ ] Model animations support (low prio)
+- [ ] Model animations support (very low prio, not needed right now)
 - [ ] ECS
   - [ ] Archetype caching
 - [ ] UI library
@@ -64,13 +64,12 @@ For samples take a look at the sample repository [HellbenderSamples](https://git
   - [ ] Buttons
   - [ ] Labels
   - [ ] Panels
+- [ ] Engine Internal rework
+  - [ ] Descriptor allocation need to change, use a descriptor allocator from VkGuide or something similar
 - [ ] Engine API rework
   - [ ] Resources
-    - [ ] Use Handles instead of pointers, better for serialization
+    - [ ] Use Handles instead of pointers, this simplify code so engine objects can be stack allocated
     - [ ] Add Shader hot reloading
-    - [ ] Combine Shader,RasterizationPipeline and RasterizationPipelineInstance etc by creating the pipeline internally
-    - [ ] Support slang maybe in the future.
-  - [ ] Remove all static types like Graphics Inputs Application and add a context object that has all of them inside.
 - [ ] Documentation
 ### Wiki
 - [Home](https://github.com/Goutch/HellbenderEngine/wiki)

@@ -60,6 +60,7 @@ namespace HBE {
 
         void release();
 
+
         VK_Renderer() = default;
 
         ~VK_Renderer() = default;
@@ -68,12 +69,11 @@ namespace HBE {
 
         VK_Renderer &operator=(const VK_Renderer &) = delete;
 
+        void cmdRasterizeGraph(const RasterizeGraphCmdInfo& info);
 
-        void rasterize(RasterizeCmdInfo &render_cmd_info);
+        void cmdTraceRays(const TraceRaysCmdInfo& trace_rays_cmd_info);
 
-        void traceRays(TraceRaysCmdInfo &trace_rays_cmd_info);
-
-        void present(PresentCmdInfo &present_cmd_info);
+        void cmdPresent(const PresentCmdInfo &present_cmd_info);
 
         void waitCurrentFrame();
 
@@ -105,7 +105,7 @@ namespace HBE {
 
         GraphicLimits getLimits();
 
-        void computeDispatch(ComputeDispatchCmdInfo &compute_dispatch_cmd_info);
+        void cmdDispatch(const ComputeDispatchCmdInfo &compute_dispatch_cmd_info);
 
         Fence *getLastFrameFence();
 

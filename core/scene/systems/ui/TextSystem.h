@@ -8,7 +8,10 @@
 #include "core/resource/Mesh.h"
 #include "core/scene/ecs/Component.h"
 #include "Event.h"
+#include "core/resource/Font.h"
+#include "core/resource/PipelineInstance.h"
 #include "core/resource/RasterizationPipeline.h"
+#include "core/resource/Shader.h"
 
 namespace HBE {
 	class Font;
@@ -37,7 +40,7 @@ namespace HBE {
 		TEXT_ALIGNMENT alignment = TEXT_ALIGNMENT_CENTER;
 
 		Font *font;
-		RasterizationPipelineInstance *pipeline_instance = nullptr;
+		PipelineInstanceHandle pipeline_instance = HBE_NULL_HANDLE;
 
 		const std::string &getText() const;
 

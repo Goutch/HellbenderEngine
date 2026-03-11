@@ -1,9 +1,9 @@
 #pragma once
 
-#include <core/resource/ComputeInstance.h>
 #include <string>
 
 #include "VK_Fence.h"
+#include "core/interface/PipelineInstanceInterface.h"
 
 namespace HBE {
 	class VK_Context;
@@ -17,7 +17,7 @@ namespace HBE {
 
 	class VK_ComputePipeline;
 
-	class VK_ComputeInstance : public ComputeInstance {
+	class VK_ComputeInstance {
 		const VK_ComputePipeline *pipeline;
 		VK_PipelineDescriptors *descriptors;
 	public:

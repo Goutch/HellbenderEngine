@@ -6,6 +6,7 @@
 #include "core/scene/Entity.h"
 #include "core/scene/ecs/Component.h"
 #include "Event.h"
+#include "core/resource/Mesh.h"
 
 using namespace HBE;
 namespace HBE {
@@ -20,7 +21,7 @@ namespace HBE {
 
 	struct UIPanel {
 		COMPONENT_IDS(UIPanel)
-		RasterizationPipelineInstance *pipeline_instance = nullptr;
+		PipelineInstanceHandle pipeline_instance = HBE_NULL_HANDLE;
 		PIVOT anchor = PIVOT_CENTER;
 		int layer = 0;
 		bool active = true;
@@ -45,7 +46,7 @@ namespace HBE {
 		void draw(RenderGraph *graph);
 
 	private:
-		Mesh *anchor_meshes[9];
+		Mesh anchor_meshes[9];
 
 	};
 

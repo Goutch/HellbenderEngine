@@ -6,7 +6,7 @@
 #include "vector"
 #include "map"
 #include "core/Graphics.h"
-#include "core/interface/AccelerationStructureInterface.h"
+#include "core/interface/MeshAccelerationStructureInterface.h"
 #include "core/interface/ImageInterface.h"
 #include "core/interface/MeshInterface.h"
 #include "core/interface/PipelineInstanceInterface.h"

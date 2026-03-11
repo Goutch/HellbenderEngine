@@ -11,10 +11,6 @@
 
 namespace HBE
 {
-    VK_Mesh::VK_Mesh()
-    {
-
-    }
 
     void VK_Mesh::setBuffer(uint32_t location, const void* vertices, size_t count)
     {
@@ -37,7 +33,7 @@ namespace HBE
             ReleaseRequest free_request{};
             free_request.vk_buffer = buffers[location].getHandle();
             free_request.allocation = buffers[location].getAllocation();
-            free_request.fence = dynamic_cast<VK_Fence&>(*context->renderer->getLastFrameFence()).getHandle();
+            free_request.fence = dynamic_cast<VK_Fence&>(*context->renderer.getLastFrameFence()).getHandle();
             context->allocator.releaseLater(free_request);
             buffers[location].reset();
         }
@@ -157,7 +153,7 @@ namespace HBE
         indices_buffer.update(data);
 
 
-        index_count = count;
+        indices_count = count;
     }
 
     void VK_Mesh::setVertexIndices(const uint16_t* data, size_t count)
@@ -219,4 +215,8 @@ namespace HBE
         return indices_buffer;
     }
 
+    uint32_t VK_Mesh::getIdicesCount() const
+    {
+        return indices_count;
+    }
 }

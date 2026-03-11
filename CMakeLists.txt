@@ -208,7 +208,7 @@ set(VK_FILES
         platforms/vk/VK_Context.cpp
         platforms/vk/VK_Context.h
         platforms/vk/VK_Types.h
-        core/interface/AccelerationStructureInterface.h
+        core/interface/MeshAccelerationStructureInterface.h
         core/interface/MeshInterface.h
         core/resource/PipelineInstance.cpp
         core/interface/PipelineInstanceInterface.h
@@ -218,6 +218,9 @@ set(VK_FILES
         core/interface/BufferInterface.h
         platforms/vk/resources/VK_PipelineInstance.cpp
         platforms/vk/resources/VK_PipelineInstance.h
+        core/interface/RootAccelerationStructureInterface.h
+        core/interface/AABBAccelerationStructureInterface.h
+        core/interface/FenceInterface.h
 )
 
 

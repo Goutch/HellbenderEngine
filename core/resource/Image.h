@@ -19,6 +19,7 @@ namespace HBE {
 		void release();
 		vec3u getSize();
 
+		ImageHandle getHandle();
 		void update(const void *data);
 
 		void load(const char* path,IMAGE_FORMAT expected_format);

@@ -1,6 +1,5 @@
-#pragma message("Application")
-#pragma once
 
+#pragma once
 #include "Core.h"
 #include "Graphics.h"
 #include "audio/Audio.h"

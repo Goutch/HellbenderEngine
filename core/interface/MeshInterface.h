@@ -6,7 +6,12 @@
 namespace HBE
 {
     typedef uint8_t VERTEX_ATTRIBUTE_FLAGS;
-
+    enum INDICES_TYPE
+    {
+        INDICES_TYPE_NONE,
+        INDICES_TYPE_UINT16,
+        INDICES_TYPE_UINT32,
+    };
     enum VERTEX_ATTRIBUTE_FLAG :uint8_t
     {
         VERTEX_ATTRIBUTE_FLAG_NONE = 0,

@@ -7,6 +7,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 
 #include "stb_image.h"
+
 namespace HBE
 {
     Image::Image(const ImageInfo& info) : context(*Application::instance->getContext())
@@ -20,10 +21,15 @@ namespace HBE
 
     vec3u Image::getSize()
     {
-        HB_ASSERT(handle != HBE_NULL_HANDLE,"allocate the image before requesting the size");
+        HB_ASSERT(handle != HBE_NULL_HANDLE, "allocate the image before requesting the size");
         vec3u size;
         context.getImageSize(handle, size);
         return size;
+    }
+
+    ImageHandle Image::getHandle()
+    {
+        return handle;
     }
 
     void Image::release()
@@ -34,7 +40,7 @@ namespace HBE
 
     void Image::update(const void* data)
     {
-        HB_ASSERT(handle != HBE_NULL_HANDLE,"allocate the image before updating it");
+        HB_ASSERT(handle != HBE_NULL_HANDLE, "allocate the image before updating it");
         context.updateImage(handle, data);
     }
 
@@ -100,7 +106,7 @@ namespace HBE
         info.optional_data = nullptr;
     }
 
-    Image::Image(Image&& other)  noexcept:context(other.context)
+    Image::Image(Image&& other) noexcept: context(other.context)
     {
         handle = other.handle;
 
@@ -115,7 +121,7 @@ namespace HBE
 
     void Image::alloc(const ImageInfo& info)
     {
-        HB_ASSERT(handle == HBE_NULL_HANDLE,"trying to allocate an image that is already allocated, this will cause a memory leak");
+        HB_ASSERT(handle == HBE_NULL_HANDLE, "trying to allocate an image that is already allocated, this will cause a memory leak");
         context.createImage(handle, info);
     }
 }

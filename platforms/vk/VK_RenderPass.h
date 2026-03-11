@@ -51,13 +51,13 @@ namespace HBE {
 
         const VkRenderPass &getHandle() const;
 
-        ImageHandle getFramebufferTexture(uint32_t index);
+        ImageHandle getFramebufferTexture();
 
         const std::vector<VkFramebuffer> &getFrameBuffers() const;
 
-        void setResolution(uint32_t width, uint32_t height);
+        void setResolution(vec2u resolution);
 
-        vec2i getResolution() const;
+        void getResolution(vec2u& resolution) const;
 
         void recreate();
 

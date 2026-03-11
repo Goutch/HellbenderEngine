@@ -1,29 +1,15 @@
 #pragma once
-#include "MeshInterface.h"
-#include "data-structure/Handle.h"
+#include "MeshAccelerationStructureInterface.h"
+
 namespace HBE
 {
     using RootAccelerationStructureHandle = Handle;
-    using AABBAccelerationStructureHandle = Handle;
-    using MeshAccelerationStructureHandle = Handle;
-    struct AABBAccelerationStructureInfo
-    {
-        vec3 min;
-        vec3 max;
-        MEMORY_TYPE_FLAGS preferred_memory_type_flags = MEMORY_TYPE_FLAG_GPU_LOCAL;
-    };
-    struct MeshAccelerationStructureInfo
-    {
-        MeshHandle mesh_handle;
-        MEMORY_TYPE_FLAGS preferred_memory_type_flags = MEMORY_TYPE_FLAG_GPU_LOCAL;
-    };
     enum ACCELERATION_STRUCTURE_TYPE
     {
         ACCELERATION_STRUCTURE_TYPE_NONE = 0,
         ACCELERATION_STRUCTURE_TYPE_AABB = 1,
         ACCELERATION_STRUCTURE_TYPE_MESH = 2,
     };
-
     struct AccelerationStructureInstance
     {
         uint32_t acceleration_structure_index;
@@ -32,7 +18,6 @@ namespace HBE
         ACCELERATION_STRUCTURE_TYPE type;
         uint32_t custom_index = 0;
     };
-
     struct RootAccelerationStructureInfo
     {
         AABBAccelerationStructureHandle* aabb_acceleration_structures;
@@ -43,5 +28,4 @@ namespace HBE
         uint32_t instance_count;
         MEMORY_TYPE_FLAGS preferred_memory_type_flags = MEMORY_TYPE_FLAG_GPU_LOCAL;
     };
-
 }

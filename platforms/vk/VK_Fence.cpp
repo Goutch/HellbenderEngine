@@ -24,6 +24,20 @@ namespace HBE
         vkDestroyFence(context->device.getHandle(), handle, nullptr);
     }
 
+    void VK_Fence::getStatus(FENCE_STATUS& status)
+    {
+        switch (vkGetFenceStatus(context->device.getHandle(), handle))
+        {
+        case VK_SUCCESS:
+            status = FENCE_STATUS_READY;
+            break;
+        case VK_NOT_READY:
+            status = FENCE_STATUS_NOT_READY;
+            break;
+        default: status = FENCE_STATUS_ERROR;
+        }
+    }
+
     const VkFence& VK_Fence::getHandle() const
     {
         return handle;

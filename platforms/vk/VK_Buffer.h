@@ -40,6 +40,7 @@ namespace HBE
         VK_Buffer() noexcept = default;
         VK_Buffer& operator=(VK_Buffer&&) noexcept;
 
+        bool allocated();
         void reset();
 
         void update(const void* data);
@@ -54,7 +55,5 @@ namespace HBE
         VkDeviceOrHostAddressConstKHR getDeviceAddress() const;
 
         void map(void* data);
-
-        bool allocated();
     };
 }

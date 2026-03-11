@@ -9,10 +9,6 @@
 
 namespace HBE
 {
-    VK_RenderPass::VK_RenderPass()
-    {
-    }
-
     void VK_RenderPass::recreate()
     {
         release();
@@ -28,7 +24,8 @@ namespace HBE
         return clear_color;
     }
 
-    void VK_RenderPass::alloc(VK_Context* context, const RasterizationTargetInfo& info) {
+    void VK_RenderPass::alloc(VK_Context* context, const RasterizationTargetInfo& info)
+    {
         this->context = context;
         this->width = info.width;
         this->height = info.height;
@@ -132,7 +129,8 @@ namespace HBE
         createFramebuffers();
     }
 
-    void VK_RenderPass::release() {
+    void VK_RenderPass::release()
+    {
         if (handle != VK_NULL_HANDLE)
         {
             context->device.wait();
@@ -144,9 +142,9 @@ namespace HBE
             for (size_t i = 0; i < images.size(); ++i)
             {
                 if (has_color_attachment)
-                    images[i].release();
+                    context->releaseImage(images[i]);
                 if (has_depth_attachment)
-                    depth_images[i].release();
+                    context->releaseImage(depth_images[i]);
             }
 
             images.clear();
@@ -234,8 +232,8 @@ namespace HBE
                 info.sampler_info.filter = IMAGE_SAMPLER_FILTER_TYPE_NEAREST;
                 info.sampler_info.address_mode = IMAGE_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
 
-                images[i].alloc(context, info);
-                image_views[i] = images[i].getImageView();
+                context->createImage(images[i], info);
+                depth_image_views[i] = context->images[images[i]].getImageView();
             }
         }
 
@@ -251,8 +249,8 @@ namespace HBE
                 info.width = width;
                 info.height = height;
                 info.flags = IMAGE_FLAG_DEPTH;
-                depth_images[i].alloc(context, info);
-                depth_image_views[i] = depth_images[i].getImageView();
+                context->createImage(depth_images[i], info);
+                depth_image_views[i] = context->images[depth_images[i]].getImageView();
             }
         }
 
@@ -291,21 +289,21 @@ namespace HBE
         return frame_buffers;
     }
 
-    void VK_RenderPass::setResolution(uint32_t width, uint32_t height)
+    void VK_RenderPass::setResolution(vec2u resolution)
     {
-        this->width = width > 0 ? width : 1;
-        this->height = height > 0 ? height : 1;
+        this->width = resolution.x > 0 ? resolution.x : 1;
+        this->height = resolution.y > 0 ? resolution.y : 1;
 
         recreate();
     }
 
-    vec2i VK_RenderPass::getResolution() const
+    void VK_RenderPass::getResolution(vec2u& resolution) const
     {
-        return vec2i(width, height);
+        resolution = vec2i(width, height);
     }
-    Image& VK_RenderPass::getFramebufferTexture(uint32_t index)
+
+    ImageHandle VK_RenderPass::getFramebufferTexture()
     {
-        HB_ASSERT(index < images.size(), "Frame index out of bounds");
-        return images[index];
+        return images[context->renderer.getCurrentFrameIndex()];
     }
 }

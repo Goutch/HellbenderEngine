@@ -20,6 +20,8 @@ namespace HBE
         renderer.init(this);
         graphic_limits = renderer.getLimits();
 
+
+        renderer.
     }
 
     template <typename T, uint32_t I>

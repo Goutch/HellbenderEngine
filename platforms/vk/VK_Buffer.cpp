@@ -10,6 +10,11 @@ namespace HBE
         return handle;
     }
 
+    bool VK_Buffer::allocated()
+    {
+        return size != 0;
+    }
+
     void VK_Buffer::alloc(VK_Context* context, BufferInfo& info)
     {
         this->device = &context->device;
@@ -64,6 +69,7 @@ namespace HBE
         HB_ASSERT(allocated(), "VK_Buffer is not allocated and you are trying to release it");
         allocator->free(allocation);
         vkDestroyBuffer(device->getHandle(), handle, nullptr);
+        size = 0;
     }
 
     VK_Buffer::VK_Buffer(VK_Buffer&& other) noexcept
@@ -118,6 +124,7 @@ namespace HBE
 
     void VK_Buffer::update(const void* data)
     {
+        //todo: add all copy commands to a single command buffer and submit once
         allocator->update(*this, data, size);
     }
 
@@ -143,11 +150,6 @@ namespace HBE
         {
             Log::error("Buffer is not mappable");
         }
-    }
-
-    bool VK_Buffer::allocated()
-    {
-        return size > 0;
     }
 
     void VK_Buffer::reset()

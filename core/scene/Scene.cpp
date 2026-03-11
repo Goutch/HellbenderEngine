@@ -230,22 +230,19 @@ namespace HBE {
         node_system->setParent(entity, parent);
     }
 
-    Image *Scene::getMainCameraTexture() {
+    ImageHandle Scene::getMainCameraTexture() {
         if (main_camera_entity.valid() && (main_camera_entity.has<Camera>() || main_camera_entity.has<Camera2D>() ||
                                            main_camera_entity.has<PixelCamera>())) {
             if (main_camera_entity.valid() && (main_camera_entity.has<Camera>())) {
-                return &main_camera_entity.get<Camera>()->getRenderTarget()->getFramebufferTexture(
-                    context.getRenderer()->getCurrentFrameIndex());
+                return main_camera_entity.get<Camera>()->getRenderTarget()->getFramebufferTexture();
             }
             if (main_camera_entity.valid() && (main_camera_entity.has<Camera2D>())) {
-                return &main_camera_entity.get<Camera2D>()->getRenderTarget()->getFramebufferTexture(
-                    context.getRenderer()->getCurrentFrameIndex());
+                return main_camera_entity.get<Camera2D>()->getRenderTarget()->getFramebufferTexture();
             }
             if (main_camera_entity.valid() && (main_camera_entity.has<PixelCamera>())) {
-                return &main_camera_entity.get<PixelCamera>()->getRenderTarget()->getFramebufferTexture(
-                    context.getRenderer()->getCurrentFrameIndex());
+                return main_camera_entity.get<PixelCamera>()->getRenderTarget()->getFramebufferTexture();
             }
         }
-        return nullptr;
+        return HBE_NULL_HANDLE;
     }
 }

@@ -9,7 +9,6 @@
 #include "core/audio/Audio.h"
 
 #include "platforms/vk/VK_Window.h"
-#include "platforms/vk/VK_Context.h"
 
 namespace HBE
 {
@@ -32,8 +31,6 @@ namespace HBE
         input.init(*window);
 
         onInit.invoke();
-
-        context.getRenderer()->createDefaultResources();
     }
 
     void Application::run()
@@ -60,12 +57,14 @@ namespace HBE
 
 
                 HB_PROFILE_BEGIN("RENDER");
-                context.getRenderer()->beginFrame();
+                //context.beginRecordCommands
+
+                context.rendererBeginRecordCommands();
                 onRender.invoke();
                 HB_PROFILE_END("RENDER");
                 HB_PROFILE_BEGIN("PRESENT");
                 onPresent.invoke();
-                context.getRenderer()->endFrame();
+                context.rendererEndRecordCommandsAndSubmit();
 
                 HB_PROFILE_END("PRESENT");
             }
@@ -82,7 +81,7 @@ namespace HBE
             frames++;
             HB_PROFILE_END("TOTAL_FRAME");
         }
-        context->getRenderer()->waitLastFrame();
+       // context.waitForFence(context.rendererGetFenceForFrame(context.rendererGetFrame(-1)));
         onWindowClosed.invoke();
         onQuit.invoke();
     }

@@ -18,7 +18,7 @@ namespace HBE {
 	void CameraSystem::onCameraAttached(Entity entity) {
 		Camera *camera = entity.get<Camera>();
 		if (camera->getRenderTarget() == nullptr)
-			camera->setRenderTarget(context.->getDefaultRenderTarget());
+			camera->setRenderTarget(context->getDefaultRenderTarget());
 
 		if (!scene->getCameraEntity().valid()) {
 			scene->setCameraEntity(entity);
@@ -51,7 +51,7 @@ namespace HBE {
 		auto group = scene->group<Node, Transform, Camera>();
 		auto group_2D = scene->group<Node, Transform, Camera2D>();
 		auto group_pixel = scene->group<Node, Transform, PixelCamera>();
-		RasterizeCmdInfo raster_cmd_info{};
+		RasterizeGraphCmdInfo raster_cmd_info{};
 		raster_cmd_info.render_graph = render_graph;
 		HB_PROFILE_END("CameraRenderGroup");
 		for (auto [handle, node, transform, camera]: group) {

@@ -43,7 +43,7 @@ namespace HBE {
 				draw_cmd.push_constants_count = push_constants_count;
 				draw_cmd.push_constants = push_constant_infos;
 				draw_cmd.mesh = mesh_renderer.mesh;
-				draw_cmd.pipeline_instance = mesh_renderer.pipeline_instance;
+				draw_cmd.pipeline_instance_handle = mesh_renderer.pipeline_instance;
 				draw_cmd.layer = mesh_renderer.layer;
 
 				if (mesh_renderer.ordered) {

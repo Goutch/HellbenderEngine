@@ -8,9 +8,14 @@
 #include "VK_Surface.h"
 #include "VK_Swapchain.h"
 #include "VK_Instance.h"
+#include "VK_RenderPass.h"
 
 #include "core/interface/ContextInterface.h"
 #include "core/interface/ComputePipelineInterface.h"
+#include "core/interface/AABBAccelerationStructureInterface.h"
+#include "core/interface/FenceInterface.h"
+#include "core/interface/RootAccelerationStructureInterface.h"
+#include "Core/interface/MeshAccelerationStructureInterface.h"
 #include "resources/VK_PipelineInstance.h"
 #include "resources/VK_RasterizationPipeline.h"
 #include "resources/VK_RasterizationTargets.h"
@@ -19,35 +24,50 @@
 #include "resources/raytracing/VK_RaytracingPipeline.h"
 #include "resources/raytracing/VK_TopLevelAccelerationStructure.h"
 
+#define VK_CONTEXT_CMD_API_FUNC(ReturnType, FuncName, Params, Args)    \
+inline ReturnType FuncName(Params)          \
+{                                           \
+    renderer.FuncName(Args);                \
+    return HBE_RESULT_SUCCESS;           \
+}
 #define VK_CONTEXT_CREATE_API_FUNC(ReturnType, FuncName, Params, Args,Collection)    \
 inline ReturnType FuncName(Params)\
 {                                           \
-        /*Collection.create();                */\
-        /*Collection[handle].alloc(this,info); */   \
+        Collection.create();                \
+        Collection[handle].alloc(this,info);    \
         return HBE_RESULT_SUCCESS;          \
 }
 
 #define VK_CONTEXT_RELEASE_API_FUNC(ReturnType, FuncName, Params, Args,Collection)      \
 inline ReturnType FuncName(Params)\
 {                                                                                       \
-    /*if(!Collection.valid(handle)) return HBE_RESULT_INVALID_HANDLE;      */               \
-    /*Collection[handle].release();                                        */               \
-    /*Collection.release(handle);                                          */               \
+    if(!Collection.valid(handle)) return HBE_RESULT_INVALID_HANDLE;                  \
+    Collection[handle].release();                                                    \
+    Collection.release(handle);                                                      \
     return HBE_RESULT_SUCCESS;                                                          \
 }
 
 #define VK_CONTEXT_MEMBER_CALL_API_FUNC(ReturnType, FuncName, Params, Args, Collection, MemberName, MemberArgs)    \
 inline ReturnType FuncName(Params)                                                                                  \
 {                                                                                                                    \
-    /*if(!Collection.valid(handle)) return HBE_RESULT_INVALID_HANDLE;                      */                          \
-    /*    Collection[handle].##MemberName(MemberArgs);                                     */                          \
+    if(!Collection.valid(handle)) return HBE_RESULT_INVALID_HANDLE;                                               \
+       Collection[handle].MemberName(MemberArgs);                                                              \
     return HBE_RESULT_SUCCESS;                                                                                      \
+}
+
+#define VK_CONTEXT_RENDERER_API_FUNC(ReturnType, FuncName, Params, Args, MemberName, MemberArgs)    \
+inline ReturnType FuncName(Params)                                                                                  \
+{                                                                                                               \
+   renderer.MemberName(MemberArgs);                                                                             \
+   return HBE_RESULT_SUCCESS;                                                                                      \
 }
 #define FUNC_ARGS(...) __VA_ARGS__
 #define FUNC_PARAMS(...) __VA_ARGS__
 
-namespace HBE {
-    class VK_Context {
+namespace HBE
+{
+    class VK_Context
+    {
     public:
         VK_Instance instance{};
         VK_Surface surface{};
@@ -70,15 +90,23 @@ namespace HBE {
         StableHandleContainer<VK_TopLevelAccelerationStructure, 16> root_acceleration_structures;
         StableHandleContainer<VK_AABBBottomLevelAccelerationStructure, 16> aabb_acceleration_structures;
         StableHandleContainer<VK_MeshBottomLevelAccelerationStructure, 16> mesh_acceleration_structures;
+        StableHandleContainer<VK_Fence, 16> fences;
 
-        HBE_RESULT init(const ContextInfo &info);
+        HBE_RESULT init(const ContextInfo& info);
 
         HBE_RESULT release();
 
-        void getGraphicLimits(GraphicLimits& graphic_limits) {
-            graphic_limits = this->graphic_limits;
-        }
+        //renderer
+        VK_CONTEXT_RENDERER_API_FUNC(HBE_RESULT,rendererBeginRecordCommands,FUNC_PARAMS(),FUNC_ARGS(),beginFrame,FUNC_ARGS());
+        VK_CONTEXT_RENDERER_API_FUNC(HBE_RESULT,rendererEndRecordCommandsAndSubmit,FUNC_PARAMS(),FUNC_ARGS(),endFrame,FUNC_ARGS());
 
+        //cmds
+        VK_CONTEXT_CMD_API_FUNC(HBE_RESULT, cmdRasterizeGraph, FUNC_PARAMS(const RasterizeGraphCmdInfo& info), FUNC_ARGS(info));
+        VK_CONTEXT_CMD_API_FUNC(HBE_RESULT, cmdTraceRays, FUNC_PARAMS(const TraceRaysCmdInfo& info), FUNC_ARGS(info));
+        VK_CONTEXT_CMD_API_FUNC(HBE_RESULT, cmdDispatch, FUNC_PARAMS(const ComputeDispatchCmdInfo& info), FUNC_ARGS(info));
+        VK_CONTEXT_CMD_API_FUNC(HBE_RESULT, cmdPresent,FUNC_PARAMS(const PresentCmdInfo& info),FUNC_ARGS(info));
+
+        //create
         VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createImage, FUNC_PARAMS(ImageHandle& handle,const ImageInfo& info), FUNC_ARGS(handle,info), images)
         VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createMesh, FUNC_PARAMS(MeshHandle &handle,const MeshInfo& info), FUNC_ARGS(handle,info), meshes);
         VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createPipelineInstance, FUNC_PARAMS(PipelineInstanceHandle& handle,const PipelineInstanceInfo& info), FUNC_ARGS(handle,info), pipeline_instances)
@@ -114,18 +142,34 @@ namespace HBE {
         VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setMeshInstanceBuffer, FUNC_PARAMS(MeshHandle handle,uint32_t location,const void *buffer, size_t count), FUNC_ARGS(handle,location,buffer,count), meshes, setInstanceBuffer, FUNC_ARGS(location,buffer,count));
 
         //pipeline instance
-        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceUniform, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, const void* data), FUNC_ARGS(handle,binding, data), pipeline_instances, setUniform, FUNC_ARGS(binding,data));
-        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceImage, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, ImageHandle image, uint32_t mip_level), FUNC_ARGS(handle,binding, image, mip_level), pipeline_instances, setImage, FUNC_ARGS(binding,image.mip_level));
-        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceImageArray, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, ImageHandle* images, uint32_t images_count, uint32_t mip_level), FUNC_ARGS(handle,binding, images, images_count, mip_level), pipeline_instances, setUniform, FUNC_ARGS(binding,data));
-        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceStorageBuffer, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, StorageBufferHandle buffer, size_t count, size_t offset, int32_t frame), FUNC_ARGS(handle,binding, buffer, count, offset, frame), pipeline_instances, setUniform, FUNC_ARGS(binding,data));
-        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceStorageBufferArray, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, StorageBufferHandle* buffers, uint32_t count), FUNC_ARGS(handle,binding, buffers, count), pipeline_instances, setUniform, FUNC_ARGS(binding,data));
-        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceTexelBuffer, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, TexelBufferHandle buffer), FUNC_ARGS(handle,binding, buffer), pipeline_instances, setUniform, FUNC_ARGS(binding,data));
-        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceTexelBufferArray, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, TexelBufferHandle* buffers, uint32_t count), FUNC_ARGS(handle,binding, buffers, count), pipeline_instances, setUniform, FUNC_ARGS(binding,data));
-        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceAccelerationStructure, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, RootAccelerationStructureHandle accelerationStructure), FUNC_ARGS(handle,binding, accelerationStructure), pipeline_instances, setUniform, FUNC_ARGS(binding,data));
-        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, getPipelineFromInstance, FUNC_PARAMS(PipelineInstanceHandle handle,Handle pipeline_handle), FUNC_ARGS(handle,pipeline_handle), pipeline_instances, setUniform, FUNC_ARGS(binding,data));
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceUniform, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, const void* data,int32_t frame_index), FUNC_ARGS(handle,binding, data,frame_index), pipeline_instances, setUniform, FUNC_ARGS(binding,data,frame_index));
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceImage, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, ImageHandle image, uint32_t mip_level,int32_t frame_index), FUNC_ARGS(handle,binding, image, mip_level,frame_index), pipeline_instances, setImage, FUNC_ARGS(binding,image,mip_level,frame_index));
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceImageArray, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, ImageHandle* images, uint32_t images_count, uint32_t mip_level,int32_t frame_index), FUNC_ARGS(handle,binding, images, images_count, mip_level,frame_index), pipeline_instances, setImageArray,FUNC_ARGS(binding, images, images_count, mip_level,frame_index));
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceStorageBuffer, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, StorageBufferHandle buffer, size_t count, size_t offset,int32_t frame_index), FUNC_ARGS(handle,binding, buffer, count, offset, frame,frame_index), pipeline_instances, setStorageBuffer, FUNC_ARGS(binding,buffer,count,offset,frame_index));
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceStorageBufferArray, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, StorageBufferHandle* buffers, uint32_t count,int32_t frame_index), FUNC_ARGS(handle,binding, buffers, count,frame_index), pipeline_instances, setStorageBufferArray, FUNC_ARGS(binding,buffers,count,frame_index));
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceTexelBuffer, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, TexelBufferHandle buffer,int32_t frame_index), FUNC_ARGS(handle,binding, buffer,frame_index), pipeline_instances, setTexelBuffer, FUNC_ARGS(binding,buffer,frame_index));
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceTexelBufferArray, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, TexelBufferHandle* buffers, uint32_t count,int32_t frame_index), FUNC_ARGS(handle,binding, buffers, count,frame_index), pipeline_instances, setStorageBufferArray, FUNC_ARGS(binding,buffers,count,frame_index));
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceAccelerationStructure, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, RootAccelerationStructureHandle acceleration_structure,int32_t frame_index), FUNC_ARGS(handle,binding, acceleration_structure,frame_index), pipeline_instances, setAccelerationStructure,FUNC_ARGS(binding,acceleration_structure,frame_index));
 
         //Rasterization Target
-        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, getRasterizationTargetResolution, FUNC_PARAMS(RasterizationTargetHandle handle,vec2u& resolution), FUNC_ARGS(handle,resolution),rasterization_targets,getResolution,FUNC_ARGS(resolution));
-        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setRasterizationTargetResolution, FUNC_PARAMS(RasterizationTargetHandle handle,vec2u resolution), FUNC_ARGS(handle,resolution),rasterization_targets,setResoltuin,FUNC_ARGS(resolution));
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, getRasterizationTargetResolution, FUNC_PARAMS(RasterizationTargetHandle handle,vec2u& resolution), FUNC_ARGS(handle,resolution), rasterization_targets, getResolution, FUNC_ARGS(resolution));
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setRasterizationTargetResolution, FUNC_PARAMS(RasterizationTargetHandle handle,vec2u resolution), FUNC_ARGS(handle,resolution), rasterization_targets, setResolution, FUNC_ARGS(resolution));
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, getRasterizationTargetFrameBuffer, FUNC_PARAMS(RasterizationTargetHandle handle), FUNC_ARGS(handle),rasterization_targets,getFramebufferTexture,FUNC_ARGS());
+
+        //fences
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT,waitForFence,FUNC_PARAMS(FenceHandle handle),FUNC_ARGS(handle),fences,wait,FUNC_ARGS())
+        VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT,getFenceStatus,FUNC_PARAMS(FenceHandle handle,FENCE_STATUS& status),FUNC_ARGS(handle,status),fences,getStatus,FUNC_ARGS(status))
+
+        HBE_RESULT getGraphicLimits(GraphicLimits& graphic_limits)
+        {
+            graphic_limits = this->graphic_limits;
+            return HBE_RESULT_SUCCESS;
+        }
+
+        HBE_RESULT getPipelineFromInstance(PipelineInstanceHandle handle, Handle& pipeline_handle)
+        {
+            pipeline_handle = pipeline_instances[handle].getPipeline();
+            return HBE_RESULT_SUCCESS;
+        }
     };
 }

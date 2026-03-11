@@ -92,7 +92,7 @@ namespace HBE {
 
         bool isActive();
 
-        virtual Image *getMainCameraTexture();
+        virtual ImageHandle getMainCameraTexture();
 
         Scene(SceneInfo info = {});
 

@@ -252,4 +252,9 @@ namespace HBE
     {
         release();
     }
+
+    VkPipeline VK_RaytracingPipeline::getHandle()
+    {
+        return handle;
+    }
 }

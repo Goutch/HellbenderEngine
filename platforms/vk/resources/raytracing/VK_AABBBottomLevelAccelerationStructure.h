@@ -1,8 +1,7 @@
 #pragma once
 
-#include "core/interface/AccelerationStructureInterface.h"
+#include "core/interface/AABBAccelerationStructureInterface.h"
 #include "vulkan/vulkan.h"
-#include "core/resource/raytracing/AccelerationStructure.h"
 #include "platforms/vk/VK_Buffer.h"
 
 namespace HBE
@@ -12,7 +11,7 @@ namespace HBE
 
     class Mesh;
 
-    class VK_AABBBottomLevelAccelerationStructure : public AABBAccelerationStructure
+    class VK_AABBBottomLevelAccelerationStructure
     {
         VkAccelerationStructureKHR handle;
         VK_Context* context = nullptr;

@@ -17,8 +17,8 @@ namespace HBE
     {
         TextRenderer* text_component = text_entity.get<TextRenderer>();
 
-        text_component->pipeline_instance = default_text_pipeline_instance;
-        text_component->font = default_font;
+        text_component->pipeline_instance = default_text_pipeline_instance.getHandle();
+        text_component->font = &default_font;
         text_component->height = 40;
     }
 
@@ -27,11 +27,6 @@ namespace HBE
         scene->onAttach<TextRenderer>().unsubscribe(on_attach_subscription_id);
         scene->onDetach<TextRenderer>().unsubscribe(on_detach_subscription_id);
         scene->onDraw.unsubscribe(on_draw_subscription_id);
-        delete default_font;
-        delete default_text_pipeline_instance;
-        delete default_text_pipeline;
-        delete default_text_vert_shader;
-        delete default_text_frag_shader;
     }
 
     TextSystem::TextSystem(Scene* scene, RasterizationTarget* render_target) : System(scene)
@@ -48,38 +43,24 @@ namespace HBE
         font_info.characters_count = characters.size();
         font_info.glyph_resolution = 64;
 
-        default_font.
+        default_font.load(font_info);
 
-        ShaderInfo text_frag_shader_info{};
-        ShaderInfo text_vert_shader_info{};
-
-        text_vert_shader_info.path = "shaders/defaults/ui/Label.vert";
-        text_vert_shader_info.stage = SHADER_STAGE_VERTEX;
-
-        text_frag_shader_info.path = "shaders/defaults/ui/Label.frag";
-        text_frag_shader_info.stage = SHADER_STAGE_FRAGMENT;
-
-
-        default_text_vert_shader = Application::instance->getContext()->createShader(text_vert_shader_info);
-        default_text_frag_shader = Application::instance->getContext()->createShader(text_frag_shader_info);
+        default_text_vert_shader.loadGLSL("shaders/defaults/ui/Label.vert", SHADER_STAGE_VERTEX);
+        default_text_frag_shader.loadGLSL("shaders/defaults/ui/Label.frag", SHADER_STAGE_FRAGMENT);
 
 
         RasterizationPipelineInfo text_pipeline_info{};
-        text_pipeline_info.vertex_shader = default_text_vert_shader;
-        text_pipeline_info.fragment_shader = default_text_frag_shader;
+        text_pipeline_info.vertex_shader = default_text_vert_shader.getHandle();
+        text_pipeline_info.fragment_shader = default_text_frag_shader.getHandle();
         text_pipeline_info.rasterization_target = render_target;
         text_pipeline_info.attribute_info_count = 1;
         text_pipeline_info.attribute_infos = &VERTEX_ATTRIBUTE_INFO_POSITION3D_UV_INTERLEAVED;
         text_pipeline_info.flags = RASTERIZATION_PIPELINE_FLAG_NO_DEPTH_TEST;
-        default_text_pipeline = Application::instance->getContext()->createRasterizationPipeline(text_pipeline_info);
+        default_text_pipeline.alloc(text_pipeline_info);
+        default_text_pipeline.allocInstance(default_text_pipeline_instance);
 
-        RasterizationPipelineInstanceInfo text_pipeline_instance_info{};
-        text_pipeline_instance_info.rasterization_pipeline = default_text_pipeline;
-        text_pipeline_instance_info.flags = RASTERIZATION_PIPELINE_INSTANCE_FLAG_NONE;
-        default_text_pipeline_instance = Application::instance->getContext()->createRasterizationPipelineInstance(text_pipeline_instance_info);
-
-        default_text_pipeline_instance->setUniform("material", &DEFAULT_TEXT_COLOR);
-        default_text_pipeline_instance->setImage("mtsdf", default_font->getTextureAtlas());
+        default_text_pipeline_instance.setUniform("material", &DEFAULT_TEXT_COLOR);
+        default_text_pipeline_instance.setImage("mtsdf", default_font.getTextureAtlas()->getHandle());
     }
 
     void TextSystem::onDetachLabel(Entity label)
@@ -87,7 +68,6 @@ namespace HBE
         TextRenderer* label_component = label.get<TextRenderer>();
         if (label_component->mesh != nullptr)
         {
-            Application::instance->getContext()->getRenderer()->waitLastFrame();
             delete label_component->mesh;
             label_component->mesh = nullptr;
         }
@@ -102,16 +82,16 @@ namespace HBE
         {
             if (!text_component.active ||
                 text_component.mesh == nullptr ||
-                text_component.pipeline_instance == nullptr ||
+                text_component.pipeline_instance == HBE_NULL_HANDLE ||
                 !node.isActiveInHierarchy())
             {
                 continue;
             }
-            HB_ASSERT(text_component.pipeline_instance != nullptr, "graphic pipeline instance is not set");
+            HB_ASSERT(text_component.pipeline_instance != HBE_NULL_HANDLE, "graphic pipeline instance is not set");
 
             DrawCmdInfo cmd{};
-            cmd.mesh = text_component.mesh;
-            cmd.pipeline_instance = text_component.pipeline_instance;
+            cmd.mesh = text_component.mesh->getHandle();
+            cmd.pipeline_instance_handle = text_component.pipeline_instance;
             cmd.order_in_layer = node.getGlobalIndex();
             LabelPushConstant push_constant{};
             push_constant.text_height = text_component.height;
@@ -138,7 +118,6 @@ namespace HBE
         HB_ASSERT(font != nullptr, "Font is not set");
         if (text.length() == 0 && mesh != nullptr)
         {
-            Application::instance->getContext()->getRenderer()->waitLastFrame();
             delete mesh;
             mesh = nullptr;
             return;

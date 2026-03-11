@@ -23,7 +23,7 @@ namespace HBE {
 				Mesh *mesh = model.getResources().meshes[node.mesh][i];
 				RasterizationPipelineInstance *material = model.getResources().materials[primitive.material];
 				draw_cmd.mesh = mesh;
-				draw_cmd.pipeline_instance = material;
+				draw_cmd.pipeline_instance_handle = material;
 
 				render_graph->add(draw_cmd);
 			} else {

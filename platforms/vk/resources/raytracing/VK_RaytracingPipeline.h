@@ -47,6 +47,7 @@ namespace HBE
         VK_RaytracingPipeline() = default;
         VK_RaytracingPipeline(VK_Context* context, const RaytracingPipelineInfo& info);
         ~VK_RaytracingPipeline();
+        VkPipeline getHandle();
         VK_RaytracingPipeline(const VK_RaytracingPipeline&) = delete;
         VK_RaytracingPipeline& operator=(const VK_RaytracingPipeline&) = delete;
         VK_RaytracingPipeline(VK_RaytracingPipeline&&);

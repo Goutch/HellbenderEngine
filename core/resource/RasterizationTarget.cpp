@@ -25,4 +25,9 @@ namespace HBE
         context.getRasterizationTargetResolution(handle, resolution);
         return resolution;
     }
+
+    ImageHandle RasterizationTarget::getFramebufferTexture()
+    {
+        return context.getRasterizationTargetFrameBuffer(handle);
+    }
 }

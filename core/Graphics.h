@@ -1,4 +1,3 @@
-
 #pragma once
 #include "Context.h"
 #ifdef VULKAN_GRAPHICS

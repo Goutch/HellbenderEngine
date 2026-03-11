@@ -47,7 +47,7 @@ namespace HBE {
     struct DrawCmdInfo {
         MeshHandle mesh = HBE_NULL_HANDLE;
         RasterizationPipelineHandle rasterization_pipeline_handle = HBE_NULL_HANDLE;
-        PipelineInstanceHandle pipeline_instance = HBE_NULL_HANDLE;
+        PipelineInstanceHandle pipeline_instance_handle = HBE_NULL_HANDLE;
         uint32_t layer = 0;
         uint32_t order_in_layer = 0; //ignored if ordered flag is not set
         uint32_t push_constants_count = 0;
@@ -55,7 +55,7 @@ namespace HBE {
         DRAW_CMD_FLAGS flags = DRAW_CMD_FLAG_NONE;
     };
 
-    struct RasterizeCmdInfo {
+    struct RasterizeGraphCmdInfo {
         RasterizationTargetHandle rasterization_target_handle;
         RenderGraph *render_graph;
         uint32_t layer_mask;
@@ -71,7 +71,7 @@ namespace HBE {
     };
 
     struct PresentCmdInfo {
-        Image **images;
+        ImageHandle *images;
         uint32_t image_count;
         PRESENT_CMD_FLAGS flags;
     };

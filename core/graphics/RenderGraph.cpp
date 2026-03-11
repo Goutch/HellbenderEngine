@@ -98,8 +98,8 @@ namespace HBE {
 			return gp1 > gp2;
 		} else {
 
-			PipelineInstanceHandle pi1 = HandleProvider::index(cmd1.pipeline_instance);
-			PipelineInstanceHandle pi2 = HandleProvider::index(cmd2.pipeline_instance);
+			PipelineInstanceHandle pi1 = HandleProvider::index(cmd1.pipeline_instance_handle);
+			PipelineInstanceHandle pi2 = HandleProvider::index(cmd2.pipeline_instance_handle);
 			if (pi1 != pi2) {
 				return pi1 > pi2;
 			} else {

@@ -12,17 +12,11 @@ namespace HBE
         Context& context;
         MeshHandle handle = HBE_NULL_HANDLE;
 
-        enum INDICES_TYPE
-        {
-            INDICES_TYPE_NONE,
-            INDICES_TYPE_UINT16,
-            INDICES_TYPE_UINT32,
-        };
+
 
         uint32_t vertex_count = 0;
         uint32_t index_count = 0;
         uint32_t instance_count = 1;
-        INDICES_TYPE indices_type = INDICES_TYPE_NONE;
 
     public:
         Mesh();

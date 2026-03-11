@@ -26,6 +26,9 @@ namespace HBE
         std::vector<VertexAttributeInfo> attributes_locations;
         uint32_t instance_count = 0;
         uint32_t vertex_count = 0;
+        INDICES_TYPE indices_type;
+
+        uint32_t indices_count = 0;
 
     public:
         void alloc(VK_Context* context, const MeshInfo& info);
@@ -48,6 +51,7 @@ namespace HBE
 
         const VK_Buffer& getIndicesBuffer() const;
 
+        uint32_t getIdicesCount() const;
         void bind() const;
 
         void unbind() const;

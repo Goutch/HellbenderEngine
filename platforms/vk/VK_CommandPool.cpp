@@ -17,8 +17,8 @@ namespace HBE
         poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
         poolInfo.queueFamilyIndex = queue.getFamilyIndex();
 
-        poolInfo.flags = VkCommandPoolCreateFlagBits::VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT |
-            VkCommandPoolCreateFlagBits::VK_COMMAND_POOL_CREATE_TRANSIENT_BIT;
+        poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT |
+            VK_COMMAND_POOL_CREATE_TRANSIENT_BIT;
 
 
         if (vkCreateCommandPool(context->device.getHandle(), &poolInfo, nullptr, &handle) != VK_SUCCESS)

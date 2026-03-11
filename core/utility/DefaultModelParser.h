@@ -28,7 +28,7 @@ namespace HBE {
 
 		MeshHandle createMesh(const HBE::ModelPrimitiveData &data, ModelInfo model_info) override;
 
-		PipelineInstanceHandle *createMaterial(const HBE::ModelMaterialData &materialData, HBE::ImageHandle *textures) override;
+		PipelineInstanceHandle createMaterial(const HBE::ModelMaterialData &materialData, HBE::ImageHandle *textures) override;
 
 		ImageHandle createTexture(const ModelTextureData &data) override;
 
