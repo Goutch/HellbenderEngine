@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Core.h"
-#include <vector>
 #include "core/Graphics.h"
 #include "core/interface/MeshInterface.h"
 

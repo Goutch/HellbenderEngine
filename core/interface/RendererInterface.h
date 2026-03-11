@@ -1,38 +1,15 @@
 #pragma once
-
 #include "Core.h"
 #include "HBETypes.h"
 #include "glm/glm.hpp"
 #include <string>
-#include "GraphicLimits.h"
 #include "core/interface/MeshInterface.h"
 #include "core/interface/RasterizationPipelineInterface.h"
 #include "core/interface/RasterizationTargetInterface.h"
 #include "core/interface/PipelineInstanceInterface.h"
 
 namespace HBE {
-    class RasterizationTarget;
-
-    class Image;
-
-    class Fence;
-    class Mesh;
-
-    class Framebuffer;
-
-    class Window;
-
-    class RasterizationPipeline;
-
-    class RasterizationPipelineInstance;
-
-    class RootAccelerationStructure;
-
-    class RaytracingPipelineInstance;
-
     class RenderGraph;
-
-    class ComputeInstance;
 
     typedef uint32_t DRAW_CMD_FLAGS;
 
@@ -88,7 +65,7 @@ namespace HBE {
     };
 
     struct TraceRaysCmdInfo {
-        RaytracingPipelineInstance *pipeline_instance;
+        PipelineInstanceHandle pipeline_instance;
         vec2i resolution;
         TRACE_RAYS_CMD_FLAGS flags;
     };
@@ -100,46 +77,9 @@ namespace HBE {
     };
 
     struct ComputeDispatchCmdInfo {
-        ComputeInstance *pipeline_instance;
+        PipelineInstanceHandle pipeline_instance;
         uint32_t size_x = 1;
         uint32_t size_y = 1;
         uint32_t size_z = 1;
-    };
-
-    class Renderer {
-    public:
-        virtual ~Renderer() = default;
-
-        virtual void rasterize(RasterizeCmdInfo &rasterize_cmd_info) = 0;
-
-        virtual void traceRays(TraceRaysCmdInfo &trace_rays_cmd_info) = 0;
-
-        virtual void present(PresentCmdInfo &present_cmd_info) = 0;
-
-        virtual void computeDispatch(ComputeDispatchCmdInfo &compute_dispatch_cmd_info) = 0;
-
-        virtual void beginFrame() = 0;
-
-        virtual void endFrame() = 0;
-
-        virtual Fence *getLastFrameFence() = 0;
-
-        virtual Fence *getCurrentFrameFence() = 0;
-
-        virtual RasterizationTarget *getDefaultRenderTarget() = 0;
-
-        virtual RasterizationTarget *getUIRenderTarget() = 0;
-
-        virtual void createDefaultResources() = 0;
-
-        virtual uint32_t getFrameCount() const = 0;
-
-        virtual uint32_t getCurrentFrameIndex() const = 0;
-
-        virtual void waitCurrentFrame() = 0;
-
-        virtual void waitLastFrame() = 0;
-
-        virtual GraphicLimits getLimits() = 0;
     };
 }

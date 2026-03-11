@@ -1,12 +1,7 @@
 #pragma once
 
-#include <core/resource/RasterizationPipeline.h>
-#include <array>
 #include "vulkan/vulkan.h"
-#include "unordered_map"
-#include "VK_Image.h"
 #include "../VK_Shader.h"
-#include "unordered_map"
 #include "VK_PipelineLayout.h"
 
 namespace HBE {

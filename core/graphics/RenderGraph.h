@@ -1,9 +1,10 @@
 #pragma once
 
 #include "Core.h"
-#include "Renderer.h"
+#include "../interface/RendererInterface.h"
 #include "unordered_map"
 #include "vector"
+#include "core/Graphics.h"
 
 namespace HBE {
 	class RasterizationPipeline;

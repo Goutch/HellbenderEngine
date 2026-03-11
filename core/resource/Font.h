@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include "Resource.h"
 #include "Core.h"
 #include "Image.h"
 #include "unordered_map"

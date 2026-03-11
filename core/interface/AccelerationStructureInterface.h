@@ -1,4 +1,5 @@
 #pragma once
+#include "MeshInterface.h"
 #include "data-structure/Handle.h"
 namespace HBE
 {

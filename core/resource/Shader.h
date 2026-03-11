@@ -7,7 +7,7 @@
 namespace HBE {
     class HB_API Shader {
         ShaderHandle handle;
-        Context *context = nullptr;
+        Context &context;
 
     public:
         Shader();

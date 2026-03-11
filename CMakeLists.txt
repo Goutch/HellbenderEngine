@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 set(CMAKE_CXX_STANDARD 20)
+
+
+add_compile_options(/showIncludes)
 project(HBE CXX)
 
 if (WIN32)
@@ -43,7 +46,6 @@ set(CORE_FILES
         core/resource/Shader.h
         core/resource/ComputePipeline.h
         core/resource/Image.cpp
-        core/resource/ComputeInstance.h
         core/resource/PipelineInstance.h
         core/resource/RasterizationTarget.h
         core/resource/raytracing/RaytracingPipeline.h
@@ -58,7 +60,7 @@ set(CORE_FILES
         core/resource/AudioClipInstance.h
 
         core/graphics/Window.h
-        core/graphics/Renderer.h
+        core/interface/RendererInterface.h
         core/graphics/Window.cpp
         core/graphics/RenderGraph.cpp
         core/graphics/RenderGraph.h
@@ -206,7 +208,6 @@ set(VK_FILES
         platforms/vk/VK_Context.cpp
         platforms/vk/VK_Context.h
         platforms/vk/VK_Types.h
-        platforms/vk/resources/VK_Images.cpp
         core/interface/AccelerationStructureInterface.h
         core/interface/MeshInterface.h
         core/resource/PipelineInstance.cpp

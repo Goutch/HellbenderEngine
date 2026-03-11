@@ -97,7 +97,7 @@ namespace HBE
                 atlas_info.optional_data = storage.pixels;
 
 
-                atlas = Application::instance->getContext()->createImage(atlas_info);
+                atlas.alloc(atlas_info);
                 for (auto glyph : glyphs)
                 {
                     msdf_atlas::unicode_t unicode = glyph.getCodepoint();
@@ -124,15 +124,10 @@ namespace HBE
         }
     }
 
-    Font::~Font()
-    {
-        delete atlas;
-    }
-
 
     Image* Font::getTextureAtlas()
     {
-        return atlas;
+        return &atlas;
     }
 
     Glyph Font::getCharacterGlyph(char character)

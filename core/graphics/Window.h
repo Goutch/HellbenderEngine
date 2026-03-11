@@ -21,7 +21,6 @@ namespace HBE
         bool is_fullscreen = false;
 
     public:
-        Input input;
         /// <summary>
         /// Called when the window is resized.
         /// Do not use this to edit graphics resources because it is called before the current frame is finished rendering.

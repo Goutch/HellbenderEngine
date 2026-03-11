@@ -6,12 +6,10 @@
 #include "dependencies/utils-collection/Event.h"
 struct GLFWwindow;
 
-namespace HBE
-{
+namespace HBE {
     class Window;
 
-    enum KEY
-    {
+    enum KEY {
         KEY_UNKNOWN = -1,
         KEY_MOUSE_BUTTON_LEFT = 0,
         KEY_MOUSE_BUTTON_RIGHT = 1,
@@ -143,9 +141,8 @@ namespace HBE
         KEY_MENU = 348,
     };
 
-    class HB_API Input
-    {
-        GLFWwindow* window_handle = nullptr;
+    class HB_API Input {
+        GLFWwindow *window_handle = nullptr;
         bool repeat[348];
         bool pressed[348];
         bool released[348];
@@ -153,13 +150,13 @@ namespace HBE
         float wheel_offset = 0.0f;
         std::queue<short> reset_queue;
 
-        static void scrollCallback(GLFWwindow* window, double x_offset, double y_offset);
+        static void scrollCallback(GLFWwindow *window, double x_offset, double y_offset);
 
-        static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+        static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
-        static void charCallback(GLFWwindow* window, unsigned int codepoint);
+        static void charCallback(GLFWwindow *window, unsigned int codepoint);
 
-        static void mouseButtonCallback(GLFWwindow* window, int key, int action, int mods);
+        static void mouseButtonCallback(GLFWwindow *window, int key, int action, int mods);
 
     public:
         Event<KEY> onKeyDown = Event<KEY>();
@@ -171,7 +168,10 @@ namespace HBE
         Event<vec2> onMouseLeftClickUp = Event<vec2>();
         Event<vec2> onMouseLeftClick = Event<vec2>();
 
-        void init(Window& window);
+        Input() = default;
+
+        void init(Window &window);
+
         void release();
 
         vec2 getMousePosition();

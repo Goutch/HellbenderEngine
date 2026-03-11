@@ -1,4 +1,3 @@
-#include <platforms/vk/raytracing/VK_RaytracingPipeline.h>
 #include "VK_Renderer.h"
 
 #define GLFW_INCLUDE_VULKAN
@@ -21,7 +20,6 @@
 #include "dependencies/utils-collection/Profiler.h"
 #include "resources/VK_PipelineDescriptors.h"
 #include "VK_RasterizationPipelineInstance.h"
-#include "raytracing/VK_RaytracingPipelineInstance.h"
 #include "core/graphics/RenderGraph.h"
 #include "platforms/vk/VK_ComputePipeline.h"
 #include "VK_ComputeInstance.h"
@@ -54,6 +52,8 @@ namespace HBE {
                                                 &VK_Renderer::reCreateSwapChain);
         Application::instance->getWindow()->onSizeChange.subscribe(window_size_changed_subscription_id, this,
                                                                    &VK_Renderer::onWindowSizeChange);
+
+        createDefaultResources();
     }
 
     void VK_Renderer::onWindowSizeChange(Window *window) {
@@ -67,7 +67,7 @@ namespace HBE {
         }
         uint32_t width, height;
         window->getSize(width, height);
-
+        vec2u resolution(width, height);
         context->device.wait();
         if (width == 0 || height == 0) {
             width = 1;
@@ -83,8 +83,8 @@ namespace HBE {
         //todo: check if nessesary
         command_pool.createCommandBuffers(MAX_FRAMES_IN_FLIGHT);
 
-        main_render_target->setResolution(width, height);
-        ui_render_target->setResolution(width, height);
+        context->setRasterizationTargetResolution(main_render_target, resolution);
+        context->setRasterizationTargetResolution(ui_render_target, resolution);
     }
 
 
@@ -118,8 +118,11 @@ namespace HBE {
             nullptr
         );
         HB_PROFILE_BEGIN("ComputeDispatch");
-        const VK_ComputePipeline *vk_pipeline = dynamic_cast<const VK_ComputePipeline *>(compute_dispatch_cmd_info.
-            pipeline_instance->getComputePipeline());
+        ComputePipelineHandle compute_pipeline_handle;
+        context->getPipelineFromInstance(compute_dispatch_cmd_info.pipeline_instance,compute_pipeline_handle);
+        const VK_PipelineInstance* vk_pipeline_instance = context->pipeline_instances[compute_dispatch_cmd_info.pipeline_instance];
+        HB_ASSERT(vk_pipeline_instance.)
+        const VK_ComputePipeline *vk_pipeline = context->compute_pipelines[compute_pipeline_handle];
         vkCmdBindPipeline(command_pool.getCurrentBuffer(), VK_PIPELINE_BIND_POINT_COMPUTE, vk_pipeline->getHandle());
         compute_dispatch_cmd_info.pipeline_instance->bind();
         ivec3 workgroup_size = vk_pipeline->getWorkgroupSize();
@@ -444,6 +447,7 @@ namespace HBE {
         }
 
         frame_presented = false;
+        onFrameEnd.invoke(current_frame_index);
         current_frame_index = (current_frame_index + 1) % MAX_FRAMES_IN_FLIGHT;
         HB_PROFILE_END("endFrame");
     }

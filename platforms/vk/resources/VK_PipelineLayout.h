@@ -5,8 +5,8 @@
 
 #include "vector"
 #include "vulkan/vulkan.h"
-#include "../VK_Shader.h"
-#include "../VK_DescriptorSetLayout.h"
+#include "VK_Shader.h"
+#include "VK_DescriptorSetLayout.h"
 namespace HBE
 {
     class VK_Shader;

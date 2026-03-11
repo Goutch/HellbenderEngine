@@ -18,7 +18,7 @@ namespace HBE {
 	void CameraSystem::onCameraAttached(Entity entity) {
 		Camera *camera = entity.get<Camera>();
 		if (camera->getRenderTarget() == nullptr)
-			camera->setRenderTarget(Application::instance->getContext()->getRenderer()->getDefaultRenderTarget());
+			camera->setRenderTarget(context.->getDefaultRenderTarget());
 
 		if (!scene->getCameraEntity().valid()) {
 			scene->setCameraEntity(entity);

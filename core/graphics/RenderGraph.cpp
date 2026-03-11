@@ -2,7 +2,7 @@
 #include "RenderGraph.h"
 #include <algorithm>
 #include "core/Application.h"
-#include "core/graphics/Renderer.h"
+#include "../interface/RendererInterface.h"
 #include "core/interface/RasterizationPipelineInterface.h"
 #include "core/utility/Log.h"
 #include "dependencies/utils-collection/Profiler.h"

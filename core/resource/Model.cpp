@@ -1,5 +1,4 @@
 #include "Model.h"
-
 #include "RasterizationPipeline.h"
 #include "Mesh.h"
 #include "core/Application.h"

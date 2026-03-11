@@ -1,4 +1,6 @@
+#pragma message("Context")
 #pragma once
+
 #include "HBETypes.h"
 #include "graphics/GraphicLimits.h"
 #include "interface/PipelineInstanceInterface.h"
@@ -9,64 +11,27 @@
 #include "interface/RasterizationPipelineInterface.h"
 #include "interface/RasterizationTargetInterface.h"
 #include "interface/BufferInterface.h"
+#include "interface/ContextInterface.h"
 
-namespace HBE
-{
-    class Font;
-    class Renderer;
-
-    enum GRAPHICS_API
-    {
-        GRAPHICS_API_NONE,
-        GRAPHICS_API_VULKAN,
-    };
-
-    typedef uint32_t VULKAN_REQUIRED_EXTENSION_FLAGS;
-
-    enum VULKAN_REQUIRED_EXTENSIONS_FLAG
-    {
-        VULKAN_REQUIRED_EXTENSION_NONE = 0,
-        VULKAN_REQUIRED_EXTENSION_RTX = 1,
-        VULKAN_REQUIRED_EXTENSION_DESCRIPTOR_INDEXING = 2,
-    };
-
-    enum VULKAN_VERSION
-    {
-        VULKAN_VERSION_1_0 = 0,
-        VULKAN_VERSION_1_1 = 1,
-        VULKAN_VERSION_1_2 = 2,
-        VULKAN_VERSION_1_3 = 3,
-    };
-
-    struct ContextInfo
-    {
-        GRAPHICS_API api = GRAPHICS_API_VULKAN;
-        VULKAN_REQUIRED_EXTENSION_FLAGS required_extension_flags = VULKAN_REQUIRED_EXTENSION_NONE;
-        VULKAN_VERSION vulkan_version = VULKAN_VERSION_1_0;
-    };
-
-
+#define FUNC_ARGS(...) __VA_ARGS__
+#define FUNC_PARAMS(...) __VA_ARGS__
 #define CONTEXT_API_FUNC(ReturnType, FuncName, Params, Args)    \
 inline ReturnType FuncName(Params)                              \
 {                                                               \
-    return context_impl.FuncName##(Args);      \
+    return HBE_RESULT_SUCCESS;/*context_impl.FuncName(Args);       */                \
 }
-#define FUNC_ARGS(...) __VA_ARGS__
-#define FUNC_PARAMS(...) __VA_ARGS__
-
-
-    template <typename Implementation>
-    class HB_API ContextBase
-    {
+namespace HBE {
+    template<typename Implementation>
+    class HB_API ContextBase {
         Implementation context_impl;
 
     public :
         //lifetime
-        CONTEXT_API_FUNC(HBE_RESULT, init, FUNC_PARAMS(const ContextInfo& info), FUNC_ARGS(info))
-        CONTEXT_API_FUNC(HBE_RESULT, release, FUNC_PARAMS(), FUNC_ARGS())
+        inline HBE_RESULT init(const ContextInfo &info) { return context_impl.init(info);};
+        inline HBE_RESULT release(const ContextInfo &info) { return context_impl.release(info);};
 
-        //general
-        CONTEXT_API_FUNC(void, getGraphicLimits, FUNC_PARAMS(GraphicLimits& limits), FUNC_ARGS(limits))
+        //CONTEXT_API_FUNC(void, getGraphicLimits, FUNC_PARAMS(GraphicLimits& limits), FUNC_ARGS(limits))
+        //create
         CONTEXT_API_FUNC(HBE_RESULT, createImage, FUNC_PARAMS(ImageHandle& handle,const ImageInfo& info), FUNC_ARGS(handle,info))
         CONTEXT_API_FUNC(HBE_RESULT, createMesh, FUNC_PARAMS(MeshHandle &handle,const MeshInfo& mesh_info), FUNC_ARGS(handle,mesh_info));
         CONTEXT_API_FUNC(HBE_RESULT, createPipelineInstance, FUNC_PARAMS(PipelineInstanceHandle& handle,const PipelineInstanceInfo& info), FUNC_ARGS(handle,info))
@@ -89,7 +54,7 @@ inline ReturnType FuncName(Params)                              \
         CONTEXT_API_FUNC(HBE_RESULT, releaseRaytracingPipeline, FUNC_PARAMS(RaytracingPipelineHandle handle), FUNC_ARGS(handle));
         CONTEXT_API_FUNC(HBE_RESULT, releaseRootAccelerationStructure, FUNC_PARAMS(RootAccelerationStructureHandle handle), FUNC_ARGS(handle));
         CONTEXT_API_FUNC(HBE_RESULT, releaseAABBAccelerationStructure, FUNC_PARAMS(AABBAccelerationStructureHandle handle), FUNC_ARGS(handle));
-       CONTEXT_API_FUNC(HBE_RESULT, releaseMeshAccelerationStructure, FUNC_PARAMS(MeshAccelerationStructureHandle handle), FUNC_ARGS(handle));
+        CONTEXT_API_FUNC(HBE_RESULT, releaseMeshAccelerationStructure, FUNC_PARAMS(MeshAccelerationStructureHandle handle), FUNC_ARGS(handle));
 
         //images
         CONTEXT_API_FUNC(HBE_RESULT, updateImage, FUNC_PARAMS(ImageHandle handle, const void* data), FUNC_ARGS(handle,data));
@@ -115,6 +80,5 @@ inline ReturnType FuncName(Params)                              \
         //Rasterization Target
         CONTEXT_API_FUNC(HBE_RESULT, getRasterizationTargetResolution, FUNC_PARAMS(RasterizationTargetHandle handle,vec2u& resolution), FUNC_ARGS(handle,resolution));
         CONTEXT_API_FUNC(HBE_RESULT, setRasterizationTargetResolution, FUNC_PARAMS(RasterizationTargetHandle handle,vec2u resolution), FUNC_ARGS(handle,resolution));
-
     };
 }

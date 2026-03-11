@@ -1,4 +1,6 @@
+#pragma message("Application")
 #pragma once
+
 #include "Core.h"
 #include "Graphics.h"
 #include "audio/Audio.h"
@@ -6,11 +8,10 @@
 #include "dependencies/utils-collection/Timer.h"
 #include "graphics/Window.h"
 #include "input/Input.h"
-
+#include "interface/ContextInterface.h"
 
 namespace HBE
 {
-
     struct ApplicationInfo
     {
         std::string app_name;
@@ -22,7 +23,6 @@ namespace HBE
     {
         Window* window = nullptr;
         Context context;
-        //todo: change Input static class to here
         Audio audio;
         Input input;
 

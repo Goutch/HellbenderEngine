@@ -5,11 +5,11 @@
 #include "../utility/ShaderCompiler.h"
 
 namespace HBE {
-    Shader::Shader() : context(Application::instance->getContext()) {
+    Shader::Shader() : context(*Application::instance->getContext()) {
         handle = HBE_NULL_HANDLE;
     }
 
-    Shader::Shader(const ShaderInfo &info) : context(Application::instance->getContext()) {
+    Shader::Shader(const ShaderInfo &info) : context(*Application::instance->getContext()) {
         alloc(info);
     }
 
@@ -34,12 +34,12 @@ namespace HBE {
     void Shader::alloc(const ShaderInfo &info) {
         if (handle != HBE_NULL_HANDLE)
             Log::error("trying to allocate a shader that has already been allocated!");
-        context->createShader(handle, info);
+        context.createShader(handle, info);
     }
 
     void Shader::release() {
         if (handle != HBE_NULL_HANDLE)
-            context->releaseShader(handle);
+            context.releaseShader(handle);
         handle = HBE_NULL_HANDLE;
     }
 }

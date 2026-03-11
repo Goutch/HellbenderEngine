@@ -1,19 +1,18 @@
 #pragma once
 
+
 #include "Core.h"
-#include "core/interface/ImageInterface.h"
+#include "core/Graphics.h"
 #include "core/interface/RasterizationTargetInterface.h"
 #include "dependencies/utils-collection/Event.h"
 
-#include "core/Graphics.h"
 
 namespace HBE
 {
     class HB_API RasterizationTarget
     {
         RasterizationTargetHandle handle = HBE_NULL_HANDLE;
-        Context& context;
-
+        ContextBase<VK_Context>& context;
     public:
         Event<RasterizationTarget*> onResolutionChange;
 
