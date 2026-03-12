@@ -3,9 +3,8 @@
 
 namespace HBE
 {
-    System::System(Scene* scene)
+    System::System(Scene* scene) : context(*Application::instance->getContext())
     {
-        context = Application::instance->getContext();
         this->scene = scene;
     }
 }

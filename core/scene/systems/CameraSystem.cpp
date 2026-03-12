@@ -18,7 +18,7 @@ namespace HBE {
 	void CameraSystem::onCameraAttached(Entity entity) {
 		Camera *camera = entity.get<Camera>();
 		if (camera->getRenderTarget() == nullptr)
-			camera->setRenderTarget(context->getDefaultRenderTarget());
+			camera->setRenderTarget(context.getDefaultRenderTarget());
 
 		if (!scene->getCameraEntity().valid()) {
 			scene->setCameraEntity(entity);
@@ -59,11 +59,11 @@ namespace HBE {
 				continue;
 			}
 			if (camera.active) {
-				raster_cmd_info.render_target = camera.getRenderTarget();
+				raster_cmd_info.rasterization_target_handle = camera.getRenderTarget()->getHandle();
 				raster_cmd_info.projection = camera.projection;
 				raster_cmd_info.view = glm::inverse(transform.world());
 				raster_cmd_info.layer_mask = camera.layer_mask;
-				Application::instance->getContext()->getRenderer()->rasterize(raster_cmd_info);
+				context.cmdRasterizeGraph(raster_cmd_info);
 			}
 		}
 		for (auto [handle, node, transform, camera]: group_2D) {
@@ -75,7 +75,7 @@ namespace HBE {
 				raster_cmd_info.projection = camera.projection;
 				raster_cmd_info.view = glm::inverse(transform.world());
 				raster_cmd_info.layer_mask = camera.layer_mask;
-				context->getRenderer()->rasterize(raster_cmd_info);
+				context.getRenderer()->rasterize(raster_cmd_info);
 			}
 		}
 		for (auto [handle, node, transform, camera]: group_pixel) {
@@ -87,7 +87,7 @@ namespace HBE {
 				raster_cmd_info.projection = camera.projection;
 				raster_cmd_info.view = glm::inverse(transform.world());
 				raster_cmd_info.layer_mask = camera.layer_mask;
-				context->getRenderer()->rasterize(raster_cmd_info);
+				context.getRenderer()->rasterize(raster_cmd_info);
 			}
 		}
 		HB_PROFILE_END("CameraRender");

@@ -9,7 +9,7 @@ namespace HBE
     class HB_API System
     {
     protected:
-        Context* context;
+        Context& context;
         Scene* scene;
 
     public:
