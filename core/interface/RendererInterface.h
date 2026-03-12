@@ -82,4 +82,11 @@ namespace HBE {
         uint32_t size_y = 1;
         uint32_t size_z = 1;
     };
+
+	struct RendererResources{
+		RasterizationTargetHandle main_render_target = HBE_NULL_HANDLE;
+		RasterizationTargetHandle ui_render_target = HBE_NULL_HANDLE;
+		RasterizationPipelineHandle screen_pipeline = HBE_NULL_HANDLE;
+		PipelineInstanceHandle screen_pipeline_instance = HBE_NULL_HANDLE;
+	};
 }

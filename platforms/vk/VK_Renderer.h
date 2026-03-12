@@ -1,4 +1,5 @@
 #pragma once
+
 #include "../../core/interface/RendererInterface.h"
 #include "vulkan/vulkan.h"
 #include "VK_Semaphore.h"
@@ -8,110 +9,106 @@
 #include "dependencies/utils-collection/Event.h"
 
 namespace HBE {
-    class Window;
-    class VK_Window;
+	class Window;
 
-    class VK_Instance;
+	class VK_Window;
 
-    class VK_PhysicalDevice;
+	class VK_Instance;
 
-    class VK_Device;
+	class VK_PhysicalDevice;
 
-    class VK_Surface;
+	class VK_Device;
 
-    class VK_Swapchain;
+	class VK_Surface;
 
-    class VK_RenderPass;
+	class VK_Swapchain;
 
-    class VK_CommandPool;
+	class VK_RenderPass;
 
-    class VK_Fence;
+	class VK_CommandPool;
 
-    class VK_Renderer {
-        struct FrameState {
-            VK_Semaphore *finished_semaphore;
-            VK_Semaphore *image_available_semaphore;
-        };
+	class VK_Fence;
 
-        uint32_t current_frame_index = 0;
-        uint32_t current_image = 0;
-        std::array<FrameState, MAX_FRAMES_IN_FLIGHT> frames;
-        std::vector<VK_Fence *> images_in_flight_fences;
+	class VK_Renderer {
+		struct FrameState {
+			VK_Semaphore *finished_semaphore;
+			VK_Semaphore *image_available_semaphore;
+		};
 
-        VkSampler default_sampler;
-        RasterizationTargetHandle main_render_target = HBE_NULL_HANDLE;
-        RasterizationTargetHandle ui_render_target = HBE_NULL_HANDLE;
-        RasterizationPipelineHandle screen_pipeline = HBE_NULL_HANDLE;
-        PipelineInstanceHandle screen_pipeline_instance;
-        bool windowResized = false;
-        bool frame_presented = false;
+		uint32_t current_frame_index = 0;
+		uint32_t current_image = 0;
+		std::array<FrameState, MAX_FRAMES_IN_FLIGHT> frames;
+		std::vector<VK_Fence *> images_in_flight_fences;
 
-        event_subscription_id vertical_sync_changed_subscription_id;
-        event_subscription_id window_closed_subscription_id;
-        event_subscription_id window_size_changed_subscription_id;
+		VkSampler default_sampler;
 
-        VK_CommandPool command_pool;
-        VK_Context *context = nullptr;
+		bool windowResized = false;
+		bool frame_presented = false;
 
-    public:
-        Event<uint32_t> onFrameEnd;
+		event_subscription_id vertical_sync_changed_subscription_id;
+		event_subscription_id window_closed_subscription_id;
+		event_subscription_id window_size_changed_subscription_id;
 
-        void init(VK_Context *context);
+		VK_CommandPool command_pool;
+		VK_Context *context = nullptr;
 
-        void release();
+		RendererResources renderer_resources;
+	public:
+		Event<uint32_t> onFrameEnd;
 
+		void init(VK_Context *context);
 
-        VK_Renderer() = default;
+		void release();
 
-        ~VK_Renderer() = default;
+		VK_Renderer() = default;
 
-        VK_Renderer(const VK_Renderer &) = delete;
+		~VK_Renderer() = default;
 
-        VK_Renderer &operator=(const VK_Renderer &) = delete;
+		VK_Renderer(const VK_Renderer &) = delete;
 
-        void cmdRasterizeGraph(const RasterizeGraphCmdInfo& info);
+		VK_Renderer &operator=(const VK_Renderer &) = delete;
 
-        void cmdTraceRays(const TraceRaysCmdInfo& trace_rays_cmd_info);
+		void cmdRasterizeGraph(const RasterizeGraphCmdInfo &info);
 
-        void cmdPresent(const PresentCmdInfo &present_cmd_info);
+		void cmdTraceRays(const TraceRaysCmdInfo &trace_rays_cmd_info);
 
-        void waitCurrentFrame();
+		void cmdPresent(const PresentCmdInfo &present_cmd_info);
 
-        void waitLastFrame();
+		void waitCurrentFrame();
 
-        RasterizationTarget *getDefaultRenderTarget();
+		void waitLastFrame();
 
-        RasterizationTarget *getUIRenderTarget();
+		void getRendererResrouces(RendererResources& resources);
 
-        void beginFrame();
+		void beginFrame();
 
-        void endFrame();
+		void endFrame();
 
-        VK_CommandPool *getCommandPool();
+		VK_CommandPool *getCommandPool();
 
-        uint32_t getFrameCount() const;
+		uint32_t getFrameCount() const;
 
-        void onWindowClosed();
+		void onWindowClosed();
 
-        void onWindowSizeChange(Window *window);
+		void onWindowSizeChange(Window *window);
 
-        void reCreateSwapChain();
+		void reCreateSwapChain();
 
-        uint32_t getCurrentFrameIndex() const;
+		uint32_t getCurrentFrameIndex() const;
 
-        void waitAll();
+		void waitAll();
 
-        VkSampler getDefaultSampler();
+		VkSampler getDefaultSampler();
 
-        GraphicLimits getLimits();
+		GraphicLimits getLimits();
 
-        void cmdDispatch(const ComputeDispatchCmdInfo &compute_dispatch_cmd_info);
+		void cmdDispatch(const ComputeDispatchCmdInfo &compute_dispatch_cmd_info);
 
-        Fence *getLastFrameFence();
+		Fence *getLastFrameFence();
 
-        Fence *getCurrentFrameFence();
+		Fence *getCurrentFrameFence();
 
-    private:
-        void createDefaultResources();
-    };
+	private:
+		void createDefaultResources();
+	};
 }

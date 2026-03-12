@@ -27,12 +27,14 @@ inline ReturnType FuncName(Params)                              \
 
 namespace HBE
 {
+
     template <typename Implementation>
     class HB_API ContextBase
     {
         Implementation context_impl;
 
     public :
+
         //lifetime
         inline HBE_RESULT init(const ContextInfo& info) { return context_impl.init(info); }
 
