@@ -14,21 +14,21 @@ namespace HBE
     {
         COMPONENT_IDS(PixelCamera);
 
-        PixelCamera() = default;
-
-        PixelCamera(const PixelCamera& other);
-
-        bool active = true;
         mat4 projection = mat4(1.0f);
+        RasterizationTargetHandle render_target = HBE_NULL_HANDLE;
         uint32_t layer_mask = UINT32_MAX;
+        bool active = true;
 
-        event_subscription_id render_target_resize_subscription_id;
-        float aspectRatio();
+    private:
+        vec2u resolution = vec2u(1920,1080);
+        float far = 1000.0f;
+        float near = 0.1f;
 
-        void setRenderTarget(RasterizationTarget* render_target);
+        bool projection_dirty = true;
 
-        RasterizationTarget* getRenderTarget();
-
+    public:
+        void setResolution(vec2u resolution);
+        vec2u getResolution();
         void setNearPlane(float near);
 
         void setFarPlane(float far);
@@ -37,11 +37,8 @@ namespace HBE
 
         float getFarPlane();
 
-    private:
-        RasterizationTarget* render_target = nullptr;
-        float near = -1000;
-        float far = 1000;
+        void calculateProjection();
 
-        void calculateProjection(RasterizationTarget* render_target);
+        bool isProjectionDirty() const;
     };
 }

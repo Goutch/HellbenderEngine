@@ -47,7 +47,8 @@ namespace HBE {
 
     public:
         VK_Shader() = default;
-
+        VK_Shader(const VK_Shader &) = delete;
+        VK_Shader(VK_Shader &&) = delete;
         ~VK_Shader();
 
         const VkShaderModule &getHandle() const;

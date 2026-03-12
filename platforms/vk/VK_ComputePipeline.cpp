@@ -20,13 +20,14 @@ namespace HBE
     void VK_ComputePipeline::alloc(VK_Context* context, const ComputePipelineInfo& info)
     {
         this->context = context;
-        const VK_Shader* vk_shader = context->pipelines.getShader(info.compute_shader);
-        layout.init(context, &vk_shader, 1, info.flags & COMPUTE_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR);
+        VK_Shader& vk_shader = context->shaders[info.compute_shader];
+        ShaderHandle shader_handle= info.compute_shader;
+        layout.init(context, &shader_handle, 1, info.flags & COMPUTE_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR);
 
         VkPipelineShaderStageCreateInfo stage{};
         stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         stage.stage = VK_SHADER_STAGE_COMPUTE_BIT;
-        stage.module = vk_shader->getHandle();
+        stage.module = vk_shader.getHandle();
         stage.pName = "main";
         VkComputePipelineCreateInfo create_info{};
         create_info.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;

@@ -1,60 +1,62 @@
 #include "Camera2D.h"
 #include "glm/gtc/matrix_transform.hpp"
-namespace HBE {
-	void Camera2D::calculateProjection(RasterizationTarget *render_target) {
-		float aspect_ratio = aspectRatio();
-		if (zoom_ratio < 0.1)
-			zoom_ratio = 0.1;
-		projection = glm::ortho(zoom_ratio * -0.5f * aspect_ratio, zoom_ratio * 0.5f * aspect_ratio, zoom_ratio * 0.5f, zoom_ratio * -.5f, near, far);
-		//projection[1] = -projection[1];
-	}
 
-	float Camera2D::aspectRatio() {
-		vec2i res = render_target->getResolution();
-		return static_cast<float>(res.x) / static_cast<float>(res.y);
-	}
+namespace HBE
+{
+    void Camera2D::setNearPlane(float near)
+    {
+        this->near = near;
+        projection_dirty = true;
+    }
 
-	Camera2D::Camera2D(const Camera2D &other) {
-		setRenderTarget(other.render_target);
-	}
+    void Camera2D::setFarPlane(float far)
+    {
+        this->far = far;
+        projection_dirty = true;
+    }
 
-	void Camera2D::setRenderTarget(RasterizationTarget* render_target) {
-		if (render_target != nullptr)
-			render_target->onResolutionChange.unsubscribe(render_target_resize_subscription_id);
-		this->render_target = render_target;
+    float Camera2D::getNearPlane()
+    {
+        return near;
+    }
 
-		render_target->onResolutionChange.subscribe(render_target_resize_subscription_id ,this, &Camera2D::calculateProjection);
-		calculateProjection(render_target);
-	}
+    float Camera2D::getFarPlane()
+    {
+        return far;
+    }
 
-	RasterizationTarget *Camera2D::getRenderTarget() {
-		return render_target;
-	}
+    void Camera2D::calculateAspectRatio(vec2u res)
+    {
+        float new_aspect_ratio = static_cast<float>(res.x) / static_cast<float>(res.y);
+        if (abs(new_aspect_ratio - aspect_ratio) <= glm::epsilon<float>())
+        {
+            projection_dirty = true;
+        }
+        aspect_ratio = new_aspect_ratio;
+    }
 
-	void Camera2D::setNearPlane(float near) {
-		this->near = near;
-		calculateProjection(render_target);
-	}
+    void Camera2D::calculateProjection()
+    {
+        if (zoom_ratio < 0.1)
+            zoom_ratio = 0.1;
+        projection = glm::ortho(zoom_ratio * -0.5f * aspect_ratio, zoom_ratio * 0.5f * aspect_ratio, zoom_ratio * 0.5f, zoom_ratio * -.5f, near, far);
+        //projection[1] = -projection[1];
+        projection_dirty = false;
+    }
 
-	void Camera2D::setFarPlane(float far) {
-		this->far = far;
-		calculateProjection(render_target);
-	}
+    bool Camera2D::isProjectionDirty() const
+    {
+        return projection_dirty;
+    }
 
-	float Camera2D::getNearPlane() {
-		return near;
-	}
+    float Camera2D::getZoomRatio()
+    {
+        return zoom_ratio;
+    }
 
-	float Camera2D::getFarPlane() {
-		return far;
-	}
-
-	float Camera2D::getZoomRatio() {
-		return zoom_ratio;
-	}
-
-	void Camera2D::setZoomRatio(float ratio) {
-		zoom_ratio = ratio;
-		calculateProjection(render_target);
-	}
+    void Camera2D::setZoomRatio(float ratio)
+    {
+        zoom_ratio = ratio;
+        projection_dirty = true;
+    }
 }

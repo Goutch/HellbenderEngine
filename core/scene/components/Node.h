@@ -7,63 +7,65 @@
 #include "core/scene/ecs/Component.h"
 #include "../../../dependencies/utils-collection/data-structure/RawVector.h"
 
-namespace HBE {
-	class Transform;
+namespace HBE
+{
+    class Transform;
 
-	/**
-	 * @brief A node in the scene hierarchy that contains a 3D transform.
-	 */
+    /**
+     * @brief A node in the scene hierarchy that contains a 3D transform.
+     */
 
-	struct HB_API Node {
-		COMPONENT_IDS(Node)
+    struct HB_API Node
+    {
+        COMPONENT_IDS(Node)
 
-		friend class Scene;
+        friend class Scene;
 
-		friend class NodeSystem;
-	private:
-		uint32_t depth = 0;
-		uint32_t local_index;
-		uint32_t global_index;
-		bool global_index_dirty = true;
+        friend class NodeSystem;
 
-		bool is_active = true;
-		bool is_active_in_hierarchy = true;
-		bool active_in_hierarchy_dirty = true;
-	protected:
-		entity_handle parent = NULL_ENTITY_HANDLE;
-		Scene *scene = nullptr;
+    private:
+        uint32_t depth = 0;
+        uint32_t local_index;
+        uint32_t global_index;
+        bool global_index_dirty = true;
 
-	public:
-		Entity entity;
+        bool is_active = true;
+        bool is_active_in_hierarchy = true;
+        bool active_in_hierarchy_dirty = true;
 
-		RawVector<entity_handle> children;
+    protected:
+        entity_handle parent = NULL_ENTITY_HANDLE;
+        Scene* scene = nullptr;
 
-		Node();
+    public:
+        Entity entity;
 
-		explicit Node(Entity entity);
+        RawVector<entity_handle> children;
 
-		//Node(Node &&other) noexcept;
+        Node() = default;
 
-		uint32_t getDepth() const;
+        explicit Node(Entity entity);
 
-		uint32_t getLocalIndex() const;
+        //Node(Node &&other) noexcept;
 
-		uint32_t getGlobalIndex() const;
+        uint32_t getDepth() const;
 
-		bool hasParent() const;
+        uint32_t getLocalIndex() const;
 
-		void setParent(Entity entity);
+        uint32_t getGlobalIndex() const;
 
-		void setParent(entity_handle entity);
+        bool hasParent() const;
 
-		entity_handle getParentHandle();
+        void setParent(Entity entity);
 
-		Entity getParent();
+        void setParent(entity_handle entity);
 
-		bool isActive() const;
+        entity_handle getParentHandle();
 
-		bool isActiveInHierarchy();
+        Entity getParent();
 
+        bool isActive() const;
 
-	};
+        bool isActiveInHierarchy();
+    };
 }

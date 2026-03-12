@@ -19,7 +19,7 @@ namespace HBE {
         VkPipeline handle = VK_NULL_HANDLE;
         VK_PipelineLayout layout;
         VK_Context *context = nullptr;
-        std::vector<const VK_Shader *> shaders;
+        std::vector<ShaderHandle> shaders;
         std::vector<VertexAttributeInfo> binding_infos;
         RasterizationPipelineInfo info;
 

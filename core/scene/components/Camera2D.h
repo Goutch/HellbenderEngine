@@ -7,43 +7,38 @@
 
 namespace HBE
 {
-	struct HB_API Camera2D {
-		COMPONENT_IDS(Camera2D)
-		Camera2D() {};
+    struct HB_API Camera2D
+    {
+        COMPONENT_IDS(Camera2D);
+        mat4 projection = mat4(1.0f);
+        RasterizationTargetHandle render_target = HBE_NULL_HANDLE;
+        uint32_t layer_mask = UINT32_MAX;
+        bool active = true;
 
-		Camera2D(const Camera2D &other);
+    private:
+        float far = 1000.0f;
+        float near = 0.1f;
+        float zoom_ratio = 10.0f;
+        float aspect_ratio = 0.0f;
+        bool projection_dirty = true;
 
-		event_subscription_id render_target_resize_subscription_id ;
-		bool active = true;
-		mat4 projection = mat4(1.0f);
+    public:
+        void setZoomRatio(float zoom);
 
-		uint32_t layer_mask = UINT32_MAX;
+        float getZoomRatio();
 
-		void setNearPlane(float near);
+        void setNearPlane(float near);
 
-		void setFarPlane(float far);
+        void setFarPlane(float far);
 
-		float getNearPlane();
+        float getNearPlane();
 
-		float getFarPlane();
+        float getFarPlane();
 
-		float getZoomRatio();
+        void calculateAspectRatio(vec2u res);
 
-		void setZoomRatio(float ratio);
+        void calculateProjection();
 
-		float aspectRatio();
-
-		void setRenderTarget(RasterizationTarget* render_target);
-
-		RasterizationTarget* getRenderTarget();
-
-	private:
-		RasterizationTarget* render_target = nullptr;
-		float zoom_ratio = 10.0f;
-		float near = -1000;
-		float far = 1000;
-
-		void calculateProjection(RasterizationTarget* render_target);
-	};
-
+        bool isProjectionDirty() const;
+    };
 }

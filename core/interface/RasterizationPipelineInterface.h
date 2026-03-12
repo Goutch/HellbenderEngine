@@ -1,5 +1,6 @@
 #pragma once
 #include "Handle.h"
+#include "RasterizationTargetInterface.h"
 #include "ShaderInterface.h"
 namespace HBE {
     class Shader;
@@ -26,7 +27,7 @@ namespace HBE {
         ShaderHandle fragment_shader = HBE_NULL_HANDLE;
         ShaderHandle geometry_shader = HBE_NULL_HANDLE;
         const VertexAttributeInfo *attribute_infos = nullptr;
-        RasterizationTarget *rasterization_target = nullptr;
+        RasterizationTargetHandle rasterization_target = HBE_NULL_HANDLE;
         uint32_t attribute_info_count = 0;
         VERTEX_TOPOLOGY topology = VERTEX_TOPOLOGY_TRIANGLE_LIST;
         RASTERIZATION_PIPELINE_FLAGS flags = RASTERIZATION_PIPELINE_FLAG_NONE;

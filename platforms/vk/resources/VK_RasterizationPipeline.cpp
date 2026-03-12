@@ -20,26 +20,24 @@ namespace HBE
     }
 
     void VK_RasterizationPipeline::alloc(VK_Context* context, const RasterizationPipelineInfo& info,
-                                        VkRenderPass render_pass_overwrite)
+                                         VkRenderPass render_pass_overwrite)
     {
         this->context = context;
         this->binding_infos = std::vector<VertexAttributeInfo>(info.attribute_infos,
                                                                info.attribute_infos + info.attribute_info_count);
 
-        const VK_Shader* vk_vertex = (dynamic_cast<const VK_Shader*>(info.vertex_shader));
-        const VK_Shader* vk_frag = (dynamic_cast<const VK_Shader*>(info.fragment_shader));
-        shaders.emplace_back(vk_vertex);
-        shaders.emplace_back(vk_frag);
+        shaders.emplace_back(info.vertex_shader);
+        shaders.emplace_back(info.fragment_shader);
         VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
         vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-        vertShaderStageInfo.module = vk_vertex->getHandle();
+        vertShaderStageInfo.module = context->shaders[info.vertex_shader].getHandle();
         vertShaderStageInfo.pName = "main";
 
         VkPipelineShaderStageCreateInfo fragShaderStageInfo{};
         fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-        fragShaderStageInfo.module = vk_frag->getHandle();
+        fragShaderStageInfo.module = context->shaders[info.fragment_shader].getHandle();
         fragShaderStageInfo.pName = "main";
 
         VkPipelineShaderStageCreateInfo shaderStages[2] = {vertShaderStageInfo, fragShaderStageInfo};
@@ -67,8 +65,9 @@ namespace HBE
         vertexInputInfo.vertexAttributeDescriptionCount = 0;
         vertexInputInfo.pVertexAttributeDescriptions = nullptr;
 
+        VK_Shader& vk_vert_shader = context->shaders[info.vertex_shader];
         std::vector<VkVertexInputAttributeDescription> attribute_descriptions;
-        std::vector<VK_VertexAttributeInfo> vertex_inputs = vk_vertex->getVertexInputs();
+        std::vector<VK_VertexAttributeInfo> vertex_inputs = vk_vert_shader.getVertexInputs();
         attribute_descriptions.resize(vertex_inputs.size());
         uint32_t offset = 0;
         uint32_t binding = 0;
@@ -103,7 +102,16 @@ namespace HBE
         //-------------------Viewports and scissors--------------------
 
         vec2u resolution;
-        resolution = context->renderer.getDefaultRenderTarget()->getResolution();
+        RasterizationTargetHandle render_pass_handle = info.rasterization_target;
+        if (render_pass_handle == HBE_NULL_HANDLE)
+        {
+            RendererResources rendererResources;
+            context->rendererGetResources(rendererResources);
+            render_pass_handle = rendererResources.main_render_target;
+        }
+
+        VK_RenderPass& render_pass = context->rasterization_targets[render_pass_handle];
+        render_pass.getResolution(resolution);
 
         VkViewport viewport{};
         viewport.x = 0.0f;
@@ -229,9 +237,7 @@ namespace HBE
 
         if (render_pass_overwrite == VK_NULL_HANDLE)
         {
-            pipelineInfo.renderPass = info.rasterization_target == nullptr
-                                          ? dynamic_cast<const VK_RenderPass*>(context->renderer.getDefaultRenderTarget())->getHandle()
-                                          : dynamic_cast<const VK_RenderPass*>(info.rasterization_target)->getHandle();
+            pipelineInfo.renderPass = render_pass.getHandle();
         }
         else
         {

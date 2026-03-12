@@ -10,7 +10,7 @@
 #include "core/resource/Shader.h"
 #include "core/input/Input.h"
 #include "core/resource/RasterizationPipeline.h"
-#include "core/resource/RasterizationPipelineInstance.h"
+#include "core/resource/PipelineInstance.h"
 #include "core/scene/components/Node.h"
 
 namespace HBE {
@@ -22,40 +22,19 @@ namespace HBE {
         Application::instance->getInput()->onMouseLeftClickDown.subscribe(left_click_subscription_id, this, &ButtonSystem::onLeftClick);
         scene->onUpdate.subscribe(update_subscription_id, this, &ButtonSystem::onUpdate);
         //region ---------------------------------------------button pipelines---------------------------------------------
-        ShaderInfo button_frag_shader_info{};
-        ShaderInfo button_vert_shader_info{};
-
-        button_vert_shader_info.path = "shaders/defaults/ui/Button.vert";
-        button_vert_shader_info.stage = SHADER_STAGE_VERTEX;
-
-        button_frag_shader_info.path = "shaders/defaults/ui/Button.frag";
-        button_frag_shader_info.stage = SHADER_STAGE_FRAGMENT;
-
-        button_vert_shader = Application::instance->getContext()->createShader(button_vert_shader_info);
-        button_frag_shader = Application::instance->getContext()->createShader(button_frag_shader_info);
+        button_vert_shader.loadGLSL("shaders/defaults/ui/Button.vert",SHADER_STAGE_VERTEX);
+        button_frag_shader.loadGLSL(  "shaders/defaults/ui/Button.frag",SHADER_STAGE_FRAGMENT);
 
         RasterizationPipelineInfo button_pipeline_info{};
-        button_pipeline_info.vertex_shader = button_vert_shader;
-        button_pipeline_info.fragment_shader = button_frag_shader;
+        button_pipeline_info.vertex_shader = button_vert_shader.getHandle();
+        button_pipeline_info.fragment_shader = button_frag_shader.getHandle();
         button_pipeline_info.rasterization_target = render_target;
         button_pipeline_info.attribute_info_count = 1;
         button_pipeline_info.attribute_infos = &VERTEX_ATTRIBUTE_INFO_POSITION3D_UV_INTERLEAVED;
         button_pipeline_info.flags = RASTERIZATION_PIPELINE_FLAG_NO_DEPTH_TEST;
-        button_pipeline = Application::instance->getContext()->createRasterizationPipeline(button_pipeline_info);
-
-
-        RasterizationPipelineInstanceInfo button_pipeline_instance_info{};
-        button_pipeline_instance_info.rasterization_pipeline = button_pipeline;
-        button_pipeline_instance_info.flags = RASTERIZATION_PIPELINE_INSTANCE_FLAG_NONE;
-
-
-        default_button_pipeline_instance =
-                Application::instance->getContext()->createRasterizationPipelineInstance(button_pipeline_instance_info);
-        default_button_hover_pipeline_instance = Application::instance->getContext()->createRasterizationPipelineInstance(
-            button_pipeline_instance_info);
-        default_button_pressed_pipeline_instance = Application::instance->getContext()->createRasterizationPipelineInstance(
-            button_pipeline_instance_info);
-
+        button_pipeline.alloc(button_pipeline_info);
+        button_pipeline.allocInstance(default_button_pipeline_instance);
+        button_pipeline.allocInstance(default_button_pressed_pipeline_instance);
 
         default_button_material = ButtonMaterial{
             DEFAULT_BUTTON_BACKGROUND_COLOR,
@@ -75,9 +54,9 @@ namespace HBE {
             DEFAULT_BUTTON_BORDER_WIDTH
         };
 
-        default_button_pipeline_instance->setUniform("material", &default_button_material);
-        default_button_hover_pipeline_instance->setUniform("material", &default_button_material_hover);
-        default_button_pressed_pipeline_instance->setUniform("material", &default_button_material_pressed);
+        default_button_pipeline_instance.setUniform("material", &default_button_material);
+        default_button_hover_pipeline_instance.setUniform("material", &default_button_material_hover);
+        default_button_pressed_pipeline_instance.setUniform("material", &default_button_material_pressed);
 
         //endregion
     }
@@ -88,7 +67,7 @@ namespace HBE {
         button->label_entity = scene->createEntity3D();
 
         UIPanel *background_renderer = entity.attach<UIPanel>();
-        background_renderer->pipeline_instance = default_button_pipeline_instance;
+        background_renderer->pipeline_instance = default_button_pipeline_instance.getHandle();
 
         TextRenderer *text_component = button->label_entity.attach<TextRenderer>();
         text_component->height = 40;
@@ -120,12 +99,6 @@ namespace HBE {
     }
 
     ButtonSystem::~ButtonSystem() {
-        delete default_button_pressed_pipeline_instance;
-        delete default_button_hover_pipeline_instance;
-        delete default_button_pipeline_instance;
-        delete button_pipeline;
-        delete button_vert_shader;
-        delete button_frag_shader;
         scene->onUpdate.unsubscribe(update_subscription_id);
         Application::instance->getInput()->onMouseLeftClickDown.unsubscribe(left_click_subscription_id);
     }
@@ -141,9 +114,9 @@ namespace HBE {
             vec2 min = (world_position - (p.size / 2.0f));
             vec2 max = (world_position + (p.size / 2.0f));
             if (max.x > position.x && min.x < position.x && max.y > position.y && min.y < position.y) {
-                p.pipeline_instance = default_button_hover_pipeline_instance;
+                p.pipeline_instance = default_button_hover_pipeline_instance.getHandle();
             } else {
-                p.pipeline_instance = default_button_pipeline_instance;
+                p.pipeline_instance = default_button_pipeline_instance.getHandle();
             }
         }
     }

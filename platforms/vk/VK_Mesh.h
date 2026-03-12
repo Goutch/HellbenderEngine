@@ -51,7 +51,9 @@ namespace HBE
 
         const VK_Buffer& getIndicesBuffer() const;
 
-        uint32_t getIdicesCount() const;
+        uint32_t getIndicesCount() const;
+        uint32_t getVertexCount() const;
+        uint32_t getInstanceCount() const;
         void bind() const;
 
         void unbind() const;

@@ -131,20 +131,20 @@ namespace HBE
     {
         this->context = context;
 
-        const VK_Shader* raygen_shader = context->pipelines.getShader(info.raygen_shader);
+        VK_Shader& raygen_shader = context->shaders[info.raygen_shader];
         ShaderHandle* miss_shaders = info.miss_shaders;
         ShaderHandle* hit_shaders = info.hit_shaders;
 
-        std::vector<const VK_Shader*> shaders;
+        std::vector<ShaderHandle> shaders;
         shaders.reserve(1 + info.miss_shader_count + info.hit_shader_count);
-        shaders.push_back(raygen_shader);
+        shaders.push_back(info.raygen_shader);
         for (int i = 0; i < info.miss_shader_count; ++i)
         {
-            shaders.push_back(context->pipelines.getShader(miss_shaders[i]));
+            shaders.push_back(miss_shaders[i]);
         }
         for (int i = 0; i < info.hit_shader_count; ++i)
         {
-            shaders.push_back(context->pipelines.getShader(hit_shaders[i]));
+            shaders.push_back(hit_shaders[i]);
         }
 
 
@@ -161,7 +161,7 @@ namespace HBE
             VkPipelineShaderStageCreateInfo raygenShaderStageInfo{};
             raygenShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
             raygenShaderStageInfo.stage = VK_SHADER_STAGE_RAYGEN_BIT_KHR;
-            raygenShaderStageInfo.module = raygen_shader->getHandle();
+            raygenShaderStageInfo.module = raygen_shader.getHandle();
             raygenShaderStageInfo.pName = "main";
             shaderStages.push_back(raygenShaderStageInfo);
 
@@ -181,7 +181,7 @@ namespace HBE
             VkPipelineShaderStageCreateInfo missShaderStageInfo{};
             missShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
             missShaderStageInfo.stage = VK_SHADER_STAGE_MISS_BIT_KHR;
-            missShaderStageInfo.module = context->pipelines.getShader(miss_shaders[i])->getHandle();
+            missShaderStageInfo.module = context->shaders[miss_shaders[i]].getHandle();
             missShaderStageInfo.pName = "main";
             shaderStages.push_back(missShaderStageInfo);
 
@@ -197,11 +197,11 @@ namespace HBE
 
         for (int i = 0; i < info.hit_shader_count; ++i)
         {
-            const VK_Shader* vk_shader = context->pipelines.getShader(hit_shaders[i]);
+            VK_Shader& vk_shader = context->shaders[hit_shaders[i]];
             VkPipelineShaderStageCreateInfo hitShaderStageInfo{};
             hitShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-            hitShaderStageInfo.stage = vk_shader->getVkStage();
-            hitShaderStageInfo.module = vk_shader->getHandle();
+            hitShaderStageInfo.stage = vk_shader.getVkStage();
+            hitShaderStageInfo.module = vk_shader.getHandle();
             hitShaderStageInfo.pName = "main";
             shaderStages.push_back(hitShaderStageInfo);
         }

@@ -5,8 +5,6 @@
 
 namespace HBE
 {
-
-
 	class HB_API RaytracingPipeline
 	{
 	};

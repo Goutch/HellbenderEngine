@@ -13,28 +13,22 @@
 
 #include "glm/gtc/quaternion.hpp"
 
-namespace HBE {
-    struct HB_API Camera {
+namespace HBE
+{
+    struct HB_API Camera
+    {
         COMPONENT_IDS(Camera)
-
-        Camera() {
-        };
-
-        Camera(const Camera &other);
-		event_subscription_id render_target_resize_subscription_id ;
         mat4 projection = mat4(1.0f);
+        RasterizationTargetHandle render_target = HBE_NULL_HANDLE;
+        uint32_t layer_mask = UINT32_MAX;
+        bool active = true;
+    private:
         float fov = 70.0f;
         float far = 1000.0f;
         float near = 0.1f;
-        bool active = true;
-        uint32_t layer_mask = UINT32_MAX;
-
-        void setRenderTarget(RasterizationTarget *render_target);
-
-        RasterizationTarget *getRenderTarget();
-
-        float aspectRatio();
-
+        float aspect_ratio = 0.0f;
+        bool projection_dirty = true;
+    public:
         void setFOV(float fov);
 
         float getFOV();
@@ -47,9 +41,12 @@ namespace HBE {
 
         float getFarPlane();
 
-    private:
-        RasterizationTarget *render_target = nullptr;
+        void calculateAspectRatio(vec2u res);
 
-        void calculateProjection(RasterizationTarget *render_target);
+        void calculateProjection();
+
+        float getAspectRatio();
+
+        bool isProjectionDirty();
     };
 }

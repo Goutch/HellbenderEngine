@@ -42,6 +42,7 @@ namespace HBE
 
         CONTEXT_API_FUNC(HBE_RESULT, rendererBeginRecordCommands, FUNC_PARAMS(), FUNC_ARGS());
         CONTEXT_API_FUNC(HBE_RESULT, rendererEndRecordCommandsAndSubmit, FUNC_PARAMS(), FUNC_ARGS());
+        CONTEXT_API_FUNC(HBE_RESULT, rendererGetResources, FUNC_PARAMS(RendererResources& resources), FUNC_ARGS(resources));
         //cmds
         CONTEXT_API_FUNC(HBE_RESULT, cmdRasterizeGraph, FUNC_PARAMS(const RasterizeGraphCmdInfo& info), FUNC_ARGS(info));
         CONTEXT_API_FUNC(HBE_RESULT, cmdRaytrace, FUNC_PARAMS(const TraceRaysCmdInfo& info), FUNC_ARGS(info));

@@ -1,59 +1,56 @@
 #include "Camera.h"
 
-namespace HBE {
+namespace HBE
+{
+    void Camera::calculateProjection()
+    {
+        projection = glm::perspective<float>(glm::radians(fov), aspect_ratio, near, far);
+        projection[1] = -projection[1];
+
+        projection_dirty = false;
+    }
+
+    float Camera::getAspectRatio()
+    {
+        return aspect_ratio;
+    }
+
+    bool Camera::isProjectionDirty()
+    {
+        return projection_dirty;
+    }
+
+    void Camera::setFOV(float fov)
+    {
+        this->fov = fov;
+        projection_dirty = true;
+    }
+
+    float Camera::getFOV()
+    {
+        return fov;
+    }
+
+    void Camera::setNearPlane(float near)
+    {
+        projection_dirty = true;
+        this->near = near;
+    }
+
+    void Camera::setFarPlane(float far)
+    {
+        projection_dirty = true;
+        this->far = far;
+    }
 
 
-	float Camera::aspectRatio() {
-		vec2i res = render_target->getResolution();
-		return static_cast<float>(res.x) / static_cast<float>(res.y);
-	}
-
-	void Camera::calculateProjection(RasterizationTarget *render_target) {
-		projection = glm::perspective<float>(glm::radians(fov), aspectRatio(), near, far);
-		projection[1] = -projection[1];
-	}
-
-	void Camera::setRenderTarget(RasterizationTarget *render_target) {
-		if (render_target != nullptr)
-			render_target->onResolutionChange.unsubscribe(render_target_resize_subscription_id);
-		this->render_target = render_target;
-
-		render_target->onResolutionChange.subscribe(render_target_resize_subscription_id, this, &Camera::calculateProjection);
-		calculateProjection(render_target);
-	}
-
-	RasterizationTarget *Camera::getRenderTarget() {
-		return render_target;
-	}
-
-	Camera::Camera(const Camera &other) {
-		setRenderTarget(other.render_target);
-	}
-
-	void Camera::setFOV(float fov) {
-		this->fov = fov;
-		calculateProjection(render_target);
-	}
-
-	float Camera::getFOV() {
-		return fov;
-	}
-
-	void Camera::setNearPlane(float near) {
-		this->near = near;
-		calculateProjection(render_target);
-	}
-
-	void Camera::setFarPlane(float far) {
-		this->far = far;
-		calculateProjection(render_target);
-	}
-
-	float Camera::getNearPlane() {
-		return near;
-	}
-
-	float Camera::getFarPlane() {
-		return far;
-	}
+    void Camera::calculateAspectRatio(vec2u res)
+    {
+        float new_aspect_ratio = static_cast<float>(res.x) / static_cast<float>(res.y);
+        if (abs(new_aspect_ratio - aspect_ratio) <= glm::epsilon<float>())
+        {
+            projection_dirty = true;
+        }
+        aspect_ratio = new_aspect_ratio;
+    }
 }

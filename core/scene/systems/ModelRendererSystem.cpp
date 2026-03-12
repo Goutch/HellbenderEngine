@@ -20,8 +20,8 @@ namespace HBE {
 		for (int i = 0; i < node.primitives.size(); ++i) {
 			const ModelPrimitive &primitive = node.primitives[i];
 			if (primitive.material != -1) {
-				Mesh *mesh = model.getResources().meshes[node.mesh][i];
-				RasterizationPipelineInstance *material = model.getResources().materials[primitive.material];
+				MeshHandle mesh = model.getResources().meshes[node.mesh][i];
+				PipelineInstanceHandle material = model.getResources().materials[primitive.material];
 				draw_cmd.mesh = mesh;
 				draw_cmd.pipeline_instance_handle = material;
 

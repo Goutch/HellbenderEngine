@@ -1,8 +1,8 @@
 #pragma once
 
-#include <core/resource/RasterizationTarget.h>
 #include "vulkan/vulkan.h"
 #include "vector"
+#include "core/interface/RasterizationTargetInterface.h"
 #include "resources/VK_Image.h"
 
 

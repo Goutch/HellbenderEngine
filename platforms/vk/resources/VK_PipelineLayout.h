@@ -39,7 +39,7 @@ namespace HBE
         VkPipelineBindPoint bind_point = VK_PIPELINE_BIND_POINT_GRAPHICS;
 
     public:
-        void init(VK_Context* context, const VK_Shader** shaders, size_t count, bool empty_descriptor_allowed = false);
+        void init(VK_Context* context, ShaderHandle* shaders, size_t count, bool empty_descriptor_allowed = false);
         void release();
         VK_PipelineLayout() = default;
         VK_PipelineLayout(VK_PipelineLayout&& other) noexcept;
@@ -63,7 +63,7 @@ namespace HBE
 
         bool IsBindingVariableSize(uint32_t binding) const;
 
-        void mergeStages(const VK_Shader** shaders, size_t count);
+        void mergeStages(ShaderHandle* shaders, size_t count);
 
         void mergeDescriptorStages(VK_DescriptorInfo& merged_descriptor, VK_DescriptorInfo& old_descriptor, VK_DescriptorInfo& new_descriptor);
 

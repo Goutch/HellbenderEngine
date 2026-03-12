@@ -1,5 +1,3 @@
-#pragma message("VK_Context")
-
 #pragma once
 #include "VK_Allocator.h"
 #include "VK_ComputePipeline.h"
@@ -23,6 +21,7 @@
 #include "resources/raytracing/VK_MeshBottomLevelAccelerationStructure.h"
 #include "resources/raytracing/VK_RaytracingPipeline.h"
 #include "resources/raytracing/VK_TopLevelAccelerationStructure.h"
+#include "platforms/vk/VK_RenderPass.h"
 
 #define VK_CONTEXT_CMD_API_FUNC(ReturnType, FuncName, Params, Args)    \
 inline ReturnType FuncName(Params)          \
@@ -99,7 +98,7 @@ namespace HBE
         //renderer
         VK_CONTEXT_RENDERER_API_FUNC(HBE_RESULT,rendererBeginRecordCommands,FUNC_PARAMS(),FUNC_ARGS(),beginFrame,FUNC_ARGS());
         VK_CONTEXT_RENDERER_API_FUNC(HBE_RESULT,rendererEndRecordCommandsAndSubmit,FUNC_PARAMS(),FUNC_ARGS(),endFrame,FUNC_ARGS());
-
+        VK_CONTEXT_RENDERER_API_FUNC(HBE_RESULT,rendererGetResources,FUNC_PARAMS(RendererResources& resources),FUNC_ARGS(resources),getRendererResrouces,FUNC_ARGS(resources));
         //cmds
         VK_CONTEXT_CMD_API_FUNC(HBE_RESULT, cmdRasterizeGraph, FUNC_PARAMS(const RasterizeGraphCmdInfo& info), FUNC_ARGS(info));
         VK_CONTEXT_CMD_API_FUNC(HBE_RESULT, cmdTraceRays, FUNC_PARAMS(const TraceRaysCmdInfo& info), FUNC_ARGS(info));

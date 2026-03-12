@@ -23,9 +23,14 @@ namespace HBE
         context.createMesh(handle, mesh_info);
     }
 
+    bool Mesh::allocated()
+    {
+        return handle != HBE_NULL_HANDLE;
+    }
+
     void Mesh::release()
     {
-        if (handle != HBE_NULL_HANDLE)
+        if (allocated())
             context.releaseMesh(handle);
         handle = HBE_NULL_HANDLE;
     }

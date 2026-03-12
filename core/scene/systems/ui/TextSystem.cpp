@@ -52,7 +52,7 @@ namespace HBE
         RasterizationPipelineInfo text_pipeline_info{};
         text_pipeline_info.vertex_shader = default_text_vert_shader.getHandle();
         text_pipeline_info.fragment_shader = default_text_frag_shader.getHandle();
-        text_pipeline_info.rasterization_target = render_target;
+        text_pipeline_info.rasterization_target = render_target->getHandle();
         text_pipeline_info.attribute_info_count = 1;
         text_pipeline_info.attribute_infos = &VERTEX_ATTRIBUTE_INFO_POSITION3D_UV_INTERLEAVED;
         text_pipeline_info.flags = RASTERIZATION_PIPELINE_FLAG_NO_DEPTH_TEST;
@@ -63,13 +63,12 @@ namespace HBE
         default_text_pipeline_instance.setImage("mtsdf", default_font.getTextureAtlas()->getHandle());
     }
 
-    void TextSystem::onDetachLabel(Entity label)
+    void TextSystem::onDetachLabel(Entity text_entity)
     {
-        TextRenderer* label_component = label.get<TextRenderer>();
-        if (label_component->mesh != nullptr)
+        TextRenderer* text_component = text_entity.get<TextRenderer>();
+        if (text_component->mesh!=HBE_NULL_HANDLE)
         {
-            delete label_component->mesh;
-            label_component->mesh = nullptr;
+            context.releaseMesh(text_component->mesh);
         }
     }
 
@@ -81,16 +80,34 @@ namespace HBE
         for (auto [handle, node, transform, text_component] : group)
         {
             if (!text_component.active ||
-                text_component.mesh == nullptr ||
                 text_component.pipeline_instance == HBE_NULL_HANDLE ||
+                text_component.font == nullptr ||
                 !node.isActiveInHierarchy())
             {
                 continue;
             }
+
+            if (text_component.dirty)
+            {
+                if (text_component.getText().length() == 0 && text_component.mesh != HBE_NULL_HANDLE)
+                {
+                    context.releaseMesh(text_component.mesh);
+                    continue;
+                }
+                Geometry::updateText(context,
+                                    text_component.mesh,
+                                     text_component.getText(),
+                                     *text_component.font,
+                                     1.0f,
+                                     0.5f,
+                                     text_component.alignment,
+                                     text_component.anchor,
+                                     text_component.size);
+            }
             HB_ASSERT(text_component.pipeline_instance != HBE_NULL_HANDLE, "graphic pipeline instance is not set");
 
             DrawCmdInfo cmd{};
-            cmd.mesh = text_component.mesh->getHandle();
+            cmd.mesh = text_component.mesh;
             cmd.pipeline_instance_handle = text_component.pipeline_instance;
             cmd.order_in_layer = node.getGlobalIndex();
             LabelPushConstant push_constant{};
@@ -115,36 +132,7 @@ namespace HBE
     void TextRenderer::setText(const std::string& text)
     {
         this->text = text;
-        HB_ASSERT(font != nullptr, "Font is not set");
-        if (text.length() == 0 && mesh != nullptr)
-        {
-            delete mesh;
-            mesh = nullptr;
-            return;
-        }
-        if (mesh != nullptr)
-        {
-            Geometry::updateText(*mesh,
-                                 text,
-                                 *font,
-                                 1.0f,
-                                 0.5f,
-                                 alignment,
-                                 anchor,
-                                 size.x,
-                                 size.y);
-        }
-        else
-        {
-            mesh = Geometry::createText(text,
-                                        *font,
-                                        1.0f,
-                                        0.5f,
-                                        alignment,
-                                        anchor,
-                                        size.x,
-                                        size.y);
-        }
+        dirty = true;
     }
 
     const std::string& TextRenderer::getText() const

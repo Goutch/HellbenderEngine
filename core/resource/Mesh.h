@@ -23,6 +23,7 @@ namespace HBE
         explicit Mesh(const MeshInfo& mesh_info);
         ~Mesh();
         void alloc(const MeshInfo& mesh_info);
+        bool allocated();
         void release();
         MeshHandle getHandle();
 

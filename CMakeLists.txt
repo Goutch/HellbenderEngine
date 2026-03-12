@@ -49,7 +49,6 @@ set(CORE_FILES
         core/resource/PipelineInstance.h
         core/resource/RasterizationTarget.h
         core/resource/raytracing/RaytracingPipeline.h
-        core/resource/raytracing/RaytracingPipelineInstance.h
         core/resource/TexelBuffer.h
         core/resource/Font.cpp
         core/resource/Font.h
@@ -180,10 +179,6 @@ set(VK_FILES
         platforms/vk/resources/VK_PipelineLayout.h
         platforms/vk/resources/VK_PipelineDescriptors.cpp
         platforms/vk/resources/VK_PipelineDescriptors.h
-        platforms/vk/VK_RasterizationPipelineInstance.cpp
-        platforms/vk/VK_RasterizationPipelineInstance.h
-        platforms/vk/VK_ComputeInstance.cpp
-        platforms/vk/VK_ComputeInstance.h
         platforms/vk/resources/raytracing/VK_TopLevelAccelerationStructure.cpp
         platforms/vk/resources/raytracing/VK_TopLevelAccelerationStructure.h
         platforms/vk/resources/raytracing/VK_MeshBottomLevelAccelerationStructure.cpp
@@ -192,8 +187,6 @@ set(VK_FILES
         platforms/vk/resources/raytracing/VK_MeshBottomLevelAccelerationStructure.cpp
         platforms/vk/resources/raytracing/VK_RaytracingPipeline.cpp
         platforms/vk/resources/raytracing/VK_RaytracingPipeline.h
-        platforms/vk/resources/raytracing/VK_RaytracingPipelineInstance.cpp
-        platforms/vk/resources/raytracing/VK_RaytracingPipelineInstance.h
         platforms/vk/VK_StorageBuffer.cpp
         platforms/vk/VK_StorageBuffer.h
         platforms/vk/VK_TexelBuffer.cpp
@@ -228,7 +221,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/utils-collection/"
 #------------------------------------VULKAN------------------------------------
 find_package(Vulkan REQUIRED)
 if (VULKAN_FOUND)
-    add_compile_definitions(VULKAN_GRAPHICS)
+    add_compile_definitions(PUBLIC VULKAN_GRAPHICS)
     message("Found vulkan at ${Vulkan_INCLUDE_DIRS}")
 else ()
     message(FATAL_ERROR "Vulkan not found")

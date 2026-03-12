@@ -332,9 +332,22 @@ namespace HBE
     }
 
 
-    void Geometry::updateText(Mesh& mesh, const std::string& text, Font& font, float line_height, float space_width, TEXT_ALIGNMENT alignment, PIVOT pivot, float& total_width,
-                              float& total_height)
+    void Geometry::updateText(Context& context, MeshHandle& mesh, const std::string& text, Font& font, float line_height, float space_width, TEXT_ALIGNMENT alignment, PIVOT pivot, vec2& out_size)
     {
+        if (mesh == HBE_NULL_HANDLE)
+        {
+            VertexAttributeInfo vertex_attribute_info{};
+            vertex_attribute_info.size = sizeof(float) * 5;
+            vertex_attribute_info.location = 0;
+            vertex_attribute_info.flags = 0;
+
+            MeshInfo mesh_info{};
+            mesh_info.flags = MESH_FLAG_NONE;
+            mesh_info.attribute_infos = &vertex_attribute_info;
+            mesh_info.attribute_info_count = 1;
+
+            context.createMesh(mesh, mesh_info);
+        }
         uint32_t vertex_size = 3 + 2;
         uint32_t quad_size = 4 * vertex_size;
         int text_length = text.size();
@@ -347,8 +360,8 @@ namespace HBE
         line_character_counts.push_back(0);
         int line = 1;
         float horizontal_offset = 0;
-        total_width = 0;
-        total_height = 0;
+        out_size.x = 0;
+        out_size.y = 0;
         int vertex_count = 0;
         for (int i = 0; i < text_length; ++i)
         {
@@ -357,7 +370,7 @@ namespace HBE
                 line++;
                 line_widths.push_back(horizontal_offset);
                 line_character_counts.push_back(0);
-                total_width = std::max(total_width, horizontal_offset);
+                out_size.x = std::max(out_size.x, horizontal_offset);
                 horizontal_offset = 0;
                 continue;
             }
@@ -427,8 +440,8 @@ namespace HBE
         }
         line_widths.push_back(horizontal_offset);
         line_character_counts.push_back(0);
-        total_width = std::max(total_width, horizontal_offset);
-        total_height = static_cast<float>(line) * line_height;
+        out_size.x = std::max(out_size.x, horizontal_offset);
+        out_size.y = static_cast<float>(line) * line_height;
 
 
         int current_line = 0;
@@ -447,10 +460,10 @@ namespace HBE
 
                 break;
             case TEXT_ALIGNMENT_RIGHT:
-                vertex_buffer[i * 5] += total_width - line_widths[current_line];
+                vertex_buffer[i * 5] += out_size.x - line_widths[current_line];
                 break;
             case TEXT_ALIGNMENT_CENTER:
-                vertex_buffer[i * 5] += (total_width - line_widths[current_line]) * 0.5f;
+                vertex_buffer[i * 5] += (out_size.x - line_widths[current_line]) * 0.5f;
                 break;
             }
             switch (pivot)
@@ -458,32 +471,32 @@ namespace HBE
             case PIVOT_TOP_LEFT:
                 break;
             case PIVOT_TOP_CENTER:
-                vertex_buffer[i * 5] -= total_width * 0.5f;
+                vertex_buffer[i * 5] -= out_size.x * 0.5f;
                 break;
             case PIVOT_TOP_RIGHT:
-                vertex_buffer[i * 5] -= total_width;
+                vertex_buffer[i * 5] -= out_size.x;
                 break;
             case PIVOT_CENTER_LEFT:
-                vertex_buffer[i * 5 + 1] += total_height * 0.5f;
+                vertex_buffer[i * 5 + 1] += out_size.y * 0.5f;
                 break;
             case PIVOT_CENTER:
-                vertex_buffer[i * 5] -= total_width * 0.5f;
-                vertex_buffer[i * 5 + 1] += total_height * 0.5f;
+                vertex_buffer[i * 5] -= out_size.x * 0.5f;
+                vertex_buffer[i * 5 + 1] += out_size.y * 0.5f;
                 break;
             case PIVOT_CENTER_RIGHT:
-                vertex_buffer[i * 5] -= total_width;
-                vertex_buffer[i * 5 + 1] += total_height * 0.5f;
+                vertex_buffer[i * 5] -= out_size.x;
+                vertex_buffer[i * 5 + 1] += out_size.y * 0.5f;
                 break;
             case PIVOT_BOTTOM_LEFT:
-                vertex_buffer[i * 5 + 1] += total_height;
+                vertex_buffer[i * 5 + 1] += out_size.y;
                 break;
             case PIVOT_BOTTOM_CENTER:
-                vertex_buffer[i * 5] -= total_width * 0.5f;
-                vertex_buffer[i * 5 + 1] -= total_height;
+                vertex_buffer[i * 5] -= out_size.x * 0.5f;
+                vertex_buffer[i * 5 + 1] -= out_size.y;
                 break;
             case PIVOT_BOTTOM_RIGHT:
-                vertex_buffer[i * 5] -= total_width;
-                vertex_buffer[i * 5 + 1] += total_height;
+                vertex_buffer[i * 5] -= out_size.x;
+                vertex_buffer[i * 5 + 1] += out_size.y;
                 break;
             }
             vertex_index++;
@@ -491,34 +504,8 @@ namespace HBE
 
 
         //if (vertex_buffer.size() > 0) {
-        mesh.setBuffer(0, vertex_buffer.data(), vertex_count);
-        mesh.setVertexIndices(index_buffer.data(), index_buffer.size());
+        context.setMeshVertexBuffer(mesh, 0, vertex_buffer.data(), vertex_count);
+        context.setMeshVertexIndices(mesh, index_buffer.data(), index_buffer.size());
         //}
-    }
-
-
-    Mesh* Geometry::createText(const std::string& text,
-                               Font& font,
-                               float line_height,
-                               float space_width,
-                               TEXT_ALIGNMENT alignment,
-                               PIVOT pivot,
-                               float& total_width,
-                               float& total_height)
-    {
-        Context* context = Application::instance->getContext();
-        VertexAttributeInfo vertex_attribute_info{};
-        vertex_attribute_info.size = sizeof(float) * 5;
-        vertex_attribute_info.location = 0;
-        vertex_attribute_info.flags = 0;
-
-        MeshInfo mesh_info{};
-        mesh_info.flags = MESH_FLAG_NONE;
-        mesh_info.attribute_infos = &vertex_attribute_info;
-        mesh_info.attribute_info_count = 1;
-
-        Mesh* mesh = context->createMesh(mesh_info);
-        updateText(*mesh, text, font, line_height, space_width, alignment, pivot, total_width, total_height);
-        return mesh;
     }
 }

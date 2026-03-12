@@ -6,20 +6,11 @@
 #include "core/scene/System.h"
 #include "dependencies/utils-collection/Event.h"
 #include "core/scene/ecs/Component.h"
-
+#include "core/resource/PipelineInstance.h"
+#include "core/resource/Font.h"
+#include "core/resource/RasterizationPipeline.h"
+#include "core/resource/Shader.h"
 namespace HBE {
-
-	class RasterizationTarget;
-
-	class RasterizationPipelineInstance;
-
-	class RasterizationPipeline;
-
-	class Shader;
-
-	class Mesh;
-
-	class Font;
 
 	struct ButtonMaterial {
 		vec4 background_color;
@@ -68,13 +59,12 @@ namespace HBE {
 		ButtonMaterial default_button_material_hover;
 		ButtonMaterial default_button_material_pressed;
 
-		Shader *button_frag_shader = nullptr;
-		Shader *button_vert_shader = nullptr;
-		RasterizationPipeline *button_pipeline = nullptr;
-		RasterizationPipelineInstance *default_button_pipeline_instance = nullptr;
-		RasterizationPipelineInstance *default_button_hover_pipeline_instance = nullptr;
-		RasterizationPipelineInstance *default_button_pressed_pipeline_instance = nullptr;
-
+		Shader button_frag_shader;
+		Shader button_vert_shader;
+		RasterizationPipeline button_pipeline;
+		PipelineInstance default_button_pipeline_instance;
+		PipelineInstance default_button_hover_pipeline_instance;
+		PipelineInstance default_button_pressed_pipeline_instance;
 	public:
 
 		ButtonSystem(Scene *scene, RasterizationTarget *render_target);

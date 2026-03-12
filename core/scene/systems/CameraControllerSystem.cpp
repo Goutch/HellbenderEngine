@@ -9,163 +9,203 @@
 #include "core/scene/components/PixelCamera.h"
 #include "core/scene/components/Transform.h"
 
-namespace HBE {
-	CameraControllerSystem::CameraControllerSystem(Scene *scene) : System(scene) {
-		scene->onUpdate.subscribe(update_subscription_id, this, &CameraControllerSystem::update);
-		scene->onDetach<CameraController>().subscribe(detach_subscription_id, this, &CameraControllerSystem::onDetach);
-		scene->onAttach<CameraController>().subscribe(attach_subscription_id, this, &CameraControllerSystem::onAttach);
-	}
+namespace HBE
+{
+    CameraControllerSystem::CameraControllerSystem(Scene* scene) : System(scene)
+    {
+        scene->onUpdate.subscribe(update_subscription_id, this, &CameraControllerSystem::update);
+        scene->onDetach<CameraController>().subscribe(detach_subscription_id, this, &CameraControllerSystem::onDetach);
+        scene->onAttach<CameraController>().subscribe(attach_subscription_id, this, &CameraControllerSystem::onAttach);
+    }
 
-	void CameraControllerSystem::update(float delta_t) {
-		HB_PROFILE_BEGIN("CameraControllerUpdate");
-		HB_PROFILE_BEGIN("CameraControllerUpdateGroup");
-		auto group = scene->group<Node, Transform, Camera, CameraController>();
-		HB_PROFILE_END("CameraControllerUpdateGroup");
-		for (auto [handle, node, transform, camera, controller]: group) {
-			if (!node.isActiveInHierarchy()) {
-				continue;
-			}
-			float max_pitch_radian = glm::radians(controller.max_pitch);
+    void CameraControllerSystem::update(float delta_t)
+    {
+        HB_PROFILE_BEGIN("CameraControllerUpdate");
+        HB_PROFILE_BEGIN("CameraControllerUpdateGroup");
+        auto group = scene->group<Node, Transform, Camera, CameraController>();
+        HB_PROFILE_END("CameraControllerUpdateGroup");
+        for (auto [handle, node, transform, camera, controller] : group)
+        {
+            if (!node.isActiveInHierarchy())
+            {
+                continue;
+            }
+            float max_pitch_radian = glm::radians(controller.max_pitch);
 
-			vec2i resolution = camera.getRenderTarget()->getResolution();
-			float width = static_cast<float>(resolution.x);
-			float height = static_cast<float>(resolution.y);
+            vec2u resolution;
+            context.getRasterizationTargetResolution(camera.render_target, resolution);
 
-			vec2 mouse_pos = Application::instance->getInput()->getMousePosition();
-			Application::instance->getInput()->setCursorPosition(resolution.x / 2.0, resolution.y / 2.0f);
+            camera.calculateAspectRatio(resolution);
 
-			float fov = glm::radians(camera.fov);
-			vec2 mouse_delta;
-			mouse_delta.x = (((width / 2.0f) - mouse_pos.x) / width) * fov;
-			mouse_delta.y = (((height / 2.0f) - mouse_pos.y) / height) * (fov * camera.aspectRatio());
+            float width = static_cast<float>(resolution.x);
+            float height = static_cast<float>(resolution.y);
 
-			//go to pitch 0
-			transform.rotate(vec3(-controller.current_pitch, 0, 0));
-			//rotate on y axis
-			transform.rotate(vec3(0, mouse_delta.x, 0));
-			//go back to current pitch
+            vec2 mouse_pos = Application::instance->getInput()->getMousePosition();
+            Application::instance->getInput()->setCursorPosition(resolution.x / 2.0, resolution.y / 2.0f);
 
-			if (controller.invert_y)
-				controller.current_pitch += mouse_delta.y;
-			else
-				controller.current_pitch -= mouse_delta.y;
+            float fov = glm::radians(camera.getFOV());
+            vec2 mouse_delta;
+            mouse_delta.x = (((width / 2.0f) - mouse_pos.x) / width) * fov;
+            mouse_delta.y = (((height / 2.0f) - mouse_pos.y) / height) * (fov * camera.getAspectRatio());
 
-			controller.current_pitch = glm::clamp(controller.current_pitch, -max_pitch_radian, max_pitch_radian);
+            //go to pitch 0
+            transform.rotate(vec3(-controller.current_pitch, 0, 0));
+            //rotate on y axis
+            transform.rotate(vec3(0, mouse_delta.x, 0));
+            //go back to current pitch
 
-			transform.rotate(vec3(controller.current_pitch, 0, 0));
+            if (controller.invert_y)
+                controller.current_pitch += mouse_delta.y;
+            else
+                controller.current_pitch -= mouse_delta.y;
 
-			vec3 translation = vec3(0);
-			if (Application::instance->getInput()->getKey(KEY_S)) {
-				translation.z += 1;
-			}
-			if (Application::instance->getInput()->getKey(KEY_W)) {
-				translation.z = -1;
-			}
-			if (Application::instance->getInput()->getKey(KEY_D)) {
-				translation.x += 1;
-			}
-			if (Application::instance->getInput()->getKey(KEY_A)) {
-				translation.x = -1;
-			}
-			if (Application::instance->getInput()->getKey(KEY_SPACE)) {
-				translation.y += 1;
-			}
-			if (Application::instance->getInput()->getKey(KEY_LEFT_CONTROL)) {
-				translation.y = -1;
-			}
-			if (Application::instance->getInput()->getKey(KEY_LEFT_SHIFT)) {
-				controller.acceleration_time += delta_t * controller.acceleration;
-				//controller.acceleration_time = glm::min(controller.acceleration_time, 1.0f);
-				controller.current_speed = std::lerp(controller.base_speed, controller.max_speed, controller.acceleration_time);
-			} else {
-				controller.acceleration_time -= delta_t * controller.acceleration;
-				controller.acceleration_time = glm::max(controller.acceleration_time, 0.0f);
-				controller.current_speed = std::lerp(controller.base_speed, controller.max_speed, controller.acceleration_time);
-			}
+            controller.current_pitch = glm::clamp(controller.current_pitch, -max_pitch_radian, max_pitch_radian);
 
-			transform.translate(translation * delta_t * controller.current_speed);
-		}
-		auto group2D = scene->group<Transform, Camera2D, CameraController>();
-		for (auto [handle, transform, camera, controller]: group2D) {
-			vec3 translation = vec3(0);
-			if (Application::instance->getInput()->getKey(KEY_EQUAL)) {
-				camera.setZoomRatio(camera.getZoomRatio() + (delta_t));
-			}
-			if (Application::instance->getInput()->getKey(KEY_MINUS)) {
-				camera.setZoomRatio(camera.getZoomRatio() - (delta_t));
-			}
-			if (Application::instance->getInput()->getKey(KEY_D)) {
-				translation.x += 1;
-			}
-			if (Application::instance->getInput()->getKey(KEY_A)) {
-				translation.x = -1;
-			}
-			if (Application::instance->getInput()->getKey(KEY_W)) {
-				translation.y += 1;
-			}
-			if (Application::instance->getInput()->getKey(KEY_S)) {
-				translation.y = -1;
-			}
-			if (Application::instance->getInput()->getKey(KEY_LEFT_SHIFT)) {
-				controller.acceleration_time += delta_t * controller.acceleration;
-				controller.acceleration_time = glm::min(controller.acceleration_time, 1.0f);
-				controller.current_speed = std::lerp(controller.base_speed, controller.max_speed, controller.acceleration_time);
-			} else {
-				controller.acceleration_time -= delta_t * controller.acceleration;
-				controller.acceleration_time = glm::max(controller.acceleration_time, 0.0f);
-				controller.current_speed = std::lerp(controller.base_speed, controller.max_speed, controller.acceleration_time);
-			}
+            transform.rotate(vec3(controller.current_pitch, 0, 0));
 
-			transform.translate(translation * delta_t * controller.current_speed);
-		}
-		auto group_pixel = scene->group<Transform, PixelCamera, CameraController>();
-		for (auto [handle, transform, camera, controller]: group_pixel) {
-			float boost = 1.0f;
-			vec3 translation = vec3(0);
-			if (Application::instance->getInput()->getKey(KEY_LEFT_SHIFT)) {
-				boost = 10.0f;
-			}
-			if (Application::instance->getInput()->getKey(KEY_D)) {
-				translation.x += 1;
-			}
-			if (Application::instance->getInput()->getKey(KEY_A)) {
-				translation.x = -1;
-			}
-			if (Application::instance->getInput()->getKey(KEY_W)) {
-				translation.y += 1;
-			}
-			if (Application::instance->getInput()->getKey(KEY_S)) {
-				translation.y = -1;
-			}
-			if (Application::instance->getInput()->getKey(KEY_LEFT_SHIFT)) {
-				controller.acceleration_time += delta_t * controller.acceleration;
-				controller.acceleration_time = glm::min(controller.acceleration_time, 1.0f);
-				controller.current_speed = std::lerp(controller.base_speed, controller.max_speed, controller.acceleration_time);
-			} else {
-				controller.acceleration_time -= delta_t * controller.acceleration;
-				controller.acceleration_time = glm::max(controller.acceleration_time, 0.0f);
-				controller.current_speed = std::lerp(controller.base_speed, controller.max_speed, controller.acceleration_time);
-			}
+            vec3 translation = vec3(0);
+            if (Application::instance->getInput()->getKey(KEY_S))
+            {
+                translation.z += 1;
+            }
+            if (Application::instance->getInput()->getKey(KEY_W))
+            {
+                translation.z = -1;
+            }
+            if (Application::instance->getInput()->getKey(KEY_D))
+            {
+                translation.x += 1;
+            }
+            if (Application::instance->getInput()->getKey(KEY_A))
+            {
+                translation.x = -1;
+            }
+            if (Application::instance->getInput()->getKey(KEY_SPACE))
+            {
+                translation.y += 1;
+            }
+            if (Application::instance->getInput()->getKey(KEY_LEFT_CONTROL))
+            {
+                translation.y = -1;
+            }
+            if (Application::instance->getInput()->getKey(KEY_LEFT_SHIFT))
+            {
+                controller.acceleration_time += delta_t * controller.acceleration;
+                //controller.acceleration_time = glm::min(controller.acceleration_time, 1.0f);
+                controller.current_speed = std::lerp(controller.base_speed, controller.max_speed, controller.acceleration_time);
+            }
+            else
+            {
+                controller.acceleration_time -= delta_t * controller.acceleration;
+                controller.acceleration_time = glm::max(controller.acceleration_time, 0.0f);
+                controller.current_speed = std::lerp(controller.base_speed, controller.max_speed, controller.acceleration_time);
+            }
 
-			transform.translate(translation * delta_t * controller.current_speed);
-		}
-		HB_PROFILE_END("CameraControllerUpdate");
-	}
+            transform.translate(translation * delta_t * controller.current_speed);
+        }
+        auto group2D = scene->group<Transform, Camera2D, CameraController>();
+        for (auto [handle, transform, camera, controller] : group2D)
+        {
+            vec3 translation = vec3(0);
+            if (Application::instance->getInput()->getKey(KEY_EQUAL))
+            {
+                camera.setZoomRatio(camera.getZoomRatio() + (delta_t));
+            }
+            if (Application::instance->getInput()->getKey(KEY_MINUS))
+            {
+                camera.setZoomRatio(camera.getZoomRatio() - (delta_t));
+            }
+            if (Application::instance->getInput()->getKey(KEY_D))
+            {
+                translation.x += 1;
+            }
+            if (Application::instance->getInput()->getKey(KEY_A))
+            {
+                translation.x = -1;
+            }
+            if (Application::instance->getInput()->getKey(KEY_W))
+            {
+                translation.y += 1;
+            }
+            if (Application::instance->getInput()->getKey(KEY_S))
+            {
+                translation.y = -1;
+            }
+            if (Application::instance->getInput()->getKey(KEY_LEFT_SHIFT))
+            {
+                controller.acceleration_time += delta_t * controller.acceleration;
+                controller.acceleration_time = glm::min(controller.acceleration_time, 1.0f);
+                controller.current_speed = std::lerp(controller.base_speed, controller.max_speed, controller.acceleration_time);
+            }
+            else
+            {
+                controller.acceleration_time -= delta_t * controller.acceleration;
+                controller.acceleration_time = glm::max(controller.acceleration_time, 0.0f);
+                controller.current_speed = std::lerp(controller.base_speed, controller.max_speed, controller.acceleration_time);
+            }
 
-	CameraControllerSystem::~CameraControllerSystem() {
-		scene->onUpdate.unsubscribe(update_subscription_id);
-		scene->onDetach<CameraController>().unsubscribe(detach_subscription_id);
-		scene->onAttach<CameraController>().unsubscribe(attach_subscription_id);
-	}
+            transform.translate(translation * delta_t * controller.current_speed);
+        }
+        auto group_pixel = scene->group<Transform, PixelCamera, CameraController>();
+        for (auto [handle, transform, camera, controller] : group_pixel)
+        {
+            float boost = 1.0f;
+            vec3 translation = vec3(0);
+            if (Application::instance->getInput()->getKey(KEY_LEFT_SHIFT))
+            {
+                boost = 10.0f;
+            }
+            if (Application::instance->getInput()->getKey(KEY_D))
+            {
+                translation.x += 1;
+            }
+            if (Application::instance->getInput()->getKey(KEY_A))
+            {
+                translation.x = -1;
+            }
+            if (Application::instance->getInput()->getKey(KEY_W))
+            {
+                translation.y += 1;
+            }
+            if (Application::instance->getInput()->getKey(KEY_S))
+            {
+                translation.y = -1;
+            }
+            if (Application::instance->getInput()->getKey(KEY_LEFT_SHIFT))
+            {
+                controller.acceleration_time += delta_t * controller.acceleration;
+                controller.acceleration_time = glm::min(controller.acceleration_time, 1.0f);
+                controller.current_speed = std::lerp(controller.base_speed, controller.max_speed, controller.acceleration_time);
+            }
+            else
+            {
+                controller.acceleration_time -= delta_t * controller.acceleration;
+                controller.acceleration_time = glm::max(controller.acceleration_time, 0.0f);
+                controller.current_speed = std::lerp(controller.base_speed, controller.max_speed, controller.acceleration_time);
+            }
 
-	void CameraControllerSystem::onAttach(Entity entity) {
-		Application::instance->getInput()->setCursorVisible(false);
-	}
+            transform.translate(translation * delta_t * controller.current_speed);
+        }
+        HB_PROFILE_END("CameraControllerUpdate");
+    }
 
-	void CameraControllerSystem::onDetach(Entity entity) {
-		Application::instance->getInput()->setCursorVisible(true);
-		CameraController *c = entity.get<CameraController>();
-		Transform *t = entity.get<Transform>();
-		t->rotate(vec3(-c->current_pitch, 0, 0));
-	}
+    CameraControllerSystem::~CameraControllerSystem()
+    {
+        scene->onUpdate.unsubscribe(update_subscription_id);
+        scene->onDetach<CameraController>().unsubscribe(detach_subscription_id);
+        scene->onAttach<CameraController>().unsubscribe(attach_subscription_id);
+    }
+
+    void CameraControllerSystem::onAttach(Entity entity)
+    {
+        Application::instance->getInput()->setCursorVisible(false);
+    }
+
+    void CameraControllerSystem::onDetach(Entity entity)
+    {
+        Application::instance->getInput()->setCursorVisible(true);
+        CameraController* c = entity.get<CameraController>();
+        Transform* t = entity.get<Transform>();
+        t->rotate(vec3(-c->current_pitch, 0, 0));
+    }
 }

@@ -8,15 +8,16 @@
 
 namespace HBE
 {
-    void VK_PipelineLayout::init(VK_Context* context, const VK_Shader** shaders, size_t count, bool empty_descriptor_allowed)
+    void VK_PipelineLayout::init(VK_Context* context, ShaderHandle* shaders, size_t count, bool empty_descriptor_allowed)
     {
         this->context = context;
 
-        if (shaders[0]->getVkStage() == VK_SHADER_STAGE_COMPUTE_BIT)
+        VkShaderStageFlagBits shaderStage = context->shaders[shaders[0]].getVkStage();
+        if (shaderStage == VK_SHADER_STAGE_COMPUTE_BIT)
         {
             bind_point = VK_PIPELINE_BIND_POINT_COMPUTE;
         }
-        if (shaders[0]->getVkStage() == VK_SHADER_STAGE_RAYGEN_BIT_KHR)
+        if (shaderStage == VK_SHADER_STAGE_RAYGEN_BIT_KHR)
         {
             bind_point = VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR;
         }
@@ -93,7 +94,7 @@ namespace HBE
     }
 
 
-    void VK_PipelineLayout::mergeStages(const VK_Shader** shaders, size_t count)
+    void VK_PipelineLayout::mergeStages(ShaderHandle* shaders, size_t count)
     {
         uint32_t max_descriptor_binding = 0;
         uint32_t max_descriptor_set = 0;
@@ -113,7 +114,7 @@ namespace HBE
         //merge all the stages descriptors into pipeline_descriptors
         for (size_t i = 0; i < count; ++i)
         {
-            std::vector<VK_DescriptorInfo> stage_descriptors = shaders[i]->getDescriptorInfos();
+            std::vector<VK_DescriptorInfo> stage_descriptors = context->shaders[shaders[i]].getDescriptorInfos();
             for (size_t j = 0; j < stage_descriptors.size(); ++j)
             {
                 VK_DescriptorInfo stage_descriptor = stage_descriptors[j];
@@ -139,7 +140,7 @@ namespace HBE
             }
 
             //merge push_constants
-            std::vector<VK_PushConstantInfo> stage_push_constants = shaders[i]->getPushConstants();
+            std::vector<VK_PushConstantInfo> stage_push_constants = context->shaders[shaders[i]].getPushConstants();
             for (int j = 0; j < stage_push_constants.size(); ++j)
             {
                 Log::message("merge push constant:" + stage_push_constants[j].name);

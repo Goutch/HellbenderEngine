@@ -46,24 +46,13 @@ namespace HBE
                                                           uint32_t subdivision_count,
                                                           VERTEX_FLAGS flags,
                                                           PIVOT pivot);
-        static Mesh* createText(
-            const std::string& text,
-            Font& font,
-            float line_height,
-            float space_width,
-            TEXT_ALIGNMENT alignment,
-            PIVOT pivot,
-            float& total_width,
-            float& total_height);
-        static void updateText(Mesh& mesh,
+        static void updateText(Context& context, MeshHandle& mesh,
                                const std::string& text,
                                Font& font,
                                float line_height,
                                float space_width,
                                TEXT_ALIGNMENT alignment,
-                               PIVOT pivot,
-                               float& total_width,
-                               float& total_height);
+                               PIVOT pivot, vec2& out_size);
 
     private:
         static void getRoundedRectanglePoints(std::vector<vec2>& points,

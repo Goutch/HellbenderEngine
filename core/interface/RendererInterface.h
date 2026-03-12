@@ -7,7 +7,7 @@
 #include "core/interface/RasterizationPipelineInterface.h"
 #include "core/interface/RasterizationTargetInterface.h"
 #include "core/interface/PipelineInstanceInterface.h"
-
+#include "core/interface/FenceInterface.h"
 namespace HBE {
     class RenderGraph;
 
@@ -81,6 +81,8 @@ namespace HBE {
         uint32_t size_x = 1;
         uint32_t size_y = 1;
         uint32_t size_z = 1;
+        //used only for async compute right now
+        FenceHandle fence;
     };
 
 	struct RendererResources{

@@ -11,7 +11,6 @@
 
 namespace HBE
 {
-
     void VK_Mesh::setBuffer(uint32_t location, const void* vertices, size_t count)
     {
         HB_ASSERT(location <= attributes_locations.size() &&
@@ -215,8 +214,18 @@ namespace HBE
         return indices_buffer;
     }
 
-    uint32_t VK_Mesh::getIdicesCount() const
+    uint32_t VK_Mesh::getIndicesCount() const
     {
         return indices_count;
+    }
+
+    uint32_t VK_Mesh::getVertexCount() const
+    {
+        return vertex_count;
+    }
+
+    uint32_t VK_Mesh::getInstanceCount() const
+    {
+        return instance_count;
     }
 }

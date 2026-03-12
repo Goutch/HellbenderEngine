@@ -74,6 +74,10 @@ namespace HBE {
 
 		void cmdPresent(const PresentCmdInfo &present_cmd_info);
 
+		void cmdDispatch(const ComputeDispatchCmdInfo &compute_dispatch_cmd_info);
+
+		void cmdDispatchAsync(const ComputeDispatchCmdInfo &compute_dispatch_cmd_info);
+
 		void waitCurrentFrame();
 
 		void waitLastFrame();
@@ -101,8 +105,6 @@ namespace HBE {
 		VkSampler getDefaultSampler();
 
 		GraphicLimits getLimits();
-
-		void cmdDispatch(const ComputeDispatchCmdInfo &compute_dispatch_cmd_info);
 
 		Fence *getLastFrameFence();
 

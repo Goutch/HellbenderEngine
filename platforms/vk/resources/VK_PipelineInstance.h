@@ -7,6 +7,7 @@
 #include "core/interface/MeshAccelerationStructureInterface.h"
 #include "core/interface/BufferInterface.h"
 #include "core/interface/PipelineInstanceInterface.h"
+#include "core/interface/ROOTAccelerationStructureInterface.h"
 #include "platforms/vk/VK_Buffer.h"
 #include "platforms/vk/VK_CommandPool.h"
 
@@ -52,8 +53,9 @@ namespace HBE
         event_subscription_id on_frame_change_subscription_id;
     public:
         VK_PipelineInstance() = default;
-
         ~VK_PipelineInstance() = default;
+        VK_PipelineInstance(const VK_PipelineInstance&) = delete;
+        VK_PipelineInstance& operator=(const VK_PipelineInstance&) = delete;
 
         PIPELINE_INSTANCE_TYPE getType();
         void alloc(VK_Context* context, const PipelineInstanceInfo& info);
