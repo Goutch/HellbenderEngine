@@ -57,5 +57,9 @@ namespace HBE
         void bind() const;
 
         void unbind() const;
+
+	    VkDeviceSize getAttributeElementSize(uint32_t location);
+
+	    INDICES_TYPE getIndicesType();
     };
 }

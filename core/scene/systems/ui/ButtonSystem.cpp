@@ -28,7 +28,7 @@ namespace HBE {
         RasterizationPipelineInfo button_pipeline_info{};
         button_pipeline_info.vertex_shader = button_vert_shader.getHandle();
         button_pipeline_info.fragment_shader = button_frag_shader.getHandle();
-        button_pipeline_info.rasterization_target = render_target;
+        button_pipeline_info.rasterization_target = render_target->getHandle();
         button_pipeline_info.attribute_info_count = 1;
         button_pipeline_info.attribute_infos = &VERTEX_ATTRIBUTE_INFO_POSITION3D_UV_INTERLEAVED;
         button_pipeline_info.flags = RASTERIZATION_PIPELINE_FLAG_NO_DEPTH_TEST;

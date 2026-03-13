@@ -228,4 +228,12 @@ namespace HBE
     {
         return instance_count;
     }
+
+	VkDeviceSize VK_Mesh::getAttributeElementSize(uint32_t location) {
+		return attributes_locations.at(location).size;
+	}
+
+	INDICES_TYPE VK_Mesh::getIndicesType() {
+		return indices_type;
+	}
 }

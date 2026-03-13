@@ -1,8 +1,5 @@
 #include "dependencies/utils-collection/Profiler.h"
 #include "VK_MeshBottomLevelAccelerationStructure.h"
-#include "../VK_Device.h"
-#include "../VK_Buffer.h"
-#include "../VK_Mesh.h"
 #include "platforms/vk/VK_Context.h"
 
 namespace HBE
@@ -11,8 +8,6 @@ namespace HBE
     {
         this->context = context;
         HB_PROFILE_BEGIN("Build Mesh Acceleration Structure");
-
-        //todo:initialize this
 
         VK_Mesh& mesh = context->meshes[info.mesh_handle];
         VkDeviceSize vertex_size = mesh.getAttributeElementSize(0);
@@ -27,7 +22,7 @@ namespace HBE
         accelerationStructureGeometry.geometry.triangles.vertexData = mesh.getBuffer(0).getDeviceAddress();
         accelerationStructureGeometry.geometry.triangles.maxVertex = mesh.getVertexCount();
         accelerationStructureGeometry.geometry.triangles.vertexStride = vertex_size;
-        accelerationStructureGeometry.geometry.triangles.indexType = mesh.getIndicesSize() == sizeof(uint32_t) ? VK_INDEX_TYPE_UINT32 : VK_INDEX_TYPE_UINT16;
+        accelerationStructureGeometry.geometry.triangles.indexType = mesh.getIndicesType() == INDICES_TYPE_UINT32 ? VK_INDEX_TYPE_UINT32 : VK_INDEX_TYPE_UINT16;
         accelerationStructureGeometry.geometry.triangles.indexData = mesh.getIndicesBuffer().getDeviceAddress();
         accelerationStructureGeometry.geometry.triangles.transformData.deviceAddress = 0;
         accelerationStructureGeometry.geometry.triangles.transformData.hostAddress = nullptr;

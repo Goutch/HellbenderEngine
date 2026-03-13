@@ -1,4 +1,3 @@
-#pragma message("Context")
 #pragma once
 
 #include "HBETypes.h"

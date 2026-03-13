@@ -2,6 +2,7 @@
 
 #include "vector"
 #include "string"
+#include "core/interface/ShaderInterface.h"
 
 namespace HBE {
 	class ShaderCompiler {
