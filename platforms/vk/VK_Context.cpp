@@ -8,7 +8,7 @@
 
 namespace HBE
 {
-    void VK_Context::init(const ContextInfo& info)
+    HBE_RESULT VK_Context::init(const ContextInfo& info)
     {
         instance.init(info);
         surface.init(instance, Application::instance->getWindow()->getHandle());
@@ -17,25 +17,26 @@ namespace HBE
         allocator.init(this);
         swapchain.init(this);
 
+
         renderer.init(this);
-        graphic_limits = renderer.getLimits();
+	    graphic_limits = renderer.getLimits();
 
-
-        renderer.
     }
 
-    template <typename T, uint32_t I>
+    template <typename T, size_t I>
     void releaseStableHandleContainerObjects(StableHandleContainer<T, I>& container)
     {
         for (T& element : container)
         {
-            if (element.allocated()) Log::warning("object was not released properly before destroying vulkan context");
-            element.release();
+            if (element.allocated()) {
+	            Log::warning("object was not released properly before destroying vulkan context");
+	            element.release();
+            }
         }
         container.clear();
     }
 
-    void VK_Context::release()
+    HBE_RESULT VK_Context::release()
     {
         allocator.processFreeRequests(0);
 

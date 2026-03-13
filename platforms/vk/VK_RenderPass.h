@@ -38,7 +38,7 @@ namespace HBE {
         VK_RenderPass() = default;
 
         void alloc(VK_Context *context, const RasterizationTargetInfo &info);
-
+		bool allocated() const;
         void release();
 
         void begin(const VkCommandBuffer &command_buffer, uint32_t i) const;

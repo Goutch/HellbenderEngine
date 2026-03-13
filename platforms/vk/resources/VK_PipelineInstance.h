@@ -37,7 +37,7 @@ namespace HBE
         bool empty_descriptor_allowed;
         VK_Context* context = nullptr;
         PIPELINE_INSTANCE_TYPE pipeline_type;
-        Handle pipeline_handle;;
+        Handle pipeline_handle;
 
         const VK_PipelineLayout* pipeline_layout = nullptr;
 
@@ -60,7 +60,7 @@ namespace HBE
 
         PIPELINE_INSTANCE_TYPE getType();
         void alloc(VK_Context* context, const PipelineInstanceInfo& info);
-
+		bool allocated();
         void release();
 
         void onFrameEnd(uint32_t frame);

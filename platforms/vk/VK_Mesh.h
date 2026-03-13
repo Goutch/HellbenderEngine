@@ -37,6 +37,7 @@ namespace HBE
 
         ~VK_Mesh();
 
+		bool allocated();
         void setVertexIndices(const uint32_t* data, size_t count);
 
         void setVertexIndices(const uint16_t* data, size_t count);
