@@ -97,38 +97,44 @@ namespace HBE
     }
 
     PipelineInstanceHandle DefaultModelParser::createMaterial(const ModelMaterialData& materialData,
-                                                              HBE::ImageHandle* textures)
+                                                              ImageHandle* textures)
     {
         PipelineInstanceHandle instance_handle;
         PipelineInstanceInfo instance_info{};
         instance_info.pipeline_handle = materialData.double_sided
-                                                   ? parser_info.graphic_pipeline_2_sided
-                                                   : parser_info.graphic_pipeline;
+                                            ? parser_info.graphic_pipeline_2_sided
+                                            : parser_info.graphic_pipeline;
 
-         context.createPipelineInstance(instance_handle,instance_info);
+        context.createPipelineInstance(instance_handle, instance_info);
 
         auto texture_type_it = parser_info.texture_names.find(MODEL_TEXTURE_TYPE_ALBEDO);
+        std::string texture_name = texture_type_it->second;
+        MODEL_TEXTURE_TYPE texture_type = texture_type_it->first;
+        uint32_t binding = 0;
+        uint32_t material_binding = 0;
+        context.getPipelineInstanceBindingFromString(instance_handle, texture_name.c_str(), binding);
+        context.getPipelineInstanceBindingFromString(instance_handle, parser_info.material_property_name.c_str(), material_binding);
         if (texture_type_it != parser_info.texture_names.end() && materialData.albedo_texture != -1)
-             context.setPipelineInstanceImage(texture_type_it->second, textures[materialData.albedo_texture]);
+            context.setPipelineInstanceImage(instance_handle, binding, textures[materialData.albedo_texture],0,-1);
         texture_type_it = parser_info.texture_names.find(MODEL_TEXTURE_TYPE_METALLIC_ROUGHNESS);
         if (texture_type_it != parser_info.texture_names.end() && materialData.metallic_roughness_texture != -1)
-            instance_ptr->setImage(texture_type_it->second, textures[materialData.metallic_roughness_texture]);
+            context.setPipelineInstanceImage(instance_handle, binding, textures[materialData.metallic_roughness_texture],0,-1);
         texture_type_it = parser_info.texture_names.find(MODEL_TEXTURE_TYPE_EMMISIVE);
         if (texture_type_it != parser_info.texture_names.end() && materialData.emmisive_texture != -1)
-            instance_ptr->setImage(texture_type_it->second, textures[materialData.emmisive_texture]);
+            context.setPipelineInstanceImage(instance_handle, binding, textures[materialData.emmisive_texture],0,-1);
         texture_type_it = parser_info.texture_names.find(MODEL_TEXTURE_TYPE_NORMAL);
         if (texture_type_it != parser_info.texture_names.end() && materialData.normal_texture != -1)
-            instance_ptr->setImage(texture_type_it->second, textures[materialData.normal_texture]);
+            context.setPipelineInstanceImage(instance_handle, binding, textures[materialData.normal_texture],0,-1);
         texture_type_it = parser_info.texture_names.find(MODEL_TEXTURE_TYPE_OCCLUSION);
         if (texture_type_it != parser_info.texture_names.end() && materialData.occlusion_texture != -1)
-            instance_ptr->setImage(texture_type_it->second, textures[materialData.occlusion_texture]);
+            context.setPipelineInstanceImage(instance_handle, binding, textures[materialData.occlusion_texture],0,-1);
 
-        instance_ptr->setUniform(parser_info.material_property_name, &materialData.properties);
+        context.setPipelineInstanceUniform(instance_handle,material_binding, &materialData.properties,-1);
 
-        return instance_ptr;
+        return instance_handle;
     }
 
-    Image* DefaultModelParser::createTexture(const ModelTextureData& data)
+    ImageHandle DefaultModelParser::createTexture(const ModelTextureData& data)
     {
         ImageInfo texture_info{};
         texture_info.width = data.width;
@@ -138,13 +144,16 @@ namespace HBE
         texture_info.format = data.format;
         texture_info.flags = IMAGE_FLAG_NONE;
         texture_info.sampler_info = data.sampler_info;
-        return Application::instance->getContext()->createImage(texture_info);
+        ImageHandle handle;
+        context.createImage(handle, texture_info);
     }
 
-    MeshAccelerationStructure* DefaultModelParser::createMeshAccelerationStructure(Mesh* mesh, int mesh_index)
+    MeshAccelerationStructureHandle DefaultModelParser::createMeshAccelerationStructure(Mesh* mesh, int mesh_index)
     {
         MeshAccelerationStructureInfo acceleration_structure_info{};
-        acceleration_structure_info.mesh = mesh;
-        return Application::instance->getContext()->createMeshAccelerationStructure(acceleration_structure_info);
+        acceleration_structure_info.mesh_handle = mesh->getHandle();
+        MeshAccelerationStructureHandle acceleration_structure_handle;
+        context.createMeshAccelerationStructure(acceleration_structure_handle, acceleration_structure_info);
+        return acceleration_structure_handle;
     }
 }

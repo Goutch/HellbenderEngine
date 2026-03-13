@@ -1,6 +1,6 @@
 #pragma once
 #include "MeshAccelerationStructureInterface.h"
-
+#include "AABBAccelerationStructureInterface.h"
 namespace HBE
 {
     using RootAccelerationStructureHandle = Handle;

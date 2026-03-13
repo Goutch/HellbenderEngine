@@ -40,7 +40,7 @@ namespace HBE
         {
             if (info.uniform_memory_type_infos[i].name != "")
             {
-                info.uniform_memory_type_infos[i].binding = pipeline_layout->getDescriptorBinding(info.uniform_memory_type_infos[i].name);
+                info.uniform_memory_type_infos[i].binding = pipeline_layout->getDescriptorBinding(info.uniform_memory_type_infos[i].name.c_str());
             }
             binding_memory_type_map.emplace(info.uniform_memory_type_infos[i].binding, info.uniform_memory_type_infos[i]);
         }
@@ -446,6 +446,11 @@ namespace HBE
         bound = true;
     }
 
+    void VK_PipelineInstance::getBinding(const char* name, uint32_t& binding)
+    {
+        binding = getBinding(name);
+    }
+
     void VK_PipelineInstance::bind(VkCommandBuffer command_buffer, uint32_t frame) const
     {
         if (bound) return;
@@ -469,12 +474,12 @@ namespace HBE
         bound = false;
     }
 
-    uint32_t VK_PipelineInstance::getBinding(const std::string& name) const
+    uint32_t VK_PipelineInstance::getBinding(const char* name) const
     {
         return pipeline_layout->getDescriptorBinding(name);
     }
 
-    void VK_PipelineInstance::setImageArray(uint32_t binding, ImageHandle* textures, uint32_t texture_count,  int32_t mip_level,int32_t frame)
+    void VK_PipelineInstance::setImageArray(uint32_t binding, ImageHandle* textures, uint32_t texture_count, int32_t mip_level, int32_t frame)
     {
         HB_ASSERT(frame < int32_t(MAX_FRAMES_IN_FLIGHT), "Frame index out of range");
         const VkDescriptorSetLayoutBinding& binding_info = pipeline_layout->getDescriptorBindings()[binding];
@@ -533,7 +538,7 @@ namespace HBE
         }
     }
 
-    void VK_PipelineInstance::setImage(uint32_t binding, ImageHandle image, uint32_t mip_level,int32_t frame)
+    void VK_PipelineInstance::setImage(uint32_t binding, ImageHandle image, uint32_t mip_level, int32_t frame)
     {
         HB_ASSERT(frame < int32_t(MAX_FRAMES_IN_FLIGHT), "Frame index out of range");
         VK_Image& vk_image_object = context->images[image];
@@ -670,7 +675,7 @@ namespace HBE
         const VkDescriptorSetLayoutBinding& descriptorSetLayoutBinding = pipeline_layout->getDescriptorBindings()[binding];
         HB_ASSERT(descriptorSetLayoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, "binding#" + std::to_string(binding) + " is not a storage buffer");
 
-        VK_StorageBuffer* vk_storage_buffer = dynamic_cast<VK_StorageBuffer*>(buffer);
+        VK_StorageBuffer& vk_storage_buffer = dynamic_cast<VK_StorageBuffer*>(buffer);
         VkDescriptorBufferInfo buffer_info{};
         buffer_info.buffer = vk_storage_buffer->getBuffer().getHandle();
         buffer_info.offset = offset;
@@ -764,15 +769,6 @@ namespace HBE
 
     Handle VK_PipelineInstance::getPipeline()
     {
-        switch (pipeline_type)
-        {
-        case PIPELINE_INSTANCE_TYPE_RASTERIZATION:
-            return context->rasterization_pipelines[pipelineHandle]
-            break;
-        case PIPELINE_INSTANCE_TYPE_COMPUTE:
-            break;
-        case PIPELINE_INSTANCE_TYPE_RAY_TRACING:
-            break;
-        }
+        return pipeline_handle;
     }
 }

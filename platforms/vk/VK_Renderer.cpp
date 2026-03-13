@@ -21,10 +21,10 @@
 #include "resources/VK_PipelineDescriptors.h"
 #include "core/graphics/RenderGraph.h"
 #include "platforms/vk/VK_ComputePipeline.h"
-#include "VK_ComputeInstance.h"
 #include "VK_Context.h"
 #include "core/Application.h"
 #include "core/Configs.h"
+#include "core/resource/Shader.h"
 
 namespace HBE
 {
@@ -283,7 +283,7 @@ namespace HBE
                 for (int j = 0; j < current_cmd.push_constants_count; ++j)
                 {
                     current_pipeline.pushConstant(
-                        current_cmd.push_constants[j].name, current_cmd.push_constants[j].data);
+                        current_cmd.push_constants[j].name.c_str(), current_cmd.push_constants[j].data);
                 }
                 if (mesh.getIndicesCount() != 0)
                 {
@@ -312,9 +312,9 @@ namespace HBE
                 }
                 else
                 {
-                    current_cmd.mesh->unbind();
-                    current_cmd.pipeline_instance_handle->unbind();
-                    current_cmd.pipeline_instance_handle->getGraphicPipeline()->unbind();
+                    mesh.unbind();
+                    current_pipeline_instance.unbind();
+                    current_pipeline.unbind();
                 }
             }
         }
@@ -346,21 +346,22 @@ namespace HBE
             nullptr
         );
 
-        const VK_PipelineInstance& vk_raytracing_pipeline_instance = context->pipeline_instances[trace_rays_cmd_info.pipeline_instance];
-        const VK_RaytracingPipeline* vk_pipeline = context->getPipelineFromInstance();
-        vk_pipeline->bind();
-        vk_pipeline_instance->bind();
+        VK_PipelineInstance& vk_raytracing_pipeline_instance = context->pipeline_instances[trace_rays_cmd_info.pipeline_instance];
+        HB_ASSERT(vk_raytracing_pipeline_instance.getType()==PIPELINE_INSTANCE_TYPE_RAY_TRACING, "pipeline instance should have a raytracing pipeline type");
+        VK_RaytracingPipeline& vk_pipeline = context->raytracing_pipelines[vk_raytracing_pipeline_instance.getPipeline()];
+        vk_pipeline.bind();
+        vk_raytracing_pipeline_instance.bind();
 
         context->device.vkCmdTraceRaysKHR(command_pool.getCurrentBuffer(),
-                                          &vk_pipeline->getRaygenShaderBindingTable(),
-                                          &vk_pipeline->getMissShaderBindingTable(),
-                                          &vk_pipeline->getHitShaderBindingTable(),
-                                          &vk_pipeline->getCallableShaderBindingTable(),
+                                          &vk_pipeline.getRaygenShaderBindingTable(),
+                                          &vk_pipeline.getMissShaderBindingTable(),
+                                          &vk_pipeline.getHitShaderBindingTable(),
+                                          &vk_pipeline.getCallableShaderBindingTable(),
                                           trace_rays_cmd_info.resolution.x,
                                           trace_rays_cmd_info.resolution.y,
                                           1);
-        vk_pipeline_instance->unbind();
-        vk_pipeline->unbind();
+        vk_raytracing_pipeline_instance.unbind();
+        vk_pipeline.unbind();
     }
 
     void VK_Renderer::beginFrame()
@@ -432,23 +433,25 @@ namespace HBE
 
         HB_PROFILE_BEGIN("SetupScreenPipeline");
         HB_PROFILE_BEGIN("screen_pipeline_instance->setImageArray");
-        VK_PipelineInstance& vk_screen_pipeline_instance = context->pipeline_instances[screen_pipeline_instance];
-        vk_screen_pipeline_instance.setImageArray(vk_screen_pipeline_instance.getBinding("layers"), &present_cmd_info.images[0], present_cmd_info.image_count0);
+        VK_PipelineInstance& vk_screen_pipeline_instance = context->pipeline_instances[renderer_resources.screen_pipeline_instance];
+        HB_ASSERT(vk_screen_pipeline_instance.getType()==PIPELINE_INSTANCE_TYPE_RASTERIZATION, "pipeline instance type should be Rasterization");
+        VK_RasterizationPipeline& vk_screen_pipeline = context->rasterization_pipelines[vk_screen_pipeline_instance.getPipeline()];
+        vk_screen_pipeline_instance.setImageArray(vk_screen_pipeline_instance.getBinding("layers"), &present_cmd_info.images[0], present_cmd_info.image_count, 0, current_frame_index);
         HB_PROFILE_END("screen_pipeline_instance->setImageArray");
         HB_PROFILE_BEGIN("screen_pipeline_instance->setUniform");
-        vk_screen_pipeline_instance.setUniform(vk_screen_pipeline_instance.getBinding("ubo"), &present_cmd_info.image_count);
+        vk_screen_pipeline_instance.setUniform(vk_screen_pipeline_instance.getBinding("ubo"), &present_cmd_info.image_count, current_frame_index);
         HB_PROFILE_END("screen_pipeline_instance->setUniform");
         HB_PROFILE_END("SetupScreenPipeline");
         HB_PROFILE_BEGIN("screenRenderPass");
         context->swapchain.beginRenderPass(current_image, command_pool.getCurrentBuffer());
 
-        screen_pipeline->bind();
-        screen_pipeline_instance->bind();
+        vk_screen_pipeline.bind();
+        vk_screen_pipeline_instance.bind();
 
 
         vkCmdDraw(command_pool.getCurrentBuffer(), 3, 1, 0, 0);
-        screen_pipeline_instance->unbind();
-        screen_pipeline->unbind();
+        vk_screen_pipeline_instance.unbind();
+        vk_screen_pipeline.unbind();
 
         context->swapchain.endRenderPass(command_pool.getCurrentBuffer());
 
@@ -506,8 +509,8 @@ namespace HBE
 
         if (!frame_presented)
         {
-            Image* render_textures[1] = {
-                &main_render_target->getFramebufferTexture(current_frame_index)
+            ImageHandle render_textures[1] = {
+                context->getRasterizationTargetFrameBuffer(renderer_resources.main_render_target)
             };
             PresentCmdInfo present_cmd_info{};
             present_cmd_info.images = render_textures;
@@ -567,10 +570,10 @@ namespace HBE
         render_target_info.format = IMAGE_FORMAT_SRGBA8_NON_LINEAR;
         render_target_info.flags = RENDER_TARGET_FLAG_COLOR_ATTACHMENT | RENDER_TARGET_FLAG_DEPTH_ATTACHMENT |
             RENDER_TARGET_FLAG_CLEAR_COLOR | RENDER_TARGET_FLAG_CLEAR_DEPTH;
-        renderer_resources.main_render_target = context->createRenderTarget(render_target_info);
+        context->createRasterizationTarget(renderer_resources.main_render_target, render_target_info);
 
         render_target_info.flags = RENDER_TARGET_FLAG_COLOR_ATTACHMENT;
-        renderer_resources.ui_render_target = context->createRenderTarget(render_target_info);
+        context->createRasterizationTarget(renderer_resources.ui_render_target, render_target_info);
 
         Shader frag_shader;
         frag_shader.loadGLSL("shaders/defaults/TexturedFullScreenTriangle.frag", SHADER_STAGE_FRAGMENT);
@@ -583,14 +586,15 @@ namespace HBE
         pipeline_info.fragment_shader = frag_shader.getHandle();
         pipeline_info.attribute_info_count = 0;
 
-        //ovewrite the renderpass so it is the swapchain
-        auto vk_screen_pipeline = new VK_RasterizationPipeline();
-        vk_screen_pipeline->alloc(context, pipeline_info, context->swapchain.getRenderPass());
-        renderer_resources.screen_pipeline = vk_screen_pipeline;
+        //manually create screen pipeline objects to ovewrite the renderpass so it is the swapchain renderpass
 
-        RasterizationPipelineInstanceInfo screen_pipeline_instance_info{};
-        screen_pipeline_instance_info.rasterization_pipeline = renderer_resources.screen_pipeline;
-        renderer_resources.screen_pipeline_instance = context->createRasterizationPipelineInstance(screen_pipeline_instance_info);
+        renderer_resources.screen_pipeline = context->rasterization_pipelines.create();
+        context->rasterization_pipelines[renderer_resources.screen_pipeline].alloc(context, pipeline_info, context->swapchain.getRenderPass());
+
+        PipelineInstanceInfo screen_pipeline_instance_info{};
+        screen_pipeline_instance_info.pipeline_handle = renderer_resources.screen_pipeline;
+        renderer_resources.screen_pipeline_instance = context->pipeline_instances.create();
+        context->pipeline_instances[renderer_resources.screen_pipeline_instance].alloc(context, screen_pipeline_instance_info);
     }
 
     GraphicLimits VK_Renderer::getLimits()

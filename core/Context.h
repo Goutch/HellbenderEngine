@@ -92,7 +92,7 @@ namespace HBE
         CONTEXT_API_FUNC(HBE_RESULT, setPipelineInstanceTexelBuffer, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, TexelBufferHandle buffer,int32_t frame_index), FUNC_ARGS(handle,binding, buffer,frame_index));
         CONTEXT_API_FUNC(HBE_RESULT, setPipelineInstanceTexelBufferArray, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, TexelBufferHandle* buffers, uint32_t count,int32_t frame_index), FUNC_ARGS(handle,binding, buffers, count,frame_index));
         CONTEXT_API_FUNC(HBE_RESULT, setPipelineInstanceAccelerationStructure, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, RootAccelerationStructureHandle acceleration_structure,int32_t frame_index), FUNC_ARGS(handle,binding, acceleration_structure,frame_index));
-
+        CONTEXT_API_FUNC(HBE_RESULT, getPipelineInstanceBindingFromString,FUNC_PARAMS(PipelineInstanceHandle handle,const char* str,uint32_t& binding),FUNC_ARGS(handle,str,binding));
         //Rasterization Target
         CONTEXT_API_FUNC(HBE_RESULT, getRasterizationTargetResolution, FUNC_PARAMS(RasterizationTargetHandle handle,vec2u& resolution), FUNC_ARGS(handle,resolution));
         CONTEXT_API_FUNC(HBE_RESULT, setRasterizationTargetResolution, FUNC_PARAMS(RasterizationTargetHandle handle,vec2u resolution), FUNC_ARGS(handle,resolution));

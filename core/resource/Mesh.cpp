@@ -35,6 +35,11 @@ namespace HBE
         handle = HBE_NULL_HANDLE;
     }
 
+    MeshHandle& Mesh::getHandleRef()
+    {
+        return handle;
+    }
+
     MeshHandle Mesh::getHandle()
     {
         return handle;

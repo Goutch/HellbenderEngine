@@ -6,12 +6,10 @@
 
 namespace HBE
 {
-
     class HB_API Mesh
     {
         Context& context;
         MeshHandle handle = HBE_NULL_HANDLE;
-
 
 
         uint32_t vertex_count = 0;
@@ -25,8 +23,8 @@ namespace HBE
         void alloc(const MeshInfo& mesh_info);
         bool allocated();
         void release();
+        MeshHandle& getHandleRef();
         MeshHandle getHandle();
-
         void setVertexIndices(const uint32_t* vertices, size_t count);
         void setVertexIndices(const uint16_t* vertices, size_t count);
         void setBuffer(uint32_t location, const void* vertices, size_t count);

@@ -47,11 +47,11 @@ namespace HBE
 
         VkPipelineLayout getHandle() const;
 
-        void pushConstant(VkCommandBuffer command_buffer, const std::string& name, const void* data) const;
+        void pushConstant(VkCommandBuffer command_buffer, const char* name, const void* data) const;
 
         const std::vector<VkDescriptorSetLayoutBinding>& getDescriptorBindings() const;
 
-        uint32_t getDescriptorBinding(const std::string& name) const;
+        uint32_t getDescriptorBinding(const char* name) const;
 
         VkPipelineBindPoint getBindPoint() const;
 

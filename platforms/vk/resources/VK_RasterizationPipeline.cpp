@@ -283,7 +283,7 @@ namespace HBE
         handle = VK_NULL_HANDLE;
     }
 
-    void VK_RasterizationPipeline::pushConstant(const std::string& name, const void* data) const
+    void VK_RasterizationPipeline::pushConstant(const char* name, const void* data) const
     {
         layout.pushConstant(context->renderer.getCommandPool()->getCurrentBuffer(), name, data);
     }

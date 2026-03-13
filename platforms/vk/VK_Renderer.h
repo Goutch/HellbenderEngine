@@ -7,6 +7,7 @@
 #include "VK_CommandPool.h"
 #include "core/graphics/GraphicLimits.h"
 #include "dependencies/utils-collection/Event.h"
+#include "resources/VK_RasterizationPipeline.h"
 
 namespace HBE {
 	class Window;

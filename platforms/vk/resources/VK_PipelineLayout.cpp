@@ -204,10 +204,10 @@ namespace HBE
         return handle;
     }
 
-    void VK_PipelineLayout::pushConstant(VkCommandBuffer command_buffer, const std::string& name, const void* data) const
+    void VK_PipelineLayout::pushConstant(VkCommandBuffer command_buffer, const char* name, const void* data) const
     {
         auto it = push_constant_name_to_index.find(name);
-        HB_ASSERT(it != push_constant_name_to_index.end(), "No push constant is named:" + name);
+        HB_ASSERT(it != push_constant_name_to_index.end(), "No push constant is named:" + std::string(name));
         vkCmdPushConstants(command_buffer,
                            handle,
                            push_constants_ranges[it->second].stageFlags,
@@ -241,9 +241,9 @@ namespace HBE
         return variable_descriptors[binding];
     }
 
-    uint32_t VK_PipelineLayout::getDescriptorBinding(const std::string& name) const
+    uint32_t VK_PipelineLayout::getDescriptorBinding(const char* name) const
     {
-        HB_ASSERT(descriptor_name_to_binding.find(name) != descriptor_name_to_binding.end(), "No descriptor is named:" + name);
+        HB_ASSERT(descriptor_name_to_binding.find(name) != descriptor_name_to_binding.end(), "No descriptor is named:" + std::string(name));
         return descriptor_name_to_binding.find(name)->second;
     }
 

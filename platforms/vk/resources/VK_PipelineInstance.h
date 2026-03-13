@@ -54,6 +54,7 @@ namespace HBE
     public:
         VK_PipelineInstance() = default;
         ~VK_PipelineInstance() = default;
+
         VK_PipelineInstance(const VK_PipelineInstance&) = delete;
         VK_PipelineInstance& operator=(const VK_PipelineInstance&) = delete;
 
@@ -68,7 +69,8 @@ namespace HBE
 
         void bind() const;
 
-        uint32_t getBinding(const std::string& name) const;
+        void getBinding(const char* name, uint32_t& uint32);
+        uint32_t getBinding(const char* name) const;
 
         void resetPool(DescriptorPool& pool);
 

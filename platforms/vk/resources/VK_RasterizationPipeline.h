@@ -3,7 +3,7 @@
 #include "vulkan/vulkan.h"
 #include "../VK_Shader.h"
 #include "VK_PipelineLayout.h"
-
+#include "core/interface/RasterizationPipelineInterface.h"
 namespace HBE {
     class VK_Device;
 
@@ -40,7 +40,7 @@ namespace HBE {
 
         void release();
 
-        void pushConstant(const std::string &name, const void *data) const;
+        void pushConstant(const char* name, const void *data) const;
 
         void bind() const;
 
