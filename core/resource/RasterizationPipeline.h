@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Core.h"
-#include "core/Graphics.h"
 #include "core/interface/RasterizationPipelineInterface.h"
+#include "core/Graphics.h"
+
 
 namespace HBE {
     class PipelineInstance;
@@ -10,13 +11,12 @@ namespace HBE {
     class HB_API RasterizationPipeline {
         Context &context;
         RasterizationPipelineHandle handle = HBE_NULL_HANDLE;
-
     public:
         RasterizationPipeline();
 
         ~RasterizationPipeline();
 
-        RasterizationPipeline(const RasterizationPipelineInfo &info);
+        explicit RasterizationPipeline(const RasterizationPipelineInfo &info);
 
         void alloc(const RasterizationPipelineInfo &info);
 
@@ -28,8 +28,6 @@ namespace HBE {
 
         uint32_t getBinding(const char *name);
 
-        bool isCompatible(VertexAttributeInfo *attribute_infos, uint32_t attribute_info_count) const;
-
-        RASTERIZATION_PIPELINE_FLAGS getFlags() const;
     };
+
 }

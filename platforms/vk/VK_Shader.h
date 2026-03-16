@@ -8,20 +8,23 @@
 #include "string"
 #include "VK_Buffer.h"
 
-namespace HBE {
+namespace HBE
+{
     class VK_Renderer;
 
     class VK_Device;
 
     class VK_CommandPool;
 
-    struct VK_VertexAttributeInfo {
+    struct VK_VertexAttributeInfo
+    {
         uint32_t location;
         uint32_t size;
         VkFormat format;
     };
 
-    struct VK_DescriptorInfo {
+    struct VK_DescriptorInfo
+    {
         std::string name;
         VkDeviceSize size = 0;
         uint32_t descriptor_set = 0;
@@ -29,13 +32,15 @@ namespace HBE {
         bool variable_size = false;
     };
 
-    struct VK_PushConstantInfo {
+    struct VK_PushConstantInfo
+    {
         std::string name;
         VkPushConstantRange push_constant_range;
     };
 
-    class VK_Shader {
-        const VK_Context *context;
+    class VK_Shader
+    {
+        const VK_Context* context;
         VkShaderModule handle = VK_NULL_HANDLE;
         std::vector<VK_VertexAttributeInfo> vertex_inputs;
         std::vector<VK_DescriptorInfo> uniforms;
@@ -47,28 +52,31 @@ namespace HBE {
 
     public:
         VK_Shader() = default;
-        VK_Shader(const VK_Shader &) = delete;
-        VK_Shader(VK_Shader &&) = delete;
-        ~VK_Shader();
+        VK_Shader(const VK_Shader&) = delete;
+        VK_Shader(VK_Shader&&) = delete;
+        ~VK_Shader() = default;
 
-        const VkShaderModule &getHandle() const;
+        const VkShaderModule& getHandle() const;
 
-        const std::vector<VK_PushConstantInfo> &getPushConstants() const;
+        const std::vector<VK_PushConstantInfo>& getPushConstants() const;
 
-        const std::vector<VK_DescriptorInfo> &getDescriptorInfos() const;
+        const std::vector<VK_DescriptorInfo>& getDescriptorInfos() const;
 
-        const std::vector<VK_VertexAttributeInfo> &getVertexInputs() const;
+        const std::vector<VK_VertexAttributeInfo>& getVertexInputs() const;
 
         SHADER_STAGE getStage() const;
 
         VkShaderStageFlagBits getVkStage() const;
 
-        void alloc(VK_Context *context, const ShaderInfo &info);
+        void alloc(VK_Context* context, const ShaderInfo& info);
 
         void release();
         bool allocated();
+
+        uvec3 getComputeWorkGroupSize() const;
+
     private:
-        void setSource(const uint32_t *spirv, uint32_t size);
+        void setSource(const uint32_t* spirv, uint32_t size);
 
         void reflect(const uint32_t* spirv, uint32_t size);
 

@@ -36,7 +36,7 @@ inline ReturnType FuncName(Params)          \
 #define VK_CONTEXT_CREATE_API_FUNC(ReturnType, FuncName, Params, Args, Collection)    \
 inline ReturnType FuncName(Params)\
 {                                           \
-        Collection.create();                \
+        handle = Collection.create();                \
         Collection[handle].alloc(this,info);    \
         return HBE_RESULT_SUCCESS;          \
 }
@@ -68,7 +68,7 @@ inline ReturnType FuncName(Params)                                              
 #define FUNC_PARAMS(...) __VA_ARGS__
 
 namespace HBE {
-	class VK_Context {
+	class HB_API VK_Context {
 	public:
 		VK_Instance instance{};
 		VK_Surface surface{};

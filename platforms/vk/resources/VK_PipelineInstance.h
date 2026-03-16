@@ -32,7 +32,7 @@ namespace HBE
         std::vector<VariableDescriptorSet> variable_descriptor_sets; //frame0 set0 |frame0 set1 | frame1 set0 | frame1 set1| frame2 set0 | frame2 set1
     };
 
-    class VK_PipelineInstance
+    class HB_API VK_PipelineInstance
     {
         bool empty_descriptor_allowed;
         VK_Context* context = nullptr;

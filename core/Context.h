@@ -33,7 +33,7 @@ namespace HBE {
         //lifetime
         inline HBE_RESULT init(const ContextInfo &info) { return context_impl.init(info); }
 
-        inline HBE_RESULT release() { return context_impl.release(); };
+        inline HBE_RESULT release() { return context_impl.release(); }
 
         CONTEXT_API_FUNC(HBE_RESULT, rendererBeginRecordCommands, FUNC_PARAMS(), FUNC_ARGS());
         CONTEXT_API_FUNC(HBE_RESULT, rendererEndRecordCommandsAndSubmit, FUNC_PARAMS(), FUNC_ARGS());
@@ -90,6 +90,8 @@ namespace HBE {
         CONTEXT_API_FUNC(HBE_RESULT, setPipelineInstanceTexelBufferArray, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, TexelBufferHandle* buffers, uint32_t count,int32_t frame_index), FUNC_ARGS(handle,binding, buffers, count,frame_index));
         CONTEXT_API_FUNC(HBE_RESULT, setPipelineInstanceAccelerationStructure, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, RootAccelerationStructureHandle acceleration_structure,int32_t frame_index), FUNC_ARGS(handle,binding, acceleration_structure,frame_index));
         CONTEXT_API_FUNC(HBE_RESULT, getPipelineInstanceBindingFromString, FUNC_PARAMS(PipelineInstanceHandle handle,const char* str,uint32_t& binding), FUNC_ARGS(handle,str,binding));
+        CONTEXT_API_FUNC(HBE_RESULT, getPipelineFromInstance,FUNC_PARAMS(PipelineInstanceHandle handle, Handle &pipeline_handle),FUNC_ARGS(handle,pipeline_handle));
+
         //Rasterization Target
         CONTEXT_API_FUNC(HBE_RESULT, getRasterizationTargetResolution, FUNC_PARAMS(RasterizationTargetHandle handle,vec2u& resolution), FUNC_ARGS(handle,resolution));
         CONTEXT_API_FUNC(HBE_RESULT, setRasterizationTargetResolution, FUNC_PARAMS(RasterizationTargetHandle handle,vec2u resolution), FUNC_ARGS(handle,resolution));

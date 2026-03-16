@@ -214,7 +214,7 @@ namespace HBE {
 				info.sampler_info.address_mode = IMAGE_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
 
 				context->createImage(images[i], info);
-				depth_image_views[i] = context->images[images[i]].getImageView();
+				image_views[i] = context->images[images[i]].getImageView();
 			}
 		}
 

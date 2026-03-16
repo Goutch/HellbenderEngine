@@ -4,7 +4,7 @@
 #include "platforms/vk/VK_RenderPass.h"
 
 namespace HBE {
-    class VK_RasterizationTargets {
+    class HB_API VK_RasterizationTargets {
         std::vector<VK_RenderPass> rasterization_targets;
         RawVector<RasterizationTargetInfo> creation_infos;
         HandleProvider handle_provider;

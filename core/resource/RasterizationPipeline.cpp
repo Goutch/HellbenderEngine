@@ -1,16 +1,17 @@
 #include "RasterizationPipeline.h"
 
+#include "PipelineInstance.h"
 #include "core/Application.h"
 #include "core/Context.h"
 
 namespace HBE
 {
-    RasterizationPipeline::RasterizationPipeline(const RasterizationPipelineInfo& info) : context(Application::instance->getContext())
+    RasterizationPipeline::RasterizationPipeline(const RasterizationPipelineInfo& info) : context(*Application::instance->getContext())
     {
         alloc(info);
     }
 
-    RasterizationPipeline::RasterizationPipeline() : context(Application::instance->getContext())
+    RasterizationPipeline::RasterizationPipeline() : context(*Application::instance->getContext())
     {
     }
 
@@ -22,6 +23,13 @@ namespace HBE
     RasterizationPipelineHandle RasterizationPipeline::getHandle()
     {
         return handle;
+    }
+
+    uint32_t RasterizationPipeline::getBinding(const char* name)
+    {
+        uint32_t binding = 0;
+        context.getPipelineInstanceBindingFromString(handle, name, binding);
+        return binding;
     }
 
     void RasterizationPipeline::alloc(const RasterizationPipelineInfo& info)

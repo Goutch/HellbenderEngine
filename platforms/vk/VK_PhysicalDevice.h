@@ -1,10 +1,11 @@
 #pragma once
-
+#include "Core.h"
 #include "vulkan/vulkan.h"
 #include "optional"
 #include "unordered_map"
 #include "set"
 #include "map"
+
 
 namespace HBE
 {
@@ -53,7 +54,7 @@ namespace HBE
         std::vector<VkPresentModeKHR> present_modes;
     };
 
-    class VK_PhysicalDevice
+    class HB_API VK_PhysicalDevice
     {
         VK_Instance* instance;
         VK_Surface* surface;
@@ -121,8 +122,7 @@ namespace HBE
         void release();
         const QueueFamilyIndices& getQueueFamilyIndices() const;
 
-        inline VkPhysicalDevice getHandle() const;
-
+        VkPhysicalDevice getHandle() const;
 
         const std::vector<const char*>& getExtensions() const;
 

@@ -15,7 +15,7 @@ namespace HBE {
 
     class VK_PipelineLayout;
 
-    class VK_RasterizationPipeline {
+    class HB_API VK_RasterizationPipeline {
         VkPipeline handle = VK_NULL_HANDLE;
         VK_PipelineLayout layout;
         VK_Context *context = nullptr;

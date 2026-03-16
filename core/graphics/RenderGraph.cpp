@@ -19,6 +19,9 @@ namespace HBE {
 	}
 
 	void RenderGraph::add(DrawCmdInfo draw_cmd_info) {
+		HB_ASSERT(draw_cmd_info.pipeline_instance_handle!=HBE_NULL_HANDLE,"draw_cmd_info.pipeline_instance_handle should not be HBE_NULL_HANDLE");
+		HB_ASSERT(draw_cmd_info.rasterization_pipeline_handle!=HBE_NULL_HANDLE,"draw_cmd_info.rasterization_pipeline_handle should not be HBE_NULL_HANDLE");
+		HB_ASSERT(draw_cmd_info.mesh!=HBE_NULL_HANDLE,"draw_cmd_info.mesh should not be HBE_NULL_HANDLE");
 		//copy push constants data to cache
 		for (int i = 0; i < draw_cmd_info.push_constants_count; ++i) {
 			if (draw_cmd_info.push_constants[i].size + current_pc_block_offset > PUSH_CONSTANT_BLOCK_SIZE) {

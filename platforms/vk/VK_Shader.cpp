@@ -5,6 +5,7 @@
 #include "spirv_glsl.hpp"
 #include "VK_Context.h"
 #include "core/utility/Log.h"
+
 namespace HBE
 {
     void VK_Shader::alloc(VK_Context* context, const ShaderInfo& info)
@@ -59,6 +60,11 @@ namespace HBE
         return handle != VK_NULL_HANDLE;
     }
 
+    uvec3 VK_Shader::getComputeWorkGroupSize() const
+    {
+        return compute_workgroup_size;
+    }
+
     void VK_Shader::setSource(const uint32_t* spirv, uint32_t size)
     {
         VkShaderModuleCreateInfo createInfo{};
@@ -72,7 +78,8 @@ namespace HBE
         }
         reflect(spirv, size);
     }
-VK_DescriptorInfo generateDescriptorInfo(VkShaderStageFlagBits stage, VkDescriptorType descriptor_type, spirv_cross::CompilerGLSL& glsl, spirv_cross::Resource& resource, VkPhysicalDeviceLimits limits)
+
+    VK_DescriptorInfo generateDescriptorInfo(VkShaderStageFlagBits stage, VkDescriptorType descriptor_type, spirv_cross::CompilerGLSL& glsl, spirv_cross::Resource& resource, VkPhysicalDeviceLimits limits)
     {
         std::string name = glsl.get_name(resource.id);
         uint32_t set_index = glsl.get_decoration(resource.id, spv::DecorationDescriptorSet);
@@ -168,6 +175,7 @@ VK_DescriptorInfo generateDescriptorInfo(VkShaderStageFlagBits stage, VkDescript
         return
             descriptor_info;
     }
+
     void VK_Shader::reflect(const uint32_t* spirv, uint32_t spirv_length)
     {
         VkPhysicalDeviceLimits limits = context->physical_device.getProperties().limits;
@@ -339,8 +347,6 @@ VK_DescriptorInfo generateDescriptorInfo(VkShaderStageFlagBits stage, VkDescript
     {
         return stage;
     }
-
-
 
 
     VkShaderStageFlagBits VK_Shader::getVkStage() const

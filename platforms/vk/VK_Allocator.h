@@ -42,7 +42,7 @@ namespace HBE
         FenceHandle fence = HBE_NULL_HANDLE;
     };
 
-    class VK_Allocator
+    class HB_API VK_Allocator
     {
         VK_Context* context;
 

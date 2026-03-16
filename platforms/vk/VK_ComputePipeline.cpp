@@ -22,7 +22,7 @@ namespace HBE
     {
         this->context = context;
         VK_Shader& vk_shader = context->shaders[info.compute_shader];
-        ShaderHandle shader_handle= info.compute_shader;
+        ShaderHandle shader_handle = info.compute_shader;
         layout.init(context, &shader_handle, 1, info.flags & COMPUTE_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR);
 
         VkPipelineShaderStageCreateInfo stage{};
@@ -35,6 +35,7 @@ namespace HBE
         create_info.layout = layout.getHandle();
         create_info.stage = stage;
 
+        work_group_size = vk_shader.getComputeWorkGroupSize();
         if (vkCreateComputePipelines(context->device.getHandle(), VK_NULL_HANDLE, 1, &create_info, nullptr,
                                      &handle) != VK_SUCCESS)
         {
@@ -58,6 +59,11 @@ namespace HBE
     VkPipeline VK_ComputePipeline::getHandle() const
     {
         return handle;
+    }
+
+     vec3u VK_ComputePipeline::getWorkgroupSize() const
+    {
+        return work_group_size;
     }
 
     bool VK_ComputePipeline::allocated()

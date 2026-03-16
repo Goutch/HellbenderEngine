@@ -25,7 +25,7 @@ namespace HBE {
 		Entity label_entity;
 		ButtonMaterial material_properties;
 		Event<Entity> onButtonClicked;
-		event_subscription_id system_clicked_subscription_id;
+		event_subscription_id system_clicked_subscription_id = HBE_NULL_HANDLE;
 
 		void setSize(vec2 size);
 

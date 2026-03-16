@@ -3,7 +3,7 @@
 #include "core/interface/ImageInterface.h"
 #include "vulkan/vulkan.h"
 #include "../VK_Types.h"
-
+#include "Core.h"
 namespace HBE {
     class VK_Context;
     class VK_Buffer;
@@ -15,7 +15,7 @@ namespace HBE {
     class VK_Semaphore;
     class VK_Allocator;
 
-    class VK_Image {
+    class HB_API VK_Image {
         VkImage handle;
         VK_Context *context = nullptr;
         VkImageLayout layout;

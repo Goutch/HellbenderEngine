@@ -24,7 +24,7 @@ namespace HBE
         MeshInfo info;
         VK_Buffer indices_buffer;
         std::vector<VertexAttributeInfo> attributes_locations;
-        uint32_t instance_count = 0;
+        uint32_t instance_count = 1;
         uint32_t vertex_count = 0;
         INDICES_TYPE indices_type;
 

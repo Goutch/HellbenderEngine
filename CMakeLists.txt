@@ -31,6 +31,8 @@ endif ()
 
 set(CORE_FILES
         HBE.h
+
+        core/Graphics.h
         core/Application.cpp
         core/Application.h
         core/Configs.cpp
@@ -57,9 +59,21 @@ set(CORE_FILES
         core/resource/AudioClip.h
         core/resource/AudioClipInstance.cpp
         core/resource/AudioClipInstance.h
+        core/resource/RasterizationPipeline.cpp
+        core/resource/RasterizationTarget.cpp
+        core/resource/PipelineInstance.cpp
+
+        core/interface/RootAccelerationStructureInterface.h
+        core/interface/AABBAccelerationStructureInterface.h
+        core/interface/FenceInterface.h
+        core/interface/MeshAccelerationStructureInterface.h
+        core/interface/MeshInterface.h
+        core/interface/PipelineInstanceInterface.h
+        core/interface/AllocatorInterface.h
+        core/interface/BufferInterface.h
+        core/interface/RendererInterface.h
 
         core/graphics/Window.h
-        core/interface/RendererInterface.h
         core/graphics/Window.cpp
         core/graphics/RenderGraph.cpp
         core/graphics/RenderGraph.h
@@ -118,7 +132,6 @@ set(CORE_FILES
         core/utility/Geometry.cpp
         core/utility/Geometry.h
         core/utility/Profiler.cpp
-        dependencies/utils-collection/Profiler.h
         core/utility/GLTFLoader.cpp
         core/utility/GLTFLoader.h
         core/utility/DefaultModelParser.cpp
@@ -177,8 +190,6 @@ set(VK_FILES
         platforms/vk/VK_ComputePipeline.h
         platforms/vk/resources/VK_PipelineLayout.cpp
         platforms/vk/resources/VK_PipelineLayout.h
-        platforms/vk/resources/VK_PipelineDescriptors.cpp
-        platforms/vk/resources/VK_PipelineDescriptors.h
         platforms/vk/resources/raytracing/VK_TopLevelAccelerationStructure.cpp
         platforms/vk/resources/raytracing/VK_TopLevelAccelerationStructure.h
         platforms/vk/resources/raytracing/VK_MeshBottomLevelAccelerationStructure.cpp
@@ -201,19 +212,8 @@ set(VK_FILES
         platforms/vk/VK_Context.cpp
         platforms/vk/VK_Context.h
         platforms/vk/VK_Types.h
-        core/interface/MeshAccelerationStructureInterface.h
-        core/interface/MeshInterface.h
-        core/resource/PipelineInstance.cpp
-        core/interface/PipelineInstanceInterface.h
-        core/resource/RasterizationTarget.cpp
-        core/Graphics.h
-        core/interface/AllocatorInterface.h
-        core/interface/BufferInterface.h
         platforms/vk/resources/VK_PipelineInstance.cpp
         platforms/vk/resources/VK_PipelineInstance.h
-        core/interface/RootAccelerationStructureInterface.h
-        core/interface/AABBAccelerationStructureInterface.h
-        core/interface/FenceInterface.h
 )
 
 

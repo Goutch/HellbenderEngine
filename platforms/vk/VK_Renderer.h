@@ -30,16 +30,13 @@ namespace HBE {
 
 	class VK_Fence;
 
-	class VK_Renderer {
-		struct FrameState {
+	class HB_API VK_Renderer {
+		struct SwapchainImageState {
 			VK_Semaphore finished_semaphore{};
 			VK_Semaphore image_available_semaphore{};
-			FenceHandle is_in_flight_fence = HBE_NULL_HANDLE;
 		};
 
-		uint32_t current_frame_index = 0;
-		uint32_t current_image = 0;
-		std::array<FrameState, MAX_FRAMES_IN_FLIGHT> frames;
+		std::array<SwapchainImageState, MAX_FRAMES_IN_FLIGHT> swap_chain_image_state;
 
 		VkSampler default_sampler;
 
