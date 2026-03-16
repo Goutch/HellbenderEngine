@@ -2,12 +2,15 @@
 
 #include "vulkan/vulkan.h"
 namespace HBE{
-    class VK_Device;
+    class VK_Context;
     class VK_Semaphore {
-        VkSemaphore handle;
-        const VK_Device* device;
+        VkSemaphore handle = VK_NULL_HANDLE;
+        VK_Context* context;
     public:
-        VK_Semaphore(const VK_Device& device);
+        VK_Semaphore()=default;
+        void alloc(VK_Context& context);
+        bool allocated();
+        void release();
         ~VK_Semaphore();
 
         const VkSemaphore & getHandle() const;

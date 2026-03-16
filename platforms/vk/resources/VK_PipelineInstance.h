@@ -90,9 +90,9 @@ namespace HBE
 
         void setAccelerationStructure(uint32_t binding, RootAccelerationStructureHandle acceleration_structure, int32_t frame);
 
-        void setStorageBuffer(uint32_t binding, StorageBufferHandle buffer, size_t count, size_t offset, int32_t frame);
+        void setStorageBuffer(uint32_t binding, BufferHandle buffer, size_t count, size_t offset, int32_t frame);
 
-        void setStorageBufferArray(uint32_t binding, StorageBufferHandle* buffers, uint32_t count, int32_t frame);
+        void setStorageBufferArray(uint32_t binding, BufferHandle* buffers, uint32_t count, int32_t frame);
 
     private:
         void copyDescriptorSets(DescriptorPool& from, DescriptorPool& to, int64_t frame);

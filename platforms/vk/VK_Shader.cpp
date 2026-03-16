@@ -4,7 +4,7 @@
 #include "spirv_cross.hpp"
 #include "spirv_glsl.hpp"
 #include "VK_Context.h"
-
+#include "core/utility/Log.h"
 namespace HBE
 {
     void VK_Shader::alloc(VK_Context* context, const ShaderInfo& info)
@@ -72,7 +72,102 @@ namespace HBE
         }
         reflect(spirv, size);
     }
+VK_DescriptorInfo generateDescriptorInfo(VkShaderStageFlagBits stage, VkDescriptorType descriptor_type, spirv_cross::CompilerGLSL& glsl, spirv_cross::Resource& resource, VkPhysicalDeviceLimits limits)
+    {
+        std::string name = glsl.get_name(resource.id);
+        uint32_t set_index = glsl.get_decoration(resource.id, spv::DecorationDescriptorSet);
+        uint32_t descriptor_count = 1;
+        bool variable_size = false;
+        size_t size = 0;
 
+        spirv_cross::SPIRType type = glsl.get_type_from_variable(resource.id);
+
+
+        if (type.basetype == spirv_cross::SPIRType::Struct)
+        {
+            size = glsl.get_declared_struct_size(type);
+            //	if (type.member_types.size() > 0) {
+            //		const spirv_cross::SPIRType &last_member_type = glsl.get_type(type.member_types.back());
+            //		if (last_member_type.array.size() == 1 && last_member_type.array[0] == 0) {
+            //			variable_size = true;
+            //		}
+            //	}
+        }
+
+        if (!type.array.empty())
+        {
+            descriptor_count = type.array[0];
+            if (descriptor_count <= 0)
+            {
+                variable_size = true;
+            }
+        }
+        spirv_cross::TypeID parent_type_id = type.parent_type;
+        while (parent_type_id != 0)
+        {
+            spirv_cross::SPIRType parent_type = glsl.get_type(parent_type_id);
+            if (!parent_type.array.empty())
+            {
+                descriptor_count = parent_type.array[0];
+                if (descriptor_count <= 0)
+                {
+                    variable_size = true;
+                }
+            }
+
+            parent_type_id = parent_type.parent_type;
+        }
+
+
+        if (variable_size)
+        {
+            switch (descriptor_type)
+            {
+            case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
+            case VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE:
+                descriptor_count = limits.maxPerStageDescriptorSampledImages;
+                break;
+
+            case VK_DESCRIPTOR_TYPE_STORAGE_IMAGE:
+            case VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
+                descriptor_count = limits.maxPerStageDescriptorStorageImages;
+                break;
+            case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
+                descriptor_count = limits.maxPerStageDescriptorStorageBuffers;
+                break;
+            case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
+                descriptor_count = limits.maxPerStageDescriptorUniformBuffers;
+                break;
+            }
+        }
+
+        VkDescriptorSetLayoutBinding layout_binding = {};
+        layout_binding.
+            binding = glsl.get_decoration(resource.id, spv::DecorationBinding);
+        layout_binding.
+            descriptorType = descriptor_type;
+        layout_binding.
+            stageFlags = stage;
+        layout_binding.
+            descriptorCount = descriptor_count; //this is for array
+        layout_binding.
+            pImmutableSamplers = nullptr;
+
+
+        VK_DescriptorInfo descriptor_info{};
+        descriptor_info.
+            layout_binding = layout_binding;
+        descriptor_info.
+            descriptor_set = set_index;
+        descriptor_info.
+            name = name;
+        descriptor_info.
+            size = size;
+        descriptor_info.
+            variable_size = variable_size;
+        return
+            descriptor_info;
+    }
     void VK_Shader::reflect(const uint32_t* spirv, uint32_t spirv_length)
     {
         VkPhysicalDeviceLimits limits = context->physical_device.getProperties().limits;
@@ -246,102 +341,7 @@ namespace HBE
     }
 
 
-    VK_DescriptorInfo generateDescriptorInfo(VkShaderStageFlagBits stage, VkDescriptorType descriptor_type, spirv_cross::CompilerGLSL& glsl, spirv_cross::Resource& resource, VkPhysicalDeviceLimits limits)
-    {
-        std::string name = glsl.get_name(resource.id);
-        uint32_t set_index = glsl.get_decoration(resource.id, spv::DecorationDescriptorSet);
-        uint32_t descriptor_count = 1;
-        bool variable_size = false;
-        size_t size = 0;
 
-        spirv_cross::SPIRType type = glsl.get_type_from_variable(resource.id);
-
-
-        if (type.basetype == spirv_cross::SPIRType::Struct)
-        {
-            size = glsl.get_declared_struct_size(type);
-            //	if (type.member_types.size() > 0) {
-            //		const spirv_cross::SPIRType &last_member_type = glsl.get_type(type.member_types.back());
-            //		if (last_member_type.array.size() == 1 && last_member_type.array[0] == 0) {
-            //			variable_size = true;
-            //		}
-            //	}
-        }
-
-        if (!type.array.empty())
-        {
-            descriptor_count = type.array[0];
-            if (descriptor_count <= 0)
-            {
-                variable_size = true;
-            }
-        }
-        spirv_cross::TypeID parent_type_id = type.parent_type;
-        while (parent_type_id != 0)
-        {
-            spirv_cross::SPIRType parent_type = glsl.get_type(parent_type_id);
-            if (!parent_type.array.empty())
-            {
-                descriptor_count = parent_type.array[0];
-                if (descriptor_count <= 0)
-                {
-                    variable_size = true;
-                }
-            }
-
-            parent_type_id = parent_type.parent_type;
-        }
-
-
-        if (variable_size)
-        {
-            switch (descriptor_type)
-            {
-            case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
-            case VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE:
-                descriptor_count = limits.maxPerStageDescriptorSampledImages;
-                break;
-
-            case VK_DESCRIPTOR_TYPE_STORAGE_IMAGE:
-            case VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
-                descriptor_count = limits.maxPerStageDescriptorStorageImages;
-                break;
-            case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
-                descriptor_count = limits.maxPerStageDescriptorStorageBuffers;
-                break;
-            case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
-                descriptor_count = limits.maxPerStageDescriptorUniformBuffers;
-                break;
-            }
-        }
-
-        VkDescriptorSetLayoutBinding layout_binding = {};
-        layout_binding.
-            binding = glsl.get_decoration(resource.id, spv::DecorationBinding);
-        layout_binding.
-            descriptorType = descriptor_type;
-        layout_binding.
-            stageFlags = stage;
-        layout_binding.
-            descriptorCount = descriptor_count; //this is for array
-        layout_binding.
-            pImmutableSamplers = nullptr;
-
-
-        VK_DescriptorInfo descriptor_info{};
-        descriptor_info.
-            layout_binding = layout_binding;
-        descriptor_info.
-            descriptor_set = set_index;
-        descriptor_info.
-            name = name;
-        descriptor_info.
-            size = size;
-        descriptor_info.
-            variable_size = variable_size;
-        return
-            descriptor_info;
-    }
 
     VkShaderStageFlagBits VK_Shader::getVkStage() const
     {

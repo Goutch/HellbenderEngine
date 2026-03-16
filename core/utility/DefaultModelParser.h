@@ -30,7 +30,7 @@ namespace HBE
         {
         };
 
-        DefaultModelParser(DefaultModelParserInfo info);
+        DefaultModelParser(const DefaultModelParserInfo& info);
 
         MeshHandle createMesh(const ModelPrimitiveData& data, ModelInfo model_info) override;
 

@@ -5,6 +5,7 @@
 #include "VK_RaytracingPipeline.h"
 #include "vulkan/vulkan.h"
 #include "vector"
+#include "core/utility/Log.h"
 #include "platforms/vk/VK_Context.h"
 
 namespace HBE
@@ -37,9 +38,9 @@ namespace HBE
         const VkBufferUsageFlags buffer_usage_flags = VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
 
 
-        BufferInfo buffer_info{};
+        VK_BufferInfo buffer_info{};
         buffer_info.usage = buffer_usage_flags;
-        buffer_info.memory_type_flags = info.preferred_shader_binding_table_memory_type_flags;
+        buffer_info.preferred_memory_type_flag = info.preferred_shader_binding_table_memory_type_flags;
 
         uint32_t offset = 0;
         buffer_info.data = shaderHandleStorage.data();

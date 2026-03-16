@@ -32,14 +32,14 @@ namespace HBE {
 
 	class VK_Renderer {
 		struct FrameState {
-			VK_Semaphore *finished_semaphore;
-			VK_Semaphore *image_available_semaphore;
+			VK_Semaphore finished_semaphore{};
+			VK_Semaphore image_available_semaphore{};
+			FenceHandle is_in_flight_fence = HBE_NULL_HANDLE;
 		};
 
 		uint32_t current_frame_index = 0;
 		uint32_t current_image = 0;
 		std::array<FrameState, MAX_FRAMES_IN_FLIGHT> frames;
-		std::vector<VK_Fence *> images_in_flight_fences;
 
 		VkSampler default_sampler;
 
@@ -78,11 +78,6 @@ namespace HBE {
 		void cmdDispatch(const ComputeDispatchCmdInfo &compute_dispatch_cmd_info);
 
 		void cmdDispatchAsync(const ComputeDispatchCmdInfo &compute_dispatch_cmd_info);
-
-		void waitCurrentFrame();
-
-		void waitLastFrame();
-
 		void getRendererResrouces(RendererResources& resources);
 
 		void beginFrame();
@@ -107,9 +102,9 @@ namespace HBE {
 
 		GraphicLimits getLimits();
 
-		Fence *getLastFrameFence();
+		FenceHandle getLastFrameFence();
 
-		Fence *getCurrentFrameFence();
+		FenceHandle getCurrentFrameFence();
 
 	private:
 		void createDefaultResources();

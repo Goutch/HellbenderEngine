@@ -76,7 +76,7 @@ namespace HBE
         command_pool.end();
     }
 
-    VK_Fence& VK_Queue::submitCommand()
+    FenceHandle VK_Queue::submitCommand()
     {
         return command_pool.submit(*this);
     }

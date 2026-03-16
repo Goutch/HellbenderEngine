@@ -15,6 +15,7 @@
 #include "core/interface/FenceInterface.h"
 #include "core/interface/RootAccelerationStructureInterface.h"
 #include "Core/interface/MeshAccelerationStructureInterface.h"
+
 #include "resources/VK_PipelineInstance.h"
 #include "resources/VK_RasterizationPipeline.h"
 #include "resources/VK_RasterizationTargets.h"
@@ -23,6 +24,7 @@
 #include "resources/raytracing/VK_RaytracingPipeline.h"
 #include "resources/raytracing/VK_TopLevelAccelerationStructure.h"
 #include "platforms/vk/VK_RenderPass.h"
+
 #include "VK_TexelBuffer.h"
 
 #define VK_CONTEXT_CMD_API_FUNC(ReturnType, FuncName, Params, Args)    \
@@ -90,7 +92,7 @@ namespace HBE {
 		StableHandleContainer<VK_AABBBottomLevelAccelerationStructure, 16> aabb_acceleration_structures;
 		StableHandleContainer<VK_MeshBottomLevelAccelerationStructure, 16> mesh_acceleration_structures;
 		StableHandleContainer<VK_Fence, 16> fences;
-		StableHandleContainer<VK_StorageBuffer, 16> storage_buffers;
+		StableHandleContainer<VK_Buffer, 16> buffers;
 		StableHandleContainer<VK_TexelBuffer, 16> texel_buffers;
 
 
@@ -115,62 +117,35 @@ namespace HBE {
 
 		//create
 		VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createImage, FUNC_PARAMS(ImageHandle & handle,const ImageInfo &info), FUNC_ARGS(handle, info), images)
-
 		VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createMesh, FUNC_PARAMS(MeshHandle & handle,const MeshInfo &info), FUNC_ARGS(handle, info), meshes);
-
 		VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createPipelineInstance, FUNC_PARAMS(PipelineInstanceHandle & handle,const PipelineInstanceInfo &info), FUNC_ARGS(handle, info), pipeline_instances)
-
 		VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createShader, FUNC_PARAMS(ShaderHandle & handle,const ShaderInfo &info), FUNC_ARGS(handle, info), shaders);
-
-		VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createRasterizationTarget, FUNC_PARAMS(RasterizationTargetHandle & handle,const RasterizationTargetInfo &info), FUNC_ARGS(handle, info),
-		                           rasterization_targets);
-
-		VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createRasterizationPipeline, FUNC_PARAMS(RasterizationPipelineHandle & handle,const RasterizationPipelineInfo &info), FUNC_ARGS(handle, info),
-		                           rasterization_pipelines);
-
+		VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createRasterizationTarget, FUNC_PARAMS(RasterizationTargetHandle & handle,const RasterizationTargetInfo &info), FUNC_ARGS(handle, info),rasterization_targets);
+		VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createRasterizationPipeline, FUNC_PARAMS(RasterizationPipelineHandle & handle,const RasterizationPipelineInfo &info), FUNC_ARGS(handle, info),rasterization_pipelines);
 		VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createComputePipeline, FUNC_PARAMS(ComputePipelineHandle & handle,const ComputePipelineInfo &info), FUNC_ARGS(handle, info), compute_pipelines);
-
-		VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createRaytracingPipeline, FUNC_PARAMS(RaytracingPipelineHandle & handle,const RaytracingPipelineInfo &info), FUNC_ARGS(handle, info),
-		                           raytracing_pipelines);
-
-		VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createRootAccelerationStructure, FUNC_PARAMS(RootAccelerationStructureHandle & handle,const RootAccelerationStructureInfo &info),
-		                           FUNC_ARGS(handle, info), root_acceleration_structures);
-
-		VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createAABBAccelerationStructure, FUNC_PARAMS(AABBAccelerationStructureHandle & handle,const AABBAccelerationStructureInfo &info),
-		                           FUNC_ARGS(handle, info), aabb_acceleration_structures);
-
-		VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createMeshAccelerationStructure, FUNC_PARAMS(MeshAccelerationStructureHandle & handle,const MeshAccelerationStructureInfo &info),
-		                           FUNC_ARGS(handle, info), mesh_acceleration_structures);
-
-		VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createStorageBuffer, FUNC_PARAMS(StorageBufferHandle & handle,const StorageBufferInfo &info), FUNC_ARGS(handle, info), storage_buffers);
-
+		VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createRaytracingPipeline, FUNC_PARAMS(RaytracingPipelineHandle & handle,const RaytracingPipelineInfo &info), FUNC_ARGS(handle, info),raytracing_pipelines);
+		VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createRootAccelerationStructure, FUNC_PARAMS(RootAccelerationStructureHandle & handle,const RootAccelerationStructureInfo &info),FUNC_ARGS(handle, info), root_acceleration_structures);
+		VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createAABBAccelerationStructure, FUNC_PARAMS(AABBAccelerationStructureHandle & handle,const AABBAccelerationStructureInfo &info),FUNC_ARGS(handle, info), aabb_acceleration_structures);
+		VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createMeshAccelerationStructure, FUNC_PARAMS(MeshAccelerationStructureHandle & handle,const MeshAccelerationStructureInfo &info),FUNC_ARGS(handle, info), mesh_acceleration_structures);
+		VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createBuffer, FUNC_PARAMS(BufferHandle & handle,const BufferInfo &info), FUNC_ARGS(handle, info), buffers);
 		VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createTexelBuffer, FUNC_PARAMS(TexelBufferHandle & handle,const TexelBufferInfo &info), FUNC_ARGS(handle, info), texel_buffers);
+		VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createFence, FUNC_PARAMS(FenceHandle & handle,const FenceInfo& info), FUNC_ARGS(handle,info), fences);
 
+		//release
 		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseImage, FUNC_PARAMS(ImageHandle handle), FUNC_ARGS(handle), images)
-
 		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseMesh, FUNC_PARAMS(MeshHandle handle), FUNC_ARGS(handle), meshes);
-
 		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releasePipelineInstance, FUNC_PARAMS(PipelineInstanceHandle handle), FUNC_ARGS(handle), pipeline_instances)
-
 		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseShader, FUNC_PARAMS(ShaderHandle handle), FUNC_ARGS(handle), shaders)
-
 		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseRasterizationTarget, FUNC_PARAMS(RasterizationTargetHandle handle), FUNC_ARGS(handle), rasterization_targets);
-
 		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseRasterizationPipeline, FUNC_PARAMS(RasterizationPipelineHandle handle), FUNC_ARGS(handle), rasterization_pipelines);
-
 		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseComputePipeline, FUNC_PARAMS(ComputePipelineHandle handle), FUNC_ARGS(handle), compute_pipelines);
-
 		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseRaytracingPipeline, FUNC_PARAMS(RaytracingPipelineHandle handle), FUNC_ARGS(handle), rasterization_pipelines);
-
 		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseRootAccelerationStructure, FUNC_PARAMS(RootAccelerationStructureHandle handle), FUNC_ARGS(handle), root_acceleration_structures);
-
 		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseAABBAccelerationStructure, FUNC_PARAMS(AABBAccelerationStructureHandle handle), FUNC_ARGS(handle), aabb_acceleration_structures);
-
 		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseMeshAccelerationStructure, FUNC_PARAMS(MeshAccelerationStructureHandle handle), FUNC_ARGS(handle), mesh_acceleration_structures);
-
-		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseStorageBuffer, FUNC_PARAMS(StorageBufferHandle handle), FUNC_ARGS(handle), storage_buffers);
-
+		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseBuffer, FUNC_PARAMS(BufferHandle handle), FUNC_ARGS(handle), buffers);
 		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseTexelBuffer, FUNC_PARAMS(TexelBufferHandle handle), FUNC_ARGS(handle), texel_buffers);
+		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseFence, FUNC_PARAMS(FenceHandle handle), FUNC_ARGS(handle), fences);
 
 		//images
 		VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, updateImage, FUNC_PARAMS(ImageHandle handle, const void *data), FUNC_ARGS(handle, data), images, update, FUNC_ARGS(data));
@@ -203,12 +178,12 @@ namespace HBE {
 		                                FUNC_ARGS(binding, images, images_count, mip_level, frame_index));
 
 		VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceStorageBuffer,
-		                                FUNC_PARAMS(PipelineInstanceHandle handle, uint32_t binding, StorageBufferHandle buffer, size_t count, size_t offset, int32_t frame_index),
+		                                FUNC_PARAMS(PipelineInstanceHandle handle, uint32_t binding, BufferHandle buffer, size_t count, size_t offset, int32_t frame_index),
 		                                FUNC_ARGS(handle, binding, buffer, count, offset, frame, frame_index), pipeline_instances, setStorageBuffer,
 		                                FUNC_ARGS(binding, buffer, count, offset, frame_index));
 
 		VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceStorageBufferArray,
-		                                FUNC_PARAMS(PipelineInstanceHandle handle, uint32_t binding, StorageBufferHandle * buffers, uint32_t count, int32_t frame_index),
+		                                FUNC_PARAMS(PipelineInstanceHandle handle, uint32_t binding, BufferHandle * buffers, uint32_t count, int32_t frame_index),
 		                                FUNC_ARGS(handle, binding, buffers, count, frame_index), pipeline_instances, setStorageBufferArray, FUNC_ARGS(binding, buffers, count, frame_index));
 
 		VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setPipelineInstanceTexelBuffer, FUNC_PARAMS(PipelineInstanceHandle handle, uint32_t binding, TexelBufferHandle buffer, int32_t frame_index),

@@ -7,7 +7,6 @@ namespace HBE
 {
     class VK_Context;
     class VK_Device;
-
     class VK_Buffer;
 
     class VK_StorageBuffer

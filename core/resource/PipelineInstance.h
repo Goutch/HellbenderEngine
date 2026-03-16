@@ -35,10 +35,10 @@ namespace HBE
         void setImage(const char* name, ImageHandle image, uint32_t mip_level = 0);
         void setImageArray(uint32_t binding, ImageHandle* images, uint32_t images_count, uint32_t mip_level = 0);
         void setImageArray(const char* name, ImageHandle* images, uint32_t images_count, uint32_t mip_level = 0);
-        void setStorageBuffer(uint32_t binding, StorageBufferHandle buffer, size_t count, size_t offset);
-        void setStorageBuffer(const char* name, StorageBufferHandle buffer, size_t count, size_t offset);
-        void setStorageBufferArray(const char* name, StorageBufferHandle* buffers, uint32_t count);
-        void setStorageBufferArray(uint32_t binding, StorageBufferHandle* buffers, uint32_t count);
+        void setStorageBuffer(uint32_t binding, BufferHandle buffer, size_t count, size_t offset);
+        void setStorageBuffer(const char* name, BufferHandle buffer, size_t count, size_t offset);
+        void setStorageBufferArray(const char* name, BufferHandle* buffers, uint32_t count);
+        void setStorageBufferArray(uint32_t binding, BufferHandle* buffers, uint32_t count);
         void setTexelBuffer(uint32_t binding, TexelBufferHandle buffer);
         void setTexelBufferArray(uint32_t binding, TexelBufferHandle* buffers, uint32_t count);
         void setTexelBuffer(const char* name, TexelBufferHandle buffer);

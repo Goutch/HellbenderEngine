@@ -5,11 +5,10 @@
 #include "VK_Context.h"
 
 #include "core/Application.h"
+#include "core/utility/Log.h"
 
-namespace HBE
-{
-    HBE_RESULT VK_Context::init(const ContextInfo& info)
-    {
+namespace HBE {
+    HBE_RESULT VK_Context::init(const ContextInfo &info) {
         instance.init(info);
         surface.init(instance, Application::instance->getWindow()->getHandle());
         physical_device.init(instance, surface);
@@ -19,25 +18,22 @@ namespace HBE
 
 
         renderer.init(this);
-	    graphic_limits = renderer.getLimits();
-
+        graphic_limits = renderer.getLimits();
+        return HBE_RESULT_SUCCESS;
     }
 
-    template <typename T, size_t I>
-    void releaseStableHandleContainerObjects(StableHandleContainer<T, I>& container)
-    {
-        for (T& element : container)
-        {
+    template<typename T, size_t I>
+    void releaseStableHandleContainerObjects(StableHandleContainer<T, I> &container) {
+        for (T &element: container) {
             if (element.allocated()) {
-	            Log::warning("object was not released properly before destroying vulkan context");
-	            element.release();
+                Log::warning("object was not released properly before destroying vulkan context");
+                element.release();
             }
         }
         container.clear();
     }
 
-    HBE_RESULT VK_Context::release()
-    {
+    HBE_RESULT VK_Context::release() {
         allocator.processFreeRequests(0);
 
         releaseStableHandleContainerObjects(images);
@@ -60,6 +56,7 @@ namespace HBE
         surface.release();
         surface.release();
         instance.release();
-    }
 
+        return HBE_RESULT_SUCCESS;
+    }
 }

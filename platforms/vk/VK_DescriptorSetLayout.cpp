@@ -4,7 +4,7 @@
 #include "VK_Shader.h"
 #include "VK_Device.h"
 #include "VK_PhysicalDevice.h"
-
+#include "core/utility/Log.h"
 namespace HBE
 {
     void VK_DescriptorSetLayout::init(VK_Context* context, uint32_t descriptor_set_index, std::vector<VK_DescriptorInfo>& pipeline_descriptors, bool empty_descriptor_allowed)

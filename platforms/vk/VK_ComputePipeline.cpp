@@ -4,6 +4,7 @@
 #include "VK_Shader.h"
 #include "resources/VK_PipelineLayout.h"
 #include "VK_Context.h"
+#include "core/utility/Log.h"
 
 namespace HBE
 {

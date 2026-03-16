@@ -2,14 +2,12 @@
 #include "VK_MeshBottomLevelAccelerationStructure.h"
 #include "platforms/vk/VK_Context.h"
 
-namespace HBE
-{
-    void VK_MeshBottomLevelAccelerationStructure::alloc(VK_Context* context, MeshAccelerationStructureInfo info)
-    {
+namespace HBE {
+    void VK_MeshBottomLevelAccelerationStructure::alloc(VK_Context *context, MeshAccelerationStructureInfo info) {
         this->context = context;
         HB_PROFILE_BEGIN("Build Mesh Acceleration Structure");
 
-        VK_Mesh& mesh = context->meshes[info.mesh_handle];
+        VK_Mesh &mesh = context->meshes[info.mesh_handle];
         VkDeviceSize vertex_size = mesh.getAttributeElementSize(0);
 
         VkAccelerationStructureGeometryKHR accelerationStructureGeometry{};
@@ -35,7 +33,7 @@ namespace HBE
         accelerationStructureBuildGeometryInfo.geometryCount = 1;
         accelerationStructureBuildGeometryInfo.pGeometries = &accelerationStructureGeometry;
 
-        const uint32_t numTriangles = mesh.hasIndexBuffer() ? mesh.getIndexCount() / 3 : mesh.getVertexCount() / 3;
+        const uint32_t numTriangles = mesh.getIndicesCount() > 0 ? mesh.getIndicesCount() / 3 : mesh.getVertexCount() / 3;
         VkAccelerationStructureBuildSizesInfoKHR accelerationStructureBuildSizesInfo{};
         accelerationStructureBuildSizesInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
 
@@ -46,10 +44,10 @@ namespace HBE
             &numTriangles,
             &accelerationStructureBuildSizesInfo);
 
-        BufferInfo buffer_info{};
+        VK_BufferInfo buffer_info{};
         buffer_info.size = accelerationStructureBuildSizesInfo.accelerationStructureSize;
         buffer_info.usage = VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
-        buffer_info.memory_type_flags = info.preferred_memory_type_flags;
+        buffer_info.preferred_memory_type_flag = info.preferred_memory_type_flags;
         buffer.alloc(context, buffer_info);
 
 
@@ -63,7 +61,7 @@ namespace HBE
         // Create a small scratch buffer used during build of the bottom level acceleration structure
         buffer_info.size = accelerationStructureBuildSizesInfo.buildScratchSize;
         buffer_info.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
-        buffer_info.memory_type_flags = MEMORY_TYPE_FLAG_GPU_LOCAL;
+        buffer_info.preferred_memory_type_flag = MEMORY_TYPE_FLAG_GPU_LOCAL;
 
         VK_Buffer scratchBuffer{};
         scratchBuffer.alloc(context, buffer_info);
@@ -84,7 +82,7 @@ namespace HBE
         accelerationStructureBuildRangeInfo.primitiveOffset = 0;
         accelerationStructureBuildRangeInfo.firstVertex = 0;
         accelerationStructureBuildRangeInfo.transformOffset = 0;
-        std::vector<VkAccelerationStructureBuildRangeInfoKHR*> accelerationBuildStructureRangeInfos = {&accelerationStructureBuildRangeInfo};
+        std::vector<VkAccelerationStructureBuildRangeInfoKHR *> accelerationBuildStructureRangeInfos = {&accelerationStructureBuildRangeInfo};
 
         // Build the acceleration structure on the device via a one-time command buffer submission
         // Some implementations may support acceleration structure building on the host (VkPhysicalDeviceAccelerationStructureFeaturesKHR->accelerationStructureHostCommands), but we prefer device builds
@@ -97,8 +95,16 @@ namespace HBE
             &accelerationBuildGeometryInfo,
             accelerationBuildStructureRangeInfos.data());
         context->device.getQueue(QUEUE_FAMILY_GRAPHICS).endCommand();
-        context->device.getQueue(QUEUE_FAMILY_GRAPHICS).submitCommand().wait();
-        scratchBuffer.release();
+        FenceHandle fence = context->device.getQueue(QUEUE_FAMILY_GRAPHICS).submitCommand();
+
+        Log::warning("Build of MeshAcceleration structure is done on the gpu and waited on right now implement waiting for it with Fencehandle return");
+        context->waitForFence(fence);
+        ReleaseRequest releaseRequest{};
+        releaseRequest.vk_buffer = scratchBuffer.getHandle();
+        releaseRequest.allocation = scratchBuffer.getAllocation();
+        releaseRequest.fence = fence;
+        context->allocator.releaseLater(releaseRequest);
+
         VkAccelerationStructureDeviceAddressInfoKHR accelerationDeviceAddressInfo{};
         accelerationDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
         accelerationDeviceAddressInfo.accelerationStructure = handle;
@@ -108,29 +114,24 @@ namespace HBE
         HB_PROFILE_END("Build Mesh Acceleration Structure");
     }
 
-    void VK_MeshBottomLevelAccelerationStructure::release()
-    {
+    void VK_MeshBottomLevelAccelerationStructure::release() {
         if (allocated()) return;
         buffer.release();
         context->device.vkDestroyAccelerationStructureKHR(context->device.getHandle(), handle, nullptr);
     }
 
-    bool VK_MeshBottomLevelAccelerationStructure::allocated()
-    {
+    bool VK_MeshBottomLevelAccelerationStructure::allocated() {
         return handle != VK_NULL_HANDLE;
     }
 
-    VkAccelerationStructureKHR VK_MeshBottomLevelAccelerationStructure::getHandle() const
-    {
+    VkAccelerationStructureKHR VK_MeshBottomLevelAccelerationStructure::getHandle() const {
         return handle;
     }
 
-    VK_MeshBottomLevelAccelerationStructure::~VK_MeshBottomLevelAccelerationStructure()
-    {
+    VK_MeshBottomLevelAccelerationStructure::~VK_MeshBottomLevelAccelerationStructure() {
     }
 
-    VkDeviceOrHostAddressConstKHR VK_MeshBottomLevelAccelerationStructure::getDeviceAddress() const
-    {
+    VkDeviceOrHostAddressConstKHR VK_MeshBottomLevelAccelerationStructure::getDeviceAddress() const {
         return address;
     }
 }

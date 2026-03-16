@@ -221,7 +221,6 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/utils-collection/"
 #------------------------------------VULKAN------------------------------------
 find_package(Vulkan REQUIRED)
 if (VULKAN_FOUND)
-    add_compile_definitions(PUBLIC VULKAN_GRAPHICS)
     message("Found vulkan at ${Vulkan_INCLUDE_DIRS}")
 else ()
     message(FATAL_ERROR "Vulkan not found")
@@ -369,6 +368,7 @@ endif ()
 target_compile_definitions(${PROJECT_NAME} PRIVATE HB_BUILD)
 
 target_include_directories(${PROJECT_NAME}
+        PUBLIC "${Vulkan_INCLUDE_DIRS}"
         PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm/"
         PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb/"

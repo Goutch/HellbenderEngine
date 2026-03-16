@@ -1,4 +1,7 @@
 #pragma once
+#include "Handle.h"
+#include "HBETypes.h"
+#include "AllocatorInterface.h"
 namespace HBE
 {
     using AABBAccelerationStructureHandle = Handle;

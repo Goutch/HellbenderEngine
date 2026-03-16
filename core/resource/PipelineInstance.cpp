@@ -72,22 +72,22 @@ namespace HBE
         setImageArray(binding, images, images_count, mip_level);
     }
 
-    void PipelineInstance::setStorageBufferArray(uint32_t binding, StorageBufferHandle* buffers, uint32_t count)
+    void PipelineInstance::setStorageBufferArray(uint32_t binding, BufferHandle* buffers, uint32_t count)
     {
     }
 
-    void PipelineInstance::setStorageBuffer(uint32_t binding, StorageBufferHandle buffer, size_t count, size_t offset)
+    void PipelineInstance::setStorageBuffer(uint32_t binding, BufferHandle buffer, size_t count, size_t offset)
     {
     }
 
-    void PipelineInstance::setStorageBuffer(const char* name, StorageBufferHandle buffer, size_t count, size_t offset)
+    void PipelineInstance::setStorageBuffer(const char* name, BufferHandle buffer, size_t count, size_t offset)
     {
         uint32_t binding = 0;
         context.getPipelineInstanceBindingFromString(handle, name, binding);
         setStorageBuffer(binding, buffer, count, offset);
     }
 
-    void PipelineInstance::setStorageBufferArray(const char* name, StorageBufferHandle* buffers, uint32_t count)
+    void PipelineInstance::setStorageBufferArray(const char* name, BufferHandle* buffers, uint32_t count)
     {
         uint32_t binding = 0;
         context.getPipelineInstanceBindingFromString(handle, name, binding);

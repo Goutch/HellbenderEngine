@@ -7,6 +7,8 @@
 #include "../VK_Device.h"
 #include "VK_RasterizationPipeline.h"
 
+#include "core/utility/Log.h"
+
 namespace HBE
 {
     bool VK_RasterizationPipeline::allocated()

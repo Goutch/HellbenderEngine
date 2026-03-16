@@ -3,15 +3,12 @@
 #include "vulkan/vulkan.h"
 #include "platforms/vk/VK_Context.h"
 
-namespace HBE
-{
-    VK_AABBBottomLevelAccelerationStructure::~VK_AABBBottomLevelAccelerationStructure()
-    {
+namespace HBE {
+    VK_AABBBottomLevelAccelerationStructure::~VK_AABBBottomLevelAccelerationStructure() {
         release();
     }
 
-    void VK_AABBBottomLevelAccelerationStructure::alloc(VK_Context* context, AABBAccelerationStructureInfo info)
-    {
+    void VK_AABBBottomLevelAccelerationStructure::alloc(VK_Context *context, AABBAccelerationStructureInfo info) {
         this->context = context;
         HB_PROFILE_BEGIN("Build AABB Acceleration Structure");
 
@@ -25,11 +22,11 @@ namespace HBE
         aabb_positions.minZ = info.min.z;
 
 
-        BufferInfo buffer_info{};
-        buffer_info.data = static_cast<void*>(&aabb_positions);
+        VK_BufferInfo buffer_info{};
+        buffer_info.data = static_cast<void *>(&aabb_positions);
         buffer_info.size = static_cast<VkDeviceSize>(sizeof(VkAabbPositionsKHR));
         buffer_info.usage = VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR;
-        buffer_info.memory_type_flags = info.preferred_memory_type_flags;
+        buffer_info.preferred_memory_type_flag = info.preferred_memory_type_flags;
         aabb_positions_buffer.alloc(context, buffer_info);
 
         VkBufferDeviceAddressInfo bufferDeviceAddressInfo{};
@@ -70,7 +67,7 @@ namespace HBE
         buffer_info.data = nullptr;
         buffer_info.size = accelerationStructureBuildSizesInfo.accelerationStructureSize;
         buffer_info.usage = VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
-        buffer_info.memory_type_flags = info.preferred_memory_type_flags;
+        buffer_info.preferred_memory_type_flag = info.preferred_memory_type_flags;
         buffer.alloc(context, buffer_info);
 
 
@@ -85,7 +82,7 @@ namespace HBE
         buffer_info = {};
         buffer_info.size = accelerationStructureBuildSizesInfo.buildScratchSize;
         buffer_info.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
-        buffer_info.memory_type_flags = MEMORY_TYPE_FLAG_GPU_LOCAL;
+        buffer_info.preferred_memory_type_flag = MEMORY_TYPE_FLAG_GPU_LOCAL;
         VK_Buffer scratchBuffer{};
         scratchBuffer.alloc(context, buffer_info);
 
@@ -102,8 +99,8 @@ namespace HBE
 
         VkAccelerationStructureBuildRangeInfoKHR accelerationStructureBuildRangeInfo{};
         accelerationStructureBuildRangeInfo.primitiveCount = 1;
-        std::vector<VkAccelerationStructureBuildRangeInfoKHR*> accelerationBuildStructureRangeInfos = {&accelerationStructureBuildRangeInfo};
-        VK_Device* device = &context->device;
+        std::vector<VkAccelerationStructureBuildRangeInfoKHR *> accelerationBuildStructureRangeInfos = {&accelerationStructureBuildRangeInfo};
+        VK_Device *device = &context->device;
         device->getQueue(QUEUE_FAMILY_GRAPHICS).beginCommand();
         device->vkCmdBuildAccelerationStructuresKHR(
             device->getQueue(QUEUE_FAMILY_GRAPHICS).getCommandPool()->getCurrentBuffer(),
@@ -111,8 +108,8 @@ namespace HBE
             &accelerationBuildGeometryInfo,
             accelerationBuildStructureRangeInfos.data());
         device->getQueue(QUEUE_FAMILY_GRAPHICS).endCommand();
-        device->getQueue(QUEUE_FAMILY_GRAPHICS).submitCommand().wait();
-
+        FenceHandle fence = device->getQueue(QUEUE_FAMILY_GRAPHICS).submitCommand();
+        context->waitForFence(fence);
         scratchBuffer.release();
         VkAccelerationStructureDeviceAddressInfoKHR accelerationDeviceAddressInfo{};
         accelerationDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
@@ -123,26 +120,22 @@ namespace HBE
         HB_PROFILE_END("Build AABB Acceleration Structure");
     }
 
-    void VK_AABBBottomLevelAccelerationStructure::release()
-    {
+    void VK_AABBBottomLevelAccelerationStructure::release() {
         if (!allocated()) return;
         aabb_positions_buffer.release();
         buffer.release();
         context->device.vkDestroyAccelerationStructureKHR(context->device.getHandle(), handle, nullptr);
     }
 
-    bool VK_AABBBottomLevelAccelerationStructure::allocated()
-    {
+    bool VK_AABBBottomLevelAccelerationStructure::allocated() {
         return handle != VK_NULL_HANDLE;
     }
 
-    VkAccelerationStructureKHR VK_AABBBottomLevelAccelerationStructure::getHandle() const
-    {
+    VkAccelerationStructureKHR VK_AABBBottomLevelAccelerationStructure::getHandle() const {
         return handle;
     }
 
-    VkDeviceOrHostAddressConstKHR VK_AABBBottomLevelAccelerationStructure::getDeviceAddress() const
-    {
+    VkDeviceOrHostAddressConstKHR VK_AABBBottomLevelAccelerationStructure::getDeviceAddress() const {
         return address;
     }
 }

@@ -6,22 +6,17 @@
 #include "VK_MeshBottomLevelAccelerationStructure.h"
 #include "platforms/vk/VK_Context.h"
 
-namespace HBE
-{
-
-    VkDeviceOrHostAddressConstKHR VK_TopLevelAccelerationStructure::getDeviceAddress() const
-    {
+namespace HBE {
+    VkDeviceOrHostAddressConstKHR VK_TopLevelAccelerationStructure::getDeviceAddress() const {
         return address;
     }
 
-    void VK_TopLevelAccelerationStructure::alloc(VK_Context* context, const RootAccelerationStructureInfo& info)
-    {
-        VK_Device* device = &context->device;
+    void VK_TopLevelAccelerationStructure::alloc(VK_Context *context, const RootAccelerationStructureInfo &info) {
+        VK_Device *device = &context->device;
         HB_PROFILE_BEGIN("Build root Acceleration Structure");
         std::vector<VkAccelerationStructureInstanceKHR> instances;
         instances.resize(info.instance_count);
-        for (int i = 0; i < info.instance_count; ++i)
-        {
+        for (int i = 0; i < info.instance_count; ++i) {
             VkTransformMatrixKHR t = {
                 {
                     {info.instances[i].transform[0][0], info.instances[i].transform[1][0], info.instances[i].transform[2][0], info.instances[i].transform[3][0]},
@@ -35,14 +30,11 @@ namespace HBE
             instances[i].mask = 0xFF;
             instances[i].instanceShaderBindingTableRecordOffset = info.instances[i].shader_group_index;
             instances[i].flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
-            if (info.instances[i].type == ACCELERATION_STRUCTURE_TYPE_AABB)
-            {
-                auto* aabb_as = (VK_AABBBottomLevelAccelerationStructure*)info.aabb_acceleration_structures[info.instances[i].acceleration_structure_index];
+            if (info.instances[i].type == ACCELERATION_STRUCTURE_TYPE_AABB) {
+                auto *aabb_as = (VK_AABBBottomLevelAccelerationStructure *) info.aabb_acceleration_structures[info.instances[i].acceleration_structure_index];
                 instances[i].accelerationStructureReference = aabb_as->getDeviceAddress().deviceAddress;
-            }
-            else
-            {
-                auto mesh_as = (VK_MeshBottomLevelAccelerationStructure*)info.mesh_acceleration_structures[info.instances[i].acceleration_structure_index];
+            } else {
+                auto mesh_as = (VK_MeshBottomLevelAccelerationStructure *) info.mesh_acceleration_structures[info.instances[i].acceleration_structure_index];
                 instances[i].accelerationStructureReference = mesh_as->getDeviceAddress().deviceAddress;
             }
         }
@@ -62,13 +54,12 @@ namespace HBE
         accelerationStructureGeometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
         accelerationStructureGeometry.geometry.instances.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_INSTANCES_DATA_KHR;
         accelerationStructureGeometry.geometry.instances.arrayOfPointers = VK_FALSE;
-        if (has_geometry)
-        {
-            BufferInfo buffer_info{};
+        if (has_geometry) {
+            VK_BufferInfo buffer_info{};
             buffer_info.data = instances.data();
             buffer_info.size = sizeof(VkAccelerationStructureInstanceKHR) * instances.size();
             buffer_info.usage = VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR;
-            buffer_info.memory_type_flags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+            buffer_info.preferred_memory_type_flag = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
             instances_buffer.alloc(context, buffer_info);
             accelerationStructureGeometry.geometry.instances.data = instances_buffer.getDeviceAddress();
         }
@@ -98,10 +89,10 @@ namespace HBE
             &accelerationStructureBuildSizesInfo);
 
 
-        BufferInfo buffer_info{};
+        VK_BufferInfo buffer_info{};
         buffer_info.size = accelerationStructureBuildSizesInfo.accelerationStructureSize;
         buffer_info.usage = VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
-        buffer_info.memory_type_flags = info.preferred_memory_type_flags;
+        buffer_info.preferred_memory_type_flag = info.preferred_memory_type_flags;
         buffer.alloc(context, buffer_info);
 
         VkAccelerationStructureCreateInfoKHR accelerationStructureCreateInfo{};
@@ -111,13 +102,13 @@ namespace HBE
         accelerationStructureCreateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR;
         device->vkCreateAccelerationStructureKHR(device->getHandle(), &accelerationStructureCreateInfo, nullptr, &handle);
 
-        const VkPhysicalDeviceAccelerationStructurePropertiesKHR& properties = context->physical_device.getAccelerationStructureProperties();
+        const VkPhysicalDeviceAccelerationStructurePropertiesKHR &properties = context->physical_device.getAccelerationStructureProperties();
         // Create a small scratch buffer used during build of the top level acceleration structure
         VK_Buffer scratchBuffer{};
-        BufferInfo scratch_buffer_info{};
+        VK_BufferInfo scratch_buffer_info{};
         scratch_buffer_info.size = accelerationStructureBuildSizesInfo.buildScratchSize;
         scratch_buffer_info.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
-        scratch_buffer_info.memory_type_flags = MEMORY_TYPE_FLAG_MAPPABLE;
+        scratch_buffer_info.preferred_memory_type_flag = MEMORY_TYPE_FLAG_MAPPABLE;
         scratch_buffer_info.optional_custom_alignment = properties.minAccelerationStructureScratchOffsetAlignment;
         scratchBuffer.alloc(context, scratch_buffer_info);
 
@@ -136,7 +127,7 @@ namespace HBE
         accelerationStructureBuildRangeInfo.primitiveOffset = 0;
         accelerationStructureBuildRangeInfo.firstVertex = 0;
         accelerationStructureBuildRangeInfo.transformOffset = 0;
-        std::vector<VkAccelerationStructureBuildRangeInfoKHR*> accelerationBuildStructureRangeInfos = {&accelerationStructureBuildRangeInfo};
+        std::vector<VkAccelerationStructureBuildRangeInfoKHR *> accelerationBuildStructureRangeInfos = {&accelerationStructureBuildRangeInfo};
 
         // Build the acceleration structure on the device via a one-time command buffer submission
         // Some implementations may support acceleration structure building on the host (VkPhysicalDeviceAccelerationStructureFeaturesKHR->accelerationStructureHostCommands), but we prefer device builds
@@ -147,7 +138,8 @@ namespace HBE
             &accelerationBuildGeometryInfo,
             accelerationBuildStructureRangeInfos.data());
         device->getQueue(QUEUE_FAMILY_GRAPHICS).endCommand();
-        device->getQueue(QUEUE_FAMILY_GRAPHICS).submitCommand().wait();
+        FenceHandle fence = device->getQueue(QUEUE_FAMILY_GRAPHICS).submitCommand();
+        context->waitForFence(fence);
 
         VkAccelerationStructureDeviceAddressInfoKHR accelerationDeviceAddressInfo{};
         accelerationDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
@@ -158,25 +150,21 @@ namespace HBE
         HB_PROFILE_END("Build root Acceleration Structure");
     }
 
-    void VK_TopLevelAccelerationStructure::release()
-    {
+    void VK_TopLevelAccelerationStructure::release() {
         context->device.vkDestroyAccelerationStructureKHR(context->device.getHandle(), handle, nullptr);
         buffer.release();
         handle = VK_NULL_HANDLE;
     }
 
-    bool VK_TopLevelAccelerationStructure::allocated()
-    {
-        handle != VK_NULL_HANDLE;
+    bool VK_TopLevelAccelerationStructure::allocated() {
+        return handle != VK_NULL_HANDLE;
     }
 
-    VK_TopLevelAccelerationStructure::~VK_TopLevelAccelerationStructure()
-    {
+    VK_TopLevelAccelerationStructure::~VK_TopLevelAccelerationStructure() {
         release();
     }
 
-    const VkAccelerationStructureKHR VK_TopLevelAccelerationStructure::getHandle() const
-    {
+    const VkAccelerationStructureKHR VK_TopLevelAccelerationStructure::getHandle() const {
         return handle;
     }
 }

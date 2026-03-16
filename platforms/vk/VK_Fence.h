@@ -15,8 +15,11 @@ namespace HBE
         VkFence handle = VK_NULL_HANDLE;
 
     public:
-        void init(VK_Context* context);
+        void alloc(VK_Context* context,const FenceInfo& info);
         void release();
+
+        FENCE_STATUS getStatus();
+
         void getStatus(FENCE_STATUS& status);
         VK_Fence() = default;
         VK_Fence(VK_Fence&& other) noexcept;

@@ -44,7 +44,7 @@ namespace HBE
 
         void endCommand();
 
-        VK_Fence& submitCommand();
+        FenceHandle submitCommand();
 
         uint32_t getFamilyIndex() const;
 

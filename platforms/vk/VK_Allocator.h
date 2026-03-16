@@ -39,7 +39,7 @@ namespace HBE
         Allocation allocation;
         VkBuffer vk_buffer = VK_NULL_HANDLE;
         VkImage vk_image = VK_NULL_HANDLE;
-        VkFence fence = VK_NULL_HANDLE;
+        FenceHandle fence = HBE_NULL_HANDLE;
     };
 
     class VK_Allocator
@@ -94,11 +94,11 @@ namespace HBE
 
         void free(const Allocation& allocation);
 
-        VK_Fence* copy(VkBuffer src, VkBuffer dest, VkDeviceSize size, VkDeviceSize offset = 0);
+        FenceHandle copy(VkBuffer src, VkBuffer dest, VkDeviceSize size, VkDeviceSize offset = 0);
 
-        VK_Fence* copy(VkBuffer src, VK_Image* dest, VkImageLayout dst_end_layout, VkBufferImageCopy region);
+        FenceHandle copy(VkBuffer src, VK_Image* dest, VkImageLayout dst_end_layout, VkBufferImageCopy region);
 
-        VK_Fence* copy(VK_Image* src, VkImageLayout src_end_layout, VK_Image* dest, VkImageLayout dst_end_layout);
+        FenceHandle copy(VK_Image* src, VkImageLayout src_end_layout, VK_Image* dest, VkImageLayout dst_end_layout);
 
         void setImageLayout(VK_Image* image, VkImageLayout newLayout);
 
@@ -114,7 +114,7 @@ namespace HBE
         void cmdBarrierTransitionImageLayout(VK_CommandPool* command_pool, VK_Image* image,
                                              VkImageLayout new_layout);
 
-        VK_Fence* blitImage(VK_Image& src, VK_Image& dest);
+        FenceHandle blitImage(VK_Image& src, VK_Image& dest);
 
 
         void releaseLater(const ReleaseRequest& allocation);

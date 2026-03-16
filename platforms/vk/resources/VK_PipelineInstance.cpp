@@ -1,5 +1,6 @@
 #include "VK_PipelineInstance.h"
 #include "VK_RasterizationPipeline.h"
+#include "core/utility/Log.h"
 #include "platforms/vk/VK_Context.h"
 
 namespace HBE {
@@ -46,13 +47,13 @@ namespace HBE {
 				if (descriptor_bindings[binding].descriptorType != VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
 					continue;
 
-				BufferInfo buffer_info = {};
+				VK_BufferInfo buffer_info = {};
 
 				auto binding_memory_type_it = binding_memory_type_map.find(binding);
 				if (binding_memory_type_it != binding_memory_type_map.end()) {
-					buffer_info.memory_type_flags = binding_memory_type_it->second.preferred_memory_type;
+					buffer_info.preferred_memory_type_flag = binding_memory_type_it->second.preferred_memory_type;
 				} else {
-					buffer_info.memory_type_flags = info.preferred_memory_type_flags;
+					buffer_info.preferred_memory_type_flag = info.preferred_memory_type_flags;
 				}
 
 
@@ -549,7 +550,7 @@ namespace HBE {
 		}
 	}
 
-	void VK_PipelineInstance::setStorageBufferArray(uint32_t binding, StorageBufferHandle *buffers, uint32_t count, int32_t frame) {
+	void VK_PipelineInstance::setStorageBufferArray(uint32_t binding, BufferHandle *buffers, uint32_t count, int32_t frame) {
 		HB_ASSERT(frame < int32_t(MAX_FRAMES_IN_FLIGHT), "Frame index out of range");
 		const VkDescriptorSetLayoutBinding &descriptorSetLayoutBinding = pipeline_layout->getDescriptorBindings()[binding];
 		HB_ASSERT(descriptorSetLayoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, "binding#" + std::to_string(binding) + " is not a storage buffer");
@@ -581,17 +582,16 @@ namespace HBE {
 		}
 	}
 
-	void VK_PipelineInstance::setStorageBuffer(uint32_t binding, StorageBufferHandle buffer, size_t count, size_t offset, int32_t frame) {
+	void VK_PipelineInstance::setStorageBuffer(uint32_t binding, BufferHandle buffer, size_t count, size_t offset, int32_t frame) {
 		HB_ASSERT(frame < int32_t(MAX_FRAMES_IN_FLIGHT), "Frame index out of range");
 		const VkDescriptorSetLayoutBinding &descriptorSetLayoutBinding = pipeline_layout->getDescriptorBindings()[binding];
 		HB_ASSERT(descriptorSetLayoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, "binding#" + std::to_string(binding) + " is not a storage buffer");
 
-		context.
-				VK_StorageBuffer & vk_storage_buffer = dynamic_cast<VK_StorageBuffer *>(buffer);
+		VK_Buffer& vk_buffer=context->buffers[buffer];
 		VkDescriptorBufferInfo buffer_info{};
-		buffer_info.buffer = vk_storage_buffer->getBuffer().getHandle();
+		buffer_info.buffer = vk_buffer.getHandle();
 		buffer_info.offset = offset;
-		buffer_info.range = count * buffer->getStride();
+		buffer_info.range = vk_buffer.getSize();
 
 		if (frame == -1) {
 			for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
@@ -609,15 +609,15 @@ namespace HBE {
 		const VkDescriptorSetLayoutBinding &descriptorSetLayoutBinding = pipeline_layout->getDescriptorBindings()[binding];
 		HB_ASSERT(descriptorSetLayoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, "binding#" + std::to_string(binding) + " is not a storage buffer");
 
-
+		VK_TexelBuffer &vk_texel_buffer = context->texel_buffers[buffer];
 		if (frame == -1) {
 			for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-				//todo: texel buffers
-				descriptor_pool.writes[i][binding].pTexelBufferView = &vk_texel_buffer->getView();
+
+				descriptor_pool.writes[i][binding].pTexelBufferView = &vk_texel_buffer.getView();
 				vkUpdateDescriptorSets(context->device.getHandle(), 1, &descriptor_pool.writes[i][binding], 0, nullptr);
 			}
 		} else {
-			descriptor_pool.writes[frame][binding].pTexelBufferView = &vk_texel_buffer->getView();
+			descriptor_pool.writes[frame][binding].pTexelBufferView = &vk_texel_buffer.getView();
 			vkUpdateDescriptorSets(context->device.getHandle(), 1, &descriptor_pool.writes[frame][binding], 0, nullptr);
 		}
 	}
