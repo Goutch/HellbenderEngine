@@ -3,7 +3,10 @@
 
 namespace HBE
 {
-    System::System(Scene* scene) : context(*Application::instance->getContext())
+    System::System(Scene* scene) :
+	context(*Application::instance->getContext()),
+	input(*Application::instance->getInput()),
+	window(*Application::instance->getWindow())
     {
         this->scene = scene;
     }

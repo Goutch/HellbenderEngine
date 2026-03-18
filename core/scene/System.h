@@ -2,6 +2,8 @@
 
 #include "Core.h"
 #include "core/Graphics.h"
+#include "core/input/Input.h"
+#include "core/graphics/Window.h"
 namespace HBE
 {
     class Scene;
@@ -10,6 +12,8 @@ namespace HBE
     {
     protected:
         Context& context;
+		Input& input;
+		Window& window;
         Scene* scene;
 
     public:

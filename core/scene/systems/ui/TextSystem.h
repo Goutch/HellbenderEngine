@@ -18,8 +18,6 @@ namespace HBE
 
     class RasterizationPipeline;
 
-    class RasterizationPipelineInstance;
-
     class Shader;
 
     class RasterizationTarget;

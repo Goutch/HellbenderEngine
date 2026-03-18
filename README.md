@@ -57,6 +57,7 @@ For samples take a look at the sample repository [HellbenderSamples](https://git
 - [ ] 2D transform component
 - [ ] Model animations support (very low prio, not needed right now)
 - [ ] ECS
+  - [ ] Local transformations, transformations should be able to be calculated in a separate thread.
   - [ ] Archetype caching
 - [ ] UI library
   - [ ] UIThemes
@@ -65,10 +66,11 @@ For samples take a look at the sample repository [HellbenderSamples](https://git
   - [ ] Labels
   - [ ] Panels
 - [ ] Engine Internal rework
+  - [ ] Swapchain semaphores are not handled correctly, new validation layers will throw an error.
   - [ ] Descriptor allocation need to change, use a descriptor allocator from VkGuide or something similar
 - [ ] Engine API rework
   - [ ] Resources
-    - [ ] Use Handles instead of pointers, this simplify code so engine objects can be stack allocated
+    - [x] Use Handles instead of pointers, this simplify code so engine objects can be stack allocated
     - [ ] Add Shader hot reloading
 - [ ] Documentation
 ### Wiki
