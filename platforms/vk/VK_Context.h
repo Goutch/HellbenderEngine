@@ -95,7 +95,6 @@ namespace HBE {
 		StableHandleContainer<VK_Buffer, 16> buffers;
 		StableHandleContainer<VK_TexelBuffer, 16> texel_buffers;
 
-
 		HBE_RESULT init(const ContextInfo &info);
 
 		HBE_RESULT release();

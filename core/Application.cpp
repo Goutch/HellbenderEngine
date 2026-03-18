@@ -104,6 +104,8 @@ namespace HBE
     void Application::terminate()
     {
         context.release();
+	    audio.release();
+	    input.release();
         delete window;
         instance = nullptr;
         Profiler::printAverange();

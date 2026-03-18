@@ -9,7 +9,7 @@ namespace HBE
 {
     class VK_Context;
 
-    class VK_Fence : public Fence
+    class VK_Fence
     {
         VK_Context* context = nullptr;
         VkFence handle = VK_NULL_HANDLE;
@@ -25,9 +25,9 @@ namespace HBE
         VK_Fence(VK_Fence&& other) noexcept;
         VK_Fence(VK_Fence& other) = delete;
         VK_Fence& operator=(VK_Fence& other) = delete;
-
+		bool allocated();
         ~VK_Fence() = default;
-        void wait() const override;
+        void wait() const;
         void reset() const;
         bool isSet() const;
         const VkFence& getHandle() const;

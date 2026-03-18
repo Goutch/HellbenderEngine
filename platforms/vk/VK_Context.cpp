@@ -8,55 +8,57 @@
 #include "core/utility/Log.h"
 
 namespace HBE {
-    HBE_RESULT VK_Context::init(const ContextInfo &info) {
-        instance.init(info);
-        surface.init(instance, Application::instance->getWindow()->getHandle());
-        physical_device.init(instance, surface);
-        device.init(this);
-        allocator.init(this);
-        swapchain.init(this);
+	HBE_RESULT VK_Context::init(const ContextInfo &info) {
+		instance.init(info);
+		surface.init(instance, Application::instance->getWindow()->getHandle());
+		physical_device.init(instance, surface);
+		device.init(this);
+		allocator.init(this);
+		swapchain.init(this);
 
 
-        renderer.init(this);
-        graphic_limits = renderer.getLimits();
-        return HBE_RESULT_SUCCESS;
-    }
+		renderer.init(this);
+		graphic_limits = renderer.getLimits();
+		return HBE_RESULT_SUCCESS;
+	}
 
-    template<typename T, size_t I>
-    void releaseStableHandleContainerObjects(StableHandleContainer<T, I> &container) {
-        for (T &element: container) {
-            if (element.allocated()) {
-                Log::warning("object was not released properly before destroying vulkan context");
-                element.release();
-            }
-        }
-        container.clear();
-    }
+	template<typename T, size_t I>
+	void releaseStableHandleContainerObjects(StableHandleContainer<T, I> &container) {
+		for (T &element: container) {
+			if (element.allocated()) {
+				Log::warning(std::string(typeid(T).name()) + " was not released properly before destroying vulkan context");
+			}
+		}
+		container.clear();
+	}
 
-    HBE_RESULT VK_Context::release() {
-        allocator.processFreeRequests(0);
+	HBE_RESULT VK_Context::release() {
+		device.wait();
+		renderer.release();
+		allocator.processFreeRequests(0);
+		swapchain.release();
+		allocator.release();
+		device.release();
+		physical_device.release();
+		surface.release();
+		instance.release();
 
-        releaseStableHandleContainerObjects(images);
-        releaseStableHandleContainerObjects(shaders);
-        releaseStableHandleContainerObjects(meshes);
-        releaseStableHandleContainerObjects(rasterization_pipelines);
-        releaseStableHandleContainerObjects(raytracing_pipelines);
-        releaseStableHandleContainerObjects(compute_pipelines);
-        releaseStableHandleContainerObjects(pipeline_instances);
-        releaseStableHandleContainerObjects(rasterization_targets);
-        releaseStableHandleContainerObjects(root_acceleration_structures);
-        releaseStableHandleContainerObjects(aabb_acceleration_structures);
-        releaseStableHandleContainerObjects(mesh_acceleration_structures);
+		releaseStableHandleContainerObjects(shaders);
+		releaseStableHandleContainerObjects(pipeline_instances);
+		releaseStableHandleContainerObjects(rasterization_pipelines);
+		releaseStableHandleContainerObjects(raytracing_pipelines);
+		releaseStableHandleContainerObjects(compute_pipelines);
 
-        renderer.release();
-        swapchain.release();
-        allocator.release();
-        device.release();
-        physical_device.release();
-        surface.release();
-        surface.release();
-        instance.release();
+		releaseStableHandleContainerObjects(rasterization_targets);
+		releaseStableHandleContainerObjects(root_acceleration_structures);
+		releaseStableHandleContainerObjects(aabb_acceleration_structures);
+		releaseStableHandleContainerObjects(mesh_acceleration_structures);
+		releaseStableHandleContainerObjects(meshes);
+		releaseStableHandleContainerObjects(images);
+		releaseStableHandleContainerObjects(texel_buffers);
+		releaseStableHandleContainerObjects(buffers);
+		releaseStableHandleContainerObjects(fences);
 
-        return HBE_RESULT_SUCCESS;
-    }
+		return HBE_RESULT_SUCCESS;
+	}
 }

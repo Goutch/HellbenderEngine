@@ -402,7 +402,7 @@ namespace HBE {
         for (int i = delete_queue.size() - 1; i >= 0; i--) {
             ReleaseRequest request = delete_queue[i];
             //check fence status
-            if (request.fence != HBE_NULL_HANDLE &&
+            if (request.fence != HBE_NULL_HANDLE && context->fences[request.fence].allocated() &&
                 context->fences[request.fence].getStatus() == FENCE_STATUS_NOT_READY)
                 continue;
 

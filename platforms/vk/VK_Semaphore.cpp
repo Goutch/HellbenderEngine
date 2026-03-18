@@ -28,10 +28,6 @@ namespace HBE {
         vkDestroySemaphore(context->device.getHandle(), handle, nullptr);
     }
 
-    VK_Semaphore::~VK_Semaphore() {
-        release();
-    }
-
     const VkSemaphore &VK_Semaphore::getHandle() const {
         return handle;
     }
