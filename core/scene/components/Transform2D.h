@@ -1,8 +1,4 @@
 #pragma once
-
-#include <core/resource/raytracing/AccelerationStructure.h>
-#include <core/resource/raytracing/AccelerationStructure.h>
-
 #include "Core.h"
 #include "HBETypes.h"
 #include "core/scene/Entity.h"

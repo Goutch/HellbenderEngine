@@ -2,6 +2,8 @@
 #include "Core.h"
 #include "Event.h"
 #include "core/scene/System.h"
+#include "core/resource/Model.h"
+
 namespace HBE {
 	class RenderGraph;
 
@@ -11,8 +13,7 @@ namespace HBE {
 		ModelRendererSystem(Scene* scene);
 		~ModelRendererSystem();
 		void draw(RenderGraph* render_graph);
-
-
+		void drawNode(RenderGraph *render_graph, HBE::Model &model, const HBE::ModelNode &node, mat4 parent_transform);
 	};
 
 }

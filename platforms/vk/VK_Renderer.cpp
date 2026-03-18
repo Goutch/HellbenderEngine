@@ -232,8 +232,7 @@ namespace HBE {
 				if ((current_cmd.layer & raster_cmd_info.layer_mask) != cache[i].layer) {
 					continue;
 				}
-
-
+				HB_PROFILE_BEGIN("GET_RESOURCES");
 				PipelineInstanceHandle current_pipeline_instance_handle = current_cmd.pipeline_instance_handle;
 				VK_PipelineInstance &current_pipeline_instance = context->pipeline_instances[current_cmd.pipeline_instance_handle];
 
@@ -241,16 +240,18 @@ namespace HBE {
 				VK_RasterizationPipeline &current_pipeline = context->rasterization_pipelines[current_pipeline_instance.getPipeline()];
 
 				VK_Mesh &mesh = context->meshes[current_cmd.mesh];
-
+				HB_PROFILE_END("GET_RESOURCES");
 				if (current_pipeline_handle != last_pipeline_handle) {
 					current_pipeline.bind();
 					last_pipeline_handle = current_pipeline_handle;
 				}
+				HB_PROFILE_BEGIN("SET_UBO");
 				if (current_pipeline_instance_handle != last_pipeline_instance_handle) {
 					current_pipeline_instance.setUniform(current_pipeline_instance.getBinding("ubo"), &ubo, command_pool.getCommandBufferIndex());
 					current_pipeline_instance.bind();
 					current_pipeline_instance_handle = last_pipeline_instance_handle;
 				}
+				HB_PROFILE_END("SET_UBO");
 				if (current_cmd.mesh != last_mesh_handle) {
 					mesh.bind();
 					last_mesh_handle = current_cmd.mesh;
