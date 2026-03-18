@@ -12,7 +12,6 @@ layout(binding = 0) uniform UniformBufferObject {
 layout(push_constant) uniform Constants
 {
 	mat4 transform;
-	vec4 color;
 } constants;
 
 void main() {

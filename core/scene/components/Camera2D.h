@@ -17,7 +17,7 @@ namespace HBE
 
     private:
         float far = 1000.0f;
-        float near = 0.1f;
+        float near = -1000;
         float zoom_ratio = 10.0f;
         float aspect_ratio = 0.0f;
         bool projection_dirty = true;

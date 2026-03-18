@@ -102,17 +102,12 @@ namespace HBE {
 
 		//renderer
 		VK_CONTEXT_RENDERER_API_FUNC(HBE_RESULT, rendererBeginRecordCommands, FUNC_PARAMS(), FUNC_ARGS(), beginFrame, FUNC_ARGS());
-
 		VK_CONTEXT_RENDERER_API_FUNC(HBE_RESULT, rendererEndRecordCommandsAndSubmit, FUNC_PARAMS(), FUNC_ARGS(), endFrame, FUNC_ARGS());
-
 		VK_CONTEXT_RENDERER_API_FUNC(HBE_RESULT, rendererGetResources, FUNC_PARAMS(RendererResources & resources), FUNC_ARGS(resources), getRendererResrouces, FUNC_ARGS(resources));
 		//cmds
 		VK_CONTEXT_CMD_API_FUNC(HBE_RESULT, cmdRasterizeGraph, FUNC_PARAMS(const RasterizeGraphCmdInfo &info), FUNC_ARGS(info));
-
 		VK_CONTEXT_CMD_API_FUNC(HBE_RESULT, cmdTraceRays, FUNC_PARAMS(const TraceRaysCmdInfo &info), FUNC_ARGS(info));
-
 		VK_CONTEXT_CMD_API_FUNC(HBE_RESULT, cmdDispatch, FUNC_PARAMS(const ComputeDispatchCmdInfo &info), FUNC_ARGS(info));
-
 		VK_CONTEXT_CMD_API_FUNC(HBE_RESULT, cmdPresent, FUNC_PARAMS(const PresentCmdInfo &info), FUNC_ARGS(info));
 
 		//create

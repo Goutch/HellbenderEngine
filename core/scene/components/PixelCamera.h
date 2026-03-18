@@ -22,7 +22,7 @@ namespace HBE
     private:
         vec2u resolution = vec2u(1920,1080);
         float far = 1000.0f;
-        float near = 0.1f;
+        float near = -1000.0f;
 
         bool projection_dirty = true;
 
