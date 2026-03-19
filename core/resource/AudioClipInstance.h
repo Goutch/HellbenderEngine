@@ -35,19 +35,19 @@ namespace HBE {
 		float pitch;
 		bool is_looping;
 
-		AudioClipInstance(AudioClipInstanceInfo info);
+
 
 	public :
 		~AudioClipInstance();
-
+		AudioClipInstance() = default;
+		void alloc(const AudioClipInstanceInfo& info);
+		void release();
 		void play();
 		void pause();
 		void stop();
 		AUDIO_CLIP_INSTANCE_STATE getState();
 
 		void resetPosition();
-
-
 
 		void setVolume(float volume);
 

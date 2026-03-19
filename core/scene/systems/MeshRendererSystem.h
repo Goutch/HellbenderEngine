@@ -14,7 +14,7 @@ namespace HBE
 
 	class Mesh;
 
-	class RasterizationPipelineInstance;
+	class PipelineInstance;
 
 	class RenderGraph;
 

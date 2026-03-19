@@ -6,7 +6,7 @@
 namespace HBE
 {
     class Mesh;
-    class RasterizationPipelineInstance;
+    class PipelineInstance;
     struct PushConstantInfo;
 
     struct HB_API MeshRenderer

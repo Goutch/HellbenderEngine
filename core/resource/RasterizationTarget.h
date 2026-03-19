@@ -13,9 +13,14 @@ namespace HBE {
         ContextBase<VK_Context> &context;
 
     public:
+		void alloc(const RasterizationTargetInfo &info);
+		bool allocated();
+		void release();
+
         Event<RasterizationTarget *> onResolutionChange;
 
         RasterizationTarget();
+		~RasterizationTarget();
 
         explicit RasterizationTarget(const RasterizationTargetInfo &info);
 

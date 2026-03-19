@@ -11,7 +11,7 @@
 #include "core/interface/MeshInterface.h"
 #include "core/interface/PipelineInstanceInterface.h"
 namespace HBE {
-	class RasterizationPipelineInstance;
+	class PipelineInstance;
 
 	class RasterizationPipeline;
 

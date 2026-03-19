@@ -14,10 +14,10 @@ namespace HBE {
 		friend class AudioClipInstance;
 
 		uint32_t buffer;
-	private:
-		AudioClip(AudioClipInfo info);
-
 	public:
+		AudioClip() = default;
+		void alloc(const AudioClipInfo& info);
+		void release();
 		~AudioClip();
 	};
 }

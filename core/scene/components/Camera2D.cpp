@@ -59,4 +59,8 @@ namespace HBE
         zoom_ratio = ratio;
         projection_dirty = true;
     }
+
+	float Camera2D::getAspectRatio() {
+		return aspect_ratio;
+	}
 }

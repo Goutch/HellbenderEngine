@@ -40,5 +40,7 @@ namespace HBE
         void calculateProjection();
 
         bool isProjectionDirty() const;
+
+	    float getAspectRatio();
     };
 }
