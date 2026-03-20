@@ -190,6 +190,8 @@ namespace HBE {
 
     template<typename Component>
     Component *Entity::get() {
+		if(!scene->valid(handle) )
+			Log::debug("will crash");
         HB_ASSERT(scene->valid(handle), "Entity does not exist");
         HB_ASSERT(scene->has<Component>(handle),
                   std::string("Entity#") + std::to_string(handle) + " does not have component " + Component::

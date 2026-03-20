@@ -1,7 +1,7 @@
 #pragma once
 
 #include "vulkan/vulkan.h"
-#include "../VK_Shader.h"
+#include "VK_Shader.h"
 #include "VK_PipelineLayout.h"
 #include "core/interface/RasterizationPipelineInterface.h"
 namespace HBE {

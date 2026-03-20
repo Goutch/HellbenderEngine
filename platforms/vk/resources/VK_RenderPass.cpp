@@ -1,11 +1,11 @@
 #include "VK_RenderPass.h"
-#include "VK_Swapchain.h"
-#include "VK_Renderer.h"
-#include "VK_CommandPool.h"
-#include "VK_Context.h"
+#include "HBE/platforms/vk/VK_Swapchain.h"
+#include "HBE/platforms/vk/VK_Renderer.h"
+#include "HBE/platforms/vk/VK_CommandPool.h"
+#include "HBE/platforms/vk/VK_Context.h"
 #include "VK_Fence.h"
 #include "core/utility/Log.h"
-#include "VK_Utils.h"
+#include "HBE/platforms/vk/VK_Utils.h"
 
 namespace HBE {
 	void VK_RenderPass::recreate() {
@@ -274,8 +274,12 @@ namespace HBE {
 		resolution = vec2i(width, height);
 	}
 
+	void VK_RenderPass::getFramebufferTexture(ImageHandle &image) {
+		image = getFramebufferTexture();
+	}
+
 	ImageHandle VK_RenderPass::getFramebufferTexture() {
-		return images[context->renderer.getCurrentFrameIndex()];
+		return images[context->renderer.getCommandPool()->getCommandBufferIndex()];
 	}
 
 	bool VK_RenderPass::allocated() const {

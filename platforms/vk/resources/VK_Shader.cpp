@@ -1,9 +1,9 @@
 #include "VK_Shader.h"
-#include "VK_Device.h"
-#include "../../core/utility/ShaderCompiler.h"
+#include "HBE/platforms/vk/VK_Device.h"
+#include "HBE/core/utility/ShaderCompiler.h"
 #include "spirv_cross.hpp"
 #include "spirv_glsl.hpp"
-#include "VK_Context.h"
+#include "HBE/platforms/vk/VK_Context.h"
 #include "core/utility/Log.h"
 
 namespace HBE

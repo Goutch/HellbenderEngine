@@ -7,7 +7,7 @@
 #include "VK_Context.h"
 #include "VK_Device.h"
 #include "VK_PhysicalDevice.h"
-#include "VK_RenderPass.h"
+#include "HBE/platforms/vk/resources/VK_RenderPass.h"
 #include "VK_Surface.h"
 #include "core/Application.h"
 #include "core/Configs.h"

@@ -4,7 +4,7 @@
 
 #include "VK_StorageBuffer.h"
 #include "vulkan/vulkan.h"
-#include "VK_Buffer.h"
+#include "HBE/platforms/vk/resources/VK_Buffer.h"
 
 namespace HBE
 {

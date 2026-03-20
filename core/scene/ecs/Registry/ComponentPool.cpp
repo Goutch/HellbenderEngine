@@ -40,7 +40,7 @@ namespace HBE {
 		if (valid[i]) {
 			memset(data + (i * info.size), 0, info.size);
 			valid[i] = false;
-			for (int j = handles.size() - 1; j <= 0; --j) {
+			for (int j = handles.size() - 1; j >= 0; --j) {
 				if (handles[j] == handle) {
 					handles.erase(j);
 					break;

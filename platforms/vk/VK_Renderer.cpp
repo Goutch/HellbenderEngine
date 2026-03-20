@@ -9,12 +9,12 @@
 #include "VK_Swapchain.h"
 #include "VK_Device.h"
 #include "VK_Surface.h"
-#include "VK_RenderPass.h"
+#include "HBE/platforms/vk/resources/VK_RenderPass.h"
 #include "VK_CommandPool.h"
-#include "VK_Fence.h"
+#include "HBE/platforms/vk/resources/VK_Fence.h"
 #include "core/Application.h"
 #include "VK_Allocator.h"
-#include "VK_Mesh.h"
+#include "HBE/platforms/vk/resources/VK_Mesh.h"
 
 #include "resources/VK_RasterizationPipeline.h"
 #include "dependencies/utils-collection/Profiler.h"
@@ -463,11 +463,11 @@ namespace HBE {
 
 		uint32_t frame_index = command_pool.getCommandBufferIndex();
 		if (!frame_presented) {
-			ImageHandle render_textures[1] = {
-					context->getRasterizationTargetFrameBuffer(renderer_resources.main_render_target)
-			};
+			ImageHandle render_texture;
+			context->getRasterizationTargetFrameBuffer(renderer_resources.main_render_target,render_texture);
+
 			PresentCmdInfo present_cmd_info{};
-			present_cmd_info.images = render_textures;
+			present_cmd_info.images = &render_texture;
 			present_cmd_info.image_count = 1;
 			cmdPresent(present_cmd_info);
 		}

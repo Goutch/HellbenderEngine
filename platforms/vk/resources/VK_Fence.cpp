@@ -1,8 +1,8 @@
 #include "vulkan/vulkan.h"
 #include "VK_Fence.h"
 
-#include "VK_Context.h"
-#include "VK_Device.h"
+#include "HBE/platforms/vk/VK_Context.h"
+#include "HBE/platforms/vk/VK_Device.h"
 #include "core/utility/Log.h"
 
 namespace HBE {

@@ -231,18 +231,19 @@ namespace HBE {
     }
 
     ImageHandle Scene::getMainCameraTexture() {
+		ImageHandle handle = HBE_NULL_HANDLE;
         if (main_camera_entity.valid() && (main_camera_entity.has<Camera>() || main_camera_entity.has<Camera2D>() ||
                                            main_camera_entity.has<PixelCamera>())) {
             if (main_camera_entity.valid() && (main_camera_entity.has<Camera>())) {
-                return context.getRasterizationTargetFrameBuffer(main_camera_entity.get<Camera>()->render_target);
+                context.getRasterizationTargetFrameBuffer(main_camera_entity.get<Camera>()->render_target,handle);
             }
             if (main_camera_entity.valid() && (main_camera_entity.has<Camera2D>())) {
-                return context.getRasterizationTargetFrameBuffer(main_camera_entity.get<Camera2D>()->render_target);
+                context.getRasterizationTargetFrameBuffer(main_camera_entity.get<Camera2D>()->render_target,handle);
             }
             if (main_camera_entity.valid() && (main_camera_entity.has<PixelCamera>())) {
-                return context.getRasterizationTargetFrameBuffer(main_camera_entity.get<PixelCamera>()->render_target);
+                context.getRasterizationTargetFrameBuffer(main_camera_entity.get<PixelCamera>()->render_target,handle);
             }
         }
-        return HBE_NULL_HANDLE;
+        return handle;
     }
 }

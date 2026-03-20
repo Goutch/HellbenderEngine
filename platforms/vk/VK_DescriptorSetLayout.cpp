@@ -1,7 +1,7 @@
 #include "VK_DescriptorSetLayout.h"
 
 #include "VK_Context.h"
-#include "VK_Shader.h"
+#include "HBE/platforms/vk/resources/VK_Shader.h"
 #include "VK_Device.h"
 #include "VK_PhysicalDevice.h"
 #include "core/utility/Log.h"

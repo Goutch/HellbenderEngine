@@ -1,6 +1,6 @@
 #pragma once
 
-#include "VK_Buffer.h"
+#include "HBE/platforms/vk/resources/VK_Buffer.h"
 #include "vulkan/vulkan.h"
 
 namespace HBE {

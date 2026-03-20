@@ -162,26 +162,24 @@ set(VK_FILES
         platforms/vk/VK_Surface.h
         platforms/vk/resources/VK_RasterizationPipeline.cpp
         platforms/vk/resources/VK_RasterizationPipeline.h
-        platforms/vk/VK_Shader.cpp
-        platforms/vk/VK_Shader.h
+        platforms/vk/resources/VK_Shader.cpp
+        platforms/vk/resources/VK_Shader.h
         platforms/vk/resources/VK_Image.cpp
         platforms/vk/resources/VK_Image.h
-        platforms/vk/VK_Mesh.h
-        platforms/vk/VK_Mesh.cpp
-        platforms/vk/VK_RenderPass.cpp
-        platforms/vk/VK_RenderPass.h
+        platforms/vk/resources/VK_Mesh.h
+        platforms/vk/resources/VK_Mesh.cpp
+        platforms/vk/resources/VK_RenderPass.cpp
+        platforms/vk/resources/VK_RenderPass.h
         core/utility/ShaderCompiler.cpp
         core/utility/ShaderCompiler.h
-        platforms/vk/VK_Semaphore.cpp
-        platforms/vk/VK_Semaphore.h
-        platforms/vk/VK_Fence.cpp
-        platforms/vk/VK_Fence.h
+        platforms/vk/resources/VK_Semaphore.cpp
+        platforms/vk/resources/VK_Semaphore.h
+        platforms/vk/resources/VK_Fence.cpp
+        platforms/vk/resources/VK_Fence.h
         platforms/vk/VK_CommandPool.cpp
         platforms/vk/VK_CommandPool.h
-        platforms/vk/VK_Buffer.cpp
-        platforms/vk/VK_Buffer.h
-        platforms/vk/VK_Memory.cpp
-        platforms/vk/VK_Memory.h
+        platforms/vk/resources/VK_Buffer.cpp
+        platforms/vk/resources/VK_Buffer.h
         platforms/vk/VK_Allocator.cpp
         platforms/vk/VK_Allocator.h
         platforms/vk/VK_Queue.cpp
@@ -198,17 +196,13 @@ set(VK_FILES
         platforms/vk/resources/raytracing/VK_MeshBottomLevelAccelerationStructure.cpp
         platforms/vk/resources/raytracing/VK_RaytracingPipeline.cpp
         platforms/vk/resources/raytracing/VK_RaytracingPipeline.h
-        platforms/vk/VK_StorageBuffer.cpp
-        platforms/vk/VK_StorageBuffer.h
-        platforms/vk/VK_TexelBuffer.cpp
-        platforms/vk/VK_TexelBuffer.h
+        platforms/vk/resources/VK_StorageBuffer.cpp
+        platforms/vk/resources/VK_StorageBuffer.h
+        platforms/vk/resources/VK_TexelBuffer.cpp
+        platforms/vk/resources/VK_TexelBuffer.h
         platforms/vk/VK_Utils.h
         platforms/vk/VK_DescriptorSetLayout.cpp
         platforms/vk/VK_DescriptorSetLayout.h
-        platforms/vk/VK_RenderTarget.cpp
-        platforms/vk/VK_RenderTarget.h
-        platforms/vk/VK_DynamicRenderTarget.cpp
-        platforms/vk/VK_DynamicRenderTarget.h
         platforms/vk/VK_Context.cpp
         platforms/vk/VK_Context.h
         platforms/vk/VK_Types.h

@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "core/interface/RaytracingPipelineInterface.h"
-#include "platforms/vk/VK_Buffer.h"
+#include "HBE/platforms/vk/resources/VK_Buffer.h"
 #include "platforms/vk/resources/VK_PipelineLayout.h"
 #include "vulkan/vulkan.h"
 

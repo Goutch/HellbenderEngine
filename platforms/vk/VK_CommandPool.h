@@ -2,7 +2,7 @@
 
 #include "vector"
 #include "vulkan/vulkan.h"
-#include "VK_Fence.h"
+#include "HBE/platforms/vk/resources/VK_Fence.h"
 #include "memory"
 
 namespace HBE

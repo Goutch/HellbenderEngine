@@ -1,7 +1,7 @@
 #include "VK_Buffer.h"
-#include "VK_Device.h"
-#include "VK_Context.h"
-#include "VK_Utils.h"
+#include "HBE/platforms/vk/VK_Device.h"
+#include "HBE/platforms/vk/VK_Context.h"
+#include "HBE/platforms/vk/VK_Utils.h"
 
 namespace HBE {
     VkBuffer VK_Buffer::getHandle() const {

@@ -41,7 +41,6 @@
 #include "core/scene/systems/ui/TextSystem.h"
 #include "core/scene/components/EntityState.h"
 
-#include "core/Context.h"
 #include "core/graphics/Window.h"
 #include "core/graphics/RenderGraph.h"
 #include "core/resource/RasterizationTarget.h"

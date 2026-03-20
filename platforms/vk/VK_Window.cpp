@@ -2,7 +2,7 @@
 #include "GLFW/glfw3.h"
 #include "core/utility/Log.h"
 #include "core/Configs.h"
-#include "VK_RenderPass.h"
+#include "HBE/platforms/vk/resources/VK_RenderPass.h"
 #include "core/Application.h"
 #include "stb_image.h"
 #include "stdio.h"

@@ -3,11 +3,11 @@
 //
 
 #include "VK_TexelBuffer.h"
-#include "VK_Allocator.h"
-#include "VK_Utils.h"
-#include "VK_Buffer.h"
-#include "VK_Context.h"
-#include "VK_Device.h"
+#include "HBE/platforms/vk/VK_Allocator.h"
+#include "HBE/platforms/vk/VK_Utils.h"
+#include "HBE/platforms/vk/resources/VK_Buffer.h"
+#include "HBE/platforms/vk/VK_Context.h"
+#include "HBE/platforms/vk/VK_Device.h"
 
 namespace HBE {
     void VK_TexelBuffer::alloc(VK_Context *context, const TexelBufferInfo &info) {

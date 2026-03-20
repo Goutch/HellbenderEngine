@@ -8,7 +8,7 @@
 #include "core/interface/BufferInterface.h"
 #include "core/interface/PipelineInstanceInterface.h"
 #include "core/interface/ROOTAccelerationStructureInterface.h"
-#include "platforms/vk/VK_Buffer.h"
+#include "VK_Buffer.h"
 #include "platforms/vk/VK_CommandPool.h"
 
 namespace HBE

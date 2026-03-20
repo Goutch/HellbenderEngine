@@ -3,7 +3,7 @@
 //
 
 #include "VK_Queue.h"
-#include "VK_Fence.h"
+#include "HBE/platforms/vk/resources/VK_Fence.h"
 #include "core/utility/Log.h"
 #include "VK_Device.h"
 #include "VK_CommandPool.h"

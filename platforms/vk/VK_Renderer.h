@@ -1,8 +1,8 @@
 #pragma once
-
-#include "../../core/interface/RendererInterface.h"
+#include "Core.h"
+#include "core/interface/RendererInterface.h"
 #include "vulkan/vulkan.h"
-#include "VK_Semaphore.h"
+#include "HBE/platforms/vk/resources/VK_Semaphore.h"
 #include "array"
 #include "VK_CommandPool.h"
 #include "core/graphics/GraphicLimits.h"

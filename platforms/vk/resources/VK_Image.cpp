@@ -1,5 +1,5 @@
 #include "platforms/vk/resources/VK_Image.h"
-#include "../VK_Buffer.h"
+#include "VK_Buffer.h"
 #include "../VK_Context.h"
 #include "../VK_Renderer.h"
 #include "../VK_Utils.h"

@@ -1,4 +1,5 @@
 #pragma once
+#include "Core.h"
 
 #include "VK_Allocator.h"
 #include "VK_ComputePipeline.h"
@@ -7,25 +8,22 @@
 #include "VK_Surface.h"
 #include "VK_Swapchain.h"
 #include "VK_Instance.h"
-#include "VK_RenderPass.h"
+#include "HBE/platforms/vk/resources/VK_RenderPass.h"
+#include "HBE/platforms/vk/resources/VK_TexelBuffer.h"
 
 #include "core/interface/ContextInterface.h"
 #include "core/interface/ComputePipelineInterface.h"
-#include "core/interface/AABBAccelerationStructureInterface.h"
 #include "core/interface/FenceInterface.h"
+#include "core/interface/AABBAccelerationStructureInterface.h"
 #include "core/interface/RootAccelerationStructureInterface.h"
 #include "Core/interface/MeshAccelerationStructureInterface.h"
 
 #include "resources/VK_PipelineInstance.h"
 #include "resources/VK_RasterizationPipeline.h"
-#include "resources/VK_RasterizationTargets.h"
 #include "resources/raytracing/VK_AABBBottomLevelAccelerationStructure.h"
 #include "resources/raytracing/VK_MeshBottomLevelAccelerationStructure.h"
 #include "resources/raytracing/VK_RaytracingPipeline.h"
 #include "resources/raytracing/VK_TopLevelAccelerationStructure.h"
-#include "platforms/vk/VK_RenderPass.h"
-
-#include "VK_TexelBuffer.h"
 
 #define VK_CONTEXT_CMD_API_FUNC(ReturnType, FuncName, Params, Args)    \
 inline ReturnType FuncName(Params)          \
@@ -201,8 +199,8 @@ namespace HBE {
 		VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setRasterizationTargetResolution, FUNC_PARAMS(RasterizationTargetHandle handle, vec2u resolution), FUNC_ARGS(handle, resolution),
 		                                rasterization_targets, setResolution, FUNC_ARGS(resolution));
 
-		VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, getRasterizationTargetFrameBuffer, FUNC_PARAMS(RasterizationTargetHandle handle), FUNC_ARGS(handle), rasterization_targets, getFramebufferTexture,
-		                                FUNC_ARGS());
+		VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, getRasterizationTargetFrameBuffer, FUNC_PARAMS(RasterizationTargetHandle handle,ImageHandle& image_handle), FUNC_ARGS(handle,image_handle), rasterization_targets, getFramebufferTexture,
+		                                FUNC_ARGS(image_handle));
 
 		//fences
 		VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, waitForFence, FUNC_PARAMS(FenceHandle handle), FUNC_ARGS(handle), fences, wait, FUNC_ARGS())

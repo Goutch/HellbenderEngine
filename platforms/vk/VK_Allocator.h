@@ -6,7 +6,7 @@
 #include "set"
 #include "string"
 #include "resources/VK_Image.h"
-#include "VK_Mesh.h"
+#include "HBE/platforms/vk/resources/VK_Mesh.h"
 #include "core/interface/ImageInterface.h"
 
 namespace HBE

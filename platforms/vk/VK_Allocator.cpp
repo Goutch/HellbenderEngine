@@ -3,7 +3,7 @@
 #include "VK_Allocator.h"
 #include "platforms/vk/VK_CommandPool.h"
 #include "resources/VK_Image.h"
-#include "platforms/vk/VK_Buffer.h"
+#include "HBE/platforms/vk/resources/VK_Buffer.h"
 #include "cstring"
 #include "VK_Context.h"
 #include "VK_Renderer.h"

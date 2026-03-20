@@ -27,7 +27,9 @@ namespace HBE {
 	}
 
 	ImageHandle RasterizationTarget::getFramebufferTexture() {
-		return context.getRasterizationTargetFrameBuffer(handle);
+		ImageHandle image_handle = HBE_NULL_HANDLE;
+		context.getRasterizationTargetFrameBuffer(handle,image_handle);
+		return image_handle;
 	}
 
 	RasterizationTarget::~RasterizationTarget() {

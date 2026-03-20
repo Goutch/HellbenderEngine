@@ -1,5 +1,5 @@
 #pragma once
-
+#include "Core.h"
 #include "HBETypes.h"
 #include "graphics/GraphicLimits.h"
 #include "interface/PipelineInstanceInterface.h"
@@ -26,7 +26,7 @@ inline ReturnType FuncName(Params)                              \
 
 namespace HBE {
     template<typename Implementation>
-    class HB_API ContextBase {
+    class ContextBase {
         Implementation context_impl;
 
     public :
@@ -95,7 +95,7 @@ namespace HBE {
         //Rasterization Target
         CONTEXT_API_FUNC(HBE_RESULT, getRasterizationTargetResolution, FUNC_PARAMS(RasterizationTargetHandle handle,vec2u& resolution), FUNC_ARGS(handle,resolution));
         CONTEXT_API_FUNC(HBE_RESULT, setRasterizationTargetResolution, FUNC_PARAMS(RasterizationTargetHandle handle,vec2u resolution), FUNC_ARGS(handle,resolution));
-        CONTEXT_API_FUNC(HBE_RESULT, getRasterizationTargetFrameBuffer, FUNC_PARAMS(RasterizationTargetHandle handle), FUNC_ARGS(handle));
+        CONTEXT_API_FUNC(HBE_RESULT, getRasterizationTargetFrameBuffer, FUNC_PARAMS(RasterizationTargetHandle handle,ImageHandle& image_handle), FUNC_ARGS(handle,image_handle));
 
         //Fences
         CONTEXT_API_FUNC(HBE_RESULT, waitForFence, FUNC_PARAMS(FenceHandle handle), FUNC_ARGS(handle))

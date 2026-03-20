@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/interface/MeshAccelerationStructureInterface.h"
-#include "platforms/vk/VK_Buffer.h"
+#include "HBE/platforms/vk/resources/VK_Buffer.h"
 #include "vulkan/vulkan.h"
 
 namespace HBE {

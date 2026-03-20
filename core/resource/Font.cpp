@@ -96,7 +96,6 @@ namespace HBE
                 atlas_info.data_format = IMAGE_FORMAT_RGBA32F;
                 atlas_info.optional_data = storage.pixels;
 
-
                 atlas.alloc(atlas_info);
                 for (auto glyph : glyphs)
                 {

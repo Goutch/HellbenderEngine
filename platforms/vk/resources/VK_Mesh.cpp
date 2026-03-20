@@ -1,11 +1,11 @@
 #include <array>
 #include "VK_Mesh.h"
-#include "VK_Device.h"
+#include "HBE/platforms/vk/VK_Device.h"
 
-#include "VK_Buffer.h"
-#include "VK_Allocator.h"
-#include "VK_Context.h"
-#include "VK_Renderer.h"
+#include "HBE/platforms/vk/resources/VK_Buffer.h"
+#include "HBE/platforms/vk/VK_Allocator.h"
+#include "HBE/platforms/vk/VK_Context.h"
+#include "HBE/platforms/vk/VK_Renderer.h"
 #include "VK_StorageBuffer.h"
 #include "core/Application.h"
 #include "core/utility/Log.h"
@@ -91,8 +91,9 @@ namespace HBE {
                 free_request.allocation = buffers[i].getAllocation();
                 free_request.fence = context->renderer.getLastFrameFence();
                 allocator->releaseLater(free_request);
+
             }
-            buffers[i].reset();
+	        buffers[i].reset();
         }
         buffers.clear();
         if (indices_buffer.allocated()) {
@@ -117,6 +118,7 @@ namespace HBE {
             free_request.vk_buffer = indices_buffer.getHandle();
             free_request.allocation = indices_buffer.getAllocation();
             context->allocator.releaseLater(free_request);
+	        indices_buffer.reset();
         }
 
 
@@ -205,7 +207,7 @@ namespace HBE {
         return indices_type;
     }
 
-    bool VK_Mesh::allocated() {
-        return buffers.size() > 0;
+    bool VK_Mesh::allocated() const {
+        return indices_count > 0 || vertex_count > 0;
     }
 }

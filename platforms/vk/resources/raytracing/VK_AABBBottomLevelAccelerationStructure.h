@@ -2,7 +2,7 @@
 
 #include "core/interface/AABBAccelerationStructureInterface.h"
 #include "vulkan/vulkan.h"
-#include "platforms/vk/VK_Buffer.h"
+#include "HBE/platforms/vk/resources/VK_Buffer.h"
 
 namespace HBE
 {

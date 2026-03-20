@@ -3,7 +3,7 @@
 #include "vulkan/vulkan.h"
 #include "vector"
 #include "core/interface/RasterizationTargetInterface.h"
-#include "resources/VK_Image.h"
+#include "VK_Image.h"
 
 
 namespace HBE {
@@ -61,7 +61,10 @@ namespace HBE {
 
         void recreate();
 
+	    void getFramebufferTexture(ImageHandle &image);
+
     private:
         void createFramebuffers();
+
     };
 }

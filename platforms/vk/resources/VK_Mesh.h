@@ -3,7 +3,7 @@
 #include "core/interface/MeshInterface.h"
 #include "vector"
 #include "vulkan/vulkan.h"
-#include "VK_CommandPool.h"
+#include "HBE/platforms/vk/VK_CommandPool.h"
 #include "VK_StorageBuffer.h"
 
 namespace HBE
@@ -37,7 +37,7 @@ namespace HBE
 
         ~VK_Mesh();
 
-		bool allocated();
+		bool allocated() const;
 
         void setVertexIndices(const uint32_t* data, size_t count);
 
