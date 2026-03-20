@@ -24,6 +24,9 @@ namespace HBE
     public:
         PipelineInstance();
         explicit PipelineInstance(const PipelineInstanceInfo& info);
+		PipelineInstance(const PipelineInstance&) = delete;
+		PipelineInstance& operator=(const PipelineInstance&) = delete;
+		PipelineInstance(PipelineInstance&& other) noexcept;
         ~PipelineInstance();
         void alloc(const PipelineInstanceInfo& info);
         void release();

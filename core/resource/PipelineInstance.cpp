@@ -134,4 +134,9 @@ namespace HBE
         context.getPipelineInstanceBindingFromString(handle, name, binding);
         setAccelerationStructure(binding, accelerationStructure);
     }
+
+	PipelineInstance::PipelineInstance(PipelineInstance &&other) noexcept : context(other.context) {
+		this->handle = other.handle;
+		other.handle = HBE_NULL_HANDLE;
+	}
 }
