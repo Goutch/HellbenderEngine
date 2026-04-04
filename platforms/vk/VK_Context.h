@@ -44,7 +44,8 @@ inline ReturnType FuncName(Params)\
 {                                                                                       \
     if(!Collection.valid(handle)) return HBE_RESULT_INVALID_HANDLE;                  \
     Collection[handle].release();                                                    \
-    Collection.release(handle);                                                      \
+    Collection.release(handle);                                                          \
+	handle = HBE_NULL_HANDLE;                                                           \
     return HBE_RESULT_SUCCESS;                                                          \
 }
 
@@ -124,20 +125,20 @@ namespace HBE {
 		VK_CONTEXT_CREATE_API_FUNC(HBE_RESULT, createFence, FUNC_PARAMS(FenceHandle & handle,const FenceInfo& info), FUNC_ARGS(handle,info), fences);
 
 		//release
-		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseImage, FUNC_PARAMS(ImageHandle handle), FUNC_ARGS(handle), images)
-		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseMesh, FUNC_PARAMS(MeshHandle handle), FUNC_ARGS(handle), meshes);
-		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releasePipelineInstance, FUNC_PARAMS(PipelineInstanceHandle handle), FUNC_ARGS(handle), pipeline_instances)
-		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseShader, FUNC_PARAMS(ShaderHandle handle), FUNC_ARGS(handle), shaders)
-		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseRasterizationTarget, FUNC_PARAMS(RasterizationTargetHandle handle), FUNC_ARGS(handle), rasterization_targets);
-		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseRasterizationPipeline, FUNC_PARAMS(RasterizationPipelineHandle handle), FUNC_ARGS(handle), rasterization_pipelines);
-		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseComputePipeline, FUNC_PARAMS(ComputePipelineHandle handle), FUNC_ARGS(handle), compute_pipelines);
-		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseRaytracingPipeline, FUNC_PARAMS(RaytracingPipelineHandle handle), FUNC_ARGS(handle), rasterization_pipelines);
-		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseRootAccelerationStructure, FUNC_PARAMS(RootAccelerationStructureHandle handle), FUNC_ARGS(handle), root_acceleration_structures);
-		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseAABBAccelerationStructure, FUNC_PARAMS(AABBAccelerationStructureHandle handle), FUNC_ARGS(handle), aabb_acceleration_structures);
-		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseMeshAccelerationStructure, FUNC_PARAMS(MeshAccelerationStructureHandle handle), FUNC_ARGS(handle), mesh_acceleration_structures);
-		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseBuffer, FUNC_PARAMS(BufferHandle handle), FUNC_ARGS(handle), buffers);
-		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseTexelBuffer, FUNC_PARAMS(TexelBufferHandle handle), FUNC_ARGS(handle), texel_buffers);
-		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseFence, FUNC_PARAMS(FenceHandle handle), FUNC_ARGS(handle), fences);
+		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseImage, FUNC_PARAMS(ImageHandle& handle), FUNC_ARGS(handle), images)
+		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseMesh, FUNC_PARAMS(MeshHandle& handle), FUNC_ARGS(handle), meshes);
+		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releasePipelineInstance, FUNC_PARAMS(PipelineInstanceHandle& handle), FUNC_ARGS(handle), pipeline_instances)
+		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseShader, FUNC_PARAMS(ShaderHandle& handle), FUNC_ARGS(handle), shaders)
+		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseRasterizationTarget, FUNC_PARAMS(RasterizationTargetHandle& handle), FUNC_ARGS(handle), rasterization_targets);
+		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseRasterizationPipeline, FUNC_PARAMS(RasterizationPipelineHandle& handle), FUNC_ARGS(handle), rasterization_pipelines);
+		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseComputePipeline, FUNC_PARAMS(ComputePipelineHandle& handle), FUNC_ARGS(handle), compute_pipelines);
+		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseRaytracingPipeline, FUNC_PARAMS(RaytracingPipelineHandle& handle), FUNC_ARGS(handle), rasterization_pipelines);
+		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseRootAccelerationStructure, FUNC_PARAMS(RootAccelerationStructureHandle& handle), FUNC_ARGS(handle), root_acceleration_structures);
+		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseAABBAccelerationStructure, FUNC_PARAMS(AABBAccelerationStructureHandle& handle), FUNC_ARGS(handle), aabb_acceleration_structures);
+		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseMeshAccelerationStructure, FUNC_PARAMS(MeshAccelerationStructureHandle& handle), FUNC_ARGS(handle), mesh_acceleration_structures);
+		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseBuffer, FUNC_PARAMS(BufferHandle& handle), FUNC_ARGS(handle), buffers);
+		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseTexelBuffer, FUNC_PARAMS(TexelBufferHandle& handle), FUNC_ARGS(handle), texel_buffers);
+		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseFence, FUNC_PARAMS(FenceHandle& handle), FUNC_ARGS(handle), fences);
 
 		//images
 		VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, updateImage, FUNC_PARAMS(ImageHandle handle, const void *data), FUNC_ARGS(handle, data), images, update, FUNC_ARGS(data));

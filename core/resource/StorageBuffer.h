@@ -1,20 +1,32 @@
 #pragma once
 
 #include "Core.h"
-#include "Resource.h"
+#include "core/Graphics.h"
 
-namespace HBE
-{
+namespace HBE {
 
-    class HB_API StorageBuffer
-    {
-    public :
-        virtual void update(const void* data) = 0;
+	class HB_API StorageBuffer {
+		BufferHandle handle = HBE_NULL_HANDLE;
+		Context &context;
+	public:
+		explicit StorageBuffer(const BufferInfo &info);
 
-        virtual uint32_t getCount() const = 0;
+		StorageBuffer();
 
-        virtual uint32_t getStride() const = 0;
+		StorageBuffer(StorageBuffer &&other) noexcept;
 
-        virtual ~StorageBuffer() = default;
-    };
+		StorageBuffer(const StorageBuffer &other) = delete;
+
+		~StorageBuffer();
+
+		void alloc(const BufferInfo &info);
+
+		void release();
+
+		BufferHandle getHandle();
+
+		BufferHandle &getHandleRef();
+
+		void update(const void *data);
+	};
 }

@@ -10,12 +10,6 @@ namespace HBE
     {
         Context& context;
         MeshHandle handle = HBE_NULL_HANDLE;
-
-
-        uint32_t vertex_count = 0;
-        uint32_t index_count = 0;
-        uint32_t instance_count = 1;
-
     public:
         Mesh();
         explicit Mesh(const MeshInfo& mesh_info);

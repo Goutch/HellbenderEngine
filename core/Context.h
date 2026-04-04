@@ -56,20 +56,24 @@ namespace HBE {
         CONTEXT_API_FUNC(HBE_RESULT, createRootAccelerationStructure, FUNC_PARAMS(RootAccelerationStructureHandle& handle,const RootAccelerationStructureInfo& root_acceleration_structure_info_info), FUNC_ARGS(handle,root_acceleration_structure_info_info));
         CONTEXT_API_FUNC(HBE_RESULT, createAABBAccelerationStructure, FUNC_PARAMS(AABBAccelerationStructureHandle& handle,const AABBAccelerationStructureInfo& aabb_acceleration_structure_info_info), FUNC_ARGS(handle,aabb_acceleration_structure_info_info));
         CONTEXT_API_FUNC(HBE_RESULT, createMeshAccelerationStructure, FUNC_PARAMS(MeshAccelerationStructureHandle& handle,const MeshAccelerationStructureInfo& mesh_acceleration_structure_info_info), FUNC_ARGS(handle,mesh_acceleration_structure_info_info));
-        CONTEXT_API_FUNC(HBE_RESULT, createFence, FUNC_PARAMS(FenceHandle & handle,const FenceInfo& info), FUNC_ARGS(handle,info));
+	    CONTEXT_API_FUNC(HBE_RESULT, createBuffer, FUNC_PARAMS(BufferHandle & handle,const BufferInfo &info), FUNC_ARGS(handle, info));
+	    CONTEXT_API_FUNC(HBE_RESULT, createTexelBuffer, FUNC_PARAMS(TexelBufferHandle & handle,const TexelBufferInfo &info), FUNC_ARGS(handle, info));
+	    CONTEXT_API_FUNC(HBE_RESULT, createFence, FUNC_PARAMS(FenceHandle & handle,const FenceInfo& info), FUNC_ARGS(handle,info));
 
-        CONTEXT_API_FUNC(HBE_RESULT, releaseImage, FUNC_PARAMS(ImageHandle handle), FUNC_ARGS(handle))
-        CONTEXT_API_FUNC(HBE_RESULT, releaseMesh, FUNC_PARAMS(MeshHandle handle), FUNC_ARGS(handle));
-        CONTEXT_API_FUNC(HBE_RESULT, releasePipelineInstance, FUNC_PARAMS(PipelineInstanceHandle handle), FUNC_ARGS(handle))
-        CONTEXT_API_FUNC(HBE_RESULT, releaseShader, FUNC_PARAMS(ShaderHandle handle), FUNC_ARGS(handle))
-        CONTEXT_API_FUNC(HBE_RESULT, releaseRasterizationTarget, FUNC_PARAMS(RasterizationTargetHandle handle), FUNC_ARGS(handle));
-        CONTEXT_API_FUNC(HBE_RESULT, releaseRasterizationPipeline, FUNC_PARAMS(RasterizationPipelineHandle handle), FUNC_ARGS(handle));
-        CONTEXT_API_FUNC(HBE_RESULT, releaseComputePipeline, FUNC_PARAMS(ComputePipelineHandle handle), FUNC_ARGS(handle));
-        CONTEXT_API_FUNC(HBE_RESULT, releaseRaytracingPipeline, FUNC_PARAMS(RaytracingPipelineHandle handle), FUNC_ARGS(handle));
-        CONTEXT_API_FUNC(HBE_RESULT, releaseRootAccelerationStructure, FUNC_PARAMS(RootAccelerationStructureHandle handle), FUNC_ARGS(handle));
-        CONTEXT_API_FUNC(HBE_RESULT, releaseAABBAccelerationStructure, FUNC_PARAMS(AABBAccelerationStructureHandle handle), FUNC_ARGS(handle));
-        CONTEXT_API_FUNC(HBE_RESULT, releaseMeshAccelerationStructure, FUNC_PARAMS(MeshAccelerationStructureHandle handle), FUNC_ARGS(handle));
-        CONTEXT_API_FUNC(HBE_RESULT, releaseFence, FUNC_PARAMS(FenceHandle handle), FUNC_ARGS(handle));
+        CONTEXT_API_FUNC(HBE_RESULT, releaseImage, FUNC_PARAMS(ImageHandle& handle), FUNC_ARGS(handle))
+        CONTEXT_API_FUNC(HBE_RESULT, releaseMesh, FUNC_PARAMS(MeshHandle& handle), FUNC_ARGS(handle));
+        CONTEXT_API_FUNC(HBE_RESULT, releasePipelineInstance, FUNC_PARAMS(PipelineInstanceHandle& handle), FUNC_ARGS(handle))
+        CONTEXT_API_FUNC(HBE_RESULT, releaseShader, FUNC_PARAMS(ShaderHandle& handle), FUNC_ARGS(handle))
+        CONTEXT_API_FUNC(HBE_RESULT, releaseRasterizationTarget, FUNC_PARAMS(RasterizationTargetHandle& handle), FUNC_ARGS(handle));
+        CONTEXT_API_FUNC(HBE_RESULT, releaseRasterizationPipeline, FUNC_PARAMS(RasterizationPipelineHandle& handle), FUNC_ARGS(handle));
+        CONTEXT_API_FUNC(HBE_RESULT, releaseComputePipeline, FUNC_PARAMS(ComputePipelineHandle& handle), FUNC_ARGS(handle));
+        CONTEXT_API_FUNC(HBE_RESULT, releaseRaytracingPipeline, FUNC_PARAMS(RaytracingPipelineHandle& handle), FUNC_ARGS(handle));
+        CONTEXT_API_FUNC(HBE_RESULT, releaseRootAccelerationStructure, FUNC_PARAMS(RootAccelerationStructureHandle& handle), FUNC_ARGS(handle));
+        CONTEXT_API_FUNC(HBE_RESULT, releaseAABBAccelerationStructure, FUNC_PARAMS(AABBAccelerationStructureHandle& handle), FUNC_ARGS(handle));
+        CONTEXT_API_FUNC(HBE_RESULT, releaseMeshAccelerationStructure, FUNC_PARAMS(MeshAccelerationStructureHandle& handle), FUNC_ARGS(handle));
+	    CONTEXT_API_FUNC(HBE_RESULT, releaseBuffer, FUNC_PARAMS(BufferHandle& handle), FUNC_ARGS(handle));
+	    CONTEXT_API_FUNC(HBE_RESULT, releaseTexelBuffer, FUNC_PARAMS(TexelBufferHandle& handle), FUNC_ARGS(handle));
+        CONTEXT_API_FUNC(HBE_RESULT, releaseFence, FUNC_PARAMS(FenceHandle& handle), FUNC_ARGS(handle));
         //images
         CONTEXT_API_FUNC(HBE_RESULT, updateImage, FUNC_PARAMS(ImageHandle handle, const void* data), FUNC_ARGS(handle,data));
         CONTEXT_API_FUNC(HBE_RESULT, getImageSize, FUNC_PARAMS(ImageHandle handle,uvec3& size_ref), FUNC_ARGS(handle,size_ref));

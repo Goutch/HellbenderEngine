@@ -509,13 +509,8 @@ namespace HBE {
 		HB_ASSERT(frame < int32_t(MAX_FRAMES_IN_FLIGHT), "Frame index out of range");
 		HB_ASSERT(pipeline_layout->getDescriptorBindings()[binding].descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 		          "binding#" + std::to_string(binding) + " is not a uniform buffer");
-		if (frame < 0) {
-			for (int frame_i = 0; frame_i < MAX_FRAMES_IN_FLIGHT; ++frame_i) {
-				uniform_buffers[frame_i][binding].update(data);
-			}
-		} else {
-			uniform_buffers[frame][binding].update(data);
-		}
+
+		uniform_buffers[frame][binding].update(data);
 	}
 
 

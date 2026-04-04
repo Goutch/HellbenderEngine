@@ -1,23 +1,27 @@
 #pragma once
 
 #include "Core.h"
-#include "Resource.h"
-
-namespace HBE
-{
-
-
-
-	class HB_API ComputePipeline
-	{
-	protected:
-		vec3i workgroup_size;
-
+#include "core/Graphics.h"
+namespace HBE {
+	class HB_API ComputePipeline {
+		Context &context;
+		ComputePipelineHandle handle = HBE_NULL_HANDLE;
 	public:
-		virtual const vec3i& getWorkgroupSize() const = 0;
+		ComputePipeline();
 
-		virtual ~ComputePipeline() = default;
+		~ComputePipeline();
 
-		virtual COMPUTE_PIPELINE_FLAGS getFlags() const = 0;
+		explicit ComputePipeline(const RasterizationPipelineInfo &info);
+
+		void alloc(const ComputePipelineInfo &info);
+
+		void allocInstance(PipelineInstance &instance);
+
+		void release();
+
+		ComputePipelineHandle getHandle();
+
+		uint32_t getBinding(const char *name);
+
 	};
 }

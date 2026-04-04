@@ -45,6 +45,7 @@ namespace HBE
         DescriptorPool temp_descriptor_pool;
 
         std::array<std::vector<VK_Buffer>, MAX_FRAMES_IN_FLIGHT> uniform_buffers;
+	    std::array<std::vector<int>, MAX_FRAMES_IN_FLIGHT> last_uniform_buffer_update_frames;
         std::queue<VK_Buffer> uniform_buffer_pool;
 
         std::queue<std::pair<uint32_t, VkDescriptorPool>> old_descriptor_pools;
