@@ -1,17 +1,16 @@
-
 #include "TexelBuffer.h"
 #include "core/Application.h"
-namespace HBE{
 
-	TexelBuffer::TexelBuffer(const TexelBufferInfo &info): context(*Application::instance->getContext()) {
+namespace HBE {
+	TexelBuffer::TexelBuffer(const TexelBufferInfo &info) : context(*Application::instance->getContext()) {
 		alloc(info);
 	}
 
-	TexelBuffer::TexelBuffer(): context(*Application::instance->getContext()) {
+	TexelBuffer::TexelBuffer() : context(*Application::instance->getContext()) {
 
 	}
 
-	TexelBuffer::TexelBuffer(TexelBuffer &&other) noexcept :context(other.context), handle(other.handle) {
+	TexelBuffer::TexelBuffer(TexelBuffer &&other) noexcept : context(other.context), handle(other.handle) {
 		other.handle = HBE_NULL_HANDLE;
 	}
 
@@ -21,6 +20,10 @@ namespace HBE{
 
 	void TexelBuffer::alloc(const TexelBufferInfo &info) {
 		context.createTexelBuffer(handle, info);
+	}
+
+	bool TexelBuffer::allocated() {
+		return handle != HBE_NULL_HANDLE;
 	}
 
 	void TexelBuffer::release() {

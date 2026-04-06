@@ -35,7 +35,8 @@ namespace HBE {
 
         inline HBE_RESULT release() { return context_impl.release(); }
 
-        CONTEXT_API_FUNC(HBE_RESULT, rendererBeginRecordCommands, FUNC_PARAMS(), FUNC_ARGS());
+        CONTEXT_API_FUNC(HBE_RESULT, rendererBeginRecordCommands, FUNC_PARAMS(), FUNC_ARGS())
+
         CONTEXT_API_FUNC(HBE_RESULT, rendererEndRecordCommandsAndSubmit, FUNC_PARAMS(), FUNC_ARGS());
         CONTEXT_API_FUNC(HBE_RESULT, rendererGetResources, FUNC_PARAMS(RendererResources& resources), FUNC_ARGS(resources));
         //cmds
@@ -104,5 +105,9 @@ namespace HBE {
         //Fences
         CONTEXT_API_FUNC(HBE_RESULT, waitForFence, FUNC_PARAMS(FenceHandle handle), FUNC_ARGS(handle))
         CONTEXT_API_FUNC(HBE_RESULT, getFenceStatus, FUNC_PARAMS(FenceHandle handle,FENCE_STATUS& status), FUNC_ARGS(handle,status))
+
+        //Buffers
+        CONTEXT_API_FUNC(HBE_RESULT, updateBuffer, FUNC_PARAMS(BufferHandle handle,const void* data),FUNC_ARGS(handle,data));
+
     };
 }

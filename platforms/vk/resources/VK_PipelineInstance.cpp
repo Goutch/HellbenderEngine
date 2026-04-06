@@ -9,7 +9,7 @@ namespace HBE {
 	}
 
 	void VK_PipelineInstance::alloc(VK_Context *context,
-	                                const PipelineInstanceInfo &info) {
+									const PipelineInstanceInfo &info) {
 		this->context = context;
 		this->pipeline_type = info.type;
 		this->empty_descriptor_allowed = empty_descriptor_allowed;
@@ -388,13 +388,13 @@ namespace HBE {
 		const VkDescriptorSet *descriptor_sets = descriptor_pool.descriptor_set_handles.data() + offset;
 
 		vkCmdBindDescriptorSets(command_buffer,
-		                        pipeline_layout->getBindPoint(),
-		                        pipeline_layout->getHandle(),
-		                        0,
-		                        descriptor_set_count,
-		                        descriptor_sets,
-		                        0,
-		                        nullptr);
+								pipeline_layout->getBindPoint(),
+								pipeline_layout->getHandle(),
+								0,
+								descriptor_set_count,
+								descriptor_sets,
+								0,
+								nullptr);
 		bound = true;
 	}
 
@@ -402,24 +402,24 @@ namespace HBE {
 		binding = getBinding(name);
 	}
 
-	void VK_PipelineInstance::bind(VkCommandBuffer command_buffer, uint32_t frame) const {
+	void VK_PipelineInstance::bind(VkCommandBuffer command_buffer, uint32_t frame){
 		if (bound) return;
 
 		uint32_t descriptor_set_count = pipeline_layout->getDescriptorSetLayoutHandles().size();
 		uint32_t offset = descriptor_set_count * frame;
 		const VkDescriptorSet *descriptor_sets = descriptor_pool.descriptor_set_handles.data() + offset;
 		vkCmdBindDescriptorSets(command_buffer,
-		                        pipeline_layout->getBindPoint(),
-		                        pipeline_layout->getHandle(),
-		                        0,
-		                        descriptor_set_count,
-		                        descriptor_sets,
-		                        0,
-		                        nullptr);
+								pipeline_layout->getBindPoint(),
+								pipeline_layout->getHandle(),
+								0,
+								descriptor_set_count,
+								descriptor_sets,
+								0,
+								nullptr);
 		bound = true;
 	}
 
-	void VK_PipelineInstance::unbind() const {
+	void VK_PipelineInstance::unbind() {
 		bound = false;
 	}
 
@@ -431,8 +431,8 @@ namespace HBE {
 		HB_ASSERT(frame < int32_t(MAX_FRAMES_IN_FLIGHT), "Frame index out of range");
 		const VkDescriptorSetLayoutBinding &binding_info = pipeline_layout->getDescriptorBindings()[binding];
 		HB_ASSERT(binding_info.descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ||
-		          binding_info.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_IMAGE ||
-		          binding_info.descriptorType == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, "binding#" + std::to_string(binding) + " is not a texture");
+				binding_info.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_IMAGE ||
+				binding_info.descriptorType == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, "binding#" + std::to_string(binding) + " is not a texture");
 		//variable descriptor count
 		if (pipeline_layout->IsBindingVariableSize(binding)) {
 			createVariableSizeDescriptors(binding, binding_info.descriptorType, texture_count, frame);
@@ -453,10 +453,10 @@ namespace HBE {
 				}
 				write_descriptor_set.pImageInfo = image_infos.data();
 				vkUpdateDescriptorSets(context->device.getHandle(),
-				                       1,
-				                       &write_descriptor_set,
-				                       0,
-				                       nullptr);
+										1,
+										&write_descriptor_set,
+										0,
+										nullptr);
 			}
 		} else {
 			VkWriteDescriptorSet write_descriptor_set = descriptor_pool.writes[frame][binding];
@@ -471,10 +471,10 @@ namespace HBE {
 			}
 			write_descriptor_set.pImageInfo = image_infos.data();
 			vkUpdateDescriptorSets(context->device.getHandle(),
-			                       1,
-			                       &write_descriptor_set,
-			                       0,
-			                       nullptr);
+									1,
+									&write_descriptor_set,
+									0,
+									nullptr);
 		}
 	}
 
@@ -508,11 +508,12 @@ namespace HBE {
 	void VK_PipelineInstance::setUniform(uint32_t binding, const void *data, int32_t frame) {
 		HB_ASSERT(frame < int32_t(MAX_FRAMES_IN_FLIGHT), "Frame index out of range");
 		HB_ASSERT(pipeline_layout->getDescriptorBindings()[binding].descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-		          "binding#" + std::to_string(binding) + " is not a uniform buffer");
+				"binding#" + std::to_string(binding) + " is not a uniform buffer");
 
-		uniform_buffers[frame][binding].update(data);
+		latest_uniform_buffer_index[binding]++;
+		latest_uniform_buffer_index[binding] %= MAX_FRAMES_IN_FLIGHT;
+		uniform_buffers[latest_uniform_buffer_index[binding]][binding].update(data);
 	}
-
 
 	void VK_PipelineInstance::setAccelerationStructure(uint32_t binding, RootAccelerationStructureHandle acceleration_structure, int32_t frame) {
 		HB_ASSERT(frame <= int32_t(MAX_FRAMES_IN_FLIGHT), "Frame index out of range");
@@ -524,7 +525,7 @@ namespace HBE {
 		if (frame == -1) {
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
 				HB_ASSERT(descriptorSetLayoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR,
-				          "binding#" + std::to_string(binding) + " is not an acceleration structure");
+						"binding#" + std::to_string(binding) + " is not an acceleration structure");
 
 				VkWriteDescriptorSetAccelerationStructureKHR accelerationStructureInfo{};
 				accelerationStructureInfo.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
@@ -538,7 +539,7 @@ namespace HBE {
 			}
 		} else {
 			HB_ASSERT(descriptorSetLayoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR,
-			          "binding#" + std::to_string(binding) + " is not an acceleration structure");
+					"binding#" + std::to_string(binding) + " is not an acceleration structure");
 
 			VkWriteDescriptorSetAccelerationStructureKHR accelerationStructureInfo{};
 			accelerationStructureInfo.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;

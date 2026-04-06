@@ -143,6 +143,8 @@ set(CORE_FILES
         core/graphics/Fence.h
         core/interface/RasterizationTargetInterface.h
 
+        core/resource/TexelBuffer.cpp
+        core/resource/StorageBuffer.cpp
 )
 set(VK_FILES
         platforms/vk/VK_Renderer.cpp
