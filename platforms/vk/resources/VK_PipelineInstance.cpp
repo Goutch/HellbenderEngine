@@ -64,6 +64,7 @@ namespace HBE {
 				buffer_info.size = descriptor_sizes[binding];
 				buffer_info.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
 				uniform_buffers[frame][binding].alloc(context, buffer_info);
+				latest_uniform_buffer_index.push_back(0);
 			}
 		}
 		createDescriptorPool(descriptor_pool);
@@ -377,7 +378,7 @@ namespace HBE {
 		}
 	}
 
-	void VK_PipelineInstance::bind() const {
+	void VK_PipelineInstance::bind() {
 		if (bound) return;
 		VkCommandBuffer command_buffer = context->renderer.getCommandPool()->getCurrentBuffer();
 		uint32_t frame = context->renderer.getCurrentFrameIndex();
@@ -505,14 +506,16 @@ namespace HBE {
 		}
 	}
 
-	void VK_PipelineInstance::setUniform(uint32_t binding, const void *data, int32_t frame) {
-		HB_ASSERT(frame < int32_t(MAX_FRAMES_IN_FLIGHT), "Frame index out of range");
+	void VK_PipelineInstance::setUniform(uint32_t binding, const void *data) {
 		HB_ASSERT(pipeline_layout->getDescriptorBindings()[binding].descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 				"binding#" + std::to_string(binding) + " is not a uniform buffer");
 
 		latest_uniform_buffer_index[binding]++;
 		latest_uniform_buffer_index[binding] %= MAX_FRAMES_IN_FLIGHT;
 		uniform_buffers[latest_uniform_buffer_index[binding]][binding].update(data);
+
+		descriptor_pool.writes[latest_uniform_buffer_index[binding]][binding].pBufferInfo->buffer
+		vkUpdateDescriptorSets(context->device.getHandle(), 1, &, 0, nullptr);
 	}
 
 	void VK_PipelineInstance::setAccelerationStructure(uint32_t binding, RootAccelerationStructureHandle acceleration_structure, int32_t frame) {

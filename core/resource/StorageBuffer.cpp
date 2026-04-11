@@ -9,8 +9,7 @@ namespace HBE {
 	StorageBuffer::StorageBuffer() : context(*Application::instance->getContext()) {
 	}
 
-	StorageBuffer::StorageBuffer(StorageBuffer &&other) noexcept {
-		context = other.context;
+	StorageBuffer::StorageBuffer(StorageBuffer &&other) noexcept: context(other.context) {
 		handle = other.handle;
 		other.handle = HBE_NULL_HANDLE;
 	}
@@ -30,10 +29,6 @@ namespace HBE {
 	void StorageBuffer::release() {
 		context.releaseBuffer(handle);
 		handle = HBE_NULL_HANDLE;
-	}
-
-	uint32_t StorageBuffer::getSize() {
-		return 0;
 	}
 
 	BufferHandle StorageBuffer::getHandle() {

@@ -55,13 +55,13 @@ namespace HBE {
 		void release();
 		void onFrameEnd(uint32_t frame);
 		Handle getPipeline();
-		void bind() const;
+		void bind();
 		void getBinding(const char *name, uint32_t &uint32);
 		uint32_t getBinding(const char *name) const;
 		void resetPool(DescriptorPool &pool);
 		void bind(VkCommandBuffer command_buffer, uint32_t frame);                                                                                                                                                                                                                                                                                         
 		void unbind();
-		void setUniform(uint32_t binding, const void *data, int32_t frame);
+		void setUniform(uint32_t binding, const void *data);
 		void setImage(uint32_t binding, ImageHandle image, uint32_t mip_level, int32_t frame);
 		void setImageArray(uint32_t binding, ImageHandle *images, uint32_t image_count, int32_t mip_level, int32_t frame);
 		void setTexelBuffer(uint32_t binding, TexelBufferHandle buffer, int32_t frame);
