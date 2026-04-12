@@ -118,7 +118,7 @@ namespace HBE {
 		if (texture_type_it != parser_info.texture_names.end() && materialData.occlusion_texture != -1)
 			context.setPipelineInstanceImage(instance_handle, binding, textures[materialData.occlusion_texture], 0, -1);
 
-		context.setPipelineInstanceUniform(instance_handle, material_binding, &materialData.properties, -1);
+		context.setPipelineInstanceUniform(instance_handle, material_binding, &materialData.properties);
 
 		return instance_handle;
 	}

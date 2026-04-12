@@ -47,9 +47,6 @@ namespace HBE
         void clear();
 
         void createCommandBuffers(int count);
-
-        void wait(int frame);
-
         void waitAll();
 
         VkCommandPool getHandle() const;

@@ -43,7 +43,7 @@ namespace HBE
         info.flags = PIPELINE_INSTANCE_FLAG_NONE;
         info.type = PIPELINE_INSTANCE_TYPE_RASTERIZATION;
         info.pipeline_handle = handle;
-        info.preferred_memory_type_flags = MEMORY_TYPE_FLAG_GPU_LOCAL;
+        info.preferred_memory_type_flags = MEMORY_TYPE_FLAG_MAPPABLE;
         instance.alloc(info);
     }
 

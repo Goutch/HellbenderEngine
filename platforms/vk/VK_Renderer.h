@@ -36,7 +36,7 @@ namespace HBE {
 			VK_Semaphore image_available_semaphore{};
 		};
 
-		std::array<SwapchainImageState, MAX_FRAMES_IN_FLIGHT> swap_chain_image_state;
+		std::vector<SwapchainImageState> swap_chain_image_state;
 
 		VkSampler default_sampler;
 

@@ -57,8 +57,6 @@ namespace HBE
 
 
                 HB_PROFILE_BEGIN("RENDER");
-                //context.beginRecordCommands
-
                 context.rendererBeginRecordCommands();
                 onRender.invoke();
                 HB_PROFILE_END("RENDER");

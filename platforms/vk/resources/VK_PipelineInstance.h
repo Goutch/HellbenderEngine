@@ -10,70 +10,81 @@
 #include "VK_Buffer.h"
 #include "platforms/vk/VK_CommandPool.h"
 
-namespace HBE {
-	class VK_PipelineLayout;
-	class VK_TopLevelAccelerationStructure;
-	class VK_Context;
+namespace HBE
+{
+    class VK_PipelineLayout;
+    class VK_TopLevelAccelerationStructure;
+    class VK_Context;
 
-	struct VariableDescriptorSet {
-		uint32_t binding;
-		uint32_t count = 1;
-		VkDescriptorType type;
-	};
+    struct VariableDescriptorSet
+    {
+        uint32_t binding;
+        uint32_t count = 1;
+        VkDescriptorType type;
+    };
 
-	struct DescriptorPool {
-		VkDescriptorPool handle;
-		std::vector<VkDescriptorSet> descriptor_set_handles; //frame0 set0 |frame0 set1 | frame1 set0 | frame1 set1| frame2 set0 | frame2 set1
-		std::array<std::vector<VkWriteDescriptorSet>, MAX_FRAMES_IN_FLIGHT> writes;
-		std::vector<VariableDescriptorSet> variable_descriptor_sets; //frame0 set0 |frame0 set1 | frame1 set0 | frame1 set1| frame2 set0 | frame2 set1
-	};
+    struct DescriptorPool
+    {
+        VkDescriptorPool handle;
 
-	class HB_API VK_PipelineInstance {
-		VK_Context *context = nullptr;
-		Handle pipeline_handle = HBE_NULL_HANDLE;
-		const VK_PipelineLayout *pipeline_layout = nullptr;
-		DescriptorPool descriptor_pool;
-		DescriptorPool temp_descriptor_pool;
-		event_subscription_id on_frame_change_subscription_id = HBE_NULL_HANDLE;
+        RawVector<VkDescriptorSet> descriptor_set_handles; //frame0 set0 |frame0 set1 | frame1 set0 | frame1 set1| frame2 set0 | frame2 set1
+        RawVector<VariableDescriptorSet> variable_descriptor_sets; //frame0 set0 |frame0 set1 | frame1 set0 | frame1 set1| frame2 set0 | frame2 set1
+        RawVector<bool> dirty_descriptor_sets_bindings; //frame0 binding0 |frame0 binding1 | frame1 binding0 | frame1 binding1| frame2 binding0 | frame2 binding1
+        RawVector<VkWriteDescriptorSet> writes;
+    };
 
-		bool empty_descriptor_allowed = false;
-		bool bound = false;
-		PIPELINE_INSTANCE_TYPE pipeline_type = PIPELINE_INSTANCE_TYPE_NONE;
+    class HB_API VK_PipelineInstance
+    {
+        VK_Context* context = nullptr;
+        Handle pipeline_handle = HBE_NULL_HANDLE;
+        const VK_PipelineLayout* pipeline_layout = nullptr;
+        DescriptorPool descriptor_pool;
+        DescriptorPool temp_descriptor_pool;
+        event_subscription_id on_frame_change_subscription_id = HBE_NULL_HANDLE;
 
-		std::queue<std::pair<uint32_t, VkDescriptorPool> > old_descriptor_pools;
-		std::array<std::vector<VK_Buffer>, MAX_FRAMES_IN_FLIGHT> uniform_buffers;
-		std::vector<uint32_t> latest_uniform_buffer_index;
+        bool empty_descriptor_allowed = false;
+        bool bound = false;
+        PIPELINE_INSTANCE_TYPE pipeline_type = PIPELINE_INSTANCE_TYPE_NONE;
 
-	public:
-		VK_PipelineInstance() = default;
-		~VK_PipelineInstance() = default;
-		VK_PipelineInstance(const VK_PipelineInstance &) = delete;
-		VK_PipelineInstance &operator=(const VK_PipelineInstance &) = delete;
-		PIPELINE_INSTANCE_TYPE getType();
-		void alloc(VK_Context *context, const PipelineInstanceInfo &info);
-		bool allocated();
-		void release();
-		void onFrameEnd(uint32_t frame);
-		Handle getPipeline();
-		void bind();
-		void getBinding(const char *name, uint32_t &uint32);
-		uint32_t getBinding(const char *name) const;
-		void resetPool(DescriptorPool &pool);
-		void bind(VkCommandBuffer command_buffer, uint32_t frame);                                                                                                                                                                                                                                                                                         
-		void unbind();
-		void setUniform(uint32_t binding, const void *data);
-		void setImage(uint32_t binding, ImageHandle image, uint32_t mip_level, int32_t frame);
-		void setImageArray(uint32_t binding, ImageHandle *images, uint32_t image_count, int32_t mip_level, int32_t frame);
-		void setTexelBuffer(uint32_t binding, TexelBufferHandle buffer, int32_t frame);
-		void setTexelBufferArray(uint32_t binding, TexelBufferHandle *buffers, uint32_t buffer_count, int32_t frame);
-		void setAccelerationStructure(uint32_t binding, RootAccelerationStructureHandle acceleration_structure, int32_t frame);
-		void setStorageBuffer(uint32_t binding, BufferHandle buffer, size_t count, size_t offset, int32_t frame);
-		void setStorageBufferArray(uint32_t binding, BufferHandle *buffers, uint32_t count, int32_t frame);
+        std::queue<std::pair<uint32_t, VkDescriptorPool>> old_descriptor_pools;
+        std::vector<VK_Buffer> uniform_buffers; //frame0 binding0 |frame0 binding1 | frame1 binding0 | frame1 binding1| frame2 binding0 | frame2 binding1
+        std::vector<VkWriteDescriptorSetAccelerationStructureKHR> acceleration_structure_infos;
+        std::vector<VkDescriptorImageInfo*> image_infos;
+        std::vector<VkDescriptorBufferInfo*> buffer_infos;
+    public:
+        VK_PipelineInstance() = default;
+        ~VK_PipelineInstance() = default;
+        VK_PipelineInstance(const VK_PipelineInstance&) = delete;
+        VK_PipelineInstance& operator=(const VK_PipelineInstance&) = delete;
+        PIPELINE_INSTANCE_TYPE getType();
+        void alloc(VK_Context* context, const PipelineInstanceInfo& info);
+        bool allocated();
+        void release();
+        void onFrameEnd(uint32_t frame);
+        Handle getPipeline();
+        void bind();
+        void getBinding(const char* name, uint32_t& uint32);
+        uint32_t getBinding(const char* name) const;
+        void resetPool(DescriptorPool& pool);
+        void bind(VkCommandBuffer command_buffer, uint32_t frame);
+        void unbind();
+        void setUniform(uint32_t binding, const void* data);
+        void setImage(uint32_t binding, ImageHandle image, uint32_t mip_level, int32_t frame);
+        void setImageArray(uint32_t binding, ImageHandle* images, uint32_t image_count, int32_t mip_level, int32_t frame);
+        void setTexelBuffer(uint32_t binding, TexelBufferHandle buffer, int32_t frame);
+        void setTexelBufferArray(uint32_t binding, TexelBufferHandle* buffers, uint32_t buffer_count, int32_t frame);
+        void setAccelerationStructure(uint32_t binding, RootAccelerationStructureHandle acceleration_structure, int32_t frame);
+        void setStorageBuffer(uint32_t binding, BufferHandle buffer, size_t byte_offset, int32_t frame);
+        void setStorageBufferArray(uint32_t binding, BufferHandle* buffers, uint32_t count, int32_t frame);
 
-	private:
-		void copyDescriptorSets(DescriptorPool &from, DescriptorPool &to, int64_t frame);
-		void createDescriptorWrites(DescriptorPool &pool);
-		void createDescriptorPool(DescriptorPool &pool);
-		void createVariableSizeDescriptors(uint32_t binding, VkDescriptorType descriptor_type, uint32_t count, int32_t frame);
-	};
+    private:
+        void setBindingDirty(uint32_t index);
+        void copyDescriptorSets(DescriptorPool& from, DescriptorPool& to, int64_t frame);
+        void createDescriptorWrites(DescriptorPool& pool);
+        void createDescriptorPool(DescriptorPool& pool);
+        void createVariableSizeDescriptors(uint32_t binding, VkDescriptorType descriptor_type, uint32_t count, int32_t frame);
+        void updateDescriptors();
+        uint32_t getBindingIndexForFrame(uint32_t binding);
+        VkDescriptorSet getDescriptorSetForBinding(uint32_t binding);
+    };
 }

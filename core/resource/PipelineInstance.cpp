@@ -41,7 +41,7 @@ namespace HBE
 
     void PipelineInstance::setUniform(uint32_t binding, const void* data)
     {
-	    context.setPipelineInstanceUniform(handle, binding, data,-1);
+	    context.setPipelineInstanceUniform(handle, binding, data);
     }
 
     void PipelineInstance::setUniform(const char* name, const void* data)
@@ -82,7 +82,7 @@ namespace HBE
 
     void PipelineInstance::setStorageBuffer(uint32_t binding, BufferHandle buffer, size_t count, size_t offset)
     {
-		context.setPipelineInstanceStorageBuffer(handle, binding, buffer, count, offset, -1);
+		context.setPipelineInstanceStorageBuffer(handle, binding, buffer,offset, -1);
     }
 
     void PipelineInstance::setStorageBuffer(const char* name, BufferHandle buffer, size_t count, size_t offset)

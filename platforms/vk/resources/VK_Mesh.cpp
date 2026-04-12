@@ -10,22 +10,26 @@
 #include "core/Application.h"
 #include "core/utility/Log.h"
 
-namespace HBE {
-    void VK_Mesh::setBuffer(uint32_t location, const void *vertices, size_t count) {
+namespace HBE
+{
+    void VK_Mesh::setBuffer(uint32_t location, const void* vertices, size_t count)
+    {
         HB_ASSERT(location <= attributes_locations.size() &&
                   attributes_locations[location].location != ::std::numeric_limits<uint32_t>::max(),
                   "Trying to set buffer at a location that were not included in the attribute infos");
 
         this->vertex_count = count;
-        if (count == 0) {
+        if (count == 0)
+        {
             Log::warning("Trying to set a mesh buffer with vertex count = 0");
             return;
         }
-        VertexAttributeInfo &attribute_info = attributes_locations[location];
+        VertexAttributeInfo& attribute_info = attributes_locations[location];
         VkDeviceSize buffer_size = attribute_info.size * count;
 
         //check if we need to release current buffer
-        if (buffers[location].allocated() && buffer_size != buffers[location].getSize()) {
+        if (buffers[location].allocated() && buffer_size != buffers[location].getSize())
+        {
             ReleaseRequest free_request{};
             free_request.vk_buffer = buffers[location].getHandle();
             free_request.allocation = buffers[location].getAllocation();
@@ -34,7 +38,8 @@ namespace HBE {
             buffers[location].reset();
         }
 
-        if (!buffers[location].allocated()) {
+        if (!buffers[location].allocated())
+        {
             VK_BufferInfo buffer_info{};
             buffer_info.size = buffer_size;
             buffer_info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | extra_usages;
@@ -45,58 +50,68 @@ namespace HBE {
     }
 
 
-    void VK_Mesh::setInstanceBuffer(uint32_t location, const void *data, size_t count) {
+    void VK_Mesh::setInstanceBuffer(uint32_t location, const void* data, size_t count)
+    {
         HB_ASSERT(location <= attributes_locations.size() &&
                   attributes_locations[location].location != ::std::numeric_limits<uint32_t>::max(),
                   "Trying to set buffer at a location that were not included in the attribute infos");
         this->instance_count = count;
-        if (count == 0) {
+        if (count == 0)
+        {
             Log::warning("Trying to set a mesh buffer with instance count = 0");
             return;
         }
         setBuffer(location, data, count);
     }
 
-    void VK_Mesh::alloc(VK_Context *context, const MeshInfo &info) {
+    void VK_Mesh::alloc(VK_Context* context, const MeshInfo& info)
+    {
         this->info = info;
         this->context = context;
-        if ((info.flags & MESH_FLAG_USED_IN_RAYTRACING) != 0) {
+        if ((info.flags & MESH_FLAG_USED_IN_RAYTRACING) != 0)
+        {
             this->extra_usages |= VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
             this->extra_usages |= VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR;
         }
-        if (info.flags & MESH_FLAG_USED_AS_STORAGE_BUFFER) {
+        if (info.flags & MESH_FLAG_USED_AS_STORAGE_BUFFER)
+        {
             this->extra_usages |= VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
         }
 
         uint32_t max_location = 0;
-        for (size_t i = 0; i < info.attribute_info_count; ++i) {
+        for (size_t i = 0; i < info.attribute_info_count; ++i)
+        {
             if (info.attribute_infos[i].location > max_location)
                 max_location = info.attribute_infos[i].location;
         }
         buffers.resize(max_location + 1);
         attributes_locations.resize(max_location + 1, {});
 
-        for (size_t i = 0; i < info.attribute_info_count; ++i) {
+        for (size_t i = 0; i < info.attribute_info_count; ++i)
+        {
             uint32_t location = info.attribute_infos[i].location;
             attributes_locations[location] = info.attribute_infos[i];
         }
     }
 
-    void VK_Mesh::release() {
-        VK_Allocator *allocator = &context->allocator;
-        for (size_t i = 0; i < buffers.size(); ++i) {
-            if (buffers[i].allocated()) {
+    void VK_Mesh::release()
+    {
+        VK_Allocator* allocator = &context->allocator;
+        for (size_t i = 0; i < buffers.size(); ++i)
+        {
+            if (buffers[i].allocated())
+            {
                 ReleaseRequest free_request{};
                 free_request.vk_buffer = buffers[i].getHandle();
                 free_request.allocation = buffers[i].getAllocation();
                 free_request.fence = context->renderer.getLastFrameFence();
                 allocator->releaseLater(free_request);
-
             }
-	        buffers[i].reset();
+            buffers[i].reset();
         }
         buffers.clear();
-        if (indices_buffer.allocated()) {
+        if (indices_buffer.allocated())
+        {
             ReleaseRequest free_request{};
             free_request.vk_buffer = indices_buffer.getHandle();
             free_request.allocation = indices_buffer.getAllocation();
@@ -104,25 +119,31 @@ namespace HBE {
             allocator->releaseLater(free_request);
             indices_buffer.reset();
         }
+        vertex_count = 0;
+        indices_count = 0;
     }
 
-    VK_Mesh::~VK_Mesh() {
+    VK_Mesh::~VK_Mesh()
+    {
         release();
     }
 
-    void VK_Mesh::setVertexIndices(const void *data, size_t count, size_t element_size) {
+    void VK_Mesh::setVertexIndices(const void* data, size_t count, size_t element_size)
+    {
         VkDeviceSize buffer_size = element_size * count;
 
-        if (indices_buffer.allocated() && buffer_size != indices_buffer.getSize()) {
+        if (indices_buffer.allocated() && buffer_size != indices_buffer.getSize())
+        {
             ReleaseRequest free_request{};
             free_request.vk_buffer = indices_buffer.getHandle();
             free_request.allocation = indices_buffer.getAllocation();
             context->allocator.releaseLater(free_request);
-	        indices_buffer.reset();
+            indices_buffer.reset();
         }
 
 
-        if (!indices_buffer.allocated()) {
+        if (!indices_buffer.allocated())
+        {
             VK_BufferInfo buffer_info{};
             buffer_info.size = buffer_size;
             buffer_info.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT | extra_usages;
@@ -136,17 +157,20 @@ namespace HBE {
         indices_count = count;
     }
 
-    void VK_Mesh::setVertexIndices(const uint16_t *data, size_t count) {
+    void VK_Mesh::setVertexIndices(const uint16_t* data, size_t count)
+    {
         indices_type = INDICES_TYPE_UINT16;
         setVertexIndices(data, count, sizeof(data[0]));
     }
 
-    void VK_Mesh::setVertexIndices(const uint32_t *data, size_t count) {
+    void VK_Mesh::setVertexIndices(const uint32_t* data, size_t count)
+    {
         indices_type = INDICES_TYPE_UINT32;
         setVertexIndices(data, count, sizeof(data[0]));
     }
 
-    void VK_Mesh::bind() const {
+    void VK_Mesh::bind() const
+    {
         if (bound)
             return;
         bound = true;
@@ -156,7 +180,8 @@ namespace HBE {
         VkDeviceSize offsets[16];
 
         int buffer_count = 0;
-        for (const VK_Buffer &buffer: buffers) {
+        for (const VK_Buffer& buffer : buffers)
+        {
             flat_buffers[buffer_count] = buffer.getHandle();
             offsets[buffer_count] = 0;
             buffer_count++;
@@ -167,7 +192,8 @@ namespace HBE {
                                buffer_count,
                                flat_buffers,
                                offsets);
-        if (indices_type != INDICES_TYPE_NONE) {
+        if (indices_type != INDICES_TYPE_NONE)
+        {
             vkCmdBindIndexBuffer(context->renderer.getCommandPool()->getCurrentBuffer(),
                                  indices_buffer.getHandle(),
                                  0,
@@ -175,39 +201,48 @@ namespace HBE {
         }
     }
 
-    void VK_Mesh::unbind() const {
+    void VK_Mesh::unbind() const
+    {
         bound = false;
     }
 
-    const VK_Buffer &VK_Mesh::getBuffer(uint32_t binding) const {
+    const VK_Buffer& VK_Mesh::getBuffer(uint32_t binding) const
+    {
         return buffers.at(binding);
     }
 
-    const VK_Buffer &VK_Mesh::getIndicesBuffer() const {
+    const VK_Buffer& VK_Mesh::getIndicesBuffer() const
+    {
         return indices_buffer;
     }
 
-    uint32_t VK_Mesh::getIndicesCount() const {
+    uint32_t VK_Mesh::getIndicesCount() const
+    {
         return indices_count;
     }
 
-    uint32_t VK_Mesh::getVertexCount() const {
+    uint32_t VK_Mesh::getVertexCount() const
+    {
         return vertex_count;
     }
 
-    uint32_t VK_Mesh::getInstanceCount() const {
+    uint32_t VK_Mesh::getInstanceCount() const
+    {
         return instance_count;
     }
 
-    VkDeviceSize VK_Mesh::getAttributeElementSize(uint32_t location) {
+    VkDeviceSize VK_Mesh::getAttributeElementSize(uint32_t location)
+    {
         return attributes_locations.at(location).size;
     }
 
-    INDICES_TYPE VK_Mesh::getIndicesType() {
+    INDICES_TYPE VK_Mesh::getIndicesType()
+    {
         return indices_type;
     }
 
-    bool VK_Mesh::allocated() const {
+    bool VK_Mesh::allocated() const
+    {
         return indices_count > 0 || vertex_count > 0;
     }
 }

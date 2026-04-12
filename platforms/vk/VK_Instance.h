@@ -12,7 +12,7 @@ namespace HBE
     class VK_Instance
     {
 #ifdef DEBUG_MODE
-        const bool ENABLE_VALIDATION_LAYERS = true;
+        const bool ENABLE_VALIDATION_LAYERS = false;
 #else
         const bool ENABLE_VALIDATION_LAYERS = false;
 #endif

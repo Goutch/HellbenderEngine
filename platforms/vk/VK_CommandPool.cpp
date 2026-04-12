@@ -47,7 +47,6 @@ namespace HBE {
 
 
 	void HBE::VK_CommandPool::createCommandBuffers(int count) {
-		current = count - 1;
 		fences.resize(count,HBE_NULL_HANDLE);
 		for (int i = 0; i < count; ++i) {
 			if(!context->fences.valid(fences[i])) {
@@ -69,7 +68,6 @@ namespace HBE {
 
 	void HBE::VK_CommandPool::begin() const {
 		context->fences[fences[current]].wait();
-
 		VkCommandBufferBeginInfo beginInfo{};
 		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 		beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT; // Optional
@@ -131,7 +129,6 @@ namespace HBE {
 		last_summited = current;
 		current++;
 		current %= command_buffers.size();
-
 		return fences[last_summited];
 	}
 
