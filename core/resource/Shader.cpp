@@ -21,18 +21,17 @@ namespace HBE
         release();
     }
 
-    void Shader::loadGLSL(const char* path, SHADER_STAGE stage)
+    void Shader::loadGLSL(const char* path, SHADER_STAGE stage,const char* preamble)
     {
         std::string source;
         ShaderCompiler::getSource(path, source);
         std::vector<uint32_t> spirv;
-        ShaderCompiler::GLSLToSpirV(source.c_str(), source.size(), spirv, stage, path);
+        ShaderCompiler::GLSLToSpirV(source.c_str(), source.size(), spirv, stage, path,preamble);
 
         ShaderInfo info;
         info.stage = stage;
         info.spirv = spirv.data();
         info.spirvLength = spirv.size();
-
         alloc(info);
     }
 

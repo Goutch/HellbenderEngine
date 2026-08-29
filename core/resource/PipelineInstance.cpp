@@ -53,12 +53,12 @@ namespace HBE
 
     void PipelineInstance::setImage(uint32_t binding, ImageHandle image, uint32_t mip_level)
     {
-		context.setPipelineInstanceImage(handle, binding, image, mip_level,-1);
+		context.setPipelineInstanceImage(handle, binding, image, mip_level);
     }
 
     void PipelineInstance::setImageArray(uint32_t binding, ImageHandle* images, uint32_t images_count, uint32_t mip_level)
     {
-	    context.setPipelineInstanceImageArray(handle, binding, images,images_count, mip_level,-1);
+	    context.setPipelineInstanceImageArray(handle, binding, images,images_count, mip_level);
     }
 
     void PipelineInstance::setImage(const char* name, ImageHandle image, uint32_t mip_level)
@@ -77,12 +77,12 @@ namespace HBE
 
     void PipelineInstance::setStorageBufferArray(uint32_t binding, BufferHandle* buffers, uint32_t count)
     {
-		context.setPipelineInstanceStorageBufferArray(handle, binding, buffers, count, -1);
+		context.setPipelineInstanceStorageBufferArray(handle, binding, buffers, count);
     }
 
     void PipelineInstance::setStorageBuffer(uint32_t binding, BufferHandle buffer, size_t count, size_t offset)
     {
-		context.setPipelineInstanceStorageBuffer(handle, binding, buffer,offset, -1);
+		context.setPipelineInstanceStorageBuffer(handle, binding, buffer,offset);
     }
 
     void PipelineInstance::setStorageBuffer(const char* name, BufferHandle buffer, size_t count, size_t offset)
@@ -101,12 +101,12 @@ namespace HBE
 
     void PipelineInstance::setTexelBuffer(uint32_t binding, TexelBufferHandle buffer)
     {
-		context.setPipelineInstanceTexelBuffer(handle, binding, buffer, -1);
+		context.setPipelineInstanceTexelBuffer(handle, binding, buffer);
     }
 
     void PipelineInstance::setTexelBufferArray(uint32_t binding, TexelBufferHandle* buffers, uint32_t count)
     {
-		context.setPipelineInstanceTexelBufferArray(handle, binding, buffers, count, -1);
+		context.setPipelineInstanceTexelBufferArray(handle, binding, buffers, count);
     }
 
     void PipelineInstance::setTexelBuffer(const char* name, TexelBufferHandle buffer)
@@ -125,7 +125,7 @@ namespace HBE
 
     void PipelineInstance::setAccelerationStructure(uint32_t binding, RootAccelerationStructureHandle accelerationStructure)
     {
-		context.setPipelineInstanceAccelerationStructure(handle, binding, accelerationStructure, -1);
+		context.setPipelineInstanceAccelerationStructure(handle, binding, accelerationStructure);
     }
 
     void PipelineInstance::setAccelerationStructure(const char* name, RootAccelerationStructureHandle accelerationStructure)

@@ -187,9 +187,13 @@ namespace HBE {
 		virtual PipelineInstanceHandle createMaterial(const ModelMaterialData &materialData, ImageHandle *textures) = 0;
 
 		//Raytracing
-		virtual MeshAccelerationStructureHandle createMeshAccelerationStructure(MeshHandle mesh, int mesh_index) { return HBE_NULL_HANDLE; };
+		virtual MeshAccelerationStructureHandle createMeshAccelerationStructure(MeshHandle mesh, int mesh_index) {
+			return HBE_NULL_HANDLE;
+		};
 
-		virtual AccelerationStructureInstance createAccelerationStructureInstance(ModelNode &node, int primitive) { return {}; };
+		virtual AccelerationStructureInstance createAccelerationStructureInstance(ModelNode &node, int primitive) {
+			return AccelerationStructureInstance{};
+		};
 
 	};
 }

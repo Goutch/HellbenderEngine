@@ -3,13 +3,13 @@
 #include "core/interface/RasterizationPipelineInterface.h"
 #include "core/resource/Mesh.h"
 #include "core/resource/Model.h"
-#include "core/resource/raytracing/AccelerationStructure.h"
+#include "core/resource/raytracing/RootAccelerationStructure.h"
 
 namespace HBE
 {
     struct DefaultModelParserInfo
     {
-        MESH_FLAG additional_mesh_flags = MESH_FLAG_NONE;
+        MESH_FLAGS additional_mesh_flags = MESH_FLAG_NONE;
         std::map<MODEL_TEXTURE_TYPE, std::string> texture_names;
         std::string material_property_name;
         RasterizationPipelineHandle rasterization_pipeline = HBE_NULL_HANDLE;
@@ -18,6 +18,7 @@ namespace HBE
 
     class HB_API DefaultModelParser : public ModelParser
     {
+    protected:
         Context& context;
     public:
         DefaultModelParserInfo parser_info;
@@ -38,6 +39,6 @@ namespace HBE
 
         ImageHandle createTexture(const ModelTextureData& data) override;
 
-        MeshAccelerationStructureHandle createMeshAccelerationStructure(Mesh* mesh, int mesh_index);
+	    virtual MeshAccelerationStructureHandle createMeshAccelerationStructure(Mesh& mesh, int mesh_index);
     };
 }

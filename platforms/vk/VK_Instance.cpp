@@ -61,7 +61,6 @@ namespace HBE
             create_info.enabledLayerCount = validation_layers.validation_layer_names.size();
             create_info.ppEnabledLayerNames = validation_layers.validation_layer_names.data();
 
-
             create_info.pNext = &validationFeaturesExt;
             validationFeaturesExt.enabledValidationFeatureCount = validation_layers.getEnabledValidationFeatures().size();
             validationFeaturesExt.pEnabledValidationFeatures = validation_layers.getEnabledValidationFeatures().data();

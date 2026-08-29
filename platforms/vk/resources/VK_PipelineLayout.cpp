@@ -120,9 +120,9 @@ namespace HBE
             {
                 VK_DescriptorInfo stage_descriptor = stage_descriptors[j];
                 uint32_t descriptor_binding = stage_descriptor.layout_binding.binding;
-                if (max_descriptor_set <= stage_descriptor.descriptor_set)
+                if (max_descriptor_set <= stage_descriptor.descriptor_set_index)
                 {
-                    max_descriptor_set = stage_descriptor.descriptor_set;
+                    max_descriptor_set = stage_descriptor.descriptor_set_index;
                     descriptor_set_layouts.resize(max_descriptor_set + 1);
                 }
                 if (max_descriptor_binding <= descriptor_binding)

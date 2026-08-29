@@ -41,7 +41,7 @@ namespace HBE {
         CONTEXT_API_FUNC(HBE_RESULT, rendererGetResources, FUNC_PARAMS(RendererResources& resources), FUNC_ARGS(resources));
         //cmds
         CONTEXT_API_FUNC(HBE_RESULT, cmdRasterizeGraph, FUNC_PARAMS(const RasterizeGraphCmdInfo& info), FUNC_ARGS(info));
-        CONTEXT_API_FUNC(HBE_RESULT, cmdRaytrace, FUNC_PARAMS(const TraceRaysCmdInfo& info), FUNC_ARGS(info));
+        CONTEXT_API_FUNC(HBE_RESULT, cmdTraceRays, FUNC_PARAMS(const TraceRaysCmdInfo& info), FUNC_ARGS(info));
         CONTEXT_API_FUNC(HBE_RESULT, cmdDispatch, FUNC_PARAMS(const ComputeDispatchCmdInfo& info), FUNC_ARGS(info));
         CONTEXT_API_FUNC(HBE_RESULT, cmdPresent, FUNC_PARAMS(const PresentCmdInfo& info), FUNC_ARGS(info));
         //CONTEXT_API_FUNC(void, getGraphicLimits, FUNC_PARAMS(GraphicLimits& limits), FUNC_ARGS(limits))
@@ -84,16 +84,18 @@ namespace HBE {
         CONTEXT_API_FUNC(HBE_RESULT, setMeshVertexIndices, FUNC_PARAMS(MeshHandle handle,const uint32_t *indices, size_t count), FUNC_ARGS(handle,indices,count));
         CONTEXT_API_FUNC(HBE_RESULT, setMeshVertexBuffer, FUNC_PARAMS(MeshHandle handle,uint32_t location,const void *vertices, size_t count), FUNC_ARGS(handle,location,vertices,count));
         CONTEXT_API_FUNC(HBE_RESULT, setMeshInstanceBuffer, FUNC_PARAMS(MeshHandle handle,uint32_t location,const void *buffer, size_t count), FUNC_ARGS(handle,location,buffer,count));
+	    CONTEXT_API_FUNC(HBE_RESULT, getMeshAttributeBuffer, FUNC_PARAMS(MeshHandle handle,uint32_t location,BufferHandle& buffer_handle), FUNC_ARGS(handle,location,buffer_handle));
+	    CONTEXT_API_FUNC(HBE_RESULT, getMeshIndicesBuffer, FUNC_PARAMS(MeshHandle handle,BufferHandle& buffer_handle), FUNC_ARGS(handle,buffer_handle));
 
         //pipeline instance
         CONTEXT_API_FUNC(HBE_RESULT, setPipelineInstanceUniform, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, const void* data), FUNC_ARGS(handle,binding, data));
-        CONTEXT_API_FUNC(HBE_RESULT, setPipelineInstanceImage, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, ImageHandle image, uint32_t mip_level,int32_t frame_index), FUNC_ARGS(handle,binding, image, mip_level,frame_index));
-        CONTEXT_API_FUNC(HBE_RESULT, setPipelineInstanceImageArray, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, ImageHandle* images, uint32_t images_count, uint32_t mip_level,int32_t frame_index), FUNC_ARGS(handle,binding, images, images_count, mip_level,frame_index));
-        CONTEXT_API_FUNC(HBE_RESULT, setPipelineInstanceStorageBuffer, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, BufferHandle buffer,  size_t offset,int32_t frame_index), FUNC_ARGS(handle,binding, buffer, offset, frame_index));
-        CONTEXT_API_FUNC(HBE_RESULT, setPipelineInstanceStorageBufferArray, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, BufferHandle* buffers, uint32_t count,int32_t frame_index), FUNC_ARGS(handle,binding, buffers, count,frame_index));
-        CONTEXT_API_FUNC(HBE_RESULT, setPipelineInstanceTexelBuffer, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, TexelBufferHandle buffer,int32_t frame_index), FUNC_ARGS(handle,binding, buffer,frame_index));
-        CONTEXT_API_FUNC(HBE_RESULT, setPipelineInstanceTexelBufferArray, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, TexelBufferHandle* buffers, uint32_t count,int32_t frame_index), FUNC_ARGS(handle,binding, buffers, count,frame_index));
-        CONTEXT_API_FUNC(HBE_RESULT, setPipelineInstanceAccelerationStructure, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, RootAccelerationStructureHandle acceleration_structure,int32_t frame_index), FUNC_ARGS(handle,binding, acceleration_structure,frame_index));
+        CONTEXT_API_FUNC(HBE_RESULT, setPipelineInstanceImage, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, ImageHandle image, uint32_t mip_level), FUNC_ARGS(handle,binding, image, mip_level));
+        CONTEXT_API_FUNC(HBE_RESULT, setPipelineInstanceImageArray, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, ImageHandle* images, uint32_t images_count, uint32_t mip_level), FUNC_ARGS(handle,binding, images, images_count, mip_level));
+        CONTEXT_API_FUNC(HBE_RESULT, setPipelineInstanceStorageBuffer, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, BufferHandle buffer,  size_t offset), FUNC_ARGS(handle,binding, buffer, offset));
+        CONTEXT_API_FUNC(HBE_RESULT, setPipelineInstanceStorageBufferArray, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, BufferHandle* buffers, uint32_t count), FUNC_ARGS(handle,binding, buffers, count));
+        CONTEXT_API_FUNC(HBE_RESULT, setPipelineInstanceTexelBuffer, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, TexelBufferHandle buffer), FUNC_ARGS(handle,binding, buffer));
+        CONTEXT_API_FUNC(HBE_RESULT, setPipelineInstanceTexelBufferArray, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, TexelBufferHandle* buffers, uint32_t count), FUNC_ARGS(handle,binding, buffers, count));
+        CONTEXT_API_FUNC(HBE_RESULT, setPipelineInstanceAccelerationStructure, FUNC_PARAMS(PipelineInstanceHandle handle,uint32_t binding, RootAccelerationStructureHandle acceleration_structure), FUNC_ARGS(handle,binding, acceleration_structure));
         CONTEXT_API_FUNC(HBE_RESULT, getPipelineInstanceBindingFromString, FUNC_PARAMS(PipelineInstanceHandle handle,const char* str,uint32_t& binding), FUNC_ARGS(handle,str,binding));
         CONTEXT_API_FUNC(HBE_RESULT, getPipelineFromInstance,FUNC_PARAMS(PipelineInstanceHandle handle, Handle &pipeline_handle),FUNC_ARGS(handle,pipeline_handle));
 
@@ -108,6 +110,12 @@ namespace HBE {
 
         //Buffers
         CONTEXT_API_FUNC(HBE_RESULT, updateBuffer, FUNC_PARAMS(BufferHandle handle,const void* data),FUNC_ARGS(handle,data));
+	    CONTEXT_API_FUNC(HBE_RESULT, getStorageBufferCount, FUNC_PARAMS(BufferHandle handle,const void* data),FUNC_ARGS(handle,data));
+
+	    uint32_t getStorageBufferCount(BufferHandle handle) {
+		    return 0;
+	    }
+
 
     };
 }

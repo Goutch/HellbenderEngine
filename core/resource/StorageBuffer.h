@@ -16,6 +16,7 @@ namespace HBE {
 		void alloc(const BufferInfo &info);
 		bool allocated();
 		void release();
+		uint32_t getCount();
 		BufferHandle getHandle();
 		BufferHandle &getHandleRef();
 		void update(const void *data);

@@ -18,11 +18,11 @@ namespace HBE
     {
         VK_Context* context = nullptr;
 
-        std::vector<VK_Buffer> buffers;
+        std::vector<BufferHandle> buffers;
         VkBufferUsageFlags extra_usages = 0;
         mutable bool bound = false;
         MeshInfo info;
-        VK_Buffer indices_buffer;
+	    BufferHandle indices_buffer = HBE_NULL_HANDLE;
         std::vector<VertexAttributeInfo> attributes_locations;
         uint32_t instance_count = 1;
         uint32_t vertex_count = 0;
@@ -49,9 +49,10 @@ namespace HBE
 
         void setInstanceBuffer(uint32_t location, const void* data, size_t count);
 
-        const VK_Buffer& getBuffer(uint32_t binding) const;
-
-        const VK_Buffer& getIndicesBuffer() const;
+        BufferHandle getBuffer(uint32_t binding,BufferHandle& handle) const;
+	    BufferHandle getBuffer(uint32_t binding) const;
+	    BufferHandle getIndicesBuffer() const;
+		void getIndicesBuffer(BufferHandle& handle) const;
 
         uint32_t getIndicesCount() const;
         uint32_t getVertexCount() const;

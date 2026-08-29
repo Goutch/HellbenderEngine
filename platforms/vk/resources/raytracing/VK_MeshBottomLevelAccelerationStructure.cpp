@@ -8,6 +8,8 @@ namespace HBE {
         HB_PROFILE_BEGIN("Build Mesh Acceleration Structure");
 
         VK_Mesh &mesh = context->meshes[info.mesh_handle];
+		VK_Buffer &mesh_first_buffer = context->buffers[mesh.getBuffer(0)];
+		VK_Buffer &indices_buffer = context->buffers[mesh.getIndicesBuffer()];
         VkDeviceSize vertex_size = mesh.getAttributeElementSize(0);
 
         VkAccelerationStructureGeometryKHR accelerationStructureGeometry{};
@@ -17,11 +19,11 @@ namespace HBE {
         accelerationStructureGeometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
         accelerationStructureGeometry.geometry.triangles.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
         accelerationStructureGeometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
-        accelerationStructureGeometry.geometry.triangles.vertexData = mesh.getBuffer(0).getDeviceAddress();
+        accelerationStructureGeometry.geometry.triangles.vertexData = mesh_first_buffer.getDeviceAddress();
         accelerationStructureGeometry.geometry.triangles.maxVertex = mesh.getVertexCount();
         accelerationStructureGeometry.geometry.triangles.vertexStride = vertex_size;
         accelerationStructureGeometry.geometry.triangles.indexType = mesh.getIndicesType() == INDICES_TYPE_UINT32 ? VK_INDEX_TYPE_UINT32 : VK_INDEX_TYPE_UINT16;
-        accelerationStructureGeometry.geometry.triangles.indexData = mesh.getIndicesBuffer().getDeviceAddress();
+        accelerationStructureGeometry.geometry.triangles.indexData = indices_buffer.getDeviceAddress();
         accelerationStructureGeometry.geometry.triangles.transformData.deviceAddress = 0;
         accelerationStructureGeometry.geometry.triangles.transformData.hostAddress = nullptr;
 
@@ -53,7 +55,7 @@ namespace HBE {
 
         VkAccelerationStructureCreateInfoKHR accelerationStructureCreateInfo{};
         accelerationStructureCreateInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR;
-        accelerationStructureCreateInfo.buffer = buffer.getHandle();
+        accelerationStructureCreateInfo.buffer = buffer.getVkHandle();
         accelerationStructureCreateInfo.size = accelerationStructureBuildSizesInfo.accelerationStructureSize;
         accelerationStructureCreateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
         context->device.vkCreateAccelerationStructureKHR(context->device.getHandle(), &accelerationStructureCreateInfo, nullptr, &handle);
@@ -100,7 +102,7 @@ namespace HBE {
         Log::warning("Build of MeshAcceleration structure is done on the gpu and waited on right now implement waiting for it with Fencehandle return");
         context->waitForFence(fence);
         ReleaseRequest releaseRequest{};
-        releaseRequest.vk_buffer = scratchBuffer.getHandle();
+        releaseRequest.vk_buffer = scratchBuffer.getVkHandle();
         releaseRequest.allocation = scratchBuffer.getAllocation();
         releaseRequest.fence = fence;
         context->allocator.releaseLater(releaseRequest);

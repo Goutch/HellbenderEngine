@@ -2,6 +2,7 @@
 
 #include "Core.h"
 #include "core/Graphics.h"
+#include "PipelineInstance.h"
 namespace HBE {
 	class HB_API ComputePipeline {
 		Context &context;
@@ -11,7 +12,7 @@ namespace HBE {
 
 		~ComputePipeline();
 
-		explicit ComputePipeline(const RasterizationPipelineInfo &info);
+		explicit ComputePipeline(const ComputePipelineInfo &info);
 
 		void alloc(const ComputePipelineInfo &info);
 

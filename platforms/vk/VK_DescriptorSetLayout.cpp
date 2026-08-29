@@ -13,7 +13,7 @@ namespace HBE
         bool variable_descriptor_reached = false;
         for (int i = 0; i < pipeline_descriptors.size(); ++i)
         {
-            if (pipeline_descriptors[i].descriptor_set == descriptor_set_index)
+            if (pipeline_descriptors[i].descriptor_set_index == descriptor_set_index)
             {
                 descriptor_infos.emplace_back(pipeline_descriptors[i]);
 
@@ -44,7 +44,7 @@ namespace HBE
             for (int i = 0; i < pipeline_descriptors.size(); ++i)
             {
                 if (last_descriptor.layout_binding.binding != pipeline_descriptors[i].layout_binding.binding &&
-                    pipeline_descriptors[i].descriptor_set == descriptor_set_index)
+                    pipeline_descriptors[i].descriptor_set_index == descriptor_set_index)
                 {
                     last_descriptor.layout_binding.descriptorCount -= pipeline_descriptors[i].layout_binding.descriptorCount;
                 }

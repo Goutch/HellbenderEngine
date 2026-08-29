@@ -69,20 +69,20 @@ namespace HBE
         void bind(VkCommandBuffer command_buffer, uint32_t frame);
         void unbind();
         void setUniform(uint32_t binding, const void* data);
-        void setImage(uint32_t binding, ImageHandle image, uint32_t mip_level, int32_t frame);
-        void setImageArray(uint32_t binding, ImageHandle* images, uint32_t image_count, int32_t mip_level, int32_t frame);
-        void setTexelBuffer(uint32_t binding, TexelBufferHandle buffer, int32_t frame);
-        void setTexelBufferArray(uint32_t binding, TexelBufferHandle* buffers, uint32_t buffer_count, int32_t frame);
-        void setAccelerationStructure(uint32_t binding, RootAccelerationStructureHandle acceleration_structure, int32_t frame);
-        void setStorageBuffer(uint32_t binding, BufferHandle buffer, size_t byte_offset, int32_t frame);
-        void setStorageBufferArray(uint32_t binding, BufferHandle* buffers, uint32_t count, int32_t frame);
+        void setImage(uint32_t binding, ImageHandle image, uint32_t mip_level);
+        void setImageArray(uint32_t binding, ImageHandle* images, uint32_t image_count, int32_t mip_level);
+        void setTexelBuffer(uint32_t binding, TexelBufferHandle buffer);
+        void setTexelBufferArray(uint32_t binding, TexelBufferHandle* buffers, uint32_t buffer_count);
+        void setAccelerationStructure(uint32_t binding, RootAccelerationStructureHandle acceleration_structure);
+        void setStorageBuffer(uint32_t binding, BufferHandle buffer, size_t byte_offset);
+        void setStorageBufferArray(uint32_t binding, BufferHandle* buffers, uint32_t count);
 
     private:
         void setBindingDirty(uint32_t index);
-        void copyDescriptorSets(DescriptorPool& from, DescriptorPool& to, int64_t frame);
+        void copyDescriptorSets(DescriptorPool& from, DescriptorPool& to);
         void createDescriptorWrites(DescriptorPool& pool);
         void createDescriptorPool(DescriptorPool& pool);
-        void createVariableSizeDescriptors(uint32_t binding, VkDescriptorType descriptor_type, uint32_t count, int32_t frame);
+        void createVariableSizeDescriptors(uint32_t binding, VkDescriptorType descriptor_type, uint32_t count);
         void updateDescriptors();
         uint32_t getBindingIndexForFrame(uint32_t binding);
         VkDescriptorSet getDescriptorSetForBinding(uint32_t binding);

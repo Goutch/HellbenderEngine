@@ -27,7 +27,7 @@ namespace HBE
     {
         std::string name;
         VkDeviceSize size = 0;
-        uint32_t descriptor_set = 0;
+        uint32_t descriptor_set_index = 0;
         VkDescriptorSetLayoutBinding layout_binding{};
         bool variable_size = false;
     };

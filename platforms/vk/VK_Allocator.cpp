@@ -200,7 +200,7 @@ namespace HBE {
             HB_PROFILE_BEGIN("VK_Allocator::update - non mappable buffer");
             ReleaseRequest staging_buffer = createTempStagingBuffer(data, size);
             HB_PROFILE_BEGIN("VK_Allocator::update - copy to non mappable buffer");
-            staging_buffer.fence = copy(staging_buffer.vk_buffer, buffer.getHandle(), size, offset);
+            staging_buffer.fence = copy(staging_buffer.vk_buffer, buffer.getVkHandle(), size, offset);
             HB_PROFILE_END("VK_Allocator::update - copy to non mappable buffer");
             releaseLater(staging_buffer);
             HB_PROFILE_END("VK_Allocator::update - non mappable buffer");

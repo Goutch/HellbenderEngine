@@ -436,7 +436,7 @@ namespace HBE
         VK_PipelineInstance& vk_screen_pipeline_instance = context->pipeline_instances[renderer_resources.screen_pipeline_instance];
         HB_ASSERT(vk_screen_pipeline_instance.getType() == PIPELINE_INSTANCE_TYPE_RASTERIZATION, "pipeline instance type should be Rasterization");
         VK_RasterizationPipeline& vk_screen_pipeline = context->rasterization_pipelines[vk_screen_pipeline_instance.getPipeline()];
-        vk_screen_pipeline_instance.setImageArray(vk_screen_pipeline_instance.getBinding("layers"), &present_cmd_info.images[0], present_cmd_info.image_count, 0, command_pool.getCommandBufferIndex());
+        vk_screen_pipeline_instance.setImageArray(vk_screen_pipeline_instance.getBinding("layers"), &present_cmd_info.images[0], present_cmd_info.image_count, 0);
         HB_PROFILE_END("screen_pipeline_instance->setImageArray");
         HB_PROFILE_BEGIN("screen_pipeline_instance->setUniform");
         vk_screen_pipeline_instance.setUniform(vk_screen_pipeline_instance.getBinding("ubo"), &present_cmd_info.image_count);
@@ -447,7 +447,6 @@ namespace HBE
 
         vk_screen_pipeline.bind();
         vk_screen_pipeline_instance.bind();
-
 
         vkCmdDraw(command_pool.getCurrentBuffer(), 3, 1, 0, 0);
         vk_screen_pipeline_instance.unbind();

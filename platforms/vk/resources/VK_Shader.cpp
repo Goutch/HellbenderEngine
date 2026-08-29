@@ -165,7 +165,7 @@ namespace HBE
         descriptor_info.
             layout_binding = layout_binding;
         descriptor_info.
-            descriptor_set = set_index;
+            descriptor_set_index = set_index;
         descriptor_info.
             name = name;
         descriptor_info.

@@ -47,6 +47,7 @@ set(CORE_FILES
         core/resource/Shader.cpp
         core/resource/Shader.h
         core/resource/ComputePipeline.h
+        core/resource/ComputePipeline.cpp
         core/resource/Image.cpp
         core/resource/PipelineInstance.h
         core/resource/RasterizationTarget.h
@@ -236,7 +237,7 @@ set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_X11 OFF CACHE BOOL "" FORCE)
 set(GLFW_VULKAN_STATIC FALSE)
 
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/" EXCLUDE_FROM_ALL)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/include")
 #set_property(TARGET glfw PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
@@ -245,7 +246,7 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "")
 set(BUILD_EXTERNAL TRUE)
 set(ENABLE_GLSLANG_BINARIES OFF CACHE BOOL "")
 set(ENABLE_CTEST OFF CACHE BOOL "")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/" EXCLUDE_FROM_ALL)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/)
 #set_property(TARGET glslang PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
@@ -267,7 +268,7 @@ set(SPIRV_CROSS_ENABLE_TESTS OFF CACHE BOOL "Enable SPIRV-Cross tests.")
 #set(SPIRV_CROSS_FORCE_PIC "Force position-independent code for all targets." FALSE)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/)
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/" EXCLUDE_FROM_ALL)
 include_directories(${Vulkan_INCLUDE_DIRS})
 #set_property(TARGET spirv-cross-glsl PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 #set_property(TARGET spirv-cross-glsl spirv-cross-cpp PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -286,7 +287,7 @@ set(TINYGLTF_HEADER_ONLY ON CACHE INTERNAL "" FORCE)
 set(TINYGLTF_INSTALL OFF CACHE INTERNAL "" FORCE)
 set(TINYGLTF_NO_INCLUDE_STB_IMAGE ON CACHE INTERNAL "" FORCE)
 set(TINYGLTF_BUILD_LOADER_EXAMPLE OFF CACHE BOOL "Build loader_example(load glTF and dump infos)" FORCE)
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf" EXCLUDE_FROM_ALL)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf)
 set_property(TARGET tinygltf PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 message("#------------------------------------FREE_TYPE------------------------------------")
@@ -303,7 +304,7 @@ set(FREETYPE_INCLUDE_DIR_ft2build "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/free
 set(FREETYPE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/freetype")
 
 
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/freetype")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/freetype" EXCLUDE_FROM_ALL)
 add_library(Freetype::Freetype ALIAS freetype)
 
 message("#------------------------------------MSDFGEN-----------------------------------")
@@ -317,7 +318,7 @@ message("#------------------------------------MSDFGEN_ATLAS_GEN-----------------
 set(MSDF_ATLAS_GEN_BUILD_STANDALONE FALSE)
 set(MSDF_ATLAS_GEN_MSDFGEN_EXTERNAL FALSE)
 
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/msdf-atlas-gen/")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/msdf-atlas-gen/" EXCLUDE_FROM_ALL)
 #include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/msdf-atlas-gen/include)
 set_property(TARGET msdf-atlas-gen PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 set_property(TARGET msdfgen-core PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
@@ -341,19 +342,23 @@ set(ALSOFT_TESTS OFF CACHE BOOL "Build test programs")
 set(ALSOFT_INSTALL_UTILS OFF CACHE BOOL "Install utility programs (openal-info, alsoft-config, ...)")
 #set(ALSOFT_UPDATE_BUILD_VERSION OFF CACHE BOOL "Update git build version info")
 
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/openal-soft/")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/openal-soft/" EXCLUDE_FROM_ALL)
 message("#------------------------------------LIBSNDFILE------------------------------------")
 set(BUILD_PROGRAMS OFF CACHE BOOL "")
 set(BUILD_EXAMPLES OFF CACHE BOOL "")
 set(ENABLE_CPACK OFF CACHE BOOL "")
 set(BUILD_TESTING OFF CACHE BOOL "Set LibSNDFile test to Off")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libsndfile/")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libsndfile/" EXCLUDE_FROM_ALL)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libsndfile/include)
 
 message("#------------------------------------HBE------------------------------------")
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}
-        ${VK_FILES})
+        ${VK_FILES}
+        core/resource/raytracing/AABBAccelerationStructure.cpp
+        core/resource/raytracing/MeshAccelerationStructure.cpp
+        core/resource/raytracing/RaytracingPipeline.cpp
+        core/resource/raytracing/RootAccelerationStructure.cpp)
 
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")

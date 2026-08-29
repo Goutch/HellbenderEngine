@@ -6,11 +6,14 @@ layout(location = 0) in vec3 inPosition;
 //instanced
 layout(location = 1) in mat4 inInstanceTransforms;
 
+
+layout (location = 0) out flat int fragInstanceID;
 layout(binding = 0) uniform UniformBufferObject {
     mat4 view;
     mat4 projection;
 } ubo;
 
 void main() {
+    fragInstanceID = gl_InstanceIndex;
     gl_Position = ubo.projection * ubo.view * inInstanceTransforms * vec4(inPosition, 1.0);
 }

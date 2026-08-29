@@ -104,19 +104,19 @@ namespace HBE {
 		context.getPipelineInstanceBindingFromString(instance_handle, texture_name.c_str(), binding);
 		context.getPipelineInstanceBindingFromString(instance_handle, parser_info.material_property_name.c_str(), material_binding);
 		if (texture_type_it != parser_info.texture_names.end() && materialData.albedo_texture != -1)
-			context.setPipelineInstanceImage(instance_handle, binding, textures[materialData.albedo_texture], 0, -1);
+			context.setPipelineInstanceImage(instance_handle, binding, textures[materialData.albedo_texture], 0);
 		texture_type_it = parser_info.texture_names.find(MODEL_TEXTURE_TYPE_METALLIC_ROUGHNESS);
 		if (texture_type_it != parser_info.texture_names.end() && materialData.metallic_roughness_texture != -1)
-			context.setPipelineInstanceImage(instance_handle, binding, textures[materialData.metallic_roughness_texture], 0, -1);
+			context.setPipelineInstanceImage(instance_handle, binding, textures[materialData.metallic_roughness_texture], 0);
 		texture_type_it = parser_info.texture_names.find(MODEL_TEXTURE_TYPE_EMMISIVE);
 		if (texture_type_it != parser_info.texture_names.end() && materialData.emmisive_texture != -1)
-			context.setPipelineInstanceImage(instance_handle, binding, textures[materialData.emmisive_texture], 0, -1);
+			context.setPipelineInstanceImage(instance_handle, binding, textures[materialData.emmisive_texture], 0);
 		texture_type_it = parser_info.texture_names.find(MODEL_TEXTURE_TYPE_NORMAL);
 		if (texture_type_it != parser_info.texture_names.end() && materialData.normal_texture != -1)
-			context.setPipelineInstanceImage(instance_handle, binding, textures[materialData.normal_texture], 0, -1);
+			context.setPipelineInstanceImage(instance_handle, binding, textures[materialData.normal_texture], 0);
 		texture_type_it = parser_info.texture_names.find(MODEL_TEXTURE_TYPE_OCCLUSION);
 		if (texture_type_it != parser_info.texture_names.end() && materialData.occlusion_texture != -1)
-			context.setPipelineInstanceImage(instance_handle, binding, textures[materialData.occlusion_texture], 0, -1);
+			context.setPipelineInstanceImage(instance_handle, binding, textures[materialData.occlusion_texture], 0);
 
 		context.setPipelineInstanceUniform(instance_handle, material_binding, &materialData.properties);
 
@@ -137,9 +137,9 @@ namespace HBE {
 		return handle;
 	}
 
-	MeshAccelerationStructureHandle DefaultModelParser::createMeshAccelerationStructure(Mesh *mesh, int mesh_index) {
+	MeshAccelerationStructureHandle DefaultModelParser::createMeshAccelerationStructure(Mesh &mesh, int mesh_index) {
 		MeshAccelerationStructureInfo acceleration_structure_info{};
-		acceleration_structure_info.mesh_handle = mesh->getHandle();
+		acceleration_structure_info.mesh_handle = mesh.getHandle();
 		MeshAccelerationStructureHandle acceleration_structure_handle;
 		context.createMeshAccelerationStructure(acceleration_structure_handle, acceleration_structure_info);
 		return acceleration_structure_handle;

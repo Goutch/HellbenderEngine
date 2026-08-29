@@ -42,4 +42,8 @@ namespace HBE {
 	void StorageBuffer::update(const void *data) {
 		context.updateBuffer(handle, data);
 	}
+
+	uint32_t StorageBuffer::getCount() {
+		return context.getStorageBufferCount(handle);
+	}
 }

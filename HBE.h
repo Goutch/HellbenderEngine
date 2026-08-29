@@ -16,7 +16,7 @@
 #include "core/resource/Model.h"
 #include "core/resource/RasterizationTarget.h"
 #include "core/resource/StorageBuffer.h"
-#include "core/resource/raytracing/AccelerationStructure.h"
+#include "core/resource/raytracing/RootAccelerationStructure.h"
 #include "core/resource/raytracing/RaytracingPipeline.h"
 #include "core/resource/AudioClip.h"
 #include "core/resource/AudioClipInstance.h"

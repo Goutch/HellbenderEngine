@@ -16,7 +16,7 @@ namespace HBE {
 
         ~Shader();
 
-        void loadGLSL(const char *path, SHADER_STAGE stage);
+        void loadGLSL(const char *path, SHADER_STAGE stage,const char* preamble = "");
 
         void alloc(const ShaderInfo &info);
 

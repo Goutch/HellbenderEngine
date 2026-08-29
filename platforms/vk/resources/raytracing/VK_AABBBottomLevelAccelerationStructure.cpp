@@ -31,7 +31,7 @@ namespace HBE {
 
         VkBufferDeviceAddressInfo bufferDeviceAddressInfo{};
         bufferDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
-        bufferDeviceAddressInfo.buffer = aabb_positions_buffer.getHandle();
+        bufferDeviceAddressInfo.buffer = aabb_positions_buffer.getVkHandle();
 
         VkDeviceOrHostAddressConstKHR aabb_position_buffer_address{};
         aabb_position_buffer_address.deviceAddress = context->device.vkGetBufferDeviceAddressKHR(context->device.getHandle(), &bufferDeviceAddressInfo);
@@ -73,7 +73,7 @@ namespace HBE {
 
         VkAccelerationStructureCreateInfoKHR accelerationStructureCreateInfo{};
         accelerationStructureCreateInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR;
-        accelerationStructureCreateInfo.buffer = buffer.getHandle();
+        accelerationStructureCreateInfo.buffer = buffer.getVkHandle();
         accelerationStructureCreateInfo.size = accelerationStructureBuildSizesInfo.accelerationStructureSize;
         accelerationStructureCreateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
         context->device.vkCreateAccelerationStructureKHR(context->device.getHandle(), &accelerationStructureCreateInfo, nullptr, &handle);

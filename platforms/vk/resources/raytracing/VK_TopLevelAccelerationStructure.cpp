@@ -31,12 +31,17 @@ namespace HBE {
             instances[i].instanceShaderBindingTableRecordOffset = info.instances[i].shader_group_index;
             instances[i].flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
             if (info.instances[i].type == ACCELERATION_STRUCTURE_TYPE_AABB) {
-                auto *aabb_as = (VK_AABBBottomLevelAccelerationStructure *) info.aabb_acceleration_structures[info.instances[i].acceleration_structure_index];
-                instances[i].accelerationStructureReference = aabb_as->getDeviceAddress().deviceAddress;
-            } else {
-                auto mesh_as = (VK_MeshBottomLevelAccelerationStructure *) info.mesh_acceleration_structures[info.instances[i].acceleration_structure_index];
-                instances[i].accelerationStructureReference = mesh_as->getDeviceAddress().deviceAddress;
+	            AABBAccelerationStructureHandle aabb_as_handle = info.aabb_acceleration_structures[info.instances[i].acceleration_structure_index];
+				VK_AABBBottomLevelAccelerationStructure& vk_aabb_as = context->aabb_acceleration_structures[aabb_as_handle];
+                instances[i].accelerationStructureReference = vk_aabb_as.getDeviceAddress().deviceAddress;
+            } else if (info.instances[i].type == ACCELERATION_STRUCTURE_TYPE_MESH) {
+	            MeshAccelerationStructureHandle mesh_as_handle = info.mesh_acceleration_structures[info.instances[i].acceleration_structure_index];
+				VK_MeshBottomLevelAccelerationStructure& vk_mesh_as = context->mesh_acceleration_structures[mesh_as_handle];
+                instances[i].accelerationStructureReference = vk_mesh_as.getDeviceAddress().deviceAddress;
             }
+			else{
+				Log::debug("Unknown acceleration structure type for instance " + std::to_string(i));
+			}
         }
 
 
@@ -97,7 +102,7 @@ namespace HBE {
 
         VkAccelerationStructureCreateInfoKHR accelerationStructureCreateInfo{};
         accelerationStructureCreateInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR;
-        accelerationStructureCreateInfo.buffer = buffer.getHandle();
+        accelerationStructureCreateInfo.buffer = buffer.getVkHandle();
         accelerationStructureCreateInfo.size = accelerationStructureBuildSizesInfo.accelerationStructureSize;
         accelerationStructureCreateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR;
         device->vkCreateAccelerationStructureKHR(device->getHandle(), &accelerationStructureCreateInfo, nullptr, &handle);
