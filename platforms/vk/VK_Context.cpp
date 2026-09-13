@@ -14,6 +14,7 @@ namespace HBE {
 		physical_device.init(instance, surface);
 		device.init(this);
 		allocator.init(this);
+		descriptor_allocator.init(this);
 		swapchain.init(this);
 
 
@@ -37,6 +38,7 @@ namespace HBE {
 		renderer.release();
 		allocator.processFreeRequests(0);
 		swapchain.release();
+		descriptor_allocator.release();
 		allocator.release();
 		device.release();
 		physical_device.release();

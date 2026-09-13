@@ -8,6 +8,7 @@
 #include "VK_Surface.h"
 #include "VK_Swapchain.h"
 #include "VK_Instance.h"
+#include "VK_DescriptorAllocator.h"
 #include "HBE/platforms/vk/resources/VK_RenderPass.h"
 #include "HBE/platforms/vk/resources/VK_TexelBuffer.h"
 
@@ -74,6 +75,7 @@ namespace HBE {
 		VK_PhysicalDevice physical_device{};
 		VK_Device device{};
 		VK_Allocator allocator{};
+		VK_DescriptorAllocator descriptor_allocator{};
 		VK_Swapchain swapchain{};
 		VK_Renderer renderer{};
 		GraphicLimits graphic_limits{};
@@ -182,5 +184,7 @@ namespace HBE {
 			pipeline_handle = pipeline_instances[handle].getPipeline();
 			return HBE_RESULT_SUCCESS;
 		}
+
+
 	};
 }

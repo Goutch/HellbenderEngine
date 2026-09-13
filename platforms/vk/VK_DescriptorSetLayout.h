@@ -2,23 +2,25 @@
 
 #include "vulkan/vulkan.h"
 #include "vector"
+#include "VK_DescriptorPoolSize.h"
 
 namespace HBE
 {
     class VK_Context;
     class VK_Device;
 
-    struct VK_DescriptorInfo;
+    struct VK_BindingInfo;
 
     class VK_DescriptorSetLayout
     {
         VkDescriptorSetLayout handle = VK_NULL_HANDLE;
-        std::vector<VkDescriptorSetLayoutBinding> bindings;
-        std::vector<VK_DescriptorInfo> descriptor_infos;
+        std::vector<VkDescriptorSetLayoutBinding> layout_bindings;
+        std::vector<VK_BindingInfo> set_bindings;
         VK_Context* context = nullptr;
-
+		uint32_t descriptor_set_index = 0;
+	    VK_DescriptorPoolSize required_pool_sizes;
     public :
-        void init(VK_Context* context, uint32_t descriptor_set_index, std::vector<VK_DescriptorInfo>& pipeline_descriptors, bool empty_descriptor_allowed);
+        void init(VK_Context* context, uint32_t descriptor_set_index, std::vector<VK_BindingInfo>& pipeline_bindings, bool empty_descriptor_allowed);
         void release();
         VK_DescriptorSetLayout() = default;
         VK_DescriptorSetLayout(VK_DescriptorSetLayout&& other) noexcept;
@@ -26,13 +28,15 @@ namespace HBE
         VK_DescriptorSetLayout(const VK_DescriptorSetLayout&) = delete;
         VK_DescriptorSetLayout& operator=(const VK_DescriptorSetLayout&) = delete;
 
-
+		uint32_t getDescriptorSetIndex() const;
         VkDescriptorSetLayout getHandle() const;
 
-        const std::vector<VkDescriptorSetLayoutBinding>& getBindings() const;
+        const std::vector<VkDescriptorSetLayoutBinding>& getLayoutBindings() const;
 
-        const std::vector<VK_DescriptorInfo>& getDescriptorInfos() const;
+        const std::vector<VK_BindingInfo>& getBindingInfos() const;
 
         uint32_t getLastBinding() const;
+
+	    const VK_DescriptorPoolSize& getRequiredPoolSizes() const;
     };
 }

@@ -401,26 +401,26 @@ The command line client calls `Compiler::build_combined_image_samplers` automati
 
 #### Descriptor sets (Vulkan GLSL) for backends which do not support them (pre HLSL 5.1 / GLSL)
 
-Descriptor sets are unique to Vulkan, so make sure that descriptor set + binding is remapped to a flat binding scheme (set always 0), so that other APIs can make sense of the bindings.
+Descriptor sets are unique to Vulkan, so make sure that descriptor set + binding is remapped to a flat binding scheme (set always 0), so that other APIs can make sense of the layout_bindings.
 This can be done with `Compiler::set_decoration(id, spv::DecorationDescriptorSet)`. For other backends like MSL and HLSL, descriptor sets
 can be used, with some minor caveats, see below.
 
 ##### MSL 2.0+
 
 Metal supports indirect argument buffers (--msl-argument-buffers). In this case, descriptor sets become argument buffers,
-and bindings are mapped to [[id(N)]] within the argument buffer. One quirk is that arrays of resources consume multiple ids,
+and layout_bindings are mapped to [[id(N)]] within the argument buffer. One quirk is that arrays of resources consume multiple ids,
 where Vulkan does not. This can be worked around either from shader authoring stage
-or remapping bindings as needed to avoid the overlap.
+or remapping layout_bindings as needed to avoid the overlap.
 There is also a rich API to declare remapping schemes which is intended to work like
 the pipeline layout in Vulkan. See `CompilerMSL::add_msl_resource_binding`. Remapping combined image samplers for example
-must be split into two bindings in MSL, so it's possible to declare an id for the texture and sampler binding separately.
+must be split into two layout_bindings in MSL, so it's possible to declare an id for the texture and sampler binding separately.
 
 ##### HLSL - SM 5.1+
 
-In SM 5.1+, descriptor set bindings are interpreted as register spaces directly. In HLSL however, arrays of resources consume
+In SM 5.1+, descriptor set layout_bindings are interpreted as register spaces directly. In HLSL however, arrays of resources consume
 multiple binding slots where Vulkan does not, so there might be overlap if the SPIR-V was not authored with this in mind.
-This can be worked around either from shader authoring stage (don't assign overlapping bindings)
-or remap bindings in SPIRV-Cross as needed to avoid the overlap.
+This can be worked around either from shader authoring stage (don't assign overlapping layout_bindings)
+or remap layout_bindings in SPIRV-Cross as needed to avoid the overlap.
 
 #### Linking by name for targets which do not support explicit locations (legacy GLSL/ESSL)
 

@@ -13,7 +13,6 @@ namespace HBE {
 	                                const PipelineInstanceInfo &info) {
 		this->context = context;
 		this->pipeline_type = info.type;
-		this->empty_descriptor_allowed = empty_descriptor_allowed;
 		VkPipeline vk_pipeline_handle = VK_NULL_HANDLE;
 		pipeline_handle = info.pipeline_handle;
 		switch (info.type) {
@@ -34,7 +33,6 @@ namespace HBE {
 				break;
 		}
 
-		const std::vector<VkDeviceSize> &descriptor_sizes = pipeline_layout->getDescriptorSizes();
 		const std::vector<VkDescriptorSetLayoutBinding> &descriptor_bindings = pipeline_layout->getDescriptorBindings();
 
 		std::unordered_map<uint32_t, UniformMemoryInfo> binding_memory_type_map;
@@ -62,14 +60,22 @@ namespace HBE {
 				}
 
 
-				buffer_info.size = descriptor_sizes[binding];
+				buffer_info.size = pipeline_layout->getBindingElementSize(binding);
 				buffer_info.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
 
 				uniform_buffers[binding_frame_offset + binding].alloc(context, buffer_info);
 			}
 		}
-		createDescriptorPool(descriptor_pool);
-		createDescriptorWrites(descriptor_pool);
+		createDescriptorWrites();
+
+		//allocate descriptor sets
+		descriptor_set_handles.resize(pipeline_layout->getDescriptorSetCount() * MAX_FRAMES_IN_FLIGHT);
+		descriptor_allocations.resize(pipeline_layout->getDescriptorSetCount() * MAX_FRAMES_IN_FLIGHT);
+		for (int i = 0; i < pipeline_layout->getDescriptorSetCount() * MAX_FRAMES_IN_FLIGHT; ++i) {
+			DescriptorSetAllocation allocation = context->descriptor_allocator.alloc(pipeline_layout, i);
+			descriptor_allocations[i] = allocation;
+			descriptor_set_handles[i] = context->descriptor_allocator.getDescriptorSet(allocation);
+		}
 
 		context->renderer.onFrameEnd.subscribe(on_frame_change_subscription_id, this, &VK_PipelineInstance::onFrameEnd);
 	}
@@ -87,224 +93,21 @@ namespace HBE {
 		for (VkDescriptorBufferInfo *buffer_info: buffer_infos) {
 			delete[] buffer_info;
 		}
+		for (DescriptorSetAllocation &descriptor_allocation: descriptor_allocations)
+		{
+			context->descriptor_allocator.free(descriptor_allocation);
+		}
 
-		vkDestroyDescriptorPool(context->device.getHandle(), descriptor_pool.handle, nullptr);
 		pipeline_layout = nullptr;
 	}
 
-	void VK_PipelineInstance::resetPool(DescriptorPool &pool) {
-		pool.dirty_descriptor_sets_bindings.clear();
-		pool.writes.clear();
-		pool.handle = VK_NULL_HANDLE;
-		pool.descriptor_set_handles.clear();
-		pool.variable_descriptor_sets.clear();
-	}
-
-	void VK_PipelineInstance::createDescriptorPool(DescriptorPool &pool) {
-		const std::vector<VkDescriptorSetLayout> pipeline_descriptor_set_layouts = pipeline_layout->getDescriptorSetLayoutHandles();
-		std::vector<VkDescriptorSetLayout> descriptor_set_layouts(MAX_FRAMES_IN_FLIGHT * pipeline_descriptor_set_layouts.size());
-		for (int i = 0; i < descriptor_set_layouts.size(); ++i) {
-			descriptor_set_layouts[i] = pipeline_descriptor_set_layouts[i % pipeline_descriptor_set_layouts.size()];
-		}
-
-		size_t combined_image_sampler_count = 0;
-		size_t separate_image_count = 0;
-		size_t storage_image_count = 0;
-		size_t uniform_buffer_count = 0;
-		size_t storage_buffer_count = 0;
-		size_t storage_texel_buffer_count = 0;
-		size_t uniform_texel_buffer_count = 0;
-		size_t acceleration_structure_count = 0;
-
-		for (auto layout_binding: pipeline_layout->getDescriptorBindings()) {
-			if (pipeline_layout->IsBindingVariableSize(layout_binding.binding)) {
-				continue;
-			}
-			switch (layout_binding.descriptorType) {
-				case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
-					uniform_buffer_count += layout_binding.descriptorCount * MAX_FRAMES_IN_FLIGHT;
-					break;
-				case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
-					combined_image_sampler_count += layout_binding.descriptorCount * MAX_FRAMES_IN_FLIGHT;
-					break;
-				case VK_DESCRIPTOR_TYPE_SAMPLER:
-					break;
-				case VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE:
-					separate_image_count += layout_binding.descriptorCount * MAX_FRAMES_IN_FLIGHT;
-					break;
-				case VK_DESCRIPTOR_TYPE_STORAGE_IMAGE:
-					storage_image_count += layout_binding.descriptorCount * MAX_FRAMES_IN_FLIGHT;
-					break;
-				case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
-					storage_buffer_count += layout_binding.descriptorCount * MAX_FRAMES_IN_FLIGHT;
-					break;
-				case VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
-					storage_texel_buffer_count += layout_binding.descriptorCount * MAX_FRAMES_IN_FLIGHT;
-					break;
-				case VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
-					uniform_texel_buffer_count += layout_binding.descriptorCount * MAX_FRAMES_IN_FLIGHT;
-					break;
-				case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR:
-					acceleration_structure_count += layout_binding.descriptorCount * MAX_FRAMES_IN_FLIGHT;
-					break;
-			}
-		}
-		if (pool.variable_descriptor_sets.size() < descriptor_set_layouts.size()) {
-			pool.variable_descriptor_sets.resize(descriptor_set_layouts.size(), {});
-		}
-		bool has_variable_size_descriptors = false;
-		std::vector<uint32_t> variable_sizes(pool.variable_descriptor_sets.size(), 0);
-		for (int i = 0; i < pool.variable_descriptor_sets.size(); ++i) {
-			VariableDescriptorSet &variable_descriptor = pool.variable_descriptor_sets[i];
-			variable_descriptor.binding = pipeline_layout->getLastDescriptorSetBinding(i % pipeline_layout->getDescriptorSetCount());
-			variable_descriptor.type = pipeline_layout->getDescriptorInfos()[pool.variable_descriptor_sets[i].binding].layout_binding.descriptorType;
-
-			if (pipeline_layout->IsBindingVariableSize(variable_descriptor.binding)) {
-				has_variable_size_descriptors = true;
-				variable_sizes[i] += variable_descriptor.count;
-				switch (variable_descriptor.type) {
-					case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
-						uniform_buffer_count += variable_descriptor.count;
-						break;
-					case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
-						combined_image_sampler_count += variable_descriptor.count;
-						break;
-					case VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE:
-						separate_image_count += variable_descriptor.count;
-						break;
-					case VK_DESCRIPTOR_TYPE_STORAGE_IMAGE:
-						storage_image_count += variable_descriptor.count;
-						break;
-					case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
-						storage_buffer_count += variable_descriptor.count;
-						break;
-					case VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
-						storage_texel_buffer_count += variable_descriptor.count;
-						break;
-					case VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
-						uniform_texel_buffer_count += variable_descriptor.count;
-						break;
-					case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR:
-						acceleration_structure_count += variable_descriptor.count;
-						break;
-				}
-			}
-		}
-		std::vector<VkDescriptorPoolSize> poolSizes{};
-		if (uniform_buffer_count > 0) {
-			poolSizes.emplace_back();
-			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			poolSizes[poolSizes.size() - 1].descriptorCount = uniform_buffer_count;
-		}
-		if (combined_image_sampler_count > 0) {
-			poolSizes.emplace_back();
-			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-			poolSizes[poolSizes.size() - 1].descriptorCount = combined_image_sampler_count;
-		}
-		if (storage_image_count > 0) {
-			poolSizes.emplace_back();
-			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-			poolSizes[poolSizes.size() - 1].descriptorCount = storage_image_count;
-		}
-		if (separate_image_count > 0) {
-			poolSizes.emplace_back();
-			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-			poolSizes[poolSizes.size() - 1].descriptorCount = separate_image_count;
-		}
-		if (storage_buffer_count > 0) {
-			poolSizes.emplace_back();
-			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-			poolSizes[poolSizes.size() - 1].descriptorCount = storage_buffer_count;
-		}
-		if (storage_texel_buffer_count > 0) {
-			poolSizes.emplace_back();
-			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
-			poolSizes[poolSizes.size() - 1].descriptorCount = storage_texel_buffer_count;
-		}
-		if (uniform_texel_buffer_count > 0) {
-			poolSizes.emplace_back();
-			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
-			poolSizes[poolSizes.size() - 1].descriptorCount = uniform_texel_buffer_count;
-		}
-		if (acceleration_structure_count > 0) {
-			poolSizes.emplace_back();
-			poolSizes[poolSizes.size() - 1].type = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
-			poolSizes[poolSizes.size() - 1].descriptorCount = acceleration_structure_count;
-		}
-
-
-		VkDescriptorPoolCreateInfo poolInfo{};
-		poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-		poolInfo.poolSizeCount = poolSizes.size();
-		poolInfo.pPoolSizes = poolSizes.data();
-		poolInfo.maxSets = descriptor_set_layouts.size();
-		if (vkCreateDescriptorPool(context->device.getHandle(), &poolInfo, nullptr, &pool.handle) != VK_SUCCESS) {
-			Log::error("failed to create descriptor pool!");
-		}
-		pool.descriptor_set_handles.resize(descriptor_set_layouts.size());
-		VkDescriptorSetAllocateInfo allocInfo{};
-		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		allocInfo.descriptorPool = pool.handle;
-		allocInfo.descriptorSetCount = descriptor_set_layouts.size();
-		allocInfo.pSetLayouts = descriptor_set_layouts.data();
-		VkDescriptorSetVariableDescriptorCountAllocateInfo variable_count_info{};
-		if (has_variable_size_descriptors) {
-			bool descriptor_indexing_enabled = context->physical_device.getEnabledExtensionFlags() & EXTENSION_FLAG_DESCRIPTOR_INDEXING;
-			HB_ASSERT(has_variable_size_descriptors == descriptor_indexing_enabled, "Descriptor indexing is not enabled but variable size descriptors are used!");
-			variable_count_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO;
-			variable_count_info.descriptorSetCount = allocInfo.descriptorSetCount;
-			variable_count_info.pDescriptorCounts = variable_sizes.data();
-			allocInfo.pNext = &variable_count_info;
-		}
-
-
-		if (vkAllocateDescriptorSets(context->device.getHandle(), &allocInfo, pool.descriptor_set_handles.data()) != VK_SUCCESS) {
-			Log::error("failed to allocate descriptor sets!");
-		}
-	}
-
-	void VK_PipelineInstance::copyDescriptorSets(DescriptorPool &from, DescriptorPool &to) {
-		std::vector<VkCopyDescriptorSet> descriptor_set_copy_infos;
-		uint32_t binding_count = pipeline_layout->getDescriptorBindings().size();
-		for (uint32_t frame = 0; frame < MAX_FRAMES_IN_FLIGHT; ++frame) {
-			uint32_t set_offset = frame * pipeline_layout->getDescriptorSetLayoutHandles().size();
-			for (uint32_t binding=0; binding < binding_count; binding++) {
-				VkWriteDescriptorSet &from_write = from.writes[binding];
-				VkWriteDescriptorSet &to_write = to.writes[binding];
-				uint32_t descriptor_set_count = pipeline_layout->getDescriptorSetCount();
-				uint32_t descriptor_index = pipeline_layout->getDescriptorInfos()[binding].descriptor_set_index;
-
-				VkCopyDescriptorSet copy{};
-				copy.sType = VK_STRUCTURE_TYPE_COPY_DESCRIPTOR_SET;
-				copy.srcSet = from.descriptor_set_handles[(frame * descriptor_set_count) + descriptor_index];
-				copy.dstSet = to.descriptor_set_handles[(frame * descriptor_set_count) + descriptor_index];
-				copy.srcBinding = from_write.dstBinding;
-				copy.dstBinding = to_write.dstBinding;
-				copy.descriptorCount = std::min(from_write.descriptorCount, to_write.descriptorCount);
-				if (copy.descriptorCount > 0) {
-					descriptor_set_copy_infos.emplace_back(copy);
-				}
-				printf(
-						"copy[%zu]: src binding=%u count=%u | dst binding=%u count=%u\n",
-						descriptor_set_copy_infos.size(),
-						from_write.dstBinding,
-						from_write.descriptorCount,
-						to_write.dstBinding,
-						to_write.descriptorCount
-				);
-			}
-		}
-
-		vkUpdateDescriptorSets(context->device.getHandle(), 0, nullptr, descriptor_set_copy_infos.size(), descriptor_set_copy_infos.data());
-	}
-
-	void VK_PipelineInstance::createDescriptorWrites(DescriptorPool &pool) {
+	void VK_PipelineInstance::createDescriptorWrites() {
 		const std::vector<VkDescriptorSetLayoutBinding> layout_bindings = pipeline_layout->getDescriptorBindings();
 		const std::vector<VkDescriptorSetLayout> &descriptor_set_layouts = pipeline_layout->getDescriptorSetLayoutHandles();
-		const std::vector<VK_DescriptorInfo> &descriptor_infos = pipeline_layout->getDescriptorInfos();
+		const std::vector<VK_BindingInfo> &descriptor_infos = pipeline_layout->getBindingInfos();
 
-		pool.writes.resize(layout_bindings.size());
-		pool.dirty_descriptor_sets_bindings.resize(MAX_FRAMES_IN_FLIGHT * layout_bindings.size(), true);
+		writes.resize(layout_bindings.size());
+		dirty_descriptor_sets_bindings.resize(MAX_FRAMES_IN_FLIGHT * layout_bindings.size(), true);
 		uint32_t frame_index = 0;
 		for (size_t binding = 0; binding < layout_bindings.size(); ++binding) {
 			auto descriptor_type = layout_bindings[binding].descriptorType;
@@ -312,95 +115,51 @@ namespace HBE {
 			uint32_t descriptor_set_index = (frame_index * descriptor_set_layouts.size()) + descriptor_infos[binding].descriptor_set_index;
 
 			if (pipeline_layout->IsBindingVariableSize(binding)) {
-				descriptor_count = pool.variable_descriptor_sets[descriptor_set_index].count;
+				descriptor_count = 0;
 			}
 
 			VkWriteDescriptorSet write = {};
 			write.descriptorType = descriptor_type;
 			write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			write.dstSet = pool.descriptor_set_handles[descriptor_set_index];
 			write.dstBinding = binding;
 			write.descriptorType = descriptor_type;
 			write.dstArrayElement = 0;
 			write.descriptorCount = descriptor_count;
 			write.pTexelBufferView = nullptr; // Optional
 
-
-			pool.writes[binding] = write;
+			writes[binding] = write;
 		}
-
-
-		std::vector<VkWriteDescriptorSet> initial_descriptor_writes;
-		initial_descriptor_writes.reserve(pool.writes.size());
 
 		buffer_infos.resize(layout_bindings.size() * MAX_FRAMES_IN_FLIGHT, {});
 		image_infos.resize(layout_bindings.size() * MAX_FRAMES_IN_FLIGHT, {});
 		acceleration_structure_infos.resize(layout_bindings.size() * MAX_FRAMES_IN_FLIGHT, {});
-		for (int binding = 0; binding < pool.writes.size(); ++binding) {
+		for (int binding = 0; binding < writes.size(); ++binding) {
 			//set uniform buffers
-			if (pool.writes[binding].descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
+			if (writes[binding].descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
 				buffer_infos[binding] = new VkDescriptorBufferInfo();
 				buffer_infos[binding]->buffer = uniform_buffers[binding].getVkHandle();
 				buffer_infos[binding]->offset = 0;
 				buffer_infos[binding]->range = uniform_buffers[binding].getSize();
-				pool.writes[binding].pBufferInfo = buffer_infos[binding];
-				initial_descriptor_writes.emplace_back(pool.writes[binding]);
+				writes[binding].pBufferInfo = buffer_infos[binding];
 			}
-			if (pool.writes[binding].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ||
-			    pool.writes[binding].descriptorType == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE ||
-			    pool.writes[binding].descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_IMAGE) {
+			if (writes[binding].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ||
+			    writes[binding].descriptorType == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE ||
+			    writes[binding].descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_IMAGE) {
 				if (image_infos[binding] != nullptr)
 					delete image_infos[binding];
-				image_infos[binding] = new VkDescriptorImageInfo[pool.writes[binding].descriptorCount];
-				pool.writes[binding].pImageInfo = image_infos[binding];
+				image_infos[binding] = new VkDescriptorImageInfo[writes[binding].descriptorCount];
+				writes[binding].pImageInfo = image_infos[binding];
 			}
-			if (pool.writes[binding].descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER) {
+			if (writes[binding].descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER) {
 				if (buffer_infos[binding] != nullptr)
 					delete buffer_infos[binding];
-				buffer_infos[binding] = new VkDescriptorBufferInfo[pool.writes[binding].descriptorCount];
-				pool.writes[binding].pBufferInfo = buffer_infos[binding];
+				buffer_infos[binding] = new VkDescriptorBufferInfo[writes[binding].descriptorCount];
+				writes[binding].pBufferInfo = buffer_infos[binding];
 			}
-			if (pool.writes[binding].descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
+			if (writes[binding].descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
 				acceleration_structure_infos[binding] = {};
 				acceleration_structure_infos[binding].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
 			}
-		}
-
-		//if (initial_descriptor_writes.size() > 0)
-		//{
-		//    vkUpdateDescriptorSets(context->device.getHandle(), initial_descriptor_writes.size(), initial_descriptor_writes.data(), 0, nullptr);
-		//}
-	}
-
-	void VK_PipelineInstance::createVariableSizeDescriptors(uint32_t binding, VkDescriptorType descriptor_type, uint32_t count) {
-		uint32_t descriptor_set = pipeline_layout->getDescriptorInfos()[binding].descriptor_set_index;
-		uint32_t last_binding = pipeline_layout->getLastDescriptorSetBinding(descriptor_set);
-
-		uint32_t frame = context->renderer.getCurrentFrameIndex();
-		uint32_t descriptor_set_index = (frame * pipeline_layout->getDescriptorSetLayoutHandles().size()) + descriptor_set;
-
-		if (descriptor_pool.variable_descriptor_sets[descriptor_set_index].count != count) {
-			VariableDescriptorSet variable_descriptor{};
-			variable_descriptor.binding = binding;
-			variable_descriptor.count = count;
-			variable_descriptor.type = descriptor_type;
-
-			resetPool(temp_descriptor_pool);
-
-			temp_descriptor_pool.variable_descriptor_sets = std::move(descriptor_pool.variable_descriptor_sets);
-			temp_descriptor_pool.variable_descriptor_sets[descriptor_set_index] = variable_descriptor;
-
-			createDescriptorPool(temp_descriptor_pool);
-			createDescriptorWrites(temp_descriptor_pool);
-
-			copyDescriptorSets(descriptor_pool, temp_descriptor_pool);
-
-			old_descriptor_pools.emplace(context->renderer.getCurrentFrameIndex(), descriptor_pool.handle);
-
-			descriptor_pool.handle = temp_descriptor_pool.handle;
-			descriptor_pool.variable_descriptor_sets = std::move(temp_descriptor_pool.variable_descriptor_sets);
-			descriptor_pool.writes = std::move(temp_descriptor_pool.writes);
-			descriptor_pool.descriptor_set_handles = std::move(temp_descriptor_pool.descriptor_set_handles);
 		}
 	}
 
@@ -413,12 +172,12 @@ namespace HBE {
 		std::vector<VkWriteDescriptorSet> out_of_date_descriptor_writes;
 		//fix dirty bindings, update with new writes.
 		for (uint32_t binding = 0; binding < binding_count; ++binding) {
-			if (!descriptor_pool.dirty_descriptor_sets_bindings[frame_binding_offset + binding])
+			if (!dirty_descriptor_sets_bindings[frame_binding_offset + binding])
 				continue;
 
-			descriptor_pool.dirty_descriptor_sets_bindings[frame_binding_offset + binding] = false;
-			descriptor_pool.writes[binding].dstSet = getDescriptorSetForBinding(binding);
-			out_of_date_descriptor_writes.emplace_back(descriptor_pool.writes[binding]);
+			dirty_descriptor_sets_bindings[frame_binding_offset + binding] = false;
+			writes[binding].dstSet = getDescriptorSetForBinding(binding);
+			out_of_date_descriptor_writes.emplace_back(writes[binding]);
 		}
 		if (!out_of_date_descriptor_writes.empty()) {
 			vkUpdateDescriptorSets(context->device.getHandle(), out_of_date_descriptor_writes.size(), out_of_date_descriptor_writes.data(), 0, nullptr);
@@ -436,14 +195,13 @@ namespace HBE {
 		uint32_t descriptor_set_count = pipeline_layout->getDescriptorSetCount();
 		uint32_t descriptor_frame_offset = frame * descriptor_set_count;
 		VkCommandBuffer command_buffer = context->renderer.getCommandPool()->getCurrentBuffer();
-		const VkDescriptorSet *descriptor_sets = descriptor_pool.descriptor_set_handles.data() + descriptor_frame_offset;
 
 		vkCmdBindDescriptorSets(command_buffer,
 		                        pipeline_layout->getBindPoint(),
 		                        pipeline_layout->getHandle(),
 		                        0,
 		                        descriptor_set_count,
-		                        descriptor_sets,
+		                        descriptor_set_handles.data() + descriptor_frame_offset,
 		                        0,
 		                        nullptr);
 		bound = true;
@@ -457,15 +215,15 @@ namespace HBE {
 		if (bound) return;
 		updateDescriptors();
 
+
 		uint32_t descriptor_set_count = pipeline_layout->getDescriptorSetLayoutHandles().size();
 		uint32_t offset = descriptor_set_count * frame;
-		const VkDescriptorSet *descriptor_sets = descriptor_pool.descriptor_set_handles.data() + offset;
 		vkCmdBindDescriptorSets(command_buffer,
 		                        pipeline_layout->getBindPoint(),
 		                        pipeline_layout->getHandle(),
 		                        0,
 		                        descriptor_set_count,
-		                        descriptor_sets,
+		                        descriptor_set_handles.data() + offset,
 		                        0,
 		                        nullptr);
 		bound = true;
@@ -489,8 +247,9 @@ namespace HBE {
 	VkDescriptorSet VK_PipelineInstance::getDescriptorSetForBinding(uint32_t binding) {
 		uint32_t frame = context->renderer.getCurrentFrameIndex();
 		uint32_t descriptor_set_count = pipeline_layout->getDescriptorSetCount();
-		uint32_t descriptor_index = pipeline_layout->getDescriptorInfos()[binding].descriptor_set_index;
-		return descriptor_pool.descriptor_set_handles[frame * descriptor_set_count + descriptor_index];
+		uint32_t descriptor_frame_offset = frame * descriptor_set_count;
+		uint32_t descriptor_index = pipeline_layout->getBindingInfos()[binding].descriptor_set_index;
+		return context->descriptor_allocator.getDescriptorSet(descriptor_allocations[descriptor_index + descriptor_frame_offset]);
 	}
 
 	void VK_PipelineInstance::setImageArray(uint32_t binding, ImageHandle *textures, uint32_t texture_count, int32_t mip_level) {
@@ -498,12 +257,8 @@ namespace HBE {
 		HB_ASSERT(binding_info.descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ||
 		          binding_info.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_IMAGE ||
 		          binding_info.descriptorType == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, "binding#" + std::to_string(binding) + " is not a texture");
-		//variable descriptor count
-		if (pipeline_layout->IsBindingVariableSize(binding)) {
-			uint32_t frame = context->renderer.getCurrentFrameIndex();
-			createVariableSizeDescriptors(binding, binding_info.descriptorType, texture_count);
-		}
-		VkWriteDescriptorSet &write_descriptor_set = descriptor_pool.writes[binding];
+
+		VkWriteDescriptorSet &write_descriptor_set = writes[binding];
 		for (uint32_t i = 0; i < write_descriptor_set.descriptorCount; ++i) {
 			int index = i >= texture_count ? texture_count - 1 : i;
 			VK_Image &vk_image = context->images[textures[index]];
@@ -517,9 +272,9 @@ namespace HBE {
 
 	void VK_PipelineInstance::setImage(uint32_t binding, ImageHandle image, uint32_t mip_level) {
 		VK_Image &vk_image_object = context->images[image];
-		HB_ASSERT(descriptor_pool.writes[binding].descriptorCount == 1, "Texture binding is an array");
+		HB_ASSERT(writes[binding].descriptorCount == 1, "Texture binding is an array");
 
-		descriptor_pool.writes[binding].descriptorCount = 1;
+		writes[binding].descriptorCount = 1;
 
 		VkDescriptorImageInfo &image_info = *image_infos[binding];
 		image_info.imageView = vk_image_object.getImageView(mip_level);
@@ -557,7 +312,7 @@ namespace HBE {
 		accelerationStructureInfo.accelerationStructureCount = 1;
 		accelerationStructureInfo.pAccelerationStructures = &acceleration_structure_handle;
 
-		descriptor_pool.writes[binding].pNext = &acceleration_structure_infos[binding];
+		writes[binding].pNext = &acceleration_structure_infos[binding];
 
 		setBindingDirty(binding);
 	}
@@ -568,10 +323,6 @@ namespace HBE {
 		HB_ASSERT(count <= descriptorSetLayoutBinding.descriptorCount || descriptorSetLayoutBinding.descriptorCount == 0, "descriptor count mismatch");
 
 		VK_StorageBuffer **vk_buffers = reinterpret_cast<VK_StorageBuffer **>(buffers);
-		//variable descriptor count
-		if (pipeline_layout->IsBindingVariableSize(binding)) {
-			createVariableSizeDescriptors(binding, descriptorSetLayoutBinding.descriptorType, count);
-		}
 
 		for (int i = 0; i < count; i++) {
 			buffer_infos[binding][i].buffer = vk_buffers[i]->getBuffer().getVkHandle();
@@ -579,8 +330,9 @@ namespace HBE {
 			buffer_infos[binding][i].range = VK_WHOLE_SIZE;
 		}
 
-		descriptor_pool.writes[binding].pBufferInfo = buffer_infos[binding];
-		descriptor_pool.writes[binding].descriptorCount = count;
+		writes[binding].dstSet = getDescriptorSetForBinding(binding);
+		writes[binding].pBufferInfo = buffer_infos[binding];
+		writes[binding].descriptorCount = count;
 
 		setBindingDirty(binding);
 	}
@@ -589,7 +341,7 @@ namespace HBE {
 		for (uint32_t frame = 0; frame < MAX_FRAMES_IN_FLIGHT; ++frame) {
 			uint32_t binding_count = pipeline_layout->getDescriptorBindings().size();
 			uint32_t frame_binding_offset = frame * binding_count;
-			descriptor_pool.dirty_descriptor_sets_bindings[frame_binding_offset + binding] = true;
+			dirty_descriptor_sets_bindings[frame_binding_offset + binding] = true;
 		}
 	}
 
@@ -604,7 +356,7 @@ namespace HBE {
 		buffer_infos[write_index]->offset = byte_offset;
 		buffer_infos[write_index]->range = vk_buffer.getSize();
 
-		descriptor_pool.writes[write_index].pBufferInfo = buffer_infos[write_index];
+		writes[write_index].pBufferInfo = buffer_infos[write_index];
 
 		setBindingDirty(binding);
 	}
@@ -615,8 +367,7 @@ namespace HBE {
 
 		VK_TexelBuffer &vk_texel_buffer = context->texel_buffers[buffer];
 
-		uint32_t write_index = getBindingIndexForFrame(binding);
-		descriptor_pool.writes[write_index].pTexelBufferView = &vk_texel_buffer.getView();
+		writes[binding].pTexelBufferView = &vk_texel_buffer.getView();
 
 		setBindingDirty(binding);
 	}
@@ -627,19 +378,14 @@ namespace HBE {
 		HB_ASSERT(buffer_count <= descriptorSetLayoutBinding.descriptorCount || descriptorSetLayoutBinding.descriptorCount == 0, "descriptor count mismatch");
 
 		VK_TexelBuffer **vk_buffers = reinterpret_cast<VK_TexelBuffer **>(buffers);
-		//variable descriptor count
-		if (pipeline_layout->IsBindingVariableSize(binding)) {
-			createVariableSizeDescriptors(binding, descriptorSetLayoutBinding.descriptorType, buffer_count);
-		}
 
 		std::vector<VkBufferView> buffer_views(buffer_count);
 		for (int i = 0; i < buffer_count; i++) {
 			buffer_views[i] = vk_buffers[i]->getView();
 		}
 		if (buffer_count != 0) {
-			uint32_t write_index = getBindingIndexForFrame(binding);
-			descriptor_pool.writes[write_index].descriptorCount = buffer_views.size();
-			descriptor_pool.writes[write_index].pTexelBufferView = buffer_views.data();
+			writes[binding].descriptorCount = buffer_views.size();
+			writes[binding].pTexelBufferView = buffer_views.data();
 		}
 
 		setBindingDirty(binding);

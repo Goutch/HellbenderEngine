@@ -24,16 +24,18 @@ namespace HBE
         VkPipelineLayout handle = VK_NULL_HANDLE;
         VK_Context* context = nullptr;
 
-        //todo: reduce the number of vector, maybe just by putting them all in one struct
+		//vulkan flat handles
         std::vector<VkDescriptorSetLayout> descriptor_set_layout_handles;
-        std::vector<VK_DescriptorSetLayout> descriptor_set_layouts;
-        std::map<std::string, size_t> descriptor_name_to_binding;
-        std::vector<bool> variable_descriptors;
-        std::vector<VkDescriptorSetLayoutBinding> bindings;
-        std::vector<VkPushConstantRange> push_constants_ranges;
-        std::vector<VkDeviceSize> descriptor_sizes;
-        std::vector<VK_DescriptorInfo> pipeline_descriptors;
+	    std::vector<VkDescriptorSetLayoutBinding> layout_binding_handles;
+	    std::vector<VkPushConstantRange> push_constants_ranges;
+
+		//HBE Vulkan data transfer objects
+        std::vector<VK_BindingInfo> pipeline_bindings;
+	    std::vector<VK_DescriptorSetLayout> descriptor_set_layouts;
         std::vector<VK_PushConstantInfo> pipeline_push_constants;
+
+		//maps
+	    std::map<std::string, size_t> descriptor_name_to_binding;
         std::map<std::string, size_t> push_constant_name_to_index;
 
 
@@ -56,19 +58,21 @@ namespace HBE
 
         VkPipelineBindPoint getBindPoint() const;
 
-        const std::vector<VkDeviceSize>& getDescriptorSizes() const;
-
         const std::vector<VkDescriptorSetLayout>& getDescriptorSetLayoutHandles() const;
 
-        const std::vector<VK_DescriptorInfo>& getDescriptorInfos() const;
+		const std::vector<VK_DescriptorSetLayout>& getDescriptorSetLayouts() const;
+
+        const std::vector<VK_BindingInfo>& getBindingInfos() const;
 
         bool IsBindingVariableSize(uint32_t binding) const;
 
         void mergeStages(ShaderHandle* shaders, size_t count);
 
-        void mergeDescriptorStages(VK_DescriptorInfo& merged_descriptor, VK_DescriptorInfo& old_descriptor, VK_DescriptorInfo& new_descriptor);
+        void mergeBindingInfoStages(VK_BindingInfo& merged_binding_info, VK_BindingInfo& old_binding_info, VK_BindingInfo& new_binding_info);
 
         uint32_t getLastDescriptorSetBinding(uint32_t set) const;
+
+		VkDeviceSize getBindingElementSize(uint32_t binding) const;
 
         uint32_t getDescriptorSetCount() const;
     };

@@ -2,7 +2,7 @@
 
 GLFW exists because people around the world donated their time and lent their
 skills.  This list only includes contributions to the main repository and
-excludes other invaluable contributions like language bindings and text and
+excludes other invaluable contributions like language layout_bindings and text and
 video tutorials.
 
  - Bobyshev Alexander

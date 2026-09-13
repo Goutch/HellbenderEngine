@@ -23,12 +23,12 @@ namespace HBE
         VkFormat format;
     };
 
-    struct VK_DescriptorInfo
+    struct VK_BindingInfo
     {
         std::string name;
-        VkDeviceSize size = 0;
+        VkDeviceSize size = 0; //struct size example 16 bytes for vec4
         uint32_t descriptor_set_index = 0;
-        VkDescriptorSetLayoutBinding layout_binding{};
+        VkDescriptorSetLayoutBinding layout_binding{}; //contain count and type
         bool variable_size = false;
     };
 
@@ -43,7 +43,7 @@ namespace HBE
         const VK_Context* context;
         VkShaderModule handle = VK_NULL_HANDLE;
         std::vector<VK_VertexAttributeInfo> vertex_inputs;
-        std::vector<VK_DescriptorInfo> uniforms;
+        std::vector<VK_BindingInfo> uniforms;
         std::vector<VK_PushConstantInfo> push_constants;
 
         uvec3 compute_workgroup_size;
@@ -60,7 +60,7 @@ namespace HBE
 
         const std::vector<VK_PushConstantInfo>& getPushConstants() const;
 
-        const std::vector<VK_DescriptorInfo>& getDescriptorInfos() const;
+        const std::vector<VK_BindingInfo>& getDescriptorInfos() const;
 
         const std::vector<VK_VertexAttributeInfo>& getVertexInputs() const;
 

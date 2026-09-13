@@ -9,6 +9,7 @@
 #include "core/interface/ROOTAccelerationStructureInterface.h"
 #include "VK_Buffer.h"
 #include "platforms/vk/VK_CommandPool.h"
+#include "platforms/vk/VK_DescriptorAllocator.h"
 
 namespace HBE
 {
@@ -23,27 +24,14 @@ namespace HBE
         VkDescriptorType type;
     };
 
-    struct DescriptorPool
-    {
-        VkDescriptorPool handle;
-
-        RawVector<VkDescriptorSet> descriptor_set_handles; //frame0 set0 |frame0 set1 | frame1 set0 | frame1 set1| frame2 set0 | frame2 set1
-        RawVector<VariableDescriptorSet> variable_descriptor_sets; //frame0 set0 |frame0 set1 | frame1 set0 | frame1 set1| frame2 set0 | frame2 set1
-        RawVector<bool> dirty_descriptor_sets_bindings; //frame0 binding0 |frame0 binding1 | frame1 binding0 | frame1 binding1| frame2 binding0 | frame2 binding1
-        RawVector<VkWriteDescriptorSet> writes;
-    };
-
     class HB_API VK_PipelineInstance
     {
         VK_Context* context = nullptr;
         Handle pipeline_handle = HBE_NULL_HANDLE;
         const VK_PipelineLayout* pipeline_layout = nullptr;
-        DescriptorPool descriptor_pool;
-        DescriptorPool temp_descriptor_pool;
         event_subscription_id on_frame_change_subscription_id = HBE_NULL_HANDLE;
+		RawVector<DescriptorSetAllocation> descriptor_allocations;
 
-        bool empty_descriptor_allowed = false;
-        bool bound = false;
         PIPELINE_INSTANCE_TYPE pipeline_type = PIPELINE_INSTANCE_TYPE_NONE;
 
         std::queue<std::pair<uint32_t, VkDescriptorPool>> old_descriptor_pools;
@@ -51,6 +39,12 @@ namespace HBE
         std::vector<VkWriteDescriptorSetAccelerationStructureKHR> acceleration_structure_infos;
         std::vector<VkDescriptorImageInfo*> image_infos;
         std::vector<VkDescriptorBufferInfo*> buffer_infos;
+
+		RawVector<VkDescriptorSet> descriptor_set_handles; //frame0 set0 |frame0 set1 | frame1 set0 | frame1 set1| frame2 set0 | frame2 set1
+	    RawVector<bool> dirty_descriptor_sets_bindings; //frame0 binding0 |frame0 binding1 | frame1 binding0 | frame1 binding1| frame2 binding0 | frame2 binding1
+	    RawVector<VkWriteDescriptorSet> writes;
+
+		bool bound = false;
     public:
         VK_PipelineInstance() = default;
         ~VK_PipelineInstance() = default;
@@ -65,7 +59,6 @@ namespace HBE
         void bind();
         void getBinding(const char* name, uint32_t& uint32);
         uint32_t getBinding(const char* name) const;
-        void resetPool(DescriptorPool& pool);
         void bind(VkCommandBuffer command_buffer, uint32_t frame);
         void unbind();
         void setUniform(uint32_t binding, const void* data);
@@ -79,10 +72,7 @@ namespace HBE
 
     private:
         void setBindingDirty(uint32_t index);
-        void copyDescriptorSets(DescriptorPool& from, DescriptorPool& to);
-        void createDescriptorWrites(DescriptorPool& pool);
-        void createDescriptorPool(DescriptorPool& pool);
-        void createVariableSizeDescriptors(uint32_t binding, VkDescriptorType descriptor_type, uint32_t count);
+        void createDescriptorWrites();
         void updateDescriptors();
         uint32_t getBindingIndexForFrame(uint32_t binding);
         VkDescriptorSet getDescriptorSetForBinding(uint32_t binding);

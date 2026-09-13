@@ -861,7 +861,7 @@ This allows for the creation of things like splash screens.
 A scancode parameter has been added to the [key callback](@ref GLFWkeyfun). Keys
 that don't have a [key token](@ref keys) still get passed on with the key
 parameter set to `GLFW_KEY_UNKNOWN`.  These scancodes will vary between machines
-and are intended to be used for key bindings.
+and are intended to be used for key layout_bindings.
 
 
 @subsubsection news_30_jsname Joystick names

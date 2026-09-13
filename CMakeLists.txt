@@ -185,6 +185,7 @@ set(VK_FILES
         platforms/vk/resources/VK_Buffer.h
         platforms/vk/VK_Allocator.cpp
         platforms/vk/VK_Allocator.h
+        platforms/vk/VK_DescriptorAllocator.cpp
         platforms/vk/VK_Queue.cpp
         platforms/vk/VK_Queue.h
         platforms/vk/VK_ComputePipeline.cpp
@@ -211,6 +212,7 @@ set(VK_FILES
         platforms/vk/VK_Types.h
         platforms/vk/resources/VK_PipelineInstance.cpp
         platforms/vk/resources/VK_PipelineInstance.h
+        platforms/vk/VK_DescriptorAllocator.h
 )
 
 

@@ -25,21 +25,20 @@ namespace HBE
         mergeStages(shaders, count);
 
         descriptor_set_layout_handles.resize(descriptor_set_layouts.size());
+
+		//per set
         for (int i = 0; i < descriptor_set_layouts.size(); ++i)
         {
-            descriptor_set_layouts[i].init(context, i, pipeline_descriptors, empty_descriptor_allowed);
+            descriptor_set_layouts[i].init(context, i, pipeline_bindings, empty_descriptor_allowed);
             descriptor_set_layout_handles[i] = descriptor_set_layouts[i].getHandle();
         }
 
-        bindings.resize(pipeline_descriptors.size());
-        variable_descriptors.resize(pipeline_descriptors.size(), false);
-        descriptor_sizes.resize(pipeline_descriptors.size(), 0);
-        for (int i = 0; i < pipeline_descriptors.size(); ++i)
+	    layout_binding_handles.resize(pipeline_bindings.size());
+		//per bindings
+        for (int i = 0; i < pipeline_bindings.size(); ++i)
         {
-            bindings[i] = pipeline_descriptors[i].layout_binding;
-            variable_descriptors[i] = pipeline_descriptors[i].variable_size;
-            descriptor_sizes[i] = pipeline_descriptors[i].size;
-            descriptor_name_to_binding.emplace(pipeline_descriptors[i].name, pipeline_descriptors[i].layout_binding.binding);
+	        layout_binding_handles[i] = pipeline_bindings[i].layout_binding;
+            descriptor_name_to_binding.emplace(pipeline_bindings[i].name, pipeline_bindings[i].layout_binding.binding);
         }
 
         VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
@@ -76,7 +75,7 @@ namespace HBE
         this->bindings = std::move(other.bindings);
         this->push_constants_ranges = std::move(other.push_constants_ranges);
         this->descriptor_sizes = std::move(other.descriptor_sizes);
-        this->pipeline_descriptors = std::move(other.pipeline_descriptors);
+        this->pipeline_bindings = std::move(other.pipeline_bindings);
         this->pipeline_push_constants = std::move(other.pipeline_push_constants);
         this->push_constant_name_to_index = std::move(other.push_constant_name_to_index);
 
@@ -88,7 +87,7 @@ namespace HBE
         other.bindings.clear();
         other.push_constants_ranges.clear();
         other.descriptor_sizes.clear();
-        other.pipeline_descriptors.clear();
+        other.pipeline_bindings.clear();
         other.pipeline_push_constants.clear();
         other.push_constant_name_to_index.clear();
         other.handle = VK_NULL_HANDLE;
@@ -99,7 +98,7 @@ namespace HBE
     {
         uint32_t max_descriptor_binding = 0;
         uint32_t max_descriptor_set = 0;
-        const VK_DescriptorInfo DEFAULT_DESCRIPTOR_INFO = {
+        const VK_BindingInfo DEFAULT_DESCRIPTOR_INFO = {
             .name = "",
             .size = 0,
             .layout_binding = {
@@ -115,28 +114,28 @@ namespace HBE
         //merge all the stages descriptors into pipeline_descriptors
         for (size_t i = 0; i < count; ++i)
         {
-            std::vector<VK_DescriptorInfo> stage_descriptors = context->shaders[shaders[i]].getDescriptorInfos();
+            std::vector<VK_BindingInfo> stage_descriptors = context->shaders[shaders[i]].getDescriptorInfos();
             for (size_t j = 0; j < stage_descriptors.size(); ++j)
             {
-                VK_DescriptorInfo stage_descriptor = stage_descriptors[j];
-                uint32_t descriptor_binding = stage_descriptor.layout_binding.binding;
-                if (max_descriptor_set <= stage_descriptor.descriptor_set_index)
+                VK_BindingInfo stage_binding_info = stage_descriptors[j];
+                uint32_t binding = stage_binding_info.layout_binding.binding;
+                if (max_descriptor_set <= stage_binding_info.descriptor_set_index)
                 {
-                    max_descriptor_set = stage_descriptor.descriptor_set_index;
+                    max_descriptor_set = stage_binding_info.descriptor_set_index;
                     descriptor_set_layouts.resize(max_descriptor_set + 1);
                 }
-                if (max_descriptor_binding <= descriptor_binding)
+                if (max_descriptor_binding <= binding)
                 {
-                    max_descriptor_binding = descriptor_binding;
-                    pipeline_descriptors.resize(max_descriptor_binding + 1, DEFAULT_DESCRIPTOR_INFO);
+                    max_descriptor_binding = binding;
+                    pipeline_bindings.resize(max_descriptor_binding + 1, DEFAULT_DESCRIPTOR_INFO);
                 }
-                if (pipeline_descriptors[descriptor_binding].layout_binding.stageFlags == 0)
+                if (pipeline_bindings[binding].layout_binding.stageFlags == 0)
                 {
-                    pipeline_descriptors[descriptor_binding] = stage_descriptor;
+	                pipeline_bindings[binding] = stage_binding_info;
                 }
                 else
                 {
-                    mergeDescriptorStages(pipeline_descriptors[descriptor_binding], pipeline_descriptors[descriptor_binding], stage_descriptor);
+	                mergeBindingInfoStages(pipeline_bindings[binding], pipeline_bindings[binding], stage_binding_info);
                 }
             }
 
@@ -163,39 +162,42 @@ namespace HBE
         }
     }
 
-    void VK_PipelineLayout::mergeDescriptorStages(VK_DescriptorInfo& merged_descriptor, VK_DescriptorInfo& old_descriptor, VK_DescriptorInfo& new_descriptor)
+    void VK_PipelineLayout::mergeBindingInfoStages(VK_BindingInfo& merged_binding_info, VK_BindingInfo& old_binding_info, VK_BindingInfo& new_binding_info)
     {
-        HB_ASSERT(old_descriptor.name=="" || new_descriptor.name == "" || old_descriptor.name == new_descriptor.name,
-                  "Uniforms have different names:" + old_descriptor.name + " and " + new_descriptor.name);
-        HB_ASSERT(old_descriptor.size == new_descriptor.size,
-                  "Uniform \"" + old_descriptor.name = "\" Binding#" + std::to_string(old_descriptor.layout_binding.binding) + " has different sizes");
-        HB_ASSERT(old_descriptor.layout_binding.descriptorType == new_descriptor.layout_binding.descriptorType,
-                  "Uniform \"" + old_descriptor.name = "\" Binding#" + std::to_string(old_descriptor.layout_binding.binding) + " has different types");
+        HB_ASSERT(old_binding_info.name == "" || new_binding_info.name == "" || old_binding_info.name == new_binding_info.name,
+                  "Uniforms have different names:" + old_binding_info.name + " and " + new_binding_info.name);
+        HB_ASSERT(old_binding_info.size == new_binding_info.size,
+                  "Uniform \"" + old_binding_info.name = "\" Binding#" + std::to_string(old_binding_info.layout_binding.binding) + " has different sizes");
+        HB_ASSERT(old_binding_info.layout_binding.descriptorType == new_binding_info.layout_binding.descriptorType,
+                  "Uniform \"" + old_binding_info.name = "\" Binding#" + std::to_string(old_binding_info.layout_binding.binding) + " has different types");
+	    HB_ASSERT(old_binding_info.variable_size == new_binding_info.variable_size,
+	              "Uniform \"" + old_binding_info.name = "\" Binding#" + std::to_string(old_binding_info.variable_size) + " has different variable size value");
 
-        merged_descriptor.name = new_descriptor.name;
-        merged_descriptor.size = new_descriptor.size;
-        merged_descriptor.layout_binding.binding = new_descriptor.layout_binding.binding;
-        merged_descriptor.layout_binding.descriptorType = new_descriptor.layout_binding.descriptorType;
-        merged_descriptor.layout_binding.stageFlags = old_descriptor.layout_binding.stageFlags | new_descriptor.layout_binding.stageFlags;
-        merged_descriptor.layout_binding.descriptorCount = old_descriptor.layout_binding.descriptorCount;
 
-        if (old_descriptor.variable_size == new_descriptor.variable_size)
+	    merged_binding_info.name = new_binding_info.name;
+	    merged_binding_info.size = new_binding_info.size;
+	    merged_binding_info.layout_binding.binding = new_binding_info.layout_binding.binding;
+	    merged_binding_info.layout_binding.descriptorType = new_binding_info.layout_binding.descriptorType;
+	    merged_binding_info.layout_binding.stageFlags = old_binding_info.layout_binding.stageFlags | new_binding_info.layout_binding.stageFlags;
+	    merged_binding_info.layout_binding.descriptorCount = old_binding_info.layout_binding.descriptorCount;
+
+        if (old_binding_info.variable_size == new_binding_info.variable_size)
         {
-            merged_descriptor.layout_binding.descriptorCount = old_descriptor.layout_binding.descriptorCount;
-            merged_descriptor.variable_size = old_descriptor.variable_size;
-            merged_descriptor.layout_binding.stageFlags = old_descriptor.layout_binding.stageFlags | new_descriptor.layout_binding.stageFlags;
+	        merged_binding_info.layout_binding.descriptorCount = old_binding_info.layout_binding.descriptorCount;
+	        merged_binding_info.variable_size = old_binding_info.variable_size;
+	        merged_binding_info.layout_binding.stageFlags = old_binding_info.layout_binding.stageFlags | new_binding_info.layout_binding.stageFlags;
         }
-        else if (old_descriptor.variable_size && !new_descriptor.variable_size)
+        else if (old_binding_info.variable_size && !new_binding_info.variable_size)
         {
-            merged_descriptor.layout_binding.descriptorCount = old_descriptor.layout_binding.descriptorCount;
-            merged_descriptor.variable_size = true;
-            merged_descriptor.layout_binding.stageFlags = old_descriptor.layout_binding.stageFlags;
+	        merged_binding_info.layout_binding.descriptorCount = old_binding_info.layout_binding.descriptorCount;
+	        merged_binding_info.variable_size = true;
+	        merged_binding_info.layout_binding.stageFlags = old_binding_info.layout_binding.stageFlags;
         }
-        else if (!old_descriptor.variable_size && new_descriptor.variable_size)
+        else if (!old_binding_info.variable_size && new_binding_info.variable_size)
         {
-            merged_descriptor.layout_binding.descriptorCount = new_descriptor.layout_binding.descriptorCount;
-            merged_descriptor.variable_size = true;
-            merged_descriptor.layout_binding.stageFlags = new_descriptor.layout_binding.stageFlags;
+	        merged_binding_info.layout_binding.descriptorCount = new_binding_info.layout_binding.descriptorCount;
+	        merged_binding_info.variable_size = true;
+	        merged_binding_info.layout_binding.stageFlags = new_binding_info.layout_binding.stageFlags;
         }
     }
 
@@ -219,17 +221,12 @@ namespace HBE
 
     const std::vector<VkDescriptorSetLayoutBinding>& VK_PipelineLayout::getDescriptorBindings() const
     {
-        return bindings;
+        return layout_binding_handles;
     }
 
     VkPipelineBindPoint VK_PipelineLayout::getBindPoint() const
     {
         return bind_point;
-    }
-
-    const std::vector<VkDeviceSize>& VK_PipelineLayout::getDescriptorSizes() const
-    {
-        return descriptor_sizes;
     }
 
     const std::vector<VkDescriptorSetLayout>& VK_PipelineLayout::getDescriptorSetLayoutHandles() const
@@ -239,7 +236,7 @@ namespace HBE
 
     bool VK_PipelineLayout::IsBindingVariableSize(uint32_t binding) const
     {
-        return variable_descriptors[binding];
+        return pipeline_bindings[binding].variable_size;
     }
 
     uint32_t VK_PipelineLayout::getDescriptorBinding(const char* name) const
@@ -248,9 +245,9 @@ namespace HBE
         return descriptor_name_to_binding.find(name)->second;
     }
 
-    const std::vector<VK_DescriptorInfo>& VK_PipelineLayout::getDescriptorInfos() const
+    const std::vector<VK_BindingInfo>& VK_PipelineLayout::getBindingInfos() const
     {
-        return pipeline_descriptors;
+        return pipeline_bindings;
     }
 
     uint32_t VK_PipelineLayout::getLastDescriptorSetBinding(uint32_t set) const
@@ -262,4 +259,12 @@ namespace HBE
     {
         return descriptor_set_layouts.size();
     }
+
+	const std::vector<VK_DescriptorSetLayout> &VK_PipelineLayout::getDescriptorSetLayouts() const {
+		return descriptor_set_layouts;
+	}
+
+	VkDeviceSize VK_PipelineLayout::getBindingElementSize(uint32_t binding) const {
+		return pipeline_bindings[binding].size;
+	}
 }
