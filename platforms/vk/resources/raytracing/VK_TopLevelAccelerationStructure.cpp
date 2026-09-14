@@ -169,7 +169,7 @@ namespace HBE {
         release();
     }
 
-    const VkAccelerationStructureKHR VK_TopLevelAccelerationStructure::getHandle() const {
+    const VkAccelerationStructureKHR& VK_TopLevelAccelerationStructure::getVkHandle() const {
         return handle;
     }
 }

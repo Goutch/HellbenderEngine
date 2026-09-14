@@ -160,8 +160,8 @@ namespace HBE {
 			size_t size = glsl.get_declared_struct_size(glsl.get_type(ub.base_type_id));
 			HB_ASSERT(size <= context->physical_device.getProperties().limits.maxUniformBufferRange, "Uniform buffer size is too big!");
 
-			VK_BindingInfo uniform_info = generateDescriptorInfo(vk_stage, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, glsl, ub, limits);
-			uniforms.emplace_back(uniform_info);
+			VK_BindingInfo binding_info = generateDescriptorInfo(vk_stage, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, glsl, ub, limits);
+			bindings.emplace_back(binding_info);
 		}
 
 		//----------------------------------------------------------TEXTURE SAMPLERS----------------------------------------------------------
@@ -170,7 +170,7 @@ namespace HBE {
 				//continue;
 			}
 			VK_BindingInfo uniform_info = generateDescriptorInfo(vk_stage, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, glsl, sampler, limits);
-			uniforms.emplace_back(uniform_info);
+			bindings.emplace_back(uniform_info);
 		}
 
 		//----------------------------------------------STORAGE BUFFERS------------------------------------------------
@@ -181,7 +181,7 @@ namespace HBE {
 			size_t size = glsl.get_declared_struct_size(glsl.get_type(sb.base_type_id));
 			HB_ASSERT(size <= context->physical_device.getProperties().limits.maxStorageBufferRange, "Storage buffer size is too big!");
 			VK_BindingInfo uniform_info = generateDescriptorInfo(vk_stage, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, glsl, sb, limits);
-			uniforms.emplace_back(uniform_info);
+			bindings.emplace_back(uniform_info);
 		}
 		//--------------------------------------------------------IMAGE----------------------------------------
 		for (auto &image: resources.separate_images) {
@@ -189,7 +189,7 @@ namespace HBE {
 				//continue;
 			}
 			VK_BindingInfo uniform_info = generateDescriptorInfo(vk_stage, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, glsl, image, limits);
-			uniforms.emplace_back(uniform_info);
+			bindings.emplace_back(uniform_info);
 		}
 		//----------------------------------------------STORAGE_IMAGES & TEXEL BUFFERS------------------------------------------------
 		for (auto &image: resources.storage_images) {
@@ -202,12 +202,12 @@ namespace HBE {
 				// The image is a storageImage
 				uniform_info = generateDescriptorInfo(vk_stage, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, glsl, image, limits);
 			}
-			uniforms.emplace_back(uniform_info);
+			bindings.emplace_back(uniform_info);
 		}
 		//----------------------------------------------------------ACCELERATION_STRUCTURES----------------------------------------------------------
 		for (auto &as: resources.acceleration_structures) {
 			VK_BindingInfo uniform_info = generateDescriptorInfo(vk_stage, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, glsl, as, limits);
-			uniforms.emplace_back(uniform_info);
+			bindings.emplace_back(uniform_info);
 		}
 		//----------------------------------------------PUSH CONSTANTS------------------------------------------------
 		for (auto &pc: resources.push_constant_buffers) {
@@ -280,7 +280,7 @@ namespace HBE {
 			compute_workgroup_size.z = entry_point.workgroup_size.z;
 		}
 
-		std::sort(uniforms.begin(), uniforms.end(),
+		std::sort(bindings.begin(), bindings.end(),
 		          [](const VK_BindingInfo &a, const VK_BindingInfo &b) -> bool {
 			          return a.layout_binding.binding < b.layout_binding.binding;
 		          });
@@ -309,7 +309,7 @@ namespace HBE {
 	}
 
 	const std::vector<VK_BindingInfo> &VK_Shader::getDescriptorInfos() const {
-		return uniforms;
+		return bindings;
 	}
 
 	const std::vector<VK_VertexAttributeInfo> &VK_Shader::getVertexInputs() const {

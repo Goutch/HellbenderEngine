@@ -43,7 +43,7 @@ namespace HBE
         const VK_Context* context;
         VkShaderModule handle = VK_NULL_HANDLE;
         std::vector<VK_VertexAttributeInfo> vertex_inputs;
-        std::vector<VK_BindingInfo> uniforms;
+        std::vector<VK_BindingInfo> bindings;
         std::vector<VK_PushConstantInfo> push_constants;
 
         uvec3 compute_workgroup_size;

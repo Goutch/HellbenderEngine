@@ -36,26 +36,26 @@ namespace HBE {
 		VK_BindingInfo &last_descriptor = set_bindings[set_bindings.size() - 1];
 
 		//this just make sure the same type descriptor do not exceed the max descriptor per stages not sure if needed
-		//if (last_descriptor.variable_size)
-		//{
-		//    int same_type_variable_descriptors = 1;
-		//    for (int i = 0; i < pipeline_descriptors.size(); ++i)
-		//    {
-		//        if (last_descriptor.layout_binding.descriptorType == pipeline_descriptors[i].layout_binding.descriptorType)
-		//        {
-		//            same_type_variable_descriptors++;
-		//        }
-		//    }
-		//    for (int i = 0; i < pipeline_descriptors.size(); ++i)
-		//    {
-		//        if (last_descriptor.layout_binding.binding != pipeline_descriptors[i].layout_binding.binding &&
-		//            pipeline_descriptors[i].descriptor_set_index == descriptor_set_index)
-		//        {
-		//            last_descriptor.layout_binding.descriptorCount -= pipeline_descriptors[i].layout_binding.descriptorCount;
-		//        }
-		//    }
-		//    last_descriptor.layout_binding.descriptorCount = std::floor((float)last_descriptor.layout_binding.descriptorCount / (float)same_type_variable_descriptors);
-		//}
+		if (last_descriptor.variable_size)
+		{
+		    int same_type_variable_descriptors = 1;
+		    for (int i = 0; i < pipeline_bindings.size(); ++i)
+		    {
+		        if (last_descriptor.layout_binding.descriptorType == pipeline_bindings[i].layout_binding.descriptorType)
+		        {
+		            same_type_variable_descriptors++;
+		        }
+		    }
+		    for (int i = 0; i < pipeline_bindings.size(); ++i)
+		    {
+		        if (last_descriptor.layout_binding.binding != pipeline_bindings[i].layout_binding.binding &&
+				        pipeline_bindings[i].descriptor_set_index == descriptor_set_index)
+		        {
+		            last_descriptor.layout_binding.descriptorCount -= pipeline_bindings[i].layout_binding.descriptorCount;
+		        }
+		    }
+		    last_descriptor.layout_binding.descriptorCount = std::floor((float)last_descriptor.layout_binding.descriptorCount / (float)same_type_variable_descriptors);
+		}
 
 		descriptor_binding_flags[descriptor_binding_flags.size() - 1] = last_descriptor.variable_size ? VK_DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT_BIT : 0;
 

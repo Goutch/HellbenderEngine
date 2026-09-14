@@ -7,9 +7,10 @@
 #include "vector"
 
 
+
 namespace HBE {
 	class VK_Context;
-
+	class VK_PipelineLayout;
 
 	struct DescriptorSetAllocation {
 		uint32_t pool_alloc_index = 0;
@@ -35,7 +36,7 @@ namespace HBE {
 
 		VK_DescriptorAllocator &operator=(const VK_DescriptorAllocator &) = delete;
 
-		void alloc(const VK_PipelineLayout *pipeline_layout, uint32_t *set_indices, DescriptorSetAllocation *allocation_buffer, uint32_t count);
+		void alloc(const VK_PipelineLayout *pipeline_layout, uint8_t *set_layout_indices, DescriptorSetAllocation *allocation_buffer, uint32_t count);
 
 		void free(DescriptorSetAllocation allocation);
 

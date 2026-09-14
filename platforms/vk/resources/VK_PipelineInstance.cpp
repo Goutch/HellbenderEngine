@@ -69,14 +69,20 @@ namespace HBE {
 		createDescriptorWrites();
 
 		//allocate descriptor sets
+
+		uint8_t set_indices[128];
 		descriptor_set_handles.resize(pipeline_layout->getDescriptorSetCount() * MAX_FRAMES_IN_FLIGHT);
 		descriptor_allocations.resize(pipeline_layout->getDescriptorSetCount() * MAX_FRAMES_IN_FLIGHT);
-		for (int i = 0; i < pipeline_layout->getDescriptorSetCount() * MAX_FRAMES_IN_FLIGHT; ++i) {
-			DescriptorSetAllocation allocation = context->descriptor_allocator.alloc(pipeline_layout, i);
-			descriptor_allocations[i] = allocation;
-			descriptor_set_handles[i] = context->descriptor_allocator.getDescriptorSet(allocation);
+		uint32_t set_count = pipeline_layout->getDescriptorSetCount() * MAX_FRAMES_IN_FLIGHT;
+		for (int i = 0; i < set_count; ++i) {
+			set_indices[i] = i % pipeline_layout->getDescriptorSetCount();
+			descriptor_set_handles[i] = VK_NULL_HANDLE;
+			descriptor_allocations[i] = {};
 		}
-
+		context->descriptor_allocator.alloc(pipeline_layout, set_indices, descriptor_allocations.data(), set_count);
+		for (int i = 0; i < set_count; ++i) {
+			descriptor_set_handles[i] = context->descriptor_allocator.getDescriptorSet(descriptor_allocations[i]);
+		}
 		context->renderer.onFrameEnd.subscribe(on_frame_change_subscription_id, this, &VK_PipelineInstance::onFrameEnd);
 	}
 
@@ -93,8 +99,10 @@ namespace HBE {
 		for (VkDescriptorBufferInfo *buffer_info: buffer_infos) {
 			delete[] buffer_info;
 		}
-		for (DescriptorSetAllocation &descriptor_allocation: descriptor_allocations)
-		{
+		for (VkBufferView *views: buffer_views) {
+			delete[] views;
+		}
+		for (DescriptorSetAllocation &descriptor_allocation: descriptor_allocations) {
 			context->descriptor_allocator.free(descriptor_allocation);
 		}
 
@@ -130,8 +138,9 @@ namespace HBE {
 			writes[binding] = write;
 		}
 
-		buffer_infos.resize(layout_bindings.size() * MAX_FRAMES_IN_FLIGHT, {});
-		image_infos.resize(layout_bindings.size() * MAX_FRAMES_IN_FLIGHT, {});
+		buffer_infos.resize(layout_bindings.size() * MAX_FRAMES_IN_FLIGHT, nullptr);
+		image_infos.resize(layout_bindings.size() * MAX_FRAMES_IN_FLIGHT, nullptr);
+		buffer_views.resize(layout_bindings.size() * MAX_FRAMES_IN_FLIGHT, nullptr);
 		acceleration_structure_infos.resize(layout_bindings.size() * MAX_FRAMES_IN_FLIGHT, {});
 		for (int binding = 0; binding < writes.size(); ++binding) {
 			//set uniform buffers
@@ -156,6 +165,15 @@ namespace HBE {
 				buffer_infos[binding] = new VkDescriptorBufferInfo[writes[binding].descriptorCount];
 				writes[binding].pBufferInfo = buffer_infos[binding];
 			}
+			if (writes[binding].descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER) {
+				if (buffer_infos[binding] != nullptr)
+					delete buffer_infos[binding];
+				if (buffer_views[binding] != nullptr)
+					delete buffer_views[binding];
+				buffer_infos[binding] = new VkDescriptorBufferInfo[writes[binding].descriptorCount];
+				buffer_views[binding] = new VkBufferView[writes[binding].descriptorCount];
+				writes[binding].pBufferInfo = buffer_infos[binding];
+			}
 			if (writes[binding].descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
 				acceleration_structure_infos[binding] = {};
 				acceleration_structure_infos[binding].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
@@ -176,7 +194,7 @@ namespace HBE {
 				continue;
 
 			dirty_descriptor_sets_bindings[frame_binding_offset + binding] = false;
-			writes[binding].dstSet = getDescriptorSetForBinding(binding);
+			writes[binding].dstSet = descriptor_set_handles[frame_binding_offset + binding];
 			out_of_date_descriptor_writes.emplace_back(writes[binding]);
 		}
 		if (!out_of_date_descriptor_writes.empty()) {
@@ -259,6 +277,12 @@ namespace HBE {
 		          binding_info.descriptorType == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, "binding#" + std::to_string(binding) + " is not a texture");
 
 		VkWriteDescriptorSet &write_descriptor_set = writes[binding];
+		if (pipeline_layout->IsBindingVariableSize(binding) && texture_count > writes[binding].descriptorCount) {
+			write_descriptor_set.descriptorCount = texture_count;
+			if (image_infos[binding] != nullptr)
+				delete image_infos[binding];
+			image_infos[binding] = new VkDescriptorImageInfo[texture_count];
+		}
 		for (uint32_t i = 0; i < write_descriptor_set.descriptorCount; ++i) {
 			int index = i >= texture_count ? texture_count - 1 : i;
 			VK_Image &vk_image = context->images[textures[index]];
@@ -267,6 +291,7 @@ namespace HBE {
 			image_infos[binding][i].sampler = vk_image.getSampler();
 		}
 
+		writes[binding].pImageInfo = image_infos[binding];
 		setBindingDirty(binding);
 	}
 
@@ -302,7 +327,7 @@ namespace HBE {
 		VK_TopLevelAccelerationStructure &vk_top_level_acceleration_structure_object = context->root_acceleration_structures[acceleration_structure];
 
 		const VkDescriptorSetLayoutBinding &descriptorSetLayoutBinding = pipeline_layout->getDescriptorBindings()[binding];
-		const VkAccelerationStructureKHR acceleration_structure_handle = vk_top_level_acceleration_structure_object.getHandle();
+		const VkAccelerationStructureKHR& acceleration_structure_handle = vk_top_level_acceleration_structure_object.getVkHandle();
 
 		HB_ASSERT(descriptorSetLayoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR,
 		          "binding#" + std::to_string(binding) + " is not an acceleration structure");
@@ -320,20 +345,24 @@ namespace HBE {
 	void VK_PipelineInstance::setStorageBufferArray(uint32_t binding, BufferHandle *buffers, uint32_t count) {
 		const VkDescriptorSetLayoutBinding &descriptorSetLayoutBinding = pipeline_layout->getDescriptorBindings()[binding];
 		HB_ASSERT(descriptorSetLayoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, "binding#" + std::to_string(binding) + " is not a storage buffer");
-		HB_ASSERT(count <= descriptorSetLayoutBinding.descriptorCount || descriptorSetLayoutBinding.descriptorCount == 0, "descriptor count mismatch");
+		HB_ASSERT(pipeline_layout->IsBindingVariableSize(binding) || (count <= descriptorSetLayoutBinding.descriptorCount), "descriptor count mismatch");
 
-		VK_StorageBuffer **vk_buffers = reinterpret_cast<VK_StorageBuffer **>(buffers);
+		if (pipeline_layout->IsBindingVariableSize(binding) && count > writes[binding].descriptorCount) {
+			writes[binding].descriptorCount = count;
+			if (image_infos[binding] != nullptr)
+				delete image_infos[binding];
+			buffer_infos[binding] = new VkDescriptorBufferInfo[count];
+		}
 
 		for (int i = 0; i < count; i++) {
-			buffer_infos[binding][i].buffer = vk_buffers[i]->getBuffer().getVkHandle();
+			HB_ASSERT(context->buffers.valid(buffers[i]), "Buffer " + std::to_string(i) + " handle is invalid");
+			VK_Buffer &vk_buffer = context->buffers[buffers[i]];
+			buffer_infos[binding][i].buffer = vk_buffer.getVkHandle();
 			buffer_infos[binding][i].offset = 0;
 			buffer_infos[binding][i].range = VK_WHOLE_SIZE;
 		}
 
-		writes[binding].dstSet = getDescriptorSetForBinding(binding);
 		writes[binding].pBufferInfo = buffer_infos[binding];
-		writes[binding].descriptorCount = count;
-
 		setBindingDirty(binding);
 	}
 
@@ -377,17 +406,27 @@ namespace HBE {
 		HB_ASSERT(descriptorSetLayoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, "binding#" + std::to_string(binding) + " is not a storage buffer");
 		HB_ASSERT(buffer_count <= descriptorSetLayoutBinding.descriptorCount || descriptorSetLayoutBinding.descriptorCount == 0, "descriptor count mismatch");
 
-		VK_TexelBuffer **vk_buffers = reinterpret_cast<VK_TexelBuffer **>(buffers);
 
-		std::vector<VkBufferView> buffer_views(buffer_count);
+		if (pipeline_layout->IsBindingVariableSize(binding) && buffer_count > writes[binding].descriptorCount) {
+			writes[binding].descriptorCount = buffer_count;
+			if (buffer_infos[binding] != nullptr)
+				delete buffer_infos[binding];
+			if (buffer_views[binding] != nullptr)
+				delete buffer_views[binding];
+			buffer_infos[binding] = new VkDescriptorBufferInfo[buffer_count];
+			buffer_views[binding] = new VkBufferView[buffer_count];
+		}
+
 		for (int i = 0; i < buffer_count; i++) {
-			buffer_views[i] = vk_buffers[i]->getView();
-		}
-		if (buffer_count != 0) {
-			writes[binding].descriptorCount = buffer_views.size();
-			writes[binding].pTexelBufferView = buffer_views.data();
+			HB_ASSERT(context->texel_buffers.valid(buffers[i]), "Texel buffer " + std::to_string(i) + " handle is invalid");
+			VK_TexelBuffer &vk_buffer = context->texel_buffers[buffers[i]];
+			buffer_views[binding][i] = vk_buffer.getView();
+			buffer_infos[binding][i].buffer = vk_buffer.getHandle();
+			buffer_infos[binding][i].range = VK_WHOLE_SIZE;
 		}
 
+		writes[binding].pTexelBufferView = buffer_views[binding];
+		writes[binding].pBufferInfo = buffer_infos[binding];
 		setBindingDirty(binding);
 	}
 

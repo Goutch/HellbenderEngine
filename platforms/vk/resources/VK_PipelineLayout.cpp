@@ -71,10 +71,8 @@ namespace HBE
         this->descriptor_set_layout_handles = std::move(other.descriptor_set_layout_handles);
         this->descriptor_set_layouts = std::move(other.descriptor_set_layouts);
         this->descriptor_name_to_binding = std::move(other.descriptor_name_to_binding);
-        this->variable_descriptors = std::move(other.variable_descriptors);
-        this->bindings = std::move(other.bindings);
+        this->pipeline_bindings = std::move(other.pipeline_bindings);
         this->push_constants_ranges = std::move(other.push_constants_ranges);
-        this->descriptor_sizes = std::move(other.descriptor_sizes);
         this->pipeline_bindings = std::move(other.pipeline_bindings);
         this->pipeline_push_constants = std::move(other.pipeline_push_constants);
         this->push_constant_name_to_index = std::move(other.push_constant_name_to_index);
@@ -83,10 +81,8 @@ namespace HBE
         other.descriptor_set_layout_handles.clear();
         other.descriptor_set_layouts.clear();
         other.descriptor_name_to_binding.clear();
-        other.variable_descriptors.clear();
-        other.bindings.clear();
+        other.pipeline_bindings.clear();
         other.push_constants_ranges.clear();
-        other.descriptor_sizes.clear();
         other.pipeline_bindings.clear();
         other.pipeline_push_constants.clear();
         other.push_constant_name_to_index.clear();
@@ -170,8 +166,8 @@ namespace HBE
                   "Uniform \"" + old_binding_info.name = "\" Binding#" + std::to_string(old_binding_info.layout_binding.binding) + " has different sizes");
         HB_ASSERT(old_binding_info.layout_binding.descriptorType == new_binding_info.layout_binding.descriptorType,
                   "Uniform \"" + old_binding_info.name = "\" Binding#" + std::to_string(old_binding_info.layout_binding.binding) + " has different types");
-	    HB_ASSERT(old_binding_info.variable_size == new_binding_info.variable_size,
-	              "Uniform \"" + old_binding_info.name = "\" Binding#" + std::to_string(old_binding_info.variable_size) + " has different variable size value");
+	   // HB_ASSERT(old_binding_info.variable_size == new_binding_info.variable_size,
+	   //           "Uniform \"" + old_binding_info.name = "\" Binding#" + std::to_string(old_binding_info.variable_size) + " has different variable size value");
 
 
 	    merged_binding_info.name = new_binding_info.name;

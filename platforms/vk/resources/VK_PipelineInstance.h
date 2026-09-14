@@ -39,6 +39,7 @@ namespace HBE
         std::vector<VkWriteDescriptorSetAccelerationStructureKHR> acceleration_structure_infos;
         std::vector<VkDescriptorImageInfo*> image_infos;
         std::vector<VkDescriptorBufferInfo*> buffer_infos;
+	    std::vector<VkBufferView*> buffer_views;
 
 		RawVector<VkDescriptorSet> descriptor_set_handles; //frame0 set0 |frame0 set1 | frame1 set0 | frame1 set1| frame2 set0 | frame2 set1
 	    RawVector<bool> dirty_descriptor_sets_bindings; //frame0 binding0 |frame0 binding1 | frame1 binding0 | frame1 binding1| frame2 binding0 | frame2 binding1

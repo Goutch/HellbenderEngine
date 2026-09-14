@@ -29,5 +29,7 @@ namespace HBE {
         void update(const void *data);
 
         const VkBufferView &getView() const;
+
+		VkBuffer getHandle() const;
     };
 }

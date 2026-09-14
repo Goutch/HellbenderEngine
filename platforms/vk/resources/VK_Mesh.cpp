@@ -225,8 +225,8 @@ namespace HBE {
 		return indices_count > 0 || vertex_count > 0;
 	}
 
-	BufferHandle VK_Mesh::getBuffer(uint32_t binding, BufferHandle &handle) const {
-		return buffers[binding];
+	void VK_Mesh::getBuffer(uint32_t binding, BufferHandle &handle) const {
+		handle = buffers[binding];
 	}
 
 	void VK_Mesh::getIndicesBuffer(BufferHandle &handle) const {

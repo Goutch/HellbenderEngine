@@ -19,7 +19,9 @@ namespace HBE {
 	}
 
 	void StorageBuffer::alloc(const BufferInfo &info) {
-		context.createBuffer(handle, info);
+		BufferInfo info_copy = info;
+		info_copy.usage |= BUFFER_USAGE_FLAG_STORAGE_BUFFER;
+		context.createBuffer(handle, info_copy);
 	}
 
 	bool StorageBuffer::allocated() {

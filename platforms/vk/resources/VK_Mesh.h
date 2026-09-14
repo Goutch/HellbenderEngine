@@ -6,63 +6,69 @@
 #include "HBE/platforms/vk/VK_CommandPool.h"
 #include "VK_StorageBuffer.h"
 
-namespace HBE
-{
-    class VK_Device;
+namespace HBE {
+	class VK_Device;
 
-    class VK_Buffer;
+	class VK_Buffer;
 
-    class VK_Renderer;
+	class VK_Renderer;
 
-    class VK_Mesh
-    {
-        VK_Context* context = nullptr;
+	class VK_Mesh {
+		VK_Context *context = nullptr;
 
-        std::vector<BufferHandle> buffers;
-        VkBufferUsageFlags extra_usages = 0;
-        mutable bool bound = false;
-        MeshInfo info;
-	    BufferHandle indices_buffer = HBE_NULL_HANDLE;
-        std::vector<VertexAttributeInfo> attributes_locations;
-        uint32_t instance_count = 1;
-        uint32_t vertex_count = 0;
-        INDICES_TYPE indices_type;
+		std::vector<BufferHandle> buffers;
+		VkBufferUsageFlags extra_usages = 0;
+		mutable bool bound = false;
+		MeshInfo info;
+		BufferHandle indices_buffer = HBE_NULL_HANDLE;
+		std::vector<VertexAttributeInfo> attributes_locations;
+		uint32_t instance_count = 1;
+		uint32_t vertex_count = 0;
+		INDICES_TYPE indices_type;
 
-        uint32_t indices_count = 0;
+		uint32_t indices_count = 0;
 
-    public:
-        void alloc(VK_Context* context, const MeshInfo& info);
-        void release();
-        VK_Mesh() = default;
+	public:
+		void alloc(VK_Context *context, const MeshInfo &info);
 
-        ~VK_Mesh();
+		void release();
+
+		VK_Mesh() = default;
+
+		~VK_Mesh();
 
 		bool allocated() const;
 
-        void setVertexIndices(const uint32_t* data, size_t count);
+		void setVertexIndices(const uint32_t *data, size_t count);
 
-        void setVertexIndices(const uint16_t* data, size_t count);
+		void setVertexIndices(const uint16_t *data, size_t count);
 
-        void setVertexIndices(const void* data, size_t count, size_t element_size);
+		void setVertexIndices(const void *data, size_t count, size_t element_size);
 
-        void setBuffer(uint32_t location, const void* vertices, size_t count);
+		void setBuffer(uint32_t location, const void *vertices, size_t count);
 
-        void setInstanceBuffer(uint32_t location, const void* data, size_t count);
+		void setInstanceBuffer(uint32_t location, const void *data, size_t count);
 
-        BufferHandle getBuffer(uint32_t binding,BufferHandle& handle) const;
-	    BufferHandle getBuffer(uint32_t binding) const;
-	    BufferHandle getIndicesBuffer() const;
-		void getIndicesBuffer(BufferHandle& handle) const;
+		void getBuffer(uint32_t binding, BufferHandle &handle) const;
 
-        uint32_t getIndicesCount() const;
-        uint32_t getVertexCount() const;
-        uint32_t getInstanceCount() const;
-        void bind() const;
+		BufferHandle getBuffer(uint32_t binding) const;
 
-        void unbind() const;
+		BufferHandle getIndicesBuffer() const;
 
-	    VkDeviceSize getAttributeElementSize(uint32_t location);
+		void getIndicesBuffer(BufferHandle &handle) const;
 
-	    INDICES_TYPE getIndicesType();
-    };
+		uint32_t getIndicesCount() const;
+
+		uint32_t getVertexCount() const;
+
+		uint32_t getInstanceCount() const;
+
+		void bind() const;
+
+		void unbind() const;
+
+		VkDeviceSize getAttributeElementSize(uint32_t location);
+
+		INDICES_TYPE getIndicesType();
+	};
 }

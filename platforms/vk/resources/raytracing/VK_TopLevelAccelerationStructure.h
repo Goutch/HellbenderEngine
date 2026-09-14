@@ -17,7 +17,7 @@ namespace HBE {
 		VK_TopLevelAccelerationStructure() = default;
 		~VK_TopLevelAccelerationStructure();
 		VkDeviceOrHostAddressConstKHR getDeviceAddress() const;
-		const VkAccelerationStructureKHR getHandle() const;
+		const VkAccelerationStructureKHR &getVkHandle() const;
 	};
 
 
