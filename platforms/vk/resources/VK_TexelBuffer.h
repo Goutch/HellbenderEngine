@@ -31,5 +31,7 @@ namespace HBE {
         const VkBufferView &getView() const;
 
 		VkBuffer getHandle() const;
+
+		VkDeviceSize getSize() const;
     };
 }

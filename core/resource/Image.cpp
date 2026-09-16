@@ -57,7 +57,7 @@ namespace HBE {
 	}
 
 
-	ImageHandle Image::load(const char *path, IMAGE_FORMAT expected_format) {
+	ImageHandle Image::load(const char *path, IMAGE_FORMAT expected_format, IMAGE_FLAGS flags) {
 		std::string path_str = RESOURCE_PATH + std::string(path);
 
 		FILE *file = fopen(path_str.c_str(), "rb");
@@ -87,6 +87,7 @@ namespace HBE {
 		info.optional_data = buffer;
 		info.data_format = expected_format;
 		info.format = expected_format;
+		info.flags = flags;
 
 		ImageHandle handle;
 		Application::instance->getContext()->createImage(handle, info);
@@ -113,8 +114,8 @@ namespace HBE {
 		context.createImage(handle, info);
 	}
 
-	void Image::loadFromFile(const char *path, IMAGE_FORMAT expected_format) {
-		handle = load(path, expected_format);
+	void Image::loadFromFile(const char *path, IMAGE_FORMAT expected_format, IMAGE_FLAGS flags) {
+		handle = load(path, expected_format,flags);
 	}
 
 	ImageHandle Image::create(const ImageInfo &info) {
@@ -122,4 +123,5 @@ namespace HBE {
 		Application::instance->getContext()->createImage(handle, info);
 		return handle;
 	}
+
 }

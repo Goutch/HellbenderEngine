@@ -30,8 +30,8 @@ namespace HBE {
 
 		void update(const void *data);
 
-		void loadFromFile(const char *path, IMAGE_FORMAT expected_format);
-		static ImageHandle load(const char *path, IMAGE_FORMAT expected_format);
+		void loadFromFile(const char *path, IMAGE_FORMAT expected_format,IMAGE_FLAGS flags = IMAGE_FLAG_NONE);
+		static ImageHandle load(const char *path, IMAGE_FORMAT expected_format,IMAGE_FLAGS flags = IMAGE_FLAG_NONE);
 		static ImageHandle create(const ImageInfo& info);
 		static int getFormatNumberOfChannels(IMAGE_FORMAT format);
 	};

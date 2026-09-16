@@ -36,7 +36,11 @@ namespace HBE {
 
 		VK_DescriptorAllocator &operator=(const VK_DescriptorAllocator &) = delete;
 
-		void alloc(const VK_PipelineLayout *pipeline_layout, uint8_t *set_layout_indices, DescriptorSetAllocation *allocation_buffer, uint32_t count);
+		void alloc(const VK_PipelineLayout *pipeline_layout,
+				   uint32_t *set_layout_indices,
+				   DescriptorSetAllocation *allocation_buffer,
+				   uint32_t count,
+				   uint32_t* variable_descriptor_count = nullptr);
 
 		void free(DescriptorSetAllocation allocation);
 

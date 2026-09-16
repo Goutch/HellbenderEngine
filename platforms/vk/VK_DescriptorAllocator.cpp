@@ -20,7 +20,11 @@ namespace HBE {
 	}
 
 
-	void VK_DescriptorAllocator::alloc(const VK_PipelineLayout *pipeline_layout, uint8_t *set_layout_indices, DescriptorSetAllocation *allocation_buffer, uint32_t count) {
+	void VK_DescriptorAllocator::alloc(const VK_PipelineLayout *pipeline_layout,
+									   uint32_t *set_layout_indices,
+									   DescriptorSetAllocation *allocation_buffer,
+									   uint32_t count,
+									   uint32_t* varible_descriptor_counts) {
 		HB_ASSERT(count <= 32, "Cannot allocate more than 32 descriptor sets at once (could easily be changed to a dynamic array if needed)");
 		VkDescriptorSetLayout pipeline_layout_handles[32];
 		VK_DescriptorPoolSize required_pool_sizes;

@@ -53,4 +53,8 @@ namespace HBE {
 	VkBuffer VK_TexelBuffer::getHandle() const {
 		return buffer.getVkHandle();
 	}
+
+	VkDeviceSize VK_TexelBuffer::getSize() const {
+		return buffer.getSize();
+	}
 }
