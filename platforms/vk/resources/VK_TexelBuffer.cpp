@@ -13,7 +13,7 @@ namespace HBE {
 	void VK_TexelBuffer::alloc(VK_Context *context, const TexelBufferInfo &info) {
 		HB_ASSERT(info.count > 0, "Texel buffer count must be greater than 0");
 		this->context = context;
-
+		count = info.count;
 		VK_BufferInfo buffer_info;
 		buffer_info.size = VK_Utils::getFormatStride(info.format) * count;
 		buffer_info.usage = VK_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT;

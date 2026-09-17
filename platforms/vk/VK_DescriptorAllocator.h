@@ -49,6 +49,9 @@ namespace HBE {
 		VK_DescriptorAllocator();
 
 		uint32_t descriptorTypeToIndex(VkDescriptorType type);
+
+		void copy(DescriptorSetAllocation &from, DescriptorSetAllocation to);
+
 	private:
 		uint32_t findOrCreatePool(const VK_DescriptorPoolSize &required_pool_sizes);
 	};

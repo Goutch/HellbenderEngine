@@ -166,6 +166,8 @@ namespace HBE {
 		context->rasterization_targets[renderer_resources.main_render_target].release();
 		context->images[renderer_resources.null_image].release();
 		context->images[renderer_resources.null_sampled_texture].release();
+		context->buffers[renderer_resources.null_buffer].release();
+		context->buffers[renderer_resources.null_texel_buffer].release();
 
 		Application::instance->onWindowClosed.unsubscribe(window_closed_subscription_id);
 		Configs::onVerticalSyncChange.unsubscribe(vertical_sync_changed_subscription_id);
@@ -513,7 +515,7 @@ namespace HBE {
 			Log::error("failed to create texture sampler!");
 		}
 
-		uint8_t null_image_data[4] = {0,255,255,0};
+		uint8_t null_image_data[4] = {0, 255, 255, 0};
 		ImageInfo null_image_info{};
 		null_image_info.width = 2;
 		null_image_info.height = 2;
@@ -527,6 +529,23 @@ namespace HBE {
 		null_image_info.flags = IMAGE_FLAG_NONE;
 		renderer_resources.null_sampled_texture = context->images.create();
 		context->images[renderer_resources.null_sampled_texture].alloc(context, null_image_info);
+
+		uint32_t null_buffer_data[4] = {0, 1, 2, 3};
+		BufferInfo null_buffer_info{};
+		null_buffer_info.stride = 4;
+		null_buffer_info.usage = BUFFER_USAGE_FLAG_STORAGE_BUFFER;
+		null_buffer_info.flags = BUFFER_FLAG_NONE;
+		null_image_info.optional_data = &null_buffer_data;
+		null_buffer_info.count = 4;
+		renderer_resources.null_buffer = context->buffers.create();
+		context->buffers[renderer_resources.null_buffer].alloc(context, null_buffer_info);
+
+		TexelBufferInfo null_texel_buffer_info{};
+		null_texel_buffer_info.count = 4;
+		null_texel_buffer_info.format = IMAGE_FORMAT_R32_UINT;
+		renderer_resources.null_buffer = context->texel_buffers.create();
+		context->texel_buffers[renderer_resources.null_buffer].alloc(context, null_texel_buffer_info);
+		context->texel_buffers[renderer_resources.null_buffer].update(&null_buffer_data);
 
 		RasterizationTargetInfo render_target_info{};
 		render_target_info.width = context->swapchain.getExtent().width;
@@ -563,7 +582,6 @@ namespace HBE {
 
 		renderer_resources.screen_pipeline_instance = context->pipeline_instances.create();
 		context->pipeline_instances[renderer_resources.screen_pipeline_instance].alloc(context, screen_pipeline_instance_info);
-
 
 
 	}

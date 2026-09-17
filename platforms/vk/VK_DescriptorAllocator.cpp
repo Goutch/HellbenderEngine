@@ -133,5 +133,10 @@ namespace HBE {
 		return pools[allocation.pool_alloc_index].descriptor_sets[allocation.descriptor_set_alloc_index];
 	}
 
+	void VK_DescriptorAllocator::copy(DescriptorSetAllocation &from, DescriptorSetAllocation to) {
+		//todo:
+		throw std::exception("Not Implemented");
+	}
+
 
 }

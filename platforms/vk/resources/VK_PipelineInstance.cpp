@@ -162,9 +162,9 @@ namespace HBE {
 				if (image_infos[binding] != nullptr)
 					delete image_infos[binding];
 				image_infos[binding] = new VkDescriptorImageInfo[writes[binding].descriptorCount];
-				ImageHandle null_image_handle = writes[binding].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER? renderer_resources.null_sampled_texture : renderer_resources.null_image;
-				VK_Image& null_image = context->images[null_image_handle];
-				for (int i = 0; i <writes[binding].descriptorCount ; ++i) {
+				ImageHandle null_image_handle = writes[binding].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ? renderer_resources.null_sampled_texture : renderer_resources.null_image;
+				VK_Image &null_image = context->images[null_image_handle];
+				for (int i = 0; i < writes[binding].descriptorCount; ++i) {
 					image_infos[binding][i].sampler = null_image.getSampler();
 					image_infos[binding][i].imageLayout = null_image.getImageLayout();
 					image_infos[binding][i].imageView = null_image.getImageView();
@@ -175,10 +175,11 @@ namespace HBE {
 				if (buffer_infos[binding] != nullptr)
 					delete buffer_infos[binding];
 				buffer_infos[binding] = new VkDescriptorBufferInfo[writes[binding].descriptorCount];
+				VkBuffer null_buffer = context->buffers[renderer_resources.null_buffer].getVkHandle();
 				for (uint32_t i = 0; i < writes[binding].descriptorCount; ++i) {
-					buffer_infos[binding][i].buffer = VK_NULL_HANDLE;
+					buffer_infos[binding][i].buffer = null_buffer;
 					buffer_infos[binding][i].offset = 0;
-					buffer_infos[binding][i].range = 0;
+					buffer_infos[binding][i].range = VK_WHOLE_SIZE;
 				}
 				writes[binding].pBufferInfo = buffer_infos[binding];
 			}
@@ -189,11 +190,13 @@ namespace HBE {
 					delete buffer_views[binding];
 				buffer_infos[binding] = new VkDescriptorBufferInfo[writes[binding].descriptorCount];
 				buffer_views[binding] = new VkBufferView[writes[binding].descriptorCount];
+
+				VK_TexelBuffer &null_texel_buffer = context->texel_buffers[renderer_resources.null_texel_buffer];
 				for (uint32_t i = 0; i < writes[binding].descriptorCount; ++i) {
-					buffer_infos[binding][i].buffer = VK_NULL_HANDLE;
+					buffer_infos[binding][i].buffer = null_texel_buffer.getHandle();
 					buffer_infos[binding][i].offset = 0;
-					buffer_infos[binding][i].range = 0;
-					buffer_views[binding][i] = VK_NULL_HANDLE;
+					buffer_infos[binding][i].range = null_texel_buffer.getSize();
+					buffer_views[binding][i] = null_texel_buffer.getView();
 				}
 				writes[binding].pBufferInfo = buffer_infos[binding];
 			}
@@ -239,7 +242,6 @@ namespace HBE {
 		uint32_t descriptor_frame_offset = frame * descriptor_set_count;
 		VkCommandBuffer command_buffer = context->renderer.getCommandPool()->getCurrentBuffer();
 
-		Log::debug("Binding pipeline instance with " + std::to_string(descriptor_set_count) + " descriptor sets for frame " + std::to_string(frame));
 		vkCmdBindDescriptorSets(command_buffer,
 		                        pipeline_layout->getBindPoint(),
 		                        pipeline_layout->getHandle(),
@@ -296,45 +298,34 @@ namespace HBE {
 		return context->descriptor_allocator.getDescriptorSet(descriptor_allocations[descriptor_index + descriptor_frame_offset]);
 	}
 
-	void VK_PipelineInstance::setImageArray(uint32_t binding, ImageHandle *textures, uint32_t texture_count, int32_t mip_level) {
+	void VK_PipelineInstance::setImageArray(uint32_t binding, ImageHandle *textures, uint32_t count, int32_t mip_level) {
 		const VkDescriptorSetLayoutBinding &layout_binding = pipeline_layout->getDescriptorBindings()[binding];
-		const VK_BindingInfo &binding_info = pipeline_layout->getBindingInfos()[binding];
-		uint32_t set_index = binding_info.descriptor_set_index;
-		VkWriteDescriptorSet &write_descriptor_set = writes[binding];
-		bool variable_size = pipeline_layout->IsBindingVariableSize(binding);
 		HB_ASSERT(layout_binding.descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ||
 		          layout_binding.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_IMAGE ||
 		          layout_binding.descriptorType == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, "binding#" + std::to_string(binding) + " is not a texture");
-		HB_ASSERT(variable_size || (texture_count <= write_descriptor_set.descriptorCount),
-		          "descriptor count mismatch for binding#" + std::to_string(binding) + " (texture_count: " + std::to_string(texture_count) + " > descriptorCount: " +
+
+
+		VkWriteDescriptorSet &write_descriptor_set = writes[binding];
+		bool variable_size = pipeline_layout->IsBindingVariableSize(binding);
+		HB_ASSERT(variable_size || (count <= write_descriptor_set.descriptorCount),
+		          "descriptor count mismatch for binding#" + std::to_string(binding) + " (count: " + std::to_string(count) + " > descriptorCount: " +
 		          std::to_string(write_descriptor_set.descriptorCount) + ")");
 
-
-
-		//todo: we need to allocate more descriptor sets
-		if (variable_size && texture_count > write_descriptor_set.descriptorCount) {
-			//todo: resize descriptors we are over the descriptor count allocated for this bindingtexture_count = max_descriptor_count;
-			DescriptorSetAllocation allocation{};
-			//todo: realloc new descriptor with new count, need a way to precise what count we want in the variable set.
-			context->descriptor_allocator.alloc(pipeline_layout, &set_index, &allocation, 1, &texture_count);
-			context->descriptor_allocator.free(descriptor_allocations[binding_info.descriptor_set_index]);
-			descriptor_allocations[binding_info.descriptor_set_index] = allocation;
-			for (int i = 0; i < descriptor_set_handles.size(); ++i) {
-				descriptor_set_handles[i] = context->descriptor_allocator.getDescriptorSet(descriptor_allocations[i]);
-			}
-
+		//We need to allocate more descriptor sets since the current count is less than the texture count. This is only allowed for variable size descriptor sets.
+		if (variable_size && count > write_descriptor_set.descriptorCount) {
+			const VK_BindingInfo &binding_info = pipeline_layout->getBindingInfos()[binding];
+			reallocateSet(binding_info.descriptor_set_index, count);
 			//we need to allocate more image_infos
-			if (texture_count != write_descriptor_set.descriptorCount) {
+			if (count != write_descriptor_set.descriptorCount) {
 				if (image_infos[binding] != nullptr)
 					delete image_infos[binding];
-				image_infos[binding] = new VkDescriptorImageInfo[texture_count];
-				//todo: initialize texture count of null textures
+				image_infos[binding] = new VkDescriptorImageInfo[count];
 			}
-			write_descriptor_set.descriptorCount = texture_count;
+			write_descriptor_set.descriptorCount = count;
 		}
 
-		for (uint32_t i = 0; i < texture_count; ++i) {
-			int index = i >= texture_count ? texture_count - 1 : i;
+		for (uint32_t i = 0; i < count; ++i) {
+			int index = i >= count ? count - 1 : i;
 			VK_Image &vk_image = context->images[textures[index]];
 			image_infos[binding][i].imageLayout = vk_image.getImageLayout();
 			image_infos[binding][i].imageView = vk_image.getImageView(mip_level);
@@ -395,15 +386,26 @@ namespace HBE {
 	}
 
 	void VK_PipelineInstance::setStorageBufferArray(uint32_t binding, BufferHandle *buffers, uint32_t count) {
-		const VkDescriptorSetLayoutBinding &descriptorSetLayoutBinding = pipeline_layout->getDescriptorBindings()[binding];
-		HB_ASSERT(descriptorSetLayoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, "binding#" + std::to_string(binding) + " is not a storage buffer");
-		HB_ASSERT(pipeline_layout->IsBindingVariableSize(binding) || (count <= descriptorSetLayoutBinding.descriptorCount), "descriptor count mismatch");
+		const VkDescriptorSetLayoutBinding &layout_binding = pipeline_layout->getDescriptorBindings()[binding];
+		HB_ASSERT(layout_binding.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, "binding#" + std::to_string(binding) + " is not a buffer");
 
-		if (pipeline_layout->IsBindingVariableSize(binding) && count > writes[binding].descriptorCount) {
-			writes[binding].descriptorCount = count;
-			if (buffer_infos[binding] != nullptr)
-				delete buffer_infos[binding];
-			buffer_infos[binding] = new VkDescriptorBufferInfo[count];
+		VkWriteDescriptorSet &write_descriptor_set = writes[binding];
+		bool variable_size = pipeline_layout->IsBindingVariableSize(binding);
+		HB_ASSERT(variable_size || (count <= write_descriptor_set.descriptorCount),
+		          "descriptor count mismatch for binding#" + std::to_string(binding) + " (count: " + std::to_string(count) + " > descriptorCount: " +
+		          std::to_string(write_descriptor_set.descriptorCount) + ")");
+
+		//We need to allocate more descriptor sets since the current count is less than the texture count. This is only allowed for variable size descriptor sets.
+		if (variable_size && count > write_descriptor_set.descriptorCount) {
+			const VK_BindingInfo &binding_info = pipeline_layout->getBindingInfos()[binding];
+			reallocateSet(binding_info.descriptor_set_index, count);
+			//we need to allocate more image_infos
+			if (count != write_descriptor_set.descriptorCount) {
+				if (buffer_infos[binding] != nullptr)
+					delete buffer_infos[binding];
+				buffer_infos[binding] = new VkDescriptorBufferInfo[count];
+			}
+			write_descriptor_set.descriptorCount = count;
 		}
 
 		for (int i = 0; i < count; i++) {
@@ -453,23 +455,30 @@ namespace HBE {
 		setBindingDirty(binding);
 	}
 
-	void VK_PipelineInstance::setTexelBufferArray(uint32_t binding, TexelBufferHandle *buffers, uint32_t buffer_count) {
-		const VkDescriptorSetLayoutBinding &descriptorSetLayoutBinding = pipeline_layout->getDescriptorBindings()[binding];
-		HB_ASSERT(descriptorSetLayoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, "binding#" + std::to_string(binding) + " is not a storage buffer");
-		HB_ASSERT(buffer_count <= descriptorSetLayoutBinding.descriptorCount || descriptorSetLayoutBinding.descriptorCount == 0, "descriptor count mismatch");
+	void VK_PipelineInstance::setTexelBufferArray(uint32_t binding, TexelBufferHandle *buffers, uint32_t count) {
+		const VkDescriptorSetLayoutBinding &layout_binding = pipeline_layout->getDescriptorBindings()[binding];
+		HB_ASSERT(layout_binding.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, "binding#" + std::to_string(binding) + " is not a texel buffer");
 
+		VkWriteDescriptorSet &write_descriptor_set = writes[binding];
+		bool variable_size = pipeline_layout->IsBindingVariableSize(binding);
+		HB_ASSERT(variable_size || (count <= write_descriptor_set.descriptorCount),
+		          "descriptor count mismatch for binding#" + std::to_string(binding) + " (count: " + std::to_string(count) + " > descriptorCount: " +
+		          std::to_string(write_descriptor_set.descriptorCount) + ")");
 
-		if (pipeline_layout->IsBindingVariableSize(binding) && buffer_count > writes[binding].descriptorCount) {
-			writes[binding].descriptorCount = buffer_count;
-			if (buffer_infos[binding] != nullptr)
-				delete buffer_infos[binding];
-			if (buffer_views[binding] != nullptr)
-				delete buffer_views[binding];
-			buffer_infos[binding] = new VkDescriptorBufferInfo[buffer_count];
-			buffer_views[binding] = new VkBufferView[buffer_count];
+		//We need to allocate more descriptor sets since the current count is less than the texture count. This is only allowed for variable size descriptor sets.
+		if (variable_size && count > write_descriptor_set.descriptorCount) {
+			const VK_BindingInfo &binding_info = pipeline_layout->getBindingInfos()[binding];
+			reallocateSet(binding_info.descriptor_set_index, count);
+			//we need to allocate more image_infos
+			if (count != write_descriptor_set.descriptorCount) {
+				if (buffer_infos[binding] != nullptr)
+					delete buffer_infos[binding];
+				buffer_infos[binding] = new VkDescriptorBufferInfo[count];
+			}
+			write_descriptor_set.descriptorCount = count;
 		}
 
-		for (int i = 0; i < buffer_count; i++) {
+		for (int i = 0; i < count; i++) {
 			HB_ASSERT(context->texel_buffers.valid(buffers[i]), "Texel buffer " + std::to_string(i) + " handle is invalid");
 			VK_TexelBuffer &vk_buffer = context->texel_buffers[buffers[i]];
 			buffer_views[binding][i] = vk_buffer.getView();
@@ -495,5 +504,16 @@ namespace HBE {
 
 	bool VK_PipelineInstance::allocated() {
 		return pipeline_layout != nullptr;
+	}
+
+	void VK_PipelineInstance::reallocateSet(uint32_t set_index, uint32_t variable_size_count) {
+		DescriptorSetAllocation allocation{};
+		context->descriptor_allocator.alloc(pipeline_layout, &set_index, &allocation, 1, &variable_size_count);
+		context->descriptor_allocator.copy(descriptor_allocations[set_index], allocation);
+		context->descriptor_allocator.free(descriptor_allocations[set_index]);
+		descriptor_allocations[set_index] = allocation;
+		for (int i = 0; i < descriptor_set_handles.size(); ++i) {
+			descriptor_set_handles[i] = context->descriptor_allocator.getDescriptorSet(descriptor_allocations[i]);
+		}
 	}
 }

@@ -9,7 +9,7 @@ layout(binding = 1) uniform UniformBufferObject {
 } ubo;
 layout(location = 1) in vec2 uv;
 void main() {
-    vec4 c = texture(layers[ubo.layer_count], uv);
+    vec4 c = texture(layers[ubo.layer_count-1], uv);
     for (int i = ubo.layer_count-1; i >= 0; i--) {
         c += texture(layers[i], uv)*(1.0-c.a);
     }

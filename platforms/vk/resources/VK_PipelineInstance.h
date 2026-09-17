@@ -66,13 +66,13 @@ namespace HBE
         void unbind();
         void setUniform(uint32_t binding, const void* data);
         void setImage(uint32_t binding, ImageHandle image, uint32_t mip_level);
-        void setImageArray(uint32_t binding, ImageHandle* images, uint32_t image_count, int32_t mip_level);
+        void setImageArray(uint32_t binding, ImageHandle* images, uint32_t count, int32_t mip_level);
         void setTexelBuffer(uint32_t binding, TexelBufferHandle buffer);
         void setTexelBufferArray(uint32_t binding, TexelBufferHandle* buffers, uint32_t buffer_count);
         void setAccelerationStructure(uint32_t binding, RootAccelerationStructureHandle acceleration_structure);
         void setStorageBuffer(uint32_t binding, BufferHandle buffer, size_t byte_offset);
         void setStorageBufferArray(uint32_t binding, BufferHandle* buffers, uint32_t count);
-
+		void reallocateSet(uint32_t set_index, uint32_t variable_size_count);
     private:
         void setBindingDirty(uint32_t index);
         void createDescriptorWrites();
