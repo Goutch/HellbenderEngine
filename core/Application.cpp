@@ -27,7 +27,7 @@ namespace HBE
             break;
         }
         context.init(info.context_info);
-        //audio.init();
+        audio.init();
         input.init(*window);
 
         onInit.invoke();

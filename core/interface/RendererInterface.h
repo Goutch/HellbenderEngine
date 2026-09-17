@@ -90,5 +90,8 @@ namespace HBE {
 		RasterizationTargetHandle ui_render_target = HBE_NULL_HANDLE;
 		PipelineInstanceHandle screen_pipeline_instance = HBE_NULL_HANDLE;
 	    RasterizationPipelineHandle screen_pipeline = HBE_NULL_HANDLE;
+
+		ImageHandle null_image = HBE_NULL_HANDLE;
+		ImageHandle null_sampled_texture = HBE_NULL_HANDLE;
 	};
 }

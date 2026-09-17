@@ -117,7 +117,7 @@ namespace HBE {
 
 		bool fit(const VK_DescriptorPoolSize &other) const {
 			for (int i = 0; i < DESCRIPTOR_TYPES_COUNT; ++i) {
-				if (sizes[i].descriptorCount <= other.sizes[i].descriptorCount) {
+				if (sizes[i].descriptorCount < other.sizes[i].descriptorCount) {
 					return false;
 				}
 			}

@@ -40,6 +40,7 @@ namespace HBE {
 
 		VkSampler default_sampler;
 
+
 		bool windowResized = false;
 		bool frame_presented = false;
 
@@ -103,6 +104,7 @@ namespace HBE {
 
 		FenceHandle getCurrentFrameFence();
 
+		RendererResources &getRendererResources();
 	private:
 		void createDefaultResources();
 	};

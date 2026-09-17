@@ -24,7 +24,7 @@ namespace HBE {
 									   uint32_t *set_layout_indices,
 									   DescriptorSetAllocation *allocation_buffer,
 									   uint32_t count,
-									   uint32_t* varible_descriptor_counts) {
+									   uint32_t* variable_descriptor_counts) {
 		HB_ASSERT(count <= 32, "Cannot allocate more than 32 descriptor sets at once (could easily be changed to a dynamic array if needed)");
 		VkDescriptorSetLayout pipeline_layout_handles[32];
 		VK_DescriptorPoolSize required_pool_sizes;
@@ -44,8 +44,15 @@ namespace HBE {
 		alloc_info.pSetLayouts = pipeline_layout_handles;
 		alloc_info.descriptorSetCount = count;
 		alloc_info.descriptorPool = pools[pool_index].handle;
-
-
+		VkDescriptorSetVariableDescriptorCountAllocateInfo variable_count_info{};
+		if (variable_descriptor_counts!= nullptr) {
+			bool descriptor_indexing_enabled = context->physical_device.getEnabledExtensionFlags() & EXTENSION_FLAG_DESCRIPTOR_INDEXING;
+			HB_ASSERT((variable_descriptor_counts!= nullptr) == descriptor_indexing_enabled, "Descriptor indexing is not enabled but variable size descriptors are used!");
+			variable_count_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO;
+			variable_count_info.descriptorSetCount = alloc_info.descriptorSetCount;
+			variable_count_info.pDescriptorCounts = variable_descriptor_counts;
+			alloc_info.pNext = &variable_count_info;
+		}
 		pools[pool_index].descriptor_sets.resize(pools[pool_index].descriptor_sets.size() + count);
 		VkDescriptorSet *set_handles = pools[pool_index].descriptor_sets.end() - count;
 
@@ -60,7 +67,7 @@ namespace HBE {
 		}
 
 		pools[pool_index].remaining_sizes -= required_pool_sizes;
-
+		pools[pool_index].allocations.addRange(allocation_buffer, count);
 	}
 
 
