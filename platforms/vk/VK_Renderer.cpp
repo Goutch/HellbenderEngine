@@ -167,7 +167,7 @@ namespace HBE {
 		context->images[renderer_resources.null_image].release();
 		context->images[renderer_resources.null_sampled_texture].release();
 		context->buffers[renderer_resources.null_buffer].release();
-		context->buffers[renderer_resources.null_texel_buffer].release();
+		context->texel_buffers[renderer_resources.null_texel_buffer].release();
 
 		Application::instance->onWindowClosed.unsubscribe(window_closed_subscription_id);
 		Configs::onVerticalSyncChange.unsubscribe(vertical_sync_changed_subscription_id);
@@ -543,9 +543,9 @@ namespace HBE {
 		TexelBufferInfo null_texel_buffer_info{};
 		null_texel_buffer_info.count = 4;
 		null_texel_buffer_info.format = IMAGE_FORMAT_R32_UINT;
-		renderer_resources.null_buffer = context->texel_buffers.create();
-		context->texel_buffers[renderer_resources.null_buffer].alloc(context, null_texel_buffer_info);
-		context->texel_buffers[renderer_resources.null_buffer].update(&null_buffer_data);
+		renderer_resources.null_texel_buffer = context->texel_buffers.create();
+		context->texel_buffers[renderer_resources.null_texel_buffer].alloc(context, null_texel_buffer_info);
+		context->texel_buffers[renderer_resources.null_texel_buffer].update(&null_buffer_data);
 
 		RasterizationTargetInfo render_target_info{};
 		render_target_info.width = context->swapchain.getExtent().width;

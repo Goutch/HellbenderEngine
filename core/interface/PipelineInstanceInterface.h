@@ -37,7 +37,7 @@ namespace HBE {
 		Handle pipeline_handle;
 		PIPELINE_INSTANCE_TYPE type = PIPELINE_INSTANCE_TYPE_NONE;
 		PIPELINE_INSTANCE_FLAGS flags = PIPELINE_INSTANCE_FLAG_NONE;
-		MEMORY_TYPE_FLAGS preferred_memory_type_flags = MEMORY_TYPE_FLAG_GPU_LOCAL;
+		MEMORY_TYPE_FLAGS preferred_memory_type_flags = MEMORY_TYPE_FLAG_MAPPABLE;
 		UniformMemoryInfo *uniform_memory_type_infos; //optional, specify memory type for specific uniform buffers
 		uint32_t uniform_memory_type_info_count = 0;
 		VariableDescriptorSizeInfo* variable_descriptor_size_infos; //optionnal, specify max count for variable size descriptors, can be set to INT_MAX to use device limit
