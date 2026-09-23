@@ -44,12 +44,9 @@ namespace HBE {
 			}
         }
 
-
         VkAccelerationStructureGeometryKHR accelerationStructureGeometry{};
 
-
         VK_Buffer instances_buffer{};
-
 
         bool has_geometry = instances.size() > 0;
 

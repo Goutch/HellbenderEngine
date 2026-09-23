@@ -37,6 +37,7 @@ namespace HBE
 		//maps
 	    std::map<std::string, size_t> descriptor_name_to_binding;
         std::map<std::string, size_t> push_constant_name_to_index;
+		std::map<uint32_t, uint32_t> descriptor_set_id_to_index;
 
 
         VkPipelineBindPoint bind_point = VK_PIPELINE_BIND_POINT_GRAPHICS;
@@ -75,5 +76,7 @@ namespace HBE
 		VkDeviceSize getBindingElementSize(uint32_t binding) const;
 
         uint32_t getDescriptorSetCount() const;
+
+		uint32_t getDescriptorSetIndex(uint32_t set_id) const;
     };
 }

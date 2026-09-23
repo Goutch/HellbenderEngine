@@ -170,7 +170,6 @@ namespace HBE {
 
 		void createAccelerationStructures();
 
-
 		void createAccelerationStructureInstances();
 	};
 
@@ -188,10 +187,12 @@ namespace HBE {
 
 		//Raytracing
 		virtual MeshAccelerationStructureHandle createMeshAccelerationStructure(MeshHandle mesh, int mesh_index) {
+
 			return HBE_NULL_HANDLE;
 		};
 
 		virtual AccelerationStructureInstance createAccelerationStructureInstance(ModelNode &node, int primitive) {
+
 			return AccelerationStructureInstance{};
 		};
 

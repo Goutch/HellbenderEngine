@@ -74,7 +74,7 @@ namespace HBE {
 	VK_BindingInfo
 	generateDescriptorInfo(VkShaderStageFlagBits stage, VkDescriptorType descriptor_type, spirv_cross::CompilerGLSL &glsl, spirv_cross::Resource &resource, VkPhysicalDeviceLimits limits) {
 		std::string name = glsl.get_name(resource.id);
-		uint32_t set_index = glsl.get_decoration(resource.id, spv::DecorationDescriptorSet);
+		uint32_t set_id = glsl.get_decoration(resource.id, spv::DecorationDescriptorSet);
 		uint32_t descriptor_count = 1;
 		bool variable_size = false;
 		size_t size = 0;
@@ -142,7 +142,7 @@ namespace HBE {
 
 		VK_BindingInfo descriptor_info{};
 		descriptor_info.layout_binding = layout_binding;
-		descriptor_info.descriptor_set_index = set_index;
+		descriptor_info.descriptor_set_id = set_id;
 		descriptor_info.name = name;
 		descriptor_info.size = size;
 		descriptor_info.variable_size = variable_size;

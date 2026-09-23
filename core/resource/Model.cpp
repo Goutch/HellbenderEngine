@@ -105,7 +105,7 @@ namespace HBE
         {
             for (int j = 0; j < resources.meshes[i].size(); ++j)
             {
-                resources.acceleration_structures.emplace_back(info.parser->createMeshAccelerationStructure(resources.meshes[i][j], i));
+                resources.acceleration_structures.emplace_back(this->info.parser->createMeshAccelerationStructure(resources.meshes[i][j], i));
             }
         }
     }
@@ -122,7 +122,7 @@ namespace HBE
             const ModelNode& node = data.nodes[i];
             for (int j = 0; j < node.primitives.size(); ++j)
             {
-                resources.acceleration_structure_instances.emplace_back(info.parser->createAccelerationStructureInstance(data.nodes[i], j));
+                resources.acceleration_structure_instances.emplace_back(this->info.parser->createAccelerationStructureInstance(data.nodes[i], j));
             }
         }
     }

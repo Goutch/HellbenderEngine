@@ -30,12 +30,17 @@ namespace HBE {
 		VK_DescriptorPoolSize required_pool_sizes;
 		for (int i = 0; i < count; ++i) {
 			uint32_t set_layout_index = set_layout_indices[i];
-			const VK_DescriptorPoolSize &set_required_pool_sizes = pipeline_layout->getDescriptorSetLayouts()[set_layout_index].getRequiredPoolSizes();
+			const VK_DescriptorSetLayout &set_layout = pipeline_layout->getDescriptorSetLayouts()[set_layout_index];
+			VK_DescriptorPoolSize set_required_pool_sizes = set_layout.getRequiredPoolSizes();
 
-			pipeline_layout_handles[i] = pipeline_layout->getDescriptorSetLayouts()[set_layout_index].getHandle();
+			if(variable_descriptor_counts != nullptr && variable_descriptor_counts[i] > 0) {
+				VkDescriptorType variable_descriptor_type = set_layout.getLastBindingType();
+				set_required_pool_sizes[variable_descriptor_type].descriptorCount += variable_descriptor_counts[i];
+			}
+
 			required_pool_sizes += set_required_pool_sizes;
+			pipeline_layout_handles[i] = set_layout.getHandle();
 		}
-
 
 		uint32_t pool_index = findOrCreatePool(required_pool_sizes);
 
@@ -51,6 +56,9 @@ namespace HBE {
 			variable_count_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO;
 			variable_count_info.descriptorSetCount = alloc_info.descriptorSetCount;
 			variable_count_info.pDescriptorCounts = variable_descriptor_counts;
+			for (int i = 0; i < count; ++i) {
+				allocation_buffer[i].variable_size_descriptor_count = variable_descriptor_counts[i];
+			}
 			alloc_info.pNext = &variable_count_info;
 		}
 		pools[pool_index].descriptor_sets.resize(pools[pool_index].descriptor_sets.size() + count);
@@ -66,6 +74,16 @@ namespace HBE {
 			allocation_buffer[i].descriptor_set_alloc_index = (pools[pool_index].descriptor_sets.size() - count) + i;
 		}
 
+		//recalculate total set sizes and store them into a cached allocation_sizes vector for the pool
+		for (int i = 0; i < count; ++i) {
+			const VK_DescriptorSetLayout& set_layout = pipeline_layout->getDescriptorSetLayouts()[set_layout_indices[i]];
+
+			VK_DescriptorPoolSize set_required_pool_sizes = set_layout.getRequiredPoolSizes();
+			set_required_pool_sizes[set_layout.getLastBindingType()].descriptorCount += allocation_buffer->variable_size_descriptor_count;
+
+			pools[pool_index].allocation_sizes.add(set_required_pool_sizes);
+		}
+
 		pools[pool_index].remaining_sizes -= required_pool_sizes;
 		pools[pool_index].allocations.addRange(allocation_buffer, count);
 	}
@@ -74,6 +92,9 @@ namespace HBE {
 	void VK_DescriptorAllocator::free(DescriptorSetAllocation allocation) {
 		DescriptorPoolAllocation &pool = pools[allocation.pool_alloc_index];
 		vkFreeDescriptorSets(context->device.getHandle(), pool.handle, 1, &pool.descriptor_sets[allocation.descriptor_set_alloc_index]);
+
+		pool.remaining_sizes += pool.allocation_sizes[allocation.descriptor_set_alloc_index];
+		pool.free_indices.add(allocation.descriptor_set_alloc_index);
 	}
 
 	uint32_t VK_DescriptorAllocator::findOrCreatePool(const VK_DescriptorPoolSize &required_pool_sizes) {
@@ -133,9 +154,34 @@ namespace HBE {
 		return pools[allocation.pool_alloc_index].descriptor_sets[allocation.descriptor_set_alloc_index];
 	}
 
-	void VK_DescriptorAllocator::copy(DescriptorSetAllocation &from, DescriptorSetAllocation to) {
-		//todo:
-		throw std::exception("Not Implemented");
+	void VK_DescriptorAllocator::copy(const VK_PipelineLayout* layout, uint32_t set_index, DescriptorSetAllocation &from, DescriptorSetAllocation to) {
+		const VK_DescriptorSetLayout& set_layout = layout->getDescriptorSetLayouts()[set_index];
+		std::vector<VkDescriptorSetLayoutBinding> bindings = set_layout.getLayoutBindings();
+		std::vector<VkCopyDescriptorSet> copies;
+		copies.reserve(bindings.size());
+		for (int i = 0; i < bindings.size(); ++i) {
+
+			VkCopyDescriptorSet copy_info{};
+			copy_info.sType = VK_STRUCTURE_TYPE_COPY_DESCRIPTOR_SET;
+			copy_info.srcSet = getDescriptorSet(from);
+			copy_info.dstSet = getDescriptorSet(to);
+			copy_info.srcBinding = bindings[i].binding;
+			copy_info.dstBinding = bindings[i].binding;
+			if(layout->IsBindingVariableSize(bindings[i].binding)) {
+				copy_info.descriptorCount = from.variable_size_descriptor_count;
+
+			} else {
+				copy_info.descriptorCount = bindings[i].descriptorCount;
+			}
+
+			if(copy_info.descriptorCount==0) {
+				continue;
+			}
+
+			copies.emplace_back(copy_info);
+		}
+
+		vkUpdateDescriptorSets(context->device.getHandle(), 0, nullptr, copies.size(), copies.data());
 	}
 
 

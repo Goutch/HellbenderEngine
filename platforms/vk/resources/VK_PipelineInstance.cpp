@@ -78,7 +78,7 @@ namespace HBE {
 		for (int i = 0; i < set_count; ++i) {
 			uint32_t set_layout_index = i % set_count_per_frame;
 			const VK_DescriptorSetLayout &set_layout = pipeline_layout->getDescriptorSetLayouts()[set_layout_index];
-			set_indices[i] = set_layout.getDescriptorSetIndex();
+			set_indices[i] = set_layout.getDescriptorSetId();
 			descriptor_set_handles[i] = VK_NULL_HANDLE;
 			descriptor_allocations[i] = {};
 		}
@@ -123,7 +123,6 @@ namespace HBE {
 		for (size_t binding = 0; binding < layout_bindings.size(); ++binding) {
 			auto descriptor_type = layout_bindings[binding].descriptorType;
 			uint32_t descriptor_count = layout_bindings[binding].descriptorCount;
-			uint32_t descriptor_set_index = (frame_index * descriptor_set_layouts.size()) + descriptor_infos[binding].descriptor_set_index;
 
 			if (pipeline_layout->IsBindingVariableSize(binding)) {
 				descriptor_count = 0;
@@ -214,15 +213,24 @@ namespace HBE {
 		uint32_t frame = context->renderer.getCurrentFrameIndex();
 		uint32_t frame_binding_offset = frame * binding_count;
 		std::vector<VkWriteDescriptorSet> out_of_date_descriptor_writes;
+
+		//reallocate descriptor sets if needed for variable size descriptor sets
+		for (uint32_t set = 0; set < pipeline_layout->getDescriptorSetCount(); ++set) {
+			uint32_t binding = pipeline_layout->getLastDescriptorSetBinding(set);
+			//We need to allocate more descriptor sets since the current count is less than the write count. This is only allowed for variable size descriptor sets.
+			if (pipeline_layout->IsBindingVariableSize(binding) &&
+			    getDescriptorAllocationFromBinding(binding).variable_size_descriptor_count < writes[binding].descriptorCount)
+				reallocateSet(binding, writes[binding].descriptorCount);
+		}
+
 		//fix dirty bindings, update with new writes.
 		for (uint32_t binding = 0; binding < binding_count; ++binding) {
-			if (!dirty_descriptor_sets_bindings[frame_binding_offset + binding])
-				continue;
 			dirty_descriptor_sets_bindings[frame_binding_offset + binding] = false;
-			writes[binding].dstSet = getDescriptorSetForBinding(binding);
-			if (writes[binding].descriptorCount != 0)
+			writes[binding].dstSet = context->descriptor_allocator.getDescriptorSet(getDescriptorAllocationFromBinding(binding));
+
+			if (writes[binding].descriptorCount != 0) {
 				out_of_date_descriptor_writes.emplace_back(writes[binding]);
-			else
+			} else
 				Log::debug("Descriptor set for binding " + std::to_string(binding) + " is empty, skipping update");
 		}
 		if (!out_of_date_descriptor_writes.empty()) {
@@ -290,12 +298,16 @@ namespace HBE {
 		return binding_frame_offset + binding;
 	}
 
-	VkDescriptorSet VK_PipelineInstance::getDescriptorSetForBinding(uint32_t binding) {
+	uint32_t VK_PipelineInstance::getSetIndexForFrame(uint32_t set_index) {
 		uint32_t frame = context->renderer.getCurrentFrameIndex();
 		uint32_t descriptor_set_count = pipeline_layout->getDescriptorSetCount();
 		uint32_t descriptor_frame_offset = frame * descriptor_set_count;
-		uint32_t descriptor_index = pipeline_layout->getBindingInfos()[binding].descriptor_set_index;
-		return context->descriptor_allocator.getDescriptorSet(descriptor_allocations[descriptor_index + descriptor_frame_offset]);
+		return descriptor_frame_offset + set_index;
+	}
+
+	DescriptorSetAllocation VK_PipelineInstance::getDescriptorAllocationFromBinding(uint32_t binding) {
+		uint32_t descriptor_set_index = getSetIndexForFrame(pipeline_layout->getBindingInfos()[binding].descriptor_set_index);
+		return descriptor_allocations[descriptor_set_index];
 	}
 
 	void VK_PipelineInstance::setImageArray(uint32_t binding, ImageHandle *textures, uint32_t count, int32_t mip_level) {
@@ -311,10 +323,7 @@ namespace HBE {
 		          "descriptor count mismatch for binding#" + std::to_string(binding) + " (count: " + std::to_string(count) + " > descriptorCount: " +
 		          std::to_string(write_descriptor_set.descriptorCount) + ")");
 
-		//We need to allocate more descriptor sets since the current count is less than the texture count. This is only allowed for variable size descriptor sets.
-		if (variable_size && count > write_descriptor_set.descriptorCount) {
-			const VK_BindingInfo &binding_info = pipeline_layout->getBindingInfos()[binding];
-			reallocateSet(binding_info.descriptor_set_index, count);
+		if (variable_size && count > getDescriptorAllocationFromBinding(binding).variable_size_descriptor_count) {
 			//we need to allocate more image_infos
 			if (count != write_descriptor_set.descriptorCount) {
 				if (image_infos[binding] != nullptr)
@@ -395,10 +404,7 @@ namespace HBE {
 		          "descriptor count mismatch for binding#" + std::to_string(binding) + " (count: " + std::to_string(count) + " > descriptorCount: " +
 		          std::to_string(write_descriptor_set.descriptorCount) + ")");
 
-		//We need to allocate more descriptor sets since the current count is less than the texture count. This is only allowed for variable size descriptor sets.
 		if (variable_size && count > write_descriptor_set.descriptorCount) {
-			const VK_BindingInfo &binding_info = pipeline_layout->getBindingInfos()[binding];
-			reallocateSet(binding_info.descriptor_set_index, count);
 			//we need to allocate more image_infos
 			if (count != write_descriptor_set.descriptorCount) {
 				if (buffer_infos[binding] != nullptr)
@@ -465,10 +471,7 @@ namespace HBE {
 		          "descriptor count mismatch for binding#" + std::to_string(binding) + " (count: " + std::to_string(count) + " > descriptorCount: " +
 		          std::to_string(write_descriptor_set.descriptorCount) + ")");
 
-		//We need to allocate more descriptor sets since the current count is less than the texture count. This is only allowed for variable size descriptor sets.
 		if (variable_size && count > write_descriptor_set.descriptorCount) {
-			const VK_BindingInfo &binding_info = pipeline_layout->getBindingInfos()[binding];
-			reallocateSet(binding_info.descriptor_set_index, count);
 			//we need to allocate more image_infos
 			if (count != write_descriptor_set.descriptorCount) {
 				if (buffer_infos[binding] != nullptr)
@@ -506,14 +509,18 @@ namespace HBE {
 		return pipeline_layout != nullptr;
 	}
 
-	void VK_PipelineInstance::reallocateSet(uint32_t set_index, uint32_t variable_size_count) {
-		DescriptorSetAllocation allocation{};
-		context->descriptor_allocator.alloc(pipeline_layout, &set_index, &allocation, 1, &variable_size_count);
-		context->descriptor_allocator.copy(descriptor_allocations[set_index], allocation);
-		context->descriptor_allocator.free(descriptor_allocations[set_index]);
-		descriptor_allocations[set_index] = allocation;
-		for (int i = 0; i < descriptor_set_handles.size(); ++i) {
-			descriptor_set_handles[i] = context->descriptor_allocator.getDescriptorSet(descriptor_allocations[i]);
-		}
+	void VK_PipelineInstance::reallocateSet(uint32_t binding, uint32_t variable_size_count) {
+
+		const VK_BindingInfo &binding_info = pipeline_layout->getBindingInfos()[binding];
+		DescriptorSetAllocation old_allocation = getDescriptorAllocationFromBinding(binding);
+		DescriptorSetAllocation new_allocation;
+		uint32_t set_index = binding_info.descriptor_set_index;
+		uint32_t set_index_for_frame = getSetIndexForFrame(set_index);
+		context->descriptor_allocator.alloc(pipeline_layout, &set_index, &new_allocation, 1, &variable_size_count);
+		context->descriptor_allocator.copy(pipeline_layout, binding_info.descriptor_set_index, old_allocation, new_allocation);
+		context->descriptor_allocator.free(old_allocation);
+		descriptor_allocations[set_index_for_frame] = new_allocation;
+		descriptor_set_handles[set_index_for_frame] = context->descriptor_allocator.getDescriptorSet(new_allocation);
+
 	}
 }

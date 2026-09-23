@@ -71,13 +71,13 @@ namespace HBE {
 	void printNodeAverange(ProfileGraphNode *node, int indent, uint32_t root_count) {
 		std::string indent_str_tabs = "";
 		for (int i = 0; i < indent; ++i) {
-			indent_str_tabs += "|    ";
+			indent_str_tabs += "|  ";
 		}
-		Log::message(indent_str_tabs + "[" + node->message + "]" + std::to_string(node->count) + "\n" +
-					indent_str_tabs + "|frame avg: " + std::to_string(node->time/root_count) + "ms|" + "\n" +
-					indent_str_tabs + "|avg: " + std::to_string(node->time/node->count) + "ms|" + "\n" +
-					indent_str_tabs + "|min: " + std::to_string(node->min) + "ms|#" + std::to_string(node->min_i) + "\n" +
-					indent_str_tabs + "|max: " + std::to_string(node->max) + "ms|#" + std::to_string(node->max_i));
+		Log::message(indent_str_tabs + "[" + node->message + "]" + std::to_string(node->count) + "\n"
+		             + indent_str_tabs + "|frame: " + std::format("{:.4f}", node->time / root_count) + "ms|" +
+		             "avg: " + std::format("{:.4f}", node->time / node->count) + "ms|" +
+		             "min #" + std::to_string(node->min_i) + ": " + std::format("{:.4f}", node->min) + "ms|" +
+		             "max #" + std::to_string(node->max_i) + ": " + std::format("{:.4f}", node->max) + "ms");
 		for (auto n: node->sub_nodes) {
 			printNodeAverange(n.second, indent + 1, root_count);
 		}

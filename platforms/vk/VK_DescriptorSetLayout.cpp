@@ -7,13 +7,13 @@
 #include "core/utility/Log.h"
 
 namespace HBE {
-	void VK_DescriptorSetLayout::init(VK_Context *context, uint32_t descriptor_set_index, std::vector<VK_BindingInfo> &pipeline_bindings, bool empty_descriptor_allowed) {
+	void VK_DescriptorSetLayout::init(VK_Context *context, uint32_t descriptor_set_id, std::vector<VK_BindingInfo> &pipeline_bindings, bool empty_descriptor_allowed) {
 		this->context = context;
 		bool variable_descriptor_reached = false;
-		this->descriptor_set_index = descriptor_set_index;
+		this->descriptor_set_id = descriptor_set_id;
 
 		for (int i = 0; i < pipeline_bindings.size(); ++i) {
-			if (pipeline_bindings[i].descriptor_set_index == descriptor_set_index) {
+			if (pipeline_bindings[i].descriptor_set_id == descriptor_set_id) {
 				set_bindings.emplace_back(pipeline_bindings[i]);
 
 				HB_ASSERT(!variable_descriptor_reached, "Variable descriptor must only be the last descriptor in the descriptor set");
@@ -28,7 +28,7 @@ namespace HBE {
 
 		}
 
-		HB_ASSERT(!set_bindings.empty(), "No descriptors for descriptor set " + std::to_string(descriptor_set_index));
+		HB_ASSERT(!set_bindings.empty(), "No descriptors for descriptor set " + std::to_string(descriptor_set_id));
 
 		VkDescriptorSetLayoutBindingFlagsCreateInfoEXT flagsInfo{};
 		std::vector<VkDescriptorBindingFlagsEXT> descriptor_binding_flags(set_bindings.size(), 0);
@@ -49,7 +49,7 @@ namespace HBE {
 		    for (int i = 0; i < pipeline_bindings.size(); ++i)
 		    {
 		        if (last_descriptor.layout_binding.binding != pipeline_bindings[i].layout_binding.binding &&
-				        pipeline_bindings[i].descriptor_set_index == descriptor_set_index)
+		            pipeline_bindings[i].descriptor_set_id == descriptor_set_id)
 		        {
 		            last_descriptor.layout_binding.descriptorCount -= pipeline_bindings[i].layout_binding.descriptorCount;
 		        }
@@ -122,11 +122,15 @@ namespace HBE {
 		return layout_bindings[layout_bindings.size() - 1].binding;
 	}
 
-	uint32_t VK_DescriptorSetLayout::getDescriptorSetIndex() const {
-		return descriptor_set_index;
+	uint32_t VK_DescriptorSetLayout::getDescriptorSetId() const {
+		return descriptor_set_id;
 	}
 
 	const VK_DescriptorPoolSize &VK_DescriptorSetLayout::getRequiredPoolSizes() const {
 		return required_pool_sizes;
+	}
+
+	VkDescriptorType VK_DescriptorSetLayout::getLastBindingType() const {
+		return layout_bindings[layout_bindings.size()-1].descriptorType;
 	}
 }

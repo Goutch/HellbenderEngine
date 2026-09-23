@@ -72,12 +72,14 @@ namespace HBE
         void setAccelerationStructure(uint32_t binding, RootAccelerationStructureHandle acceleration_structure);
         void setStorageBuffer(uint32_t binding, BufferHandle buffer, size_t byte_offset);
         void setStorageBufferArray(uint32_t binding, BufferHandle* buffers, uint32_t count);
-		void reallocateSet(uint32_t set_index, uint32_t variable_size_count);
+		void reallocateSet(uint32_t binding, uint32_t variable_size_count);
     private:
         void setBindingDirty(uint32_t index);
         void createDescriptorWrites();
         void updateDescriptors();
         uint32_t getBindingIndexForFrame(uint32_t binding);
-        VkDescriptorSet getDescriptorSetForBinding(uint32_t binding);
+        DescriptorSetAllocation getDescriptorAllocationFromBinding(uint32_t binding);
+
+	    uint32_t getSetIndexForFrame(uint32_t binding);
     };
 }

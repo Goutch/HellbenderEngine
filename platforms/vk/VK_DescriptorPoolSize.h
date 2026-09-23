@@ -4,7 +4,7 @@
 #include "vulkan/vulkan.h"
 
 namespace HBE {
-	//VK_PoolSize is just a standardized way to store VkDescriptorPoolSize with the engine supported descriptor types.
+	//VK_DescriptorPoolSize is just a standardized way to store VkDescriptorPoolSize with the engine supported descriptor types.
 	struct VK_DescriptorPoolSize {
 		static const uint32_t DESCRIPTOR_TYPES_COUNT = 10; // not including the raytracing descriptor types
 		static constexpr VkDescriptorType DESCRIPTOR_TYPES[DESCRIPTOR_TYPES_COUNT] = {
@@ -32,16 +32,17 @@ namespace HBE {
 				{VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 0}
 		};
 		uint32_t non_zero_sizes_count = 0;
+		bool non_zero_sizes_dirty = true;
 		VkDescriptorPoolSize non_zero_sizes[DESCRIPTOR_TYPES_COUNT] = {
-				{VK_DESCRIPTOR_TYPE_MAX_ENUM,                    0},
-				{VK_DESCRIPTOR_TYPE_MAX_ENUM,     0},
-				{VK_DESCRIPTOR_TYPE_MAX_ENUM,              0},
-				{VK_DESCRIPTOR_TYPE_MAX_ENUM,              0},
-				{VK_DESCRIPTOR_TYPE_MAX_ENUM,       0},
-				{VK_DESCRIPTOR_TYPE_MAX_ENUM,       0},
-				{VK_DESCRIPTOR_TYPE_MAX_ENUM,             0},
-				{VK_DESCRIPTOR_TYPE_MAX_ENUM,             0},
-				{VK_DESCRIPTOR_TYPE_MAX_ENUM,           0},
+				{VK_DESCRIPTOR_TYPE_MAX_ENUM, 0},
+				{VK_DESCRIPTOR_TYPE_MAX_ENUM, 0},
+				{VK_DESCRIPTOR_TYPE_MAX_ENUM, 0},
+				{VK_DESCRIPTOR_TYPE_MAX_ENUM, 0},
+				{VK_DESCRIPTOR_TYPE_MAX_ENUM, 0},
+				{VK_DESCRIPTOR_TYPE_MAX_ENUM, 0},
+				{VK_DESCRIPTOR_TYPE_MAX_ENUM, 0},
+				{VK_DESCRIPTOR_TYPE_MAX_ENUM, 0},
+				{VK_DESCRIPTOR_TYPE_MAX_ENUM, 0},
 				{VK_DESCRIPTOR_TYPE_MAX_ENUM, 0}
 		};
 
@@ -75,44 +76,57 @@ namespace HBE {
 			for (int i = 0; i < DESCRIPTOR_TYPES_COUNT; ++i) {
 				sizes[i].descriptorCount -= other.sizes[i].descriptorCount;
 			}
+			non_zero_sizes_dirty = true;
 		}
 
 		void operator+=(const VK_DescriptorPoolSize &other) {
 			for (int i = 0; i < DESCRIPTOR_TYPES_COUNT; ++i) {
 				sizes[i].descriptorCount += other.sizes[i].descriptorCount;
 			}
+			non_zero_sizes_dirty = true;
 		}
 
 		void operator+=(VkDescriptorPoolSize other) {
 			(*this)[other.type].descriptorCount += other.descriptorCount;
+			non_zero_sizes_dirty = true;
 		}
 
 		void operator-=(VkDescriptorPoolSize other) {
 			(*this)[other.type].descriptorCount -= other.descriptorCount;
+			non_zero_sizes_dirty = true;
 		}
 
-		VkDescriptorPoolSize* getNonZeroSizes() {
-			non_zero_sizes_count = 0;
-			for (int i = 0; i < DESCRIPTOR_TYPES_COUNT; ++i) {
-				if (sizes[i].descriptorCount > 0) {
-					non_zero_sizes[non_zero_sizes_count] = sizes[i];
-					non_zero_sizes_count++;
+
+		VkDescriptorPoolSize *getNonZeroSizes() {
+			if (non_zero_sizes_dirty) {
+				non_zero_sizes_count = 0;
+				for (int i = 0; i < DESCRIPTOR_TYPES_COUNT; ++i) {
+					if (sizes[i].descriptorCount > 0) {
+						non_zero_sizes[non_zero_sizes_count] = sizes[i];
+						non_zero_sizes_count++;
+					}
 				}
+				non_zero_sizes_dirty = false;
 			}
+
 			return non_zero_sizes;
 		}
 
 		uint32_t getNonZeroSizesCount() {
+			getNonZeroSizes();
 			return non_zero_sizes_count;
 		}
 
 		void initCore(uint32_t default_count) {
-			for (int i = 0; i < DESCRIPTOR_TYPES_COUNT-1; ++i) {
+			for (int i = 0; i < DESCRIPTOR_TYPES_COUNT - 1; ++i) {
 				sizes[i].descriptorCount = default_count;
 			}
+			non_zero_sizes_dirty = true;
 		}
+
 		void initRaytracing(uint32_t default_count) {
-				(*this)[VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR].descriptorCount = default_count;
+			(*this)[VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR].descriptorCount = default_count;
+			non_zero_sizes_dirty = true;
 		}
 
 		bool fit(const VK_DescriptorPoolSize &other) const {

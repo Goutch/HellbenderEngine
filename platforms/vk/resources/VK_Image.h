@@ -71,6 +71,9 @@ namespace HBE {
         void setImageLayout(VkImageLayout layout);
 
         bool allocated();
+
+	    void getSize(vec3u &size) const;
+
     private:
         VkImageLayout chooseLayout();
     };

@@ -7,21 +7,24 @@
 #include "vector"
 
 
-
 namespace HBE {
 	class VK_Context;
+
 	class VK_PipelineLayout;
 
 	struct DescriptorSetAllocation {
 		uint32_t pool_alloc_index = 0;
 		uint32_t descriptor_set_alloc_index = 0;
+		uint32_t variable_size_descriptor_count = 0;
 	};
 	struct DescriptorPoolAllocation {
 		VkDescriptorPool handle = VK_NULL_HANDLE;
 		uint32_t max_sets = 0;
 		VK_DescriptorPoolSize remaining_sizes;
 		RawVector<DescriptorSetAllocation> allocations;
+		RawVector<VK_DescriptorPoolSize> allocation_sizes;
 		RawVector<VkDescriptorSet> descriptor_sets;
+		RawVector<uint32_t> free_indices;
 	};
 
 	class VK_DescriptorAllocator {
@@ -37,10 +40,10 @@ namespace HBE {
 		VK_DescriptorAllocator &operator=(const VK_DescriptorAllocator &) = delete;
 
 		void alloc(const VK_PipelineLayout *pipeline_layout,
-				   uint32_t *set_layout_indices,
-				   DescriptorSetAllocation *allocation_buffer,
-				   uint32_t count,
-				   uint32_t* variable_descriptor_count = nullptr);
+		           uint32_t *set_layout_indices,
+		           DescriptorSetAllocation *allocation_buffer,
+		           uint32_t count,
+		           uint32_t *variable_descriptor_count = nullptr);
 
 		void free(DescriptorSetAllocation allocation);
 
@@ -48,11 +51,11 @@ namespace HBE {
 
 		VK_DescriptorAllocator();
 
-		uint32_t descriptorTypeToIndex(VkDescriptorType type);
-
-		void copy(DescriptorSetAllocation &from, DescriptorSetAllocation to);
+		void copy(const VK_PipelineLayout *layout, uint32_t set_index, DescriptorSetAllocation &from, DescriptorSetAllocation to);
 
 	private:
 		uint32_t findOrCreatePool(const VK_DescriptorPoolSize &required_pool_sizes);
+
+
 	};
 }

@@ -144,7 +144,7 @@ namespace HBE {
 		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseFence, FUNC_PARAMS(FenceHandle& handle), FUNC_ARGS(handle), fences);
 		//images
 		VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, updateImage, FUNC_PARAMS(ImageHandle handle, const void *data), FUNC_ARGS(handle, data), images, update, FUNC_ARGS(data));
-		VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, getImageSize, FUNC_PARAMS(ImageHandle handle, uvec3 & size_ref), FUNC_ARGS(handle, size_ref), images, getSize, FUNC_ARGS());
+		VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, getImageSize, FUNC_PARAMS(ImageHandle handle, uvec3 & size_ref), FUNC_ARGS(handle, size_ref), images, getSize, FUNC_ARGS(size_ref));
 		//meshes
 		VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setMeshVertexIndices16, FUNC_PARAMS(MeshHandle handle,const uint16_t *indices, size_t count), FUNC_ARGS(handle, indices, count), meshes, setVertexIndices, FUNC_ARGS(indices, count));
 		VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, setMeshVertexIndices, FUNC_PARAMS(MeshHandle handle,const uint32_t *indices, size_t count), FUNC_ARGS(handle, indices, count), meshes, setVertexIndices, FUNC_ARGS(indices, count));
