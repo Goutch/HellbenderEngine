@@ -10,16 +10,14 @@ namespace HBE {
 		std::string path;
 	};
 
-	class HB_API AudioClip : public Resource {
-		friend class Resources;
-
+	class HB_API AudioClip  {
 		friend class AudioClipInstance;
 
 		uint32_t buffer;
-	private:
-		AudioClip(AudioClipInfo info);
-
 	public:
-		~AudioClip() override;
+		AudioClip() = default;
+		void alloc(const AudioClipInfo& info);
+		void release();
+		~AudioClip();
 	};
 }

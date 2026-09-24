@@ -3,22 +3,33 @@
 #include <algorithm>
 #include <cstdint>
 #include "VK_Swapchain.h"
+
+#include "VK_Context.h"
 #include "VK_Device.h"
 #include "VK_PhysicalDevice.h"
-#include "VK_RenderPass.h"
-#include "Configs.h"
+#include "HBE/platforms/vk/resources/VK_RenderPass.h"
+#include "VK_Surface.h"
+#include "core/Application.h"
+#include "core/Configs.h"
 
 namespace HBE {
+	void VK_Swapchain::init(VK_Context *context) {
+		this->context = context;
+		ApplicationInfo info = Application::instance->getInfo();
+		recreate(info.window_info.startSize.x, info.window_info.startSize.y);
+	}
 
-	VK_Swapchain::VK_Swapchain(uint32_t width,
-							   uint32_t height,
-							   const VkSurfaceKHR &surface_handle,
-							   const VK_Device &device) {
-		this->physical_device = &device.getPhysicalDevice();
-		this->device = &device;
-		this->surface_handle = &surface_handle;
-
-		recreate(width, height);
+	void VK_Swapchain::release() {
+		if (render_pass != VK_NULL_HANDLE) {
+			for (auto framebuffer: frame_buffers) {
+				vkDestroyFramebuffer(context->device.getHandle(), framebuffer, nullptr);
+			}
+			vkDestroyRenderPass(context->device.getHandle(), render_pass, nullptr);
+		}
+		for (auto imageView: image_views) {
+			vkDestroyImageView(context->device.getHandle(), imageView, nullptr);
+		}
+		vkDestroySwapchainKHR(context->device.getHandle(), handle, nullptr);
 	}
 
 	void VK_Swapchain::recreate(uint32_t width, uint32_t height) {
@@ -26,15 +37,16 @@ namespace HBE {
 		this->extent.height = height;
 		if (handle != VK_NULL_HANDLE) {
 			for (auto imageView: image_views) {
-				vkDestroyImageView(device->getHandle(), imageView, nullptr);
+				vkDestroyImageView(context->device.getHandle(), imageView, nullptr);
 			}
-			vkDestroySwapchainKHR(device->getHandle(), handle, nullptr);
+			vkDestroySwapchainKHR(context->device.getHandle(), handle, nullptr);
 		}
 
-		SwapchainSupportDetails details = physical_device->querySwapchainSupportDetails(physical_device->getHandle());
-		image_count = details.capabilities.minImageCount + 1;
-		if (details.capabilities.maxImageCount > 0 && image_count > details.capabilities.maxImageCount)
-			image_count = details.capabilities.maxImageCount;
+		SwapchainSupportDetails details = context->physical_device.querySwapchainSupportDetails(context->physical_device.getHandle());
+		image_count = MAX_FRAMES_IN_FLIGHT;
+		image_count = image_count > details.capabilities.minImageCount ? image_count : details.capabilities.minImageCount + 1;
+		if (details.capabilities.maxImageCount > 0)
+			image_count = image_count < details.capabilities.maxImageCount ? image_count : details.capabilities.maxImageCount;
 		VkSurfaceFormatKHR surface_format = chooseSwapSurfaceFormat(details.formats);
 		VkPresentModeKHR present_mode = chooseSwapPresentMode(details.present_modes);
 		chooseSwapExtent(details.capabilities);
@@ -43,7 +55,7 @@ namespace HBE {
 
 		VkSwapchainCreateInfoKHR create_info{};
 		create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-		create_info.surface = *surface_handle;
+		create_info.surface = context->surface.getHandle();
 		create_info.imageExtent = extent;
 		create_info.minImageCount = image_count;
 		create_info.imageFormat = format;
@@ -52,7 +64,7 @@ namespace HBE {
 		create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
 
-		QueueFamilyIndices indices = physical_device->getQueueFamilyIndices();
+		QueueFamilyIndices indices = context->physical_device.getQueueFamilyIndices();
 
 		uint32_t queue_family_indices[] = {
 				indices.graphics_family.value(),
@@ -73,39 +85,26 @@ namespace HBE {
 		create_info.clipped = VK_TRUE;
 		create_info.oldSwapchain = VK_NULL_HANDLE;
 
-		if (vkCreateSwapchainKHR(device->getHandle(), &create_info, nullptr, &handle) != VK_SUCCESS) {
+		if (vkCreateSwapchainKHR(context->device.getHandle(), &create_info, nullptr, &handle) != VK_SUCCESS) {
 			Log::error("Failed to create swap chain!");
 		}
 
-		vkGetSwapchainImagesKHR(device->getHandle(), handle, &image_count, nullptr);
+		vkGetSwapchainImagesKHR(context->device.getHandle(), handle, &image_count, nullptr);
 		images.resize(image_count);
-		vkGetSwapchainImagesKHR(device->getHandle(), handle, &image_count, images.data());
+		vkGetSwapchainImagesKHR(context->device.getHandle(), handle, &image_count, images.data());
 
 		createImageViews();
 
 		Log::status(std::string("Created swapchain with extent:") + std::to_string(extent.width) + "x" +
-					std::to_string(extent.height));
+		            std::to_string(extent.height));
 
 		createRenderPass();
-	}
-
-	VK_Swapchain::~VK_Swapchain() {
-		if (render_pass != VK_NULL_HANDLE) {
-			for (auto framebuffer: frame_buffers) {
-				vkDestroyFramebuffer(device->getHandle(), framebuffer, nullptr);
-			}
-			vkDestroyRenderPass(device->getHandle(), render_pass, nullptr);
-		}
-		for (auto imageView: image_views) {
-			vkDestroyImageView(device->getHandle(), imageView, nullptr);
-		}
-		vkDestroySwapchainKHR(device->getHandle(), handle, nullptr);
 	}
 
 	VkSurfaceFormatKHR VK_Swapchain::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &available_formats) {
 		for (const auto &available_format: available_formats) {
 			if (available_format.format == VK_FORMAT_B8G8R8A8_SRGB &&
-				available_format.colorSpace == VK_COLORSPACE_SRGB_NONLINEAR_KHR) {
+			    available_format.colorSpace == VK_COLORSPACE_SRGB_NONLINEAR_KHR) {
 				return available_format;
 			}
 		}
@@ -113,8 +112,7 @@ namespace HBE {
 	}
 
 	VkPresentModeKHR VK_Swapchain::chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &available_present_modes) {
-		VkPresentModeKHR preferred = Configs::getVerticalSync() ? VK_PRESENT_MODE_FIFO_KHR :
-									 VK_PRESENT_MODE_MAILBOX_KHR;
+		VkPresentModeKHR preferred = Configs::getVerticalSync() ? VK_PRESENT_MODE_FIFO_KHR : VK_PRESENT_MODE_MAILBOX_KHR;
 		for (const auto &available_present_mode: available_present_modes) {
 			if (available_present_mode == preferred)
 				return preferred;
@@ -127,9 +125,9 @@ namespace HBE {
 			extent = capabilities.currentExtent;
 		} else {
 			extent.width = std::clamp(extent.width, capabilities.minImageExtent.width,
-									  capabilities.maxImageExtent.width);
+			                          capabilities.maxImageExtent.width);
 			extent.height = std::clamp(extent.height, capabilities.minImageExtent.height,
-									   capabilities.maxImageExtent.height);
+			                           capabilities.maxImageExtent.height);
 		}
 	}
 
@@ -150,8 +148,8 @@ namespace HBE {
 			create_info.subresourceRange.levelCount = 1;
 			create_info.subresourceRange.baseArrayLayer = 0;
 			create_info.subresourceRange.layerCount = 1;
-			if (vkCreateImageView(device->getHandle(), &create_info, nullptr, &image_views[i]) !=
-				VK_SUCCESS) {
+			if (vkCreateImageView(context->device.getHandle(), &create_info, nullptr, &image_views[i]) !=
+			    VK_SUCCESS) {
 				Log::error("Failed to create image views");
 			}
 		}
@@ -189,8 +187,8 @@ namespace HBE {
 			framebuffer_create_info.layers = 1;
 
 
-			if (vkCreateFramebuffer(device->getHandle(), &framebuffer_create_info, nullptr, &frame_buffers[i]) !=
-				VK_SUCCESS) {
+			if (vkCreateFramebuffer(context->device.getHandle(), &framebuffer_create_info, nullptr, &frame_buffers[i]) !=
+			    VK_SUCCESS) {
 				Log::error("Failed to create framebuffer!");
 			}
 		}
@@ -199,9 +197,9 @@ namespace HBE {
 	void VK_Swapchain::createRenderPass() {
 		if (render_pass != VK_NULL_HANDLE) {
 			for (auto framebuffer: frame_buffers) {
-				vkDestroyFramebuffer(device->getHandle(), framebuffer, nullptr);
+				vkDestroyFramebuffer(context->device.getHandle(), framebuffer, nullptr);
 			}
-			vkDestroyRenderPass(device->getHandle(), render_pass, nullptr);
+			vkDestroyRenderPass(context->device.getHandle(), render_pass, nullptr);
 		}
 
 		VkAttachmentDescription colorAttachment{};
@@ -243,7 +241,7 @@ namespace HBE {
 		render_pass_info.dependencyCount = 1;
 		render_pass_info.pDependencies = &dependency;
 
-		if (vkCreateRenderPass(device->getHandle(), &render_pass_info, nullptr, &render_pass) != VK_SUCCESS) {
+		if (vkCreateRenderPass(context->device.getHandle(), &render_pass_info, nullptr, &render_pass) != VK_SUCCESS) {
 			Log::error("failed to create rasterize pass!");
 		}
 		createFramebuffers();
@@ -277,4 +275,3 @@ namespace HBE {
 		return render_pass;
 	}
 }
-

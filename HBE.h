@@ -2,27 +2,22 @@
 #define _USE_MATH_DEFINES
 
 #include "Core.h"
-#include "Configs.h"
-#include "Application.h"
+#include "HBE/core/Configs.h"
+#include "HBE/core/Application.h"
 #include "Core.h"
 #include "HBETypes.h"
 
 
-#include "core/resource/Resources.h"
 #include "core/resource/Shader.h"
 #include "core/resource/RasterizationPipeline.h"
 #include "core/resource/ComputePipeline.h"
-#include "core/resource/ComputeInstance.h"
 #include "core/resource/Mesh.h"
 #include "core/resource/Image.h"
 #include "core/resource/Model.h"
 #include "core/resource/RasterizationTarget.h"
-#include "core/resource/RasterizationPipelineInstance.h"
-#include "core/resource/ComputeInstance.h"
 #include "core/resource/StorageBuffer.h"
-#include "core/resource/raytracing/AccelerationStructure.h"
+#include "core/resource/raytracing/RootAccelerationStructure.h"
 #include "core/resource/raytracing/RaytracingPipeline.h"
-#include "core/resource/raytracing/RaytracingPipelineInstance.h"
 #include "core/resource/AudioClip.h"
 #include "core/resource/AudioClipInstance.h"
 #include "core/resource/TexelBuffer.h"
@@ -46,11 +41,9 @@
 #include "core/scene/systems/ui/TextSystem.h"
 #include "core/scene/components/EntityState.h"
 
-#include "core/graphics/Graphics.h"
 #include "core/graphics/Window.h"
 #include "core/graphics/RenderGraph.h"
 #include "core/resource/RasterizationTarget.h"
-#include "core/graphics/Allocator.h"
 
 #include "core/input/Input.h"
 #include "core/math/Plane.h"

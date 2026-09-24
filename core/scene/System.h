@@ -1,15 +1,24 @@
 #pragma once
 
 #include "Core.h"
+#include "core/Graphics.h"
+#include "core/input/Input.h"
+#include "core/graphics/Window.h"
+namespace HBE
+{
+    class Scene;
 
-namespace HBE {
-	class Scene;
-	class HB_API System {
-	protected:
-		Scene *scene;
-	public:
-		virtual ~System() = default;
+    class HB_API System
+    {
+    protected:
+        Context& context;
+		Input& input;
+		Window& window;
+        Scene* scene;
 
-		System(Scene *scene);
-	};
+    public:
+        virtual ~System() = default;
+
+        System(Scene* scene);
+    };
 }

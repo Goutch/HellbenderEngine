@@ -7,19 +7,11 @@
 #include "core/scene/Scene.h"
 
 namespace HBE {
-    Node::Node() {
-    }
 
     Node::Node(Entity entity) {
         this->entity = entity;
         this->scene = entity.getScene();
     }
-
-    //Node::Node(Node &&other) noexcept {
-    //    parent = other.parent;
-    //    children = std::move(other.children);
-    //}
-
     uint32_t Node::getDepth() const {
         return depth;
     }

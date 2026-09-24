@@ -7,19 +7,9 @@
 
 namespace HBE {
 
-	AudioClipInstance::AudioClipInstance(AudioClipInstanceInfo info) {
-		this->audioClip = info.clip;
-
-		alGenSources(1, &source);
-		alSourcei(source, AL_BUFFER, info.clip->buffer);
-		setVolume(info.volume);
-		setPitch(info.pitch);
-		setLooping(info.looping);
-	}
 
 	AudioClipInstance::~AudioClipInstance() {
-		stop();
-		alDeleteSources(1, &source);
+		release();
 	}
 
 	void AudioClipInstance::stop() {
@@ -93,6 +83,21 @@ namespace HBE {
 		float duration = (num_samples) / static_cast<float>(sample_rate);
 		duration *= pitch;
 		return duration;
+	}
+
+	void AudioClipInstance::release() {
+		stop();
+		alDeleteSources(1, &source);
+	}
+
+	void AudioClipInstance::alloc(const AudioClipInstanceInfo &info) {
+		this->audioClip = info.clip;
+
+		alGenSources(1, &source);
+		alSourcei(source, AL_BUFFER, info.clip->buffer);
+		setVolume(info.volume);
+		setPitch(info.pitch);
+		setLooping(info.looping);
 	}
 
 

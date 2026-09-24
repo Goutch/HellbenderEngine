@@ -1,29 +1,67 @@
 #include "Mesh.h"
-#include "core/resource/ResourceFactory.h"
 
-namespace HBE {
-	uint32_t Mesh::getVertexCount() const {
-		return vertex_count;
-	}
+#include "core/Application.h"
 
-	uint32_t Mesh::getIndexCount() const {
-		return index_count;
-	}
+namespace HBE
+{
+    Mesh::Mesh(): context(*Application::instance->getContext())
+    {
+    }
 
-	uint32_t Mesh::getInstanceCount() const {
-		return instance_count;
-	}
+    Mesh::Mesh(const MeshInfo& mesh_info): context(*Application::instance->getContext())
+    {
+        alloc(mesh_info);
+    }
 
-	bool Mesh::hasIndexBuffer() const {
-		return indices_type != INDICES_TYPE_NONE;
-	}
+    Mesh::~Mesh()
+    {
+        release();
+    }
 
-	size_t Mesh::getIndicesSize() const {
-		return indices_type == INDICES_TYPE_UINT32 ? sizeof(uint32_t) : sizeof(uint16_t);
-	}
+    void Mesh::alloc(const MeshInfo& mesh_info)
+    {
+        context.createMesh(handle, mesh_info);
+    }
 
-	size_t Mesh::getAttributeElementSize(uint32_t location) const {
-		return attributes_locations.at(location).size;
-	}
+    bool Mesh::allocated()
+    {
+        return handle != HBE_NULL_HANDLE;
+    }
 
+    void Mesh::release()
+    {
+        if (allocated())
+            context.releaseMesh(handle);
+        handle = HBE_NULL_HANDLE;
+    }
+
+    MeshHandle& Mesh::getHandleRef()
+    {
+        return handle;
+    }
+
+    MeshHandle Mesh::getHandle()
+    {
+        return handle;
+    }
+
+    void Mesh::setVertexIndices(const uint32_t* indices, size_t count)
+    {
+        context.setMeshVertexIndices(handle, indices, count);
+    }
+
+    void Mesh::setVertexIndices(const uint16_t* indices, size_t count)
+    {
+        context.setMeshVertexIndices16(handle, indices, count);
+    }
+
+    void Mesh::setBuffer(uint32_t location, const void* vertices, size_t count)
+    {
+        context.setMeshVertexBuffer(handle, location, vertices, count);
+    }
+
+    void Mesh::setInstanceBuffer(uint32_t location, const void* data, size_t count)
+    {
+        context.setMeshInstanceBuffer(handle, location, data, count);
+    }
 }

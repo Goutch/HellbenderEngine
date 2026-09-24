@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 set(CMAKE_CXX_STANDARD 20)
+
+
+add_compile_options(/showIncludes)
 project(HBE CXX)
 
 if (WIN32)
@@ -28,11 +31,13 @@ endif ()
 
 set(CORE_FILES
         HBE.h
-        Application.cpp
-        Application.h
-        Configs.cpp
+
+        core/Graphics.h
+        core/Application.cpp
+        core/Application.h
+        core/Configs.cpp
         Core.h
-        Configs.h
+        core/Configs.h
         HBETypes.h
 
         core/resource/Model.cpp
@@ -41,18 +46,12 @@ set(CORE_FILES
         core/resource/Mesh.h
         core/resource/Shader.cpp
         core/resource/Shader.h
-        core/resource/ResourceFactory.h
-        core/resource/Resource.h
         core/resource/ComputePipeline.h
-        core/resource/Resources.h
-        core/resource/Resources.cpp
+        core/resource/ComputePipeline.cpp
         core/resource/Image.cpp
-        core/resource/RasterizationPipelineInstance.h
-        core/resource/ComputeInstance.h
-        core/resource/IPipelineInstance.h
+        core/resource/PipelineInstance.h
         core/resource/RasterizationTarget.h
         core/resource/raytracing/RaytracingPipeline.h
-        core/resource/raytracing/RaytracingPipelineInstance.h
         core/resource/TexelBuffer.h
         core/resource/Font.cpp
         core/resource/Font.h
@@ -61,12 +60,21 @@ set(CORE_FILES
         core/resource/AudioClip.h
         core/resource/AudioClipInstance.cpp
         core/resource/AudioClipInstance.h
+        core/resource/RasterizationPipeline.cpp
+        core/resource/RasterizationTarget.cpp
+        core/resource/PipelineInstance.cpp
+
+        core/interface/RootAccelerationStructureInterface.h
+        core/interface/AABBAccelerationStructureInterface.h
+        core/interface/FenceInterface.h
+        core/interface/MeshAccelerationStructureInterface.h
+        core/interface/MeshInterface.h
+        core/interface/PipelineInstanceInterface.h
+        core/interface/AllocatorInterface.h
+        core/interface/BufferInterface.h
+        core/interface/RendererInterface.h
 
         core/graphics/Window.h
-        core/graphics/Renderer.h
-        core/graphics/Graphics.cpp
-        core/graphics/Graphics.h
-        core/graphics/Renderer.cpp
         core/graphics/Window.cpp
         core/graphics/RenderGraph.cpp
         core/graphics/RenderGraph.h
@@ -114,7 +122,6 @@ set(CORE_FILES
         core/scene/components/CameraController.h
         core/scene/components/Transform2D.cpp
         core/scene/components/PixelCamera.cpp
-        core/scene/components/ModelRenderer.cpp
         core/scene/components/Camera2D.cpp
         core/scene/components/Camera.cpp
         core/scene/components/Transform.cpp
@@ -126,15 +133,19 @@ set(CORE_FILES
         core/utility/Geometry.cpp
         core/utility/Geometry.h
         core/utility/Profiler.cpp
-        dependencies/utils-collection/Profiler.h
         core/utility/GLTFLoader.cpp
         core/utility/GLTFLoader.h
         core/utility/DefaultModelParser.cpp
         core/utility/DefaultModelParser.h
-        core/scene/components/MeshRenderer.cpp
         core/scene/components/MeshRenderer.h
+        core/scene/ecs/Group/GroupIterator.cpp
+        core/scene/ecs/Group/PageDataArchetype.h
+        core/scene/ecs/Registry/ECSTypes.h
+        core/graphics/Fence.h
+        core/interface/RasterizationTargetInterface.h
 
-
+        core/resource/TexelBuffer.cpp
+        core/resource/StorageBuffer.cpp
 )
 set(VK_FILES
         platforms/vk/VK_Renderer.cpp
@@ -152,79 +163,63 @@ set(VK_FILES
         platforms/vk/VK_Swapchain.h
         platforms/vk/VK_Surface.cpp
         platforms/vk/VK_Surface.h
-        platforms/vk/VK_RasterizationPipeline.cpp
-        platforms/vk/VK_RasterizationPipeline.h
-        platforms/vk/VK_Shader.cpp
-        platforms/vk/VK_Shader.h
-        platforms/vk/VK_ResourceFactory.cpp
-        platforms/vk/VK_ResourceFactory.h
-        platforms/vk/VK_Image.cpp
-        platforms/vk/VK_Image.h
-        platforms/vk/VK_Mesh.h
-        platforms/vk/VK_Mesh.cpp
-        platforms/vk/VK_RenderPass.cpp
-        platforms/vk/VK_RenderPass.h
-        platforms/vk/ShaderCompiler.cpp
-        platforms/vk/ShaderCompiler.h
-        platforms/vk/VK_Semaphore.cpp
-        platforms/vk/VK_Semaphore.h
-        platforms/vk/VK_Fence.cpp
-        platforms/vk/VK_Fence.h
+        platforms/vk/resources/VK_RasterizationPipeline.cpp
+        platforms/vk/resources/VK_RasterizationPipeline.h
+        platforms/vk/resources/VK_Shader.cpp
+        platforms/vk/resources/VK_Shader.h
+        platforms/vk/resources/VK_Image.cpp
+        platforms/vk/resources/VK_Image.h
+        platforms/vk/resources/VK_Mesh.h
+        platforms/vk/resources/VK_Mesh.cpp
+        platforms/vk/resources/VK_RenderPass.cpp
+        platforms/vk/resources/VK_RenderPass.h
+        core/utility/ShaderCompiler.cpp
+        core/utility/ShaderCompiler.h
+        platforms/vk/resources/VK_Semaphore.cpp
+        platforms/vk/resources/VK_Semaphore.h
+        platforms/vk/resources/VK_Fence.cpp
+        platforms/vk/resources/VK_Fence.h
         platforms/vk/VK_CommandPool.cpp
         platforms/vk/VK_CommandPool.h
-        platforms/vk/VK_Buffer.cpp
-        platforms/vk/VK_Buffer.h
-        platforms/vk/VK_Memory.cpp
-        platforms/vk/VK_Memory.h
+        platforms/vk/resources/VK_Buffer.cpp
+        platforms/vk/resources/VK_Buffer.h
         platforms/vk/VK_Allocator.cpp
         platforms/vk/VK_Allocator.h
+        platforms/vk/VK_DescriptorAllocator.cpp
         platforms/vk/VK_Queue.cpp
         platforms/vk/VK_Queue.h
         platforms/vk/VK_ComputePipeline.cpp
         platforms/vk/VK_ComputePipeline.h
-        platforms/vk/VK_PipelineLayout.cpp
-        platforms/vk/VK_PipelineLayout.h
-        platforms/vk/VK_PipelineDescriptors.cpp
-        platforms/vk/VK_PipelineDescriptors.h
-        platforms/vk/VK_RasterizationPipelineInstance.cpp
-        platforms/vk/VK_RasterizationPipelineInstance.h
-        platforms/vk/VK_ComputeInstance.cpp
-        platforms/vk/VK_ComputeInstance.h
-        platforms/vk/raytracing/VK_TopLevelAccelerationStructure.cpp
-        platforms/vk/raytracing/VK_TopLevelAccelerationStructure.h
-        platforms/vk/raytracing/VK_MeshBottomLevelAccelerationStructure.cpp
-        platforms/vk/raytracing/VK_MeshBottomLevelAccelerationStructure.h
-        platforms/vk/raytracing/VK_AABBBottomLevelAccelerationStructure.cpp
-        platforms/vk/raytracing/VK_MeshBottomLevelAccelerationStructure.cpp
-        platforms/vk/raytracing/VK_RaytracingPipeline.cpp
-        platforms/vk/raytracing/VK_RaytracingPipeline.h
-        platforms/vk/raytracing/VK_RaytracingPipelineInstance.cpp
-        platforms/vk/raytracing/VK_RaytracingPipelineInstance.h
-        platforms/vk/VK_StorageBuffer.cpp
-        platforms/vk/VK_StorageBuffer.h
-        platforms/vk/VK_TexelBuffer.cpp
-        platforms/vk/VK_TexelBuffer.h
+        platforms/vk/resources/VK_PipelineLayout.cpp
+        platforms/vk/resources/VK_PipelineLayout.h
+        platforms/vk/resources/raytracing/VK_TopLevelAccelerationStructure.cpp
+        platforms/vk/resources/raytracing/VK_TopLevelAccelerationStructure.h
+        platforms/vk/resources/raytracing/VK_MeshBottomLevelAccelerationStructure.cpp
+        platforms/vk/resources/raytracing/VK_MeshBottomLevelAccelerationStructure.h
+        platforms/vk/resources/raytracing/VK_AABBBottomLevelAccelerationStructure.cpp
+        platforms/vk/resources/raytracing/VK_MeshBottomLevelAccelerationStructure.cpp
+        platforms/vk/resources/raytracing/VK_RaytracingPipeline.cpp
+        platforms/vk/resources/raytracing/VK_RaytracingPipeline.h
+        platforms/vk/resources/VK_StorageBuffer.cpp
+        platforms/vk/resources/VK_StorageBuffer.h
+        platforms/vk/resources/VK_TexelBuffer.cpp
+        platforms/vk/resources/VK_TexelBuffer.h
         platforms/vk/VK_Utils.h
         platforms/vk/VK_DescriptorSetLayout.cpp
         platforms/vk/VK_DescriptorSetLayout.h
-        platforms/vk/VK_RenderTarget.cpp
-        platforms/vk/VK_RenderTarget.h
-        platforms/vk/VK_DynamicRenderTarget.cpp
-        platforms/vk/VK_DynamicRenderTarget.h
-        core/graphics/Allocator.h
-        core/scene/ecs/Group/GroupIterator.cpp
-        core/scene/ecs/Group/PageDataArchetype.h
-        core/scene/ecs/Registry/ECSTypes.h
-        core/graphics/Fence.h
+        platforms/vk/VK_Context.cpp
+        platforms/vk/VK_Context.h
+        platforms/vk/VK_Types.h
+        platforms/vk/resources/VK_PipelineInstance.cpp
+        platforms/vk/resources/VK_PipelineInstance.h
+        platforms/vk/VK_DescriptorAllocator.h
 )
 
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/utils-collection/")
 #------------------------------------VULKAN------------------------------------
 find_package(Vulkan REQUIRED)
 if (VULKAN_FOUND)
-    add_compile_definitions(VULKAN_RENDERER)
     message("Found vulkan at ${Vulkan_INCLUDE_DIRS}")
 else ()
     message(FATAL_ERROR "Vulkan not found")
@@ -244,7 +239,7 @@ set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_X11 OFF CACHE BOOL "" FORCE)
 set(GLFW_VULKAN_STATIC FALSE)
 
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/" EXCLUDE_FROM_ALL)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw/include")
 #set_property(TARGET glfw PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
@@ -253,7 +248,7 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "")
 set(BUILD_EXTERNAL TRUE)
 set(ENABLE_GLSLANG_BINARIES OFF CACHE BOOL "")
 set(ENABLE_CTEST OFF CACHE BOOL "")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/" EXCLUDE_FROM_ALL)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang/)
 #set_property(TARGET glslang PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
@@ -275,7 +270,7 @@ set(SPIRV_CROSS_ENABLE_TESTS OFF CACHE BOOL "Enable SPIRV-Cross tests.")
 #set(SPIRV_CROSS_FORCE_PIC "Force position-independent code for all targets." FALSE)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/)
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/spirv-cross/" EXCLUDE_FROM_ALL)
 include_directories(${Vulkan_INCLUDE_DIRS})
 #set_property(TARGET spirv-cross-glsl PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 #set_property(TARGET spirv-cross-glsl spirv-cross-cpp PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -294,7 +289,7 @@ set(TINYGLTF_HEADER_ONLY ON CACHE INTERNAL "" FORCE)
 set(TINYGLTF_INSTALL OFF CACHE INTERNAL "" FORCE)
 set(TINYGLTF_NO_INCLUDE_STB_IMAGE ON CACHE INTERNAL "" FORCE)
 set(TINYGLTF_BUILD_LOADER_EXAMPLE OFF CACHE BOOL "Build loader_example(load glTF and dump infos)" FORCE)
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf" EXCLUDE_FROM_ALL)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf)
 set_property(TARGET tinygltf PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 message("#------------------------------------FREE_TYPE------------------------------------")
@@ -311,7 +306,7 @@ set(FREETYPE_INCLUDE_DIR_ft2build "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/free
 set(FREETYPE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/freetype")
 
 
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/freetype")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/freetype" EXCLUDE_FROM_ALL)
 add_library(Freetype::Freetype ALIAS freetype)
 
 message("#------------------------------------MSDFGEN-----------------------------------")
@@ -325,8 +320,8 @@ message("#------------------------------------MSDFGEN_ATLAS_GEN-----------------
 set(MSDF_ATLAS_GEN_BUILD_STANDALONE FALSE)
 set(MSDF_ATLAS_GEN_MSDFGEN_EXTERNAL FALSE)
 
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/msdf-atlas-gen/")
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/msdf-atlas-gen/include)
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/msdf-atlas-gen/" EXCLUDE_FROM_ALL)
+#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/msdf-atlas-gen/include)
 set_property(TARGET msdf-atlas-gen PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 set_property(TARGET msdfgen-core PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 set_property(TARGET msdfgen-ext PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
@@ -349,23 +344,23 @@ set(ALSOFT_TESTS OFF CACHE BOOL "Build test programs")
 set(ALSOFT_INSTALL_UTILS OFF CACHE BOOL "Install utility programs (openal-info, alsoft-config, ...)")
 #set(ALSOFT_UPDATE_BUILD_VERSION OFF CACHE BOOL "Update git build version info")
 
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/openal-soft/")
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/openal-soft/include)
-
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/openal-soft/" EXCLUDE_FROM_ALL)
 message("#------------------------------------LIBSNDFILE------------------------------------")
 set(BUILD_PROGRAMS OFF CACHE BOOL "")
 set(BUILD_EXAMPLES OFF CACHE BOOL "")
 set(ENABLE_CPACK OFF CACHE BOOL "")
 set(BUILD_TESTING OFF CACHE BOOL "Set LibSNDFile test to Off")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libsndfile/")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libsndfile/" EXCLUDE_FROM_ALL)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libsndfile/include)
 
 message("#------------------------------------HBE------------------------------------")
-include_directories(.)
 add_library(${PROJECT_NAME} SHARED
         ${CORE_FILES}
         ${VK_FILES}
-        core/scene/ecs/Component.cpp)
+        core/resource/raytracing/AABBAccelerationStructure.cpp
+        core/resource/raytracing/MeshAccelerationStructure.cpp
+        core/resource/raytracing/RaytracingPipeline.cpp
+        core/resource/raytracing/RootAccelerationStructure.cpp)
 
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
@@ -376,12 +371,15 @@ endif ()
 target_compile_definitions(${PROJECT_NAME} PRIVATE HB_BUILD)
 
 target_include_directories(${PROJECT_NAME}
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}"
+        PUBLIC "${Vulkan_INCLUDE_DIRS}"
+        PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm/"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb/"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf/"
-        PUBLIC "${FREETYPE_INCLUDE_DIRS}"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/utils-collection")
+        PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb/"
+        PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/tinygltf/"
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/utils-collection"
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/utils-collection/data-structure"
+        PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/"
+        PRIVATE "${FREETYPE_INCLUDE_DIRS}")
 
 
 set(GLSLANG_LIBS
@@ -406,7 +404,7 @@ set(MSDFGEN_LIBS
         msdfgen-all
         msdf-atlas-gen)
 set(OPENAL_LIBS
-        OpenAL)
+        OpenAL::OpenAL)
 set(SNDFILE_LIBS
         sndfile)
 
@@ -420,7 +418,7 @@ set(HBE_LIBS
         ${OPENAL_LIBS}
         ${SNDFILE_LIBS})
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} PUBLIC
         ${HBE_LIBS})
 
 if (NOT DEFINED HBE_OUTPUT_DIR)

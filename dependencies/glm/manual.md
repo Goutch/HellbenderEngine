@@ -2384,7 +2384,7 @@ LibreOffice includes several applications that make it the most powerful Free an
 * [JGLM](https://github.com/jroyalty/jglm) - Java OpenGL Mathematics Library
 * [SwiftGL Math Library](https://github.com/SwiftGL/Math/blob/master/Sources/glm.swift) GLM for Swift
 * [glm-go](https://github.com/jbowtie/glm-go): Simple linear algebra library similar in spirit to GLM
-* [openll](https://github.com/Polkm/openll): Lua bindings for OpenGL, GLM, GLFW, OpenAL, SOIL and PhysicsFS
+* [openll](https://github.com/Polkm/openll): Lua layout_bindings for OpenGL, GLM, GLFW, OpenAL, SOIL and PhysicsFS
 * [glm-rs](https://github.com/dche/glm-rs): GLSL mathematics for Rust programming language
 * [glmpython](https://github.com/Queatz/glmpython): GLM math library for Python
 

@@ -1,42 +1,28 @@
 #pragma once
 
 #include "Core.h"
-#include "Resource.h"
-
-namespace HBE
-{
-	class Shader;
-
-	class Image;
-
-	class ComputeBuffer;
-
-	class RasterizationTarget;
-
-	typedef uint32_t COMPUTE_PIPELINE_FLAG;
-
-	enum COMPUTE_PIPELINE_FLAGS
-	{
-		COMPUTE_PIPELINE_FLAG_NONE = 0,
-		COMPUTE_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR = 1,
-	};
-
-	struct ComputePipelineInfo
-	{
-		Shader* compute_shader;
-		COMPUTE_PIPELINE_FLAGS flags = COMPUTE_PIPELINE_FLAG_NONE;
-	};
-
-	class HB_API ComputePipeline : public Resource
-	{
-	protected:
-		vec3i workgroup_size;
-
+#include "core/Graphics.h"
+#include "PipelineInstance.h"
+namespace HBE {
+	class HB_API ComputePipeline {
+		Context &context;
+		ComputePipelineHandle handle = HBE_NULL_HANDLE;
 	public:
-		virtual const vec3i& getWorkgroupSize() const = 0;
+		ComputePipeline();
 
-		virtual ~ComputePipeline() = default;
+		~ComputePipeline();
 
-		virtual COMPUTE_PIPELINE_FLAGS getFlags() const = 0;
+		explicit ComputePipeline(const ComputePipelineInfo &info);
+
+		void alloc(const ComputePipelineInfo &info);
+
+		void allocInstance(PipelineInstance &instance);
+
+		void release();
+
+		ComputePipelineHandle getHandle();
+
+		uint32_t getBinding(const char *name);
+
 	};
 }

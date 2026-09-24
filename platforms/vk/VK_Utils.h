@@ -309,6 +309,9 @@ namespace HBE {
 				case IMAGE_FORMAT_RGBA16_SNORM:
 					vk_format = VK_FORMAT_R16G16B16A16_SNORM;
 					break;
+				default:
+					Log::error("Format not supported");
+					break;
 			}
 			return vk_format;
 		}

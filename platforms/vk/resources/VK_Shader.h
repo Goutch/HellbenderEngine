@@ -1,0 +1,85 @@
+#pragma once
+
+#include <vector>
+
+#include "HBETypes.h"
+#include "core/interface/ShaderInterface.h"
+#include "vulkan/vulkan.h"
+#include "string"
+#include "HBE/platforms/vk/resources/VK_Buffer.h"
+
+namespace HBE {
+	class VK_Renderer;
+
+	class VK_Device;
+
+	class VK_CommandPool;
+
+	struct VK_VertexAttributeInfo {
+		uint32_t location;
+		uint32_t size;
+		VkFormat format;
+	};
+
+	struct VK_BindingInfo {
+		std::string name;
+		VkDeviceSize size = 0; //struct size example 16 bytes for vec4
+		uint32_t descriptor_set_id = 0; //actual shader descriptor set number
+		uint32_t descriptor_set_index = 0; //logical descriptor set index, so a shader can have descriptor 999 and still be valid. descriptor 0,1,999 would be index 0,1,2
+		VkDescriptorSetLayoutBinding layout_binding{}; //contain count and type
+		bool variable_size = false;
+	};
+
+	struct VK_PushConstantInfo {
+		std::string name;
+		VkPushConstantRange push_constant_range;
+	};
+
+	class VK_Shader {
+		const VK_Context *context;
+		VkShaderModule handle = VK_NULL_HANDLE;
+		std::vector<VK_VertexAttributeInfo> vertex_inputs;
+		std::vector<VK_BindingInfo> bindings;
+		std::vector<VK_PushConstantInfo> push_constants;
+
+		uvec3 compute_workgroup_size;
+		SHADER_STAGE stage;
+		VkShaderStageFlagBits vk_stage;
+
+	public:
+		VK_Shader() = default;
+
+		VK_Shader(const VK_Shader &) = delete;
+
+		VK_Shader(VK_Shader &&) = delete;
+
+		~VK_Shader() = default;
+
+		const VkShaderModule &getHandle() const;
+
+		const std::vector<VK_PushConstantInfo> &getPushConstants() const;
+
+		const std::vector<VK_BindingInfo> &getDescriptorInfos() const;
+
+		const std::vector<VK_VertexAttributeInfo> &getVertexInputs() const;
+
+		SHADER_STAGE getStage() const;
+
+		VkShaderStageFlagBits getVkStage() const;
+
+		void alloc(VK_Context *context, const ShaderInfo &info);
+
+		void release();
+
+		bool allocated();
+
+		uvec3 getComputeWorkGroupSize() const;
+
+	private:
+		void setSource(const uint32_t *spirv, uint32_t size);
+
+		void reflect(const uint32_t *spirv, uint32_t size);
+
+		void reflect_c(const uint32_t *spirv, uint32_t size);
+	};
+}

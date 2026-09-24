@@ -1,19 +1,19 @@
 #pragma once
 
 #include "Core.h"
-#include "Renderer.h"
 #include "unordered_map"
 #include "vector"
+#include "core/Graphics.h"
 
 namespace HBE {
 	class RasterizationPipeline;
 
-	class RasterizationPipelineInstance;
+	class PipelineInstance;
 
 	class Mesh;
 
 	class HB_API RenderGraph {
-#define MAP(T1, T2) std::unordered_map<T1,T2>
+		Context& context;
 		std::vector<DrawCmdInfo> render_cache;
 		std::vector<DrawCmdInfo> ordered_render_cache;
 
@@ -21,6 +21,7 @@ namespace HBE {
 		size_t current_pc_block = 0;
 		size_t current_pc_block_offset = 0;
 		std::vector<char *> push_constant_blocks;
+
 
 		static bool compareDrawCmd(const DrawCmdInfo &cmd1, const DrawCmdInfo &cmd2);
 

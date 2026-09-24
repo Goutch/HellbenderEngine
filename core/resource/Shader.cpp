@@ -1,49 +1,56 @@
-
 #include "Shader.h"
-#include "core/resource/ResourceFactory.h"
 #include "core/utility/Log.h"
 #include "fstream"
+#include "core/Application.h"
+#include "../utility/ShaderCompiler.h"
 
-namespace HBE {
+namespace HBE
+{
+    Shader::Shader() : context(*Application::instance->getContext())
+    {
+        handle = HBE_NULL_HANDLE;
+    }
 
-	void Shader::getSource(const std::string &path, std::string &buffer) {
-		try {
-			std::string res_path = RESOURCE_PATH + path;
-			std::ifstream file;
-			file.open(res_path, std::ios::ate);
-			if (file.is_open()) {
-				size_t size = (size_t) file.tellg();
-				buffer.resize(size);
-				file.seekg(0);
-				file.read(buffer.data(), size);
-				file.close();
-			} else {
-				Log::error("Unable to find file:" + path);
-			}
-			/*
-			FILE *file = fopen(res_path.c_str(), "r");
-			if (ferror(file)) {
-				Log::error("Unable to find file:" + path);
-			}
-			while (!feof(file)) {
-				fgetc(file);
-				size++;
-			}
-			rewind(file);
-			*buffer = new char[size + 1];
-			for (int i = 0; i < size; ++i) {
-				char c = getc(file);
-				(*buffer)[i] = c;
-			}
-			buffer[size] = 0;
-			fclose(file);*/
-		}
-		catch (std::exception &e) {
-			Log::error("failed to read file " + path + "\n" + e.what());
-		}
-	}
+    Shader::Shader(const ShaderInfo& info) : context(*Application::instance->getContext())
+    {
+        alloc(info);
+    }
 
-	vec3i Shader::getWorkgroupSize() {
-		return workgroup_size;
-	}
+    Shader::~Shader()
+    {
+        release();
+    }
+
+    void Shader::loadGLSL(const char* path, SHADER_STAGE stage,const char* preamble)
+    {
+        std::string source;
+        ShaderCompiler::getSource(path, source);
+        std::vector<uint32_t> spirv;
+        ShaderCompiler::GLSLToSpirV(source.c_str(), source.size(), spirv, stage, path,preamble);
+
+        ShaderInfo info;
+        info.stage = stage;
+        info.spirv = spirv.data();
+        info.spirvLength = spirv.size();
+        alloc(info);
+    }
+
+    void Shader::alloc(const ShaderInfo& info)
+    {
+        if (handle != HBE_NULL_HANDLE)
+            Log::error("trying to allocate a shader that has already been allocated!");
+        context.createShader(handle, info);
+    }
+
+    ShaderHandle Shader::getHandle()
+    {
+        return handle;
+    }
+
+    void Shader::release()
+    {
+        if (handle != HBE_NULL_HANDLE)
+            context.releaseShader(handle);
+        handle = HBE_NULL_HANDLE;
+    }
 }

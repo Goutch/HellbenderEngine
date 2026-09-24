@@ -1,36 +1,44 @@
-
 #pragma once
 
+#include "core/interface/RasterizationPipelineInterface.h"
 #include "core/resource/Mesh.h"
 #include "core/resource/Model.h"
-#include "core/resource/raytracing/AccelerationStructure.h"
+#include "core/resource/raytracing/RootAccelerationStructure.h"
 
-namespace HBE {
-	struct DefaultModelParserInfo {
-		MESH_FLAG additional_mesh_flags = MESH_FLAG_NONE;
-		std::map<MODEL_TEXTURE_TYPE, std::string> texture_names;
-		std::string material_property_name;
-		RasterizationPipeline *graphic_pipeline = nullptr;
-		RasterizationPipeline *graphic_pipeline_2_sided = nullptr;
-	};
+namespace HBE
+{
+    struct DefaultModelParserInfo
+    {
+        MESH_FLAGS additional_mesh_flags = MESH_FLAG_NONE;
+        std::map<MODEL_TEXTURE_TYPE, std::string> texture_names;
+        std::string material_property_name;
+        RasterizationPipelineHandle rasterization_pipeline = HBE_NULL_HANDLE;
+        RasterizationPipelineHandle rasterization_pipeline_2_sided = HBE_NULL_HANDLE;
+    };
 
-	class HB_API DefaultModelParser : public HBE::ModelParser {
-	public:
-		DefaultModelParserInfo parser_info;
-	public:
-		void onStartParsingModel(Model *model) override {};
+    class HB_API DefaultModelParser : public ModelParser
+    {
+    protected:
+        Context& context;
+    public:
+        DefaultModelParserInfo parser_info;
 
-		void onEndParsingModel(Model *model) override {};
+        void onStartParsingModel(Model* model) override
+        {
+        };
 
-		DefaultModelParser(DefaultModelParserInfo info);
+        void onEndParsingModel(Model* model) override
+        {
+        };
 
-		Mesh *createMesh(const HBE::ModelPrimitiveData &data, ModelInfo model_info) override;
+        DefaultModelParser(const DefaultModelParserInfo& info);
 
-		RasterizationPipelineInstance *createMaterial(const HBE::ModelMaterialData &materialData, HBE::Image **textures) override;
+        MeshHandle createMesh(const ModelPrimitiveData& data, ModelInfo model_info) override;
 
-		Image *createTexture(const ModelTextureData &data) override;
+        PipelineInstanceHandle createMaterial(const ModelMaterialData& materialData, ImageHandle* textures) override;
 
-		MeshAccelerationStructure *createMeshAccelerationStructure(Mesh *mesh, int mesh_index) override;
-	};
+        ImageHandle createTexture(const ModelTextureData& data) override;
+
+	    virtual MeshAccelerationStructureHandle createMeshAccelerationStructure(Mesh& mesh, int mesh_index);
+    };
 }
-

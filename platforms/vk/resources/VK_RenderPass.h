@@ -1,0 +1,70 @@
+#pragma once
+
+#include "vulkan/vulkan.h"
+#include "vector"
+#include "core/interface/RasterizationTargetInterface.h"
+#include "VK_Image.h"
+
+
+namespace HBE {
+    class VK_Device;
+
+    class VK_Swapchain;
+
+    class VK_Semaphore;
+
+    class VK_Fence;
+
+    class VK_RenderPass {
+        VK_Context *context;
+        VkRenderPass handle = VK_NULL_HANDLE;
+        uint32_t width = 0, height = 0;
+        vec4 clear_color = vec4(0.f, 0.f, 0.f, 1.f);
+        VkExtent2D extent;
+
+        std::vector<ImageHandle> depth_images;
+        std::vector<ImageHandle> images;
+        std::vector<VkFramebuffer> frame_buffers;
+        uint32_t current_frame = 0;
+        VkFormat vk_format;
+        IMAGE_FORMAT format;
+        RENDER_TARGET_FLAGS flags;
+        bool has_color_attachment = false;
+        bool has_depth_attachment = false;
+        bool clear_color_enabled = false;
+        bool clear_depth_enabled = false;
+
+    public:
+        VK_RenderPass() = default;
+
+        void alloc(VK_Context *context, const RasterizationTargetInfo &info);
+		bool allocated() const;
+        void release();
+
+        void begin(const VkCommandBuffer &command_buffer, uint32_t i) const;
+
+        void end(const VkCommandBuffer &command_buffer) const;
+
+        void setClearColor(vec4 color);
+
+        const vec4 &getClearColor() const;
+
+        const VkRenderPass &getHandle() const;
+
+        ImageHandle getFramebufferTexture();
+
+        const std::vector<VkFramebuffer> &getFrameBuffers() const;
+
+        void setResolution(vec2u resolution);
+
+        void getResolution(vec2u& resolution) const;
+
+        void recreate();
+
+	    void getFramebufferTexture(ImageHandle &image);
+
+    private:
+        void createFramebuffers();
+
+    };
+}

@@ -2,8 +2,8 @@
 #pragma once
 
 #include "Core.h"
-#include "Resource.h"
 #include "AudioClip.h"
+#include "HBETypes.h"
 
 namespace HBE {
 	struct AudioClipInstanceInfo {
@@ -26,7 +26,7 @@ namespace HBE {
 	//	- AUDIO_CLIP_INSTANCE_STATE_STOPPED
 	/// </summary>
 
-	class HB_API AudioClipInstance : public Resource {
+	class HB_API AudioClipInstance  {
 		friend class Resources;
 
 		uint32_t source;
@@ -35,19 +35,19 @@ namespace HBE {
 		float pitch;
 		bool is_looping;
 
-		AudioClipInstance(AudioClipInstanceInfo info);
+
 
 	public :
-		~AudioClipInstance() override;
-
+		~AudioClipInstance();
+		AudioClipInstance() = default;
+		void alloc(const AudioClipInstanceInfo& info);
+		void release();
 		void play();
 		void pause();
 		void stop();
 		AUDIO_CLIP_INSTANCE_STATE getState();
 
 		void resetPosition();
-
-
 
 		void setVolume(float volume);
 

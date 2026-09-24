@@ -55,18 +55,35 @@ For samples take a look at the sample repository [HellbenderSamples](https://git
 #### TODO :
 - [ ] Fix vram leak when resizing window or changing the vsync
 - [ ] 2D transform component
-- [ ] Model animations support (low prio)
+- [ ] Model animations support (very low prio, not needed right now)
 - [ ] ECS
+  - [ ] Local transformations, transformations should be able to be calculated in a separate thread. this is already possible but not really straight forward we need.
   - [ ] Archetype caching
+  - [ ] When doing parallel foreach the group should give a thread index so user can accumulate a result.
 - [ ] UI library
   - [ ] UIThemes
+  - [ ] Layout system
   - [ ] Buttons
   - [ ] Labels
   - [ ] Panels
-- [ ] Resources rework
-  - [ ] Use Handles instead of pointers
-  - [ ] Add Shader hot reloading
-  - [ ] Combine RasterizationPipeline with RasterizationPipelineInstance etc by creating the pipeline internally?
+- [ ] Engine Internal rework
+  - [ ] Swapchain semaphores are not handled correctly, new validation layers will throw an error.
+  - [ ] Descriptor allocation need to change, use a descriptor allocator from VkGuide or something similar
+- [ ] Engine API rework
+  - [ ] Resources
+    - [x] Use Handles
+      - [x] Pipeline
+      - [x] PipelineInstance
+      - [x] Images
+      - [x] Shaders
+      - [x] RenderTargets
+      - [x] Fences
+      - [x] Buffers
+      - [x] TexelBuffers
+      - [x] Meshes
+      - [ ] Font 
+    - [ ] Add Shader hot reloading
+    - [ ] Geometry class has too many parameters, should use an info struct as an input.
 - [ ] Documentation
 ### Wiki
 - [Home](https://github.com/Goutch/HellbenderEngine/wiki)

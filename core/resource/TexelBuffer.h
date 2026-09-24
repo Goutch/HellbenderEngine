@@ -1,32 +1,23 @@
 #pragma once
-
 #include "Core.h"
-#include "Image.h"
+#include "core/Graphics.h"
 
-namespace HBE
-{
-	typedef uint32_t TEXEL_BUFFER_FLAGS;
+namespace HBE {
+	class HB_API TexelBuffer {
+		TexelBufferHandle handle = HBE_NULL_HANDLE;
+		Context &context;
 
-	enum TEXEL_BUFFER_FLAG
-	{
-		TEXEL_BUFFER_FLAG_NONE = 0,
-	};
-
-	struct TexelBufferInfo
-	{
-		IMAGE_FORMAT format = IMAGE_FORMAT_R8;
-		uint32_t count = 0;
-		TEXEL_BUFFER_FLAGS flags = TEXEL_BUFFER_FLAG_NONE;
-		MEMORY_TYPE_FLAGS preferred_memory_type_flags = MEMORY_TYPE_FLAG_GPU_LOCAL;
-	};
-
-	class HB_API TexelBuffer : public Resource
-	{
 	public:
-		virtual void update(const void* data) = 0;
-
-		virtual ~TexelBuffer()
-		{
-		};
+		explicit TexelBuffer(const TexelBufferInfo &info);
+		TexelBuffer();
+		TexelBuffer(TexelBuffer &&other) noexcept;
+		TexelBuffer(const TexelBuffer &other) = delete;
+		~TexelBuffer();
+		void alloc(const TexelBufferInfo &info);
+		bool allocated();
+		void release();
+		TexelBufferHandle getHandle();
+		TexelBufferHandle &getHandleRef();
+		void update(const void *data);
 	};
 }

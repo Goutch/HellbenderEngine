@@ -3,12 +3,20 @@
 #include "Core.h"
 #include "dependencies/utils-collection/Event.h"
 #include "HBETypes.h"
+#include "core/input/Input.h"
 
 struct GLFWwindow;
+
 namespace HBE {
+	struct WindowInfo {
+		vec2i startSize = vec2i(1920, 1080);
+		bool fullscreen = false;
+	};
+
 	class HB_API Window {
 	protected:
 		bool is_fullscreen = false;
+
 	public:
 		/// <summary>
 		/// Called when the window is resized.
@@ -19,20 +27,22 @@ namespace HBE {
 
 		virtual bool shouldClose() = 0;
 
-		virtual void swapBuffers() = 0;
-
 		virtual void requestClose() = 0;
 
 		bool isFullscreen();
 
-		virtual ~Window() {};
-
-		static Window *create(const char *title, uint32_t width, uint32_t height);
+		virtual ~Window() = default;
 
 		//todo: fix this hack
 		virtual GLFWwindow *getHandle() = 0;
 
 		virtual void getSize(uint32_t &width, uint32_t &height) = 0;
+
+		virtual vec2u getSize() {
+			vec2u size;
+			getSize(size.x, size.y);
+			return size;
+		}
 
 		virtual uint32_t getWidth() = 0;
 
@@ -43,6 +53,3 @@ namespace HBE {
 		virtual bool isMinimized() = 0;
 	};
 }
-
-
-

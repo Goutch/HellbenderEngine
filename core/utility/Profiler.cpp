@@ -1,5 +1,7 @@
 #include "Profiler.h"
 
+#include "Log.h"
+
 namespace HBE {
 	std::stack<Profile> Profiler::profile_stack;
 	std::unordered_map<std::string, ProfileGraphNode *> Profiler::nodes;
@@ -57,9 +59,7 @@ namespace HBE {
 		current_node->min = current_node->count > 1 ? std::min(profile_stack.top().node->min, ms) : ms;
 		current_node->max = current_node->count > 1 ? std::max(profile_stack.top().node->max, ms) : ms;
 
-
-		double total = current_node->time * (current_node->count - 1);
-		current_node->time = (total + ms) / current_node->count;
+		current_node->time += ms;
 		std::string indent = "";
 		for (int i = 0; i < profile_stack.size(); ++i) {
 			indent += '-';
@@ -68,17 +68,18 @@ namespace HBE {
 		profile_stack.pop();
 	}
 
-	void printNodeAverange(ProfileGraphNode *node, int indent) {
+	void printNodeAverange(ProfileGraphNode *node, int indent, uint32_t root_count) {
 		std::string indent_str_tabs = "";
 		for (int i = 0; i < indent; ++i) {
-			indent_str_tabs += "|    ";
+			indent_str_tabs += "|  ";
 		}
-		Log::message(indent_str_tabs + "[" + node->message + "]" + std::to_string(node->count) + "\n" +
-		             indent_str_tabs + "|avg: " + std::to_string(node->time) + "ms|" + "\n" +
-		             indent_str_tabs + "|min: " + std::to_string(node->min) + "ms|#" + std::to_string(node->min_i) + "\n" +
-		             indent_str_tabs + "|max: " + std::to_string(node->max) + "ms|#" + std::to_string(node->max_i));
+		Log::message(indent_str_tabs + "[" + node->message + "]" + std::to_string(node->count) + "\n"
+		             + indent_str_tabs + "|frame: " + std::format("{:.4f}", node->time / root_count) + "ms|" +
+		             "avg: " + std::format("{:.4f}", node->time / node->count) + "ms|" +
+		             "min #" + std::to_string(node->min_i) + ": " + std::format("{:.4f}", node->min) + "ms|" +
+		             "max #" + std::to_string(node->max_i) + ": " + std::format("{:.4f}", node->max) + "ms");
 		for (auto n: node->sub_nodes) {
-			printNodeAverange(n.second, indent + 1);
+			printNodeAverange(n.second, indent + 1, root_count);
 		}
 		delete node;
 	}
@@ -86,8 +87,8 @@ namespace HBE {
 	void Profiler::printAverange() {
 		int indent = 0;
 		for (auto n: nodes) {
-			printNodeAverange(n.second, indent);
+			uint32_t root_count = n.second->count;
+			printNodeAverange(n.second, indent, root_count);
 		}
 	}
 }
-

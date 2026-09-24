@@ -1,16 +1,17 @@
 #pragma once
 
 #include "Core.h"
-#include "core/utility/Log.h"
+#include "HBETypes.h"
 #include "string"
 #include "vector"
 #include "map"
-#include "Resource.h"
-#include "core/resource/Image.h"
-#include "core/resource/raytracing/AccelerationStructure.h"
-
+#include "core/Graphics.h"
+#include "core/interface/MeshAccelerationStructureInterface.h"
+#include "core/interface/ImageInterface.h"
+#include "core/interface/MeshInterface.h"
+#include "core/interface/PipelineInstanceInterface.h"
 namespace HBE {
-	class RasterizationPipelineInstance;
+	class PipelineInstance;
 
 	class RasterizationPipeline;
 
@@ -118,10 +119,10 @@ namespace HBE {
 	};
 	struct ModelResources {
 		//todo: flatten meshes
-		std::vector<std::vector<Mesh *>> meshes;
-		std::vector<Image *> textures;
-		std::vector<RasterizationPipelineInstance *> materials;
-		std::vector<MeshAccelerationStructure *> acceleration_structures;
+		std::vector<std::vector<MeshHandle>> meshes;
+		std::vector<ImageHandle> textures;
+		std::vector<PipelineInstanceHandle> materials;
+		std::vector<MeshAccelerationStructureHandle> acceleration_structures;
 		std::vector<AccelerationStructureInstance> acceleration_structure_instances;
 	};
 
@@ -141,19 +142,17 @@ namespace HBE {
 	};
 
 
-	class HB_API Model : public Resource {
-		friend class Resources;
+	class HB_API Model  {
+		Context& context;
 
 		ModelInfo info;
 		ModelData data;
 		ModelResources resources;
-
-		void load(const ModelInfo &info);
-
-		Model(const ModelInfo &info);
-
 	public:
 		~Model();
+		Model();
+		explicit Model(const ModelInfo &info);
+		void load(const ModelInfo &info);
 
 		const ModelResources &getResources();
 
@@ -171,7 +170,6 @@ namespace HBE {
 
 		void createAccelerationStructures();
 
-
 		void createAccelerationStructureInstances();
 	};
 
@@ -181,16 +179,22 @@ namespace HBE {
 
 		virtual void onEndParsingModel(Model *model) {};
 
-		virtual Mesh *createMesh(const ModelPrimitiveData &data, ModelInfo info) = 0;
+		virtual MeshHandle createMesh(const ModelPrimitiveData &data, ModelInfo info) = 0;
 
-		virtual Image *createTexture(const ModelTextureData &data) = 0;
+		virtual ImageHandle createTexture(const ModelTextureData &data) = 0;
 
-		virtual RasterizationPipelineInstance *createMaterial(const ModelMaterialData &materialData, Image **textures) = 0;
+		virtual PipelineInstanceHandle createMaterial(const ModelMaterialData &materialData, ImageHandle *textures) = 0;
 
 		//Raytracing
-		virtual MeshAccelerationStructure *createMeshAccelerationStructure(Mesh *mesh, int mesh_index) { return nullptr; };
+		virtual MeshAccelerationStructureHandle createMeshAccelerationStructure(MeshHandle mesh, int mesh_index) {
 
-		virtual AccelerationStructureInstance createAccelerationStructureInstance(ModelNode &node, int primitive) { return {}; };
+			return HBE_NULL_HANDLE;
+		};
+
+		virtual AccelerationStructureInstance createAccelerationStructureInstance(ModelNode &node, int primitive) {
+
+			return AccelerationStructureInstance{};
+		};
 
 	};
 }

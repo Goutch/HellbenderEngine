@@ -17,7 +17,7 @@
 #include "RegistryPage.h"
 #include "ComponentPool.h"
 #include "core/scene/ecs//Component.h"
-#include "dependencies/utils-collection/RawVector.h"
+#include "../../../../dependencies/utils-collection/data-structure/RawVector.h"
 #include "ECSTypes.h"
 
 namespace HBE {

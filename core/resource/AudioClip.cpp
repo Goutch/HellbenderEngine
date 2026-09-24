@@ -8,8 +8,11 @@
 #include "core/utility/Log.h"
 
 namespace HBE {
-	AudioClip::AudioClip(AudioClipInfo info) {
+	AudioClip::~AudioClip() {
+		release();
+	}
 
+	void AudioClip::alloc(const AudioClipInfo& info) {
 		std::string path = RESOURCE_PATH + info.path;
 		// Open the audio file with libsndfile
 		SF_INFO sfInfo{};
@@ -17,7 +20,6 @@ namespace HBE {
 		if (!file) {
 			printf("Failed to open file %s\n", path.c_str());
 		}
-
 
 		// Set the audio format for OpenAL
 		ALenum format = 0;
@@ -54,7 +56,7 @@ namespace HBE {
 		sf_close(file);
 	}
 
-	AudioClip::~AudioClip() {
+	void AudioClip::release() {
 		// Cleanup and exit
 		alDeleteBuffers(1, &buffer);
 	}

@@ -1,63 +1,76 @@
 #include "VK_ComputePipeline.h"
 #include "VK_Renderer.h"
 #include "VK_Device.h"
-#include "VK_Shader.h"
-#include "VK_PipelineLayout.h"
-#include "VK_PipelineLayout.h"
-#include "VK_CommandPool.h"
-#include "VK_Fence.h"
+#include "HBE/platforms/vk/resources/VK_Shader.h"
+#include "resources/VK_PipelineLayout.h"
+#include "VK_Context.h"
+#include "core/utility/Log.h"
 
 namespace HBE
 {
-	VK_ComputePipeline::VK_ComputePipeline(VK_Renderer* renderer, const ComputePipelineInfo& info)
-	{
-		this->renderer = renderer;
-		this->info = info;
-		this->workgroup_size = info.compute_shader->getWorkgroupSize();
-		const VK_Shader* vk_shader = dynamic_cast<VK_Shader*>(info.compute_shader);
-		layout = new VK_PipelineLayout(renderer->getDevice(), &vk_shader, 1, info.flags & COMPUTE_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR);
+    VK_ComputePipeline::VK_ComputePipeline(VK_Context* context, const ComputePipelineInfo& info)
+    {
+        alloc(context, info);
+    }
 
-		VkPipelineShaderStageCreateInfo stage{};
-		stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-		stage.stage = VK_SHADER_STAGE_COMPUTE_BIT;
-		stage.module = vk_shader->getHandle();
-		stage.pName = "main";
-		VkComputePipelineCreateInfo create_info{};
-		create_info.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
-		create_info.layout = layout->getHandle();
-		create_info.stage = stage;
+    VK_ComputePipeline::~VK_ComputePipeline()
+    {
+        release();
+    }
 
-		if (vkCreateComputePipelines(renderer->getDevice()->getHandle(), VK_NULL_HANDLE, 1, &create_info, nullptr,
-		                             &handle) != VK_SUCCESS)
+    void VK_ComputePipeline::alloc(VK_Context* context, const ComputePipelineInfo& info)
+    {
+        this->context = context;
+        VK_Shader& vk_shader = context->shaders[info.compute_shader];
+        ShaderHandle shader_handle = info.compute_shader;
+        layout.init(context, &shader_handle, 1, info.flags & COMPUTE_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR);
+
+        VkPipelineShaderStageCreateInfo stage{};
+        stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        stage.stage = VK_SHADER_STAGE_COMPUTE_BIT;
+        stage.module = vk_shader.getHandle();
+        stage.pName = "main";
+        VkComputePipelineCreateInfo create_info{};
+        create_info.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+        create_info.layout = layout.getHandle();
+        create_info.stage = stage;
+
+        work_group_size = vk_shader.getComputeWorkGroupSize();
+        if (vkCreateComputePipelines(context->device.getHandle(), VK_NULL_HANDLE, 1, &create_info, nullptr,
+                                     &handle) != VK_SUCCESS)
+        {
+            Log::error("Failed to create compute pipeline");
+        }
+    }
+
+    void VK_ComputePipeline::release()
+    {
+		if(allocated())
 		{
-			Log::error("Failed to create compute pipeline");
+			vkDestroyPipeline(context->device.getHandle(), handle, nullptr);
+			layout.release();
+			handle = VK_NULL_HANDLE;
 		}
-	}
-
-	VK_ComputePipeline::~VK_ComputePipeline()
-	{
-		vkDestroyPipeline(renderer->getDevice()->getHandle(), handle, nullptr);
-		delete layout;
-	}
+    }
 
 
-	const VK_PipelineLayout* VK_ComputePipeline::getPipelineLayout() const
-	{
-		return layout;
-	}
+    const VK_PipelineLayout& VK_ComputePipeline::getPipelineLayout() const
+    {
+        return layout;
+    }
 
-	VkPipeline VK_ComputePipeline::getHandle() const
-	{
-		return handle;
-	}
+    VkPipeline VK_ComputePipeline::getHandle() const
+    {
+        return handle;
+    }
 
-	const vec3i& VK_ComputePipeline::getWorkgroupSize() const
-	{
-		return workgroup_size;
-	}
+     vec3u VK_ComputePipeline::getWorkgroupSize() const
+    {
+        return work_group_size;
+    }
 
-	COMPUTE_PIPELINE_FLAGS VK_ComputePipeline::getFlags() const
-	{
-		return info.flags;
-	}
+    bool VK_ComputePipeline::allocated()
+    {
+        return handle != VK_NULL_HANDLE;
+    }
 }

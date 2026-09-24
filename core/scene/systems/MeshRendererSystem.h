@@ -14,13 +14,13 @@ namespace HBE
 
 	class Mesh;
 
-	class RasterizationPipelineInstance;
+	class PipelineInstance;
 
 	class RenderGraph;
 
 	class MeshRendererSystem : public System
 	{
-		event_subscription_id on_draw_subscription_id;
+		event_subscription_id on_draw_subscription_id = HBE_NULL_HANDLE;
 	public:
 		MeshRendererSystem(Scene* scene);
 

@@ -1,13 +1,17 @@
 #pragma once
-#include "core/graphics/Renderer.h"
+#include "Core.h"
+#include "core/interface/RendererInterface.h"
 #include "vulkan/vulkan.h"
-#include "VK_Semaphore.h"
-#include "unordered_map"
-#include "list"
+#include "HBE/platforms/vk/resources/VK_Semaphore.h"
 #include "array"
+#include "VK_CommandPool.h"
+#include "core/graphics/GraphicLimits.h"
 #include "dependencies/utils-collection/Event.h"
+#include "resources/VK_RasterizationPipeline.h"
 
 namespace HBE {
+	class Window;
+
 	class VK_Window;
 
 	class VK_Instance;
@@ -20,109 +24,88 @@ namespace HBE {
 
 	class VK_Swapchain;
 
-	class VK_ResourceFactory;
-
 	class VK_RenderPass;
 
 	class VK_CommandPool;
 
 	class VK_Fence;
 
-	class VK_Renderer : public Renderer {
-
-	private:
-		struct FrameState {
-			VK_Semaphore *finished_semaphore;
-			VK_Semaphore *image_available_semaphore;
+	class HB_API VK_Renderer {
+		struct SwapchainImageState {
+			VK_Semaphore finished_semaphore{};
+			VK_Semaphore image_available_semaphore{};
 		};
 
-		VK_Window *window;
-		VK_Instance *instance;
-		VK_Surface *surface;
-		VK_PhysicalDevice *physical_device;
-		VK_Device *device;
-		VK_ResourceFactory *factory;
-		VK_Swapchain *swapchain;
-		VK_CommandPool *command_pool;
-
-
-
-		uint32_t current_frame = 0;
-		uint32_t current_image = 0;
-		std::array<FrameState, MAX_FRAMES_IN_FLIGHT> frames;
-		std::vector<VK_Fence *> images_in_flight_fences;
+		std::vector<SwapchainImageState> swap_chain_image_state;
 
 		VkSampler default_sampler;
-		RasterizationTarget *main_render_target = nullptr;
-		RasterizationTarget *ui_render_target = nullptr;
-		RasterizationPipeline *screen_pipeline = nullptr;
-		RasterizationPipelineInstance *screen_pipeline_instance = nullptr;
+
+
 		bool windowResized = false;
 		bool frame_presented = false;
 
 		event_subscription_id vertical_sync_changed_subscription_id;
 		event_subscription_id window_closed_subscription_id;
 		event_subscription_id window_size_changed_subscription_id;
+
+		VK_CommandPool command_pool;
+		VK_Context *context = nullptr;
+
+		RendererResources renderer_resources;
 	public:
-		void rasterize(RasterizeCmdInfo &render_cmd_info) override;
+		Event<uint32_t> onFrameEnd;
 
-		void traceRays(TraceRaysCmdInfo &trace_rays_cmd_info) override;
+		void init(VK_Context *context);
 
-		void present(PresentCmdInfo &present_cmd_info) override;
+		void release();
 
-		void waitCurrentFrame() override;
-		void waitLastFrame() override;
+		VK_Renderer() = default;
 
-		RasterizationTarget *getDefaultRenderTarget() override;
+		~VK_Renderer() = default;
 
-		RasterizationTarget *getUIRenderTarget() override;
+		VK_Renderer(const VK_Renderer &) = delete;
 
-		void beginFrame() override;
+		VK_Renderer &operator=(const VK_Renderer &) = delete;
 
-		void endFrame() override;
+		void cmdRasterizeGraph(const RasterizeGraphCmdInfo &info);
 
-		VK_Renderer();
+		void cmdTraceRays(const TraceRaysCmdInfo &trace_rays_cmd_info);
 
-		~VK_Renderer() override;
+		void cmdPresent(const PresentCmdInfo &present_cmd_info);
 
-		const ResourceFactory *getResourceFactory() const override;
+		void cmdDispatch(const ComputeDispatchCmdInfo &compute_dispatch_cmd_info);
+
+		void cmdDispatchAsync(const ComputeDispatchCmdInfo &compute_dispatch_cmd_info);
+		void getRendererResrouces(RendererResources& resources);
+
+		void beginFrame();
+
+		void endFrame();
 
 		VK_CommandPool *getCommandPool();
 
-		VK_Device *getDevice();
-
-		uint32_t getFrameCount() const override;
+		uint32_t getFrameCount() const;
 
 		void onWindowClosed();
 
 		void onWindowSizeChange(Window *window);
 
-		void reCreateSwapchain();
+		void reCreateSwapChain();
 
-		const VK_Swapchain &getSwapchain() const;
-
-		uint32_t getCurrentFrame() const override;
-
-		const VK_Instance *getInstance() const;
+		uint32_t getCurrentFrameIndex() const;
 
 		void waitAll();
 
 		VkSampler getDefaultSampler();
 
-		GraphicLimits getLimits() override;
+		GraphicLimits getLimits();
 
-		void computeDispatch(ComputeDispatchCmdInfo &compute_dispatch_cmd_info) override;
+		FenceHandle getLastFrameFence();
 
-		Fence * getLastFrameFence() override;
+		FenceHandle getCurrentFrameFence();
 
-		Fence * getCurrentFrameFence() override;
-
+		RendererResources &getRendererResources();
 	private:
-
-		void createDefaultResources() override;
-
-
+		void createDefaultResources();
 	};
 }
-
-

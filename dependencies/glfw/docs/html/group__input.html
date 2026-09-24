@@ -735,7 +735,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >This function returns the name of the specified printable key, encoded as UTF-8. This is typically the character that key would produce without any modifier keys, intended for displaying key bindings to the user. For dead keys, it is typically the diacritic it would add to a character.</p>
+<p >This function returns the name of the specified printable key, encoded as UTF-8. This is typically the character that key would produce without any modifier keys, intended for displaying key layout_bindings to the user. For dead keys, it is typically the diacritic it would add to a character.</p>
 <p ><b>Do not use this function</b> for <a class="el" href="input_guide.html#input_char">text input</a>. You will break text input for many languages even if it happens to work for yours.</p>
 <p >If the key is <code>GLFW_KEY_UNKNOWN</code>, the scancode is used to identify the key, otherwise the scancode is ignored. If you specify a non-printable key, or <code>GLFW_KEY_UNKNOWN</code> and a scancode that maps to a non-printable key, this function returns <code>NULL</code> but does not emit an error.</p>
 <p >This behavior allows you to always pass in the arguments in the <a class="el" href="input_guide.html#input_key">key callback</a> without modification.</p>

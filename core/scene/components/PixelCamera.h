@@ -8,38 +8,37 @@
 #include "core/resource/RasterizationTarget.h"
 #include "core/scene/ecs/Component.h"
 
-namespace HBE{
+namespace HBE
+{
+    struct HB_API PixelCamera
+    {
+        COMPONENT_IDS(PixelCamera);
 
-	struct HB_API PixelCamera {
-		COMPONENT_IDS(PixelCamera);
-			PixelCamera() {};
+        mat4 projection = mat4(1.0f);
+        RasterizationTargetHandle render_target = HBE_NULL_HANDLE;
+        uint32_t layer_mask = UINT32_MAX;
+        bool active = true;
 
-			PixelCamera(const PixelCamera &other);
+    private:
+        vec2u resolution = vec2u(1920,1080);
+        float far = 1000.0f;
+        float near = -1000.0f;
 
-			bool active = true;
-			mat4 projection = mat4(1.0f);
-			uint32_t layer_mask = UINT32_MAX;
+        bool projection_dirty = true;
 
-			event_subscription_id render_target_resize_subscription_id;
-			float aspectRatio();
+    public:
+        void setResolution(vec2u resolution);
+        vec2u getResolution();
+        void setNearPlane(float near);
 
-			void setRenderTarget(RasterizationTarget *render_target);
+        void setFarPlane(float far);
 
-			RasterizationTarget *getRenderTarget();
+        float getNearPlane();
 
-			void setNearPlane(float near);
+        float getFarPlane();
 
-			void setFarPlane(float far);
+        void calculateProjection();
 
-			float getNearPlane();
-
-			float getFarPlane();
-
-			private:
-			RasterizationTarget *render_target = nullptr;
-			float near = -1000;
-			float far = 1000;
-
-			void calculateProjection(RasterizationTarget *render_target);
-	};
+        bool isProjectionDirty() const;
+    };
 }

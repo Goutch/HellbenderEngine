@@ -2,35 +2,42 @@
 
 #include "Core.h"
 #include "string"
-namespace HBE {
+
+namespace HBE
+{
 #define error(s, ...) error_(s, __LINE__,__FILE__,__func__)
+    typedef uint32_t LOG_FLAGS;
 
-	class HB_API Log {
-	public:
-		enum LOG_FLAGS{
-			PROFILE = 32,
-			DEBUG = 16,
-			MESSAGE = 8,
-			STATUS = 4,
-			WARNING = 2,
-			ERROR = 1,
-			NONE = 0,
-			ALL = 99999,
-		};
-	private:
-		static uint32_t log_flags;
-	public:
-		static void setFlags(uint32_t flags);
+    enum LOG_FLAG
+    {
+        LOG_FLAG_PROFILE = 32,
+        LOG_FLAG_DEBUG = 16,
+        LOG_FLAG_MESSAGE = 8,
+        LOG_FLAG_STATUS = 4,
+        LOG_FLAG_WARNING = 2,
+        LOG_FLAG_ERROR = 1,
+        LOG_FLAG_NONE = 0,
+        LOG_FLAG_ALL = 0xFFFFFFFF
+    };
 
-		static void debug(const std::string &s);
-		static void profile(const std::string &s);
-		static void message(const std::string &s);
+    class HB_API Log
+    {
 
-		static void status(const std::string &s);
+    private:
+        static LOG_FLAGS log_flags;
 
-		static void warning(const std::string &s);
+    public:
+        static void setFlags(uint32_t flags);
 
-		static void error_(const std::string &s, unsigned int line, std::string file, std::string function);
-		static uint32_t getFlags();
-	};
+        static void debug(const std::string& s);
+        static void profile(const std::string& s);
+        static void message(const std::string& s);
+
+        static void status(const std::string& s);
+
+        static void warning(const std::string& s);
+
+        static void error_(const std::string& s, unsigned int line, std::string file, std::string function);
+        static uint32_t getFlags();
+    };
 }

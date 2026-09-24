@@ -1,58 +1,33 @@
 #pragma once
 
 #include "Core.h"
-#include "string"
-#include "vector"
-#include "glm/glm.hpp"
-#include "Resource.h"
+#include "core/interface/RasterizationPipelineInterface.h"
+#include "core/Graphics.h"
 
-namespace HBE
-{
-	class Shader;
 
-	class Image;
+namespace HBE {
+    class PipelineInstance;
 
-	class MeshLayout;
+    class HB_API RasterizationPipeline {
+        Context &context;
+        RasterizationPipelineHandle handle = HBE_NULL_HANDLE;
+    public:
+        RasterizationPipeline();
 
-	class RasterizationTarget;
+        ~RasterizationPipeline();
 
-	typedef uint32_t RASTERIZATION_PIPELINE_FLAGS;
+        explicit RasterizationPipeline(const RasterizationPipelineInfo &info);
 
-	enum RASTERIZATION_PIPELINE_FLAG
-	{
-		RASTERIZATION_PIPELINE_FLAG_NONE = 0,
-		RASTERIZATION_PIPELINE_FLAG_CULL_BACK = 1 << 0,
-		RASTERIZATION_PIPELINE_FLAG_CULL_FRONT = 1 << 1,
-		RASTERIZATION_PIPELINE_FLAG_NO_DEPTH_TEST = 1 << 2,
-		RASTERIZATION_PIPELINE_FLAG_FRONT_COUNTER_CLOCKWISE = 1 << 3,
-		RASTERIZATION_PIPELINE_FLAG_ALLOW_EMPTY_DESCRIPTOR = 1 << 4,
-	};
+        void alloc(const RasterizationPipelineInfo &info);
 
-	struct RasterizationPipelineInfo
-	{
-		const Shader* vertex_shader = nullptr;
-		const Shader* fragment_shader = nullptr;
-		const Shader* geometry_shader = nullptr;
-		const VertexAttributeInfo* attribute_infos = nullptr;
-		const RasterizationTarget* rasterization_target = nullptr;
-		uint32_t attribute_info_count = 0;
-		VERTEX_TOPOLOGY topology = VERTEX_TOPOLOGY_TRIANGLE_LIST;
-		RASTERIZATION_PIPELINE_FLAGS flags = RASTERIZATION_PIPELINE_FLAG_NONE;
-	};
+        void allocInstance(PipelineInstance &instance);
 
-	class HB_API RasterizationPipeline : public Resource
-	{
-	public:
-		virtual ~RasterizationPipeline() = default;
+        void release();
 
-		virtual void bind() const = 0;
+        RasterizationPipelineHandle getHandle();
 
-		virtual void unbind() const = 0;
+        uint32_t getBinding(const char *name);
 
-		virtual void pushConstant(const std::string& name, const void* data) const = 0;
+    };
 
-		bool isCompatible(VertexAttributeInfo* attribute_infos, uint32_t attribute_info_count) const;
-
-		virtual RASTERIZATION_PIPELINE_FLAGS getFlags() const = 0;
-	};
 }

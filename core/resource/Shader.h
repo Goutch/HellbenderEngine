@@ -1,44 +1,27 @@
 #pragma once
 
 #include "Core.h"
-#include "string"
-#include "Resource.h"
-#include "map"
-#include "memory"
-#include "vector"
+#include "core/Graphics.h"
+#include "core/interface/ShaderInterface.h"
 
 namespace HBE {
-	enum SHADER_STAGE {
-		SHADER_STAGE_NONE,
-		SHADER_STAGE_COMPUTE,
-		SHADER_STAGE_VERTEX,
-		SHADER_STAGE_FRAGMENT,
-		SHADER_STAGE_GEOMETRY,
-		SHADER_STAGE_RAY_GEN,
-		SHADER_STAGE_RAY_MISS,
-		SHADER_STAGE_CLOSEST_HIT,
-		SHADER_STAGE_ANY_HIT,
-		SHADER_STAGE_INTERSECTION,
-	};
+    class HB_API Shader {
+        ShaderHandle handle;
+        Context &context;
 
+    public:
+        Shader();
 
-	struct ShaderInfo {
-		SHADER_STAGE stage = SHADER_STAGE_NONE;
-		std::string path = "";
-		std::string preamble = "";
-	};
+        explicit Shader(const ShaderInfo &info);
 
-	class HB_API Shader : public Resource {
-	protected:
-		vec3i workgroup_size;
-	public:
-		virtual SHADER_STAGE getStage() const = 0;
+        ~Shader();
 
-		virtual ~Shader() = default;
+        void loadGLSL(const char *path, SHADER_STAGE stage,const char* preamble = "");
 
-		static void getSource(const std::string &path, std::string &buffer);
+        void alloc(const ShaderInfo &info);
 
-		vec3i getWorkgroupSize();
-	};
+        ShaderHandle getHandle();
+
+        void release();
+    };
 }
-
