@@ -57,7 +57,7 @@ For samples take a look at the sample repository [HellbenderSamples](https://git
 - [ ] 2D transform component
 - [ ] Model animations support (very low prio, not needed right now)
 - [ ] ECS
-  - [ ] Local transformations, transformations should be able to be calculated in a separate thread. this is already possible but not really straight forward we need.
+  - [ ] Local transformations, transformations should be able to be calculated in a separate thread. this is already possible but not really straight forward.
   - [ ] Archetype caching
   - [ ] When doing parallel foreach the group should give a thread index so user can accumulate a result.
 - [ ] UI library
@@ -68,7 +68,7 @@ For samples take a look at the sample repository [HellbenderSamples](https://git
   - [ ] Panels
 - [ ] Engine Internal rework
   - [ ] Swapchain semaphores are not handled correctly, new validation layers will throw an error.
-  - [ ] Descriptor allocation need to change, use a descriptor allocator from VkGuide or something similar
+  - [x] Descriptor allocation need to change, use a descriptor allocator from VkGuide or something similar
 - [ ] Engine API rework
   - [ ] Resources
     - [x] Use Handles
