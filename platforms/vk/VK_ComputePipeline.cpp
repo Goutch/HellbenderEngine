@@ -45,9 +45,12 @@ namespace HBE
 
     void VK_ComputePipeline::release()
     {
-        vkDestroyPipeline(context->device.getHandle(), handle, nullptr);
-        layout.release();
-        handle = VK_NULL_HANDLE;
+		if(allocated())
+		{
+			vkDestroyPipeline(context->device.getHandle(), handle, nullptr);
+			layout.release();
+			handle = VK_NULL_HANDLE;
+		}
     }
 
 

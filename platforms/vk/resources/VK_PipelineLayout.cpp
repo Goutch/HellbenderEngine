@@ -59,7 +59,9 @@ namespace HBE {
 		for (int i = 0; i < descriptor_set_layouts.size(); ++i) {
 			descriptor_set_layouts[i].release();
 		}
-		vkDestroyPipelineLayout(context->device.getHandle(), handle, nullptr);
+		if(handle!= VK_NULL_HANDLE)
+			vkDestroyPipelineLayout(context->device.getHandle(), handle, nullptr);
+		handle = VK_NULL_HANDLE;
 	}
 
 	VK_PipelineLayout::VK_PipelineLayout(VK_PipelineLayout &&other) noexcept {

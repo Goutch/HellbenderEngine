@@ -209,8 +209,6 @@ namespace HBE {
 		VkRect2D scissor{};
 		scissor.offset = {0, 0};
 		scissor.extent = VkExtent2D{(uint32_t) resolution.x, (uint32_t) resolution.y};
-
-		//static_cast<VK_RenderTarget*>(render_target)->begin(command_pool.getCurrentBuffer());
 		vkCmdSetViewport(command_pool.getCurrentBuffer(), 0, 1, &viewport);
 		vkCmdSetScissor(command_pool.getCurrentBuffer(), 0, 1, &scissor);
 		UniformBufferObject ubo{};
@@ -349,10 +347,11 @@ namespace HBE {
 		frame_presented = true;
 		uint32_t frame_index = command_pool.getCommandBufferIndex();
 		uint32_t current_swapchain_image_index = 0;
+		uint32_t swapchain_state_index = frame_index % swap_chain_image_state.size();
 		VkResult result = vkAcquireNextImageKHR(context->device.getHandle(),
 		                                        context->swapchain.getHandle(),
 		                                        UINT64_MAX,
-		                                        swap_chain_image_state[frame_index].image_available_semaphore.getHandle(),
+		                                        swap_chain_image_state[swapchain_state_index].image_available_semaphore.getHandle(),
 		                                        VK_NULL_HANDLE,
 		                                        &current_swapchain_image_index);
 
@@ -425,9 +424,9 @@ namespace HBE {
 		command_pool.end();
 		HB_PROFILE_END("screenRenderPass");
 
-		VkSemaphore wait_semaphores[] = {swap_chain_image_state[frame_index].image_available_semaphore.getHandle()};
+		VkSemaphore wait_semaphores[] = {swap_chain_image_state[swapchain_state_index].image_available_semaphore.getHandle()};
 		VkPipelineStageFlags stages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-		VkSemaphore signal_semaphores[] = {swap_chain_image_state[frame_index].finished_semaphore.getHandle()};
+		VkSemaphore signal_semaphores[] = {swap_chain_image_state[swapchain_state_index].finished_semaphore.getHandle()};
 
 		HB_PROFILE_BEGIN("SubmitCommandBuffer");
 		command_pool.submit(context->device.getQueue(QUEUE_FAMILY_GRAPHICS),

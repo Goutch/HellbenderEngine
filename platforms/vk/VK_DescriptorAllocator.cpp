@@ -25,8 +25,8 @@ namespace HBE {
 									   DescriptorSetAllocation *allocation_buffer,
 									   uint32_t count,
 									   uint32_t* variable_descriptor_counts) {
-		HB_ASSERT(count <= 32, "Cannot allocate more than 32 descriptor sets at once (could easily be changed to a dynamic array if needed)");
-		VkDescriptorSetLayout pipeline_layout_handles[32];
+		RawVector<VkDescriptorSetLayout> pipeline_layout_handles;
+		pipeline_layout_handles.resize(count);
 		VK_DescriptorPoolSize required_pool_sizes;
 		for (int i = 0; i < count; ++i) {
 			uint32_t set_layout_index = set_layout_indices[i];
@@ -46,7 +46,7 @@ namespace HBE {
 
 		VkDescriptorSetAllocateInfo alloc_info{};
 		alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		alloc_info.pSetLayouts = pipeline_layout_handles;
+		alloc_info.pSetLayouts = pipeline_layout_handles.data();
 		alloc_info.descriptorSetCount = count;
 		alloc_info.descriptorPool = pools[pool_index].handle;
 		VkDescriptorSetVariableDescriptorCountAllocateInfo variable_count_info{};

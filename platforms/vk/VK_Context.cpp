@@ -37,20 +37,12 @@ namespace HBE {
 		device.wait();
 		renderer.release();
 		allocator.processFreeRequests(0);
-		swapchain.release();
-		descriptor_allocator.release();
-		allocator.release();
-		device.release();
-		physical_device.release();
-		surface.release();
-		instance.release();
 
 		releaseStableHandleContainerObjects(shaders);
 		releaseStableHandleContainerObjects(pipeline_instances);
 		releaseStableHandleContainerObjects(rasterization_pipelines);
 		releaseStableHandleContainerObjects(raytracing_pipelines);
 		releaseStableHandleContainerObjects(compute_pipelines);
-
 		releaseStableHandleContainerObjects(rasterization_targets);
 		releaseStableHandleContainerObjects(root_acceleration_structures);
 		releaseStableHandleContainerObjects(aabb_acceleration_structures);
@@ -59,6 +51,17 @@ namespace HBE {
 		releaseStableHandleContainerObjects(images);
 		releaseStableHandleContainerObjects(texel_buffers);
 		releaseStableHandleContainerObjects(buffers);
+
+		allocator.processFreeRequests(0);
+		swapchain.release();
+		descriptor_allocator.release();
+		allocator.release();
+		device.release();
+		physical_device.release();
+		surface.release();
+		instance.release();
+
+		//all the above use fences
 		releaseStableHandleContainerObjects(fences);
 
 		return HBE_RESULT_SUCCESS;

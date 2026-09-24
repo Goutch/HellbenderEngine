@@ -8,7 +8,7 @@ namespace HBE {
 	class VK_TopLevelAccelerationStructure {
 		VK_Context *context;
 		VkAccelerationStructureKHR handle;
-		VK_Buffer buffer;
+		BufferHandle buffer;
 		VkDeviceOrHostAddressConstKHR address{};
 	public:
 		void alloc(VK_Context *context,const  RootAccelerationStructureInfo& info);

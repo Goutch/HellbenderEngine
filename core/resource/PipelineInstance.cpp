@@ -25,8 +25,16 @@ namespace HBE
 
     void PipelineInstance::release()
     {
-        if (handle != HBE_NULL_HANDLE)
-            context.releasePipelineInstance(handle);
+        if (allocated())
+        {
+	        context.releasePipelineInstance(handle);
+			handle = HBE_NULL_HANDLE;
+		}
+	}
+
+	bool PipelineInstance::allocated() const
+	{
+		return handle != HBE_NULL_HANDLE;
     }
 
     PipelineInstanceHandle PipelineInstance::getHandle() const

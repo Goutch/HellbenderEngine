@@ -135,7 +135,7 @@ namespace HBE {
 		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseRasterizationTarget, FUNC_PARAMS(RasterizationTargetHandle& handle), FUNC_ARGS(handle), rasterization_targets);
 		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseRasterizationPipeline, FUNC_PARAMS(RasterizationPipelineHandle& handle), FUNC_ARGS(handle), rasterization_pipelines);
 		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseComputePipeline, FUNC_PARAMS(ComputePipelineHandle& handle), FUNC_ARGS(handle), compute_pipelines);
-		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseRaytracingPipeline, FUNC_PARAMS(RaytracingPipelineHandle& handle), FUNC_ARGS(handle), rasterization_pipelines);
+		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseRaytracingPipeline, FUNC_PARAMS(RaytracingPipelineHandle& handle), FUNC_ARGS(handle), raytracing_pipelines);
 		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseRootAccelerationStructure, FUNC_PARAMS(RootAccelerationStructureHandle& handle), FUNC_ARGS(handle), root_acceleration_structures);
 		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseAABBAccelerationStructure, FUNC_PARAMS(AABBAccelerationStructureHandle& handle), FUNC_ARGS(handle), aabb_acceleration_structures);
 		VK_CONTEXT_RELEASE_API_FUNC(HBE_RESULT, releaseMeshAccelerationStructure, FUNC_PARAMS(MeshAccelerationStructureHandle& handle), FUNC_ARGS(handle), mesh_acceleration_structures);

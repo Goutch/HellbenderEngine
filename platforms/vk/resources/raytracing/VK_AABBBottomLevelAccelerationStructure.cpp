@@ -125,7 +125,8 @@ namespace HBE {
         aabb_positions_buffer.release();
         buffer.release();
         context->device.vkDestroyAccelerationStructureKHR(context->device.getHandle(), handle, nullptr);
-    }
+        handle = VK_NULL_HANDLE;
+	}
 
     bool VK_AABBBottomLevelAccelerationStructure::allocated() {
         return handle != VK_NULL_HANDLE;

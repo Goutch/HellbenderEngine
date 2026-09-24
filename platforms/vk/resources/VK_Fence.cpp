@@ -17,6 +17,7 @@ namespace HBE {
 	}
 
 	void VK_Fence::release() {
+		if (!allocated()) return;
 		vkDestroyFence(context->device.getHandle(), handle, nullptr);
 		handle = VK_NULL_HANDLE;
 	}

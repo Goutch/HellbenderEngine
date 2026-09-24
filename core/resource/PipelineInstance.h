@@ -53,5 +53,7 @@ namespace HBE
         void dispatchAsync(uint32_t size_x, uint32_t size_y, uint32_t size_z);
         bool isDispatchFinished();
         void wait();
+
+	    bool allocated() const;
     };
 }

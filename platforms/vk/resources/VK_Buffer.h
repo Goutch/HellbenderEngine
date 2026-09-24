@@ -29,7 +29,7 @@ namespace HBE {
         void alloc(VK_Context *context, VK_BufferInfo &info);
 
         void release();
-
+		~VK_Buffer();
         VK_Buffer(VK_Buffer &) = delete;
 
         VK_Buffer &operator=(const VK_Buffer &) = delete;

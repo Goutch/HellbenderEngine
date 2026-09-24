@@ -12,6 +12,7 @@ namespace HBE {
     }
 
     void VK_TopLevelAccelerationStructure::alloc(VK_Context *context, const RootAccelerationStructureInfo &info) {
+	    this->context = context;
         VK_Device *device = &context->device;
         HB_PROFILE_BEGIN("Build root Acceleration Structure");
         std::vector<VkAccelerationStructureInstanceKHR> instances;
@@ -95,11 +96,12 @@ namespace HBE {
         buffer_info.size = accelerationStructureBuildSizesInfo.accelerationStructureSize;
         buffer_info.usage = VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
         buffer_info.preferred_memory_type_flag = info.preferred_memory_type_flags;
-        buffer.alloc(context, buffer_info);
+		buffer = context->buffers.create();
+	    context->buffers[buffer].alloc(context, buffer_info);
 
         VkAccelerationStructureCreateInfoKHR accelerationStructureCreateInfo{};
         accelerationStructureCreateInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR;
-        accelerationStructureCreateInfo.buffer = buffer.getVkHandle();
+        accelerationStructureCreateInfo.buffer = context->buffers[buffer].getVkHandle();
         accelerationStructureCreateInfo.size = accelerationStructureBuildSizesInfo.accelerationStructureSize;
         accelerationStructureCreateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR;
         device->vkCreateAccelerationStructureKHR(device->getHandle(), &accelerationStructureCreateInfo, nullptr, &handle);
@@ -153,8 +155,11 @@ namespace HBE {
     }
 
     void VK_TopLevelAccelerationStructure::release() {
-        context->device.vkDestroyAccelerationStructureKHR(context->device.getHandle(), handle, nullptr);
-        buffer.release();
+		if(handle != VK_NULL_HANDLE)
+		{
+			context->device.vkDestroyAccelerationStructureKHR(context->device.getHandle(), handle, nullptr);
+			context->releaseBuffer(buffer);
+		}
         handle = VK_NULL_HANDLE;
     }
 

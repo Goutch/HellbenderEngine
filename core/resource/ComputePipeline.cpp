@@ -21,8 +21,7 @@ namespace HBE{
 
 	void ComputePipeline::release() {
 		if (handle != HBE_NULL_HANDLE)
-			context.releaseRasterizationPipeline(handle);
-		context.releaseComputePipeline(handle);
+			context.releaseComputePipeline(handle);
 	}
 
 	ComputePipelineHandle ComputePipeline::getHandle() {

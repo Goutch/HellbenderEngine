@@ -92,7 +92,9 @@ namespace HBE {
 	}
 
 	void VK_DescriptorSetLayout::release() {
-		vkDestroyDescriptorSetLayout(context->device.getHandle(), handle, nullptr);
+		if(handle != VK_NULL_HANDLE)
+			vkDestroyDescriptorSetLayout(context->device.getHandle(), handle, nullptr);
+		handle = VK_NULL_HANDLE;
 	}
 
 

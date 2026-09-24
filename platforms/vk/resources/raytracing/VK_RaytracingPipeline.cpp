@@ -118,14 +118,15 @@ namespace HBE
 
     void VK_RaytracingPipeline::release()
     {
-        pipeline_layout.release();
-        pipeline_layout.release();
-        shader_binding_table_buffer.release();
-        raygen_shader_binding_table_buffer.release();
-        miss_shader_binding_table_buffer.release();
-        hit_shader_binding_table_buffer.release();
-        vkDestroyPipeline(context->device.getHandle(), handle, nullptr);
-        handle = VK_NULL_HANDLE;
+		if(allocated())
+		{
+			pipeline_layout.release();
+			raygen_shader_binding_table_buffer.release();
+			miss_shader_binding_table_buffer.release();
+			hit_shader_binding_table_buffer.release();
+			vkDestroyPipeline(context->device.getHandle(), handle, nullptr);
+			handle = VK_NULL_HANDLE;
+		}
     }
 
     void VK_RaytracingPipeline::alloc(VK_Context* context, const RaytracingPipelineInfo& info)

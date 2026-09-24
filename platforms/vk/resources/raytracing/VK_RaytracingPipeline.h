@@ -24,7 +24,6 @@ namespace HBE
 
         VkPipeline handle;
         VK_PipelineLayout pipeline_layout{};
-        VK_Buffer shader_binding_table_buffer{};
         ShaderHandle* any_hit_shaders;
         uint32_t any_hit_shader_count;
 

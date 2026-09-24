@@ -67,10 +67,13 @@ namespace HBE {
 #ifdef DEBUG_MODE
 		Log::debug("Delete buffer " + VK_Utils::handleToString(handle));
 #endif
-		HB_ASSERT(allocated(), "VK_Buffer is not allocated and you are trying to release it");
-		allocator->free(allocation);
-		vkDestroyBuffer(device->getHandle(), handle, nullptr);
-		size = 0;
+		if(allocated())
+		{
+			allocator->free(allocation);
+			vkDestroyBuffer(device->getHandle(), handle, nullptr);
+			handle = VK_NULL_HANDLE;
+			size = 0;
+		}
 	}
 
 	VK_Buffer::VK_Buffer(VK_Buffer &&other) noexcept {
@@ -146,5 +149,11 @@ namespace HBE {
 		allocation = {};
 		handle = VK_NULL_HANDLE;
 		size = 0;
+	}
+
+	VK_Buffer::~VK_Buffer() {
+		if (allocated()) {
+			release();
+		}
 	}
 }
