@@ -4,7 +4,7 @@
 #include "core/scene/Scene.h"
 
 namespace HBE {
-	class CameraControllerSystem : public System {
+	class HB_API CameraControllerSystem : public System {
 		event_subscription_id update_subscription_id;
 		event_subscription_id detach_subscription_id;
 		event_subscription_id attach_subscription_id;
