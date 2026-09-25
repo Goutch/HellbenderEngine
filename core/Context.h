@@ -110,11 +110,7 @@ namespace HBE {
 
         //Buffers
         CONTEXT_API_FUNC(HBE_RESULT, updateBuffer, FUNC_PARAMS(BufferHandle handle,const void* data),FUNC_ARGS(handle,data));
-	    CONTEXT_API_FUNC(HBE_RESULT, getStorageBufferCount, FUNC_PARAMS(BufferHandle handle,const void* data),FUNC_ARGS(handle,data));
-
-	    uint32_t getStorageBufferCount(BufferHandle handle) {
-		    return 0;
-	    }
+	    CONTEXT_API_FUNC(HBE_RESULT, resizeBuffer, FUNC_PARAMS(BufferHandle handle,BufferInfo& info), FUNC_ARGS(handle,info));
 
 
     };

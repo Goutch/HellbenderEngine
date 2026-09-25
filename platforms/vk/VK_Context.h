@@ -174,6 +174,7 @@ namespace HBE {
 
 		//Buffers
 		VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, updateBuffer, FUNC_PARAMS(BufferHandle handle,const void* data), FUNC_ARGS(handle,data), buffers, update, FUNC_ARGS(data));
+		VK_CONTEXT_MEMBER_CALL_API_FUNC(HBE_RESULT, resizeBuffer, FUNC_PARAMS(BufferHandle handle,BufferInfo& info), FUNC_ARGS(handle,data), buffers, resize, FUNC_ARGS(info));
 
 		HBE_RESULT getGraphicLimits(GraphicLimits &graphic_limits) {
 			graphic_limits = this->graphic_limits;

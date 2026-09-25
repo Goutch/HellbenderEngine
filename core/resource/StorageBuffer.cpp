@@ -19,6 +19,7 @@ namespace HBE {
 	}
 
 	void StorageBuffer::alloc(const BufferInfo &info) {
+		count = info.count;
 		BufferInfo info_copy = info;
 		info_copy.usage |= BUFFER_USAGE_FLAG_STORAGE_BUFFER;
 		context.createBuffer(handle, info_copy);
@@ -29,6 +30,7 @@ namespace HBE {
 	}
 
 	void StorageBuffer::release() {
+		count = 0;
 		context.releaseBuffer(handle);
 		handle = HBE_NULL_HANDLE;
 	}
@@ -46,6 +48,11 @@ namespace HBE {
 	}
 
 	uint32_t StorageBuffer::getCount() {
-		return context.getStorageBufferCount(handle);
+		return count;
+	}
+
+	void StorageBuffer::resize(BufferInfo &info) {
+		count = info.count;
+		context.resizeBuffer(handle, info);
 	}
 }

@@ -19,6 +19,7 @@ namespace HBE {
 
     class VK_Buffer {
         VK_Allocator *allocator;
+	    VK_Context *context;
         VK_Device *device;
         VkBuffer handle = VK_NULL_HANDLE;
         Allocation allocation;
@@ -57,5 +58,9 @@ namespace HBE {
         VkDeviceOrHostAddressConstKHR getDeviceAddress() const;
 
         void map(void *data);
+
+	    void releaseLater();
+
+	    void resize(BufferInfo &info);
     };
 }
