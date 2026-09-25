@@ -140,10 +140,10 @@ namespace HBE {
 			writes[binding] = write;
 		}
 
-		buffer_infos.resize(layout_bindings.size() * MAX_FRAMES_IN_FLIGHT, nullptr);
-		image_infos.resize(layout_bindings.size() * MAX_FRAMES_IN_FLIGHT, nullptr);
-		buffer_views.resize(layout_bindings.size() * MAX_FRAMES_IN_FLIGHT, nullptr);
-		acceleration_structure_infos.resize(layout_bindings.size() * MAX_FRAMES_IN_FLIGHT, {});
+		buffer_infos.resize(layout_bindings.size(), nullptr);
+		image_infos.resize(layout_bindings.size(), nullptr);
+		buffer_views.resize(layout_bindings.size(), nullptr);
+		acceleration_structure_infos.resize(layout_bindings.size(), {});
 
 		RendererResources &renderer_resources = context->renderer.getRendererResources();
 		for (int binding = 0; binding < writes.size(); ++binding) {
@@ -438,14 +438,13 @@ namespace HBE {
 		const VkDescriptorSetLayoutBinding &descriptorSetLayoutBinding = pipeline_layout->getDescriptorBindings()[binding];
 		HB_ASSERT(descriptorSetLayoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, "binding#" + std::to_string(binding) + " is not a storage buffer");
 
-		uint32_t write_index = getBindingIndexForFrame(binding);
 		VK_Buffer &vk_buffer = context->buffers[buffer];
 
-		buffer_infos[write_index]->buffer = vk_buffer.getVkHandle();
-		buffer_infos[write_index]->offset = byte_offset;
-		buffer_infos[write_index]->range = vk_buffer.getSize();
+		buffer_infos[binding]->buffer = vk_buffer.getVkHandle();
+		buffer_infos[binding]->offset = byte_offset;
+		buffer_infos[binding]->range = vk_buffer.getSize();
 
-		writes[write_index].pBufferInfo = buffer_infos[write_index];
+		writes[binding].pBufferInfo = buffer_infos[binding];
 
 		setBindingDirty(binding);
 	}

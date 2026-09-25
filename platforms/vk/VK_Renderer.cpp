@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "VK_Renderer.h"
 
 #define GLFW_INCLUDE_VULKAN
@@ -264,10 +265,10 @@ namespace HBE {
 				}
 				if (mesh.getIndicesCount() != 0) {
 					vkCmdDrawIndexed(command_pool.getCurrentBuffer(), mesh.getIndicesCount(),
-					                 mesh.getInstanceCount(), 0, 0, 0);
+					                 glm::max(mesh.getInstanceCount(),current_cmd.instance_count), 0, 0, 0);
 				} else {
 					vkCmdDraw(command_pool.getCurrentBuffer(), mesh.getVertexCount(),
-					          mesh.getInstanceCount(), 0, 0);
+					          glm::max(mesh.getInstanceCount(),current_cmd.instance_count), 0, 0);
 				}
 				if (i != cache.size() - 1) {
 					if (cache[i + 1].mesh != current_cmd.mesh) {

@@ -29,6 +29,7 @@ namespace HBE {
 	}
 
 	void VK_Buffer::alloc(VK_Context *context, VK_BufferInfo &info) {
+		this->context = context;
 		this->device = &context->device;
 		this->allocator = &context->allocator;
 
@@ -73,6 +74,31 @@ namespace HBE {
 			vkDestroyBuffer(device->getHandle(), handle, nullptr);
 			handle = VK_NULL_HANDLE;
 			size = 0;
+		}
+	}
+
+
+	void VK_Buffer::resize(BufferInfo &info)
+	{
+		VkDeviceSize size = info.count * info.stride;
+		if (this->size != size) {
+			releaseLater();
+			alloc(context,info);
+		}
+	}
+	void VK_Buffer::releaseLater()
+	{
+#ifdef DEBUG_MODE
+		Log::debug("Delete buffer later " + VK_Utils::handleToString(handle));
+#endif
+		if(allocated())
+		{
+			ReleaseRequest release_request{};
+			release_request.allocation = allocation;
+			release_request.vk_buffer = handle;
+			release_request.fence = context->renderer.getCurrentFrameFence();
+			allocator->releaseLater(release_request);
+			reset();
 		}
 	}
 

@@ -54,6 +54,7 @@ namespace HBE {
 		uint32_t layer = 0;
 		uint32_t order_in_layer = 0; //ignored if ordered flag is not set
 		uint32_t push_constants_count = 0;
+		uint32_t instance_count = 1;
 		PushConstantInfo *push_constants = nullptr;
 		DRAW_CMD_FLAGS flags = DRAW_CMD_FLAG_NONE;
 	};
