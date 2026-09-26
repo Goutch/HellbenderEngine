@@ -21,7 +21,6 @@ namespace HBE {
         uint32_t width = 0, height = 0;
         vec4 clear_color = vec4(0.f, 0.f, 0.f, 1.f);
         VkExtent2D extent;
-
         std::vector<ImageHandle> depth_images;
         std::vector<ImageHandle> images;
         std::vector<VkFramebuffer> frame_buffers;
@@ -58,8 +57,6 @@ namespace HBE {
         void setResolution(vec2u resolution);
 
         void getResolution(vec2u& resolution) const;
-
-        void recreate();
 
 	    void getFramebufferTexture(ImageHandle &image);
 

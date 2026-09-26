@@ -32,7 +32,8 @@ namespace HBE {
 		}
 
 		std::tuple<entity_handle, Components &...> operator*() {
-			entity_handle handle = page_entity_references[current_page][current_entity_handle_index];
+			RawVector<entity_handle>& page = page_entity_references[current_page];
+			entity_handle handle = page[current_entity_handle_index];
 			return pools_data[current_page].createTuple(handle);
 		}
 

@@ -69,7 +69,6 @@ namespace HBE {
 			width = 1;
 			height = 1;
 		}
-		command_pool.waitAll();
 		command_pool.clear();
 
 		context->swapchain.recreate(width, height);

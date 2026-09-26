@@ -8,9 +8,6 @@
 #include "HBE/platforms/vk/VK_Utils.h"
 
 namespace HBE {
-	void VK_RenderPass::recreate() {
-		release();
-	}
 
 	void VK_RenderPass::setClearColor(vec4 color) {
 		this->clear_color = color;
@@ -267,7 +264,14 @@ namespace HBE {
 		this->width = resolution.x > 0 ? resolution.x : 1;
 		this->height = resolution.y > 0 ? resolution.y : 1;
 
-		recreate();
+		release();
+		RasterizationTargetInfo info{};
+		info.width = width;
+		info.height = height;
+		info.format = format;
+		info.clear_color = clear_color;
+		info.flags = flags;
+		alloc(context, info);
 	}
 
 	void VK_RenderPass::getResolution(vec2u &resolution) const {
